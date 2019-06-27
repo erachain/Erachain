@@ -16,7 +16,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
     private String name;
     private long timeout;
-    private String[] columnNames;
+    protected String[] columnNames;
     private Timer timer;
     protected boolean needUpdate;
     protected boolean descending;
@@ -145,6 +145,10 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
     public int getRowCount() {
         return (this.list == null) ? 0 : this.list.size();
+    }
+
+    public boolean isEmpty() {
+        return (this.list == null) ? true : this.list.isEmpty();
     }
 
     public abstract Object getValueAt(int row, int column);

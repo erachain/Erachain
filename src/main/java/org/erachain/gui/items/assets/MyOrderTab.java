@@ -1,14 +1,24 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
 import org.erachain.gui.models.WalletOrdersTableModel;
+import org.erachain.gui.transaction.CreateOrderDetailsFrame;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -71,6 +81,22 @@ public class MyOrderTab extends SplitPanel {
         this.jTableJScrollPanelLeftPanel = new MTable(ordersModel);
         // this.jTableJScrollPanelLeftPanel = table;
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point point = e.getPoint();
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
+
+                Fun.Tuple2<Long, Order> itemTableSelected = ordersModel.getItem(row);
+
+                if (e.getClickCount() == 2) {
+                    tableMouse2Click(itemTableSelected.b);
+                }
+
+            }
+        });
+
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
@@ -98,8 +124,8 @@ public class MyOrderTab extends SplitPanel {
         });
 
         // MENU
-        JPopupMenu assetsMenu = new JPopupMenu();
-        assetsMenu.addAncestorListener(new AncestorListener() {
+        JPopupMenu orderMenu = new JPopupMenu();
+        orderMenu.addAncestorListener(new AncestorListener() {
 
             @Override
             public void ancestorAdded(AncestorEvent arg0) {
@@ -127,67 +153,70 @@ public class MyOrderTab extends SplitPanel {
 
         });
 
-        JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
-        favorite.addActionListener(new ActionListener() {
+        JMenuItem orderDetails = new JMenuItem(Lang.getInstance().translate("Details"));
+        orderDetails.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                favorite_set(jTableJScrollPanelLeftPanel);
+                if (ordersModel.getSortableList().isEmpty())
+                    return;
+
+                Order order = ordersModel.getItem(row).b;
+                Transaction createOrder = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
+
+                IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, createOrder,
+                        (int) (MainFrame.getInstance().getWidth() / 1.2),
+                        (int) (MainFrame.getInstance().getHeight() / 1.2),
+                        "");
+
+                CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
+                dd.jScrollPane1.setViewportView(ww);
+                dd.setLocationRelativeTo(null);
+                dd.pack();
+                dd.setVisible(true);
 
             }
         });
+        orderMenu.add(orderDetails);
 
-        assetsMenu.addPopupMenuListener(new PopupMenuListener() {
-
-            @Override
-            public void popupMenuCanceled(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                // TODO Auto-generated method stub
-
-                row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
-
-            }
-
-        }
-
-        );
-
-        assetsMenu.add(favorite);
-
-        JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
-        details.addActionListener(new ActionListener() {
+        // MENU on MY ORDERS
+        JMenuItem orderTrades = new JMenuItem(Lang.getInstance().translate("Trades"));
+        orderTrades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                // AssetCls asset = assetsModel.getAsset(row);
-                // new AssetFrame(asset);
+                Order order = ordersModel.getItem(row).b;
+                if (order != null)
+                    new TradesFrame(order, false);
             }
         });
-        // assetsMenu.add(details);
-        JMenuItem dividend = new JMenuItem(Lang.getInstance().translate("Pay dividend"));
-        dividend.addActionListener(new ActionListener() {
+        orderMenu.add(orderTrades);
+
+        JMenuItem cancelOrder = new JMenuItem(Lang.getInstance().translate("Cancel"));
+        cancelOrder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                // AssetCls asset = assetsModel.getAsset(row);
-                // new PayDividendFrame(asset);
+                Order order = ordersModel.getItem(row).b;
+                new CancelOrderFrame(order);
             }
         });
-        assetsMenu.add(dividend);
+        orderMenu.add(cancelOrder);
+
+        JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        exchange.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                tableMouse2Click(ordersModel.getItem(row).b);
+
+            }
+        });
+        orderMenu.add(exchange);
+
+
         // table.setComponentPopupMenu(assetsMenu);
-        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, assetsMenu); // SELECT
+        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, orderMenu); // SELECT
                                                                                                // ROW
                                                                                                // ON
                                                                                                // WHICH
@@ -211,6 +240,13 @@ public class MyOrderTab extends SplitPanel {
                 Point p = e.getPoint();
                 int row = jTableJScrollPanelLeftPanel.rowAtPoint(p);
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
+
+                Order order = ordersModel.getItem(row).b;
+                if (order.state() == "Active")
+                    orderMenu.getComponent(2).setEnabled(true);
+                else
+                    orderMenu.getComponent(2).setEnabled(false);
+
                 /*
                  * if(e.getClickCount() == 2) { row =
                  * table.convertRowIndexToModel(row); AssetCls asset =
@@ -232,21 +268,6 @@ public class MyOrderTab extends SplitPanel {
             }
         });
 
-    }
-
-    public void onIssueClick() {
-        new IssueAssetFrame();
-    }
-
-    public void onAllClick() {
-        new AllAssetsFrame();
-    }
-
-    public void onMyOrdersClick() {
-        new MyOrdersFrame();
-    }
-
-    public void favorite_set(JTable assetsTable) {
     }
 
     // CreateOrderDetailsFrame
@@ -299,6 +320,13 @@ public class MyOrderTab extends SplitPanel {
         setIntervalPanel.deleteObservers();
         
     }
-    
+
+    protected void tableMouse2Click(Order order) {
+
+        String action = null;
+        ExchangePanel panel = new ExchangePanel(order.getHaveAsset(), order.getWantAsset(), action, "");
+        panel.setName(order.getHaveAsset().getShortName() + "/" + order.getWantAsset().getShortName());
+        MainPanel.getInstance().insertTab(panel);
+    }
 
 }

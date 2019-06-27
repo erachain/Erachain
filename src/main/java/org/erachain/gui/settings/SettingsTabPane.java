@@ -47,7 +47,7 @@ public class SettingsTabPane extends JTabbedPane {
 
         rates_Setting_Panel = new RatesSettingPanel();
         JScrollPane scrollPane6 = new JScrollPane(rates_Setting_Panel);
-        this.addTab(Lang.getInstance().translate("Rates Settings"), scrollPane6);
+        this.addTab(Lang.getInstance().translate("Exchange"), scrollPane6);
     }
 
     public void close() {

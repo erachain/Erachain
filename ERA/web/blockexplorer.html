@@ -646,7 +646,9 @@ button.white-bgc[disabled]:focus,
 
         function addresses(data) {
 
-            var output = data.message;
+            var output = lastBlock(data.lastBlock);
+            //output += data.message;
+
             return output;
 
         }
@@ -863,10 +865,6 @@ button.white-bgc[disabled]:focus,
             output += '<b>Description:</b><br>' + fformat(data.pool.description) + '<br><br>';
 
             output += '<b>Creator:</b> <a href=?address=' + data.pool.creator + get_lang() + '>' + data.pool.creator + '</a><br><br>';
-
-            if (data.pool.hasOwnProperty('dateTime')) {
-                output += '<b>Creation date:</b> ' + data.pool.dateTime + '<br><br>';
-            }
 
             output += '<table border="0" cellspacing="5" class="table">';
             output += '<tr><td><b>Option</b></td><td><b>Votes</b></td><td width="390"><b>% of total</b></td></tr>';
@@ -1461,7 +1459,7 @@ button.white-bgc[disabled]:focus,
                         output += '<td align=right width=250>Height: <a href=?block=' + data[i].block.height + get_lang() + '>' + data[i].block.height + '</a>';
                         output += ' / confirmations: ' + data[i].block.confirmations + '</td>';
 
-                        output += '<td align=right width=200>' + data[i].block.dateTime + '</td></tr></table>';
+                        output += '<td align=right width=200>' + convertTimestamp(data.pageItems[i].timestamp, true) + '</td></tr></table>';
 
                         output += '<tr><td>';
                         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -1498,7 +1496,8 @@ button.white-bgc[disabled]:focus,
                         output += (data[i].trade.initiatorTxSignature + '/' + data[i].trade.targetTxSignature).substr(0, 100) + '...</a></td>';
                         output += '<td align=right width=250>Height: <a href=?block=' + data[i].trade.height + get_lang() + '>' + data[i].trade.height + '</a>';
                         output += ' / confirmations: ' + data[i].trade.confirmations + '</td>';
-                        output += '<td align=right width=200>' + data[i].trade.dateTime + '</td></tr></table>';
+                        convertTimestamp(data.pageItems[i].timestamp, true)
+                        output += '<td align=right width=200>' + convertTimestamp(data[i].trade.timestamp, true) + '</td></tr></table>';
 
                         output += '<tr><td>';
                         output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
@@ -1595,7 +1594,7 @@ button.white-bgc[disabled]:focus,
                             output += ' / confirmations: ' + data[i].atTransaction.confirmations;
                         }
                         output += '</td>';
-                        output += '<td align=right width=200>' + data[i].atTransaction.dateTime + '</td></tr></table>';
+                        output += '<td align=right width=200>' + convertTimestamp(data[i].atTransaction.timestamp, true) + '</td></tr></table>';
 
                         output += '<tr><td>';
 
@@ -1972,7 +1971,7 @@ button.white-bgc[disabled]:focus,
 
             var output = '';
             output += lastBlock.label_Last_processed_block + ': <a href=?block=' + lastBlock.height + get_lang() + '>' + lastBlock.height + '</a>';
-            output += ' (' + lastBlock.dateTime + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' + lastBlock.label_ago + ') ';
+            output += ' (' + convertTimestamp(lastBlock.timestamp, true) + ', ' + secToFine(new Date().getTime() - lastBlock.timestamp, lastBlock) + '  ' + lastBlock.label_ago + ') ';
             output += '<br>';
 
             return output;
@@ -2045,7 +2044,7 @@ button.white-bgc[disabled]:focus,
                 output += '<tr>' +
                     '<td><a href=?block=' + data.pageItems[i].height + get_lang() + '>' + data.pageItems[i].height + '</a>' +
                     '<td>' + addCommas(data.pageItems[i].target) +
-                    '<td>' + data.pageItems[i].dateTime +
+                    '<td>' + convertTimestamp(data.pageItems[i].timestamp, true) +
                     '<td>' + '<a href=?address=' + data.pageItems[i].generator + get_lang() + '>' + data.pageItems[i].generator +
                     '<td>' + addCommas(data.pageItems[i].generatingBalance) +
                     '<td>' + data.pageItems[i].deltaHeight +
@@ -2068,7 +2067,7 @@ button.white-bgc[disabled]:focus,
 
         function transactions(data) {
 
-            return transactions_Table(data);
+            return lastBlock(data.lastBlock) + transactions_Table(data);
         }
 
         function assets(data) {

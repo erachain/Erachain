@@ -1,10 +1,12 @@
 function person_asset(data) {
-    var output = '';
+
+    var output = lastBlock(data.lastBlock);
+
     if (data.error != null) {
         return data.error;
     }
 
-    output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
     output += '<tr><td align=left>';
     output += '<table><tr><td>';
 
@@ -38,12 +40,14 @@ function person_asset(data) {
 }
 
 function person_status(data) {
-    var output = '';
+
+    var output = lastBlock(data.lastBlock);
+
     if (data.error != null) {
         return data.error;
     }
 
-    output = '<table id=last BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output += '<table id=last BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
     output += '<tr><td align=left>';
     output += '<table><tr><td>';
 
@@ -121,7 +125,8 @@ function person_status(data) {
 
 function person(data) {
 
-    var output = '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    var output = lastBlock(data.lastBlock);
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
     output += '<tr><td align=left>';
     output += '<table><tr><td>';
 

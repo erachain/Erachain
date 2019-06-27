@@ -3,13 +3,11 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
-import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
@@ -18,69 +16,60 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_TYPE = 1;
-    public static final int COLUMN_AMOUNT = 2;
-    public static final int COLUMN_PRICE = 3;
-    public static final int COLUMN_AMOUNT_WANT = 4;
+    public static final int COLUMN_AMOUNT_WHO = 1;
+    public static final int COLUMN_PRICE = 2;
+    public static final int COLUMN_WHO_AMOUNT = 3;
 
-    private SortableList<Tuple2<Long, Long>, Trade> trades;
     private Order order;
+    private boolean isSell;
 
-    public OrderTradesTableModel(Order order) {
-        super(new String[]{"Timestamp", "Type", "Amount", "Price", "Total"}, true);
+    /**
+     * Ордера которые погрызли данный
+     * @param order
+     * @param isSell
+     */
+    public OrderTradesTableModel(Order order, boolean isSell) {
+        super(new String[]{"Timestamp", isSell?"Amount":"Creator", "Price", !isSell?"Amount":"Creator"}, true);
 
         this.order = order;
-        this.trades = DCSet.getInstance().getTradeMap().getTrades(order.getId());
-    }
-
-    @Override
-    public SortableList<Tuple2<Long, Long>, Trade> getSortableList() {
-        return this.trades;
-    }
-
-    public Trade getTrade(int row) {
-        return this.trades.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        return this.trades.size();
+        this.isSell = isSell;
+        this.listSorted = DCSet.getInstance().getTradeMap().getTrades(order.getId());
 
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.trades == null || row > this.trades.size() - 1) {
+        if (this.listSorted == null || row > this.listSorted.size() - 1) {
             return null;
         }
 
-        Trade trade = this.trades.get(row).getB();
-        int type = 0;
-        Order initatorOrder = null;
-        Order targetOrder = null;
-
-        if (trade != null) {
-            DCSet db = DCSet.getInstance();
-
-            initatorOrder = Order.getOrder(db, trade.getInitiator());
-            targetOrder = Order.getOrder(db, trade.getTarget());
+        Trade trade = this.listSorted.get(row).getB();
+        if (trade == null) {
+            return null;
         }
+
+
+        int type = 0;
+        DCSet db = DCSet.getInstance();
+
+        Order initiatorOrder = Order.getOrder(db, trade.getInitiator());
+        Order targetOrder = Order.getOrder(db, trade.getTarget());
 
         switch (column) {
             case COLUMN_TIMESTAMP:
 
                 return DateTimeFormat.timestamptoString(trade.getTimestamp());
 
-            case COLUMN_TYPE:
+            case COLUMN_AMOUNT_WHO:
 
-                return initatorOrder.getHave() == this.order.getHave() ? Lang.getInstance().translate("Buy") : Lang.getInstance().translate("Sell");
+                String result;
 
-            case COLUMN_AMOUNT:
+                if (isSell)
+                    result = NumberAsString.formatAsString(trade.getAmountHave());
+                else
+                    result = initiatorOrder.getCreator().getPersonAsString();
 
-                
-                String result = NumberAsString.formatAsString(trade.getAmountHave());
-
-                if (Controller.getInstance().isAddressIsMine(initatorOrder.getCreator().getAddress())) {
+                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
@@ -88,11 +77,22 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
             case COLUMN_PRICE:
 
-                return NumberAsString.formatAsString(trade.calcPrice());
+                if (isSell)
+                    return "<html><span style='color:green'>▲</span>"
+                            + NumberAsString.formatAsString(trade.calcPrice(order.getHaveAsset(), order.getWantAsset()))
+                            + "</html>";
+                else
+                    return "<html><span style='color:red'>▼</span>"
+                            + NumberAsString.formatAsString(trade.calcPriceRevers(order.getHaveAsset(), order.getWantAsset()))
+                            + "</html>";
 
-            case COLUMN_AMOUNT_WANT:
+            case COLUMN_WHO_AMOUNT:
 
-                result = NumberAsString.formatAsString(trade.getAmountWant());
+                if (isSell)
+                    result = initiatorOrder.getCreator().getPersonAsString();
+                    //result = NumberAsString.formatAsString(trade.getAmountWant());
+                else
+                    result = NumberAsString.formatAsString(trade.getAmountHave());
 
                 if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
@@ -106,35 +106,15 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
-    }
-
     public synchronized void syncUpdate(Observable o, Object arg) {
-        ObserverMessage message = (ObserverMessage) arg;
-
-        //CHECK IF LIST UPDATED
-        if (message.getType() == ObserverMessage.ADD_TRADE_TYPE || message.getType() == ObserverMessage.REMOVE_TRADE_TYPE) {
-            this.fireTableDataChanged();
-        }
-    }
-
-    public void addObservers() {
-        //this.trades.registerObserver();
-    }
-
-    public void deleteObservers() {
-        //this.trades.removeObserver();
-        Controller.getInstance().deleteObserver(this);
     }
 
     @Override
-    public Trade getItem(int k) {
-        // TODO Auto-generated method stub
-        return this.trades.get(k).getB();
+    public void addObservers() {
     }
+
+    @Override
+    public void deleteObservers() {
+    }
+
 }

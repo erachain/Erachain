@@ -95,7 +95,7 @@ public class MyOrdersFrame extends JFrame {
                 row = ordersTable.convertRowIndexToModel(row);
 
                 Order order = ordersTableModel.getItem(row).b;
-                new TradesFrame(order);
+                new TradesFrame(order, true);
             }
         });
         ordersMenu.add(trades);
@@ -126,7 +126,7 @@ public class MyOrdersFrame extends JFrame {
                 if (e.getClickCount() == 2) {
                     row = ordersTable.convertRowIndexToModel(row);
                     Order order = ordersTableModel.getItem(row).b;
-                    new TradesFrame(order);
+                    new TradesFrame(order, false);
                 }
             }
         });

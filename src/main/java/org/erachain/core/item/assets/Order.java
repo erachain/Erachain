@@ -10,6 +10,7 @@ import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
+import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -187,6 +188,9 @@ public class Order implements Comparable<Order> {
     }
 
     public AssetCls getHaveAsset() {
+        if (dcSet == null)
+            dcSet = DCSet.getInstance();
+
         return this.getHaveAsset(this.dcSet);
     }
 
@@ -199,6 +203,9 @@ public class Order implements Comparable<Order> {
     }
 
     public AssetCls getWantAsset() {
+        if (dcSet == null)
+            dcSet = DCSet.getInstance();
+
         return this.getWantAsset(this.dcSet);
     }
 
@@ -240,6 +247,25 @@ public class Order implements Comparable<Order> {
         return this.fulfilledHave.multiply(this.price).setScale(this.amountWant.scale(), RoundingMode.HALF_DOWN);
     }
 
+    public String state() {
+        if (amountHave.compareTo(fulfilledHave) == 0) {
+            return "Done";
+        } else {
+
+            if (DCSet.getInstance().getCompletedOrderMap().contains(id))
+                return "Canceled";
+
+            if (DCSet.getInstance().getOrderMap().contains(id)) {
+                if (fulfilledHave.signum() == 0)
+                    return "Active";
+                else
+                    return "Fulfilled";
+            }
+
+            return "Orphaned"; //"unconfirmed";
+        }
+
+    }
     ///////// PRICE
     public BigDecimal getPrice() {
         return this.price;
@@ -449,7 +475,8 @@ public class Order implements Comparable<Order> {
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
-                this.id.equals(770667456757788l)
+                //this.id.equals(770667456757788l)
+                height == 255577
                 //(this.haveKey == 1004l && this.wantKey == 2l)
                 //|| (this.wantKey == 1004l && this.haveKey == 2l)
                 //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())

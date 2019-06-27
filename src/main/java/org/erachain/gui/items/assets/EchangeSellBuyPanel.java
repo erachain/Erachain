@@ -191,7 +191,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         orderInfo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (sellOrdersTableModel.getSortableList().isEmpty())
+                if (sellOrdersTableModel.isEmpty())
                     return;
 
                 int row = sellOrdersTable.getSelectedRow();
@@ -222,7 +222,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         trades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (sellOrdersTableModel.getSortableList().isEmpty())
+                if (sellOrdersTableModel.isEmpty())
                     return;
 
                 int row = sellOrdersTable.getSelectedRow();
@@ -231,7 +231,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 row = sellOrdersTable.convertRowIndexToModel(row);
 
                 Order order = sellOrdersTableModel.getItem(row);
-                new TradesFrame(order);
+                new TradesFrame(order, true);
             }
         });
         sellOrdersMenu.add(trades);
@@ -240,7 +240,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (sellOrdersTableModel.getSortableList().isEmpty())
+                if (sellOrdersTableModel.isEmpty())
                     return;
                 int row = sellOrdersTable.getSelectedRow();
                 if (row < 0)
@@ -333,7 +333,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         buyOrderInfo.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (buyOrdersTableModel.getSortableList().isEmpty())
+                if (buyOrdersTableModel.isEmpty())
                     return;
 
                 int row = buyOrdersTable.getSelectedRow();
@@ -352,6 +352,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 CreateOrderDetailsFrame ww = new CreateOrderDetailsFrame((CreateOrderTransaction) createOrder);
                 dd.jScrollPane1.setViewportView(ww);
                 dd.setLocationRelativeTo(null);
+                dd.pack();
                 dd.setVisible(true);
 
             }
@@ -363,18 +364,18 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         buyTrades.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SortableList<Long, Order> sl = buyOrdersTableModel.getSortableList();
-                if (sl.isEmpty())
+                if (buyOrdersTableModel.isEmpty())
                     return;
 
                 int row = buyOrdersTable.getSelectedRow();
                 if (row < 0)
                     return;
+
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
                 Order order = buyOrdersTableModel.getItem(row);
                 if (order != null)
-                    new TradesFrame(order);
+                    new TradesFrame(order, false);
             }
         });
         buyOrdersMenu.add(buyTrades);
@@ -382,12 +383,13 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         buyCancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SortableList<Long, Order> sl = buyOrdersTableModel.getSortableList();
-                if (sl.isEmpty())
+                if (buyOrdersTableModel.isEmpty())
                     return;
+
                 int row = buyOrdersTable.getSelectedRow();
                 if (row < 0)
                     return;
+
                 row = buyOrdersTable.convertRowIndexToModel(row);
 
                 Order order = buyOrdersTableModel.getItem(row);
@@ -431,10 +433,10 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 MTable target = (MTable) e.getSource();
                 int row = target.getSelectedRow();
 
-                if (row > tradesTableModel.getSortableList().size())
+                if (row > tradesTableModel.getRowCount())
                     return;
 
-                Trade trade = tradesTableModel.getTrade(row);
+                Trade trade = tradesTableModel.getItem(row);
                 if (trade == null)
                     return;
 
@@ -445,14 +447,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
 
                     if (type) {
-                        BigDecimal price = trade.calcPriceRevers();
+                        BigDecimal price = trade.calcPriceRevers(have, want);
                         sellOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         sellOrderPanel.txtPrice.setText(price.toPlainString());
 
                         buyOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         buyOrderPanel.txtPrice.setText(price.toPlainString());
                     } else {
-                        BigDecimal price = trade.calcPrice();
+                        BigDecimal price = trade.calcPrice(have, want);
                         sellOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
                         sellOrderPanel.txtPrice.setText(price.toPlainString());
 

@@ -34,7 +34,7 @@ public class VouchingDetailsFrame extends RecDetailsFrame {
         } else {
             message += ", time: " + record.viewTimestamp() + "</div>";
             message += "<div> type: <b>" + record.viewFullTypeName() + "</b>, size: " + record.viewSize(Transaction.FOR_NETWORK)
-                    + ", fee:" + record.viewFeeAndFiat() + "</div>";
+                    + ", fee: " + record.viewFeeAndFiat() + "</div>";
 
             //message += "<div>REF: <font size='2'>" + record.viewReference() + "</font></div>";
             message += "<div>SIGN: <font size='2'>" + record.viewSignature() + "</font></div>";

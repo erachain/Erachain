@@ -590,8 +590,10 @@ public class MainPanel extends javax.swing.JPanel {
 
     // insert tab in tabbedpane
     public boolean insertTab(JPanel panel) {
-        //String name = Lang.getInstance().translate(panel.getClass().getSimpleName());
-        String name = Lang.getInstance().translate(panel.getName());
+        String name = panel.getName();
+        if (name == null)
+            name = panel.getClass().getSimpleName();
+
         int index = jTabbedPane1.indexOfTab(name);
         boolean inserted = false;
         if (index == -1) {
@@ -602,6 +604,16 @@ public class MainPanel extends javax.swing.JPanel {
         jTabbedPane1.setSelectedIndex(index);
 
         return inserted;
+
+    }
+
+    // insert tab in tabbedpane
+    public void renameTab(String oldTitle, String newTitle) {
+        int index = jTabbedPane1.indexOfTab(oldTitle);
+        if (index > 0) {
+            jTabbedPane1.setTitleAt(index, newTitle);
+            jTabbedPane1.getComponentAt(index).setName(newTitle);
+        }
 
     }
 

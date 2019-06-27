@@ -74,10 +74,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(AssetCls assetIn, int balancePosition,
+    public AccountAssetActionPanelCls(String panelName, AssetCls assetIn, int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
-        setName("Send");
+        setName(Lang.getInstance().translate(panelName));
         if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else

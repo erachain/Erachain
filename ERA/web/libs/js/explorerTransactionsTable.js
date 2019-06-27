@@ -303,7 +303,7 @@ function transactions_Table(data) {
         }
 
         output += item.amount_key + '<td>'
-            + item.date;
+            + convertTimestamp(item.timestamp, true);
         output += '<td><a href ="?address=' + item.creator_addr + get_lang() + '">' +
             item.creator + '</a><td>';
         output += item.size

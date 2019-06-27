@@ -332,6 +332,31 @@ public class OrderMap extends DCMap<Long, Order> {
         return new SortableList<Long, Order>(this, keys);
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Order> getOrders(long have, long want, int limit) {
+
+        //FILTER ALL KEYS
+        List<Long> keys = new ArrayList<>(((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, want, null, null),
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
+
+        Iterable iterable = keys;
+
+        if (limit > 0 && keys.size() > limit) {
+            iterable = Iterables.limit(iterable, limit);
+        }
+
+        List<Order> orders = new ArrayList<Order>();
+
+        Iterator iterator = iterable.iterator();
+        while (iterator.hasNext()) {
+            orders.add(this.get((Long)iterator.next()));
+        }
+
+        //RETURN
+        return orders;
+    }
+
     public List<Order> getOrdersForAddress(
             String address, Long have, Long want) {
 

@@ -1,7 +1,9 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.BalanceFromAddressTableModel;
@@ -31,7 +33,7 @@ public class MyBalanceTab extends SplitPanel {
     private static final long serialVersionUID = 1L;
     final MTable table;
     protected int row;
-    BalanceFromAddressTableModel BalancesModel;
+    BalanceFromAddressTableModel balancesModel;
     private SortableList<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> balances;
     private MyBalanceTab th;
 
@@ -49,13 +51,13 @@ public class MyBalanceTab extends SplitPanel {
 
         //TABLE
 
-        BalancesModel = new BalanceFromAddressTableModel();
-        table = new MTable(BalancesModel);
+        balancesModel = new BalanceFromAddressTableModel();
+        table = new MTable(balancesModel);
 
 
         //assetsModel.getAsset(row)
         //POLLS SORTER
-        RowSorter sorter = new TableRowSorter(BalancesModel);
+        RowSorter sorter = new TableRowSorter(balancesModel);
         table.setRowSorter(sorter);
 //	Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
 //	CoreRowSorter sorter = new CoreRowSorter(assetsModel, indexes);
@@ -120,9 +122,25 @@ public class MyBalanceTab extends SplitPanel {
 // add listener
 //		jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(table);
 // show	
-        this.jTableJScrollPanelLeftPanel.setModel(BalancesModel);
+        this.jTableJScrollPanelLeftPanel.setModel(balancesModel);
         this.jTableJScrollPanelLeftPanel = table;
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
+        jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Point point = e.getPoint();
+                int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
+                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
+
+                AssetCls itemTableSelected = balancesModel.getAsset(row);
+
+                if (e.getClickCount() == 2) {
+                    tableMouse2Click(itemTableSelected);
+                }
+
+            }
+        });
+
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
@@ -145,10 +163,10 @@ public class MyBalanceTab extends SplitPanel {
                 String search = searchTextField_SearchToolBar_LeftPanel.getText();
 
                 // SET FILTER
-                BalancesModel.fireTableDataChanged();
+                balancesModel.fireTableDataChanged();
                 RowFilter filter = RowFilter.regexFilter(".*" + search + ".*", 1);
                 ((DefaultRowSorter) sorter).setRowFilter(filter);
-                BalancesModel.fireTableDataChanged();
+                balancesModel.fireTableDataChanged();
 
             }
         });
@@ -192,8 +210,8 @@ public class MyBalanceTab extends SplitPanel {
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = BalancesModel.getAsset(row);
-                String account = BalancesModel.getAccount(row);
+                AssetCls asset = balancesModel.getAsset(row);
+                String account = balancesModel.getAccount(row);
                 MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "To sell", account));
 
 
@@ -205,7 +223,7 @@ public class MyBalanceTab extends SplitPanel {
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = BalancesModel.getAsset(row);
+                AssetCls asset = balancesModel.getAsset(row);
                 MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "", ""));
 
             }
@@ -216,7 +234,7 @@ public class MyBalanceTab extends SplitPanel {
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                AssetCls asset = BalancesModel.getAsset(row);
+                AssetCls asset = balancesModel.getAsset(row);
                 MainPanel.getInstance().insertTab(new ExchangePanel(asset, null, "Buy", ""));
 
             }
@@ -249,7 +267,7 @@ public class MyBalanceTab extends SplitPanel {
 
                                                 row = table.getSelectedRow();
                                                 row = table.convertRowIndexToModel(row);
-                                                Class<? extends Object> order = BalancesModel.getColumnClass(row);
+                                                Class<? extends Object> order = balancesModel.getColumnClass(row);
 
                                                 //IF ASSET CONFIRMED AND NOT ERM
 			/*
@@ -397,7 +415,7 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
         public void valueChanged(ListSelectionEvent arg0) {
             AssetCls asset = null;
             if (table.getSelectedRow() >= 0)
-                asset = BalancesModel.getAsset(table.convertRowIndexToModel(table.getSelectedRow()));
+                asset = balancesModel.getAsset(table.convertRowIndexToModel(table.getSelectedRow()));
             if (asset == null) return;
             //AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
             //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
@@ -411,6 +429,16 @@ if(order.getKey() >= AssetCls.INITIAL_FAVORITES)
             jSplitPanel.setOrientation(or);
 
         }
+    }
+
+    protected void tableMouse2Click(ItemCls item) {
+
+        AssetCls asset = (AssetCls) item;
+        AssetCls compu = DCSet.getInstance().getItemAssetMap().get(2L);
+        String action = null;
+        ExchangePanel panel = new ExchangePanel(asset, compu, action, "");
+        panel.setName(asset.getTickerName() + "/" + compu.getTickerName());
+        MainPanel.getInstance().insertTab(panel);
     }
 
 }

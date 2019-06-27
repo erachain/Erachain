@@ -9,6 +9,7 @@ import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
@@ -31,8 +32,8 @@ public class DepositExchange extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(DepositExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private MButton jButton_Cansel;
-    private MButton jButton_Confirm;
+    private MButton jButtonHistory;
+    private MButton jButton_getDetails;
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
     private JLabel jLabel_Address;
@@ -56,9 +57,9 @@ public class DepositExchange extends JPanel {
 
     }
 
-    public void onGoClick() {
+    public void onGoClick(JLabel jText_Help) {
 
-        jButton_Confirm.setEnabled(false);
+        jButton_getDetails.setEnabled(false);
         jTextField_Details.setText("");
         jTextField_Details_Check.setText(Lang.getInstance().translate("wait"));
 
@@ -155,7 +156,11 @@ public class DepositExchange extends JPanel {
             jTextField_Details_Check.setText(Lang.getInstance().translate("error"));
         }
 
-        jButton_Confirm.setEnabled(true);
+        jButton_getDetails.setEnabled(true);
+
+        jText_Help.setText("<html><h2>5. " + Lang.getInstance().translate(
+                "Transfer bitcoins to address below") + "</h2></html>");
+        jButton_getDetails.setText(Lang.getInstance().translate("Get Payment Details"));
 
     }
 
@@ -188,10 +193,35 @@ public class DepositExchange extends JPanel {
         this.setLayout(layout);
 
         int gridy = 0;
+
+        JLabel jText_Title = new JLabel();
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_Title, gridBagConstraints);
+        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Deposit of Bitcoins to the Exchange") + "</h1></html>");
+
+        JLabel jText_Help = new JLabel();
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_Help, gridBagConstraints);
+        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select Your account or insert another account in field below") + "</h2></html>");
+
         jLabel_YourAddress.setText(Lang.getInstance().translate("Your account") + ":");
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new Insets(21, 27, 0, 0);
         add(jLabel_YourAddress, gridBagConstraints);
@@ -204,6 +234,9 @@ public class DepositExchange extends JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 jTextField_Address.setText(((Account) jComboBox_YourAddress.getSelectedItem()).getAddress());
+
+                jText_Help.setText("<html><h2>2. " + Lang.getInstance().translate(
+                        "Select Asset that Your wish to receive") + "</h2></html>");
 
             }
         });
@@ -297,6 +330,11 @@ public class DepositExchange extends JPanel {
                                             " " + Lang.getInstance().translate("for deposit") + " bitcoins",
                                     detailsHead);
                     }
+
+                    jText_Help.setText("<html><h2>3. " + Lang.getInstance().translate(
+                            "Click the button '%1' and transfer the bitcoins to the received address")
+                            .replace("%1", Lang.getInstance().translate("Get Payment Details")) + "</h2></html>");
+
                 }
             }
         });
@@ -305,11 +343,18 @@ public class DepositExchange extends JPanel {
 
         gridy += 3;
 
-        jButton_Confirm = new MButton(Lang.getInstance().translate("Get Payment Details"), 2);
-        jButton_Confirm.setToolTipText("");
-        jButton_Confirm.addActionListener(new ActionListener() {
+        jButton_getDetails = new MButton(Lang.getInstance().translate("Get Payment Details"), 2);
+        jButton_getDetails.setToolTipText("");
+        jButton_getDetails.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onGoClick();
+                jButton_getDetails.setText(Lang.getInstance().translate("Wait") + "...");
+                jText_Help.setText("<html><h2><blink>4. " + Lang.getInstance().translate(
+                        "Please Wait...") + "</blink></h2></html>");
+
+                // чтобы не ждать зависание скрипта - и отображение текста моментальное будеьт
+                new Thread(() -> {
+                    onGoClick(jText_Help);
+                }).start();
             }
         });
 
@@ -319,7 +364,7 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-        add(jButton_Confirm, gridBagConstraints);
+        add(jButton_getDetails, gridBagConstraints);
 
         ////////////// DETAILS
         gridy += 3;
@@ -328,10 +373,11 @@ public class DepositExchange extends JPanel {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = ++gridy;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new Insets(0, 27, 0, 0);
+        //gridBagConstraints.anchor = GridBagConstraints.ABOVE_BASELINE_TRAILING;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(detailsHead, gridBagConstraints);
-        detailsHead.setHorizontalAlignment(JTextField.LEFT);
+        //detailsHead.setHorizontalAlignment(JTextField.LEFT);
         detailsHead.setText(Lang.getInstance().translate("Payment Details"));
 
         gridBagConstraints = new GridBagConstraints();
@@ -364,11 +410,17 @@ public class DepositExchange extends JPanel {
         add(jTextField_Details_Check, gridBagConstraints);
 
         //////////////////////////
+        JLabel jText_History = new JLabel();
+
         gridy += 3;
 
-        jButton_Cansel = new MButton(Lang.getInstance().translate("See Deposit History"), 2);
-        jButton_Cansel.addActionListener(new ActionListener() {
+        jButtonHistory = new MButton(Lang.getInstance().translate("See Deposit History"), 2);
+        jButtonHistory.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
+
+                jText_History.setText(showHistory((AssetCls) cbxAssets.getSelectedItem(),
+                        jTextField_Address.getText(), jLabel_Adress_Check));
+
             }
         });
 
@@ -379,8 +431,176 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-        add(jButton_Cansel, gridBagConstraints);
 
+        add(jButtonHistory, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_History, gridBagConstraints);
+
+    }
+
+    public static String showHistory(AssetCls asset, String address, JLabel tip) {
+        JSONObject jsonObject;
+
+        // [TOKEN]/[ADDRESS]
+        String urlGetDetails = "https://api.face2face.cash/apipay/history.json/";
+
+        switch ((int) asset.getKey()) {
+            case 12:
+                urlGetDetails += "@BTC/"; // BTC -> eBTC
+                break;
+            case 14:
+                urlGetDetails += "@ETH/"; // BTC -> eBTC
+                break;
+            case 92:
+                urlGetDetails += "@RUB/"; // BTC -> eUSD
+                break;
+            case 95:
+                urlGetDetails += "@USD/"; // BTC -> eUSD
+                break;
+            default:
+                urlGetDetails += "COMPU/"; // BTC -> COMPU
+        }
+
+        urlGetDetails += address;
+
+
+        String inputText = "";
+        try {
+
+            // CREATE CONNECTION
+            URL url = new URL(urlGetDetails);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // EXECUTE
+            int resCode = connection.getResponseCode();
+
+            //READ RESULT
+            InputStream stream;
+            if (resCode == 400) {
+                stream = connection.getErrorStream();
+            } else {
+                stream = connection.getInputStream();
+            }
+
+            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+            //String result = new BufferedReader(isReader).readLine();
+
+            BufferedReader bufferedReader = new BufferedReader(isReader);
+            String inputLine;
+            while ((inputLine = bufferedReader.readLine()) != null)
+                inputText += inputLine;
+            bufferedReader.close();
+
+            jsonObject = (JSONObject) JSONValue.parse(inputText);
+
+        } catch (Exception e) {
+            jsonObject = null;
+            inputText = "";
+        }
+
+        LOGGER.debug(inputText);
+
+        if (jsonObject != null) {
+            if (jsonObject.containsKey("deal")) {
+                if (BlockChain.DEVELOP_USE) {
+                    tip.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
+                }
+
+                String resultText = "<html>";
+                JSONArray unconfirmed = (JSONArray) jsonObject.get("unconfirmed");
+                if (!unconfirmed.isEmpty()) {
+                    resultText += "<h3>" + Lang.getInstance().translate("Pending") + "</h3>";
+                    /**
+                     *  [{"abbrev": "COMPU", "id": 10},
+                     *      "0.01", "5zAuwca5nvAGboRNagXKamtZCHvLdBs5Zii1Sb51wMMigFccQnPzVdASQSWftmjotaazZKWKZLd4DtaEN5iVJ5qN",
+                     *      0, 0, 2, "2019-06-21 16:35:10", "7KJjTKrj7Zmm7cYJANWHmLfmNPoZbwmbiy"]
+                     */
+                    for (Object item : unconfirmed) {
+                        try {
+                            JSONArray array = (JSONArray) item;
+                            JSONObject curr = (JSONObject) array.get(0);
+                            resultText += array.get(1) + " " + curr.get("abbrev")
+                                    + " - " + array.get(6)
+                                    + "  <span style='font-size:0.8em'>" + array.get(2) + "</span><br>";
+
+                        } catch (Exception e) {
+                            resultText += item.toString() + "<br>";
+                        }
+                    }
+                }
+
+                JSONArray in_process = (JSONArray) jsonObject.get("in_process");
+                if (!in_process.isEmpty()) {
+                    resultText += "<h3>" + Lang.getInstance().translate("In Process") + "</h3>";
+                    /**
+                     * ???
+                     */
+                    for (Object item : in_process) {
+                        try {
+                            JSONArray array = (JSONArray) item;
+                            JSONObject curr = (JSONObject) array.get(0);
+                            resultText += array.get(1) + " " + curr.get("abbrev")
+                                    + " : " + array.get(6)
+                                    + " : " + array.get(2) + "<br>";
+
+                        } catch (Exception e) {
+                            resultText += item.toString() + "<br>";
+                        }
+                    }
+                }
+
+                JSONArray done = (JSONArray) jsonObject.get("done");
+                if (!done.isEmpty()) {
+                    resultText += "<h3>" + Lang.getInstance().translate("Done") + "</h3>";
+                    /**
+                     * {"acc": "7KJjTKrj7Zmm7cYJANWHmLfmNPoZbwmbiy", "stasus": "ok",
+                     * "curr_in": {"abbrev": "COMPU", "id": 10},
+                     * "curr_out": {"abbrev": "COMPU", "id": 10},
+                     * "pay_out": {"status": null, "info": null, "created_ts": 1561122345.0, "amo_in": 0.02, "amo_taken": 0.01890641, "tax_mess": null,
+                     *      "vars": {"payment_id": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ", "status": "success"},
+                     *      "created_on": "2019-06-21 16:05:45", "txid": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ",
+                     *      "amount": 0.01888609, "amo_to_pay": 0.0, "amo_gift": 2.032e-05, "id": 77, "amo_partner": 0.0
+                     *      },
+                     *  "amount_in": 0.02, "created": "2019-06-21 16:03:10", "confitmations": 1,
+                     *  "txid": "3C82efTYLiPjDgPpJqgeU8Kp5b9Bwe2aKsc1aXjtnXHhxpo9QbuuNrr3juhkEhcBTaV7fxeUynYdkPFSuXb6trU5"},
+                     */
+                    for (Object item : done) {
+                        try {
+                            JSONObject json = (JSONObject) item;
+                            JSONObject curr_in = (JSONObject) json.get("curr_in");
+                            JSONObject curr_out = (JSONObject) json.get("curr_out");
+                            JSONObject pay_out = (JSONObject) json.get("pay_out");
+
+                            resultText += json.get("amount_in") + " " + curr_in.get("abbrev")
+                                    + " :: " + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
+                                    + " - " + pay_out.get("created_on")
+                                    + "  <span style='font-size:0.8em'>" + pay_out.get("txid") + "</span><br>";
+                        } catch (Exception e) {
+                            resultText += item.toString() + "<br>";
+                        }
+                    }
+                }
+
+                if (unconfirmed.isEmpty() && in_process.isEmpty() && done.isEmpty()) {
+                    resultText += "<h3>" + Lang.getInstance().translate("Not Found") + "</h3>";
+                }
+                resultText += "</html>";
+                return resultText;
+
+            } else {
+                LOGGER.debug(inputText);
+                return inputText;
+            }
+        } else {
+            return inputText;
+        }
     }
 
 }

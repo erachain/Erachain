@@ -6,7 +6,9 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TradeMap;
 import org.erachain.gui.models.SortedListTableModelCls;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.DateTimeFormat;
@@ -20,20 +22,11 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
+public class TradesTableModel extends TimerTableModelCls<Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
-    public static final int COLUMN_TYPE = 1;
-    public static final int COLUMN_ASSET_1 = 2;
-    public static final int COLUMN_PRICE = 3;
-    public static final int COLUMN_ASSET_2 = 4;
-
-    private boolean needRepaint = false;
-    private long updateTime = 0l;
-
-    BigDecimal sumAsset1;
-    BigDecimal sumAsset2;
-
-    private SortableList<Tuple2<Long, Long>, Trade> trades;
+    public static final int COLUMN_ASSET_1 = 1;
+    public static final int COLUMN_PRICE = 2;
+    public static final int COLUMN_ASSET_2 = 3;
 
     private AssetCls have;
     private AssetCls want;
@@ -42,15 +35,22 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
 
     public TradesTableModel(AssetCls have, AssetCls want) {
 
-        super(new String[]{"Timestamp", "Type", "Check 1", "Price", "Check 2"}, true);
+        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Amount", "Price", "Total"}, true);
 
         this.have = have;
         this.want = want;
 
+        columnNames[1] = columnNames[1] + " " + have.getShortName();
+        columnNames[3] = columnNames[3] + " " + want.getShortName();
+
         this.haveKey = this.have.getKey();
         this.wantKey = this.want.getKey();
 
-        this.trades = Controller.getInstance().getTrades(have, want);
+        getInterval();
+        fireTableDataChanged();
+        addObservers();
+
+        ///this.listSorted = Controller.getInstance().getTrades(have, want);
         //this.trades.registerObserver();
 
         //this.columnNames[2] = have.getShort();
@@ -58,49 +58,13 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         //this.columnNames[3] = Lang.getInstance().translate("Price") + ": " + this.columnNames[4];
 
         ///totalCalc();
+
     }
 
-    private void totalCalc() {
-        sumAsset1 = BigDecimal.ZERO;
-        sumAsset2 = BigDecimal.ZERO;
-
-        for (Pair<Tuple2<Long, Long>, Trade> tradePair : this.trades) {
-
-            Trade trade = tradePair.getB();
-            String type = Order.getOrder(DCSet.getInstance(), trade.getInitiator()).getHave() == this.have.getKey() ? "Sell" : "Buy";
-
-            if (type.equals("Buy")) {
-                sumAsset1 = sumAsset1.add(trade.getAmountHave());
-                sumAsset2 = sumAsset2.add(trade.getAmountWant());
-            } else {
-                sumAsset1 = sumAsset1.add(trade.getAmountWant());
-                sumAsset2 = sumAsset2.add(trade.getAmountHave());
-            }
-
-        }
-    }
-
-    @Override
-    public SortableList<Tuple2<Long, Long>, Trade> getSortableList() {
-        return this.trades;
-    }
-
-    public Trade getTrade(int row) {
-        Pair<Tuple2<Long, Long>, Trade> rec = this.trades.get(row);
-        if (rec == null)
-            return null;
-
-        return this.trades.get(row).getB();
-    }
-
-    @Override
-    public int getRowCount() {
-        return this.trades.size() + 1;
-    }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.trades == null || row > this.trades.size()) {
+        if (this.list == null || row > this.list.size()) {
             return null;
         }
 
@@ -109,8 +73,8 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         Order initatorOrder = null;
         Order targetOrder = null;
 
-        if (row < this.trades.size()) {
-            trade = this.trades.get(row).getB();
+        if (row < this.list.size()) {
+            trade = this.list.get(row);
             if (trade != null) {
                 DCSet db = DCSet.getInstance();
 
@@ -125,19 +89,14 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         switch (column) {
             case COLUMN_TIMESTAMP:
 
-                if (row == this.trades.size())
+                if (row == this.list.size())
                     return "<html>" + Lang.getInstance().translate("Total") + ":</html>";
 
                 return DateTimeFormat.timestamptoString(trade.getTimestamp());
 
-            case COLUMN_TYPE:
-
-                return type == 0 ? "" : type > 0 ? Lang.getInstance().translate("Sell") :
-                        Lang.getInstance().translate("Buy");
-
             case COLUMN_ASSET_1:
 
-                if (row == this.trades.size())
+                if (row == this.list.size())
                     return "";
                 //    return "<html><i>" + NumberAsString.formatAsString(sumAsset1) + "</i></html>";
 
@@ -156,18 +115,23 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
 
             case COLUMN_PRICE:
 
-                if (row == this.trades.size())
+                if (row == this.list.size())
                     return "";
                     ///return null;
 
-                if (type > 0)
-                    return NumberAsString.formatAsString(trade.calcPrice());
+
+            if (type > 0)
+                    return "<html><span style='color:green'>▲</span>"
+                        + NumberAsString.formatAsString(trade.calcPrice(have, want))
+                        + "</html>";
                 else
-                    return NumberAsString.formatAsString(trade.calcPriceRevers());
+                    return "<html><span style='color:red'>▼</span>"
+                        + NumberAsString.formatAsString(trade.calcPriceRevers(have, want))
+                        + "</html>";
 
             case COLUMN_ASSET_2:
 
-                if (row == this.trades.size())
+                if (row == this.list.size())
                     return "";
                     ///return "<html><i>" + NumberAsString.formatAsString(sumAsset2) + "</i></html>";
 
@@ -187,26 +151,13 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
         return null;
     }
 
-    public synchronized void repaint() {
-        this.needRepaint = false;
-        this.updateTime = NTP.getTime();
-
-        this.trades = Controller.getInstance().getTrades(this.have, this.want);
-
-        /// so FARD to CALCULATE  --totalCalc();
-        this.fireTableDataChanged();
-        this.needRepaint = false;
-
-    }
-
     @Override
-    public void update(Observable o, Object arg) {
-        try {
-            this.syncUpdate(o, arg);
-        } catch (Exception e) {
-            //GUI ERROR
-        }
+    public void getIntervalThis(long start, long end) {
+
+        this.list = ((TradeMap)map).getTrades(haveKey, wantKey,0,300);
+
     }
+
 
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
@@ -218,57 +169,40 @@ public class TradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>
                 || type == ObserverMessage.REMOVE_TRADE_TYPE
         ) {
 
-            Order order = (Order) message.getValue();
-            long haveKey = order.getHave();
-            long wantKey = order.getWant();
+            Trade trade = (Trade) message.getValue();
+            long haveKey = trade.getHaveKey();
+            long wantKey = trade.getWantKey();
             if (!(haveKey == this.haveKey && wantKey == this.wantKey)
                     && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
                 return;
             }
 
-            this.needRepaint = true;
+            this.needUpdate = true;
             return;
 
-        } else if (this.needRepaint == true) {
+        } else if (needUpdate) {
             if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
                     || type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
                 if (Controller.getInstance().isStatusOK()) {
-                    this.repaint();
+                    this.needUpdate = false;
+                    this.getInterval();
+                    fireTableDataChanged();
                     return;
-                } else {
-                    if (NTP.getTime() - updateTime > 100000) {
-                        this.repaint();
+                } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
+                        || type == ObserverMessage.NETWORK_STATUS) {
+                    if (Controller.getInstance().isStatusOK()) {
+                        this.needUpdate = false;
+                        this.getInterval();
+                        fireTableDataChanged();
                         return;
-
                     }
                 }
-            } else if (type == ObserverMessage.BLOCKCHAIN_SYNC_STATUS
-                    || type == ObserverMessage.NETWORK_STATUS) {
-                if (Controller.getInstance().isStatusOK()) {
-                    this.repaint();
-                    return;
-                }
+            } else if (type == ObserverMessage.GUI_REPAINT) {
+                this.needUpdate = false;
+                this.getInterval();
+                fireTableDataChanged();
+                return;
             }
         }
-
-    }
-
-    public void addObservers() {
-        Controller.getInstance().addObserver(this);
-    }
-
-    public void deleteObservers() {
-        //this.trades.removeObserver();
-        Controller.getInstance().deleteObserver(this);
-    }
-
-    @Override
-    public Trade getItem(int k) {
-        // TODO Auto-generated method stub
-        Pair<Tuple2<Long, Long>, Trade> rec = this.trades.get(k);
-        if (rec == null)
-            return null;
-
-        return this.trades.get(k).getB();
     }
 }

@@ -66,7 +66,7 @@ public class BlockExplorer {
     private volatile static BlockExplorer blockExplorer;
     private JSONObject langObj;
     private Locale local = new Locale("ru", "RU"); // Date format
-    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
+//    private DateFormat df = DateFormat.getDateInstance(DateFormat.DATE_FIELD, local); // for
     private String langFile;
     private DCSet dcSet;
     private LinkedHashMap output;
@@ -242,10 +242,6 @@ public class BlockExplorer {
         makePage(type, keys, start, pageSize, result, langObj);
 
         return result;
-    }
-
-    public static String timestampToStr ( long timestamp){
-        return DateTimeFormat.timestamptoString(timestamp);
     }
 
     @SuppressWarnings("static-access")
@@ -921,7 +917,6 @@ public class BlockExplorer {
                 Long blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
                 Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
                 assetJSON.put("timestamp", transactions.getTimestamp());
-                assetJSON.put("dateTime", BlockExplorer.timestampToStr(transactions.getTimestamp()));
             }
         } else {
             // OLD
@@ -931,7 +926,6 @@ public class BlockExplorer {
                 IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
                 if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
                     assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
-                    assetJSON.put("dateTime", BlockExplorer.timestampToStr(issueAssetTransaction.getTimestamp()));
                     break;
                 }
             }
@@ -1065,33 +1059,37 @@ public class BlockExplorer {
 
         Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
 
-        tradeJSON.put("realPrice", trade.calcPrice().toPlainString());
-        tradeJSON.put("realReversePrice", trade.calcPriceRevers().toPlainString());
+        //tradeJSON.put("realPrice", trade.calcPrice(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        //.setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        tradeJSON.put("realPrice", trade.calcPrice(pairAssetHave, pairAssetWant));
+
+        //tradeJSON.put("realReversePrice", trade.calcPriceRevers(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        tradeJSON.put("realReversePrice", trade.calcPriceRevers(pairAssetHave, pairAssetWant));
 
         tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
         tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
         tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getPersonOrShortAddress(12));
-        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
+        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 
         tradeJSON.put("targetTx", Transaction.viewDBRef(orderTarget.getId()));
         tradeJSON.put("targetCreator_addr", orderTarget.getCreator().getAddress()); // viewCreator
         tradeJSON.put("targetCreator", orderTarget.getCreator().getPersonOrShortAddress(12)); // viewCreator
-        tradeJSON.put("targetAmount", orderTarget.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
+        tradeJSON.put("targetAmount", orderTarget.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
         if (pairHaveKey == orderInitiator.getHave()) {
             tradeJSON.put("type", "sell");
 
-            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetWant.getScale()).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountHave().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
 
 
         } else {
             tradeJSON.put("type", "buy");
 
-            tradeJSON.put("amountHave", trade.getAmountHave().setScale(pairAssetHave.getScale()).toPlainString());
-            tradeJSON.put("amountWant", trade.getAmountWant().setScale(pairAssetWant.getScale()).toPlainString());
+            tradeJSON.put("amountHave", trade.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+            tradeJSON.put("amountWant", trade.getAmountWant().setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
         }
 
         return tradeJSON;
@@ -1642,7 +1640,7 @@ public class BlockExplorer {
 
                     Map accountJSON = new LinkedHashMap();
                     accountJSON.put("address", address);
-                    accountJSON.put("to_date", DateTimeFormat.timestamptoString(item.a * 86400000l));
+                    accountJSON.put("to_date", item.a * 86400000l);
                     accountJSON.put("creator", transactionIssue.getCreator().getPersonAsString());
                     accountJSON.put("creator_address", transactionIssue.getCreator().getAddress());
 
@@ -1699,7 +1697,8 @@ public class BlockExplorer {
                 myPersonJSON.put("key", item.getKey());
                 myPersonJSON.put("name", item.getName());
 
-                myPersonJSON.put("date", df.format(new Date(myIssuePerson.getTimestamp())));
+                myPersonJSON.put("timestamp", myIssuePerson.getTimestamp());
+
                 myPersonsJSON.put(i, myPersonJSON);
                 i++;
             }
@@ -1719,10 +1718,9 @@ public class BlockExplorer {
 
         output.put("height", lastBlock.getHeight());
         output.put("timestamp", lastBlock.getTimestamp());
-        output.put("dateTime", BlockExplorer.timestampToStr(lastBlock.getTimestamp()));
 
-        output.put("timezone", Settings.getInstance().getTimeZone());
-        output.put("timeformat", Settings.getInstance().getTimeFormat());
+        //output.put("timezone", Settings.getInstance().getTimeZone());
+        //output.put("timeformat", Settings.getInstance().getTimeFormat());
         output.put("label_hour", Lang.getInstance().translateFromLangObj("hour", langObj));
         output.put("label_hours", Lang.getInstance().translateFromLangObj("hours", langObj));
         output.put("label_mins", Lang.getInstance().translateFromLangObj("mins", langObj));
@@ -1972,7 +1970,6 @@ public class BlockExplorer {
             transactionDataJSON.put("confirmations", createOrderTarget.getConfirmations(DCSet.getInstance()));
 
             transactionDataJSON.put("timestamp", trade.getInitiator());
-            transactionDataJSON.put("dateTime", "--"); //BlockExplorer.timestampToStr(trade.getTimestamp()));
 
             transactionJSON.put("type", "trade");
             transactionJSON.put("trade", transactionDataJSON);
@@ -2166,7 +2163,7 @@ public class BlockExplorer {
                 transactionDataJSON.put("blockHeight", transaction.getBlockHeight());
             }
 
-            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(transaction.getTimestamp()));
+            transactionDataJSON.put("timestamp", transaction.getTimestamp());
 
             transactionJSON.put("type", "tx");
             transactionJSON.put("transaction", transactionDataJSON);
@@ -2178,7 +2175,6 @@ public class BlockExplorer {
 
             transactionDataJSON = new LinkedHashMap();
             transactionDataJSON.put("timestamp", block.getTimestamp());
-            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
 
             int height = block.getHeight();
             transactionDataJSON.put("confirmations", getHeight() - height + 1);
@@ -2216,7 +2212,6 @@ public class BlockExplorer {
             Block block = Controller.getInstance().getBlockByHeight(aTtransaction.getBlockHeight());
             long timestamp = block.getTimestamp();
             transactionDataJSON.put("timestamp", timestamp);
-            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(timestamp));
 
             transactionDataJSON.put("confirmations", getHeight() - ((ATTransaction) unit).getBlockHeight() + 1);
 
@@ -2336,9 +2331,9 @@ public class BlockExplorer {
                 pairJSON.put("last", "--");
             } else {
                 if (trade.getHaveKey() == pair.getB()) {
-                    pairJSON.put("last", trade.calcPrice().toPlainString());
+                    pairJSON.put("last", trade.calcPrice(assetHave, assetWant).toPlainString());
                 } else {
-                    pairJSON.put("last", trade.calcPriceRevers().toPlainString());
+                    pairJSON.put("last", trade.calcPriceRevers(assetHave, assetWant).toPlainString());
                 }
             }
 
@@ -3008,7 +3003,8 @@ public class BlockExplorer {
             output.put("creator_name", "");
         }
 
-        output.put("date", df.format(new Date(trans.getTimestamp())).toString());
+        //output.put("date", df.format(new Date(trans.getTimestamp())).toString());
+        output.put("timestamp", trans.getTimestamp());
 
         output.put("vouches_table", WebTransactionsHTML.getInstance().getVouchesNew(personItem, trans, langObj));
 
@@ -3180,7 +3176,6 @@ public class BlockExplorer {
             Map transactionDataJSON = new LinkedHashMap();
 
             transactionDataJSON.put("timestamp", block.getTimestamp());
-            transactionDataJSON.put("dateTime", BlockExplorer.timestampToStr(block.getTimestamp()));
 
             int height = block.getHeight();
             transactionDataJSON.put("confirmations", getHeight() - height + 1);
@@ -3347,19 +3342,14 @@ public class BlockExplorer {
                     //out.put("reference", "--");
                     out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
 
+                    out.put("timestamp", dcSet.getBlockMap().get(transaction.getBlockHeight()).getTimestamp());
 
                     String message = txCalculated.getMessage();
-                    if (message.equals("forging")) {
-                        out.put("date", DateTimeFormat.timestamptoString(dcSet.getBlockMap().get(transaction.getBlockHeight()).getTimestamp()));
-                    } else {
-                        out.put("date", message);
-                    }
-
                     String typeName = transaction.viewFullTypeName();
+                    out.put("type", typeName);
+
                     if (typeName.equals("_protocol_")) {
-                        out.put("type", message);
-                    } else {
-                        out.put("type", typeName);
+                        out.put("title", message);
                     }
 
                     out.put("creator", txCalculated.getRecipient().getPersonAsString());
@@ -3370,7 +3360,7 @@ public class BlockExplorer {
 
                 } else {
                     out.put("signature", Base58.encode(transaction.getSignature()));
-                    out.put("date", DateTimeFormat.timestamptoString(transaction.getTimestamp()));
+                    out.put("timestamp", transaction.getTimestamp());
                     String typeName = transaction.viewFullTypeName();
                     out.put("type", typeName);
 

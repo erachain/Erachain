@@ -61,5 +61,9 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
         return listSorted.size();
     }
 
+    @Override
+    public boolean isEmpty() {
+        return (this.listSorted == null) ? true : this.listSorted.isEmpty();
+    }
 
 }

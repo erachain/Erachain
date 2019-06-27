@@ -8,6 +8,7 @@ import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import java.awt.*;
@@ -104,7 +105,12 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
     @Override
     protected void tableMouse2Click(ItemCls item) {
 
-        MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) item, null, "", ""));
+        AssetCls asset = (AssetCls) item;
+        AssetCls assetSell = Settings.getInstance().getDefaultPairAsset();
+        String action = null;
+        ExchangePanel panel = new ExchangePanel(asset, assetSell, action, "");
+        panel.setName(asset.getTickerName() + "/" + assetSell.getTickerName());
+        MainPanel.getInstance().insertTab(panel);
 
     }
 

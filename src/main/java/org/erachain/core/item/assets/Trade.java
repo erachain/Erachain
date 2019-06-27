@@ -3,6 +3,7 @@ package org.erachain.core.item.assets;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -81,8 +82,17 @@ public class Trade {
     public BigDecimal calcPrice() {
         return Order.calcPrice(this.amountHave, this.amountWant);
     }
+    public BigDecimal calcPrice(AssetCls assetHave, AssetCls assetWant) {
+        return Order.calcPrice(amountHave.setScale(assetHave.getScale(), RoundingMode.HALF_DOWN),
+                amountWant.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN));
+
+    }
     public BigDecimal calcPriceRevers() {
         return Order.calcPrice(this.amountWant, this.amountHave);
+    }
+    public BigDecimal calcPriceRevers(AssetCls assetHave, AssetCls assetWant) {
+        return Order.calcPrice(amountWant.setScale(assetHave.getScale(), RoundingMode.HALF_DOWN),
+                amountHave.setScale(assetWant.getScale(), RoundingMode.HALF_DOWN));
     }
 
     public int getSequence() {

@@ -77,8 +77,9 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
 
 
                     return item == null ? "" : ("<html>" + (item.c == null ? "0" : NumberAsString.formatAsString(item.c)))
-                            + " " + this.list.get(row).getShort() + "&hArr;  "//"<br>"
-                            + NumberAsString.formatAsString(item.d)
+                            //+ " " + this.list.get(row).getShort() + "&hArr;  "//"<br>"
+                            + " " + this.list.get(row).getShort()
+                            + " +" + NumberAsString.formatAsString(item.d)
                             + " " + Controller.getInstance().getAsset(this.key).getShort()
                             + "</html>";
 
@@ -95,8 +96,9 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
                     if (item == null) return "";
                     if (item.b > 0)
                         return "<html>" + NumberAsString.formatAsString(item.e)
-                                + " " + this.list.get(row).getShort() + "&hArr; " //"<br>"
-                                + NumberAsString.formatAsString(item.f)
+                                //+ " " + this.list.get(row).getShort() + "&hArr; " //"<br>"
+                                + " " + this.list.get(row).getShort()
+                                + " +" + NumberAsString.formatAsString(item.f)
                                 + " " + Controller.getInstance().getAsset(this.key).getShort()
                                 + "</html>";
                     else

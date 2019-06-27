@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
@@ -616,7 +617,34 @@ public class Settings {
 
         return "100";
     }
-    
+
+    public long getCompuRateAsset() {
+        if (this.settingsJSON.containsKey("compuRateAsset")) {
+            return  Long.valueOf(this.settingsJSON.get("compuRateAsset").toString());
+        }
+
+        return 95L;
+    }
+
+    public long getDefaultPairAssetKey() {
+        if (this.settingsJSON.containsKey("defaultPairAsset")) {
+            return  Long.valueOf(this.settingsJSON.get("defaultPairAsset").toString());
+        }
+
+        return 2L;
+    }
+
+    public AssetCls getDefaultPairAsset() {
+        long key = getDefaultPairAssetKey();
+
+        AssetCls asset = Controller.getInstance().getAsset(key);
+        if (asset == null)
+            Controller.getInstance().getAsset(2L);
+
+        return asset;
+    }
+
+
     public boolean getbacUpAskToStart() {
         if (this.settingsJSON.containsKey("backupasktostart")) {
             return ((Boolean) this.settingsJSON.get("backupasktostart")).booleanValue();

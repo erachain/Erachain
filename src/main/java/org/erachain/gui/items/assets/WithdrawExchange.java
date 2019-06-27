@@ -36,7 +36,7 @@ public class WithdrawExchange extends JPanel {
     private static final Logger LOGGER = LoggerFactory.getLogger(WithdrawExchange.class);
 
     private static final long serialVersionUID = 2717571093561259483L;
-    private MButton jButton_Cansel;
+    private MButton jButton_ShowForm;
     private MButton jButton_Confirm;
     private JComboBox<Account> jComboBox_YourAddress;
     public JComboBox<AssetCls> cbxAssets;
@@ -163,7 +163,7 @@ public class WithdrawExchange extends JPanel {
                             + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> BTC";
             }
 
-            panel.jLabel_Title.setText("<html>" + formTitle + "</html>");
+            panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
 
         }
 
@@ -198,6 +198,30 @@ public class WithdrawExchange extends JPanel {
 
         int gridy = 0;
 
+        JLabel jText_Title = new JLabel();
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_Title, gridBagConstraints);
+        jText_Title.setText("<html><h1>" + Lang.getInstance().translate("Withdraw of Bitcoins from the Exchange") + "</h1></html>");
+
+        JLabel jText_Help = new JLabel();
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_Help, gridBagConstraints);
+        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select the Asset that you want to withdraw") + "</h2></html>");
+
         /////////////// ASSET
         jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
         gridBagConstraints = new GridBagConstraints();
@@ -225,6 +249,12 @@ public class WithdrawExchange extends JPanel {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     asset = (AssetCls) cbxAssets.getSelectedItem();
+
+                    jText_Help.setText("<html><h3>2. " + Lang.getInstance().translate("Set the address for bitcoins where you want to withdraw")
+                            + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
+                                Lang.getInstance().translate("Withdraw"))
+                            + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
+                            + ".</h3></html>");
                 }
             }
         });
@@ -286,11 +316,16 @@ public class WithdrawExchange extends JPanel {
         add(jButton_Confirm, gridBagConstraints);
 
         //////////////////////////
+
+        JLabel jText_History = new JLabel();
+
         gridy += 3;
 
-        jButton_Cansel = new MButton(Lang.getInstance().translate("See Withdraw Transactions"), 2);
-        jButton_Cansel.addActionListener(new ActionListener() {
+        jButton_ShowForm = new MButton(Lang.getInstance().translate("See Withdraw Transactions"), 2);
+        jButton_ShowForm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
+                jText_History.setText(DepositExchange.showHistory((AssetCls) cbxAssets.getSelectedItem(),
+                        jTextField_Address.getText(), jLabel_Adress_Check));
             }
         });
 
@@ -300,7 +335,16 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.CENTER;
         //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
-        add(jButton_Cansel, gridBagConstraints);
+        add(jButton_ShowForm, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = ++gridy;
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+        add(jText_History, gridBagConstraints);
 
     }
 
