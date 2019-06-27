@@ -412,15 +412,6 @@ public class OrderMap extends DCMap<Long, Order> {
     }
     */
 
-    public Order get(Long id) {
-
-        Order order = super.get(id);
-        if (order != null)
-            order.setDC((DCSet)getDBSet());
-
-        return order;
-    }
-
     public void add(Order order) {
 
         this.set(order.getId(), order);

@@ -670,9 +670,9 @@ public class OrderTestsMy {
         BigDecimal amountHave = new BigDecimal("123.456");
         BigDecimal amountWant = new BigDecimal("12.456");
 
-        Order order = new Order(Transaction.makeDBRef(12, 3), this.accountA, 12L, 13L,
-                amountHave, amountWant
-        );
+        Order order = new Order(Transaction.makeDBRef(12, 3), this.accountA, 12L, amountHave, 8, 13L,
+                amountWant,
+                8);
 
 
         // CONVERT TO BYTES

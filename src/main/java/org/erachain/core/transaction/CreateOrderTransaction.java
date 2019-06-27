@@ -299,12 +299,9 @@ public class CreateOrderTransaction extends Transaction {
     // PARSE CONVERT
 
     public Order makeOrder() {
-        // set SCALE by ASSETs
-        BigDecimal amountHave = this.amountHave.setScale(this.haveAsset.getScale());
-        BigDecimal amountWant = this.amountWant.setScale(this.wantAsset.getScale());
-
-        return new Order(dcSet, Transaction.makeDBRef(this.height, this.seqNo), this.creator, this.haveKey, this.wantKey,
-                amountHave, amountWant
+        return new Order(dcSet, Transaction.makeDBRef(this.height, this.seqNo), this.creator,
+                this.haveKey, this.amountHave, this.haveAsset.getScale(),
+                this.wantKey, this.amountWant, this.wantAsset.getScale()
         );
     }
 
