@@ -7,7 +7,6 @@ package org.erachain.webserver;
 import org.erachain.api.ApiErrorFactory;
 //import com.google.gson.Gson;
 import org.erachain.controller.Controller;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
@@ -243,7 +242,7 @@ public class APIExchange {
             sellJSON.put("amount", vol);
             sumAmount = sumAmount.add(vol);
 
-            sellJSON.put("sellingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()));
+            sellJSON.put("sellingPrice", order.calcPriceReverse());
 
             BigDecimal sellingAmount = order.getAmountWantLeft();
 
@@ -279,7 +278,7 @@ public class APIExchange {
 
             sumAmount = sumAmount.add(vol);
 
-            buyJSON.put("buyingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()));
+            buyJSON.put("buyingPrice", order.calcPriceReverse());
 
             BigDecimal buyingAmount = order.getAmountWantLeft();
 
@@ -384,7 +383,7 @@ public class APIExchange {
 
             tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
             tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave());
-            if (orderInitiator.getHave() == have) {
+            if (orderInitiator.getHaveAssetKey() == have) {
                 tradeJSON.put("type", "sell");
                 tradeWantAmount = tradeWantAmount.add(trade.getAmountHave());
                 tradeHaveAmount = tradeHaveAmount.add(trade.getAmountWant());

@@ -20,14 +20,12 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
-import org.erachain.core.voting.PollOption;
 import org.erachain.database.SortableList;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.*;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -40,10 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriInfo;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -751,59 +747,59 @@ public class BlockExplorer {
         BigDecimal volumeAmount = BigDecimal.ZERO;
 
         for (Order order : orders) {
-            if (!pairsOpenOrders.containsKey(order.getWant())) {
+            if (!pairsOpenOrders.containsKey(order.getWantAssetKey())) {
                 count = 0;
             } else {
-                count = pairsOpenOrders.get(order.getWant());
+                count = pairsOpenOrders.get(order.getWantAssetKey());
             }
 
-            if (!volumeAmountOrders.containsKey(order.getWant())) {
+            if (!volumeAmountOrders.containsKey(order.getWantAssetKey())) {
                 volumeAmount = BigDecimal.ZERO;
             } else {
-                volumeAmount = volumeAmountOrders.get(order.getWant());
+                volumeAmount = volumeAmountOrders.get(order.getWantAssetKey());
             }
 
-            if (!volumePriceOrders.containsKey(order.getWant())) {
+            if (!volumePriceOrders.containsKey(order.getWantAssetKey())) {
                 volumePrice = BigDecimal.ZERO;
             } else {
-                volumePrice = volumePriceOrders.get(order.getWant());
+                volumePrice = volumePriceOrders.get(order.getWantAssetKey());
             }
 
             count++;
-            pairsOpenOrders.put(order.getWant(), count);
+            pairsOpenOrders.put(order.getWantAssetKey(), count);
 
             volumeAmount = volumeAmount.add(order.getAmountHaveLeft());
 
-            volumeAmountOrders.put(order.getWant(), volumeAmount);
+            volumeAmountOrders.put(order.getWantAssetKey(), volumeAmount);
 
-            volumePriceOrders.put(order.getWant(), volumePrice);
+            volumePriceOrders.put(order.getWantAssetKey(), volumePrice);
 
-            if (!pairsOpenOrders.containsKey(order.getHave())) {
+            if (!pairsOpenOrders.containsKey(order.getHaveAssetKey())) {
                 count = 0;
             } else {
-                count = pairsOpenOrders.get(order.getHave());
+                count = pairsOpenOrders.get(order.getHaveAssetKey());
             }
 
-            if (!volumePriceOrders.containsKey(order.getHave())) {
+            if (!volumePriceOrders.containsKey(order.getHaveAssetKey())) {
                 volumePrice = BigDecimal.ZERO;
             } else {
-                volumePrice = volumePriceOrders.get(order.getHave());
+                volumePrice = volumePriceOrders.get(order.getHaveAssetKey());
             }
 
-            if (!volumeAmountOrders.containsKey(order.getHave())) {
+            if (!volumeAmountOrders.containsKey(order.getHaveAssetKey())) {
                 volumeAmount = BigDecimal.ZERO;
             } else {
-                volumeAmount = volumeAmountOrders.get(order.getHave());
+                volumeAmount = volumeAmountOrders.get(order.getHaveAssetKey());
             }
 
             count++;
-            pairsOpenOrders.put(order.getHave(), count);
+            pairsOpenOrders.put(order.getHaveAssetKey(), count);
 
             volumePrice = volumePrice.add(order.getAmountHaveLeft());
 
-            volumePriceOrders.put(order.getHave(), volumePrice);
+            volumePriceOrders.put(order.getHaveAssetKey(), volumePrice);
 
-            volumeAmountOrders.put(order.getHave(), volumeAmount);
+            volumeAmountOrders.put(order.getHaveAssetKey(), volumeAmount);
         }
 
         Map<Long, Integer> pairsTrades = new TreeMap<Long, Integer>();
@@ -813,44 +809,44 @@ public class BlockExplorer {
         for (Trade trade : trades) {
 
             Order initiator = Order.getOrder(dcSet, trade.getInitiator());
-            if (!pairsTrades.containsKey(initiator.getWant())) { //.c.a)) {
+            if (!pairsTrades.containsKey(initiator.getWantAssetKey())) { //.c.a)) {
                 count = 0;
                 volumePrice = BigDecimal.ZERO;
                 volumeAmount = BigDecimal.ZERO;
             } else {
-                count = pairsTrades.get(initiator.getWant());
-                volumePrice = volumePriceTrades.get(initiator.getWant());
-                volumeAmount = volumeAmountTrades.get(initiator.getWant());
+                count = pairsTrades.get(initiator.getWantAssetKey());
+                volumePrice = volumePriceTrades.get(initiator.getWantAssetKey());
+                volumeAmount = volumeAmountTrades.get(initiator.getWantAssetKey());
             }
 
             count++;
-            pairsTrades.put(initiator.getWant(), count);
+            pairsTrades.put(initiator.getWantAssetKey(), count);
 
             volumePrice = volumePrice.add(trade.getAmountHave());
             volumeAmount = volumeAmount.add(trade.getAmountWant());
 
-            volumePriceTrades.put(initiator.getWant(), volumePrice);
-            volumeAmountTrades.put(initiator.getWant(), volumeAmount);
+            volumePriceTrades.put(initiator.getWantAssetKey(), volumePrice);
+            volumeAmountTrades.put(initiator.getWantAssetKey(), volumeAmount);
 
             Order target = Order.getOrder(dcSet, trade.getTarget());
-            if (!pairsTrades.containsKey(target.getWant())) {
+            if (!pairsTrades.containsKey(target.getWantAssetKey())) {
                 count = 0;
                 volumePrice = BigDecimal.ZERO;
                 volumeAmount = BigDecimal.ZERO; // ;
             } else {
-                count = pairsTrades.get(target.getWant());
-                volumePrice = volumePriceTrades.get(target.getWant());
-                volumeAmount = volumeAmountTrades.get(target.getWant());
+                count = pairsTrades.get(target.getWantAssetKey());
+                volumePrice = volumePriceTrades.get(target.getWantAssetKey());
+                volumeAmount = volumeAmountTrades.get(target.getWantAssetKey());
             }
 
             count++;
-            pairsTrades.put(target.getWant(), count);
+            pairsTrades.put(target.getWantAssetKey(), count);
 
             volumePrice = volumePrice.add(trade.getAmountHave());
             volumeAmount = volumeAmount.add(trade.getAmountWant());
 
-            volumePriceTrades.put(target.getWant(), volumePrice);
-            volumeAmountTrades.put(target.getWant(), volumeAmount);
+            volumePriceTrades.put(target.getWantAssetKey(), volumePrice);
+            volumeAmountTrades.put(target.getWantAssetKey(), volumeAmount);
         }
 
         Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = new TreeMap<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>>();
@@ -1061,10 +1057,10 @@ public class BlockExplorer {
 
         //tradeJSON.put("realPrice", trade.calcPrice(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
         //.setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
-        tradeJSON.put("realPrice", trade.calcPrice(pairAssetHave, pairAssetWant));
+        tradeJSON.put("realPrice", trade.calcPrice());
 
         //tradeJSON.put("realReversePrice", trade.calcPriceRevers(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
-        tradeJSON.put("realReversePrice", trade.calcPriceRevers(pairAssetHave, pairAssetWant));
+        tradeJSON.put("realReversePrice", trade.calcPriceRevers());
 
         tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
         tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
@@ -1078,7 +1074,7 @@ public class BlockExplorer {
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (pairHaveKey == orderInitiator.getHave()) {
+        if (pairHaveKey == orderInitiator.getHaveAssetKey()) {
             tradeJSON.put("type", "sell");
 
             tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
@@ -1108,7 +1104,7 @@ public class BlockExplorer {
 
         // Collections.reverse(ordersWant);
 
-        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 25);
+        List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 50);
 
         AssetCls assetHave = Controller.getInstance().getAsset(have);
         AssetCls assetWant = Controller.getInstance().getAsset(want);
@@ -1145,7 +1141,7 @@ public class BlockExplorer {
             sellJSON.put("amount", vol.toPlainString()); // getAmountHaveLeft
             sumAmount = sumAmount.add(vol);
 
-            sellJSON.put("sellingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
+            sellJSON.put("sellingPrice", order.calcPriceReverse().toPlainString());
 
             //BigDecimal sellingAmount = Order.calcAmountWantLeft(order);
             BigDecimal sellingAmount = order.getAmountWantLeft();
@@ -1192,7 +1188,7 @@ public class BlockExplorer {
 
             sumAmount = sumAmount.add(vol);
 
-            buyJSON.put("buyingPrice", Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
+            buyJSON.put("buyingPrice", order.calcPriceReverse().toPlainString());
 
             //BigDecimal buyingAmount = Order.calcAmountWantLeft(order);
             BigDecimal buyingAmount = order.getAmountWantLeft();
@@ -1770,7 +1766,7 @@ public class BlockExplorer {
         Collection<Order> orders = dcSet.getOrderMap().getValues();
 
         for (Order order : orders) {
-            if (order.getHave() == key) {
+            if (order.getHaveAssetKey() == key) {
                 alloreders = alloreders.add(order.getFulfilledHave());
             }
         }
@@ -1951,13 +1947,13 @@ public class BlockExplorer {
 
             transactionDataJSON.put("initiatorCreator", orderInitiator.getCreator());
             transactionDataJSON.put("initiatorAmount", orderInitiator.getAmountHave().toPlainString());
-            transactionDataJSON.put("initiatorHave", orderInitiator.getHave());
-            transactionDataJSON.put("initiatorWant", orderInitiator.getWant());
+            transactionDataJSON.put("initiatorHave", orderInitiator.getHaveAssetKey());
+            transactionDataJSON.put("initiatorWant", orderInitiator.getWantAssetKey());
 
             /*
             if (assetNames != null) {
-                assetNames.setKey(orderInitiator.getHave());
-                assetNames.setKey(orderInitiator.getWant());
+                assetNames.setKey(orderInitiator.getHaveAssetKey());
+                assetNames.setKey(orderInitiator.getWantAssetKey());
             }
             */
 
@@ -2016,8 +2012,8 @@ public class BlockExplorer {
 
                     /*
                     if (assetNames != null) {
-                        assetNames.setKey(order.getHave());
-                        assetNames.setKey(order.getWant());
+                        assetNames.setKey(order.getHaveAssetKey());
+                        assetNames.setKey(order.getWantAssetKey());
                     }
                     */
 
@@ -2028,7 +2024,7 @@ public class BlockExplorer {
                         orderJSON.put("amountLeft", "??");
                         orderJSON.put("amountWant", createOrder.getAmountWant().toPlainString());
                         orderJSON.put("price", Order.calcPrice(createOrder.getAmountHave(),
-                                createOrder.getAmountWant()).toPlainString());
+                                createOrder.getAmountWant(), 8).toPlainString());
 
                         transactionDataJSON.put("orderSource", orderJSON);
                     }
@@ -2043,13 +2039,13 @@ public class BlockExplorer {
 
                     /*
                     if (assetNames != null) {
-                        assetNames.setKey(order.getHave());
-                        assetNames.setKey(order.getWant());
+                        assetNames.setKey(order.getHaveAssetKey());
+                        assetNames.setKey(order.getWantAssetKey());
                     }
                     */
 
-                    orderJSON.put("have", order.getHave());
-                    orderJSON.put("want", order.getWant());
+                    orderJSON.put("have", order.getHaveAssetKey());
+                    orderJSON.put("want", order.getWantAssetKey());
 
                     orderJSON.put("amount", order.getAmountHave().toPlainString());
                     orderJSON.put("amountLeft", order.getAmountHaveLeft().toPlainString());
@@ -2331,9 +2327,9 @@ public class BlockExplorer {
                 pairJSON.put("last", "--");
             } else {
                 if (trade.getHaveKey() == pair.getB()) {
-                    pairJSON.put("last", trade.calcPrice(assetHave, assetWant).toPlainString());
+                    pairJSON.put("last", trade.calcPrice().toPlainString());
                 } else {
-                    pairJSON.put("last", trade.calcPriceRevers(assetHave, assetWant).toPlainString());
+                    pairJSON.put("last", trade.calcPriceRevers().toPlainString());
                 }
             }
 
@@ -2521,6 +2517,10 @@ public class BlockExplorer {
             long refInitator = Transaction.parseDBRef(refs[0]);
             long refTarget = Transaction.parseDBRef(refs[1]);
             trade = dcSet.getTradeMap().get(Fun.t2(refInitator, refTarget));
+            if (trade == null) {
+                output.put("error", "Trade not Found");
+                return output;
+            }
 
             all.add(DCSet.getInstance().getTransactionFinalMap().get(refInitator));
             all.add(DCSet.getInstance().getTransactionFinalMap().get(refTarget));

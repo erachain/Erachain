@@ -6,14 +6,12 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.lang.Lang;
-import org.erachain.utils.Pair;
 import org.erachain.utils.TableMenuPopupUtil;
 
 import javax.swing.*;
@@ -280,7 +278,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     if (row < sellOrdersTableModel.getRowCount()) {
                         buyOrderPanel.txtAmountHave.setText(order.getAmountHaveLeft().toPlainString());
                         // MAKE BIG SCALE
-                        buyOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountHave(), order.getAmountWant()).toPlainString());
+                        buyOrderPanel.txtPrice.setText(order.calcPrice().toPlainString());
 
                     }
                 }
@@ -323,7 +321,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
                     sellOrderPanel.txtAmountHave.setText(order.getAmountWantLeft().toPlainString());
                     // MAKE BIG SCALE
-                    sellOrderPanel.txtPrice.setText(Order.calcPrice(order.getAmountWant(), order.getAmountHave()).toPlainString());
+                    sellOrderPanel.txtPrice.setText(order.calcPriceReverse().toPlainString());
                 }
             }
         });
@@ -442,19 +440,19 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                 DCSet db = DCSet.getInstance();
                 Order initiator = Order.getOrder(db, trade.getInitiator());
-                boolean type = initiator.getHave() == have.getKey();
+                boolean type = initiator.getHaveAssetKey() == have.getKey();
 
                 if (e.getClickCount() == 2) {
 
                     if (type) {
-                        BigDecimal price = trade.calcPriceRevers(have, want);
+                        BigDecimal price = trade.calcPriceRevers();
                         sellOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         sellOrderPanel.txtPrice.setText(price.toPlainString());
 
                         buyOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         buyOrderPanel.txtPrice.setText(price.toPlainString());
                     } else {
-                        BigDecimal price = trade.calcPrice(have, want);
+                        BigDecimal price = trade.calcPrice();
                         sellOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
                         sellOrderPanel.txtPrice.setText(price.toPlainString());
 

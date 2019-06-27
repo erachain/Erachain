@@ -3,16 +3,12 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
-import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
-import org.erachain.ntp.NTP;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 
 import java.math.BigDecimal;
 import java.util.Observable;
@@ -91,7 +87,7 @@ public class BuyOrdersTableModel extends TimerTableModelCls<Order> implements Ob
 
                 //BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
                 // TODO: в новой версии нужно сделать везде +Scale = 0 - иначе несостыкоавка в процессинге ордера - там то 0
-                BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
+                BigDecimal price = order.calcPriceReverse();
                 amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
 
                 if (isMine)
@@ -135,8 +131,8 @@ public class BuyOrdersTableModel extends TimerTableModelCls<Order> implements Ob
         ) {
 
             Order order = (Order) message.getValue();
-            long haveKey = order.getHave();
-            long wantKey = order.getWant();
+            long haveKey = order.getHaveAssetKey();
+            long wantKey = order.getWantAssetKey();
             if (!(haveKey == this.haveKey && wantKey == this.wantKey)
                     && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
                 return;

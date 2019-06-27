@@ -7,10 +7,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.LoggerFactory;
 
 import java.util.Observer;
 
@@ -59,8 +57,8 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
 
             case COLUMN_HAVE:
 
-                AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHave());
-                return asset == null ? "[" + order.getHave() + "]" : asset.getShort();
+                AssetCls asset = DCSet.getInstance().getItemAssetMap().get(order.getHaveAssetKey());
+                return asset == null ? "[" + order.getHaveAssetKey() + "]" : asset.getShort();
 
             case COLUMN_PRICE:
 
@@ -68,8 +66,8 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
 
             case COLUMN_WANT:
 
-                asset = DCSet.getInstance().getItemAssetMap().get(order.getWant());
-                return asset == null ? "[" + order.getWant() + "]" : asset.getShort();
+                asset = DCSet.getInstance().getItemAssetMap().get(order.getWantAssetKey());
+                return asset == null ? "[" + order.getWantAssetKey() + "]" : asset.getShort();
 
             case COLUMN_AMOUNT_WANT:
 

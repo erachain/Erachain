@@ -79,11 +79,11 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
                 if (isSell)
                     return "<html><span style='color:green'>▲</span>"
-                            + NumberAsString.formatAsString(trade.calcPrice(order.getHaveAsset(), order.getWantAsset()))
+                            + NumberAsString.formatAsString(trade.calcPrice())
                             + "</html>";
                 else
                     return "<html><span style='color:red'>▼</span>"
-                            + NumberAsString.formatAsString(trade.calcPriceRevers(order.getHaveAsset(), order.getWantAsset()))
+                            + NumberAsString.formatAsString(trade.calcPriceRevers())
                             + "</html>";
 
             case COLUMN_WHO_AMOUNT:

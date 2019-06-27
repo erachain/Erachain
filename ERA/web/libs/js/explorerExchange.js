@@ -16,7 +16,7 @@ function exchange(data){
 
     output += '<h4 style="text-align: center;">' + data.label_table_PopularPairs + '</h4>';
 
-    output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_table_have;
     output += '<td><b>' + data.label_table_want + '<td><b>' + data.label_table_orders + '<td><b>' +
          data.label_table_last_price + '<td><b>' + data.label_table_volume24 + '</tr>';
@@ -39,7 +39,7 @@ function exchange(data){
 
     output += '<h4 style="text-align: center;">' + data.label_table_LastTrades + '</h4>';
 
-    output += '<table border="0" cellspacing="3" cellpadding="5" class="table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
     output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date;
     output += '<td align=center><b>' + data.label_Pair + '<td align=center><b>' + data.label_Trade_Initiator;
     output += '<td align=center><b>' + data.label_Amount;
@@ -72,8 +72,8 @@ function exchange(data){
 
                     if (trade.unchecked == true) {}
                     else {
-                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.4em"></span>'
-                            + '<span style="font-size:1.4em">' + addCommas(trade.realReversePrice) + '</span>';
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
+                            + '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
                         ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
                     }
 
@@ -85,8 +85,8 @@ function exchange(data){
 
                     if (trade.unchecked == true) {}
                     else {
-                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.4em"></span>'
-                            + '<span style="font-size:1.4em">' + addCommas(trade.realPrice) + '</span>';
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
+                            + '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
                         //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
                     }
 

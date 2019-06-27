@@ -8,9 +8,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.Pair;
 
@@ -19,8 +16,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,7 +95,7 @@ public class CancelOrderFrame extends JDialog {
 
         //TXT HAVE
         txtGBC.gridy = 2;
-        JTextField txtHave = new JTextField(String.valueOf(order.getHave()));
+        JTextField txtHave = new JTextField(String.valueOf(order.getHaveAssetKey()));
         txtHave.setEditable(false);
         this.add(txtHave, txtGBC);
 
@@ -111,7 +106,7 @@ public class CancelOrderFrame extends JDialog {
 
         //TXT WANT
         txtGBC.gridy = 3;
-        JTextField txtWant = new JTextField(String.valueOf(order.getWant()));
+        JTextField txtWant = new JTextField(String.valueOf(order.getWantAssetKey()));
         txtWant.setEditable(false);
         this.add(txtWant, txtGBC);
 

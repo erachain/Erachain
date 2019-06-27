@@ -559,7 +559,7 @@ button.white-bgc[disabled]:focus,
 
             for (key in data.aTs) {
 
-                output += '<table class="table table-striped" style="border: 1px solid #ddd;"><tr bgcolor="f1f1f1"><td>';
+                output += '<table class="tiny table table-striped" style="border: 1px solid #ddd;"><tr bgcolor="f1f1f1"><td>';
 
                 output += '<table width="100%">';
 
@@ -612,7 +612,7 @@ button.white-bgc[disabled]:focus,
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="">';
             output += '<tr><td align=left>';
 
-            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="table table-striped" style="border: 1px solid #ddd;">';
+            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  class="tiny table table-striped" style="border: 1px solid #ddd;">';
             output += '<tr><td><b>' + data.Label_No + '<td><b>' + data.Label_IP + ' <td><b>' + data.Label_Height + '<td><b>' + data.Label_Ping_mc + '<td><b>' + data.Label_Reliable + '<td><b>' + data.Label_Initiator + '<td><b>' + data.Label_Finding_ago + '<td><b>' + data.Label_Online_Time + '<td><b>' + data.Label_Version;
 
             minHeight = (data.maxHeight <= 20) ? 1 : data.maxHeight - 20;
@@ -685,7 +685,7 @@ button.white-bgc[disabled]:focus,
             output += '<table width="1280" border=0><tr><td align=left>';
             output += data.Balance.label_Balance_table + ':<br>';
             output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
-                ' class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
+                ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
             output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key +
                 '<td><b>' + data.Balance.label_asset_name + '<td><b>' + data.Balance.label_Balance_1 +
                 '<td><b>' + data.Balance.label_Balance_2 + '<td><b>' + data.Balance.label_Balance_3 + '<td><b>'
@@ -743,7 +743,7 @@ button.white-bgc[disabled]:focus,
             }
 
 
-            var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Table_Balance + '<td><b>' + data.Label_Table_in_OWN + '<td><b>' + data.Label_Table_Prop;
+            var table = '<table id=top100 BORDER=0  cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;"><tr><td><b>#<td><b>' + data.Label_Table_Account + '<td><b>' + data.Label_Table_person + '<td><b>' + data.Label_Table_Balance + '<td><b>' + data.Label_Table_in_OWN + '<td><b>' + data.Label_Table_Prop;
 
             for (key in data.top) {
                 var item = data.top[key];
@@ -797,7 +797,7 @@ button.white-bgc[disabled]:focus,
             }
 
 
-            var table = '<table id=top100 BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd; width: auto;">';
+            var table = '<table id=top100 BORDER=0 cellpadding=10 cellspacing=0 class="tiny table table-striped" style="border: 1px solid #ddd; width: auto;">';
 
             table += '<tr><td><b>Poll<td><b>Votes<td><b>Asset';//<td><b>View';
 
@@ -866,7 +866,7 @@ button.white-bgc[disabled]:focus,
 
             output += '<b>Creator:</b> <a href=?address=' + data.pool.creator + get_lang() + '>' + data.pool.creator + '</a><br><br>';
 
-            output += '<table border="0" cellspacing="5" class="table">';
+            output += '<table border="0" cellspacing="5" class="tiny table">';
             output += '<tr><td><b>Option</b></td><td><b>Votes</b></td><td width="390"><b>% of total</b></td></tr>';
 
             for (key in data.pool.options) {
@@ -893,7 +893,7 @@ button.white-bgc[disabled]:focus,
 
             output += '<br>';
 
-            output += '<table border="0" cellspacing="5" class="table table-condensed">';
+            output += '<table border="0" cellspacing="5" class="tiny table table-condensed">';
             output += '<tr><td><b>Address</b></td><td><b>Option</b></td><td><b>Votes</b></td></tr>';
 
             for (key in data.pool.votes) {
@@ -972,7 +972,7 @@ button.white-bgc[disabled]:focus,
 
             output += '<h3>' + data.asset.label_Available_pairs + '</h3>';
 
-            output += '<table border="0" cellspacing="10" class="table table-striped" style="border: 1px solid #ddd;"><tr>';
+            output += '<table border="0" cellspacing="10" class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
             output += '<td><b>' + data.asset.label_Pair + '</b></td><td><b>' + data.asset.label_Orders_Count + '</b></td>';
             output += '<td><b>' + data.asset.label_Open_Orders_Volume + '</b></td>';
             output += '<td><b>' + data.asset.label_Trades_Count + '</b></td><td><b>' + data.asset.label_Trades_Volume + '</b></td>';
@@ -1462,7 +1462,7 @@ button.white-bgc[disabled]:focus,
                         output += '<td align=right width=200>' + convertTimestamp(data.pageItems[i].timestamp, true) + '</td></tr></table>';
 
                         output += '<tr><td>';
-                        output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+                        output += '<table width="100%" class="tiny table table-striped"><tr><td width="70" align="center">';
                         output += '<b>Action</b></td><td width="290"><b>Generator</b></td><td><b>Fee</b></td>';
                         if (data[i].hasOwnProperty('balance')) {
                             output += '<td width=180><b>Balance</b></td>';
@@ -1500,7 +1500,7 @@ button.white-bgc[disabled]:focus,
                         output += '<td align=right width=200>' + convertTimestamp(data[i].trade.timestamp, true) + '</td></tr></table>';
 
                         output += '<tr><td>';
-                        output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+                        output += '<table width="100%" class="tiny table table-striped"><tr><td width="70" align="center">';
 
                         output += '<b>Action</b></td><td width="290"><b>Seller</b></td><td width="290"><b>Buyer</b></td>';
                         output += '<td width=135><b>Have</b></td><td width=135><b>Want</b></td><td width=135><b>Price</b></td>';
@@ -1598,7 +1598,7 @@ button.white-bgc[disabled]:focus,
 
                         output += '<tr><td>';
 
-                        output += '<table width="100%" class="table table-striped"><tr><td width="70" align="center">';
+                        output += '<table width="100%" class="tiny table table-striped"><tr><td width="70" align="center">';
 
                         output += '<b>Action</b></td><td width="290"><b>Sender</b></td><td width=200><b>Amount</b></td>';
                         output += '<td><b>Recipient</b></td><td><b>SeqNo</b></td>';
@@ -2012,7 +2012,7 @@ button.white-bgc[disabled]:focus,
                 + ': ' + data.unconfirmedTxs + '</a>';
             output += '<td align="right">' + data.Label_total_transactions + ': ' + data.totaltransactions + "</table>";
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180"  ' +
-                'class="table table-striped" style="border: 1px solid #ddd;">';
+                'class="tiny table table-striped" style="border: 1px solid #ddd;">';
             output += '<tr>' +
                 '<td><b>' + data.Label_Height +
                 '<td><b>' + data.Label_Target +
@@ -2087,7 +2087,7 @@ button.white-bgc[disabled]:focus,
             output += '<br><br>';
 
             output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 ' +
-                'class="table table-striped" style="border: 1px solid #ddd;"><tr>';
+                'class="tiny table table-striped" style="border: 1px solid #ddd;"><tr>';
             output += '<td><b>' + data.label_table_asset_key + ': <b>' + data.label_table_asset_name +
                 '<td><b>' + data.label_table_asset_description + '<td><b>' + data.label_table_asset_owner;
             output += '<td><b>' + data.label_table_asset_orders + '<td><b>' +

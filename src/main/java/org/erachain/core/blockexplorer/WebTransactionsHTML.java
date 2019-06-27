@@ -287,13 +287,20 @@ public class WebTransactionsHTML {
         CreateOrderTransaction createOrder = (CreateOrderTransaction) DCSet.getInstance().getTransactionFinalMap().get(key);
 
         out += "</br><h3>" + Lang.getInstance().translateFromLangObj("Order to Cancel", langObj) + "</h3>";
-        out += create_Order_HTML(createOrder, langObj);
+        if (createOrder == null) {
+            out += "not found" + " : " + cancelOrder.viewSignature();
+        } else {
+            out += create_Order_HTML(createOrder, langObj);
+        }
+
         return out;
     }
 
     private String create_Order_HTML(Transaction transaction, JSONObject langObj) {
         // TODO Auto-generated method stub
+
         String out = "";
+
         CreateOrderTransaction orderCreation = (CreateOrderTransaction) transaction;
 
         Order order = null;
@@ -324,7 +331,8 @@ public class WebTransactionsHTML {
                     + Lang.getInstance().translateFromLangObj("fulfilled", langObj) + ")" : "")
                 + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Price", langObj) + ":</b> "
-                + orderCreation.getPriceCalc().toPlainString() + " / " + orderCreation.getPriceCalcReverse().toPlainString() + "<br>";
+                + orderCreation.makeOrder().calcPrice().toPlainString()
+                + " / " + orderCreation.makeOrder().calcPriceReverse().toPlainString() + "<br>";
 
 
         return out;

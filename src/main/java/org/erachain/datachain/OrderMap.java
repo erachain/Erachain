@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.*;
 import org.erachain.database.DBMap;
@@ -89,8 +90,8 @@ public class OrderMap extends DCMap<Long, Order> {
                     @Override
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
-                        return new Fun.Tuple4<>(value.getHave(), value.getWant(),
-                                Order.calcPrice(value.getAmountHave(), value.getAmountWant()),
+                        return new Fun.Tuple4<>(value.getHaveAssetKey(), value.getWantAssetKey(),
+                                value.calcPrice(),
                                 value.getId());
                     }
                 });
@@ -113,7 +114,7 @@ public class OrderMap extends DCMap<Long, Order> {
                     public Fun.Tuple5<String, Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple5<String, Long, Long, BigDecimal, Long>
-                                (value.getCreator().getAddress(), value.getHave(), value.getWant(), value.getPrice(),
+                                (value.getCreator().getAddress(), value.getHaveAssetKey(), value.getWantAssetKey(), value.getPrice(),
                                         key);
                     }
                 });
@@ -130,8 +131,8 @@ public class OrderMap extends DCMap<Long, Order> {
                     @Override
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
-                        return new Fun.Tuple4<>(value.getWant(), value.getHave(),
-                                Order.calcPrice(value.getAmountHave(), value.getAmountWant()),
+                        return new Fun.Tuple4<>(value.getWantAssetKey(), value.getHaveAssetKey(),
+                                value.calcPrice(),
                                 value.getId());
             }
         });
@@ -301,7 +302,12 @@ public class OrderMap extends DCMap<Long, Order> {
         List<Order> orders = new ArrayList<Order>();
 
         for (Long key : keys) {
-            orders.add(this.get(key));
+            Order order = this.get(key);
+            if (order != null) {
+                orders.add(order);
+            } else {
+                // возможно произошло удаление в момент запроса??
+            }
         }
 
         if (reverse) {
