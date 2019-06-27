@@ -1135,13 +1135,10 @@ button.white-bgc[disabled]:focus,
 
                 output += '<td align=right style="line-height: 150%;">';
 
-                if (trade.initiatorCreator_addr == data.assetHaveOwner) {
-                    output += ' <b>&#9654;</b> ';
+                if (trade.initiatorCreator_addr == data.assetWantOwner) {
+                    output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span> ';
                 }
 
-                if (trade.initiatorCreator_addr == data.assetWantOwner) {
-                    output += ' <b>&#9655;</b> ';
-                }
                 output += '<a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
 
                 if (trade.type == 'sell') {
@@ -1168,10 +1165,7 @@ button.white-bgc[disabled]:focus,
                 output += '<a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
 
                 if (trade.targetCreator_addr == data.assetHaveOwner) {
-                    output += ' <b>&#9664;</span></b> ';
-                }
-                if (trade.targetCreator_addr == data.assetWantOwner) {
-                    output += ' <b>&#9665;</b> ';
+                    output += ' <span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
                 }
 
             }
