@@ -679,110 +679,75 @@ public class Order implements Comparable<Order> {
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
             compare = thisPrice.compareTo(orderReversePrice);
             if (compare > 0) {
-                // TODO: тут надо сделать просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
-                // просто - if (еhisPrice.compareTo(orderReversePrice) == 0) {
-
-                if (true || height > NEW_FLOR) {
-                    // пытаемся поиграть с точностью округления - см примеры в тестах
-                    // org.erachain.core.transaction.OrderTestsMy.price33 и org.erachain.core.transaction.OrderTestsMy.price33_1
-                    int thisPriceScale = thisPrice.stripTrailingZeros().scale();
-                    int orderReversePriceScale = orderReversePrice.stripTrailingZeros().scale();
-
-                    // если точность у заказа больше чем у нас - то он не сыграет
-                    // например 1 / 3 = 0.00333333
-                    // поэтому надо обрeтную цену проверить
-                    if (thisPriceScale > orderReversePriceScale) {
-                        // если обртаная цена к нам у ордера меньше точность - попробуем сравнить обратные цены
-                        // но при этом точность у нашей цены снизим до точности Заказа
-                        BigDecimal scaledThisPrice = thisPrice.setScale(orderReversePriceScale, RoundingMode.HALF_DOWN);
-                        if (scaledThisPrice.compareTo(orderReversePrice) == 0) {
-                            // да цены совпали
-                            // тогда еще так же обратные цены проверим
-                            BigDecimal thisReversePrice = calcPriceReverse();
-                            //BigDecimal scaledOrderPrice = orderPrice.setScale(thisReversePrice.scale(), RoundingMode.HALF_DOWN);
-                            // и сравним так же по прямой цене со сниженной точностью у Заказа
-                            if (orderPrice.compareTo(thisReversePrice) == 0)
-                                compare = 0;
-                            else
-                                break;
-                        } else
-                            break;
-                    } else if ((true || height > NEW_FLOR2) && thisPriceScale < orderReversePriceScale) {
-                        BigDecimal scaledOrderReversePrice = orderReversePrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
-                        if (scaledOrderReversePrice.compareTo(thisPrice) == 0) {
-                            // да цены совпали
-                            // тогда еще так же обратные цены проверим
-                            BigDecimal thisReversePrice = calcPriceReverse();
-                            //BigDecimal scaledOrderPrice = orderPrice.setScale(thisReversePrice.scale(), RoundingMode.HALF_DOWN);
-                            // и сравним так же по прямой цене со сниженной точностью у Заказа
-                            if (orderPrice.compareTo(thisReversePrice) == 0
-                                    && isPricesClose(thisPrice, orderReversePrice))
-                                compare = 0;
-                            else
-                                break;
-                        } else
-                            break;
-                    } else
-                        break;
-                } else
+                // Делаем просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
+                BigDecimal thisReversePrice = calcPriceReverse();
+                // и сравним так же по прямой цене со сниженной точностью у Заказа
+                if (orderPrice.compareTo(thisReversePrice) == 0) {
+                    compare = 0;
+                } else {
                     break;
+                }
             }
 
             orderAmountHaveLeft = order.getAmountHaveLeft();
             // SCALE for HAVE in ORDER
-            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.HALF_UP);
+            // цену ему занижаем так как это держатель позиции
+            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.DOWN);
 
             compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
-            if (compareLeft >= 0) {
+            if (compareLeft <= 0) {
+
+                // У позиции меньше чем нам надо - берем все данные с позиции
+                tradeAmountForHave = orderAmountHaveLeft;
+                tradeAmountForWant = orderAmountWantLeft;
+
+            } else {
 
                 tradeAmountForWant = thisAmountHaveLeft;
 
-                if (compareLeft == 0)
+                if (debug) {
+                    debug = true;
+                }
 
-                    tradeAmountForHave = orderAmountHaveLeft;
+                if (compare == 0) {
+                    // цена совпала (возможно с округлением) то без пересчета берем что раньше посчитали
+                    tradeAmountForHave = this.getAmountWantLeft();
 
-                else {
+                } else {
 
-                    if (debug) {
-                        debug = true;
-                    }
-
-                    if (compare == 0) {
-                        // цена совпала (возможно с округлением)
-                        tradeAmountForHave = this.getAmountWantLeft();
+                    // RESOLVE amount with SCALE
+                    // тут округляем наоборот вверх - больше даем тому кто активный
+                    tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.UP);
+                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
+                        // если вылазим после округления за предел то берем что есть
+                        tradeAmountForHave = orderAmountHaveLeft;
 
                     } else {
-                        // RESOLVE amount with SCALE
-                        tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.UP);
-                        if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
-                            // если вылазим после округления за предел то берем что есть
+
+                        if (debug) {
+                            debug = true;
+                        }
+
+                        // если там сотаток слишком маленький то добавим его в сделку
+                        // так как выше было округление и оно могло чуточку недотянуть
+                        BigDecimal diffForLeft = tradeAmountForHave.subtract(orderAmountHaveLeft).abs().divide(orderAmountHaveLeft, 10, RoundingMode.HALF_DOWN);
+                        if (PRECISION_UNIT.compareTo(diffForLeft) > 0
+                                || order.willUnResolvedFor(tradeAmountForHave)
+                        ) {
                             tradeAmountForHave = orderAmountHaveLeft;
-                        } else {
 
-                            if (debug) {
-                                debug = true;
-                            }
-
-                            // если там сотаток слишком маленький то добавим его в сделку
-                            // так как выше было округление и оно омгло чуточку недотянуть
-                            BigDecimal diffForLeft = tradeAmountForHave.subtract(orderAmountHaveLeft).abs().divide(orderAmountHaveLeft, 10, RoundingMode.HALF_DOWN);
-                            if (PRECISION_UNIT.compareTo(diffForLeft) > 0
-                                    || order.willUnResolvedFor(tradeAmountForHave)
-                            ) {
+                            // проверим еще раз может вылезло за рамки
+                            if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
+                                // если вылазим после округления за предел то берем что есть
                                 tradeAmountForHave = orderAmountHaveLeft;
                             }
                         }
-
                     }
+
                 }
 
                 //THIS is COMPLETED
                 completedOrder = true;
-
-            } else {
-
-                tradeAmountForHave = orderAmountHaveLeft;
-                tradeAmountForWant = orderAmountWantLeft;
 
             }
 
