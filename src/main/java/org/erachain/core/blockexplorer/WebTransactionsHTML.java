@@ -303,6 +303,9 @@ public class WebTransactionsHTML {
 
         CreateOrderTransaction orderCreation = (CreateOrderTransaction) transaction;
 
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ":</b> " + orderCreation.viewSignature() + "</br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("SeqNo", langObj) + ":</b> " + transaction.viewHeightSeq() + "</br>";
+
         Order order = null;
         boolean canceled = false;
         if (DCSet.getInstance().getCompletedOrderMap().contains(orderCreation.getDBRef())) {

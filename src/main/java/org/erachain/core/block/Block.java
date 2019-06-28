@@ -1267,6 +1267,11 @@ public class Block implements ExplorerJsonLine {
 
         Controller cnt = Controller.getInstance();
 
+        if (BlockChain.BLOCK_COUNT > 0 && this.heightBlock > BlockChain.BLOCK_COUNT) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] - Max count reached");
+            return false;
+        }
+
         // for DEBUG
         /*
         if (this.heightBlock == 60624) {
@@ -1389,7 +1394,6 @@ public class Block implements ExplorerJsonLine {
             // empty transactions
         } else {
 
-            int seq = 1;
             byte[] blockSignature = this.getSignature();
             byte[] transactionSignature;
             byte[] transactionsSignatures = new byte[0];
@@ -1552,7 +1556,7 @@ public class Block implements ExplorerJsonLine {
 
                         ///logger.debug("[" + seq + "] try finalMap.set" );
                         processTimingLocal = System.nanoTime();
-                        Long key = Transaction.makeDBRef(this.heightBlock, seq);
+                        Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
                         finalMap.set(key, transaction);
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                         if (processTimingLocalDiff < 999999999999l)
@@ -1583,7 +1587,7 @@ public class Block implements ExplorerJsonLine {
                         // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
 
                         processTimingLocal = System.nanoTime();
-                        Long key = Transaction.makeDBRef(this.heightBlock, seq);
+                        Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
                         finalMap.set(key, transaction);
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                         if (processTimingLocalDiff < 999999999999l)
@@ -1875,7 +1879,6 @@ public class Block implements ExplorerJsonLine {
         }
 
         //PROCESS TRANSACTIONS
-        int seq = 1;
         byte[] blockSignature = this.getSignature();
         byte[] transactionSignature;
 
@@ -1909,10 +1912,12 @@ public class Block implements ExplorerJsonLine {
                 if (cnt.isOnStopping())
                     throw new Exception("on stoping");
 
+                ++seqNo;
+
                 //logger.debug("[" + seq + "] record is process" );
 
                 // NEED set DC for WIPED too
-                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, ++seqNo);
+                transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                 //PROCESS
                 if (!transaction.isWiped()) {
@@ -1942,7 +1947,7 @@ public class Block implements ExplorerJsonLine {
 
                 } else {
 
-                    Long key = Transaction.makeDBRef(this.heightBlock, seq);
+                    Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
 
                     if (cnt.isOnStopping())
                         throw new Exception("on stoping");
@@ -1962,8 +1967,6 @@ public class Block implements ExplorerJsonLine {
                     }
                     timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
                 }
-
-                seq++;
 
             }
 

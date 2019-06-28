@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class BlockGenerator extends MonitoredThread implements Observer {
 
-    public static final boolean TEST_001 = true;
+    public static final boolean TEST_001 = false;
 
     static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getName());
 
