@@ -46,8 +46,6 @@ public class Block implements ExplorerJsonLine {
 
     static private HashMap totalCOMPUtest = new HashMap();
 
-    static public boolean TEST_DB_TXS_OFF = false;
-
     public static final int VERSION_LENGTH = 4;
     public static final int TIMESTAMP_LENGTH = 8;
     public static final int GENERATING_BALANCE_LENGTH = 4;
@@ -1549,7 +1547,7 @@ public class Block implements ExplorerJsonLine {
                     if (cnt.isOnStopping())
                         return false;
 
-                    if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                    if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
                             && ((RSend)transaction).getAssetKey() != 1) {
                         ;
                     } else {
@@ -1578,7 +1576,7 @@ public class Block implements ExplorerJsonLine {
 
                 } else {
 
-                    if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                    if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
                             && ((RSend) transaction).getAssetKey() != 1) {
                         ;
                     } else {
@@ -1942,7 +1940,7 @@ public class Block implements ExplorerJsonLine {
                 unconfirmedMap.delete(transactionSignature);
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
-                if (TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
                         && ((RSend)transaction).getAssetKey() != 1) {
 
                 } else {

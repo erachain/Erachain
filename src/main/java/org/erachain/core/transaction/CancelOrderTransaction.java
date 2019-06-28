@@ -202,6 +202,20 @@ public class CancelOrderTransaction extends Transaction {
         if (this.orderID == null || !this.dcSet.getOrderMap().contains(this.orderID)) {
             if (this.height > BlockChain.CANCEL_ORDERS_ALL_VALID) {
 
+                if (true) {
+                    if (this.orderID == null) {
+                        LOGGER.debug("INVALID: this.orderID == null");
+                    } else {
+                        // 3qUAUPdifyWYg7ABYa5TiWmyssHH1gJtKDatATS6UeKMnSzEwpuPJN5QFKCPHtUWpDYbK7fceFyDGhc51CuhiJ3
+                        LOGGER.debug("INVALID: this.sign = " + Base58.encode(signature));
+                        LOGGER.debug("INVALID: this.orderID = " + Transaction.viewDBRef(orderID));
+                        LOGGER.debug("INVALID: this.orderSign == " + Base58.encode(orderSignature));
+                        if (!this.dcSet.getCompletedOrderMap().contains(this.orderID)) {
+                            LOGGER.debug("INVALID: not in Completed");
+                        }
+                    }
+                }
+
                 return ORDER_DOES_NOT_EXIST;
             } else {
                 emptyOrder = true;
