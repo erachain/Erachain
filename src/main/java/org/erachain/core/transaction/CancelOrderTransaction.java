@@ -210,8 +210,10 @@ public class CancelOrderTransaction extends Transaction {
                         LOGGER.debug("INVALID: this.sign = " + Base58.encode(signature));
                         LOGGER.debug("INVALID: this.orderID = " + Transaction.viewDBRef(orderID));
                         LOGGER.debug("INVALID: this.orderSign == " + Base58.encode(orderSignature));
-                        if (!this.dcSet.getCompletedOrderMap().contains(this.orderID)) {
-                            LOGGER.debug("INVALID: not in Completed");
+                        if (this.dcSet.getCompletedOrderMap().contains(this.orderID)) {
+                            LOGGER.debug("INVALID: already Completed");
+                        } else {
+                            LOGGER.debug("INVALID: not exist in chain");
                         }
                     }
                 }
