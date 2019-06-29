@@ -154,9 +154,12 @@ public class Order implements Comparable<Order> {
      * проверяем по остаткам - сильно ли съехала цена для них.
      * если сильно то это уже ордер который не исполнится - его нужно отменять.
      * Перед употреблением нужно задать базу
+     * <hr>
+     * Перед использованием необходимо проверить order.isFulfilled - может он исполнился полностью
      * @return
      */
     public boolean isUnResolved() {
+
         BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(getFulfilledWant()), wantAssetScale);
         if (priceForLeft.signum() == 0)
             // уже не сошлось
@@ -701,6 +704,9 @@ public class Order implements Comparable<Order> {
                 tradeAmountForHave = orderAmountHaveLeft;
                 tradeAmountForWant = orderAmountWantLeft;
 
+                if (compareLeft == 0)
+                    completedOrder = true;
+
             } else {
 
                 tradeAmountForWant = thisAmountHaveLeft;
@@ -846,6 +852,12 @@ public class Order implements Comparable<Order> {
 
                 if (completedOrder)
                     break;
+
+                // возможно схлопнулся?
+                if (isFulfilled()) {
+                    completedOrder = true;
+                    break;
+                }
 
                 // if can't trade by more good price than self - by orderOrice - then  auto cancel!
                 if (this.isUnResolved()) {
