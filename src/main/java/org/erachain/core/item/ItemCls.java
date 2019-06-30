@@ -547,7 +547,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     //
-    public void insertToMap(DCSet db, long startKey) {
+    public Long insertToMap(DCSet db, long startKey) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
 
@@ -575,6 +575,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
         //SET ORPHAN DATA
         this.getDBIssueMap(db).set(this.reference, newKey);
 
+        return key;
     }
 
     public long removeFromMap(DCSet db, long startKey) {

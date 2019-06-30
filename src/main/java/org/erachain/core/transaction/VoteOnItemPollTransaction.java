@@ -71,6 +71,11 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     //public static String getName() { return "Vote on Poll"; }
 
     @Override
+    public long getKey() {
+        return this.key;
+    }
+
+    @Override
     public ItemCls getItem()
     {
         if (poll == null) {
@@ -83,17 +88,6 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
         this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
-    }
-
-    public long getKey() {
-        return this.key;
-    }
-
-    public long getAbsKey() {
-        if (this.key < 0)
-            return -this.key;
-
-        return this.key;
     }
 
     public int getOption() {
