@@ -24,6 +24,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -38,6 +39,7 @@ public class OrderTestsMy {
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
 
+    Random random = new Random();
     long flags = 0l;
     int seqNo = 0;
 
@@ -107,6 +109,7 @@ public class OrderTestsMy {
 
     int haveAssetScale = 8;
     int wantAssetScale = 8;
+
     private void init() {
 
         db = DCSet.createEmptyDatabaseSet();
@@ -137,9 +140,6 @@ public class OrderTestsMy {
 
         assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
-        // set SCALABLE assets ++
-        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
-
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
@@ -161,11 +161,16 @@ public class OrderTestsMy {
     }
 
     // reload from DB
-    private Order reloadOrder(
-            Order order) {
+    private Order reloadOrder(Order order) {
 
         return db.getCompletedOrderMap().contains(order.getId()) ? db.getCompletedOrderMap().get(order.getId())
                 : db.getOrderMap().get(order.getId());
+
+    }
+    private Order reloadOrder(Long orderId) {
+
+        return db.getCompletedOrderMap().contains(orderId) ? db.getCompletedOrderMap().get(orderId)
+                : db.getOrderMap().get(orderId);
 
     }
 
@@ -285,7 +290,7 @@ public class OrderTestsMy {
 
     }
 
-        @Test
+    @Test
     public void scaleTest() {
 
         init();
@@ -441,6 +446,89 @@ public class OrderTestsMy {
                 amountInvalid, (byte) 0, timestamp, 0l);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
+
+    }
+
+    @Test
+    public void scaleTest800() {
+
+        init();
+
+        int fromScale = 5;
+        assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+        byte[] reference = new byte[64];
+        this.random.nextBytes(reference);
+        assetA.setReference(reference);
+        assetA.insertToMap(db, 0l);
+
+        int toScale = 0;
+        assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+        this.random.nextBytes(reference);
+        assetB.setReference(reference);
+        assetB.insertToMap(db, 0l);
+
+        int cap = 60000;
+        for (int i = cap - 100; i < cap + 100; i++) {
+            BigDecimal amountSell = new BigDecimal(i);
+            BigDecimal amountBuy = new BigDecimal("1");
+
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuy,
+                    amountSell, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(orderCreation.getOrderId());
+            order_BA_1 = reloadOrder(orderCreation.getOrderId());
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            if (!order_AB_1.isFulfilled()) {
+                fullfilledA = fullfilledA;
+            }
+            if (!order_BA_1.isFulfilled()) {
+                fullfilledA = fullfilledA;
+            }
+            assertEquals(true, order_AB_1.isFulfilled());
+            assertEquals(true, order_BA_1.isFulfilled());
+
+        }
+
+        for (int i = cap - 100; i < cap + 100; i++) {
+            BigDecimal amountSell = new BigDecimal(1);
+            BigDecimal amountBuy = new BigDecimal("3");
+
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuy,
+                    amountSell, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(orderCreation.getOrderId());
+            order_BA_1 = reloadOrder(orderCreation.getOrderId());
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            assertEquals(true, order_AB_1.isFulfilled());
+            assertEquals(true, order_BA_1.isFulfilled());
+
+        }
 
     }
 

@@ -698,7 +698,11 @@ public class Order implements Comparable<Order> {
             orderAmountHaveLeft = order.getAmountHaveLeft();
             // SCALE for HAVE in ORDER
             // цену ему занижаем так как это держатель позиции
-            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.DOWN);
+            if (order.fulfilledHave.signum() == 0) {
+                orderAmountWantLeft = order.amountWant;
+            } else {
+                orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.DOWN);
+            }
 
             compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
             if (compareLeft <= 0) {
