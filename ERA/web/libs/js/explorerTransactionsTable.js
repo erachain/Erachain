@@ -313,7 +313,7 @@ function transactions_Table(data) {
 
         output += '<td>' + convertTimestamp(item.timestamp, true);
         output += '<td><a href ="?address=' + item.creator_addr + get_lang() + '">' +
-            cutBlank(item.creator, 30) + '</a><td>';
+            cut(cutBlank(item.creator, 30), 35) + '</a><td>';
         output += item.size
             + '<td>'+ item.fee
             + '<td>' + item.confirmations + '</td>'

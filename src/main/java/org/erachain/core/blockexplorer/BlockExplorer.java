@@ -3404,10 +3404,11 @@ public class BlockExplorer {
 
                 }
 
-                String amount = transaction.viewAmount();
-                if (amount.length() > 0) {
+                BigDecimal amount = transaction.getAmount();
+                if (amount != null && amount.signum() != 0) {
+                    amount = amount.stripTrailingZeros().abs();
                     out.put("amount",
-                            (outcome ? "-" : "+") + transaction.viewAmount());
+                                (outcome ? "-" : "+") + amount.toPlainString());
                 }
 
                 Long absKey = transaction.getAbsKey();

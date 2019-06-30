@@ -846,7 +846,7 @@ public class Account {
             return GenesisBlock.CREATOR.equals(this) ? "GENESIS" : this.getAddress().substring(0, cutAddress) + "..";
         } else {
             String personStr = personChar(personRes) + personRes.b.getShort();
-            String addressStr = this.getAddress().substring(1, 7);
+            String addressStr = this.getAddress().substring(1, 5);
             return addressStr + "" + personStr;
         }
     }
