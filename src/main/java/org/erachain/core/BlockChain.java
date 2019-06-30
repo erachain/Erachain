@@ -176,11 +176,12 @@ public class BlockChain {
                     //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };
 
+    public static final int TRADE_PRECISION = 5;
+
     public static final int ITEM_POLL_FROM = DEVELOP_USE ? 77000 : VERS_4_11;
 
     public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 1034 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
-    public static final int TRADE_PRECISION = 5;
     public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = new String[]{

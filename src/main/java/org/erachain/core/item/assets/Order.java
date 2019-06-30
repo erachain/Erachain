@@ -23,9 +23,9 @@ public class Order implements Comparable<Order> {
 
     private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
 
-    final private static BigDecimal PRECISION_UNIT = BigDecimal.ONE.scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION));
+    final private static BigDecimal PRECISION_UNIT = new BigDecimal("3.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION));
     // нужно на 1 больше сделать
-    final private static BigDecimal PRICE_CLOSESD = BigDecimal.ONE.scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
+    final private static BigDecimal PRICE_CLOSESD = new BigDecimal("3.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
 
     /**
      * с какого номера блока включить новое округление
@@ -162,13 +162,14 @@ public class Order implements Comparable<Order> {
      */
     public boolean isUnResolved() {
 
-        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(getFulfilledWant()), wantAssetScale);
+        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave),
+                amountWant.subtract(getFulfilledWant()), wantAssetScale);
         if (priceForLeft.signum() == 0)
             // уже не сошлось
             return true;
 
         BigDecimal diff = price.subtract(priceForLeft).divide(price,
-                wantAssetScale + BlockChain.TRADE_PRECISION + 3, RoundingMode.HALF_DOWN).abs();
+                wantAssetScale + BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
         if (diff.compareTo(PRECISION_UNIT) > 0)
             return true;
@@ -184,7 +185,7 @@ public class Order implements Comparable<Order> {
     public static boolean isPricesClose(BigDecimal price1, BigDecimal price2) {
 
         BigDecimal diff = price1.subtract(price2).divide(price1.min(price2),
-                BlockChain.TRADE_PRECISION + 3, RoundingMode.UP).abs();
+                BlockChain.TRADE_PRECISION + 1, RoundingMode.UP).abs();
         if (diff.compareTo(PRICE_CLOSESD) < 0)
             return true;
         return false;
@@ -192,9 +193,9 @@ public class Order implements Comparable<Order> {
 
     public boolean willUnResolvedFor(BigDecimal fulfilledHave, BigDecimal fulfilledWant) {
         BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave),
-                amountWant.subtract(fulfilledWant), wantAssetScale + BlockChain.TRADE_PRECISION);
+                amountWant.subtract(fulfilledWant), wantAssetScale);
         BigDecimal diff = price.subtract(priceForLeft).divide(price,
-                wantAssetScale + BlockChain.TRADE_PRECISION + 3, RoundingMode.HALF_DOWN).abs();
+                wantAssetScale + BlockChain.TRADE_PRECISION + 1, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
         if (diff.compareTo(PRECISION_UNIT) > 0)
             return true;
@@ -208,7 +209,7 @@ public class Order implements Comparable<Order> {
 
     public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
-        int scalePrice = Order.powerTen(amountHave) + (wantScale > 0 ? wantScale : 0) + (BlockChain.TRADE_PRECISION + 3);
+        int scalePrice = Order.powerTen(amountHave) + (wantScale > 0 ? wantScale : 0) + (BlockChain.TRADE_PRECISION);
         BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
@@ -753,12 +754,13 @@ public class Order implements Comparable<Order> {
                             debug = true;
                         }
 
-                        // если там сотаток слишком маленький то добавим его в сделку
-                        // так как выше было округление и оно могло чуточку недотянуть
+                        // если исполненый ордер станет не исполняемым то попробуем его тут обработать особо
                         if (order.willUnResolvedFor(tradeAmountForHave, tradeAmountForWant)) {
-                            BigDecimal reversePriceUnResolved =
-                                    calcPrice(tradeAmountForWant, tradeAmountForHave, wantAssetScale);
-                            if (Order.isPricesClose(orderReversePrice, reversePriceUnResolved)) {
+                            BigDecimal priceUpdateTrade = calcPrice(orderAmountHaveLeft,
+                                    // this.haveSacel for order.WANT
+                                    tradeAmountForWant, haveAssetScale);
+                            // если цена такущей сделки не сильно изменится то весь ордер в сделку собльем
+                            if (Order.isPricesClose(orderPrice, priceUpdateTrade)) {
                                 tradeAmountForHave = orderAmountHaveLeft;
                             }
 
