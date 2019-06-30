@@ -3304,6 +3304,9 @@ public class BlockExplorer {
         int i = 0;
         boolean outcome;
         int type;
+
+        ItemAssetMap assetMap = DCSet.getInstance().getItemAssetMap();
+
         int height = Controller.getInstance().getMyHeight();
 
         LinkedHashMap transactionsJSON = new LinkedHashMap();
@@ -3391,7 +3394,7 @@ public class BlockExplorer {
                             }
                         }
 
-                        out.put("creator", atSideAccount.getPersonAsString());
+                        out.put("creator", atSideAccount.getPersonAsString(15));
                         out.put("creator_addr", atSideAccount.getAddress());
 
                     }
@@ -3401,25 +3404,30 @@ public class BlockExplorer {
 
                 }
 
-
-                long absKey = transaction.getAbsKey();
-                String amount = transaction.viewAmount();
+                Long absKey = transaction.getAbsKey();
                 if (absKey > 0) {
-                    if (amount.length() > 0) {
-                        out.put("amount_key",
-                                (outcome ? "-" : "+") + transaction.viewAmount() + ":" + absKey);
+                    out.put("amountAssetKey", absKey);
+                    AssetCls asset = assetMap.get(absKey);
+                    if (asset == null) {
+                        out.put("amountAssetName", "[" + absKey + "]");
                     } else {
-                        out.put("amount_key", "" + absKey);
+                        out.put("amountAssetName", asset.getShortName());
                     }
-                } else {
-                    out.put("amount_key", "");
+
+                    String amount = transaction.viewAmount();
+                    if (amount.length() > 0) {
+                        out.put("amount",
+                                (outcome ? "-" : "+") + transaction.viewAmount());
+                    }
                 }
 
+                /*
                 if (transaction.viewRecipient() == null) {
                     out.put("recipient", "-");
                 } else {
-                    out.put("recipient", transaction.viewRecipient());
+                    out.put("recipient", transaction.getRecipient(),getPersonAsString(15)
                 }
+                */
 
                 transactionsJSON.put(i, out);
                 i++;
@@ -3427,6 +3435,7 @@ public class BlockExplorer {
         }
 
         outputTXs.put("transactions", transactionsJSON);
+        outputTXs.put("label_seqNo", Lang.getInstance().translateFromLangObj("Number", langObj));
         outputTXs.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
         outputTXs.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
         outputTXs.put("label_type_transaction", Lang.getInstance().translateFromLangObj("Type", langObj));

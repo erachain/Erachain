@@ -840,6 +840,17 @@ public class Account {
         }
     }
 
+    public String getPersonAsString(int cutAddress) {
+        Tuple2<Integer, PersonCls> personRes = this.getPerson();
+        if (personRes == null) {
+            return GenesisBlock.CREATOR.equals(this) ? "GENESIS" : this.getAddress().substring(0, cutAddress) + "..";
+        } else {
+            String personStr = personChar(personRes) + personRes.b.getShort();
+            String addressStr = this.getAddress().substring(1, 7);
+            return addressStr + "" + personStr;
+        }
+    }
+
     public String getPersonOrShortAddress(int max) {
         Tuple2<Integer, PersonCls> personRes = this.getPerson();
         if (personRes == null) {
