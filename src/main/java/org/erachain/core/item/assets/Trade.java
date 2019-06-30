@@ -62,6 +62,11 @@ public class Trade {
         return this.target;
     }
 
+    public static Trade get(DCSet db, Order initiator, Order target) {
+
+        return db.getTradeMap().get(new Tuple2<>(initiator.getId(), target.getId()));
+    }
+
     public Order getTargetOrder(DCSet db) {
         return Order.getOrder(db, this.target);
     }

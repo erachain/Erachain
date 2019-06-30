@@ -182,9 +182,9 @@ public class Order implements Comparable<Order> {
         return false;
     }
 
-    public boolean willUnResolvedFor(BigDecimal fulfilledHave) {
+    public boolean willUnResolvedFor(BigDecimal fulfilledHave, BigDecimal fulfilledWant) {
         BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave),
-                amountWant.subtract(willFulfilledWant(fulfilledHave)), wantAssetScale);
+                amountWant.subtract(fulfilledWant), wantAssetScale + BlockChain.TRADE_PRECISION);
         BigDecimal diff = price.subtract(priceForLeft).divide(price,
                 wantAssetScale + BlockChain.TRADE_PRECISION + 3, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
@@ -301,6 +301,10 @@ public class Order implements Comparable<Order> {
 
     public boolean isFulfilled() {
         return this.fulfilledHave.compareTo(this.amountHave) == 0;
+    }
+
+    public boolean isActive(DCSet dcSet) {
+        return dcSet.getOrderMap().contains(id);
     }
 
     // TO DO
@@ -746,7 +750,7 @@ public class Order implements Comparable<Order> {
                         BigDecimal diffForLeft = tradeAmountForHave.subtract(orderAmountHaveLeft).abs().divide(orderAmountHaveLeft,
                                 BlockChain.TRADE_PRECISION + 3, RoundingMode.HALF_DOWN);
                         if (PRECISION_UNIT.compareTo(diffForLeft) > 0
-                                || order.willUnResolvedFor(tradeAmountForHave)
+                                || order.willUnResolvedFor(tradeAmountForHave, tradeAmountForWant)
                         ) {
                             tradeAmountForHave = orderAmountHaveLeft;
 

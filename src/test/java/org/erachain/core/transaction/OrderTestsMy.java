@@ -459,13 +459,15 @@ public class OrderTestsMy {
         byte[] reference = new byte[64];
         this.random.nextBytes(reference);
         assetA.setReference(reference);
-        assetA.insertToMap(db, 0l);
+        // чтобы точность сбросить в 0
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
         int toScale = 0;
         assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
         this.random.nextBytes(reference);
         assetB.setReference(reference);
-        assetB.insertToMap(db, 0l);
+        // чтобы точность сбросить в 0
+        assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
         int cap = 60000;
         for (int i = cap - 100; i < cap + 100; i++) {
@@ -477,16 +479,18 @@ public class OrderTestsMy {
             orderCreation.sign(accountA, Transaction.FOR_NETWORK);
             orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
             orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
 
             orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuy,
                     amountSell, (byte) 0, timestamp++, 0l);
             orderCreation.sign(accountB, Transaction.FOR_NETWORK);
             orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
             orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
 
             // посре обработки обновим все данные
-            order_AB_1 = reloadOrder(orderCreation.getOrderId());
-            order_BA_1 = reloadOrder(orderCreation.getOrderId());
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
 
             BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
             BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
@@ -497,33 +501,154 @@ public class OrderTestsMy {
             if (!order_BA_1.isFulfilled()) {
                 fullfilledA = fullfilledA;
             }
+
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
+
             assertEquals(true, order_AB_1.isFulfilled());
             assertEquals(true, order_BA_1.isFulfilled());
 
         }
 
         for (int i = cap - 100; i < cap + 100; i++) {
-            BigDecimal amountSell = new BigDecimal(1);
-            BigDecimal amountBuy = new BigDecimal("3");
+            BigDecimal amountSell = new BigDecimal("1");
+            BigDecimal amountBuy = new BigDecimal(i);
 
             orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuy,
                     amountSell, (byte) 0, timestamp++, 0l);
             orderCreation.sign(accountA, Transaction.FOR_NETWORK);
             orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
             orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
 
             orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
                     amountBuy, (byte) 0, timestamp++, 0l);
             orderCreation.sign(accountB, Transaction.FOR_NETWORK);
             orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
             orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
 
             // посре обработки обновим все данные
-            order_AB_1 = reloadOrder(orderCreation.getOrderId());
-            order_BA_1 = reloadOrder(orderCreation.getOrderId());
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
 
             BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
             BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
+
+            assertEquals(true, order_AB_1.isFulfilled());
+            assertEquals(true, order_BA_1.isFulfilled());
+
+        }
+
+    }
+
+    /**
+     * тут частично недо покупка на мизер и ордер или отменяется если он иницатор
+     * иди остаток прибаляется к иницатору и он становится комплетед
+     */
+    @Test
+    public void scaleTest800_1() {
+
+        init();
+
+        int fromScale = 0;
+        assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+        byte[] reference = new byte[64];
+        this.random.nextBytes(reference);
+        assetA.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int toScale = 0;
+        assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+        this.random.nextBytes(reference);
+        assetB.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int cap = 60000;
+        for (int i = cap - 100; i < cap + 100; i++) {
+            BigDecimal amountSell = new BigDecimal(i);
+            BigDecimal amountBuy = new BigDecimal("1111111");
+
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
+
+            // увеличим ордер-кусатель
+            amountBuy = amountBuy.add(new BigDecimal("1"));
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuy,
+                    amountSell, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            if (!order_AB_1.isFulfilled()) {
+                fullfilledA = fullfilledA;
+            }
+            if (!order_BA_1.isFulfilled()) {
+                fullfilledA = fullfilledA;
+            }
+
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
+
+            assertEquals(true, order_AB_1.isFulfilled());
+            assertEquals(false, order_BA_1.isFulfilled());
+
+        }
+
+        for (int i = cap - 100; i < cap + 100; i++) {
+            BigDecimal amountSell = new BigDecimal("1111111");
+            BigDecimal amountBuy = new BigDecimal(i);
+
+            // увеличим ордер-держатель
+            BigDecimal price = amountSell.divide(amountBuy, 20, RoundingMode.DOWN);
+            BigDecimal amountBuyNew = amountBuy.add(new BigDecimal("3000"));
+            BigDecimal amountSellNew = amountBuyNew.multiply(price).setScale(assetA.getScale(), RoundingMode.DOWN);
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuyNew,
+                    amountSellNew, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
+
+            //amountBuy = amountBuy.subtract(new BigDecimal("1"));
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
+
+            Trade trade = Trade.get(db, order_BA_1, order_AB_1);
+
+            BigDecimal tradePrice = trade.calcPrice();
+            Order.isPricesClose(order_AB_1.getPrice(), tradePrice);
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(true, order_BA_1.isActive(db));
 
             assertEquals(true, order_AB_1.isFulfilled());
             assertEquals(true, order_BA_1.isFulfilled());
