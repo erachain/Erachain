@@ -61,7 +61,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
 
-
     // RETURN START KEY in tot GEMESIS
     public long getStartKey(int height) {
         if (height < BlockChain.VERS_4_11) {

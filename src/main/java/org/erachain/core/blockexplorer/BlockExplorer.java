@@ -3404,20 +3404,24 @@ public class BlockExplorer {
 
                 }
 
+                String amount = transaction.viewAmount();
+                if (amount.length() > 0) {
+                    out.put("amount",
+                            (outcome ? "-" : "+") + transaction.viewAmount());
+                }
+
                 Long absKey = transaction.getAbsKey();
                 if (absKey > 0) {
-                    out.put("amountAssetKey", absKey);
-                    AssetCls asset = assetMap.get(absKey);
-                    if (asset == null) {
-                        out.put("amountAssetName", "[" + absKey + "]");
-                    } else {
-                        out.put("amountAssetName", asset.getShortName());
-                    }
+                    out.put("itemKey", absKey);
 
-                    String amount = transaction.viewAmount();
-                    if (amount.length() > 0) {
-                        out.put("amount",
-                                (outcome ? "-" : "+") + transaction.viewAmount());
+                    if (transaction instanceof Itemable) {
+                        Itemable itemable = (Itemable) transaction;
+
+                        ItemCls item = itemable.getItem();
+                        if (item != null) {
+                            out.put("itemName", item.getShortName());
+                            out.put("itemType", item.getItemTypeName());
+                        }
                     }
                 }
 

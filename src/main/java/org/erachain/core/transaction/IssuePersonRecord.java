@@ -57,7 +57,6 @@ public class IssuePersonRecord extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-    //public String getName() { return "Issue Person"; }
 
     @Override
     public long getInvitedFee() {

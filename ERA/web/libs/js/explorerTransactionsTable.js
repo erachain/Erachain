@@ -295,19 +295,20 @@ function transactions_Table(data) {
             output += '<td>';
         }
 
-        if (item.type != 'forging') {
-            output += item.type + '<td>';
-        } else {
-            output += item.type + '<td>';
+        output += item.type + '<td>';
+
+        if (item.hasOwnProperty('amount')) {
+            output += item.amount + ' ';
         }
 
-        if (item.hasOwnProperty('amountAssetKey')) {
-            if (item.hasOwnProperty('amount')) {
-                output += item.amount + ' ';
-            }
+        if (item.hasOwnProperty('itemKey')) {
 
-            output += '<a href ="?asset=' + item.amountAssetKey + get_lang() + '">' +
-                item.amountAssetName + '</a>';
+            if (item.hasOwnProperty('itemName')) {
+                output += '<a href ="?' + item.itemType + '=' + item.itemKey + get_lang() + '">' +
+                    item.itemName + '</a>';
+            } else {
+                output += '[' + item.itemKey + ']';
+            }
         }
 
         output += '<td>' + convertTimestamp(item.timestamp, true);

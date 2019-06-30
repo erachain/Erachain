@@ -96,7 +96,7 @@ public class TestRecSetStatusToItem {
 
         timestamp += 100;
         setStatusTransaction = new RSetStatusToItem(maker, FEE_POWER, status_key,
-                person.getItemTypeInt(), person.getKey(db),
+                person.getItemType(), person.getKey(db),
                 to_date, birthDay + 1000,
                 45646533, 987978972,
                 "teasdsdst TEST".getBytes(Charset.forName("UTF-8")),
@@ -124,7 +124,7 @@ public class TestRecSetStatusToItem {
 
         //INVALID SIGNATURE
         setStatusTransaction = new RSetStatusToItem(maker, FEE_POWER, status_key,
-                person.getItemTypeInt(), person.getKey(db), to_date, null,
+                person.getItemType(), person.getKey(db), to_date, null,
                 323234, 2342342, null, "test TEST 11".getBytes(Charset.forName("UTF-8")), 0l, null,
                 timestamp, maker.getLastTimestamp(db), new byte[64]);
 
@@ -224,7 +224,7 @@ public class TestRecSetStatusToItem {
 
         to_date = timestamp + 1234L * 84600000L;
         RSetStatusToItem setStatusTransaction_2 = new RSetStatusToItem(maker, FEE_POWER, status_key,
-                person.getItemTypeInt(), person.getKey(db), to_date, null,
+                person.getItemType(), person.getKey(db), to_date, null,
                 234354, 546567,
                 "wersdfsdfsdftest TEST".getBytes(Charset.forName("UTF-8")),
                 "test TEST".getBytes(Charset.forName("UTF-8")),

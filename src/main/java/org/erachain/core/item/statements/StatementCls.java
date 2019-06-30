@@ -23,11 +23,11 @@ public abstract class StatementCls extends ItemCls {
     }
 
     //GETTERS/SETTERS
-    public int getItemTypeInt() {
+    public int getItemType() {
         return ItemCls.STATEMENT_TYPE;
     }
 
-    public String getItemTypeStr() {
+    public String getItemTypeName() {
         return "statement";
     }
 

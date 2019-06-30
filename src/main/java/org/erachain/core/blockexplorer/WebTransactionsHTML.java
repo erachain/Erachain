@@ -394,7 +394,7 @@ public class WebTransactionsHTML {
                     + new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")) + "<br>";
         }
         out += "<b>" + Lang.getInstance().translateFromLangObj("Item Name", langObj) + ":</b> "
-                + item.getItemTypeStr() + " - " + item.getItemSubType()
+                + item.getItemTypeName() + " - " + item.getItemSubType()
                 + ": " + item.getName() + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Item Description", langObj) + ":</b> "
                 + item.getDescription() + "<br>";

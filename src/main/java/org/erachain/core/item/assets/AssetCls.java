@@ -225,6 +225,58 @@ public abstract class AssetCls extends ItemCls {
     }
 
     //GETTERS/SETTERS
+
+    @Override
+    public int getItemType() {
+        return ItemCls.ASSET_TYPE;
+    }
+
+    @Override
+    public String getItemTypeName() {
+        return "asset";
+    }
+
+    // DB
+    @Override
+    public ItemMap getDBMap(DCSet db) {
+        return db.getItemAssetMap();
+    }
+
+    @Override
+    public IssueItemMap getDBIssueMap(DCSet db) {
+        return db.getIssueAssetMap();
+    }
+
+    public abstract Long getQuantity();
+
+    public abstract Long getTotalQuantity(DCSet dc);
+
+	/*
+	public boolean isDivisible() {
+		if (this.key < BlockChain.AMOUNT_SCALE_FROM)
+			return divisible;
+
+		return this.scale > 0;
+	}
+	 */
+
+    public int getScale() {
+        if (this.key > 0 && this.key < 5 ||
+                this.key > 1000 &&
+                        this.key < BlockChain.AMOUNT_SCALE_FROM
+        ) {
+            //return this.assetType == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
+            // IN ANY CASE
+            return BlockChain.AMOUNT_DEDAULT_SCALE;
+        }
+
+        return this.scale;
+    }
+
+    public int getAssetType() {
+        return this.assetType;
+    }
+
     @Override
     public String getName() {
 		/*
@@ -309,57 +361,6 @@ public abstract class AssetCls extends ItemCls {
         }
 
         return this.description;
-    }
-
-    @Override
-    public int getItemTypeInt() {
-        return ItemCls.ASSET_TYPE;
-    }
-
-    @Override
-    public String getItemTypeStr() {
-        return "asset";
-    }
-
-    // DB
-    @Override
-    public ItemMap getDBMap(DCSet db) {
-        return db.getItemAssetMap();
-    }
-
-    @Override
-    public IssueItemMap getDBIssueMap(DCSet db) {
-        return db.getIssueAssetMap();
-    }
-
-    public abstract Long getQuantity();
-
-    public abstract Long getTotalQuantity(DCSet dc);
-
-	/*
-	public boolean isDivisible() {
-		if (this.key < BlockChain.AMOUNT_SCALE_FROM)
-			return divisible;
-
-		return this.scale > 0;
-	}
-	 */
-
-    public int getScale() {
-        if (this.key > 0 && this.key < 5 ||
-                this.key > 1000 &&
-                        this.key < BlockChain.AMOUNT_SCALE_FROM
-        ) {
-            //return this.assetType == 1? BlockChain.AMOUNT_DEDAULT_SCALE : 0;
-            // IN ANY CASE
-            return BlockChain.AMOUNT_DEDAULT_SCALE;
-        }
-
-        return this.scale;
-    }
-
-    public int getAssetType() {
-        return this.assetType;
     }
 
     @Override

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
-public abstract class IssueItemRecord extends Transaction {
+public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     static Logger LOGGER = LoggerFactory.getLogger(IssueItemRecord.class.getName());
 

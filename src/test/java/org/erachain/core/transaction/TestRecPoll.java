@@ -194,7 +194,7 @@ public class TestRecPoll {
     public void parseIssuePollRecord() {
 
 
-        LOGGER.info("poll: " + poll.getType()[0] + ", " + poll.getType()[1]);
+        LOGGER.info("poll: " + poll.getTypeBytes()[0] + ", " + poll.getTypeBytes()[1]);
 
         // PARSE POLL
 
@@ -217,7 +217,7 @@ public class TestRecPoll {
         assertEquals(poll.getOwner().getAddress(), parsedPoll.getOwner().getAddress());
         assertEquals(poll.getName(), parsedPoll.getName());
         assertEquals(poll.getDescription(), parsedPoll.getDescription());
-        assertEquals(poll.getItemTypeStr(), parsedPoll.getItemTypeStr());
+        assertEquals(poll.getItemTypeName(), parsedPoll.getItemTypeName());
 
         // PARSE ISSEU POLL RECORD
         issuePollTransaction.sign(certifier, Transaction.FOR_NETWORK);
@@ -265,7 +265,7 @@ public class TestRecPoll {
         //CHECK DESCRIPTION
         assertEquals(poll.getDescription(), parsedPoll.getDescription());
 
-        assertEquals(poll.getItemTypeStr(), parsedPoll.getItemTypeStr());
+        assertEquals(poll.getItemTypeName(), parsedPoll.getItemTypeName());
 
         assertEquals(poll.getOptions().size(), parsedPoll.getOptions().size());
         assertEquals(poll.getOptions().get(2), parsedPoll.getOptions().get(2));

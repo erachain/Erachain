@@ -51,7 +51,6 @@ public class IssueStatusRecord extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Issue Status"; }
 
     // RETURN START KEY in tot GEMESIS
     public long getStartKey(int height) {

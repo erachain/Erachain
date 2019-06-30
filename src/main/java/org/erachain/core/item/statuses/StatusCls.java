@@ -28,11 +28,11 @@ public abstract class StatusCls extends ItemCls {
     }
 
     //GETTERS/SETTERS
-    public int getItemTypeInt() {
+    public int getItemType() {
         return ItemCls.STATUS_TYPE;
     }
 
-    public String getItemTypeStr() {
+    public String getItemTypeName() {
         return "status";
     }
 

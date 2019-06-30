@@ -101,7 +101,6 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int VERS_ORDER_0 = DEVELOP_USE ? 230000 : 194400;
     public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 330000 : 256555;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 325555 : 256555;
 

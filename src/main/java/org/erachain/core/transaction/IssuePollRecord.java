@@ -50,7 +50,7 @@ public class IssuePollRecord extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Issue Poll"; }
+
     // RETURN START KEY in tot GEMESIS
 
     public long getStartKey(int height) {
