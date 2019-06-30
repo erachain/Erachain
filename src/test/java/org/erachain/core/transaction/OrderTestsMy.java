@@ -611,14 +611,37 @@ public class OrderTestsMy {
             assertEquals(false, order_BA_1.isFulfilled());
 
         }
+    }
 
-        for (int i = cap - 100; i < cap + 100; i++) {
+    @Test
+    public void scaleTest800_1back() {
+
+        init();
+
+        int fromScale = 0;
+        assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+        byte[] reference = new byte[64];
+        this.random.nextBytes(reference);
+        assetA.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int toScale = 0;
+        assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+        this.random.nextBytes(reference);
+        assetB.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int cap = 60000;
+
+        for (int i = cap - 10; i < cap + 10; i++) {
             BigDecimal amountSell = new BigDecimal("1111111");
             BigDecimal amountBuy = new BigDecimal(i);
 
             // увеличим ордер-держатель
             BigDecimal price = amountSell.divide(amountBuy, 20, RoundingMode.DOWN);
-            BigDecimal amountBuyNew = amountBuy.add(new BigDecimal("3000"));
+            BigDecimal amountBuyNew = amountBuy.add(new BigDecimal("2"));
             BigDecimal amountSellNew = amountBuyNew.multiply(price).setScale(assetA.getScale(), RoundingMode.DOWN);
             orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuyNew,
                     amountSellNew, (byte) 0, timestamp++, 0l);
@@ -627,7 +650,6 @@ public class OrderTestsMy {
             orderCreation.process(null, Transaction.FOR_NETWORK);
             order_AB_1_ID = orderCreation.getOrderId();
 
-            //amountBuy = amountBuy.subtract(new BigDecimal("1"));
             orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
                     amountBuy, (byte) 0, timestamp++, 0l);
             orderCreation.sign(accountB, Transaction.FOR_NETWORK);
@@ -642,13 +664,13 @@ public class OrderTestsMy {
             Trade trade = Trade.get(db, order_BA_1, order_AB_1);
 
             BigDecimal tradePrice = trade.calcPrice();
-            Order.isPricesClose(order_AB_1.getPrice(), tradePrice);
+            assertEquals(false, Order.isPricesClose(order_AB_1.getPrice(), tradePrice));
 
             BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
             BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
 
             assertEquals(false, order_AB_1.isActive(db));
-            assertEquals(true, order_BA_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
 
             assertEquals(true, order_AB_1.isFulfilled());
             assertEquals(true, order_BA_1.isFulfilled());

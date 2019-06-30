@@ -24,6 +24,8 @@ public class Order implements Comparable<Order> {
     private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
 
     final private static BigDecimal PRECISION_UNIT = BigDecimal.ONE.scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION));
+    // нужно на 1 больше сделать
+    final private static BigDecimal PRICE_CLOSESD = BigDecimal.ONE.scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
 
     /**
      * с какого номера блока включить новое округление
@@ -173,11 +175,17 @@ public class Order implements Comparable<Order> {
         return false;
     }
 
+    /**
+     * есди цены в погрешности
+     * @param price1
+     * @param price2
+     * @return
+     */
     public static boolean isPricesClose(BigDecimal price1, BigDecimal price2) {
 
         BigDecimal diff = price1.subtract(price2).divide(price1.min(price2),
                 BlockChain.TRADE_PRECISION + 3, RoundingMode.UP).abs();
-        if (diff.compareTo(PRECISION_UNIT) < 0)
+        if (diff.compareTo(PRICE_CLOSESD) < 0)
             return true;
         return false;
     }
@@ -747,12 +755,12 @@ public class Order implements Comparable<Order> {
 
                         // если там сотаток слишком маленький то добавим его в сделку
                         // так как выше было округление и оно могло чуточку недотянуть
-                        BigDecimal diffForLeft = tradeAmountForHave.subtract(orderAmountHaveLeft).abs().divide(orderAmountHaveLeft,
-                                BlockChain.TRADE_PRECISION + 3, RoundingMode.HALF_DOWN);
-                        if (PRECISION_UNIT.compareTo(diffForLeft) > 0
-                                || order.willUnResolvedFor(tradeAmountForHave, tradeAmountForWant)
-                        ) {
-                            tradeAmountForHave = orderAmountHaveLeft;
+                        if (order.willUnResolvedFor(tradeAmountForHave, tradeAmountForWant)) {
+                            BigDecimal reversePriceUnResolved =
+                                    calcPrice(tradeAmountForWant, tradeAmountForHave, wantAssetScale);
+                            if (Order.isPricesClose(orderReversePrice, reversePriceUnResolved)) {
+                                tradeAmountForHave = orderAmountHaveLeft;
+                            }
 
                             // проверим еще раз может вылезло за рамки
                             if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
