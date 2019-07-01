@@ -191,6 +191,11 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         this.set(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()), trade);
     }
 
+    /**
+     * поиск ключей для протокольных вторичных индексов с учетом Родительской таблицы (если база форкнута)
+     * @param order
+     * @return
+     */
     @SuppressWarnings("unchecked")
     private Collection<Tuple2> getKeys(Order order) {
 

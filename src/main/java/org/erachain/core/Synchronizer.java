@@ -36,7 +36,7 @@ public class Synchronizer {
     private static final int BYTES_MAX_GET = 1024 << 10;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
-    public static int BAN_BLOCK_TIMES = 4;
+    public static int BAN_BLOCK_TIMES = 16;
     private static int MAX_ORPHAN_TRANSACTIONS = BlockChain.DEVELOP_USE? 200000: 50000;
     // private boolean run = true;
     // private Block runedBlock;
@@ -78,7 +78,7 @@ public class Synchronizer {
 
         // CHECK BLOCK SIGNATURE
         if (!block.isSignatureValid()) {
-            int banTime = BAN_BLOCK_TIMES;
+            int banTime = BAN_BLOCK_TIMES << 1;
             String mess = "*** getBlock: Dishonest peer - Invalid block --signature. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
@@ -88,7 +88,7 @@ public class Synchronizer {
         try {
             block.getTransactions();
         } catch (Exception e) {
-            int banTime = BAN_BLOCK_TIMES;
+            int banTime = BAN_BLOCK_TIMES << 1;
             String mess = "*** getBlock: Dishonest peer - Invalid block on parse transactions. Ban for " + banTime;
             peer.ban(banTime, mess);
             throw new Exception(mess);
@@ -242,7 +242,7 @@ public class Synchronizer {
             if (!block.isSignatureValid()) {
                 // INVALID BLOCK THROW EXCEPTION
                 String mess = "Dishonest peer by not is Valid block, heigh: " + height;
-                peer.ban(BAN_BLOCK_TIMES, mess);
+                peer.ban(BAN_BLOCK_TIMES << 1, mess);
                 throw new Exception(mess);
             }
 
@@ -251,14 +251,14 @@ public class Synchronizer {
             } catch (Exception e) {
                 LOGGER.debug(e.getMessage(), e);
                 String mess = "Dishonest peer error block.getTransactions PARSE: " + height;
-                peer.ban(BAN_BLOCK_TIMES, mess);
+                peer.ban(BAN_BLOCK_TIMES << 1, mess);
                 throw new Exception(mess);
             }
 
             if (!block.isValid(fork, true)) {
                 // INVALID BLOCK THROW EXCEPTION
                 String mess = "Dishonest peer by not is Valid block, heigh: " + height;
-                peer.ban(BAN_BLOCK_TIMES, mess);
+                peer.ban(BAN_BLOCK_TIMES << 1, mess);
                 throw new Exception(mess);
             }
 
@@ -473,7 +473,7 @@ public class Synchronizer {
 
                     // INVALID BLOCK THROW EXCEPTION
                     errorMess = "Dishonest peer on block null";
-                    banTime = BAN_BLOCK_TIMES >> 4;
+                    banTime = BAN_BLOCK_TIMES >> 2;
                     break;
                 }
 
@@ -556,7 +556,7 @@ public class Synchronizer {
 
             if (errorMess != null) {
                 // INVALID BLOCK THROW EXCEPTION
-                String mess = "Dishonest peer on block " + errorMess;
+                String mess = "Dishonest peer on SYNCHRONIZE block " + errorMess;
                 peer.ban(banTime, mess);
                 throw new Exception(mess);
             }
