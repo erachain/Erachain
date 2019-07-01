@@ -174,6 +174,13 @@ public class OrderTestsMy {
 
     }
 
+    private void removeOrder(Long orderId) {
+
+        db.getCompletedOrderMap().delete(orderId);
+        db.getOrderMap().delete(orderId);
+
+    }
+
     @Test
     public void crypto() {
 
@@ -508,6 +515,10 @@ public class OrderTestsMy {
             assertEquals(true, order_AB_1.isFulfilled());
             assertEquals(true, order_BA_1.isFulfilled());
 
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
+
         }
 
         for (int i = cap - 100; i < cap + 100; i++) {
@@ -540,6 +551,10 @@ public class OrderTestsMy {
 
             assertEquals(true, order_AB_1.isFulfilled());
             assertEquals(true, order_BA_1.isFulfilled());
+
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
 
         }
 
@@ -610,90 +625,15 @@ public class OrderTestsMy {
             assertEquals(true, order_AB_1.isFulfilled());
             assertEquals(false, order_BA_1.isFulfilled());
 
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
+
         }
     }
 
     /**
      * тут малое отклонение с заказа стенки забираем кусателю
-     */
-    @Test
-    public void scaleTest800_3back() {
-
-        init();
-
-        int fromScale = 0;
-        assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
-        byte[] reference = new byte[64];
-        this.random.nextBytes(reference);
-        assetA.setReference(reference);
-        // чтобы точность сбросить в 0
-        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
-
-        int toScale = 0;
-        assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
-        this.random.nextBytes(reference);
-        assetB.setReference(reference);
-        // чтобы точность сбросить в 0
-        assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
-
-        BigDecimal ADD = new BigDecimal("2");
-        int cap = 60000;
-
-        for (int i = cap - 10; i < cap + 10; i++) {
-            BigDecimal amountSell = new BigDecimal("1111111");
-            BigDecimal amountBuy = new BigDecimal(i);
-
-            // увеличим ордер-держатель
-            BigDecimal price = amountSell.divide(amountBuy, 20, RoundingMode.DOWN);
-            BigDecimal amountBuyNew = amountBuy.add(ADD);
-            BigDecimal amountSellNew = amountBuyNew.multiply(price).setScale(assetA.getScale(), RoundingMode.DOWN);
-            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuyNew,
-                    amountSellNew, (byte) 0, timestamp++, 0l);
-            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
-            orderCreation.process(null, Transaction.FOR_NETWORK);
-            order_AB_1_ID = orderCreation.getOrderId();
-
-            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
-                    amountBuy, (byte) 0, timestamp++, 0l);
-            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
-            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
-            orderCreation.process(null, Transaction.FOR_NETWORK);
-            order_BA_1_ID = orderCreation.getOrderId();
-
-            // посре обработки обновим все данные
-            order_AB_1 = reloadOrder(order_AB_1_ID);
-            order_BA_1 = reloadOrder(order_BA_1_ID);
-
-            Trade trade = Trade.get(db, order_BA_1, order_AB_1);
-
-            BigDecimal tradePrice = trade.calcPrice();
-            assertEquals(true, Order.isPricesClose(order_AB_1.getPrice(), tradePrice));
-
-            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
-            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
-
-            assertEquals(false, order_AB_1.isActive(db));
-            assertEquals(false, order_BA_1.isActive(db));
-
-            assertEquals(true, order_AB_1.isFulfilled());
-            assertEquals(true, order_BA_1.isFulfilled());
-
-            assertEquals(true, trade.getAmountWant().compareTo(order_BA_1.getAmountHave()) == 0);
-            // кусатель получил больше
-            assertEquals(true, trade.getAmountHave().compareTo(order_BA_1.getAmountWant()) > 0);
-
-            // держатель позиции получил меньше
-            assertEquals(true, trade.getAmountWant().compareTo(order_AB_1.getAmountWant()) < 0);
-            assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
-
-        }
-
-    }
-
-    /**
-     * тут малое отклонение с заказа стенки
-     * и стенку снимаем - она не исполнится
      */
     @Test
     public void scaleTest800_10back() {
@@ -752,31 +692,39 @@ public class OrderTestsMy {
             BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
             BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
 
-            // доержатель отменяет свой ордер
             assertEquals(false, order_AB_1.isActive(db));
             assertEquals(false, order_BA_1.isActive(db));
 
-            // доержатель не исполняет свой ордер
-            assertEquals(false, order_AB_1.isFulfilled());
+            assertEquals(true, order_AB_1.isFulfilled());
             assertEquals(true, order_BA_1.isFulfilled());
 
             assertEquals(true, trade.getAmountWant().compareTo(order_BA_1.getAmountHave()) == 0);
-            // кусатель получил столько же
-            assertEquals(true, trade.getAmountHave().compareTo(order_BA_1.getAmountWant()) >= 0);
+            // кусатель получил больше
+            assertEquals(true, trade.getAmountHave().compareTo(order_BA_1.getAmountWant()) > 0);
 
+            // держатель позиции получил меньше
             assertEquals(true, trade.getAmountWant().compareTo(order_AB_1.getAmountWant()) < 0);
-            assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) < 0);
+            assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
+
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
 
         }
 
     }
 
     /**
-     * тут НЕ малое отклонение с заказа стенки
-     * и стенку оставим
+     * тут малое отклонение от заказа стенки
+     * и стенку снимаем и не прибаляем к кусателю
+     * Это очень сильно зависит от коэффициентов:
+     * org.erachain.core.BlockChain#PRECISION_UNIT
+     * org.erachain.core.BlockChain#PRICE_CLOSEST
+     * и может тут не работать если выставить другие значения там - все тонко настраивается в тестах тут
+     * правим ADD
      */
     @Test
-    public void scaleTest800_300back() {
+    public void scaleTest800_100back() {
 
         init();
 
@@ -788,14 +736,14 @@ public class OrderTestsMy {
         // чтобы точность сбросить в 0
         assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
-        int toScale = 1;
+        int toScale = 0;
         assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
         this.random.nextBytes(reference);
         assetB.setReference(reference);
         // чтобы точность сбросить в 0
         assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
 
-        BigDecimal ADD = new BigDecimal("300");
+        BigDecimal ADD = new BigDecimal("46");
         int cap = 60000;
 
         for (int i = cap - 10; i < cap + 10; i++) {
@@ -833,7 +781,7 @@ public class OrderTestsMy {
             BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
 
             // доержатель отменяет свой ордер
-            assertEquals(true, order_AB_1.isActive(db));
+            assertEquals(false, order_AB_1.isActive(db));
             assertEquals(false, order_BA_1.isActive(db));
 
             // доержатель не исполняет свой ордер
@@ -842,10 +790,14 @@ public class OrderTestsMy {
 
             assertEquals(true, trade.getAmountWant().compareTo(order_BA_1.getAmountHave()) == 0);
             // кусатель получил столько же
-            assertEquals(true, trade.getAmountHave().compareTo(order_BA_1.getAmountWant()) >= 0);
+            assertEquals(true, trade.getAmountHave().compareTo(order_BA_1.getAmountWant()) > 0);
 
             assertEquals(true, trade.getAmountWant().compareTo(order_AB_1.getAmountWant()) < 0);
-            assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) < 0);
+            assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
+
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
 
         }
 
