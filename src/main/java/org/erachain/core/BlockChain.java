@@ -176,7 +176,12 @@ public class BlockChain {
                     //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };
 
-    public static final int TRADE_PRECISION = 5;
+    // DEX precision
+    public static final int TRADE_PRECISION = 4;
+    final public static BigDecimal PRECISION_UNIT = new BigDecimal("5.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION));
+    // нужно на 1 больше сделать
+    final public static BigDecimal PRICE_CLOSEST = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
+
 
     public static final int ITEM_POLL_FROM = DEVELOP_USE ? 77000 : VERS_4_11;
 
