@@ -225,7 +225,7 @@ public class AssetPairSelect extends JDialog {
             @Override
             public void valueChanged(ListSelectionEvent arg0) {
 
-                if (pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
+                if (false && pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow() >= 0) {
                     // GET ROW
                     int row = pair_Panel.jTableJScrollPanelLeftPanel.getSelectedRow();
 
