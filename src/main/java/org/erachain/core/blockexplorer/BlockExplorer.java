@@ -1981,6 +1981,13 @@ public class BlockExplorer {
             Iterator<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> iterator = balances.iterator();
             while (iterator.hasNext()) {
                 Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
+                if (item.getA().b.equals(AssetCls.LIA_KEY)) {
+                    continue;
+                }
+
+                AssetCls asset = assetsMap.get(item.getA().b);
+                if (asset == null)
+                    continue;
 
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> itemBals = item.getB();
                 if (true || itemBals.a.b.signum() != 0
@@ -1988,7 +1995,7 @@ public class BlockExplorer {
                         && itemBals.c.b.signum() != 0) {
                     Map bal = new LinkedHashMap();
                     bal.put("asset_key", item.getA().b);
-                    bal.put("asset_name", assetsMap.get(item.getA().b).viewName());
+                    bal.put("asset_name", asset.viewName());
                     bal.put("balance_1", itemBals.a.b);
                     bal.put("balance_2", itemBals.b.b);
                     bal.put("balance_3", itemBals.c.b);
