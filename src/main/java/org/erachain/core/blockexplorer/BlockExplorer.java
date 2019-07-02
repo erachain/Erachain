@@ -994,6 +994,92 @@ public class BlockExplorer {
         return output;
     }
 
+    public Map jsonQueryOrder(long orderId) {
+
+        output.put("search", "order");
+        output.put("search_message", "" + orderId);
+
+        Map output = new LinkedHashMap();
+
+        Order order = dcSet.getOrderMap().get(orderId);
+        boolean isCompleted;
+        boolean isExist = order != null;
+        if (!isExist) {
+            order = dcSet.getCompletedOrderMap().get(orderId);
+            if (order == null) {
+                isExist = false;
+            } else {
+                isExist = true;
+                isCompleted = true;
+            }
+        }
+
+        if (!isExist) {
+            output.put("error", "order not found");
+        }
+
+        List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId);
+
+        AssetCls assetHave = Controller.getInstance().getAsset(order.getHaveAssetKey());
+        AssetCls assetWant = Controller.getInstance().getAsset(order.getWantAssetKey());
+
+        output.put("assetHaveOwner", assetHave.getOwner().getAddress());
+        output.put("assetWantOwner", assetWant.getOwner().getAddress());
+
+        output.put("assetHave", assetHave.getKey());
+        output.put("assetHaveName", assetHave.getName());
+        output.put("assetWant", assetWant.getKey());
+        output.put("assetWantName", assetWant.getName());
+
+        Map sellsJSON = new LinkedHashMap();
+        Map buysJSON = new LinkedHashMap();
+
+        BigDecimal sumAmount = BigDecimal.ZERO;
+        BigDecimal sumAmountGood = BigDecimal.ZERO;
+
+        BigDecimal sumSellingAmount = BigDecimal.ZERO;
+        BigDecimal sumSellingAmountGood = BigDecimal.ZERO;
+
+        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        Transaction createOrder;
+
+        Map tradesJSON = new LinkedHashMap();
+
+        output.put("tradesCount", trades.size());
+
+        int i = 0;
+        for (Trade trade : trades) {
+
+            tradesJSON.put(i++, tradeJSON(trade, assetHave, assetWant));
+
+            if (i > 100)
+                break;
+        }
+        output.put("trades", tradesJSON);
+
+        output.put("label_Trades", Lang.getInstance().translateFromLangObj("Trades", langObj));
+        output.put("label_Trade_Initiator", Lang.getInstance().translateFromLangObj("Trade Initiator", langObj));
+        output.put("label_Position_Holder", Lang.getInstance().translateFromLangObj("Position Holder", langObj));
+        output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
+        output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
+        output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));
+        output.put("label_Amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
+        output.put("label_Orders", Lang.getInstance().translateFromLangObj("Orders", langObj));
+        output.put("label_Sell_Orders", Lang.getInstance().translateFromLangObj("Sell Orders", langObj));
+        output.put("label_Buy_Orders", Lang.getInstance().translateFromLangObj("Buy Orders", langObj));
+        output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
+        output.put("label_Total_For_Sell", Lang.getInstance().translateFromLangObj("Total for Sell", langObj));
+        output.put("label_Total_For_Buy", Lang.getInstance().translateFromLangObj("Total for Buy", langObj));
+        output.put("label_Trade_History", Lang.getInstance().translateFromLangObj("Trade History", langObj));
+        output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
+        output.put("label_Type", Lang.getInstance().translateFromLangObj("Type", langObj));
+        output.put("label_Trade_Volume", Lang.getInstance().translateFromLangObj("Trade Volume", langObj));
+        output.put("label_Go_To", Lang.getInstance().translateFromLangObj("Go To", langObj));
+        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+
+        return output;
+    }
+
     private Map tradeJSON(Trade trade, AssetCls assetHaveIn, AssetCls assetWantIn) {
 
         Map tradeJSON = new HashMap();
