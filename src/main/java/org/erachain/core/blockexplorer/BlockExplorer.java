@@ -1007,6 +1007,7 @@ public class BlockExplorer {
 
     public Map jsonQueryOrder(String orderIdStr) {
 
+        output.put("type", "order");
         output.put("search", "order");
         output.put("search_message", orderIdStr);
 
@@ -1027,19 +1028,28 @@ public class BlockExplorer {
             isCompleted = false;
         }
 
+        output.put("order", order.toJson());
+
         List<Trade> trades = dcSet.getTradeMap().getTradesByOrderID(orderId);
 
         AssetCls assetHave = Controller.getInstance().getAsset(order.getHaveAssetKey());
         AssetCls assetWant = Controller.getInstance().getAsset(order.getWantAssetKey());
 
         output.put("completed", isCompleted);
+        output.put("canceled", isCompleted && !order.isFulfilled());
+
+        output.put("txSeqNo", Transaction.viewDBRef(order.getId()));
+        Transaction transaction = dcSet.getTransactionFinalMap().get(orderId);
+        output.put("timestamp", transaction.getTimestamp());
+        output.put("creator", transaction.getCreator().getAddress());
+        output.put("creator_person", transaction.getCreator().getPersonAsString());
 
         output.put("assetHaveOwner", assetHave.getOwner().getAddress());
         output.put("assetWantOwner", assetWant.getOwner().getAddress());
 
-        output.put("assetHave", assetHave.getKey());
+        output.put("assetHaveKey", assetHave.getKey());
         output.put("assetHaveName", assetHave.getName());
-        output.put("assetWant", assetWant.getKey());
+        output.put("assetWantKey", assetWant.getKey());
         output.put("assetWantName", assetWant.getName());
 
         Map tradesJSON = new LinkedHashMap();
@@ -1054,27 +1064,38 @@ public class BlockExplorer {
             if (i > 100)
                 break;
         }
-        output.put("trades", tradesJSON);
 
-        output.put("label_Trades", Lang.getInstance().translateFromLangObj("Trades", langObj));
+
+
+        output.put("lastTrades", tradesJSON);
+
+        output.put("label_Head", Lang.getInstance().translateFromLangObj("Exchange Order", langObj));
+
+        output.put("label_Order", Lang.getInstance().translateFromLangObj("Order", langObj));
+
+        output.put("label_Active", Lang.getInstance().translateFromLangObj("Active", langObj));
+        output.put("label_Completed", Lang.getInstance().translateFromLangObj("Completed", langObj));
+        output.put("label_Canceled", Lang.getInstance().translateFromLangObj("Canceled", langObj));
+
+        output.put("label_Fulfilled", Lang.getInstance().translateFromLangObj("Fulfilled", langObj));
+        output.put("label_LeftHave", Lang.getInstance().translateFromLangObj("Left Have", langObj));
+        output.put("label_table_LastTrades", Lang.getInstance().translateFromLangObj("Last Trades", langObj));
+        output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
+        output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
+        output.put("label_table_orders", Lang.getInstance().translateFromLangObj("Opened Orders", langObj));
+        output.put("label_table_last_price", Lang.getInstance().translateFromLangObj("Last Price", langObj));
+        output.put("label_table_volume24", Lang.getInstance().translateFromLangObj("Day Volume", langObj));
+
         output.put("label_Trade_Initiator", Lang.getInstance().translateFromLangObj("Trade Initiator", langObj));
         output.put("label_Position_Holder", Lang.getInstance().translateFromLangObj("Position Holder", langObj));
+        output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
+        output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
+        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
+        output.put("label_Amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
         output.put("label_Volume", Lang.getInstance().translateFromLangObj("Volume", langObj));
         output.put("label_Price", Lang.getInstance().translateFromLangObj("Price", langObj));
+        output.put("label_Reverse_Price", Lang.getInstance().translateFromLangObj("Reverse Price", langObj));
         output.put("label_Total_Cost", Lang.getInstance().translateFromLangObj("Total Cost", langObj));
-        output.put("label_Amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        output.put("label_Orders", Lang.getInstance().translateFromLangObj("Orders", langObj));
-        output.put("label_Sell_Orders", Lang.getInstance().translateFromLangObj("Sell Orders", langObj));
-        output.put("label_Buy_Orders", Lang.getInstance().translateFromLangObj("Buy Orders", langObj));
-        output.put("label_Total", Lang.getInstance().translateFromLangObj("Total", langObj));
-        output.put("label_Total_For_Sell", Lang.getInstance().translateFromLangObj("Total for Sell", langObj));
-        output.put("label_Total_For_Buy", Lang.getInstance().translateFromLangObj("Total for Buy", langObj));
-        output.put("label_Trade_History", Lang.getInstance().translateFromLangObj("Trade History", langObj));
-        output.put("label_Date", Lang.getInstance().translateFromLangObj("Date", langObj));
-        output.put("label_Type", Lang.getInstance().translateFromLangObj("Type", langObj));
-        output.put("label_Trade_Volume", Lang.getInstance().translateFromLangObj("Trade Volume", langObj));
-        output.put("label_Go_To", Lang.getInstance().translateFromLangObj("Go To", langObj));
-        output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
 
         return output;
     }
@@ -1125,18 +1146,18 @@ public class BlockExplorer {
             pairAssetHave = dcSet.getItemAssetMap().get(pairHaveKey);
             pairAssetWant = dcSet.getItemAssetMap().get(pairWantKey);
 
-            tradeJSON.put("assetHaveKey", pairAssetHave.getKey());
-            tradeJSON.put("assetHaveName", pairAssetHave.getName());
-
-            tradeJSON.put("assetWantKey", pairAssetWant.getKey());
-            tradeJSON.put("assetWantName", pairAssetWant.getName());
-
         } else {
             pairAssetHave = assetHaveIn;
             pairAssetWant = assetWantIn;
             pairHaveKey = pairAssetHave.getKey();
             //pairWantKey = pairAssetWant.getKey();
         }
+
+        tradeJSON.put("assetHaveKey", pairAssetHave.getKey());
+        tradeJSON.put("assetHaveName", pairAssetHave.getName());
+
+        tradeJSON.put("assetWantKey", pairAssetWant.getKey());
+        tradeJSON.put("assetWantName", pairAssetWant.getName());
 
         Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
 
