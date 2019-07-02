@@ -7,6 +7,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.assets.DepositExchange;
 import org.erachain.gui.items.assets.ExchangePanel;
+import org.erachain.gui.items.assets.MyOrderTab;
 import org.erachain.gui.items.assets.WithdrawExchange;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
@@ -31,6 +32,8 @@ public class MenuExchange extends JMenu {
         });
         add(deposit);
 
+        addSeparator();
+
         // TRADE
         JMenuItem trade = new JMenuItem(Lang.getInstance().translate("Trade on DEX"));
         trade.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("Trade on Exchange"));
@@ -41,6 +44,19 @@ public class MenuExchange extends JMenu {
             }
         });
         add(trade);
+
+        // TRADE
+        JMenuItem orders = new JMenuItem(Lang.getInstance().translate("My Orders"));
+        orders.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("See My Orders"));
+        orders.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                //
+                MainPanel.getInstance().addTab(MyOrderTab.class.getSimpleName());
+            }
+        });
+        add(orders);
+
+        addSeparator();
 
         // WITHDRAW
         JMenuItem withdraw = new JMenuItem(Lang.getInstance().translate("Withdraw or Sell"));
