@@ -2003,6 +2003,7 @@ public class BlockExplorer {
             if (true) {
                 transactionDataJSON = trade.toJson(0);
                 Order orderInitiator = trade.getInitiatorOrder(dcSet);
+                Order orderTarget = trade.getTargetOrder(dcSet);
                 AssetCls haveAsset = Controller.getInstance().getAsset(orderInitiator.getHaveAssetKey());
                 AssetCls wantAsset = Controller.getInstance().getAsset(orderInitiator.getWantAssetKey());
                 transactionDataJSON.put("haveKey", haveAsset.getKey());
@@ -2019,6 +2020,12 @@ public class BlockExplorer {
                 transactionDataJSON.put("confirmations", Controller.getInstance().getMyHeight() - height);
 
                 transactionDataJSON.put("timestamp", Transaction.getTimestampByDBRef(trade.getInitiator()));
+
+                transactionDataJSON.put("initiatorCreator", orderInitiator.getCreator().getAddress());
+                transactionDataJSON.put("initiatorCreatorName", orderInitiator.getCreator().getPersonAsString());
+                transactionDataJSON.put("targetCreator", orderTarget.getCreator().getAddress());
+                transactionDataJSON.put("targetCreatorName", orderTarget.getCreator().getPersonAsString());
+
 
             } else {
                 Order orderInitiator = trade.getInitiatorOrder(dcSet);

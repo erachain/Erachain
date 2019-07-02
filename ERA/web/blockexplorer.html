@@ -1498,11 +1498,17 @@ button.white-bgc[disabled]:focus,
 
                         output += '<tr><td><a class=without href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
                         output += '<a href=?trade=' + data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + get_lang() + '>';
-                        output += (data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo) + '</a></td>';
+                        output += data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + '</a></td>';
+
+                        output += '<td><a href=?order=' + data[i].trade.initiatorTxSeqNo + get_lang() + '>';
+                        output += data[i].trade.targetTxSeqNo + '</a> ';
+                        output += '<td><a href=?order=' + data[i].trade.targetTxSeqNo + get_lang() + '>';
+                        output += data[i].trade.initiatorTxSeqNo + '</a></td>';
+
                         output += '<td align=right width=250>Height: <a href=?block=' + data[i].trade.height + get_lang() + '>' + data[i].trade.height + '</a>';
                         output += ' / confirmations: ' + data[i].trade.confirmations + '</td>';
 
-                        output += '<tr><td>';
+                        output += '<tr><td colspan=4>';
                         output += '<table width="100%" class="tiny table table-striped"><tr><td width="70" align="center">';
 
                         output += '<b>Action</b></td><td width="290"><b>Seller</b></td><td width="290"><b>Buyer</b></td>';
@@ -1526,7 +1532,7 @@ button.white-bgc[disabled]:focus,
                             output += '<td><font color="dimgray">' + data[i].trade.targetCreator + '</font>';
                             img1 = 'img/redright.png';
                         } else {
-                            output += '<td><a href=?address=' + data[i].trade.targetCreator + get_lang() + '>' + data[i].trade.targetCreator + '</a>';
+                            output += '<td><a href=?address=' + data[i].trade.targetCreator + get_lang() + '>' + data[i].trade.targetCreatorName + '</a>';
                             img1 = 'img/grright.png';
                         }
 
@@ -1548,7 +1554,7 @@ button.white-bgc[disabled]:focus,
                             output += '<td><font color="dimgray">' + data[i].trade.initiatorCreator + '</font><br>';
                             img2 = 'img/redleft.png';
                         } else {
-                            output += '<td><a href=?address=' + data[i].trade.initiatorCreator + get_lang() + '>' + data[i].trade.initiatorCreator + '</a>';
+                            output += '<td><a href=?address=' + data[i].trade.initiatorCreator + get_lang() + '>' + data[i].trade.initiatorCreatorName + '</a>';
                             img2 = 'img/grleft.png';
                         }
 
