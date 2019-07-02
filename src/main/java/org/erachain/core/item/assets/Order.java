@@ -182,7 +182,7 @@ public class Order implements Comparable<Order> {
     public static boolean isPricesClose(BigDecimal price1, BigDecimal price2) {
 
         BigDecimal diff = price1.subtract(price2).divide(price1.min(price2),
-                BlockChain.PRICE_CLOSEST.scale() + 1, RoundingMode.UP).abs();
+                BlockChain.PRICE_CLOSEST.scale() + 1, RoundingMode.HALF_DOWN).abs();
         if (diff.compareTo(BlockChain.PRICE_CLOSEST) < 0)
             return true;
         return false;
@@ -739,7 +739,7 @@ public class Order implements Comparable<Order> {
 
                     // RESOLVE amount with SCALE
                     // тут округляем наоборот вверх - больше даем тому кто активный
-                    tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.UP);
+                    tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
                     if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
                         // если вылазим после округления за предел то берем что есть
                         tradeAmountForHave = orderAmountHaveLeft;
