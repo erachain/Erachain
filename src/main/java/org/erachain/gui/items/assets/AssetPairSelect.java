@@ -207,7 +207,7 @@ public class AssetPairSelect extends JDialog {
         });
 
 
-        assetPairSelectTableModel = new AssetPairSelectTableModel(key); //, action);
+        assetPairSelectTableModel = new AssetPairSelectTableModel(key);
 
         final MTable assetsPairTable = new MTable(assetPairSelectTableModel);
 

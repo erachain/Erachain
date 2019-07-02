@@ -757,107 +757,111 @@ public class BlockExplorer {
         BigDecimal volumePrice = BigDecimal.ZERO;
         BigDecimal volumeAmount = BigDecimal.ZERO;
 
-        for (Order order : orders) {
-            if (!pairsOpenOrders.containsKey(order.getWantAssetKey())) {
-                count = 0;
-            } else {
-                count = pairsOpenOrders.get(order.getWantAssetKey());
+        if (orders != null) {
+            for (Order order : orders) {
+                if (!pairsOpenOrders.containsKey(order.getWantAssetKey())) {
+                    count = 0;
+                } else {
+                    count = pairsOpenOrders.get(order.getWantAssetKey());
+                }
+
+                if (!volumeAmountOrders.containsKey(order.getWantAssetKey())) {
+                    volumeAmount = BigDecimal.ZERO;
+                } else {
+                    volumeAmount = volumeAmountOrders.get(order.getWantAssetKey());
+                }
+
+                if (!volumePriceOrders.containsKey(order.getWantAssetKey())) {
+                    volumePrice = BigDecimal.ZERO;
+                } else {
+                    volumePrice = volumePriceOrders.get(order.getWantAssetKey());
+                }
+
+                count++;
+                pairsOpenOrders.put(order.getWantAssetKey(), count);
+
+                volumeAmount = volumeAmount.add(order.getAmountHaveLeft());
+
+                volumeAmountOrders.put(order.getWantAssetKey(), volumeAmount);
+
+                volumePriceOrders.put(order.getWantAssetKey(), volumePrice);
+
+                if (!pairsOpenOrders.containsKey(order.getHaveAssetKey())) {
+                    count = 0;
+                } else {
+                    count = pairsOpenOrders.get(order.getHaveAssetKey());
+                }
+
+                if (!volumePriceOrders.containsKey(order.getHaveAssetKey())) {
+                    volumePrice = BigDecimal.ZERO;
+                } else {
+                    volumePrice = volumePriceOrders.get(order.getHaveAssetKey());
+                }
+
+                if (!volumeAmountOrders.containsKey(order.getHaveAssetKey())) {
+                    volumeAmount = BigDecimal.ZERO;
+                } else {
+                    volumeAmount = volumeAmountOrders.get(order.getHaveAssetKey());
+                }
+
+                count++;
+                pairsOpenOrders.put(order.getHaveAssetKey(), count);
+
+                volumePrice = volumePrice.add(order.getAmountHaveLeft());
+
+                volumePriceOrders.put(order.getHaveAssetKey(), volumePrice);
+
+                volumeAmountOrders.put(order.getHaveAssetKey(), volumeAmount);
             }
-
-            if (!volumeAmountOrders.containsKey(order.getWantAssetKey())) {
-                volumeAmount = BigDecimal.ZERO;
-            } else {
-                volumeAmount = volumeAmountOrders.get(order.getWantAssetKey());
-            }
-
-            if (!volumePriceOrders.containsKey(order.getWantAssetKey())) {
-                volumePrice = BigDecimal.ZERO;
-            } else {
-                volumePrice = volumePriceOrders.get(order.getWantAssetKey());
-            }
-
-            count++;
-            pairsOpenOrders.put(order.getWantAssetKey(), count);
-
-            volumeAmount = volumeAmount.add(order.getAmountHaveLeft());
-
-            volumeAmountOrders.put(order.getWantAssetKey(), volumeAmount);
-
-            volumePriceOrders.put(order.getWantAssetKey(), volumePrice);
-
-            if (!pairsOpenOrders.containsKey(order.getHaveAssetKey())) {
-                count = 0;
-            } else {
-                count = pairsOpenOrders.get(order.getHaveAssetKey());
-            }
-
-            if (!volumePriceOrders.containsKey(order.getHaveAssetKey())) {
-                volumePrice = BigDecimal.ZERO;
-            } else {
-                volumePrice = volumePriceOrders.get(order.getHaveAssetKey());
-            }
-
-            if (!volumeAmountOrders.containsKey(order.getHaveAssetKey())) {
-                volumeAmount = BigDecimal.ZERO;
-            } else {
-                volumeAmount = volumeAmountOrders.get(order.getHaveAssetKey());
-            }
-
-            count++;
-            pairsOpenOrders.put(order.getHaveAssetKey(), count);
-
-            volumePrice = volumePrice.add(order.getAmountHaveLeft());
-
-            volumePriceOrders.put(order.getHaveAssetKey(), volumePrice);
-
-            volumeAmountOrders.put(order.getHaveAssetKey(), volumeAmount);
         }
 
         Map<Long, Integer> pairsTrades = new TreeMap<Long, Integer>();
         Map<Long, BigDecimal> volumePriceTrades = new TreeMap<Long, BigDecimal>();
         Map<Long, BigDecimal> volumeAmountTrades = new TreeMap<Long, BigDecimal>();
 
-        for (Trade trade : trades) {
+        if (trades != null) {
+            for (Trade trade : trades) {
 
-            Order initiator = Order.getOrder(dcSet, trade.getInitiator());
-            if (!pairsTrades.containsKey(initiator.getWantAssetKey())) { //.c.a)) {
-                count = 0;
-                volumePrice = BigDecimal.ZERO;
-                volumeAmount = BigDecimal.ZERO;
-            } else {
-                count = pairsTrades.get(initiator.getWantAssetKey());
-                volumePrice = volumePriceTrades.get(initiator.getWantAssetKey());
-                volumeAmount = volumeAmountTrades.get(initiator.getWantAssetKey());
+                Order initiator = Order.getOrder(dcSet, trade.getInitiator());
+                if (!pairsTrades.containsKey(initiator.getWantAssetKey())) { //.c.a)) {
+                    count = 0;
+                    volumePrice = BigDecimal.ZERO;
+                    volumeAmount = BigDecimal.ZERO;
+                } else {
+                    count = pairsTrades.get(initiator.getWantAssetKey());
+                    volumePrice = volumePriceTrades.get(initiator.getWantAssetKey());
+                    volumeAmount = volumeAmountTrades.get(initiator.getWantAssetKey());
+                }
+
+                count++;
+                pairsTrades.put(initiator.getWantAssetKey(), count);
+
+                volumePrice = volumePrice.add(trade.getAmountHave());
+                volumeAmount = volumeAmount.add(trade.getAmountWant());
+
+                volumePriceTrades.put(initiator.getWantAssetKey(), volumePrice);
+                volumeAmountTrades.put(initiator.getWantAssetKey(), volumeAmount);
+
+                Order target = Order.getOrder(dcSet, trade.getTarget());
+                if (!pairsTrades.containsKey(target.getWantAssetKey())) {
+                    count = 0;
+                    volumePrice = BigDecimal.ZERO;
+                    volumeAmount = BigDecimal.ZERO; // ;
+                } else {
+                    count = pairsTrades.get(target.getWantAssetKey());
+                    volumePrice = volumePriceTrades.get(target.getWantAssetKey());
+                    volumeAmount = volumeAmountTrades.get(target.getWantAssetKey());
+                }
+
+                count++;
+                pairsTrades.put(target.getWantAssetKey(), count);
+
+                volumePrice = volumePrice.add(trade.getAmountHave());
+                volumeAmount = volumeAmount.add(trade.getAmountWant());
+
+                volumePriceTrades.put(target.getWantAssetKey(), volumePrice);
+                volumeAmountTrades.put(target.getWantAssetKey(), volumeAmount);
             }
-
-            count++;
-            pairsTrades.put(initiator.getWantAssetKey(), count);
-
-            volumePrice = volumePrice.add(trade.getAmountHave());
-            volumeAmount = volumeAmount.add(trade.getAmountWant());
-
-            volumePriceTrades.put(initiator.getWantAssetKey(), volumePrice);
-            volumeAmountTrades.put(initiator.getWantAssetKey(), volumeAmount);
-
-            Order target = Order.getOrder(dcSet, trade.getTarget());
-            if (!pairsTrades.containsKey(target.getWantAssetKey())) {
-                count = 0;
-                volumePrice = BigDecimal.ZERO;
-                volumeAmount = BigDecimal.ZERO; // ;
-            } else {
-                count = pairsTrades.get(target.getWantAssetKey());
-                volumePrice = volumePriceTrades.get(target.getWantAssetKey());
-                volumeAmount = volumeAmountTrades.get(target.getWantAssetKey());
-            }
-
-            count++;
-            pairsTrades.put(target.getWantAssetKey(), count);
-
-            volumePrice = volumePrice.add(trade.getAmountHave());
-            volumeAmount = volumeAmount.add(trade.getAmountWant());
-
-            volumePriceTrades.put(target.getWantAssetKey(), volumePrice);
-            volumeAmountTrades.put(target.getWantAssetKey(), volumeAmount);
         }
 
         Map<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>> all = new TreeMap<Long, Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal>>();

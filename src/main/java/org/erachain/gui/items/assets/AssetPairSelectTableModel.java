@@ -35,7 +35,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
 
     private String filter_Name;
 
-    public AssetPairSelectTableModel(long key)// , String action)
+    public AssetPairSelectTableModel(long key)
     {
         super(DCSet.getInstance().getItemAssetMap(), new String[]{"Key", "Name", "<html>Orders<br>count</html>", "Orders Volume",
                 "<html>Trades<br>count</html>", "Trades Volume"},
@@ -53,8 +53,8 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
             return null;
         }
 
-        long key = this.list.get(row).getKey();
-        Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal> item = this.all.get(key);
+        Long keyAsset = this.list.get(row).getKey();
+        Tuple6<Integer, Integer, BigDecimal, BigDecimal, BigDecimal, BigDecimal> item = this.all.get(keyAsset);
 
         try {
 
@@ -62,7 +62,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
             switch (column) {
                 case COLUMN_KEY:
 
-                    return key;
+                    return keyAsset;
 
                 case COLUMN_NAME:
 
@@ -80,7 +80,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
                             //+ " " + this.list.get(row).getShort() + "&hArr;  "//"<br>"
                             + " " + this.list.get(row).getShort()
                             + " +" + NumberAsString.formatAsString(item.d)
-                            + " " + Controller.getInstance().getAsset(this.key).getShort()
+                            + " " + Controller.getInstance().getAsset(keyAsset).getShort()
                             + "</html>";
 
                 case COLUMN_TRADES_COUNT:
@@ -99,7 +99,7 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
                                 //+ " " + this.list.get(row).getShort() + "&hArr; " //"<br>"
                                 + " " + this.list.get(row).getShort()
                                 + " +" + NumberAsString.formatAsString(item.f)
-                                + " " + Controller.getInstance().getAsset(this.key).getShort()
+                                + " " + Controller.getInstance().getAsset(keyAsset).getShort()
                                 + "</html>";
                     else
                         return "";
