@@ -54,15 +54,18 @@ public class ItemAssetMap extends ItemMap {
         }
     }
 
+    // http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html
     public AssetCls get(Long key) {
 
         AssetCls item;
         if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
             switch (key.intValue()) {
-                // http://seo-mayak.com/sozdanie-bloga/wordpress-dlya-novichkov/simvoly-kotoryx-net-na-klaviature.html
+
                 case (int)AssetCls.LIA_KEY:
                     item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                             AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
+                    item = null;
+
                     break;
                 case 555:
                     item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, new String("¤¤¤"), null, null,
@@ -100,6 +103,7 @@ public class ItemAssetMap extends ItemMap {
             if (key.equals(AssetCls.LIA_KEY)) {
                 item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                         AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
+                item = null;
             } else {
                 item = (AssetCls) super.get(key);
             }
