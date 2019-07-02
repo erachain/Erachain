@@ -5,7 +5,18 @@ function tx(data) {
         output += '<b>' + data.body.timestampLabel + '</b>: ' + convertTimestamp(data.body.timestamp, true) + '<br>';
     }
     if (data.body.hasOwnProperty('body')) {
-        output += fformat(data.body.body) + '<br>';
+        var body = data.body.body;
+        if (body.hasOwnProperty("type_name")) {
+            // тут просто JSON от calculated
+            if (body.hasOwnProperty("message")) {
+                output += '<h4>' + body.message + '</h4>';
+            }
+            if (body.hasOwnProperty("recipient")) {
+                output += 'recipient: ' + body.recipient + '<br>';
+            }
+        } else {
+            output += fformat(data.body.body) + '<br>';
+        }
     }
     if (data.body.hasOwnProperty('message')) {
         output += fformat(data.body.message) + '<br>';
