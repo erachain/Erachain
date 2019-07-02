@@ -115,3 +115,107 @@ function exchange(data){
 
     return output;
 }
+
+function order(data){
+    var output = '';
+
+    if(data.hasOwnProperty('error'))
+    {
+        return '<h2>' + data.error + '</h2>';
+    }
+
+    var notDisplayPages = data.notDisplayPages;
+    var numberShiftDelta = data.numberOfRepresentsItemsOnPage;
+    //Отображение последнего блока
+    output += lastBlock(data.lastBlock);
+    var start = data.start;
+
+    output += '<div><div class="col-lg-5" style="padding-left: 5em;">';
+
+    output += '<h4 style="text-align: center;">' + data.label_table_PopularPairs + '</h4>';
+
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_table_have;
+    output += '<td><b>' + data.label_table_want + '<td><b>' + data.label_table_orders + '<td><b>' +
+         data.label_table_last_price + '<td><b>' + data.label_table_volume24 + '</tr>';
+
+    output += '</table></div><div class="col-lg-7" style="padding-right: 5em;">';
+
+    output += '<h4 style="text-align: center;">' + data.label_table_LastTrades + '</h4>';
+
+    output += '<table border="0" cellspacing="3" cellpadding="5" class="tiny table table-striped" style="width:100%; vertical-align: baseline; border: 1px solid #ddd; fonf-size:0.8em">';
+    output += '<tr bgcolor="#e0e0e0" style="background:#e0e0e0"><td align=center><b>' + data.label_Date;
+    output += '<td align=center><b>' + data.label_Pair + '<td align=center><b>' + data.label_Trade_Initiator;
+    output += '<td align=center><b>' + data.label_Amount;
+    output += '<td align=center><b>' + data.label_Price;
+    output += '<td align=center><b>' + data.label_Position_Holder + '<tr>'
+    //output += data.label_Total_Cost + '</b></td></tr>';
+
+    for (key in data.lastTrades) {
+
+        var trade = data.lastTrades[key];
+        output += '<tr>';
+
+        output += '<td align=center><a href=?trade=' + trade.initiatorTx + '/' + trade.targetTx + get_lang()
+        output += '>' + convertTimestamp( trade.timestamp, false);
+
+        output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + getShortNameBlanked(trade.assetHaveName) + '/' + getShortNameBlanked(trade.assetWantName) + '</a>';
+
+        output += '<td><a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
+
+        // отобрадает что это создатель актива действует
+        if (trade.initiatorCreator_addr == data.assetWantOwner) {
+            if (trade.type != 'sell') {
+                output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
+            } else {
+                output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
+            }
+        }
+
+        if (trade.type == 'sell') {
+                    output += '<td align=right>' + addCommas(trade.amountHave);
+                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+
+                    if (trade.unchecked == true) {}
+                    else {
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
+                            + '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
+                        ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+                    }
+
+                    //output += '<td>' + addCommas(trade.amountWant);
+                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            } else {
+                    output += '<td align=right>' + addCommas(trade.amountHave);
+                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+
+                    if (trade.unchecked == true) {}
+                    else {
+                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
+                            + '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
+                        //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
+                    }
+
+                    //output += '<td>' + addCommas(trade.amountWant);
+                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            }
+
+        // отобрадает что это создатель актива действует
+        if (trade.targetCreator_addr == data.assetWantOwner) {
+            if (trade.type == 'sell') {
+                output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
+            } else {
+                output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson"></span>';
+            }
+        }
+
+        output += '<td><a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
+
+        //output += '<td>' + addCommas(trade.amountWant);
+
+    }
+
+    output += '</table>';
+
+    return output;
+}
