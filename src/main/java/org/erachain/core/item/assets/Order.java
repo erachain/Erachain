@@ -147,6 +147,23 @@ public class Order implements Comparable<Order> {
         return i;
     }
 
+    /**
+     * Это вызывается только для ордера-Цели
+     * @param fulfilledHave
+     * @return
+     */
+    public boolean willUnResolvedFor(BigDecimal fulfilledHave) {
+        BigDecimal willHave = amountHave.subtract(fulfilledHave);
+        BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
+
+        BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
+        BigDecimal diff = price.subtract(priceForLeft).divide(price,
+                BlockChain.TARGET_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
+        // если разница цены выросла от начального сильно - то
+        if (diff.compareTo(BlockChain.TARGET_PRICE_DIFF_LIMIT) > 0)
+            return true;
+        return false;
+    }
 
     /**
      * проверяем по остаткам - сильно ли съехала цена для них.
@@ -154,6 +171,7 @@ public class Order implements Comparable<Order> {
      * Перед употреблением нужно задать базу
      * <hr>
      * Перед использованием необходимо проверить order.isFulfilled - может он исполнился полностью
+     * И причем это вызывается только для Иницатора
      * @return
      */
     public boolean isUnResolved() {
@@ -166,9 +184,10 @@ public class Order implements Comparable<Order> {
             // уже не сошлось
             return true;
 
-        BigDecimal diff = price.subtract(priceForLeft).divide(price, BlockChain.PRECISION_UNIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
+        BigDecimal diff = price.subtract(priceForLeft).divide(price,
+                BlockChain.INITIATOR_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
-        if (diff.compareTo(BlockChain.PRECISION_UNIT) > 0)
+        if (diff.compareTo(BlockChain.INITIATOR_PRICE_DIFF_LIMIT) > 0)
             return true;
         return false;
     }
@@ -182,21 +201,8 @@ public class Order implements Comparable<Order> {
     public static boolean isPricesClose(BigDecimal price1, BigDecimal price2) {
 
         BigDecimal diff = price1.subtract(price2).divide(price1.min(price2),
-                BlockChain.PRICE_CLOSEST.scale() + 1, RoundingMode.HALF_DOWN).abs();
-        if (diff.compareTo(BlockChain.PRICE_CLOSEST) < 0)
-            return true;
-        return false;
-    }
-
-    public boolean willUnResolvedFor(BigDecimal fulfilledHave) {
-        BigDecimal willHave = amountHave.subtract(fulfilledHave);
-        BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
-
-        BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
-        BigDecimal diff = price.subtract(priceForLeft).divide(price,
-                BlockChain.PRECISION_UNIT.scale()  + 1, RoundingMode.HALF_DOWN).abs();
-        // если разница цены выросла от начального сильно - то
-        if (diff.compareTo(BlockChain.PRECISION_UNIT) > 0)
+                BlockChain.TRADE_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
+        if (diff.compareTo(BlockChain.TRADE_PRICE_DIFF_LIMIT) < 0)
             return true;
         return false;
     }
@@ -705,6 +711,7 @@ public class Order implements Comparable<Order> {
                 }
             }
 
+            boolean willUnResolvedFor = false;
             orderAmountHaveLeft = order.getAmountHaveLeft();
             // SCALE for HAVE in ORDER
             // цену ему занижаем так как это держатель позиции
@@ -752,7 +759,8 @@ public class Order implements Comparable<Order> {
                         }
 
                         // если исполненый ордер станет не исполняемым то попробуем его тут обработать особо
-                        if (order.willUnResolvedFor(tradeAmountForHave)) {
+                        willUnResolvedFor = order.willUnResolvedFor(tradeAmountForHave);
+                        if (willUnResolvedFor) {
                             BigDecimal priceUpdateTrade = calcPrice(orderAmountHaveLeft,
                                     // this.haveSacel for order.WANT
                                     tradeAmountForWant, haveAssetScale);
@@ -836,7 +844,7 @@ public class Order implements Comparable<Order> {
                     completedMap.add(order);
                 } else {
                     //UPDATE ORDER
-                    if (order.isUnResolved()) {
+                    if (willUnResolvedFor) {
                         // if left not enough for 1 buy by price this order
                         order.dcSet = dcSet;
                         order.processOnUnresolved(block, transaction);
