@@ -816,7 +816,7 @@ public class TransactionCreator {
 
 		//CREATE SERTIFY PERSON TRANSACTION
 		//int version = 5; // without user sign
-		record = new RSetStatusToItem(creator, (byte)feePow, key, item.getItemTypeInt(), item.getKey(),
+		record = new RSetStatusToItem(creator, (byte)feePow, key, item.getItemType(), item.getKey(),
 				beg_date, end_date, value_1, value_2, data, refParent,
 				timestamp, 0l);
 		record.sign(creator, asPack);
@@ -841,7 +841,7 @@ public class TransactionCreator {
 
         //CREATE SERTIFY PERSON TRANSACTION
         //int version = 5; // without user sign
-        record = new RSetStatusToItem(creator, (byte) feePow, key, item.getItemTypeInt(), item.getKey(),
+        record = new RSetStatusToItem(creator, (byte) feePow, key, item.getItemType(), item.getKey(),
                 beg_date, end_date, value_1, value_2, data_1, data_2, refParent, descr,
                 timestamp, 0l);
         record.sign(creator, Transaction.FOR_NETWORK);

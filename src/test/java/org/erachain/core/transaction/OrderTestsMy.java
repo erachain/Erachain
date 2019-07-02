@@ -24,6 +24,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -38,6 +39,7 @@ public class OrderTestsMy {
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
 
+    Random random = new Random();
     long flags = 0l;
     int seqNo = 0;
 
@@ -107,6 +109,7 @@ public class OrderTestsMy {
 
     int haveAssetScale = 8;
     int wantAssetScale = 8;
+
     private void init() {
 
         db = DCSet.createEmptyDatabaseSet();
@@ -137,9 +140,6 @@ public class OrderTestsMy {
 
         assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
-        // set SCALABLE assets ++
-        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
-
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
@@ -161,11 +161,23 @@ public class OrderTestsMy {
     }
 
     // reload from DB
-    private Order reloadOrder(
-            Order order) {
+    private Order reloadOrder(Order order) {
 
         return db.getCompletedOrderMap().contains(order.getId()) ? db.getCompletedOrderMap().get(order.getId())
                 : db.getOrderMap().get(order.getId());
+
+    }
+    private Order reloadOrder(Long orderId) {
+
+        return db.getCompletedOrderMap().contains(orderId) ? db.getCompletedOrderMap().get(orderId)
+                : db.getOrderMap().get(orderId);
+
+    }
+
+    private void removeOrder(Long orderId) {
+
+        db.getCompletedOrderMap().delete(orderId);
+        db.getOrderMap().delete(orderId);
 
     }
 
@@ -285,7 +297,7 @@ public class OrderTestsMy {
 
     }
 
-        @Test
+    @Test
     public void scaleTest() {
 
         init();
@@ -441,6 +453,353 @@ public class OrderTestsMy {
                 amountInvalid, (byte) 0, timestamp, 0l);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
+
+    }
+
+    @Test
+    public void scaleTest800() {
+
+        init();
+
+        int fromScale = 5;
+        assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+        byte[] reference = new byte[64];
+        this.random.nextBytes(reference);
+        assetA.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int toScale = 0;
+        assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+        this.random.nextBytes(reference);
+        assetB.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int cap = 60000;
+        for (int i = cap - 100; i < cap + 100; i++) {
+            BigDecimal amountSell = new BigDecimal(i);
+            BigDecimal amountBuy = new BigDecimal("1");
+
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
+
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuy,
+                    amountSell, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            if (!order_AB_1.isFulfilled()) {
+                fullfilledA = fullfilledA;
+            }
+            if (!order_BA_1.isFulfilled()) {
+                fullfilledA = fullfilledA;
+            }
+
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
+
+            assertEquals(true, order_AB_1.isFulfilled());
+            assertEquals(true, order_BA_1.isFulfilled());
+
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
+
+        }
+
+        for (int i = cap - 100; i < cap + 100; i++) {
+            BigDecimal amountSell = new BigDecimal("1");
+            BigDecimal amountBuy = new BigDecimal(i);
+
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuy,
+                    amountSell, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
+
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
+
+            assertEquals(true, order_AB_1.isFulfilled());
+            assertEquals(true, order_BA_1.isFulfilled());
+
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
+
+        }
+
+    }
+
+    /**
+     * тут частично недо покупка на мизер и ордер или отменяется если он иницатор
+     * иди остаток прибаляется к иницатору и он становится комплетед
+     */
+    @Test
+    public void scaleTest800_1() {
+
+        init();
+
+        int fromScale = 0;
+        assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+        byte[] reference = new byte[64];
+        this.random.nextBytes(reference);
+        assetA.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int toScale = 0;
+        assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+        this.random.nextBytes(reference);
+        assetB.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int cap = 60000;
+        for (int i = cap - 100; i < cap + 100; i++) {
+            BigDecimal amountSell = new BigDecimal(i);
+            BigDecimal amountBuy = new BigDecimal("1111111");
+
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
+
+            // увеличим ордер-кусатель
+            amountBuy = amountBuy.add(new BigDecimal("1"));
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuy,
+                    amountSell, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            if (!order_AB_1.isFulfilled()) {
+                fullfilledA = fullfilledA;
+            }
+            if (!order_BA_1.isFulfilled()) {
+                fullfilledA = fullfilledA;
+            }
+
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
+
+            assertEquals(true, order_AB_1.isFulfilled());
+            assertEquals(false, order_BA_1.isFulfilled());
+
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
+
+        }
+    }
+
+    /**
+     * тут малое отклонение с заказа стенки забираем кусателю
+     */
+    @Test
+    public void scaleTest800_10back() {
+
+        init();
+
+        int fromScale = 0;
+        assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+        byte[] reference = new byte[64];
+        this.random.nextBytes(reference);
+        assetA.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int toScale = 0;
+        assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+        this.random.nextBytes(reference);
+        assetB.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        BigDecimal ADD = new BigDecimal("10");
+        int cap = 60000;
+
+        for (int i = cap - 10; i < cap + 10; i++) {
+            BigDecimal amountSell = new BigDecimal("1111111");
+            BigDecimal amountBuy = new BigDecimal(i);
+
+            // увеличим ордер-держатель
+            BigDecimal price = amountSell.divide(amountBuy, 20, RoundingMode.DOWN);
+            BigDecimal amountBuyNew = amountBuy.add(ADD);
+            BigDecimal amountSellNew = amountBuyNew.multiply(price).setScale(assetA.getScale(), RoundingMode.DOWN);
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuyNew,
+                    amountSellNew, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
+
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
+
+            Trade trade = Trade.get(db, order_BA_1, order_AB_1);
+
+            BigDecimal tradePrice = trade.calcPrice();
+            assertEquals(true, Order.isPricesClose(order_AB_1.getPrice(), tradePrice));
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
+
+            assertEquals(true, order_AB_1.isFulfilled());
+            assertEquals(true, order_BA_1.isFulfilled());
+
+            assertEquals(true, trade.getAmountWant().compareTo(order_BA_1.getAmountHave()) == 0);
+            // кусатель получил больше
+            assertEquals(true, trade.getAmountHave().compareTo(order_BA_1.getAmountWant()) > 0);
+
+            // держатель позиции получил меньше
+            assertEquals(true, trade.getAmountWant().compareTo(order_AB_1.getAmountWant()) < 0);
+            assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
+
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
+
+        }
+
+    }
+
+    /**
+     * тут малое отклонение от заказа стенки
+     * и стенку снимаем и не прибаляем к кусателю
+     * Это очень сильно зависит от коэффициентов:
+     * org.erachain.core.BlockChain#PRECISION_UNIT
+     * org.erachain.core.BlockChain#PRICE_CLOSEST
+     * и может тут не работать если выставить другие значения там - все тонко настраивается в тестах тут
+     * правим ADD
+     */
+    @Test
+    public void scaleTest800_100back() {
+
+        init();
+
+        int fromScale = 0;
+        assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, fromScale, 0L);
+        byte[] reference = new byte[64];
+        this.random.nextBytes(reference);
+        assetA.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        int toScale = 0;
+        assetB = new AssetVenture(accountB, "BBB", icon, image, ".", 0, toScale, 0L);
+        this.random.nextBytes(reference);
+        assetB.setReference(reference);
+        // чтобы точность сбросить в 0
+        assetB.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
+
+        BigDecimal ADD = new BigDecimal("46");
+        int cap = 60000;
+
+        for (int i = cap - 10; i < cap + 10; i++) {
+            BigDecimal amountSell = new BigDecimal("1111111");
+            BigDecimal amountBuy = new BigDecimal(i);
+
+            // увеличим ордер-держатель
+            BigDecimal price = amountSell.divide(amountBuy, 20, RoundingMode.DOWN);
+            BigDecimal amountBuyNew = amountBuy.add(ADD);
+            BigDecimal amountSellNew = amountBuyNew.multiply(price).setScale(assetA.getScale(), RoundingMode.DOWN);
+            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(db), assetA.getKey(db), amountBuyNew,
+                    amountSellNew, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_AB_1_ID = orderCreation.getOrderId();
+
+            orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(db), assetB.getKey(db), amountSell,
+                    amountBuy, (byte) 0, timestamp++, 0l);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
+            orderCreation.process(null, Transaction.FOR_NETWORK);
+            order_BA_1_ID = orderCreation.getOrderId();
+
+            // посре обработки обновим все данные
+            order_AB_1 = reloadOrder(order_AB_1_ID);
+            order_BA_1 = reloadOrder(order_BA_1_ID);
+
+            Trade trade = Trade.get(db, order_BA_1, order_AB_1);
+
+            BigDecimal tradePrice = trade.calcPrice();
+            assertEquals(true, Order.isPricesClose(order_AB_1.getPrice(), tradePrice));
+
+            BigDecimal fullfilledA = order_BA_1.getFulfilledHave();
+            BigDecimal fullfilledB = order_AB_1.getFulfilledHave();
+
+            // доержатель отменяет свой ордер
+            assertEquals(false, order_AB_1.isActive(db));
+            assertEquals(false, order_BA_1.isActive(db));
+
+            // доержатель не исполняет свой ордер
+            assertEquals(false, order_AB_1.isFulfilled());
+            assertEquals(true, order_BA_1.isFulfilled());
+
+            assertEquals(true, trade.getAmountWant().compareTo(order_BA_1.getAmountHave()) == 0);
+            // кусатель получил столько же
+            assertEquals(true, trade.getAmountHave().compareTo(order_BA_1.getAmountWant()) > 0);
+
+            assertEquals(true, trade.getAmountWant().compareTo(order_AB_1.getAmountWant()) < 0);
+            assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
+
+            // удалим их на всяк случай чтобы они не ыбли в стакане
+            removeOrder(order_AB_1_ID);
+            removeOrder(order_BA_1_ID);
+
+        }
 
     }
 

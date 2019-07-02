@@ -52,7 +52,6 @@ public class IssueTemplateRecord extends IssueItemRecord {
     }
 
     //GETTERS/SETTERS
-    //public static String getName() { return "Issue Template"; }
 
     // RETURN START KEY in tot GEMESIS
     public long getStartKey(int height) {

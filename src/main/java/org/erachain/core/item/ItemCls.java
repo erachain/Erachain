@@ -16,7 +16,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.utils.Pair;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple6;
@@ -57,7 +56,6 @@ public abstract class ItemCls implements ExplorerJsonLine {
     //protected DCMap dbMap;
     //protected DCMap dbIssueMap;
     static Logger LOGGER = LoggerFactory.getLogger(ItemCls.class.getName());
-    protected String TYPE_NAME = "unknown";
     protected byte[] typeBytes;
     protected PublicKeyAccount owner;
     protected String name;
@@ -82,8 +80,6 @@ public abstract class ItemCls implements ExplorerJsonLine {
         this(new byte[TYPE_LENGTH], owner, name, icon, image, description);
         this.typeBytes[0] = (byte) type;
     }
-
-    //GETTERS/SETTERS
 
     public static Pair<Integer, Long> resolveDateFromStr(String str, Long defaultVol) {
         if (str.length() == 0) return new Pair<Integer, Long>(0, defaultVol);
@@ -130,9 +126,9 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
     public abstract int getMinNameLen();
 
-    public abstract int getItemTypeInt();
+    public abstract int getItemType();
 
-    public abstract String getItemTypeStr();
+    public abstract String getItemTypeName();
     //public abstract FavoriteItemMap getDBFavoriteMap();
 
     public abstract String getItemSubType();
@@ -141,7 +137,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
     public abstract IssueItemMap getDBIssueMap(DCSet db);
 
-    public byte[] getType() {
+    public byte[] getTypeBytes() {
         return this.typeBytes;
     }
 
@@ -234,7 +230,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
         }
     }
 
-    public static String getItemTypeStr(int itemType) {
+    public static String getItemTypeName(int itemType) {
         return "@" + getItemTypeChar(itemType);
     }
 
@@ -460,7 +456,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
         JSONObject itemJSON = new JSONObject();
 
         // ADD DATA
-        itemJSON.put("item_type", this.getItemTypeStr());
+        itemJSON.put("item_type", this.getItemTypeName());
         itemJSON.put("item_type_sub", this.getItemSubType());
         itemJSON.put("type0", Byte.toUnsignedInt(this.typeBytes[0]));
         itemJSON.put("type1", Byte.toUnsignedInt(this.typeBytes[1]));
@@ -551,7 +547,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     //
-    public void insertToMap(DCSet db, long startKey) {
+    public Long insertToMap(DCSet db, long startKey) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
 
@@ -579,6 +575,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
         //SET ORPHAN DATA
         this.getDBIssueMap(db).set(this.reference, newKey);
 
+        return key;
     }
 
     public long removeFromMap(DCSet db, long startKey) {

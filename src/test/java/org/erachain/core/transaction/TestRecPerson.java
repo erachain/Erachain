@@ -205,7 +205,7 @@ public class TestRecPerson {
 
         init();
 
-        LOGGER.info("person: " + person.getType()[0] + ", " + person.getType()[1]);
+        LOGGER.info("person: " + person.getTypeBytes()[0] + ", " + person.getTypeBytes()[1]);
 
         // PARSE PERSON
 
@@ -229,7 +229,7 @@ public class TestRecPerson {
         assertEquals(person.getOwner().getAddress(), parsedPerson.getOwner().getAddress());
         assertEquals(person.getName(), parsedPerson.getName());
         assertEquals(person.getDescription(), parsedPerson.getDescription());
-        assertEquals(person.getItemTypeStr(), parsedPerson.getItemTypeStr());
+        assertEquals(person.getItemTypeName(), parsedPerson.getItemTypeName());
         assertEquals(person.getBirthday(), parsedPerson.getBirthday());
         assertEquals(person.getDeathday(), parsedPerson.getDeathday());
         assertEquals(person.getGender(), parsedPerson.getGender());
@@ -287,7 +287,7 @@ public class TestRecPerson {
         //CHECK DESCRIPTION
         assertEquals(person.getDescription(), parsedPerson.getDescription());
 
-        assertEquals(person.getItemTypeStr(), parsedPerson.getItemTypeStr());
+        assertEquals(person.getItemTypeName(), parsedPerson.getItemTypeName());
         assertEquals(person.getBirthday(), parsedPerson.getBirthday());
         assertEquals(person.getGender(), parsedPerson.getGender());
         assertEquals(person.getRace(), parsedPerson.getRace());

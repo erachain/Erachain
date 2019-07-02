@@ -41,11 +41,11 @@ public abstract class PollCls extends ItemCls {
     }
 
     //GETTERS/SETTERS
-    public int getItemTypeInt() {
+    public int getItemType() {
         return ItemCls.POLL_TYPE;
     }
 
-    public String getItemTypeStr() {
+    public String getItemTypeName() {
         return "poll";
     }
 

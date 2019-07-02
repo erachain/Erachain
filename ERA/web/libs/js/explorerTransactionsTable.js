@@ -269,16 +269,15 @@ function pagesComponentBeauty(start, label, numberLast, step, linkName) {
 
 function transactions_Table(data) {
 
-    console.log("data=")
-    console.log(data)
+    //console.log("data=")
+    //console.log(data)
     var output = data.Transactions.label_transactions_table + ':<br>';
-    //output += pagesComponentMixed(data);
     output += pagesComponent2(data);
 
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
         ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
 
-    output += '<tr bgcolor="f1f1f1"><td><b>' + data.Transactions.label_block + '<td><b>' +
+    output += '<tr bgcolor="f1f1f1"><td><b>' + data.Transactions.label_seqNo + '<td><b>' +
         data.Transactions.label_title + '<td><b>' + data.Transactions.label_type_transaction + '<td><b>' +
         data.Transactions.label_amount_key + '<td><b>' + data.Transactions.label_date + '<td><b>' +
         data.Transactions.label_atside + '<td><b>' + data.Transactions.label_size + '<td><b>' +
@@ -291,21 +290,30 @@ function transactions_Table(data) {
 
         if (item.title != null) {
             output += '<a href="?tx=' + item.signature + get_lang() + '">'
-                + escapeHtml(item.title) + '</a><td>';
+                + escapeHtml(cutBlank(item.title, 30)) + '</a><td>';
         } else {
             output += '<td>';
         }
 
-        if (item.type != 'forging') {
-            output += item.type + '<td>';
-        } else {
-            output += item.type + '<td>';
+        output += item.type + '<td>';
+
+        if (item.hasOwnProperty('amount')) {
+            output += item.amount + ' ';
         }
 
-        output += item.amount_key + '<td>'
-            + convertTimestamp(item.timestamp, true);
+        if (item.hasOwnProperty('itemKey')) {
+
+            if (item.hasOwnProperty('itemName')) {
+                output += '<a href ="?' + item.itemType + '=' + item.itemKey + get_lang() + '">' +
+                    item.itemName + '</a>';
+            } else {
+                output += '[' + item.itemKey + ']';
+            }
+        }
+
+        output += '<td>' + convertTimestamp(item.timestamp, true);
         output += '<td><a href ="?address=' + item.creator_addr + get_lang() + '">' +
-            item.creator + '</a><td>';
+            cut(cutBlank(item.creator, 30), 35) + '</a><td>';
         output += item.size
             + '<td>'+ item.fee
             + '<td>' + item.confirmations + '</td>'
@@ -313,7 +321,6 @@ function transactions_Table(data) {
 
     }
     output += '</table></td></tr></table>';
-    //output += pagesComponentMixed(data);
     output += pagesComponent2(data);
 
 

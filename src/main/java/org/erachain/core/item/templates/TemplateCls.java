@@ -40,11 +40,11 @@ public abstract class TemplateCls extends ItemCls {
 
     //GETTERS/SETTERS
 
-    public int getItemTypeInt() {
+    public int getItemType() {
         return ItemCls.TEMPLATE_TYPE;
     }
 
-    public String getItemTypeStr() {
+    public String getItemTypeName() {
         return "template";
     }
 

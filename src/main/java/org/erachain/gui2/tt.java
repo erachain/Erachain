@@ -110,9 +110,9 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Assets")));
         assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Assets")));
         assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Issue Asset")));
-        assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Orders")));
+        //assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Orders")));
         assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("My Balance")));
-        assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Exchange")));
+        //assets_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Exchange")));
 
         templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Favorite Templates")));
         templates_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Search Templates")));
