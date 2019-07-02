@@ -23,11 +23,11 @@ public abstract class ImprintCls extends ItemCls {
 
     //GETTERS/SETTERS
 
-    public int getItemTypeInt() {
+    public int getItemType() {
         return ItemCls.IMPRINT_TYPE;
     }
 
-    public String getItemTypeStr() {
+    public String getItemTypeName() {
         return "imprint";
     }
 

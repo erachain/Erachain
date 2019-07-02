@@ -1,10 +1,8 @@
 package org.erachain.gui.transaction;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
-import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
@@ -146,7 +144,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         //NAME
         ++detailGBC.gridy;
-        JTextField itemName = new JTextField(item.getItemTypeStr() + " - " + item.getItemSubType()
+        JTextField itemName = new JTextField(item.getItemTypeName() + " - " + item.getItemSubType()
                 + ": " + item.viewName());
         itemName.setEditable(false);
         MenuPopupUtil.installContextMenu(itemName);

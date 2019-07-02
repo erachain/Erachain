@@ -51,7 +51,7 @@ public class GenesisIssueItemRecord extends GenesisRecord {
         JSONObject transaction = super.toJson();
 
         //ADD CREATOR/NAME/DISCRIPTION/QUANTITY/DIVISIBLE
-        transaction.put(this.item.getItemTypeStr(), this.item.toJson());
+        transaction.put(this.item.getItemTypeName(), this.item.toJson());
 
         return transaction;
     }

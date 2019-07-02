@@ -177,7 +177,7 @@ public class TestRecAsset {
 
         //CREATE SIGNATURE
         AssetUnique assetUni = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
-        LOGGER.info("asset: " + assetUni.getType()[0] + ", " + assetUni.getType()[1]);
+        LOGGER.info("asset: " + assetUni.getTypeBytes()[0] + ", " + assetUni.getTypeBytes()[1]);
         byte[] rawUni = assetUni.toBytes(false, false);
         assertEquals(rawUni.length, assetUni.getDataLength(false));
         assetUni.setReference(new byte[64]);
@@ -186,7 +186,7 @@ public class TestRecAsset {
 
         //CREATE SIGNATURE
         AssetVenture asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 8, 1000l);
-        LOGGER.info("asset: " + asset.getType()[0] + ", " + asset.getType()[1]);
+        LOGGER.info("asset: " + asset.getTypeBytes()[0] + ", " + asset.getTypeBytes()[1]);
         byte[] raw = asset.toBytes(false, false);
         assertEquals(raw.length, asset.getDataLength(false));
         asset.setReference(new byte[64]);

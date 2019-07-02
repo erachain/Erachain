@@ -639,6 +639,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return key;
     }
 
+    public String getTypeKey() {
+        return "";
+    }
+
     public BigDecimal getAmount() {
         return BigDecimal.ZERO;
     }

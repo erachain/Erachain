@@ -8,6 +8,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
@@ -61,7 +62,7 @@ typeBytes[3].3-7 = point accuracy: -16..16 = BYTE - 16
 /**
  *
  */
-public abstract class TransactionAmount extends Transaction {
+public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final byte[][] VALID_REC = new byte[][]{
         //Base58.decode("2PLy4qTVeYnwAiESvaeaSUTWuGcERQr14bpGj3qo83c4vTP8RRMjnmRXnd6USsbvbLwWUNtjErcdvs5KtZMpyREC"),
     };
@@ -158,10 +159,15 @@ public abstract class TransactionAmount extends Transaction {
     }
     
     @Override
+    public ItemCls getItem() {
+        return this.asset;
+    }
+
+    @Override
     public AssetCls getAsset() {
         return this.asset;
     }
-    
+
     @Override
     public BigDecimal getAmount() {
         // return this.amount == null? BigDecimal.ZERO: this.amount;

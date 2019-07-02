@@ -101,7 +101,6 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int VERS_ORDER_0 = DEVELOP_USE ? 230000 : 194400;
     public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 330000 : 256555;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 325555 : 256555;
 
@@ -177,11 +176,17 @@ public class BlockChain {
                     //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };
 
+    // DEX precision
+    public static final int TRADE_PRECISION = 4;
+    final public static BigDecimal PRECISION_UNIT = new BigDecimal("5.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION));
+    // нужно на 1 больше сделать
+    final public static BigDecimal PRICE_CLOSEST = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
+
+
     public static final int ITEM_POLL_FROM = DEVELOP_USE ? 77000 : VERS_4_11;
 
     public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 1034 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
-    public static final int TRADE_PRECISION = 5;
     public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = new String[]{

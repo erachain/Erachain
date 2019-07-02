@@ -6,6 +6,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
@@ -28,7 +29,7 @@ typeBytes[2].3-7 = point accuracy for HAVE amount: -16..16 = BYTE - 16
 typeBytes[3].3-7 = point accuracy for WANT amount: -16..16 = BYTE - 16
 
  */
-public class CreateOrderTransaction extends Transaction {
+public class CreateOrderTransaction extends Transaction implements Itemable {
     public static final byte[][] VALID_REC = new byte[][]{
         //Base58.decode("3C41sWQNguCxhe66QhKSUr7NTFYQqQ8At6E2LfKDBNxpDtWZDjRBTwVRZN9ZuxQrzXL9R4V4EF1EP7B1HucctkqJ"),
         //Base58.decode("3BTEfHJ6cQJtrvA2A1QkKwuznN7LckVUU9YDBjaZiBPapQrN6zHtc6JhgBy1tU8k6z6i7iW9Q4H7ZpordUYdfu2t"),
@@ -97,6 +98,11 @@ public class CreateOrderTransaction extends Transaction {
 
     // GETTERS/SETTERS
     // public static String getName() { return "Create Order"; }
+
+    @Override
+    public ItemCls getItem() {
+        return this.haveAsset;
+    }
 
     @Override
     public String viewAmount() {

@@ -23,8 +23,6 @@ public class Order implements Comparable<Order> {
 
     private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
 
-    final private static BigDecimal PRECISION_UNIT = BigDecimal.ONE.scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION));
-
     /**
      * с какого номера блока включить новое округление
      */
@@ -154,35 +152,51 @@ public class Order implements Comparable<Order> {
      * проверяем по остаткам - сильно ли съехала цена для них.
      * если сильно то это уже ордер который не исполнится - его нужно отменять.
      * Перед употреблением нужно задать базу
+     * <hr>
+     * Перед использованием необходимо проверить order.isFulfilled - может он исполнился полностью
      * @return
      */
     public boolean isUnResolved() {
-        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave), amountWant.subtract(getFulfilledWant()), wantAssetScale);
+        //BigDecimal willHave = amountHave.subtract(fulfilledHave);
+        //BigDecimal willWant = amountWant.subtract(getFulfilledWant());
+
+        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave),
+                amountWant.subtract(getFulfilledWant()), wantAssetScale);
         if (priceForLeft.signum() == 0)
             // уже не сошлось
             return true;
 
-        BigDecimal diff = price.subtract(priceForLeft).divide(price, wantAssetScale + 10, RoundingMode.HALF_DOWN).abs();
+        BigDecimal diff = price.subtract(priceForLeft).divide(price, BlockChain.PRECISION_UNIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
-        if (diff.compareTo(PRECISION_UNIT) > 0)
+        if (diff.compareTo(BlockChain.PRECISION_UNIT) > 0)
             return true;
         return false;
     }
 
+    /**
+     * есди цены в погрешности
+     * @param price1
+     * @param price2
+     * @return
+     */
     public static boolean isPricesClose(BigDecimal price1, BigDecimal price2) {
 
-        BigDecimal diff = price1.subtract(price2).divide(price1.min(price2), BlockChain.TRADE_PRECISION << 1, RoundingMode.UP).abs();
-        if (diff.compareTo(PRECISION_UNIT) < 0)
+        BigDecimal diff = price1.subtract(price2).divide(price1.min(price2),
+                BlockChain.PRICE_CLOSEST.scale() + 1, RoundingMode.HALF_DOWN).abs();
+        if (diff.compareTo(BlockChain.PRICE_CLOSEST) < 0)
             return true;
         return false;
     }
 
     public boolean willUnResolvedFor(BigDecimal fulfilledHave) {
-        BigDecimal priceForLeft = calcPrice(amountHave.subtract(fulfilledHave),
-                amountWant.subtract(willFulfilledWant(fulfilledHave)), wantAssetScale);
-        BigDecimal diff = price.subtract(priceForLeft).divide(price, wantAssetScale + 10, RoundingMode.HALF_DOWN).abs();
+        BigDecimal willHave = amountHave.subtract(fulfilledHave);
+        BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
+
+        BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
+        BigDecimal diff = price.subtract(priceForLeft).divide(price,
+                BlockChain.PRECISION_UNIT.scale()  + 1, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
-        if (diff.compareTo(PRECISION_UNIT) > 0)
+        if (diff.compareTo(BlockChain.PRECISION_UNIT) > 0)
             return true;
         return false;
     }
@@ -194,7 +208,7 @@ public class Order implements Comparable<Order> {
 
     public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
-        int scalePrice = Order.powerTen(amountHave) + (wantScale > 0 ? wantScale : 0);
+        int scalePrice = Order.powerTen(amountHave) + (wantScale > 0 ? wantScale : 0) + 3;
         BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
@@ -297,19 +311,20 @@ public class Order implements Comparable<Order> {
         return this.fulfilledHave.compareTo(this.amountHave) == 0;
     }
 
-    // TO DO
-    public BigDecimal getFulfilledWant() {
-        // надо округлять до точности актива, иначе из-за более точной цены может точность лишу дать в isUnResolved
-        return this.fulfilledHave.multiply(this.price).setScale(this.wantAssetScale, RoundingMode.UP);
+    public boolean isActive(DCSet dcSet) {
+        return dcSet.getOrderMap().contains(id);
     }
 
-    /**
-     * Проверка - если уменьшим то остаток норм все еще?
-     * @param fulfilledHave
-     * @return
-     */
-    public BigDecimal willFulfilledWant(BigDecimal fulfilledHave) {
-        return fulfilledHave.multiply(this.price); //.setScale(this.wantAssetScale, RoundingMode.HALF_DOWN);
+    // TO DO
+    public static BigDecimal getFulfilledWant(BigDecimal fulfilledHave, BigDecimal price, int wantAssetScale) {
+        // надо округлять до точности актива, иначе из-за более точной цены может точность лишу дать в isUnResolved
+        BigDecimal result = fulfilledHave.multiply(price).setScale(wantAssetScale + 2, RoundingMode.HALF_DOWN);
+        BigDecimal result2 = fulfilledHave.multiply(price).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
+        return result2;
+    }
+
+    public BigDecimal getFulfilledWant() {
+        return getFulfilledWant(this.fulfilledHave, this.price, this.wantAssetScale);
     }
 
     public String state() {
@@ -563,11 +578,11 @@ public class Order implements Comparable<Order> {
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
-                //this.id.equals(770667456757788l)
-                height == 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
-                || height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
-                || height == 253841 // сработал NEW_FLOR 2-й
-                || height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
+                //this.id.equals(770667456757788l) // 174358
+                height == 174358 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
+                //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
+                //|| height == 253841 // сработал NEW_FLOR 2-й
+                //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
         //|| (this.haveAssetKey == 12L && this.wantAssetKey == 95L)
                 //|| (this.wantAssetKey == 95L && this.haveAssetKey == 12L)
                 //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
@@ -679,110 +694,84 @@ public class Order implements Comparable<Order> {
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
             compare = thisPrice.compareTo(orderReversePrice);
             if (compare > 0) {
-                // TODO: тут надо сделать просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
-                // просто - if (еhisPrice.compareTo(orderReversePrice) == 0) {
-
-                if (true || height > NEW_FLOR) {
-                    // пытаемся поиграть с точностью округления - см примеры в тестах
-                    // org.erachain.core.transaction.OrderTestsMy.price33 и org.erachain.core.transaction.OrderTestsMy.price33_1
-                    int thisPriceScale = thisPrice.stripTrailingZeros().scale();
-                    int orderReversePriceScale = orderReversePrice.stripTrailingZeros().scale();
-
-                    // если точность у заказа больше чем у нас - то он не сыграет
-                    // например 1 / 3 = 0.00333333
-                    // поэтому надо обрeтную цену проверить
-                    if (thisPriceScale > orderReversePriceScale) {
-                        // если обртаная цена к нам у ордера меньше точность - попробуем сравнить обратные цены
-                        // но при этом точность у нашей цены снизим до точности Заказа
-                        BigDecimal scaledThisPrice = thisPrice.setScale(orderReversePriceScale, RoundingMode.HALF_DOWN);
-                        if (scaledThisPrice.compareTo(orderReversePrice) == 0) {
-                            // да цены совпали
-                            // тогда еще так же обратные цены проверим
-                            BigDecimal thisReversePrice = calcPriceReverse();
-                            //BigDecimal scaledOrderPrice = orderPrice.setScale(thisReversePrice.scale(), RoundingMode.HALF_DOWN);
-                            // и сравним так же по прямой цене со сниженной точностью у Заказа
-                            if (orderPrice.compareTo(thisReversePrice) == 0)
-                                compare = 0;
-                            else
-                                break;
-                        } else
-                            break;
-                    } else if ((true || height > NEW_FLOR2) && thisPriceScale < orderReversePriceScale) {
-                        BigDecimal scaledOrderReversePrice = orderReversePrice.setScale(thisPriceScale, RoundingMode.HALF_DOWN);
-                        if (scaledOrderReversePrice.compareTo(thisPrice) == 0) {
-                            // да цены совпали
-                            // тогда еще так же обратные цены проверим
-                            BigDecimal thisReversePrice = calcPriceReverse();
-                            //BigDecimal scaledOrderPrice = orderPrice.setScale(thisReversePrice.scale(), RoundingMode.HALF_DOWN);
-                            // и сравним так же по прямой цене со сниженной точностью у Заказа
-                            if (orderPrice.compareTo(thisReversePrice) == 0
-                                    && isPricesClose(thisPrice, orderReversePrice))
-                                compare = 0;
-                            else
-                                break;
-                        } else
-                            break;
-                    } else
-                        break;
-                } else
+                // Делаем просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
+                BigDecimal thisReversePrice = calcPriceReverse();
+                // и сравним так же по прямой цене со сниженной точностью у Заказа
+                if (orderPrice.compareTo(thisReversePrice) == 0) {
+                    compare = 0;
+                } else {
                     break;
+                }
             }
 
             orderAmountHaveLeft = order.getAmountHaveLeft();
             // SCALE for HAVE in ORDER
-            orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.HALF_UP);
+            // цену ему занижаем так как это держатель позиции
+            if (order.fulfilledHave.signum() == 0) {
+                orderAmountWantLeft = order.amountWant;
+            } else {
+                orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.DOWN);
+            }
 
             compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
-            if (compareLeft >= 0) {
+            if (compareLeft <= 0) {
+
+                // У позиции меньше чем нам надо - берем все данные с позиции
+                tradeAmountForHave = orderAmountHaveLeft;
+                tradeAmountForWant = orderAmountWantLeft;
+
+                if (compareLeft == 0)
+                    completedOrder = true;
+
+            } else {
 
                 tradeAmountForWant = thisAmountHaveLeft;
 
-                if (compareLeft == 0)
+                if (debug) {
+                    debug = true;
+                }
 
-                    tradeAmountForHave = orderAmountHaveLeft;
+                if (compare == 0) {
+                    // цена совпала (возможно с округлением) то без пересчета берем что раньше посчитали
+                    tradeAmountForHave = this.getAmountWantLeft();
 
-                else {
+                } else {
 
-                    if (debug) {
-                        debug = true;
-                    }
-
-                    if (compare == 0) {
-                        // цена совпала (возможно с округлением)
-                        tradeAmountForHave = this.getAmountWantLeft();
+                    // RESOLVE amount with SCALE
+                    // тут округляем наоборот вверх - больше даем тому кто активный
+                    tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.HALF_DOWN);
+                    if (tradeAmountForHave.compareTo(orderAmountHaveLeft) >= 0) {
+                        // если вылазим после округления за предел то берем что есть
+                        tradeAmountForHave = orderAmountHaveLeft;
 
                     } else {
-                        // RESOLVE amount with SCALE
-                        tradeAmountForHave = tradeAmountForWant.multiply(orderReversePrice).setScale(wantAssetScale, RoundingMode.UP);
-                        if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
-                            // если вылазим после округления за предел то берем что есть
-                            tradeAmountForHave = orderAmountHaveLeft;
-                        } else {
 
-                            if (debug) {
-                                debug = true;
+                        if (debug) {
+                            debug = true;
+                        }
+
+                        // если исполненый ордер станет не исполняемым то попробуем его тут обработать особо
+                        if (order.willUnResolvedFor(tradeAmountForHave)) {
+                            BigDecimal priceUpdateTrade = calcPrice(orderAmountHaveLeft,
+                                    // this.haveSacel for order.WANT
+                                    tradeAmountForWant, haveAssetScale);
+                            // если цена такущей сделки не сильно изменится то весь ордер в сделку собльем
+                            if (Order.isPricesClose(orderPrice, priceUpdateTrade)) {
+                                tradeAmountForHave = orderAmountHaveLeft;
                             }
 
-                            // если там сотаток слишком маленький то добавим его в сделку
-                            // так как выше было округление и оно омгло чуточку недотянуть
-                            BigDecimal diffForLeft = tradeAmountForHave.subtract(orderAmountHaveLeft).abs().divide(orderAmountHaveLeft, 10, RoundingMode.HALF_DOWN);
-                            if (PRECISION_UNIT.compareTo(diffForLeft) > 0
-                                    || order.willUnResolvedFor(tradeAmountForHave)
-                            ) {
+                            // проверим еще раз может вылезло за рамки
+                            if (tradeAmountForHave.compareTo(orderAmountHaveLeft) > 0) {
+                                // если вылазим после округления за предел то берем что есть
                                 tradeAmountForHave = orderAmountHaveLeft;
                             }
                         }
-
                     }
+
                 }
 
                 //THIS is COMPLETED
                 completedOrder = true;
-
-            } else {
-
-                tradeAmountForHave = orderAmountHaveLeft;
-                tradeAmountForWant = orderAmountWantLeft;
 
             }
 
@@ -881,6 +870,12 @@ public class Order implements Comparable<Order> {
 
                 if (completedOrder)
                     break;
+
+                // возможно схлопнулся?
+                if (isFulfilled()) {
+                    completedOrder = true;
+                    break;
+                }
 
                 // if can't trade by more good price than self - by orderOrice - then  auto cancel!
                 if (this.isUnResolved()) {

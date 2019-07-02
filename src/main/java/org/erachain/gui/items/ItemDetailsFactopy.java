@@ -25,7 +25,7 @@ public class ItemDetailsFactopy extends JPanel {
     }
 
     public Object show(ItemCls item) {
-        int in = item.getItemTypeInt();
+        int in = item.getItemType();
 
         switch (in) {
             case ItemCls.ASSET_TYPE:

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
-public abstract class IssueItemRecord extends Transaction {
+public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     static Logger LOGGER = LoggerFactory.getLogger(IssueItemRecord.class.getName());
 
@@ -24,6 +24,7 @@ public abstract class IssueItemRecord extends Transaction {
     public static final long START_KEY = 0; // << 20;
 
     protected ItemCls item;
+    protected Long key;
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);
@@ -48,8 +49,22 @@ public abstract class IssueItemRecord extends Transaction {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Item"; }
 
+    @Override
     public ItemCls getItem() {
         return this.item;
+    }
+
+    /** нужно для отображение в блокэксплорере
+     *  - не участвует в Протоколе, так как перед выпуском неизвестно его значение
+     * @return
+     */
+    @Override
+    public long getKey() {
+        if (key == null) {
+            key = item.getKey(dcSet);
+        }
+
+        return key;
     }
 
     @Override
@@ -193,7 +208,7 @@ public abstract class IssueItemRecord extends Transaction {
             this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
-        this.item.insertToMap(this.dcSet, this.getStartKey(this.height));
+        key = this.item.insertToMap(this.dcSet, this.getStartKey(this.height));
 
     }
 

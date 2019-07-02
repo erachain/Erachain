@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 //import java.math.BigInteger;
 
 
-public class RSignNote extends Transaction {
+public class RSignNote extends Transaction implements Itemable {
 
     protected static final byte HAS_TEMPLATE_MASK = (byte) (1 << 7);
     private static final byte TYPE_ID = (byte) SIGN_NOTE_TRANSACTION;
@@ -43,6 +43,7 @@ public class RSignNote extends Transaction {
     [3] - < 0 - has DATA
      */
     protected long key; // key for Template
+    protected TemplateCls template;
     protected byte[] data;
     protected byte[] encrypted;
     protected byte[] isText;
@@ -119,6 +120,17 @@ public class RSignNote extends Transaction {
         this.signers = signers;
         this.signatures = signatures;
         this.setTypeBytes();
+    }
+
+    //GETTERS/SETTERS
+
+    @Override
+    public ItemCls getItem()
+    {
+        if (template == null) {
+            template = (TemplateCls) dcSet.getItemTemplateMap().get(key);
+        }
+        return this.template;
     }
 
     public static boolean hasTemplate(byte[] typeBytes) {

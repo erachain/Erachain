@@ -189,7 +189,7 @@ public class TestRecUnion {
 
         init();
 
-        LOGGER.info("union: " + union.getType()[0] + ", " + union.getType()[1]);
+        LOGGER.info("union: " + union.getTypeBytes()[0] + ", " + union.getTypeBytes()[1]);
 
         // PARSE UNION
 
@@ -212,7 +212,7 @@ public class TestRecUnion {
         assertEquals(union.getOwner().getAddress(), parsedUnion.getOwner().getAddress());
         assertEquals(union.getName(), parsedUnion.getName());
         assertEquals(union.getDescription(), parsedUnion.getDescription());
-        assertEquals(union.getItemTypeStr(), parsedUnion.getItemTypeStr());
+        assertEquals(union.getItemTypeName(), parsedUnion.getItemTypeName());
         assertEquals(union.getBirthday(), parsedUnion.getBirthday());
         assertEquals(union.getParent(), parsedUnion.getParent());
 
@@ -262,7 +262,7 @@ public class TestRecUnion {
         //CHECK DESCRIPTION
         assertEquals(union.getDescription(), parsedUnion.getDescription());
 
-        assertEquals(union.getItemTypeStr(), parsedUnion.getItemTypeStr());
+        assertEquals(union.getItemTypeName(), parsedUnion.getItemTypeName());
         assertEquals(union.getBirthday(), parsedUnion.getBirthday());
         assertEquals(union.getParent(), parsedUnion.getParent());
 

@@ -7,6 +7,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
@@ -16,7 +17,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class VoteOnItemPollTransaction extends Transaction {
+public class VoteOnItemPollTransaction extends Transaction implements Itemable {
     private static final byte TYPE_ID = (byte) VOTE_ON_ITEM_POLL_TRANSACTION;
     private static final String NAME_ID = "Vote on Item Poll";
     private static final int OPTION_SIZE_LENGTH = 4;
@@ -67,8 +68,38 @@ public class VoteOnItemPollTransaction extends Transaction {
     }
 
     //GETTERS/SETTERS
-
     //public static String getName() { return "Vote on Poll"; }
+
+    @Override
+    public long getKey() {
+        return this.key;
+    }
+
+    @Override
+    public ItemCls getItem()
+    {
+        if (poll == null) {
+            poll = (PollCls) dcSet.getItemPersonMap().get(key);
+        }
+        return this.poll;
+    }
+
+    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
+        super.setDC(dcSet, asDeal, blockHeight, seqNo);
+
+        this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
+    }
+
+    public int getOption() {
+        return this.option;
+    }
+
+    @Override
+    public boolean hasPublicText() {
+        return false;
+    }
+
+    //PARSE CONVERT
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
@@ -146,34 +177,6 @@ public class VoteOnItemPollTransaction extends Transaction {
         } else {
             return new VoteOnItemPollTransaction(typeBytes, creator, pollKey, option, reference, signatureBytes);
         }
-    }
-
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
-
-        this.poll = (PollCls) this.dcSet.getItemPollMap().get(this.key);
-    }
-
-    public long getKey() {
-        return this.key;
-    }
-
-    public long getAbsKey() {
-        if (this.key < 0)
-            return -this.key;
-
-        return this.key;
-    }
-
-    public int getOption() {
-        return this.option;
-    }
-
-    //PARSE CONVERT
-
-    @Override
-    public boolean hasPublicText() {
-        return false;
     }
 
     @SuppressWarnings("unchecked")

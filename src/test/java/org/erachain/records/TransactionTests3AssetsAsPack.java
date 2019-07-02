@@ -103,7 +103,7 @@ public class TransactionTests3AssetsAsPack {
 
         //CREATE SIGNATURE
         AssetUnique asset = new AssetUnique(maker, "test", icon, image, "strontje", 0, 8);
-        LOGGER.info("asset: " + asset.getType()[0] + ", " + asset.getType()[1]);
+        LOGGER.info("asset: " + asset.getTypeBytes()[0] + ", " + asset.getTypeBytes()[1]);
         boolean includeReference = false;
         byte[] raw = asset.toBytes(includeReference, false);
         assertEquals(raw.length, asset.getDataLength(includeReference));

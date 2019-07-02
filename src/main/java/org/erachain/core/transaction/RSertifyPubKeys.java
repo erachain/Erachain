@@ -30,7 +30,7 @@ import java.util.*;
 // typeBytes[1] - version =0 - not need sign by person;
 // 		 =1 - need sign by person
 // typeBytes[2] - size of personalized accounts
-public class RSertifyPubKeys extends Transaction {
+public class RSertifyPubKeys extends Transaction implements Itemable {
 
     protected static final BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(1000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
 
@@ -47,6 +47,7 @@ public class RSertifyPubKeys extends Transaction {
     protected static final int BASE_LENGTH_AS_DBRECORD = Transaction.BASE_LENGTH_AS_DBRECORD + LOAD_LENGTH;
 
     protected Long key; // PERSON KEY
+    protected PersonCls person;
     protected Integer add_day; // in days
     protected List<PublicKeyAccount> sertifiedPublicKeys;
     protected List<byte[]> sertifiedSignatures;
@@ -134,7 +135,14 @@ public class RSertifyPubKeys extends Transaction {
 
     //GETTERS/SETTERS
 
-    //public static String getName() { return "Send"; }
+    @Override
+    public ItemCls getItem()
+    {
+        if (person == null) {
+            person = (PersonCls) dcSet.getItemPersonMap().get(key);
+        }
+        return this.person;
+    }
 
     public static int getPublicKeysSize(byte[] typeBytes) {
         return typeBytes[2];
