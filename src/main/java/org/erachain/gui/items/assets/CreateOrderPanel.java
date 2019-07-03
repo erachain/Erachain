@@ -29,6 +29,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Queue;
 
 @SuppressWarnings("serial")
 public class CreateOrderPanel extends JPanel {
@@ -40,12 +43,12 @@ public class CreateOrderPanel extends JPanel {
     private AssetCls want;
     private JButton sellButton;
     private JComboBox<String> txtFeePow;
-    private JTextField txtWantAmount;
+    private MDecimalFormatedTextField txtWantAmount;
     private JTextPane superHintText;
     private boolean SHOW_HINTS = false;
     boolean needUpdatePrice = false;
     boolean noUpdateFields = false;
-    
+
     public CreateOrderPanel(AssetCls have, AssetCls want, boolean buying, String account) {
         this.setLayout(new GridBagLayout());
         this.have = have;
@@ -195,7 +198,7 @@ public class CreateOrderPanel extends JPanel {
         txtPrice = new MDecimalFormatedTextField();
         // set scale
 
-        txtPrice.setScale(setScale(have, want));
+        txtPrice.setScale(setScale(6, want));
         this.add(txtPrice, detailGBC);
         // ASSET HINT
         assetHintGBC.gridy = detailGBC.gridy;
@@ -243,8 +246,8 @@ public class CreateOrderPanel extends JPanel {
 
         // AMOUNT
         detailGBC.gridy++;
-        txtWantAmount = new JTextField();
-        /////////txtWantAmount.setEditable(false);
+        txtWantAmount = new MDecimalFormatedTextField();
+        txtWantAmount.setScale(want==null? 8: buying? have.getScale() : want.getScale());
         txtWantAmount.setHorizontalAlignment(javax.swing.JTextField.LEFT);
 
         this.add(txtWantAmount, detailGBC);
@@ -440,6 +443,15 @@ public class CreateOrderPanel extends JPanel {
             BigDecimal r = new BigDecimal(target.getText());
             if (r.signum() != 0)
                 sellButton.setEnabled(true);
+
+            int powerAmountHave;
+            if (amount == null) {
+                powerAmountHave = 6;
+            } else {
+                powerAmountHave = Order.powerTen(amount);
+            }
+            txtPrice.setScale(setScale(powerAmountHave, want));
+
         } catch (Exception e) {
             sellButton.setEnabled(false);
         }
@@ -646,11 +658,11 @@ public class CreateOrderPanel extends JPanel {
         this.sellButton.setEnabled(true);
     }
     // confirm asset & return scale
-    private int setScale(AssetCls assetHave, AssetCls assetWant){
-        if (assetHave != null && assetWant != null) {
-            return assetHave.getScale() + assetWant.getScale() + 3;
+    private int setScale(int powerAmountHave, AssetCls assetWant){
+        if (assetWant != null) {
+            return Order.calcPriceScale(powerAmountHave, assetWant.getScale(), 1);
         }
-        return 8;
+        return 10;
     }
 
 }

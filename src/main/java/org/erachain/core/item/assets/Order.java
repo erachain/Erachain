@@ -189,16 +189,12 @@ public class Order implements Comparable<Order> {
             return true;
 
         BigDecimal diff = priceForLeft.subtract(price);
-        int signum = diff.signum();
-        if (signum == 0) {
+        if (diff.signum() == 0) {
             return false;
-        } else if (signum < 0) {
-            // если цена ниже начальной то темблоее отменяем так как нам
-            // не выгодно продавать по более низкой цене
-            return true;
         }
 
-        diff = diff.divide(price,
+        // тут МИНУС всегда случается и причем с маленьким отклонением
+        diff = diff.abs().divide(price,
                 BlockChain.INITIATOR_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN);
         // если разница цены выросла от начального сильно - то
         if (diff.compareTo(BlockChain.INITIATOR_PRICE_DIFF_LIMIT) > 0)
@@ -230,9 +226,16 @@ public class Order implements Comparable<Order> {
         return powerTen(value) + value.scale();
     }
 
+    public static int calcPriceScale(int powerAmountHave, int wantScale, int addScale) {
+        return powerAmountHave + (wantScale > 0 ? wantScale : 0) + addScale;
+    }
+    public static int calcPriceScale(BigDecimal amountHave, int wantScale, int addScale) {
+        return calcPriceScale(Order.powerTen(amountHave), wantScale, addScale);
+    }
+
     public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
         // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
-        int scalePrice = Order.powerTen(amountHave) + (wantScale > 0 ? wantScale : 0) + 3;
+        int scalePrice = calcPriceScale(amountHave, wantScale, 3);
         BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
         // IF SCALE = -1..1 - make error in mapDB - org.mapdb.DataOutput2.packInt(DataOutput, int)
@@ -916,6 +919,10 @@ public class Order implements Comparable<Order> {
 
                 // if can't trade by more good price than self - by orderOrice - then  auto cancel!
                 if (this.isUnResolved()) {
+
+                    if (debug) {
+                        debug = this.isUnResolved();
+                    }
 
                     // cancel order if it not fulfiled isDivisible
 

@@ -182,18 +182,18 @@ public class BlockChain {
      * Если после исполнения торговой сделки оостатется статок у ордера-инициатора и
      * цена для остатка отклонится больше чем на эту величину то ему возвращаем остаток
      */
-    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.000001");
+    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT =     new BigDecimal("0.000001");
     /**
      * Если после исполнения торговой сделки оостатется статок у ордера-цели и
      * цена для остатка отклонится больше чем на эту величину то либо скидываем остаток в эту сделку либо ему возвращаем остаток
      */
-    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.000005");
+    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT =        new BigDecimal("0.000006");
     /**
      * Если цена сделки после скидывания в нее сотатка ордера-цели не выйдет за это ограничени то скидываем в сделку.
      * Инача отдаем обратно
      */
     ///final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
-    final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
+    final public static BigDecimal TRADE_PRICE_DIFF_LIMIT =         new BigDecimal("0.001");
 
 
     public static final int ITEM_POLL_FROM = DEVELOP_USE ? 77000 : VERS_4_11;
