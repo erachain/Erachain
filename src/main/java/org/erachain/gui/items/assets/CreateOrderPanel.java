@@ -450,6 +450,8 @@ public class CreateOrderPanel extends JPanel {
             BigDecimal value = new BigDecimal(editedField.getText());
             if (value.signum() <= 0) {
                 sellButton.setEnabled(false);
+            } else {
+                sellButton.setEnabled(true);
             }
         } catch (Exception e) {
             sellButton.setEnabled(false);

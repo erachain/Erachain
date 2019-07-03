@@ -956,12 +956,12 @@ public class Block implements ExplorerJsonLine {
     }
 
     public int getTransactionSeq(byte[] signature) {
-        int seq = 1;
+        int seqNo = 1;
         for (Transaction transaction : this.getTransactions()) {
             if (Arrays.equals(transaction.getSignature(), signature)) {
-                return seq;
+                return seqNo;
             }
-            seq++;
+            seqNo++;
         }
 
         return -1;
@@ -1533,10 +1533,10 @@ public class Block implements ExplorerJsonLine {
                 if (andProcess) {
 
                     //SET PARENT
-                    ///logger.debug("[" + seq + "] try refsMap.set" );
+                    ///logger.debug("[" + seqNo + "] try refsMap.set" );
                     if (isPrimarySet) {
                         //REMOVE FROM UNCONFIRMED DATABASE
-                        ///logger.debug("[" + seq + "] try unconfirmedMap delete" );
+                        ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
                         unconfirmedMap.delete(transactionSignature);
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
@@ -1552,7 +1552,7 @@ public class Block implements ExplorerJsonLine {
                         ;
                     } else {
 
-                        ///logger.debug("[" + seq + "] try finalMap.set" );
+                        ///logger.debug("[" + seqNo + "] try finalMap.set" );
                         processTimingLocal = System.nanoTime();
                         Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
                         finalMap.set(key, transaction);
@@ -1912,7 +1912,7 @@ public class Block implements ExplorerJsonLine {
 
                 ++seqNo;
 
-                //logger.debug("[" + seq + "] record is process" );
+                //logger.debug("[" + seqNo + "] record is process" );
 
                 // NEED set DC for WIPED too
                 transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
@@ -1932,10 +1932,10 @@ public class Block implements ExplorerJsonLine {
                 transactionSignature = transaction.getSignature();
 
                 //SET PARENT
-                ///logger.debug("[" + seq + "] try refsMap.set" );
+                ///logger.debug("[" + seqNo + "] try refsMap.set" );
 
                 //REMOVE FROM UNCONFIRMED DATABASE
-                ///logger.debug("[" + seq + "] try unconfirmedMap delete" );
+                ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
                 unconfirmedMap.delete(transactionSignature);
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
@@ -1950,11 +1950,11 @@ public class Block implements ExplorerJsonLine {
                     if (cnt.isOnStopping())
                         throw new Exception("on stoping");
 
-                    ///logger.debug("[" + seq + "] try finalMap.set" );
+                    ///logger.debug("[" + seqNo + "] try finalMap.set" );
                     timerStart = System.currentTimeMillis();
                     finalMap.set(key, transaction);
                     timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                    //logger.debug("[" + seq + "] try transFinalMapSinds.set" );
+                    //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
                     timerStart = System.currentTimeMillis();
                     transFinalMapSinds.set(transactionSignature, key);
                     List<byte[]> signatures = transaction.getSignatures();
