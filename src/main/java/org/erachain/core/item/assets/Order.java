@@ -21,7 +21,7 @@ import java.util.List;
 
 public class Order implements Comparable<Order> {
 
-    private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
+    //private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
 
     /**
      * с какого номера блока включить новое округление
@@ -157,7 +157,11 @@ public class Order implements Comparable<Order> {
         BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
 
         BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
-        BigDecimal diff = price.subtract(priceForLeft).divide(price,
+        BigDecimal diff = price.subtract(priceForLeft);
+        if (diff.signum() == 0)
+            return false;
+
+        diff = diff.divide(price,
                 BlockChain.TARGET_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
         if (diff.compareTo(BlockChain.TARGET_PRICE_DIFF_LIMIT) > 0)
@@ -184,8 +188,18 @@ public class Order implements Comparable<Order> {
             // уже не сошлось
             return true;
 
-        BigDecimal diff = price.subtract(priceForLeft).divide(price,
-                BlockChain.INITIATOR_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
+        BigDecimal diff = priceForLeft.subtract(price);
+        int signum = diff.signum();
+        if (signum == 0) {
+            return false;
+        } else if (signum < 0) {
+            // если цена ниже начальной то темблоее отменяем так как нам
+            // не выгодно продавать по более низкой цене
+            return true;
+        }
+
+        diff = diff.divide(price,
+                BlockChain.INITIATOR_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN);
         // если разница цены выросла от начального сильно - то
         if (diff.compareTo(BlockChain.INITIATOR_PRICE_DIFF_LIMIT) > 0)
             return true;
@@ -200,7 +214,11 @@ public class Order implements Comparable<Order> {
      */
     public static boolean isPricesClose(BigDecimal price1, BigDecimal price2) {
 
-        BigDecimal diff = price1.subtract(price2).divide(price1.min(price2),
+        BigDecimal diff = price1.subtract(price2);
+        if (diff.signum() == 0)
+            return true;
+
+        diff = diff.divide(price1.min(price2),
                 BlockChain.TRADE_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
         if (diff.compareTo(BlockChain.TRADE_PRICE_DIFF_LIMIT) < 0)
             return true;
@@ -213,7 +231,7 @@ public class Order implements Comparable<Order> {
     }
 
     public static BigDecimal calcPrice(BigDecimal amountHave, BigDecimal amountWant, int wantScale) {
-        // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.UP).precision() + scalePrice>0?scalePrice : 0;
+        // .precision() - WRONG calculating!!!! scalePrice = amountHave.setScale(0, RoundingMode.HALF_DOWN).precision() + scalePrice>0?scalePrice : 0;
         int scalePrice = Order.powerTen(amountHave) + (wantScale > 0 ? wantScale : 0) + 3;
         BigDecimal result = amountWant.divide(amountHave, scalePrice, RoundingMode.HALF_DOWN).stripTrailingZeros();
 
@@ -301,7 +319,7 @@ public class Order implements Comparable<Order> {
     public BigDecimal getAmountWantLeft() {
         // надо округлять до точности актива, иначе из-за более точной цены может точность лишу дать в isUnResolved
         //return this.getAmountHaveLeft().multiply(this.price, rounding).setScale(this.wantAssetScale, RoundingMode.HALF_DOWN);
-        return this.getAmountHaveLeft().multiply(this.price).setScale(this.wantAssetScale, RoundingMode.UP);
+        return this.getAmountHaveLeft().multiply(this.price).setScale(this.wantAssetScale, RoundingMode.HALF_DOWN);
     }
 
     //////// FULFILLED
@@ -678,6 +696,11 @@ public class Order implements Comparable<Order> {
 
             index++;
 
+            if (order.getAmountHaveLeft().divide(order.amountHave, 6, RoundingMode.HALF_DOWN)
+                    .compareTo(new BigDecimal("0.001")) < 0) {
+                debug = true;
+            }
+
             if (debug) {
                 debug = true;
             }
@@ -718,7 +741,7 @@ public class Order implements Comparable<Order> {
             if (order.fulfilledHave.signum() == 0) {
                 orderAmountWantLeft = order.amountWant;
             } else {
-                orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.DOWN);
+                orderAmountWantLeft = orderAmountHaveLeft.multiply(orderPrice).setScale(haveAssetScale, RoundingMode.HALF_DOWN);
             }
 
             compareLeft = orderAmountWantLeft.compareTo(thisAmountHaveLeft);
@@ -884,6 +907,11 @@ public class Order implements Comparable<Order> {
                 if (isFulfilled()) {
                     completedOrder = true;
                     break;
+                }
+
+                if (this.getAmountHaveLeft().divide(this.amountHave, 6, RoundingMode.HALF_DOWN)
+                        .compareTo(new BigDecimal("0.001")) < 0) {
+                    debug = true;
                 }
 
                 // if can't trade by more good price than self - by orderOrice - then  auto cancel!
