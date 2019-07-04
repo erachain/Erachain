@@ -93,13 +93,13 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.15 beta dev";
-    public static String buildTime = "2019-07-03 13:33:33 UTC";
+    public static String version = "4.11.16 beta dev";
+    public static String buildTime = "2019-07-04 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
     // IF new abilities is made - new license insert in CHAIN and set this KEY
-    public static final long LICENSE_VERS = 107; // versopn of LICENSE
+    public static final long LICENSE_VERS = 107; // version of LICENSE
     public static HashMap<String, Long> LICENSE_LANG_REFS = BlockChain.DEVELOP_USE ?
             new HashMap<String, Long>(3, 1) {
                 {
