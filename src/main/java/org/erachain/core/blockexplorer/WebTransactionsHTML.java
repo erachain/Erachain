@@ -306,20 +306,24 @@ public class WebTransactionsHTML {
         out += "<b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ":</b> " + orderCreation.viewSignature() + "</br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("SeqNo", langObj) + ":</b> " + transaction.viewHeightSeq() + "</br>";
 
+        Long refDB = orderCreation.getDBRef();
         Order order = null;
-        boolean canceled = false;
-        if (DCSet.getInstance().getCompletedOrderMap().contains(orderCreation.getDBRef())) {
-            order = DCSet.getInstance().getCompletedOrderMap().get(orderCreation.getDBRef());
-            if (!order.getFulfilledHave().equals(order.getAmountHave())) {
-                canceled = true;
+        String status;
+        if (DCSet.getInstance().getOrderMap().contains(refDB)) {
+            order = DCSet.getInstance().getOrderMap().get(refDB);
+            status = "Active";
+        } else if (DCSet.getInstance().getCompletedOrderMap().contains(refDB)) {
+            order = DCSet.getInstance().getCompletedOrderMap().get(refDB);
+            if (order.isFulfilled()) {
+                status = "Completed";
+            } else {
+                status = "Canceled";
             }
-            out += "<b>" + Lang.getInstance().translateFromLangObj(canceled?"Canceled":"Completed", langObj) + "</b><br>";
-        } else if (DCSet.getInstance().getOrderMap().contains(orderCreation.getDBRef())) {
-            order = DCSet.getInstance().getOrderMap().get(orderCreation.getDBRef());
-            out += "<b>" + Lang.getInstance().translateFromLangObj("ACTIVE", langObj) + "</b><br>";
         } else {
-            out += "<b>" + Lang.getInstance().translateFromLangObj("unknown", langObj) + "</b></br>";
+            status = "Unknown";
         }
+
+        out += "<h4><a href='?order=" + Transaction.viewDBRef(refDB) + get_Lang(langObj) + "'>" + Lang.getInstance().translateFromLangObj(status, langObj) + "</a></h4>";
 
         out += "<b>" + Lang.getInstance().translateFromLangObj("Have", langObj) + ":</b> "
                 + orderCreation.getAmountHave().toPlainString() + " x "

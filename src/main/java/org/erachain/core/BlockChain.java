@@ -34,7 +34,7 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
     public static final boolean HARD_WORK = false;
     public static final int BLOCK_COUNT = 0; ////
     static public boolean TEST_DB_TXS_OFF = false;
@@ -177,10 +177,23 @@ public class BlockChain {
             };
 
     // DEX precision
-    public static final int TRADE_PRECISION = 4;
-    final public static BigDecimal PRECISION_UNIT = new BigDecimal("5.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION));
-    // нужно на 1 больше сделать
-    final public static BigDecimal PRICE_CLOSEST = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
+    ///public static final int TRADE_PRECISION = 4;
+    /**
+     * Если после исполнения торговой сделки оостатется статок у ордера-инициатора и
+     * цена для остатка отклонится больше чем на эту величину то ему возвращаем остаток
+     */
+    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT =     new BigDecimal("0.000001");
+    /**
+     * Если после исполнения торговой сделки оостатется статок у ордера-цели и
+     * цена для остатка отклонится больше чем на эту величину то либо скидываем остаток в эту сделку либо ему возвращаем остаток
+     */
+    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT =        new BigDecimal("0.000006");
+    /**
+     * Если цена сделки после скидывания в нее сотатка ордера-цели не выйдет за это ограничени то скидываем в сделку.
+     * Инача отдаем обратно
+     */
+    ///final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
+    final public static BigDecimal TRADE_PRICE_DIFF_LIMIT =         new BigDecimal("0.001");
 
 
     public static final int ITEM_POLL_FROM = DEVELOP_USE ? 77000 : VERS_4_11;

@@ -256,7 +256,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     }
 
     @SuppressWarnings("unchecked")
-    public SortableList<Tuple2<Long, Long>, Trade> getTradesByOrderID(Long orderID) {
+    public SortableList<Tuple2<Long, Long>, Trade> getTradesByOrderIDAsSorted(Long orderID) {
         //ADD REVERSE KEYS
         Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
                 Fun.t2(orderID, null),
@@ -265,6 +265,24 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         //RETURN
         return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
     }
+
+    public List<Trade> getTradesByOrderID(Long orderID) {
+        //ADD REVERSE KEYS
+        Collection<Tuple2<Long, Long>> tradesKeys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
+                Fun.t2(orderID, null),
+                Fun.t2(orderID, Fun.HI())).values();
+
+        //GET ALL ORDERS FOR KEYS
+        List<Trade> trades = new ArrayList<Trade>();
+
+        for (Tuple2<Long, Long> tradeKey : tradesKeys) {
+            trades.add(this.get(tradeKey));
+        }
+
+        //RETURN
+        return trades;
+    }
+
 
     @SuppressWarnings("unchecked")
     public List<Trade> getTrades(long haveWant)

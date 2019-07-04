@@ -236,8 +236,9 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         JMenuItem cancel = new JMenuItem(Lang.getInstance().translate("Cancel"));
         cancel.addActionListener(new ActionListener() {
-            @Override
+
             public void actionPerformed(ActionEvent e) {
+
                 if (sellOrdersTableModel.isEmpty())
                     return;
                 int row = sellOrdersTable.getSelectedRow();
@@ -253,10 +254,33 @@ public class EchangeSellBuyPanel extends JTabbedPane {
     //    sellOrdersTable.setComponentPopupMenu(sellOrdersMenu);
         TableMenuPopupUtil.installContextMenu(sellOrdersTable, sellOrdersMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
-
         sellOrdersTable.addMouseListener(new MouseAdapter() {
             @Override
+            public void mousePressed(MouseEvent e) {
+
+                if (false) {
+                    super.mousePressed(e);
+
+                    MTable target = (MTable) e.getSource();
+                    int row = target.getSelectedRow();
+
+                    if (row > sellOrdersTableModel.getRowCount())
+                        return;
+
+                    Order order = sellOrdersTableModel.getItem(row);
+                    if (order == null)
+                        return;
+                }
+
+            }
+
+            @Override
             public void mouseClicked(MouseEvent e) {
+
+                // иначе прии вызове правой мышки не происходит выбора текущей записи
+                // и меню для старого выбора срабатывает
+
+                super.mouseClicked(e);
 
                 MTable target = (MTable) e.getSource();
                 int row = target.getSelectedRow();

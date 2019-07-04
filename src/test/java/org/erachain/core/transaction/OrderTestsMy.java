@@ -718,8 +718,8 @@ public class OrderTestsMy {
      * тут малое отклонение от заказа стенки
      * и стенку снимаем и не прибаляем к кусателю
      * Это очень сильно зависит от коэффициентов:
-     * org.erachain.core.BlockChain#PRECISION_UNIT
-     * org.erachain.core.BlockChain#PRICE_CLOSEST
+     * org.erachain.core.BlockChain#INITIATOR_PRICE_DIFF_LIMIT
+     * org.erachain.core.BlockChain#TRADE_PRICE_DIFF_LIMIT
      * и может тут не работать если выставить другие значения там - все тонко настраивается в тестах тут
      * правим ADD
      */

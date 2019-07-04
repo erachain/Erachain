@@ -346,6 +346,9 @@ button.white-bgc[disabled]:focus,
                                 if (type == 'exchange') {
                                     document.getElementById('main').innerHTML = exchange(data);
                                 } else
+                                if (type == 'order') {
+                                    document.getElementById('main').innerHTML = order(data);
+                                } else
                                 if (type == 'transactions') {
                                     document.getElementById('main').innerHTML = transactions(data);
                                 } else
@@ -1494,14 +1497,18 @@ button.white-bgc[disabled]:focus,
                         output += '<table width="100%" style="border-top: 1px solid #ddd; background-color: #f1f1f1; border-spacing: 7px; border-collapse: separate;">';
 
                         output += '<tr><td><a class=without href=' + urlstart + '#' + i + get_lang() + '>#' + i + '</a>&nbsp;&nbsp;';
-                        output += '<a href=?trade=' + data[i].trade.initiatorTxSignature + '/' + data[i].trade.targetTxSignature + get_lang() + '>';
-                        output += (data[i].trade.initiatorTxSignature + '/' + data[i].trade.targetTxSignature).substr(0, 100) + '...</a></td>';
+                        output += '<a href=?trade=' + data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + get_lang() + '>';
+                        output += data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + '</a></td>';
+
+                        output += '<td><a href=?order=' + data[i].trade.initiatorTxSeqNo + get_lang() + '>';
+                        output += data[i].trade.targetTxSeqNo + '</a> ';
+                        output += '<td><a href=?order=' + data[i].trade.targetTxSeqNo + get_lang() + '>';
+                        output += data[i].trade.initiatorTxSeqNo + '</a></td>';
+
                         output += '<td align=right width=250>Height: <a href=?block=' + data[i].trade.height + get_lang() + '>' + data[i].trade.height + '</a>';
                         output += ' / confirmations: ' + data[i].trade.confirmations + '</td>';
-                        convertTimestamp(data.pageItems[i].timestamp, true)
-                        output += '<td align=right width=200>' + convertTimestamp(data[i].trade.timestamp, true) + '</td></tr></table>';
 
-                        output += '<tr><td>';
+                        output += '<tr><td colspan=4>';
                         output += '<table width="100%" class="tiny table table-striped"><tr><td width="70" align="center">';
 
                         output += '<b>Action</b></td><td width="290"><b>Seller</b></td><td width="290"><b>Buyer</b></td>';
@@ -1525,7 +1532,7 @@ button.white-bgc[disabled]:focus,
                             output += '<td><font color="dimgray">' + data[i].trade.targetCreator + '</font>';
                             img1 = 'img/redright.png';
                         } else {
-                            output += '<td><a href=?address=' + data[i].trade.targetCreator + get_lang() + '>' + data[i].trade.targetCreator + '</a>';
+                            output += '<td><a href=?address=' + data[i].trade.targetCreator + get_lang() + '>' + data[i].trade.targetCreatorName + '</a>';
                             img1 = 'img/grright.png';
                         }
 
@@ -1535,7 +1542,7 @@ button.white-bgc[disabled]:focus,
 
                         output += '<p>';
 
-                        output += addCommas(data[i].trade.amount) + ' ' + getAssetNameMini(data[i].trade.initiatorWant, data[i].trade.wantName);
+                        output += addCommas(data[i].trade.amountWant) + ' ' + getAssetNameMini(data[i].trade.wantKey, data[i].trade.wantName);
 
                         output += ' <img src=' + img1 + ' style="vertical-align: middle;">';
 
@@ -1547,7 +1554,7 @@ button.white-bgc[disabled]:focus,
                             output += '<td><font color="dimgray">' + data[i].trade.initiatorCreator + '</font><br>';
                             img2 = 'img/redleft.png';
                         } else {
-                            output += '<td><a href=?address=' + data[i].trade.initiatorCreator + get_lang() + '>' + data[i].trade.initiatorCreator + '</a>';
+                            output += '<td><a href=?address=' + data[i].trade.initiatorCreator + get_lang() + '>' + data[i].trade.initiatorCreatorName + '</a>';
                             img2 = 'img/grleft.png';
                         }
 
@@ -1558,18 +1565,18 @@ button.white-bgc[disabled]:focus,
                         output += '<p>';
                         output += '<img src=' + img2 + ' style="vertical-align: middle;"> ';
 
-                        output += '' + addCommas(data[i].trade.price) + ' ' + getAssetNameMini(data[i].trade.initiatorHave, data[i].trade.haveName);
+                        output += '' + addCommas(data[i].trade.amountHave) + ' ' + getAssetNameMini(data[i].trade.haveKey, data[i].trade.haveName);
 
                         output += '</p>';
                         output += '</td>';
 
-                        output += '<td>' + ' <a href=?asset=' + data[i].trade.initiatorWant + get_lang() + '>' + getAssetName(data[i].trade.initiatorWant, data[i].trade.wantName) + '</a>';
+                        output += '<td>' + ' <a href=?asset=' + data[i].trade.wantKey + get_lang() + '>' + getAssetName(data[i].trade.wantKey, data[i].trade.wantName) + '</a>';
 
-                        output += '<td>' + ' <a href=?asset=' + data[i].trade.initiatorHave + get_lang() + '>' + getAssetName(data[i].trade.initiatorHave, data[i].trade.haveName) + '</a>';
+                        output += '<td>' + ' <a href=?asset=' + data[i].trade.haveKey + get_lang() + '>' + getAssetName(data[i].trade.haveKey, data[i].trade.haveName) + '</a>';
 
-                        output += '<td>' + addCommas(data[i].trade.realPrice);
-                        output += '<br>' + getAssetNameMini(data[i].trade.initiatorHave, data[i].trade.haveName);
-                        output += '/' + getAssetNameMini(data[i].trade.initiatorWant, data[i].trade.wantName);
+                        output += '<td>' + addCommas(data[i].trade.reversePrice);
+                        output += '<br>' + getAssetNameMini(data[i].trade.haveKey, data[i].trade.haveName);
+                        output += '/' + getAssetNameMini(data[i].trade.wantKey, data[i].trade.wantName);
 
                         if (data[i].hasOwnProperty('balance')) {
                             output += '<td>' + printBalance(data[i].balance) + '</td>';
@@ -2184,6 +2191,7 @@ button.white-bgc[disabled]:focus,
             document.getElementById('home').href = '?blocks&lang=' + params['lang'];
             document.getElementById('menu_transactions').href = '?transactions&lang=' + params['lang'];
             document.getElementById('menu_exchange').href = '?exchange&lang=' + params['lang'];
+            document.getElementById('menu_order').href = '?order&lang=' + params['lang'];
             document.getElementById('menu_addresses').href = '?addresses&lang=' + params['lang'];
             document.getElementById('menu_persons').href = '?persons&lang=' + params['lang'];
             document.getElementById('menu_polls').href = '?polls&lang=' + params['lang'];
@@ -2202,6 +2210,7 @@ button.white-bgc[disabled]:focus,
             document.getElementById('menuTemplates').setAttribute('class', '');
             document.getElementById('menuTransactions').setAttribute('class', '');
             document.getElementById('menuExchange').setAttribute('class', '');
+            document.getElementById('menuOrder').setAttribute('class', '');
 
             var title = 'Erachain BlockExplorer';
 
@@ -2309,6 +2318,7 @@ button.white-bgc[disabled]:focus,
                                 <option value=statuses id=menu_statuses_op translate="true">Status</option>
                                 <option value=templates id=menu_templates_op translate="true">Template</option>
                                 <option value=top id=menu_tops_op translate="false">TOP 100</option>
+                                <option value=order id=menu_order_op translate="true">Order</option>
                             </select>
                         </div>
                         <div class="input-group">
@@ -2330,7 +2340,7 @@ button.white-bgc[disabled]:focus,
             <div class="container-fluid">
                 <div class="row">
                     <div class="main-tabs">
-                        <div class="container">
+                        <div class="container" style="width: 1300px;">
                             <div class="row" id="main-menu">
                                 <ul role="tablist" class="nav nav-tabs" style="font-size:1.2em;">
                                     <li id=menuBlocks><a href="?blocks" id=home translate="true">Blocks</a></li>
@@ -2343,6 +2353,7 @@ button.white-bgc[disabled]:focus,
                                     <li id=menuStatuses><a href="?statuses" id=menu_statuses translate="true">Statuses</a></li>
                                     <li id=menuTemplates><a href="?templates" id=menu_templates translate="true">Templates</a></li>
                                     <li id=menuTop100><a href="?top=100" id=menu_top_100 translate="true">Top 100 Richest</a></li>
+                                    <li id=menuOrder><a href="?order" id=menu_order translate="true">Order</a></li>
                                     <li id=menuPeers><a href="?peers" id=menu_peers translate="true">Peers</a></li>
                                 </ul>
                             </div>
