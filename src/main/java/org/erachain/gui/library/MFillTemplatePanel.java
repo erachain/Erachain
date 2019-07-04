@@ -25,7 +25,7 @@ import java.util.Set;
 public class MFillTemplatePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    public ComboBoxModelItemsTemplates jComboBox_Template;
+    public javax.swing.JComboBox<ItemCls> jComboBox_Template;
     public ItemCls sel_Template = null;
     public JCheckBox add_Tamplate;
 
@@ -44,7 +44,7 @@ public class MFillTemplatePanel extends JPanel {
 
     public MFillTemplatePanel() {
         jTextPane_Message_Public = new MImprintEDITPane();
-        //comboBoxModelTemplates = new ComboBoxModelItemsTemplates();
+        jComboBox_Template.setModel(new ComboBoxModelItemsTemplates());
         jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener() {
 
             @Override
@@ -74,7 +74,7 @@ public class MFillTemplatePanel extends JPanel {
 
         initComponents();
 
-        set_Template(comboBoxModelTemplates.getElementAt(0));
+        set_Template(jComboBox_Template.getSelectedItem());
 
         jComboBox_Template.addItemListener(new ItemListener() {
             @Override
@@ -101,7 +101,6 @@ public class MFillTemplatePanel extends JPanel {
         GridBagConstraints gridBagConstraints;
 
         jLabel_Template1 = new JLabel();
-        jComboBox_Template = new ComboBoxModelItemsTemplates();
         jCheckBox_Is_Text = new JCheckBox();
         jCheckBox_Is_Encripted = new JCheckBox();
         sp_pan = new MSplitPane();
