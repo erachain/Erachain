@@ -3,6 +3,7 @@ package org.erachain.core.exdata;
 import org.erachain.core.item.templates.TemplateCls;
 
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
+import org.erachain.gui.items.templates.ComboBoxModelItemsTemplates;
 import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ZipBytes;
@@ -43,7 +44,7 @@ public class ExDataPanel extends javax.swing.JPanel {
     protected TemplateCls sel_Template;
     private TableModelIssueHashes hashes_Table_Model;
     private DefaultTableModel attached_Files_Model;
-    private DefaultTableModel params_Template_Model;
+    private ComboBoxModelItemsTemplates params_Template_Model;
     private ExDataPanel th;
     // Variables declaration - do not modify
     private MButton jButton_Add_Attached_Files;

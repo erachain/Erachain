@@ -1,8 +1,10 @@
 package org.erachain.gui.library;
 
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.templates.ComboBoxModelItemsTemplates;
+import org.erachain.gui.items.templates.ComboBoxModelItemsTemplates_old;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -23,15 +25,15 @@ import java.util.Set;
 public class MFillTemplatePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    public JComboBox<TemplateCls> jComboBox_Template;
-    public TemplateCls sel_Template = null;
+    public ComboBoxModelItemsTemplates jComboBox_Template;
+    public ItemCls sel_Template = null;
     public JCheckBox add_Tamplate;
 
     // Variables declaration - do not modify
     public JCheckBox jCheckBox_Is_Encripted;
     public MSplitPane sp_pan;
     Params_Template_Model params_Template_Model;
-    private ComboBoxModelItemsTemplates comboBoxModelTemplates;
+    //private ComboBoxModelItemsTemplates comboBoxModelTemplates;
     private JCheckBox jCheckBox_Is_Text;
     private JLabel jLabel1;
     private JLabel jLabel_Template1;
@@ -42,7 +44,7 @@ public class MFillTemplatePanel extends JPanel {
 
     public MFillTemplatePanel() {
         jTextPane_Message_Public = new MImprintEDITPane();
-        comboBoxModelTemplates = new ComboBoxModelItemsTemplates();
+        //comboBoxModelTemplates = new ComboBoxModelItemsTemplates();
         jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener() {
 
             @Override
@@ -94,12 +96,12 @@ public class MFillTemplatePanel extends JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">
+    //// <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
         jLabel_Template1 = new JLabel();
-        jComboBox_Template = new JComboBox<TemplateCls>(comboBoxModelTemplates);
+        jComboBox_Template = new ComboBoxModelItemsTemplates();
         jCheckBox_Is_Text = new JCheckBox();
         jCheckBox_Is_Encripted = new JCheckBox();
         sp_pan = new MSplitPane();
@@ -225,7 +227,7 @@ public class MFillTemplatePanel extends JPanel {
     }// </editor-fold>
     // End of variables declaration
 
-    private void set_Template(TemplateCls item) {
+    private void set_Template(ItemCls item) {
         sel_Template = null;
 
         if (item == null || !add_Tamplate.isSelected())
