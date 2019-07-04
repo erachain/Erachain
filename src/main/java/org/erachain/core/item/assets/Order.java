@@ -149,11 +149,15 @@ public class Order implements Comparable<Order> {
 
     /**
      * Это вызывается только для ордера-Цели
-     * @param fulfilledHave
+     * @param fulfilledHaveWill
      * @return
      */
-    public boolean willUnResolvedFor(BigDecimal fulfilledHave) {
-        BigDecimal willHave = amountHave.subtract(fulfilledHave);
+    public boolean willUnResolvedFor(BigDecimal fulfilledHaveWill) {
+        BigDecimal willHave = amountHave.subtract(fulfilledHave).subtract(fulfilledHaveWill);
+        if (willHave.signum() == 0)
+            return false;
+
+        // сколь нам надо будет если эту сделку обработаем
         BigDecimal willWant = getFulfilledWant(willHave, this.price, this.wantAssetScale);
 
         BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
@@ -607,10 +611,10 @@ public class Order implements Comparable<Order> {
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
                 //this.id.equals(770667456757788l) // 174358 ---- 	255979-3	255992-1
-                height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
+                //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
-                || height == 255992
-                || Transaction.viewDBRef(id).equals("255836-7")
+                //|| height == 255992
+                Transaction.viewDBRef(id).equals("25-5836-7")
                 //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
                 //|| height == 253841 // сработал NEW_FLOR 2-й
                 //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
@@ -707,7 +711,9 @@ public class Order implements Comparable<Order> {
                 debug = true;
             }
 
-            if (debug) {
+            if (debug
+                || Transaction.viewDBRef(order.id).equals("255-836-7")
+                        ) {
                 debug = true;
             }
 
