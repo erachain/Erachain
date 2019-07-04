@@ -606,8 +606,11 @@ public class Order implements Comparable<Order> {
 
         if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
-                //this.id.equals(770667456757788l) // 174358
-                height == 174358 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
+                //this.id.equals(770667456757788l) // 174358 ---- 	255979-3	255992-1
+                height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
+                //// 	255979-3	255992-1
+                || height == 255992
+                || Transaction.viewDBRef(id).equals("255836-7")
                 //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
                 //|| height == 253841 // сработал NEW_FLOR 2-й
                 //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
@@ -722,6 +725,7 @@ public class Order implements Comparable<Order> {
             BigDecimal tradeAmountAccurate;
             BigDecimal differenceTrade;
             //BigDecimal differenceTradeThis;
+            String orderREF = Transaction.viewDBRef(order.getId());
 
             /////////////// - разность точности цены из-за того что у одного ордера значение больше на порядки и этот порядок в точность уходит
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
@@ -851,6 +855,11 @@ public class Order implements Comparable<Order> {
                     Long error = null;
                     error ++;
                 }
+
+                if (tradeAmountForHave.compareTo(new BigDecimal("0.000001")) < 0
+                        || tradeAmountForWant.compareTo(new BigDecimal("0.000001")) < 0) {
+                    debug = true;
+                }
                 trade = new Trade(this.getId(), order.getId(), this.haveAssetKey, this.wantAssetKey,
                         tradeAmountForHave, tradeAmountForWant,
                         haveAssetScale, wantAssetScale, index);
@@ -910,11 +919,6 @@ public class Order implements Comparable<Order> {
                 if (isFulfilled()) {
                     completedOrder = true;
                     break;
-                }
-
-                if (this.getAmountHaveLeft().divide(this.amountHave, 6, RoundingMode.HALF_DOWN)
-                        .compareTo(new BigDecimal("0.001")) < 0) {
-                    debug = true;
                 }
 
                 // if can't trade by more good price than self - by orderOrice - then  auto cancel!
