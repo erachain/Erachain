@@ -42,11 +42,11 @@ public class BlockChain {
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
-    public static final int TESTNET_PORT = DEVELOP_USE ? 9065 : 9045;
-    public static final int MAINNET_PORT = DEVELOP_USE ? 9066 : 9046;
+    public static final int TESTNET_PORT = DEVELOP_USE ? 9095 : 9045;
+    public static final int MAINNET_PORT = DEVELOP_USE ? 9096 : 9046;
 
-    public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9067 : 9047;
-    public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9068 : 9048;
+    public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9097 : 9047;
+    public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9098 : 9048;
 
     //public static final String TIME_ZONE = "GMT+3";
     //
@@ -69,14 +69,14 @@ public class BlockChain {
     public static final int MIN_GENERATING_BALANCE = 100;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
     //public static final int GENERATING_RETARGET = 10;
-    public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
+    public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 32 : 288; // 300 PER DAY
     public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 4);
     static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
     public static final int MAX_BLOCK_SIZE = HARD_WORK ? 22222 : 5000;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
-    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 5000: 15000;
+    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 2000: 15000;
     public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = DEVELOP_USE? 1 : 2; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
@@ -96,25 +96,20 @@ public class BlockChain {
 
     public static final long BONUS_STOP_PERSON_KEY = 13l;
 
-    public static final int VERS_4_11 = DEVELOP_USE ? 230000 : 194400;
+    public static final int VERS_4_11 = DEVELOP_USE ? 0 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 330000 : 256555;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 325555 : 256555;
+    public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 0 : 256555;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 0 : 256555;
 
-    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
+    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 0 : VERS_4_11;
 
     public static final int DEVELOP_FORGING_START = 100;
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
-                    // ORDER on ERG
-                    Base58.decode("4ycpev6jq5dagkCz49LHoMmo6MM7cQEyC36A7tHKLz6ex25NjjKMkd7hdfPnd8yEmuy3biYVSezQXUuEH8f3HZFv"),
-                    Base58.decode("3JR3Wivtjm1uTmrnzkTHtXRdUvMdxrApcmu2Q5uha82HMucWqFWLgN82SwKqYB7EXQ7ThVtJD5s7iJqR8BwqGxF9"),
-                    Base58.decode("5rh9StwPMPsxu7dRvsT5N3KmYkKwUTnRdfQ4Crhqmzbey6uDMh1i6SudphFSUZkexmDAJYJzrarUGsbdEycYytu4"),
-
             } :
             new byte[][]{
 
@@ -196,11 +191,11 @@ public class BlockChain {
     final public static BigDecimal TRADE_PRICE_DIFF_LIMIT =         new BigDecimal("0.001");
 
 
-    public static final int ITEM_POLL_FROM = DEVELOP_USE ? 77000 : VERS_4_11;
+    public static final int ITEM_POLL_FROM = DEVELOP_USE ? 0 : VERS_4_11;
 
-    public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 1034 : 1033;
+    public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 0 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
-    public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 249222;
+    public static final int FREEZE_FROM = DEVELOP_USE ? 0 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = new String[]{
             "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"
@@ -214,7 +209,7 @@ public class BlockChain {
     //TESTNET
     //   1486444444444l
     //	 1487844444444   1509434273     1509434273
-    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
+    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1562243542000l : 1487844793333l;
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
@@ -266,11 +261,9 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
 
     //private int checkPoint = DEVELOP_USE?1:32400;
-    public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            DEVELOP_USE?289561 : 235267,
-            Base58.decode(DEVELOP_USE?
-                    "4MhxLvzH3svg5MoVi4sX8LZYVQosamoBubsEbeTo2fqu6Fcv14zJSVPtZDuu93Tc7RuS2nPJDYycWjpvdSYdmm1W"
-                    :"2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"));
+    public static final Tuple2<Integer, byte[]> CHECKPOINT =
+            DEVELOP_USE? new Tuple2<Integer, byte[]>(235267, Base58.decode("2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"))
+            : new Tuple2<Integer, byte[]>(0, null);
 
     // issue PERSON
     //public static final BigDecimal PERSON_MIN_ERA_BALANCE = BigDecimal.valueOf(10000000);
