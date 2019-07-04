@@ -75,11 +75,11 @@ public class DepositExchange extends JPanel {
 
         AssetCls asset = (AssetCls) cbxAssets.getSelectedItem();
         switch ((int)asset.getKey()) {
+            case 1:
+                urlGetDetails += "3/9/" + jTextField_Address.getText() + "/0.1"; // BTC -> ERA
+                break;
             case 12:
                 urlGetDetails += "3/12/" + jTextField_Address.getText() + "/0.1"; // BTC -> eBTC
-                break;
-            case 2:
-                urlGetDetails += "3/10/" + jTextField_Address.getText() + "/0.1"; // BTC -> COMPU
                 break;
             case 95:
                 urlGetDetails += "3/13/" + jTextField_Address.getText() + "/0.1"; // BTC -> eUSD
@@ -127,28 +127,41 @@ public class DepositExchange extends JPanel {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
-            String rate = jsonObject.get("rate").toString();
-            String bal = jsonObject.get("bal").toString();
+            if (jsonObject.containsKey("wrong")) {
+                jTextField_Details.setText(Lang.getInstance().translate("error"));
+                jTextField_Details_Check.setText("<html><b>" + jsonObject.get("wrong") + "<b></html>");
 
-            LOGGER.debug(StrJSonFine.convert(jsonObject));
-            String help;
+            } else {
 
-            String incomeAssetName = "bitcoins";
-            asset = (AssetCls) cbxAssets.getSelectedItem();
-            switch ((int)asset.getKey()) {
-                case 2:
-                    help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
-                            .replace("%1", incomeAssetName) + " <b>COMPU</B>"
-                        + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
-                        + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> COMPU";
-                    break;
-                default:
-                    help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
-                            .replace("%1", incomeAssetName);
+                String rate = jsonObject.get("rate").toString();
+                String bal = jsonObject.get("bal").toString();
+
+                LOGGER.debug(StrJSonFine.convert(jsonObject));
+                String help;
+
+                String incomeAssetName = "bitcoins";
+                asset = (AssetCls) cbxAssets.getSelectedItem();
+                switch ((int) asset.getKey()) {
+                    case 1:
+                        help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
+                                .replace("%1", incomeAssetName) + " <b>ERA</B>"
+                                + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
+                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> ERA";
+                        break;
+                    case 2:
+                        help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
+                                .replace("%1", incomeAssetName) + " <b>COMPU</B>"
+                                + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
+                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> COMPU";
+                        break;
+                    default:
+                        help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
+                                .replace("%1", incomeAssetName);
+                }
+
+                jTextField_Details.setText(jsonObject.get("addr_in").toString());
+                jTextField_Details_Check.setText("<html>" + help + "</html>");
             }
-
-            jTextField_Details.setText(jsonObject.get("addr_in").toString());
-            jTextField_Details_Check.setText("<html>" + help + "</html>");
 
         } else {
             jLabel_Adress_Check.setText("<html>" + inputText + "</html>");
@@ -301,7 +314,7 @@ public class DepositExchange extends JPanel {
         favoritesGBC.gridx = 2;
         favoritesGBC.gridy = gridy;
 
-        cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel());
+        cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
         this.add(cbxAssets, favoritesGBC);
 
         JLabel detailsHead = new JLabel();
@@ -318,6 +331,12 @@ public class DepositExchange extends JPanel {
                     jTextField_Details_Check.setText("");
 
                     switch ((int)asset.getKey()) {
+                        case 1:
+                            jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
+                            refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
+                                            " " + Lang.getInstance().translate("for buy") + " ERA",
+                                    detailsHead);
+                            break;
                         case 2:
                             jLabel_Details.setText(Lang.getInstance().translate("Bitcoin Address for buy") + ":");
                             refreshReceiverDetails(Lang.getInstance().translate("Payment Details") +
@@ -452,6 +471,9 @@ public class DepositExchange extends JPanel {
         String urlGetDetails = "https://api.face2face.cash/apipay/history.json/";
 
         switch ((int) asset.getKey()) {
+            case 1:
+                urlGetDetails += "ERA/"; // BTC -> eBTC
+                break;
             case 12:
                 urlGetDetails += "@BTC/"; // BTC -> eBTC
                 break;

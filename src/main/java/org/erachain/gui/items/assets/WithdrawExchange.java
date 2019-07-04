@@ -240,7 +240,7 @@ public class WithdrawExchange extends JPanel {
         favoritesGBC.gridx = 2;
         favoritesGBC.gridy = gridy;
 
-        cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel());
+        cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(false));
         this.add(cbxAssets, favoritesGBC);
 
         cbxAssets.addItemListener(new ItemListener() {
