@@ -44,6 +44,7 @@ public class MFillTemplatePanel extends JPanel {
 
     public MFillTemplatePanel() {
         jTextPane_Message_Public = new MImprintEDITPane();
+        jComboBox_Template = new JComboBox<>();
         jComboBox_Template.setModel(new ComboBoxModelItemsTemplates());
         jTextPane_Message_Public.addHyperlinkListener(new HyperlinkListener() {
 
@@ -74,7 +75,7 @@ public class MFillTemplatePanel extends JPanel {
 
         initComponents();
 
-        set_Template(jComboBox_Template.getSelectedItem());
+        set_Template((ItemCls) jComboBox_Template.getSelectedItem());
 
         jComboBox_Template.addItemListener(new ItemListener() {
             @Override
