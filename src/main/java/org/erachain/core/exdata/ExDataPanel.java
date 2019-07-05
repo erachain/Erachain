@@ -3,6 +3,7 @@ package org.erachain.core.exdata;
 import org.erachain.core.item.templates.TemplateCls;
 
 import org.erachain.gui.items.link_hashes.TableModelIssueHashes;
+import org.erachain.gui.items.templates.ComboBoxModelItemsTemplates;
 import org.erachain.gui.library.*;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ZipBytes;
@@ -43,7 +44,7 @@ public class ExDataPanel extends javax.swing.JPanel {
     protected TemplateCls sel_Template;
     private TableModelIssueHashes hashes_Table_Model;
     private DefaultTableModel attached_Files_Model;
-    private DefaultTableModel params_Template_Model;
+    private ParamsTemplateModel params_Template_Model;
     private ExDataPanel th;
     // Variables declaration - do not modify
     private MButton jButton_Add_Attached_Files;
@@ -92,9 +93,10 @@ public class ExDataPanel extends javax.swing.JPanel {
                 jTextPane_Message_Public.pars.replace("{{" + arg0.getDescription() + "}}", str);
                 jTextPane_Message_Public
                         .setText(jTextPane_Message_Public.init_String(jTextPane_Message_Public.text, false));
-                for (int i1 = 0; i1 < params_Template_Model.getRowCount(); i1++) {
-                    if (arg0.getDescription().equals(params_Template_Model.getValueAt(i1, 0)))
-                        params_Template_Model.setValueAt(str, i1, 1);
+                for (int i1 = 0; i1 < jTable_Params_Message_Public.getRowCount(); i1++) {
+
+                    if (arg0.getDescription().equals(jTable_Params_Message_Public.getValueAt(i1, 0)))
+                        jTable_Params_Message_Public.setValueAt(str, i1, 1);
                 }
             }
         });
@@ -732,7 +734,7 @@ public class ExDataPanel extends javax.swing.JPanel {
                     (Boolean) attached_Files_Model.getValueAt(i, 2), (byte[]) attached_Files_Model.getValueAt(i, 5)));
         }
 
-        return ExData.toByte_V2(jTextField_Title_Message.getText(), fill_Template_Panel.sel_Template,
+        return ExData.toByte_V2(jTextField_Title_Message.getText(), (TemplateCls) fill_Template_Panel.sel_Template,
                 this.fill_Template_Panel.get_Params(), hashes_Map, jTextPane_Message_Private.getText(), files_1);
 
     }
