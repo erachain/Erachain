@@ -95,10 +95,7 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
         List<ItemCls> items = new ArrayList<ItemCls>();
         int i = 0;
         for (Long key : keys) {
-            if (key == 0
-                    || key > 2 && key < 10
-            )
-                continue;
+            i++;
 
             //GET ASSET
             ItemCls item = Controller.getInstance().getItem(item_type, key);
@@ -116,7 +113,6 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
                 selected = item; // need for SELECT as OBJECT
             }
 
-            i++;
         }
 
         //RESET SELECTED ITEM
