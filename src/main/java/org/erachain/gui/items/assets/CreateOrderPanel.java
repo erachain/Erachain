@@ -398,6 +398,7 @@ public class CreateOrderPanel extends JPanel {
      * calculateAmounts(txtAmountWant, buying); }
      */
 
+    нужно отдельно цену считаь для подстановок извне
     public synchronized void calculateAmounts(MDecimalFormatedTextField editedField, boolean buying) {
 
         noUpdateFields = true;
