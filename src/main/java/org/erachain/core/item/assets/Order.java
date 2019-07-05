@@ -23,15 +23,6 @@ public class Order implements Comparable<Order> {
 
     //private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
 
-    /**
-     * с какого номера блока включить новое округление
-     */
-    public static final int NEW_FLOR = BlockChain.DEVELOP_USE ? 317000 : BlockChain.VERS_4_12;
-    /**
-     * с какого блока считаем новое округление в обратную строну. Иначе цена 0,65 не срабатывает и обе заявки стоят в стакане
-     */
-    public static final int NEW_FLOR2 = BlockChain.DEVELOP_USE ? 317000 : 253000;
-
     public static final int ID_LENGTH = 8;
     private static final int CREATOR_LENGTH = 20; // as SHORT (old - 25)
     private static final int HAVE_LENGTH = 8;

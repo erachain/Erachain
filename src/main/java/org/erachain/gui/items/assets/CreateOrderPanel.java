@@ -398,7 +398,7 @@ public class CreateOrderPanel extends JPanel {
      * calculateAmounts(txtAmountWant, buying); }
      */
 
-    нужно отдельно цену считаь для подстановок извне
+    //нужно отдельно цену считаь для подстановок извне
     public synchronized void calculateAmounts(MDecimalFormatedTextField editedField, boolean buying) {
 
         noUpdateFields = true;
@@ -417,7 +417,7 @@ public class CreateOrderPanel extends JPanel {
                 if (buying) {
                     total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
                 } else {
-                    total = price.multiply(amount).setScale(want.getScale(), RoundingMode.DOWN);
+                    total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
                 }
                 txtAmountWant.setText(total.toPlainString());
 
@@ -435,7 +435,7 @@ public class CreateOrderPanel extends JPanel {
                 total = new BigDecimal(txtAmountWant.getText());
                 price = new BigDecimal(txtPrice.getText());
                 if (buying) {
-                    amount = total.divide(price, want.getScale(), RoundingMode.DOWN);
+                    amount = total.divide(price, want.getScale(), RoundingMode.HALF_DOWN);
                 } else {
                     amount = total.divide(price, have.getScale(), RoundingMode.HALF_DOWN);
                 }
@@ -462,39 +462,32 @@ public class CreateOrderPanel extends JPanel {
 
     }
 
-    public void calculateSellingAmount(JTextField target, boolean buying) {
+    public synchronized void calculateWant(BigDecimal amount, BigDecimal price, boolean buying) {
 
-        int i = 1;
+        noUpdateFields = true;
+
         try {
 
-            BigDecimal amount = new BigDecimal(txtAmountWant.getText());
-            i++;
-            BigDecimal price = new BigDecimal(txtPrice.getText());
-
-            BigDecimal result;
+            BigDecimal total;
 
             if (buying) {
-                result = amount.divide(price, have.getScale(), RoundingMode.HALF_DOWN);
+                txtAmountWant.setText(amount.toEngineeringString());
+                addQueve(txtAmountWant);
+                txtPrice.setText(price.toPlainString());
+                addQueve(txtPrice);
+                total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
+                txtAmountHave.setText(total.toPlainString());
             } else {
-                result = amount.divide(price, want.getScale(), RoundingMode.HALF_DOWN);
+                txtAmountHave.setText(amount.toEngineeringString());
+                addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
+                txtPrice.setText(price.toPlainString());
+                addQueve(txtPrice);
+                total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
+                txtAmountWant.setText(total.toPlainString());
             }
 
-            noUpdateFields = true;
-            target.setText(result.toPlainString());
-            noUpdateFields = false;
+            sellButton.setEnabled(true);
 
-            BigDecimal r = new BigDecimal(target.getText());
-            if (r.signum() != 0)
-                sellButton.setEnabled(true);
-        } catch (Exception e) {
-            sellButton.setEnabled(false);
-        }
-
-        try {
-            BigDecimal value = new BigDecimal(target.getText());
-            if (value.signum() <= 0) {
-                sellButton.setEnabled(false);
-            }
         } catch (Exception e) {
             sellButton.setEnabled(false);
         }
