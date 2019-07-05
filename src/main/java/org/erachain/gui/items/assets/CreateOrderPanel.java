@@ -416,7 +416,7 @@ public class CreateOrderPanel extends JPanel {
                 if (buying) {
                     total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
                 } else {
-                    total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
+                    total = price.multiply(amount).setScale(want.getScale(), RoundingMode.DOWN);
                 }
                 txtAmountWant.setText(total.toPlainString());
 
@@ -434,7 +434,7 @@ public class CreateOrderPanel extends JPanel {
                 total = new BigDecimal(txtAmountWant.getText());
                 price = new BigDecimal(txtPrice.getText());
                 if (buying) {
-                    amount = total.divide(price, want.getScale(), RoundingMode.HALF_DOWN);
+                    amount = total.divide(price, want.getScale(), RoundingMode.DOWN);
                 } else {
                     amount = total.divide(price, have.getScale(), RoundingMode.HALF_DOWN);
                 }
