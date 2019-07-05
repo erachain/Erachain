@@ -697,11 +697,6 @@ public class Order implements Comparable<Order> {
 
             index++;
 
-            if (order.getAmountHaveLeft().divide(order.amountHave, 6, RoundingMode.HALF_DOWN)
-                    .compareTo(new BigDecimal("0.001")) < 0) {
-                debug = true;
-            }
-
             if (debug
                 || Transaction.viewDBRef(order.id).equals("255-836-7")
                         ) {
@@ -853,10 +848,6 @@ public class Order implements Comparable<Order> {
                     error ++;
                 }
 
-                if (tradeAmountForHave.compareTo(new BigDecimal("0.000001")) < 0
-                        || tradeAmountForWant.compareTo(new BigDecimal("0.000001")) < 0) {
-                    debug = true;
-                }
                 trade = new Trade(this.getId(), order.getId(), this.haveAssetKey, this.wantAssetKey,
                         tradeAmountForHave, tradeAmountForWant,
                         haveAssetScale, wantAssetScale, index);
