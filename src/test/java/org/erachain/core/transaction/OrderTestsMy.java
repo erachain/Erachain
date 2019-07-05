@@ -1451,7 +1451,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, new BigDecimal("1000"),
                 new BigDecimal("650"), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(db, Transaction.FOR_NETWORK, Order.NEW_FLOR + 1, ++seqNo);
+        orderCreation.setDC(db, Transaction.FOR_NETWORK, 1, ++seqNo);
         orderCreation.process(null, Transaction.FOR_NETWORK);
 
         Long order_AB_1_ID = orderCreation.makeOrder().getId();
@@ -1461,7 +1461,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, new BigDecimal("0.00000333"),
                 new BigDecimal("0.00100"), (byte) 0, timestamp++, 0l, new byte[]{5, 6});
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(db, Transaction.FOR_NETWORK, Order.NEW_FLOR + 1, ++seqNo);
+        orderCreation.setDC(db, Transaction.FOR_NETWORK, 1, ++seqNo);
         orderCreation.process(null, Transaction.FOR_NETWORK);
         Long order_BA_1_ID = orderCreation.makeOrder().getId();
 
@@ -1493,7 +1493,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, new BigDecimal("30"),
                 new BigDecimal("0.1"), (byte) 0, timestamp++, 0l, new byte[64]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(db, Transaction.FOR_NETWORK, Order.NEW_FLOR + 1, ++seqNo);
+        orderCreation.setDC(db, Transaction.FOR_NETWORK, 1, ++seqNo);
         orderCreation.process(null, Transaction.FOR_NETWORK);
 
         Long order_AB_1_ID = orderCreation.makeOrder().getId();
@@ -1503,12 +1503,12 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, new BigDecimal("0.00000333"),
                 new BigDecimal("0.00100"), (byte) 0, timestamp++, 0l, new byte[]{5, 6});
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(db, Transaction.FOR_NETWORK, Order.NEW_FLOR + 1, ++seqNo);
+        orderCreation.setDC(db, Transaction.FOR_NETWORK, 1, ++seqNo);
         orderCreation.process(null, Transaction.FOR_NETWORK);
         Long order_BA_1_ID = orderCreation.makeOrder().getId();
 
         // CHECK BALANCES
-        Assert.assertEquals(accountA.getBalanceUSE(keyA, db), new BigDecimal("49970.00000000")); // BALANCE
+        Assert.assertEquals(accountA.getBalanceUSE(keyA, db), new BigDecimal("49970")); // BALANCE
         Assert.assertEquals(accountA.getBalanceUSE(keyB, db), new BigDecimal("0.00000333")); // BALANCE
 
         Assert.assertEquals(accountB.getBalanceUSE(keyB, db), new BigDecimal("49999.99999667")); // BALANCE

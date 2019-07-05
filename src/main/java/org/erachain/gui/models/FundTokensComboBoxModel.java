@@ -19,16 +19,38 @@ import java.util.concurrent.locks.ReentrantLock;
 @SuppressWarnings("serial")
 public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
 
-    public FundTokensComboBoxModel() {
+    public FundTokensComboBoxModel(boolean deposit) {
+
+        AssetCls asset;
         if (BlockChain.DEVELOP_USE) {
             //this.addElement(Controller.getInstance().getAsset(1031));
-            this.addElement(Controller.getInstance().getAsset(1077));
-            this.addElement(Controller.getInstance().getAsset(1078));
-            this.addElement(Controller.getInstance().getAsset(1079));
-            this.addElement(Controller.getInstance().getAsset(2));
+
+
+            for (Long key: new Long[]{1077L, 1078L, 1079L, 2L}) {
+                asset = Controller.getInstance().getAsset(key);
+                if (asset == null)
+                    continue;
+                this.addElement(asset);
+            }
+
+            if (deposit) {
+                this.addElement(Controller.getInstance().getAsset(1L));
+            } else {
+            }
+
         } else {
-            this.addElement(Controller.getInstance().getAsset(12)); // BTC
-            this.addElement(Controller.getInstance().getAsset(2)); // COMPU
+            for (Long key: new Long[]{12L, 2L}) {
+                asset = Controller.getInstance().getAsset(key);
+                if (asset == null)
+                    continue;
+
+                this.addElement(asset);
+            }
+
+            if (deposit) {
+                this.addElement(Controller.getInstance().getAsset(1L));
+            } else {
+            }
             //this.addElement(Controller.getInstance().getAsset(14)); // ETH
             //this.addElement(Controller.getInstance().getAsset(92)); // RUB
             //this.addElement(Controller.getInstance().getAsset(95)); // USD
