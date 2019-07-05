@@ -427,7 +427,7 @@ public class CreateOrderPanel extends JPanel {
                 if (buying) {
                     price = Order.calcPrice(amount, total, want.getScale());
                 } else {
-                    price = Order.calcPrice(total, amount, have.getScale());
+                    price = Order.calcPrice(amount, total, want.getScale());
                 }
                 txtPrice.setText(price.toPlainString());
 
