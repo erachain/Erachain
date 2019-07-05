@@ -34,7 +34,7 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
     public static final boolean HARD_WORK = false;
     public static final int BLOCK_COUNT = 0; ////
     static public boolean TEST_DB_TXS_OFF = false;
@@ -42,11 +42,11 @@ public class BlockChain {
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
-    public static final int TESTNET_PORT = DEVELOP_USE ? 9095 : 9045;
-    public static final int MAINNET_PORT = DEVELOP_USE ? 9096 : 9046;
+    public static final int TESTNET_PORT = DEVELOP_USE ? 9065 : 9045;
+    public static final int MAINNET_PORT = DEVELOP_USE ? 9066 : 9046;
 
-    public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9097 : 9047;
-    public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9098 : 9048;
+    public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9067 : 9047;
+    public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9068 : 9048;
 
     //public static final String TIME_ZONE = "GMT+3";
     //
