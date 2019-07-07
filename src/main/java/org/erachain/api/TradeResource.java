@@ -154,8 +154,13 @@ public class TradeResource {
             out.put("active", true);
             return out.toJSONString();
         } else {
-            JSONObject out = DCSet.getInstance().getCompletedOrderMap().get(orderID).toJson();
-            out.put("completed", true);
+            Order order = DCSet.getInstance().getCompletedOrderMap().get(orderID);
+            JSONObject out = order.toJson();
+            if (order.isFulfilled()) {
+                out.put("completed", true);
+            } else {
+                out.put("canceled", true);
+            }
             return out.toJSONString();
         }
 
