@@ -52,7 +52,7 @@ public class WalletItemAssetsTableModel extends WalletAutoKeyTableModel<Tuple2<L
 
             case COLUMN_NAME:
 
-                return asset.viewName();
+                return asset; // for Icon
 
             case COLUMN_ADDRESS:
 
