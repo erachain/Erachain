@@ -159,12 +159,12 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
         if (this.asset == null)
             return false;
 
+        transaction.setDC_HeightSeq(dcSet);
+
         if (transaction.getAbsKey() != this.asset.getKey()
                 // все для Компушек
-            && this.asset.getKey() != Transaction.FEE_KEY)
-                return false;
-
-        transaction.setDC_HeightSeq(dcSet);
+                && this.asset.getKey() != Transaction.FEE_KEY)
+            return false;
 
         Trans trr = new Trans();
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
