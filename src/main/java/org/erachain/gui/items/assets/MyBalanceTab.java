@@ -7,6 +7,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.BalanceFromAddressTableModel;
+import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -118,11 +119,16 @@ public class MyBalanceTab extends SplitPanel {
 		column4.setCellRenderer(new RendererRight());
 */
 
+        // иконку будем рисовать
+        table.getColumnModel().getColumn(balancesModel.COLUMN_FOR_ICON)
+                .setCellRenderer(new RendererIcon());
+
 
 // add listener
 //		jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(table);
 // show	
         this.jTableJScrollPanelLeftPanel.setModel(balancesModel);
+
         this.jTableJScrollPanelLeftPanel = table;
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
         jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {

@@ -471,14 +471,14 @@ public class CreateOrderPanel extends JPanel {
             BigDecimal total;
 
             if (buying) {
-                txtAmountWant.setText(amount.toEngineeringString());
-                addQueve(txtAmountWant);
+                txtAmountHave.setText(amount.toPlainString());
+                addQueve(txtAmountHave);
                 txtPrice.setText(price.toPlainString());
                 addQueve(txtPrice);
                 total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
-                txtAmountHave.setText(total.toPlainString());
+                txtAmountWant.setText(total.toPlainString());
             } else {
-                txtAmountHave.setText(amount.toEngineeringString());
+                txtAmountHave.setText(amount.toPlainString());
                 addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
                 txtPrice.setText(price.toPlainString());
                 addQueve(txtPrice);
