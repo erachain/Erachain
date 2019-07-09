@@ -37,6 +37,7 @@ import java.util.Set;
  */
 public class ExDataPanel extends javax.swing.JPanel {
 
+    public MultipleRecipientsPanel multipleRecipientsPanel;
     public MSplitPane sp_pan;
     public MFillTemplatePanel fill_Template_Panel;
     public javax.swing.JTextField jTextField_Title_Message;
@@ -282,6 +283,7 @@ public class ExDataPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        multipleRecipientsPanel = new MultipleRecipientsPanel();
         jTabbedPane_Message = new javax.swing.JTabbedPane();
         jPanel_Message_Public = new javax.swing.JPanel();
         jScrollPane_Message_Public_TextPane = new javax.swing.JScrollPane();
@@ -357,6 +359,7 @@ public class ExDataPanel extends javax.swing.JPanel {
         // jPanel_Message_Public.add(jCheckBox_Message_Public,
         // gridBagConstraints);
 
+        jTabbedPane_Message.addTab(Lang.getInstance().translate("Recipients"), multipleRecipientsPanel);
         // jTabbedPane_Message.addTab(Lang.getInstance().translate("Public
         // Part"), jPanel_Message_Public);
         fill_Template_Panel = new MFillTemplatePanel();
