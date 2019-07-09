@@ -52,15 +52,21 @@ public class MultipleRecipientsPanel extends JPanel {
             // delete row
             @Override
             public void actionPerformed(ActionEvent e) {
+                int interval=0;
                 if (recipientsTableModel.getRowCount() > 0) {
                     int selRow = jTableRecipients.getSelectedRow();
                     if (selRow != -1 && recipientsTableModel.getRowCount() >= selRow) {
                         ((DefaultTableModel) recipientsTableModel).removeRow(selRow);
+                        interval = selRow-1;
+                        if (interval<0) interval =0;
                     }
                 }
-                if (recipientsTableModel.getRowCount()<1) recipientsTableModel.addRow(new Object[]{"", ""});
+                if (recipientsTableModel.getRowCount()<1) {
+                    recipientsTableModel.addRow(new Object[]{"", ""});
+                    interval = 0;
+                }
 
-                jTableRecipients.setRowSelectionInterval(recipientsTableModel.getRowCount()-1, recipientsTableModel.getRowCount()-1);
+                jTableRecipients.setRowSelectionInterval(interval, interval);
                 recipientsTableModel.fireTableDataChanged();
             }
         });
