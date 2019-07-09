@@ -163,6 +163,11 @@ public class WithdrawExchange extends JPanel {
                             + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> BTC";
             }
 
+            if (jsonObject.containsKey("may_pay")) {
+                formTitle += "<br>" + Lang.getInstance().translate("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
+                        + incomeAssetName;
+            }
+
             panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
 
         }
