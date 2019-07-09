@@ -140,32 +140,32 @@ public class DepositExchange extends JPanel {
                 String help;
 
                 String incomeAssetName = "bitcoins";
+                String incomeName = "BTC";
                 String outcomeAssetName;
                 asset = (AssetCls) cbxAssets.getSelectedItem();
                 switch ((int) asset.getKey()) {
                     case 1:
                         outcomeAssetName = "ERA";
                         help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
-                                .replace("%1", incomeAssetName) + " <b>" + outcomeAssetName + "</B>"
+                                .replace("%1", incomeAssetName) + " <b>" + outcomeAssetName + "</b>"
                                 + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
                                 + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetName;
                         break;
                     case 2:
                         outcomeAssetName = "COMPU";
                         help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
-                                .replace("%1", incomeAssetName) + " <b>\" + curr_inName + \"</b>"
+                                .replace("%1", incomeAssetName) + " <b>" + outcomeAssetName + "</b>"
                                 + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
                                 + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetName;
                         break;
                     default:
-                        outcomeAssetName = "unknown";
                         help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
                                 .replace("%1", incomeAssetName);
                 }
 
                 if (jsonObject.containsKey("may_pay")) {
                     help += "<br>" + Lang.getInstance().translate("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
-                        + incomeAssetName;
+                        + incomeName;
                 }
 
                 jTextField_Details.setText(jsonObject.get("addr_in").toString());
