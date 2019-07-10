@@ -145,7 +145,6 @@ public class WithdrawExchange extends JPanel {
             message += ":" + jTextField_Address.getText();
             AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
                     null, new Account(accountTo), null, message);
-            MainPanel.getInstance().insertTab(panel);
 
             String rate = jsonObject.get("rate").toString();
             String bal = jsonObject.get("bal").toString();
@@ -154,7 +153,7 @@ public class WithdrawExchange extends JPanel {
             String incomeAssetName = assetIn.getName();
             switch ((int) assetIn.getKey()) {
                 case 12:
-                    formTitle = Lang.getInstance().translate("Withdraw BTC to") + " " + accountTo;
+                    formTitle = Lang.getInstance().translate("Withdraw %1 to").replace("%1", incomeAssetName) + " " + accountTo;
                     break;
                 default:
                     formTitle = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
@@ -163,7 +162,15 @@ public class WithdrawExchange extends JPanel {
                             + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> BTC";
             }
 
+            if (jsonObject.containsKey("may_pay")) {
+                formTitle += "<br>" + Lang.getInstance().translate("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
+                        + incomeAssetName;
+            }
+
             panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
+            panel.setName(Lang.getInstance().translate("Withdraw"));
+            MainPanel.getInstance().removeTab(panel.getName());
+            MainPanel.getInstance().insertTab(panel);
 
         }
 
