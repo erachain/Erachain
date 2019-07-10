@@ -1202,6 +1202,7 @@
   "hour": "час",
   "mins": "минут",
   "min": "мин",
+  "Minimal payment in equivalent <b>%1 BTC</b>": "Минимальный платеж в эквиваленте <b>%1 BTC</b>",
   "secs": "сек",
   "Unconfirmed Transactions": "Неподтверждённые Транзакции",
   "Later": "Следующая",
