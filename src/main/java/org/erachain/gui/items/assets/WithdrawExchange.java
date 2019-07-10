@@ -233,7 +233,8 @@ public class WithdrawExchange extends JPanel {
                         Lang.getInstance().translate("Withdraw"))
                         + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
                         + ".</h3>"
-                + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025")
+                + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025") + "<br>"
+                + Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
                 +"</html>");
 
         /////////////// ASSET
@@ -269,7 +270,8 @@ public class WithdrawExchange extends JPanel {
                                 Lang.getInstance().translate("Withdraw"))
                             + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
                             + ".</h3>"
-                            + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025")
+                            + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025") + "<br>"
+                            + Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
                     );
                 }
             }

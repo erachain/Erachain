@@ -168,7 +168,7 @@ public class DepositExchange extends JPanel {
                         + incomeName;
                 }
 
-                help += "<br>" + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025");
+                help += "<br>" + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0005");
 
                 jTextField_Details.setText(jsonObject.get("addr_in").toString());
                 jTextField_Details_Check.setText("<html>" + help + "</html>");
