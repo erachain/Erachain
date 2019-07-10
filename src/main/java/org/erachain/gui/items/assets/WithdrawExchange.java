@@ -234,7 +234,8 @@ public class WithdrawExchange extends JPanel {
                         + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
                         + ".</h3>"
                 + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025") + "<br>"
-                + Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
+                //+ Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
+                + Lang.getInstance().translate("Service will have some commission")
                 +"</html>");
 
         /////////////// ASSET
@@ -271,7 +272,8 @@ public class WithdrawExchange extends JPanel {
                             + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
                             + ".</h3>"
                             + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025") + "<br>"
-                            + Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
+                            //+ Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
+                            + Lang.getInstance().translate("Service will have some commission")
                     );
                 }
             }
@@ -317,7 +319,7 @@ public class WithdrawExchange extends JPanel {
         gridy += 3;
 
 
-        jButton_Confirm = new MButton(Lang.getInstance().translate("Withdraw"), 2);
+        jButton_Confirm = new MButton(Lang.getInstance().translate("Next"), 2);
         jButton_Confirm.setToolTipText("");
         jButton_Confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
