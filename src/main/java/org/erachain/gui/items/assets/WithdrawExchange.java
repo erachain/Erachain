@@ -145,7 +145,6 @@ public class WithdrawExchange extends JPanel {
             message += ":" + jTextField_Address.getText();
             AccountAssetSendPanel panel = new AccountAssetSendPanel(assetIn, TransactionAmount.ACTION_SEND,
                     null, new Account(accountTo), null, message);
-            MainPanel.getInstance().insertTab(panel);
 
             String rate = jsonObject.get("rate").toString();
             String bal = jsonObject.get("bal").toString();
@@ -154,7 +153,7 @@ public class WithdrawExchange extends JPanel {
             String incomeAssetName = assetIn.getName();
             switch ((int) assetIn.getKey()) {
                 case 12:
-                    formTitle = Lang.getInstance().translate("Withdraw BTC to") + " " + accountTo;
+                    formTitle = Lang.getInstance().translate("Withdraw %1 to").replace("%1", incomeAssetName) + " " + accountTo;
                     break;
                 default:
                     formTitle = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
@@ -163,7 +162,15 @@ public class WithdrawExchange extends JPanel {
                             + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> BTC";
             }
 
+            if (jsonObject.containsKey("may_pay")) {
+                formTitle += "<br>" + Lang.getInstance().translate("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
+                        + incomeAssetName;
+            }
+
             panel.jLabel_Title.setText("<html><h2>" + formTitle + "</h2></html>");
+            panel.setName(Lang.getInstance().translate("Withdraw"));
+            MainPanel.getInstance().removeTab(panel.getName());
+            MainPanel.getInstance().insertTab(panel);
 
         }
 
@@ -220,7 +227,16 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         //gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jText_Help, gridBagConstraints);
-        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select the Asset that you want to withdraw") + "</h2></html>");
+        jText_Help.setText("<html><h2>1. " + Lang.getInstance().translate("Select the Asset that you want to withdraw") + "</h2>"
+                + "<h3>2. " + Lang.getInstance().translate("Set the address for bitcoins where you want to withdraw")
+                        + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
+                        Lang.getInstance().translate("Withdraw"))
+                        + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
+                        + ".</h3>"
+                + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025") + "<br>"
+                //+ Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
+                + Lang.getInstance().translate("Service will have some commission")
+                +"</html>");
 
         /////////////// ASSET
         jLabel_Asset.setText(Lang.getInstance().translate("Asset") + ":");
@@ -254,7 +270,11 @@ public class WithdrawExchange extends JPanel {
                             + ". " + Lang.getInstance().translate("And click button '%1' to open the panel for payment").replace("%1",
                                 Lang.getInstance().translate("Withdraw"))
                             + ". " + Lang.getInstance().translate("Where You need to set only amount of withdraw asset in the panel for payment")
-                            + ".</h3></html>");
+                            + ".</h3>"
+                            + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0025") + "<br>"
+                            //+ Lang.getInstance().translate("Service will take commission fee approx - %1%").replace("%1","2.75")
+                            + Lang.getInstance().translate("Service will have some commission")
+                    );
                 }
             }
         });
@@ -299,7 +319,7 @@ public class WithdrawExchange extends JPanel {
         gridy += 3;
 
 
-        jButton_Confirm = new MButton(Lang.getInstance().translate("Withdraw"), 2);
+        jButton_Confirm = new MButton(Lang.getInstance().translate("Next"), 2);
         jButton_Confirm.setToolTipText("");
         jButton_Confirm.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
