@@ -42,17 +42,17 @@ public class APIExchange {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apiexchange/orders?have={have}&want={want}&limit={limit}",
+        help.put("apiexchange/orders/[have]/[want]?limit=[limit]",
                 "Get orders for HaveKey & WantKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 50, default 20.");
-        help.put("apiexchange/trades?have={have}&want={want}&timestamp={timestamp}&limit={limit}",
+        help.put("apiexchange/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades from timestamp for HaveKey & WantKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
-        help.put("apiexchange/volume24?have={have}&want={want}",
+        help.put("apiexchange/volume24/[have]/[want]",
                 "Get day volume of trades for HaveKey & WantKey");
-        help.put("apiexchange/ordersfull?have={have}&want={want}&limit={limit}",
+        help.put("apiexchange/ordersfull/[have]/[want]?limit=[limit]",
                 "Get Orders. Only for local requests");
-        help.put("apiexchange/tradesfull?have={have}&want={want}&limit={limit}",
+        help.put("apiexchange/tradesfull/[have]/[want]?limit=[limit]",
                 "Get trades. Only for local requests");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -60,9 +60,9 @@ public class APIExchange {
     }
 
     @GET
-    @Path("orders")
-    // apiexchange/get?have=1&want=2&&limit=4
-    public Response getOrders(@QueryParam("have") Long have, @QueryParam("want") Long want,
+    @Path("orders/{have}/{want}")
+    // orders/1/2?imit=4
+    public Response getOrders(@PathParam("have") Long have, @PathParam("want") Long want,
                               @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = this.dcSet.getItemAssetMap();
@@ -82,27 +82,38 @@ public class APIExchange {
             limitInt = 50;
 
 
-        List<Order> haveOrders = dcSet.getOrderMap().getOrdersHave(have, limitInt);
-        List<Order> wantOrders = dcSet.getOrderMap().getOrdersWant(want, limitInt);
+        List<Order> haveOrders = dcSet.getOrderMap().getOrders(have, want, limitInt);
+        List<Order> wantOrders = dcSet.getOrderMap().getOrders(want, have, limitInt);
 
         JSONObject result = new JSONObject();
 
-        // тут ошибка конвертации если пользовать StrJSonFine или gs
-        //  java.lang.NumberFormatException: For input string: "587341072695297-1"
-        // .entity(StrJSonFine.convert(output)) или gs.toJson(listResult)
-        ////////// ТАК у нас у Ордера есть toString - и Сборщики почемуто берут это а не .toJson
-        // поэтому делаем вручную
         JSONArray arrayHave = new JSONArray();
         for (Order order: haveOrders) {
-            arrayHave.add(order.toJson());
+            JSONObject json = new JSONObject();
+            json.put("id", order.getId());
+            json.put("seqNo", Transaction.viewDBRef(order.getId()));
+            json.put("creator", order.getCreator().getAddress());
+            json.put("left", order.getAmountHaveLeft().toPlainString());
+            json.put("price", order.getPrice().toPlainString());
+            arrayHave.add(json);
         }
         result.put("have", arrayHave);
 
         JSONArray arrayWant = new JSONArray();
         for (Order order: wantOrders) {
-            arrayWant.add(order.toJson());
+            JSONObject json = new JSONObject();
+            json.put("id", order.getId());
+            json.put("seqNo", Transaction.viewDBRef(order.getId()));
+            json.put("creator", order.getCreator().getAddress());
+            // get REVERSE price and AMOUNT
+            json.put("left", order.getAmountWantLeft().toPlainString());
+            json.put("price", order.calcPriceReverse().toPlainString());
+            arrayWant.add(json);
         }
         result.put("want", arrayWant);
+
+        result.put("haveKey", have);
+        result.put("wantKey", want);
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
@@ -123,9 +134,9 @@ public class APIExchange {
      */
 
     @GET
-    @Path("trades")
+    @Path("trades/{have}/{want}")
     // apiexchange/get?have=1&want=2&timestamp=3&limit=4
-    public Response getTradesFromTimestamp(@QueryParam("have") Long have, @QueryParam("want") Long want,
+    public Response getTradesFromTimestamp(@PathParam("have") Long have, @PathParam("want") Long want,
                                @DefaultValue("0") @QueryParam("timestamp") Long timestamp,
                                @DefaultValue("50") @QueryParam("limit") Long limit) {
 
@@ -158,9 +169,9 @@ public class APIExchange {
     }
 
     @GET
-    @Path("volume24")
+    @Path("volume24/{have}/{want}")
     // apiexchange/get?have=1&want=2&timestamp=3&limit=4
-    public Response getVolume24(@QueryParam("have") Long have, @QueryParam("want") Long want) {
+    public Response getVolume24(@PathParam("have") Long have, @PathParam("want") Long want) {
 
         ItemAssetMap map = this.dcSet.getItemAssetMap();
         // DOES ASSETID EXIST
@@ -191,9 +202,9 @@ public class APIExchange {
      */
 
     @GET
-    @Path("ordersfull")
+    @Path("ordersfull/{have}/{want}")
     // apiexchange/orders?have=1&want=2&limit=20
-    public Response ordersFull(@QueryParam("have") Long have, @QueryParam("want") Long want,
+    public Response ordersFull(@PathParam("have") Long have, @PathParam("want") Long want,
                            @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
@@ -318,9 +329,9 @@ public class APIExchange {
      */
 
     @GET
-    @Path("tradesfull")
+    @Path("tradesfull/{have}/{want}")
     // apiexchange/trades?have=1&want=2&limit=20
-    public Response tradesFull(@QueryParam("have") Long have, @QueryParam("want") Long want,
+    public Response tradesFull(@PathParam("have") Long have, @PathParam("want") Long want,
                            @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {

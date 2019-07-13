@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMap;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @Path("trade")
@@ -37,16 +39,20 @@ public class TradeResource {
 
     @GET
     public String help() {
+
         Map<String, String> help = new LinkedHashMap<String, String>();
-        help.put("GET trade/rater/{start/stop}",
+        help.put("GET trade/rater/[start/stop]",
                 "Start Rater: 1 - start, 0 - stop");
-        help.put("GET trade/create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}?feePow={feePow}&password={password}",
-                "make and broadcast CreateOrder ");
-        help.put("GET trade/get/{signature}",
+        help.put("GET trade/create/[creator]/[haveKey]/[wantKey]/[haveAmount]/[wantAmount]?feePow=[feePow]&password=[password]",
+                "make and broadcast CreateOrder");
+        help.put("GET trade/get/[signature]",
                 "Get Order");
-        help.put("GET trade/getbyaddress/{creator}/{haveKey}/{wantKey}",
+        help.put("GET trade/orders/[have]/[want]?limit=[limit]",
+                "Get tradeorders for HaveKey & WantKey, "
+                        + "limit is count record. The number of transactions is limited by input param, default 20.");
+        help.put("GET trade/getbyaddress/[creator]/[haveKey]/[wantKey]",
                 "get list of orders in CAP by address");
-        help.put("GET trade/cancel/{creator}/{signature}?password={password}",
+        help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
                 "Cancel Order");
 
         return StrJSonFine.convert(help);
@@ -235,6 +241,62 @@ public class TradeResource {
             return out.toJSONString();
         }
 
+    }
+
+    @GET
+    @Path("orders/{have}/{want}")
+    // orders/1/2?imit=4
+    public String getOrders(@PathParam("have") Long have, @PathParam("want") Long want,
+                              @DefaultValue("20") @QueryParam("limit") Long limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        int limitInt = limit.intValue();
+
+        List<Order> haveOrders = DCSet.getInstance().getOrderMap().getOrders(have, want, limitInt);
+        List<Order> wantOrders = DCSet.getInstance().getOrderMap().getOrders(want, have, limitInt);
+
+        JSONObject result = new JSONObject();
+
+        JSONArray arrayHave = new JSONArray();
+        for (Order order: haveOrders) {
+            JSONObject json = new JSONObject();
+            json.put("id", order.getId());
+            json.put("seqNo", Transaction.viewDBRef(order.getId()));
+            json.put("creator", order.getCreator().getAddress());
+            json.put("left", order.getAmountHaveLeft().toPlainString());
+            json.put("price", order.getPrice().toPlainString());
+            arrayHave.add(json);
+        }
+        result.put("have", arrayHave);
+
+        JSONArray arrayWant = new JSONArray();
+        for (Order order: wantOrders) {
+            JSONObject json = new JSONObject();
+            json.put("id", order.getId());
+            json.put("seqNo", Transaction.viewDBRef(order.getId()));
+            json.put("creator", order.getCreator().getAddress());
+            // get REVERSE price and AMOUNT
+            json.put("left", order.getAmountWantLeft().toPlainString());
+            json.put("price", order.calcPriceReverse().toPlainString());
+            arrayWant.add(json);
+        }
+        result.put("want", arrayWant);
+
+        result.put("haveKey", have);
+        result.put("wantKey", want);
+
+        return result.toJSONString();
     }
 
     @GET
