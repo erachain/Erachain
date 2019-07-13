@@ -69,7 +69,8 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
                 else
                     result = initiatorOrder.getCreator().getPersonAsString();
 
-                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())) {
+                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
+                        || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
@@ -77,13 +78,18 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
             case COLUMN_PRICE:
 
+                boolean isMine = Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
+                        || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress());
+
                 if (isSell)
                     return "<html><span style='color:green'>▲</span>"
-                            + NumberAsString.formatAsString(trade.calcPrice())
+                            + (isMine? "<b>" + NumberAsString.formatAsString(trade.calcPrice()) + "</b>"
+                                : NumberAsString.formatAsString(trade.calcPrice()))
                             + "</html>";
                 else
                     return "<html><span style='color:red'>▼</span>"
-                            + NumberAsString.formatAsString(trade.calcPriceRevers())
+                            + (isMine? "<b>" + NumberAsString.formatAsString(trade.calcPriceRevers()) + "</b>"
+                                : NumberAsString.formatAsString(trade.calcPriceRevers()))
                             + "</html>";
 
             case COLUMN_WHO_AMOUNT:
@@ -94,7 +100,8 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
                 else
                     result = NumberAsString.formatAsString(trade.getAmountHave());
 
-                if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
+                        || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
