@@ -6,7 +6,9 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.OrderMap;
@@ -24,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,7 +52,10 @@ public class TradeResource {
                 "Get Order");
         help.put("GET trade/orders/[have]/[want]?limit=[limit]",
                 "Get tradeorders for HaveKey & WantKey, "
-                        + "limit is count record. The number of transactions is limited by input param, default 20.");
+                        + "limit is count record. The number of orders is limited by input param, default 20.");
+        help.put("GET trade/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
+                "Get trades for HaveKey & WantKey, "
+                        + "limit is count record. The number of trades is limited by input param, default 50.");
         help.put("GET trade/getbyaddress/[creator]/[haveKey]/[wantKey]",
                 "get list of orders in CAP by address");
         help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
@@ -246,7 +252,7 @@ public class TradeResource {
     @GET
     @Path("orders/{have}/{want}")
     // orders/1/2?imit=4
-    public String getOrders(@PathParam("have") Long have, @PathParam("want") Long want,
+    public static String getOrders(@PathParam("have") Long have, @PathParam("want") Long want,
                               @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
@@ -295,8 +301,50 @@ public class TradeResource {
 
         result.put("haveKey", have);
         result.put("wantKey", want);
+        result.put("limited", limitInt);
 
         return result.toJSONString();
+    }
+
+    /**
+     * Get trades by timestamp. The number of transactions is limited by input
+     * param.
+     *
+     * @param have      is account
+     * @param want      is account two
+     * @param timestamp value time
+     * @param limit     count out record
+     * @return record trades
+     * @author Ruslan
+     */
+
+    @GET
+    @Path("trades/{have}/{want}")
+    // /trades/1/2?timestamp=3&limit=4
+    public static String getTradesFromTimestamp(@PathParam("have") Long have, @PathParam("want") Long want,
+                                           @DefaultValue("0") @QueryParam("timestamp") Long timestamp,
+                                           @DefaultValue("50") @QueryParam("limit") Long limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        int limitInt = limit.intValue();
+        List<Trade> listResult = Controller.getInstance().getTradeByTimestmp(have, want, timestamp, limitInt);
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade: listResult) {
+            arrayJSON.add(trade.toJson(have));
+        }
+
+        return arrayJSON.toJSONString();
     }
 
     @GET
