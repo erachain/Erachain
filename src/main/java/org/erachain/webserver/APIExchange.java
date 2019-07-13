@@ -230,8 +230,11 @@ public class APIExchange {
 
         Map output = new LinkedHashMap();
 
-        List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
-        List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, true);
+        ///List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        ///List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, true);
+
+        List<Order> haveOrders = dcSet.getOrderMap().getOrders(have, want, limitInt);
+        List<Order> wantOrders = dcSet.getOrderMap().getOrders(want, have, limitInt);
 
         Map sellsJSON = new LinkedHashMap();
         Map buysJSON = new LinkedHashMap();
