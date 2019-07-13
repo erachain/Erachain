@@ -554,6 +554,7 @@ public class Order implements Comparable<Order> {
 
         JSONObject order = new JSONObject();
         order.put("id", this.id);
+        order.put("seqNo", Transaction.viewDBRef(this.id));
         order.put("creator", this.creator.getAddress());
         order.put("haveAssetKey", this.haveAssetKey);
         order.put("wantAssetKey", this.wantAssetKey);

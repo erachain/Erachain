@@ -43,7 +43,7 @@ public class APIExchange {
         Map<String, String> help = new LinkedHashMap<>();
 
         help.put("apiexchange/orders?have={have}&want={want}&limit={limit}",
-                "Get orders from timestamp for HaveKey & WantKey, "
+                "Get orders for HaveKey & WantKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 50, default 20.");
         help.put("apiexchange/trades?have={have}&want={want}&timestamp={timestamp}&limit={limit}",
                 "Get trades from timestamp for HaveKey & WantKey, "
