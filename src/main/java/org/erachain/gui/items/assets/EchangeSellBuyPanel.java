@@ -300,8 +300,8 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
 
                     if (row < sellOrdersTableModel.getRowCount()) {
-                        buyOrderPanel.calculateWant(order.getAmountHaveLeft(), order.getPrice(), false);
-                        ///buyOrderPanel.txtAmountHave.setText(order.getAmountHaveLeft().toPlainString());
+                        buyOrderPanel.calculateWant(order.getAmountHaveLeft(), order.getPrice(), true);
+                        ///buyOrderPanel.txtAmountHave.setText(order.getAmountHaveLeft().toPlainString()); buy
                         ///buyOrderPanel.txtPrice.setText(order.calcPrice().toPlainString());
 
                     }
@@ -344,7 +344,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                 if (e.getClickCount() == 2) {
                     sellOrderPanel.calculateWant(order.getAmountWantLeft(), order.calcPriceReverse(), false);
-                    ///sellOrderPanel.txtAmountHave.setText(order.getAmountWantLeft().toPlainString());
+                    ///sellOrderPanel.txtAmountHave.setText(order.getAmountWantLeft().toPlainString()); sell
                     ///sellOrderPanel.txtPrice.setText(order.calcPriceReverse().toPlainString());
                 }
             }
@@ -470,20 +470,20 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
                     if (type) {
                         BigDecimal price = trade.calcPriceRevers();
-                        sellOrderPanel.calculateWant(trade.getAmountWant(), price, true);
+                        sellOrderPanel.calculateWant(trade.getAmountWant(), price, type);
                         //sellOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         //sellOrderPanel.txtPrice.setText(price.toPlainString());
 
-                        buyOrderPanel.calculateWant(trade.getAmountWant(), price, true);
+                        buyOrderPanel.calculateWant(trade.getAmountWant(), price, type);
                         //buyOrderPanel.txtAmountHave.setText(trade.getAmountWant().toPlainString());
                         //buyOrderPanel.txtPrice.setText(price.toPlainString());
                     } else {
                         BigDecimal price = trade.calcPrice();
-                        sellOrderPanel.calculateWant(trade.getAmountHave(), price, false);
+                        sellOrderPanel.calculateWant(trade.getAmountHave(), price, type);
                         //sellOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
                         //sellOrderPanel.txtPrice.setText(price.toPlainString());
 
-                        buyOrderPanel.calculateWant(trade.getAmountHave(), price, false);
+                        buyOrderPanel.calculateWant(trade.getAmountHave(), price, type);
                         //buyOrderPanel.txtAmountHave.setText(trade.getAmountHave().toPlainString());
                         //buyOrderPanel.txtPrice.setText(price.toPlainString());
                     }

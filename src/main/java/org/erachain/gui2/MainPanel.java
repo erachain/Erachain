@@ -617,7 +617,13 @@ public class MainPanel extends javax.swing.JPanel {
 
     }
 
-    // get node by name
+    public void removeTab(String title) {
+        int index = jTabbedPane1.indexOfTab(title);
+        if (index > 0) {
+            jTabbedPane1.remove(index);
+        }
+    }
+        // get node by name
     private DefaultMutableTreeNode getNodeByName(String sNodeName, DefaultMutableTreeNode parent) {
         if (parent != null)
             for (Enumeration e = parent.breadthFirstEnumeration(); e.hasMoreElements(); ) {

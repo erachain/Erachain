@@ -23,6 +23,9 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
     public static final int COLUMN_A = 2;
     public static final int COLUMN_ASSET_NAME = 1;
     public static final int COLUMN_ASSET_KEY = 0;
+
+    public static final int COLUMN_FOR_ICON = 1;
+
     Account account;
     Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
     Tuple2<Long, String> asset;
@@ -39,8 +42,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
         List<Account> accounts = Controller.getInstance().getAccounts();
         tableBalance = new ArrayList<>();// Pair();
         tableBalance1 = new ArrayList<>();
-        HashSet<Long> item;
-        item = new HashSet();
+        HashSet<Long> assetKeys = new HashSet();
 
         for (Account account1 : accounts) {
             account = account1;
@@ -48,13 +50,19 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
             for (Pair<Tuple2<String, Long>,
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance1 : this.balances) {
+
+                if (Controller.getInstance().getAsset(balance1.getA().b) == null) {
+                    // SKIP LIA etc.
+                    continue;
+                }
+
                 balance = balance1;
                 tableBalance1.add(new Pair(account, new Pair(balance.getA(), balance.getB())));
-                item.add(balance.getA().b);
+                assetKeys.add(balance.getA().b);
             }
         }
 
-        for (Long i : item) {
+        for (Long assetKey: assetKeys) {
             BigDecimal sumAA = new BigDecimal(0);
             BigDecimal sumBA = new BigDecimal(0);
             BigDecimal sumCA = new BigDecimal(0);
@@ -66,7 +74,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
             BigDecimal sumDB = new BigDecimal(0);
             BigDecimal sumEB = new BigDecimal(0);
             for (Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k : this.tableBalance1) {
-                if (k.getB().getA().b.equals(i)) {
+                if (k.getB().getA().b.equals(assetKey)) {
 
                     sumAA = sumAA.add(k.getB().getB().a.a);
                     sumBA = sumBA.add(k.getB().getB().b.a);
@@ -83,7 +91,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
                 }
 
             }
-            tableBalance.add(new Pair(account, new Pair(i, new Tuple5(
+            tableBalance.add(new Pair(account, new Pair(assetKey, new Tuple5(
                     new Tuple2(sumAA, sumAB), new Tuple2(sumBA, sumBB), new Tuple2(sumCA, sumCB),
                     new Tuple2(sumDA, sumDB), new Tuple2(sumEA, sumEB)))));
 
@@ -140,7 +148,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
             case COLUMN_C:
                 return NumberAsString.formatAsString(tableBalance.get(row).getB().getB().c.b);
             case COLUMN_ASSET_NAME:
-                return asset.viewName();
+                return asset;
         }
         return null;
     }

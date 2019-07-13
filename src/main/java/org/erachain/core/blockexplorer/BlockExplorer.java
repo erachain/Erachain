@@ -2470,10 +2470,11 @@ public class BlockExplorer {
                     + orders.getCount(pair.getB(), pair.getA()));
 
             Trade trade = trades.getLastTrade(pair.getA(), pair.getB());
+            //Order initiator
             if (trade == null) {
                 pairJSON.put("last", "--");
             } else {
-                if (trade.getHaveKey() == pair.getB()) {
+                if (trade.getHaveKey().equals(pair.getB())) {
                     pairJSON.put("last", trade.calcPrice().toPlainString());
                 } else {
                     pairJSON.put("last", trade.calcPriceRevers().toPlainString());

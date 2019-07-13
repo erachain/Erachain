@@ -46,6 +46,8 @@ public class RendererIcon extends DefaultTableCellRenderer {
         if (iconBytes != null && iconBytes.length > 0) {
             ImageIcon image = new ImageIcon(iconBytes);
             setIcon(new ImageIcon(image.getImage().getScaledInstance(20, 20, 1)));
+        } else {
+            setIcon(new ImageIcon());
         }
 
         setText(item.viewName());

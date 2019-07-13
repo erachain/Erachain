@@ -7,6 +7,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -89,11 +90,15 @@ public class MyAssetsTab extends SplitPanel {
         column4.setMaxWidth(1000);
         column4.setPreferredWidth(50);
 
+        // иконку будем рисовать
+        table.getColumnModel().getColumn(assetsModel.COLUMN_FOR_ICON)
+                .setCellRenderer(new RendererIcon());
 
         // add listener
         //		jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(table);
         // show
-        this.jTableJScrollPanelLeftPanel.setModel(assetsModel);
+        /// this.jTableJScrollPanelLeftPanel.setModel(assetsModel);
+
         this.jTableJScrollPanelLeftPanel = table;
 
         jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
