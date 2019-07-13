@@ -280,7 +280,8 @@ public class TradeResource {
             json.put("id", order.getId());
             json.put("seqNo", Transaction.viewDBRef(order.getId()));
             json.put("creator", order.getCreator().getAddress());
-            json.put("left", order.getAmountHaveLeft().toPlainString());
+            json.put("amount", order.getAmountHaveLeft().toPlainString());
+            json.put("total", order.getAmountWantLeft().toPlainString());
             json.put("price", order.getPrice().toPlainString());
             arrayHave.add(json);
         }
@@ -293,7 +294,8 @@ public class TradeResource {
             json.put("seqNo", Transaction.viewDBRef(order.getId()));
             json.put("creator", order.getCreator().getAddress());
             // get REVERSE price and AMOUNT
-            json.put("left", order.getAmountWantLeft().toPlainString());
+            json.put("amount", order.getAmountWantLeft().toPlainString());
+            json.put("total", order.getAmountHaveLeft().toPlainString());
             json.put("price", order.calcPriceReverse().toPlainString());
             arrayWant.add(json);
         }
