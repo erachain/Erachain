@@ -13,6 +13,7 @@ import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 import org.mapdb.Fun;
 
 import javax.swing.*;
@@ -21,6 +22,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MyAssetsTab extends SplitPanel {
 
@@ -221,6 +224,25 @@ public class MyAssetsTab extends SplitPanel {
 
         });
 
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AssetCls asset = assetsModel.getItem(row).b;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?asset=" + asset.getKey()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        assetsMenu.add(setSeeInBlockexplorer);
 
         JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
         favorite.addActionListener(new ActionListener() {

@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 
 import javax.swing.JLabel;
@@ -27,7 +29,9 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 
 @SuppressWarnings("serial")
@@ -167,6 +171,28 @@ public class UnconfirmedTransactionsPanel extends JPanel
         this.add(record_stpit, tableGBC);
 
         JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                Transaction trans = transactionsModel.getItem(row);
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + trans.viewSignature()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        menu.add(setSeeInBlockexplorer);
 
         JMenuItem item_Rebroadcast = new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
 

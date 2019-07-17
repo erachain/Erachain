@@ -661,6 +661,14 @@ public class Settings {
         return BlockChain.DEFAULT_WEB_PORT;
     }
 
+    public String getBlockexplorerURL() {
+        if (this.settingsJSON.containsKey("explorerURL")) {
+            return this.settingsJSON.get("explorerURL").toString();
+        }
+
+        return BlockChain.DEFAULT_EXPLORER;
+    }
+
     public boolean isGuiConsoleEnabled() {
         if (this.settingsJSON.containsKey("guiconsoleenabled")) {
             return ((Boolean) this.settingsJSON.get("guiconsoleenabled")).booleanValue();

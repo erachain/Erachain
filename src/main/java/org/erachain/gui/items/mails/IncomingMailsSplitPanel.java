@@ -8,7 +8,9 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -21,6 +23,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class IncomingMailsSplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
@@ -51,6 +55,32 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
         // MENU
         JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
+                    return;
+
+                Transaction transaction = incoming_Mails_Model.getTransaction(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                if (transaction == null)
+                    return;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + transaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        menu.add(setSeeInBlockexplorer);
 
         JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Account"));
         copySender.addActionListener(new ActionListener() {

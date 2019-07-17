@@ -7,11 +7,15 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 @SuppressWarnings("serial")
 public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
@@ -23,6 +27,25 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
         super(tableModelTemplates, "SearchTemplatesSplitPanel", "SearchTemplatesSplitPanel");
         this.th = this;
         setName(Lang.getInstance().translate("Search Templates"));
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?template=" + itemMenu.getKey()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        menuTable.add(setSeeInBlockexplorer);
+
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
 
         vouch_Item.addActionListener(new ActionListener() {

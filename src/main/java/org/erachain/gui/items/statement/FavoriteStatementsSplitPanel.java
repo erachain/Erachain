@@ -11,7 +11,9 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -22,6 +24,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -71,19 +75,31 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set status"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
 
-        set_Status_Item.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        //	  	@SuppressWarnings("unused")
-                        //	PersonSetStatusDialog fm = new PersonSetStatusDialog( search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
+                    return;
 
-                    }
-                });
+                Transaction transaction = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                if (transaction == null)
+                    return;
 
-        //	menu.add(set_Status_Item);
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + transaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        menu.add(setSeeInBlockexplorer);
 
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
 
@@ -92,7 +108,8 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
 
 
-            Transaction statement = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            Transaction statement = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel
+                    .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (statement == null) return;
             new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
         });

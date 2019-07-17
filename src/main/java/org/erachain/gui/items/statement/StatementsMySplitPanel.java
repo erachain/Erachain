@@ -3,8 +3,12 @@ package org.erachain.gui.items.statement;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -14,6 +18,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -110,6 +120,37 @@ public class StatementsMySplitPanel extends SplitPanel {
 //			 Dimension size = MainFrame.getInstance().desktopPane.getSize();
 //			 this.setSize(new Dimension((int)size.getWidth()-100,(int)size.getHeight()-100));
         // jSplitPanel.setDividerLocation((int)(size.getWidth()/1.618));
+
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
+                    return;
+
+                Transaction transaction = my_Statements_Model.get_Statement(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                if (transaction == null)
+                    return;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + transaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        menu.add(setSeeInBlockexplorer);
+
+        TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);
+
     }
 
     // set favorine My
