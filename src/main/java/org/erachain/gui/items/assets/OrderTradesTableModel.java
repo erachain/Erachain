@@ -55,6 +55,9 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
         Order initiatorOrder = Order.getOrder(db, trade.getInitiator());
         Order targetOrder = Order.getOrder(db, trade.getTarget());
 
+        boolean isMine = Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
+                || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress());
+
         switch (column) {
             case COLUMN_TIMESTAMP:
 
@@ -69,17 +72,13 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
                 else
                     result = initiatorOrder.getCreator().getPersonAsString();
 
-                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
-                        || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+                if (isMine) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
                 return result;
 
             case COLUMN_PRICE:
-
-                boolean isMine = Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
-                        || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress());
 
                 if (isSell)
                     return "<html><span style='color:green'>▲</span>"
@@ -96,12 +95,10 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
                 if (isSell)
                     result = initiatorOrder.getCreator().getPersonAsString();
-                    //result = NumberAsString.formatAsString(trade.getAmountWant());
                 else
                     result = NumberAsString.formatAsString(trade.getAmountHave());
 
-                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
-                        || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+                if (isMine) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
