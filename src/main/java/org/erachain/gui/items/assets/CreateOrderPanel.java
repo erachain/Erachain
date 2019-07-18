@@ -32,7 +32,7 @@ import java.math.RoundingMode;
 
 @SuppressWarnings("serial")
 public class CreateOrderPanel extends JPanel {
-    static Logger LOGGER = LoggerFactory.getLogger(CreateOrderPanel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(CreateOrderPanel.class);
     public JComboBox<Account> cbxAccount;
     public MDecimalFormatedTextField txtAmountHave;
     public MDecimalFormatedTextField txtPrice;

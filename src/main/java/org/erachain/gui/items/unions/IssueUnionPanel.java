@@ -35,7 +35,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
 public class IssueUnionPanel extends JPanel {
-    private static Logger logger = LoggerFactory.getLogger(IssueUnionPanel.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(IssueUnionPanel.class);
 
     private JComboBox<Account> cbxFrom;
     private JComboBox<String> txtFeePow = new JComboBox<String>();

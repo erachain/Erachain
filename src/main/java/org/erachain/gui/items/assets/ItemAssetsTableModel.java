@@ -22,7 +22,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
                 new Boolean[]{false, true, true, false, false, false, false, false},
                 COLUMN_FAVORITE);
 
-        logger = LoggerFactory.getLogger(ItemAssetsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(ItemAssetsTableModel.class);
     }
 
     @Override

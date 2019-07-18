@@ -18,7 +18,7 @@ public class ItemsPersonsTableModel extends SearchItemsTableModel {
         super(DCSet.getInstance().getItemPersonMap(), new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"},
                 new Boolean[]{false, true, true, false},
                 COLUMN_FAVORITE);
-        logger = LoggerFactory.getLogger(ItemsPersonsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(ItemsPersonsTableModel.class);
     }
 
     @Override

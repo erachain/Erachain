@@ -28,7 +28,7 @@ public class ItemSplitPanel extends SplitPanel {
     protected JPopupMenu menuTable;
     protected ItemCls itemMenu;
     protected ItemCls itemTableSelected = null;
-    private static Logger logger = LoggerFactory.getLogger(ItemSplitPanel.class.getName());
+    protected static Logger logger = LoggerFactory.getLogger(ItemSplitPanel.class);
 
 
     @SuppressWarnings("rawtypes")

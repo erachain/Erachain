@@ -9,11 +9,14 @@ import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
     /**
@@ -26,12 +29,25 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
     public SearchAssetsSplitPanel(boolean search_and_exchange) {
         super(new ItemAssetsTableModel(), "SearchAssetsSplitPanel", "SearchAssetsSplitPanel");
-        th = this;
         setName(Lang.getInstance().translate("Search Assets"));
-
 
         // MENU
 
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?asset=" + itemMenu.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
 
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
@@ -42,7 +58,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -51,7 +66,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -59,7 +73,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
             }
         });
-
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
@@ -72,8 +85,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-
-//	nameSalesMenu.add(favorite);
         if (search_and_exchange) {
             this.menuTable.add(excahge);
             this.menuTable.addSeparator();
@@ -85,10 +96,15 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             this.menuTable.addSeparator();
 
             this.menuTable.add(vouch_menu);
+
+            menuTable.addSeparator();
+            menuTable.add(setSeeInBlockexplorer);
         } else {
             this.menuTable.remove(this.favoriteMenuItems);
-        }
 
+            menuTable.addSeparator();
+            menuTable.add(setSeeInBlockexplorer);
+        }
 
     }
 

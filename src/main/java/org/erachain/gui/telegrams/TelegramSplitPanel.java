@@ -402,8 +402,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 Pair<String, Tuple2<String, String>> ac = accountModel.getPairItem(row);
                 Controller.getInstance().wallet.database.getAccountsPropertisMap().delete(ac.getA());
             } catch (Exception e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+                logger.error(e1.getMessage(), e1);
             }
 
         }

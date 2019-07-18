@@ -60,6 +60,7 @@ public class SendTableModel extends JTable implements Observer {
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendTableModel.class);
+
     Comparator<MessageBuf> comparator = new Comparator<MessageBuf>() {
         public int compare(MessageBuf c1, MessageBuf c2) {
             long diff = c2.getTimestamp() - c1.getTimestamp();

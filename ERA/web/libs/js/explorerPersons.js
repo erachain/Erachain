@@ -178,7 +178,7 @@ function person(data) {
 
     for (key in data.accounts) {
         output += '<tr><td><a href = "?address=' + data.accounts[key].address + get_lang() + '">' + data.accounts[key].address + '</a><td>'
-            + data.accounts[key].to_date + '<td><a href ="?address=' + data.accounts[key].creator_address + get_lang() + '">' + data.accounts[key].creator + '</a><tr>';
+            + convertTimestamp(data.accounts[key].to_date, true) + '<td><a href ="?address=' + data.accounts[key].creator_address + get_lang() + '">' + data.accounts[key].creator + '</a><tr>';
     }
     output += '</table><br>';
 

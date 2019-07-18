@@ -43,7 +43,7 @@ public class MyBalanceTab extends SplitPanel {
         super("MyBalanceTab");
         th = this;
         this.setName(Lang.getInstance().translate("My Balance"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -150,7 +150,7 @@ public class MyBalanceTab extends SplitPanel {
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 onChange();
             }
@@ -166,7 +166,7 @@ public class MyBalanceTab extends SplitPanel {
             public void onChange() {
 
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
                 // SET FILTER
                 balancesModel.fireTableDataChanged();

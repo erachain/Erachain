@@ -16,6 +16,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
+import static org.erachain.core.BlockChain.MAX_REC_DATA_BYTES;
+
 /*
 
 ## typeBytes
@@ -495,7 +497,7 @@ public class RSend extends TransactionAmount {
 
         if (this.data != null) {
             // CHECK DATA SIZE
-            if (data.length > Integer.MAX_VALUE) {
+            if (data.length > MAX_REC_DATA_BYTES) {
                 return INVALID_DATA_LENGTH;
             }
         }

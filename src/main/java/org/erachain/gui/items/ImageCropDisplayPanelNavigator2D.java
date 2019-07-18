@@ -26,7 +26,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private Point currentPoint = new Point();
 
 
-    private Logger logger = LoggerFactory.getLogger(ImageCropDisplayPanelNavigator2D.class.getName());
+    private Logger logger = LoggerFactory.getLogger(ImageCropDisplayPanelNavigator2D.class);
 
     public ImageCropDisplayPanelNavigator2D(File imageFile, int cropWidth, int cropHeight) {
         setPreferredSize(new Dimension(600, 500));

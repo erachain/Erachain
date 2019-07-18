@@ -17,7 +17,7 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class AllowedTableModel extends AbstractTableModel implements Observer {
 
-    static Logger LOGGER = LoggerFactory.getLogger(AllowedTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(AllowedTableModel.class);
     private List<Peer> peers;
     private String[] columnNames = {"IP"};
 

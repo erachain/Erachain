@@ -4,6 +4,8 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.erachain.utils.ZipBytes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,12 +20,16 @@ import java.util.zip.Inflater;
 
 public class MAttachedFilesPanel extends JPanel {
 
+    protected Logger logger;
+
     private Attache_Files_Model model;
     private MTable table;
     private JScrollPane scrollPane;
     private FileChooser chooser;
 
     public MAttachedFilesPanel() {
+
+        logger = LoggerFactory.getLogger(getClass());
 
         setLayout(new java.awt.GridBagLayout());
         model = new Attache_Files_Model();
@@ -76,8 +82,7 @@ public class MAttachedFilesPanel extends JPanel {
                             try {
                                 buffer1 = ZipBytes.decompress(buffer);
                             } catch (DataFormatException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
+                                logger.error(e1.getMessage(), e1);
                             }
                             fos.write(buffer1, 0, buffer1.length);
                         } else {
@@ -130,8 +135,7 @@ public class MAttachedFilesPanel extends JPanel {
                             try {
                                 buffer1 = ZipBytes.decompress(buffer);
                             } catch (DataFormatException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
+                                logger.error(e1.getMessage(), e1);
                             }
                             fos.write(buffer1, 0, buffer1.length);
                         } else {
@@ -150,8 +154,7 @@ public class MAttachedFilesPanel extends JPanel {
                              
                             Desktop.getDesktop().open(ff);
                         } catch (IOException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
+                            logger.error(e1.getMessage(), e1);
                         }
                 
 

@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 
 import javax.swing.JLabel;
@@ -27,13 +29,18 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("serial")
 public class UnconfirmedTransactionsPanel extends JPanel
 
 {
+    protected Logger logger;
 
     private static UnconfirmedTransactionsPanel instance;
     private UnconfirmedTransactionsTableModel transactionsModel;
@@ -45,6 +52,9 @@ public class UnconfirmedTransactionsPanel extends JPanel
         this.setLayout(new GridBagLayout());
         // this.setLayout(new ScrollPaneLayout());
         // ScrollPaneLayout
+
+        logger = LoggerFactory.getLogger(getClass());
+
 
         // PADDING
         // this.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -221,7 +231,30 @@ public class UnconfirmedTransactionsPanel extends JPanel
             
         });
         menu.add(item_Save);
-        
+
+        menu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                Transaction trans = transactionsModel.getItem(row);
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + trans.viewSignature()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+        menu.add(setSeeInBlockexplorer);
+
         TableMenuPopupUtil.installContextMenu(record_stpit.jTableJScrollPanelLeftPanel, menu);
 
         // this.add(this.transactionsTable);

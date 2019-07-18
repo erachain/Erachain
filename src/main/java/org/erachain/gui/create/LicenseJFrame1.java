@@ -41,7 +41,7 @@ import org.erachain.settings.Settings;
 
 public class LicenseJFrame1 extends JDialog {
     
-    static Logger LOGGER = LoggerFactory.getLogger(LicenseJFrame1.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(LicenseJFrame1.class);
     boolean needAccept;
     NoWalletFrame parent;
     int goCreateWallet;

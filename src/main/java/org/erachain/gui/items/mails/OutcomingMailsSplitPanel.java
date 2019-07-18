@@ -1,10 +1,13 @@
 package org.erachain.gui.items.mails;
 
 import org.erachain.core.transaction.RSend;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -17,6 +20,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 public class OutcomingMailsSplitPanel extends SplitPanel {
@@ -33,7 +38,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         super("OutcomingMailsSplitPanel");
 
         this.setName(Lang.getInstance().translate("Outcoming Mails"));
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -71,7 +76,6 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
         //MENU
         JPopupMenu menu = new JPopupMenu();
 
-
         JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Account"));
         copySender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -101,9 +105,36 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
         menu.add(copyRecipient);
 
+        menu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) {
+                    return;
+                }
+
+                Transaction transaction = incoming_Mails_Model.getTransaction(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                if (transaction == null) {
+                    return;
+                }
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + transaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        menu.add(setSeeInBlockexplorer);
 
         TableMenuPopupUtil.installContextMenu(inciming_Mail_Table, menu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
-			
 			
 		/*	
 			
@@ -116,7 +147,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 			favoriteColumn.setPreferredWidth(50);//.setWidth(30);
 		*/
         // UPDATE FILTER ON TEXT CHANGE
-        this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
+        this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(incoming_Mails_Model);
         this.jTableJScrollPanelLeftPanel = inciming_Mail_Table;
@@ -177,7 +208,7 @@ public class OutcomingMailsSplitPanel extends SplitPanel {
 
         public void onChange() {
             // GET VALUE
-            String search = searchTextField_SearchToolBar_LeftPanel.getText();
+            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
             // SET FILTER
             incoming_Mails_Model.fireTableDataChanged();
 

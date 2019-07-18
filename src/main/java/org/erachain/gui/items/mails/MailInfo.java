@@ -34,7 +34,7 @@ import java.nio.charset.Charset;
  */
 public class MailInfo extends javax.swing.JPanel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Send_RecordDetailsFrame.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MailInfo.class);
     public VoushLibraryPanel voush_Library_Panel;
     public JTabbedPane jTabbedPane1;
     RSend trans;
@@ -221,8 +221,7 @@ public class MailInfo extends javax.swing.JPanel {
         try {
 			doc.insertString(doc.getLength(), descript_Mesage(), style);
 		} catch (BadLocationException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
 		}
      */
 
