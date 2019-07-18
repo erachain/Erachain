@@ -74,19 +74,18 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        JMenuItem vouchItem = new JMenuItem(Lang.getInstance().translate("Vouch"));
 
-        vouch_Item.addActionListener(e -> {
+        vouchItem.addActionListener(e -> {
 
             if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-
 
             Transaction statement = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
             if (statement == null) return;
             new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
         });
 
-        menu.add(vouch_Item);
+        menu.add(vouchItem);
 
         menu.addSeparator();
 

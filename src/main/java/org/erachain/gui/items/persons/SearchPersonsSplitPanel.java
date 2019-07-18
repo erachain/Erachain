@@ -83,8 +83,8 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
         });
         this.menuTable.add(attestPubKey_Item);
 
-        JMenuItem vouchPerson_Item = new JMenuItem(Lang.getInstance().translate("Vouch the person info"));
-        vouchPerson_Item.addActionListener(new ActionListener() {
+        JMenuItem vouchPersonItem = new JMenuItem(Lang.getInstance().translate("Vouch the person info"));
+        vouchPersonItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -97,7 +97,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
             }
         });
-        this.menuTable.add(vouchPerson_Item);
+        this.menuTable.add(vouchPersonItem);
 
         menuTable.addSeparator();
 
