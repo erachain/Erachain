@@ -32,10 +32,9 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         th = this;
         setName(Lang.getInstance().translate("Search Assets"));
 
-
         // MENU
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -92,9 +91,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         });
 
 
-//	nameSalesMenu.add(favorite);
         if (search_and_exchange) {
-            menuTable.add(setSeeInBlockexplorer);
             this.menuTable.add(excahge);
             this.menuTable.addSeparator();
             this.menuTable.add(buy);
@@ -105,10 +102,15 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             this.menuTable.addSeparator();
 
             this.menuTable.add(vouch_menu);
+
+            menuTable.addSeparator();
+            menuTable.add(setSeeInBlockexplorer);
         } else {
             this.menuTable.remove(this.favoriteMenuItems);
-        }
 
+            menuTable.addSeparator();
+            menuTable.add(setSeeInBlockexplorer);
+        }
 
     }
 

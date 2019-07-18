@@ -161,8 +161,8 @@ public class MyTemplatesTab extends SplitPanel {
 
 
         //MENU
-        JPopupMenu assetsMenu = new JPopupMenu();
-        assetsMenu.addAncestorListener(new AncestorListener() {
+        JPopupMenu itemMenu = new JPopupMenu();
+        itemMenu.addAncestorListener(new AncestorListener() {
 
 
             @Override
@@ -170,7 +170,7 @@ public class MyTemplatesTab extends SplitPanel {
                 // TODO Auto-generated method stub
                 row = table.getSelectedRow();
                 if (row < 1) {
-                    assetsMenu.disable();
+                    itemMenu.disable();
                 }
 
                 row = table.convertRowIndexToModel(row);
@@ -193,28 +193,6 @@ public class MyTemplatesTab extends SplitPanel {
 
         });
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                row = table.getSelectedRow();
-                row = table.convertRowIndexToModel(row);
-                AssetCls asset = assetsModel.getItem(row).b;
-
-                try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?template=" + asset.getKey()));
-                } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-        assetsMenu.add(setSeeInBlockexplorer);
-
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
 
         JMenuItem favorite = new JMenuItem();
@@ -227,9 +205,9 @@ public class MyTemplatesTab extends SplitPanel {
             }
         });
 
-        assetsMenu.add(vouch_Item);
+        itemMenu.add(vouch_Item);
 
-        assetsMenu.addPopupMenuListener(new PopupMenuListener() {
+        itemMenu.addPopupMenuListener(new PopupMenuListener() {
 
                 @Override
                 public void popupMenuCanceled(PopupMenuEvent arg0) {
@@ -266,7 +244,7 @@ public class MyTemplatesTab extends SplitPanel {
 
         );
 
-        assetsMenu.add(favorite);
+        itemMenu.add(favorite);
 
         JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
         details.addActionListener(new ActionListener() {
@@ -285,9 +263,34 @@ public class MyTemplatesTab extends SplitPanel {
                 //		new PayDividendFrame(asset);
             }
         });
-        assetsMenu.add(dividend);
-     //   table.setComponentPopupMenu(assetsMenu);
-        TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+        itemMenu.add(dividend);
+
+        itemMenu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                row = table.getSelectedRow();
+                row = table.convertRowIndexToModel(row);
+                AssetCls asset = assetsModel.getItem(row).b;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?template=" + asset.getKey()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        itemMenu.add(setSeeInBlockexplorer);
+
+        //   table.setComponentPopupMenu(assetsMenu);
+        TableMenuPopupUtil.installContextMenu(table, itemMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
         //MOUSE ADAPTER

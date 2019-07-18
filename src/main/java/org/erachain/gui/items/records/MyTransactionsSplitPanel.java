@@ -139,27 +139,6 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
         });
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                if (selectedTransaction == null)
-                    return;
-
-                try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?tx=" + selectedTransaction.viewHeightSeq()));
-                } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-        menu.add(setSeeInBlockexplorer);
-
         item_Rebroadcast = new JMenuItem(Lang.getInstance().translate("Rebroadcast"));
 
         item_Rebroadcast.addActionListener(new ActionListener() {
@@ -207,7 +186,30 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         });
 
         menu.add(item_Save);
-        
+
+        menu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (selectedTransaction == null)
+                    return;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + selectedTransaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        menu.add(setSeeInBlockexplorer);
+
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);
         menu.addAncestorListener(new AncestorListener() {
 
@@ -239,9 +241,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
             }
 
-
         });
-
 
     }
 

@@ -52,7 +52,7 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
 
         });
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -71,15 +71,16 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
             }
         });
 
-        menuTable.add(setSeeInBlockexplorer);
-
-        menuTable.addSeparator();
         menuTable.add(exchange);
         menuTable.addSeparator();
         menuTable.add(buy);
         menuTable.add(sell);
         menuTable.addSeparator();
         menuTable.add(vouchMenu);
+
+        menuTable.addSeparator();
+        menuTable.add(setSeeInBlockexplorer);
+
     }
 
     // show details

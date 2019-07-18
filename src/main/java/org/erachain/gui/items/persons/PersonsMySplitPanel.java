@@ -31,25 +31,6 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
         th = this;
 //      add items in menu
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?person=" + th.itemMenu.getKey()));
-                } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-
-        menuTable.add(setSeeInBlockexplorer);
-
         JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Person"));
 
         set_Status_Item.addActionListener(new ActionListener() {
@@ -93,6 +74,26 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
         });
         this.menuTable.add(vouchPerson_Item);
 
+        menuTable.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?person=" + th.itemMenu.getKey()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        menuTable.add(setSeeInBlockexplorer);
 
     }
 

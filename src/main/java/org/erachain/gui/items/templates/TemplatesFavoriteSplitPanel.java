@@ -26,7 +26,20 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
         this.setName(Lang.getInstance().translate("Favorite Templates"));
         th = this;
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
+        vouch_menu.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                DCSet db = DCSet.getInstance();
+                Transaction trans = db.getTransactionFinalMap().get(((TemplateCls) th.itemMenu).getReference());
+                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
+
+            }
+        });
+        th.menuTable.add(vouch_menu);
+
+        menuTable.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -44,17 +57,6 @@ public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
         });
         menuTable.add(setSeeInBlockexplorer);
 
-
-        JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
-        vouch_menu.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(((TemplateCls) th.itemMenu).getReference());
-                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
-
-            }
-        });
-        th.menuTable.add(vouch_menu);
     }
 
     // show details

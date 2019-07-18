@@ -28,7 +28,24 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
         this.th = this;
         setName(Lang.getInstance().translate("Search Templates"));
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
+
+        vouch_Item.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                TemplateCls template = (TemplateCls) th.itemMenu;
+                if (template == null) return;
+                Transaction trans = DCSet.getInstance().getTransactionFinalMap().get(template.getReference());
+                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
+            }
+        });
+        this.menuTable.add(vouch_Item);
+
+        menuTable.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -46,20 +63,6 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
         });
         menuTable.add(setSeeInBlockexplorer);
 
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
-
-        vouch_Item.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                TemplateCls template = (TemplateCls) th.itemMenu;
-                if (template == null) return;
-                Transaction trans = DCSet.getInstance().getTransactionFinalMap().get(template.getReference());
-                new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
-            }
-        });
-        this.menuTable.add(vouch_Item);
     }
 
 

@@ -224,26 +224,6 @@ public class MyAssetsTab extends SplitPanel {
 
         });
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
-
-                try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?asset=" + asset.getKey()));
-                } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-
-        assetsMenu.add(setSeeInBlockexplorer);
-
         JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
         favorite.addActionListener(new ActionListener() {
             @Override
@@ -266,7 +246,6 @@ public class MyAssetsTab extends SplitPanel {
 
         });
 
-
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             @Override
@@ -276,7 +255,6 @@ public class MyAssetsTab extends SplitPanel {
             }
         });
         assetsMenu.add(excahge);
-
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
@@ -367,7 +345,30 @@ public class MyAssetsTab extends SplitPanel {
             }
         });
         assetsMenu.add(dividend);
-   //     table.setComponentPopupMenu(assetsMenu);
+
+        assetsMenu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AssetCls asset = assetsModel.getItem(row).b;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?asset=" + asset.getKey()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        assetsMenu.add(setSeeInBlockexplorer);
+
+        //     table.setComponentPopupMenu(assetsMenu);
         TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 

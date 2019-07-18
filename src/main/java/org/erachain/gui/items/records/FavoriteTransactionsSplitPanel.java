@@ -74,7 +74,23 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
+
+        vouch_Item.addActionListener(e -> {
+
+            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
+
+
+            Transaction statement = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+            if (statement == null) return;
+            new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
+        });
+
+        menu.add(vouch_Item);
+
+        menu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
@@ -97,20 +113,6 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
             }
         });
         menu.add(setSeeInBlockexplorer);
-
-        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
-
-        vouch_Item.addActionListener(e -> {
-
-            if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) return;
-
-
-            Transaction statement = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-            if (statement == null) return;
-            new VouchRecordDialog(statement.getBlockHeight(), statement.getSeqNo());
-        });
-
-        menu.add(vouch_Item);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);
 

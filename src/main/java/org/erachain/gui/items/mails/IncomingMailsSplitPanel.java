@@ -56,32 +56,6 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         // MENU
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
-                    return;
-
-                Transaction transaction = incoming_Mails_Model.getTransaction(jTableJScrollPanelLeftPanel
-                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-                if (transaction == null)
-                    return;
-
-                try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?tx=" + transaction.viewHeightSeq()));
-                } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-
-        menu.add(setSeeInBlockexplorer);
-
         JMenuItem copySender = new JMenuItem(Lang.getInstance().translate("Copy Sender Account"));
         copySender.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -141,6 +115,34 @@ public class IncomingMailsSplitPanel extends SplitPanel {
             }
         });
         menu.add(vouch_Mail_item_Menu);
+
+        menu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
+                    return;
+
+                Transaction transaction = incoming_Mails_Model.getTransaction(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                if (transaction == null)
+                    return;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + transaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        menu.add(setSeeInBlockexplorer);
 
         TableMenuPopupUtil.installContextMenu(inciming_Mail_Table, menu); // SELECT
         // ROW

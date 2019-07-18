@@ -28,24 +28,6 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
         super(tableModelPolls, "Search_Popll_Tab", "Search_Poll_Tab");
         th = this;
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?poll=" + itemMenu.getKey()));
-                } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-        th.menuTable.add(setSeeInBlockexplorer);
-
         // ADD MENU ITEMS
         JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
         confirm_Menu.addActionListener(new ActionListener() {
@@ -75,6 +57,26 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
             }
         });
         this.menuTable.add(setVote_Menu);
+
+        menuTable.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?poll=" + itemMenu.getKey()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        th.menuTable.add(setSeeInBlockexplorer);
 
     }
 	
