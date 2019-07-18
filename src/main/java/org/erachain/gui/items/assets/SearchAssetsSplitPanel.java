@@ -60,7 +60,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -69,7 +68,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             }
         });
 
-
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -77,7 +75,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
             }
         });
-
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
@@ -89,7 +86,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
             }
         });
-
 
         if (search_and_exchange) {
             this.menuTable.add(excahge);

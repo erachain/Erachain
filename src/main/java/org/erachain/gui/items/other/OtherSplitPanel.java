@@ -156,7 +156,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
         JPopupMenu menuMy = new JPopupMenu();
 
-        JMenuItem setSeeInBlockexplorerMy = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorerMy = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
         setSeeInBlockexplorerMy.addActionListener(new ActionListener() {
             @Override
@@ -221,7 +221,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override

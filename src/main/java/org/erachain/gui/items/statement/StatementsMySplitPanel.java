@@ -123,7 +123,7 @@ public class StatementsMySplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in blockexplorer"));
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override

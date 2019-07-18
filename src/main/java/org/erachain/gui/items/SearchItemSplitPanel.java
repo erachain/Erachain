@@ -16,10 +16,6 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
     private MDecimalFormatedTextField key_Item;
-//	protected JMenuItem favoriteMenuItems;
-//	protected JPopupMenu menuTable;
-//	protected ItemCls itemMenu;
-//	protected ItemCls itemTableSelected = null;
 
     @SuppressWarnings("rawtypes")
     public SearchItemSplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {

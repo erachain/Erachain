@@ -44,27 +44,6 @@ public class DealsPopupMenu extends JPopupMenu {
         this.table = table;
         this.assetSelector = assetSelector;
 
-        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("See in Blockexplorer"));
-
-        setSeeInBlockexplorer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                try {
-                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
-                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?address=" + pubKey.getAddress()));
-                } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-
-        add(setSeeInBlockexplorer);
-
-        this.addSeparator();
-
         sendMail = new JMenuItem(Lang.getInstance().translate("Send mail"));
         sendMail.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -192,7 +171,28 @@ public class DealsPopupMenu extends JPopupMenu {
             }
         });
         this.add(set_name);
-        
+
+        this.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?address=" + pubKey.getAddress()));
+                } catch (MalformedURLException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+
+        add(setSeeInBlockexplorer);
+
         this.addPopupMenuListener(new PopupMenuListener() {
 
             @Override
