@@ -29,7 +29,6 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
 
     public SearchAssetsSplitPanel(boolean search_and_exchange) {
         super(new ItemAssetsTableModel(), "SearchAssetsSplitPanel", "SearchAssetsSplitPanel");
-        th = this;
         setName(Lang.getInstance().translate("Search Assets"));
 
         // MENU
