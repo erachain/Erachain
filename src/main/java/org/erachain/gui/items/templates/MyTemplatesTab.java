@@ -18,7 +18,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.logging.Logger;
 
 public class MyTemplatesTab extends SplitPanel {
 
@@ -35,7 +34,7 @@ public class MyTemplatesTab extends SplitPanel {
         super("MyTemplatesTab");
 
         this.setName("My Template");
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -96,7 +95,7 @@ public class MyTemplatesTab extends SplitPanel {
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 onChange();
@@ -115,7 +114,7 @@ public class MyTemplatesTab extends SplitPanel {
             public void onChange() {
 
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
                 // SET FILTER
                 assetsModel.fireTableDataChanged();

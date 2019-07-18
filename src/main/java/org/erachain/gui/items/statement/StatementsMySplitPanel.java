@@ -3,7 +3,6 @@ package org.erachain.gui.items.statement;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
@@ -12,16 +11,12 @@ import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -44,7 +39,7 @@ public class StatementsMySplitPanel extends SplitPanel {
         super("StatementsMySplitPanel");
 
         this.setName(Lang.getInstance().translate("My Statements"));
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -98,7 +93,7 @@ public class StatementsMySplitPanel extends SplitPanel {
 			favoriteColumn.setPreferredWidth(50);//.setWidth(30);
 	
 			// UPDATE FILTER ON TEXT CHANGE
-			this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
+			this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
 			*/        // SET VIDEO
         //this.jTableJScrollPanelLeftPanel.setModel(my_PersonsModel);
         this.jTableJScrollPanelLeftPanel = new MTable(my_Statements_Model); //my_Statements_table;

@@ -3,9 +3,7 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
@@ -41,7 +39,7 @@ public class MyAssetsTab extends SplitPanel {
         super("MyAssetsTab");
         th = this;
         this.setName(Lang.getInstance().translate("My Assets"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -125,7 +123,7 @@ public class MyAssetsTab extends SplitPanel {
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void changedUpdate(DocumentEvent e) {
@@ -145,7 +143,7 @@ public class MyAssetsTab extends SplitPanel {
             public void onChange() {
 
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
                 // SET FILTER
                 assetsModel.fireTableDataChanged();

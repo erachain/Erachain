@@ -49,7 +49,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         this.setName(Lang.getInstance().translate("Search Records"));
 
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
         this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
         searchString = new JTextField();
         searchString.setToolTipText("");
@@ -84,15 +84,15 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         // 	Records_Table_Model records_Model = new Records_Table_Model();
         // 	this.jTableJScrollPanelLeftPanel = new JTable(records_Model);
 
-        MenuPopupUtil.installContextMenu(this.searchTextField_SearchToolBar_LeftPanel);
-        this.searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
+        this.searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 //searchString.setText("");
                 transactionsTableModel.clear();
-                transactionsTableModel.setBlockNumber(searchTextField_SearchToolBar_LeftPanel.getText());
+                transactionsTableModel.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
 
             }
 
@@ -235,7 +235,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     }
 
     public void listener() {
-        transactionsTableModel.setBlockNumber(searchTextField_SearchToolBar_LeftPanel.getText());
+        transactionsTableModel.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
     }
 
     // listener select row

@@ -41,7 +41,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     public SearchStatementsSplitPanel() {
         super("SearchStatementsSplitPanel");
         setName(Lang.getInstance().translate("Search Statements"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         this.searchToolBar_LeftPanel.setVisible(true);
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
 
@@ -67,7 +67,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                searchTextField_SearchToolBar_LeftPanel.setText("");
+                searchTextFieldSearchToolBarLeftPanelDocument.setText("");
                 search_Table_Model.findByKey(key_Item.getText());
                 if (search_Table_Model.getRowCount() < 1)
                     return;
@@ -121,14 +121,14 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         // search_Table.setRowSorter(searchSorter);
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
                 jScrollPanelLeftPanel.setViewportView(null);
                 jScrollPaneJPanelRightPanel.setViewportView(null);
 

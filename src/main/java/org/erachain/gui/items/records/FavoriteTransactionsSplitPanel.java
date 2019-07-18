@@ -42,7 +42,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
     public FavoriteTransactionsSplitPanel() {
         super("FavoriteStatementsSplitPanel");
         setName(Lang.getInstance().translate("Favorite Transactions"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // not show buttons
         jToolBarRightPanel.setVisible(false);
@@ -56,7 +56,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         favotitesTable = new FavoriteTransactionTableModel();
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new search_tab_filter());
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
         jTableJScrollPanelLeftPanel = new MTable(this.favotitesTable);
         //	jTableJScrollPanelLeftPanel = search_Table;
@@ -200,7 +200,7 @@ public class FavoriteTransactionsSplitPanel extends SplitPanel {
         public void onChange() {
 
             // GET VALUE
-            String search = searchTextField_SearchToolBar_LeftPanel.getText();
+            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
             // SET FILTER
             //tableModelPersons.getSortableList().setFilter(search);

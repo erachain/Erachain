@@ -6,7 +6,6 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
-import org.erachain.gui.items.persons.InsertPersonPanel;
 import org.erachain.gui.library.MSplitPane;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
@@ -51,9 +50,9 @@ public class SplitPanel extends JPanel {
     public JToolBar jToolBarRightPanel;
     public JPanel leftPanel;
     public JPanel rightPanel1;
-    public JTextField searchTextField_SearchToolBar_LeftPanel;
+    public JTextField searchTextFieldSearchToolBarLeftPanelDocument;
     public JToolBar searchToolBar_LeftPanel;
-    public JLabel searthLabel_SearchToolBar_LeftPanel;
+    public JLabel searthLabelSearchToolBarLeftPanel;
     public JToolBar toolBarLeftPanel;
     public JCheckBox searchMyJCheckBoxLeftPanel;
     public JCheckBox searchFavoriteJCheckBoxLeftPanel;
@@ -103,8 +102,8 @@ public class SplitPanel extends JPanel {
         button1ToolBarLeftPanel = new JButton();
         button2ToolBarLeftPanel = new JButton();
         searchToolBar_LeftPanel = new JToolBar();
-        searthLabel_SearchToolBar_LeftPanel = new JLabel();
-        searchTextField_SearchToolBar_LeftPanel = new JTextField();
+        searthLabelSearchToolBarLeftPanel = new JLabel();
+        searchTextFieldSearchToolBarLeftPanelDocument = new JTextField();
         jScrollPanelLeftPanel = new JScrollPane();
 
         rightPanel1 = new JPanel();
@@ -160,16 +159,16 @@ public class SplitPanel extends JPanel {
         searchToolBar_LeftPanel.add(searchFavoriteJCheckBoxLeftPanel);
 
 
-        searthLabel_SearchToolBar_LeftPanel.setText("    " + Lang.getInstance().translate("Search") + ":   ");
-        searthLabel_SearchToolBar_LeftPanel.setToolTipText("");
-        searchToolBar_LeftPanel.add(searthLabel_SearchToolBar_LeftPanel);
+        searthLabelSearchToolBarLeftPanel.setText("    " + Lang.getInstance().translate("Search") + ":   ");
+        searthLabelSearchToolBarLeftPanel.setToolTipText("");
+        searchToolBar_LeftPanel.add(searthLabelSearchToolBarLeftPanel);
 
-        searchTextField_SearchToolBar_LeftPanel.setToolTipText("");
-        searchTextField_SearchToolBar_LeftPanel.setAlignmentX(1.0F);
-        searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(200, 20));
-        searchTextField_SearchToolBar_LeftPanel.setName(""); // NOI18N
-        searchTextField_SearchToolBar_LeftPanel.setPreferredSize(new Dimension(200, 20));
-        searchToolBar_LeftPanel.add(searchTextField_SearchToolBar_LeftPanel);
+        searchTextFieldSearchToolBarLeftPanelDocument.setToolTipText("");
+        searchTextFieldSearchToolBarLeftPanelDocument.setAlignmentX(1.0F);
+        searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(200, 20));
+        searchTextFieldSearchToolBarLeftPanelDocument.setName(""); // NOI18N
+        searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(200, 20));
+        searchToolBar_LeftPanel.add(searchTextFieldSearchToolBarLeftPanelDocument);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;

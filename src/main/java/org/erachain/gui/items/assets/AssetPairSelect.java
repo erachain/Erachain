@@ -1,7 +1,6 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.MDecimalFormatedTextField;
@@ -109,7 +108,7 @@ public class AssetPairSelect extends JDialog {
         pair_Panel.jButton1_jToolBar_RightPanel.setVisible(false);
         pair_Panel.jButton2_jToolBar_RightPanel.setVisible(false);
 
-        pair_Panel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        pair_Panel.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         pair_Panel.searchToolBar_LeftPanel.setVisible(true);
         pair_Panel.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Find Key") + ":"));
@@ -131,7 +130,7 @@ public class AssetPairSelect extends JDialog {
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
 
-                pair_Panel.searchTextField_SearchToolBar_LeftPanel.setText("");
+                pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.setText("");
 
                 pair_Panel.Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
 
@@ -156,13 +155,13 @@ public class AssetPairSelect extends JDialog {
         });
 
 
-        pair_Panel.searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // GET VALUE
-                String search = pair_Panel.searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.getText();
                 if (search.equals("")) {
                     pair_Panel.jScrollPaneJPanelRightPanel.setViewportView(null);
                     assetPairSelectTableModel.clear();
@@ -311,10 +310,10 @@ public class AssetPairSelect extends JDialog {
         //this.add(label, labelGBC);
 
         pair_Panel.jScrollPanelLeftPanel.setViewportView(pair_Panel.jTableJScrollPanelLeftPanel);
-        pair_Panel.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        pair_Panel.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // UPDATE FILTER ON TEXT CHANGE
-        pair_Panel.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 onChange();
             }
@@ -330,7 +329,7 @@ public class AssetPairSelect extends JDialog {
             public void onChange() {
 
                 // GET VALUE
-                String search = pair_Panel.searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = pair_Panel.searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
                 // SET FILTER
                 assetPairSelectTableModel.fireTableDataChanged();

@@ -1,7 +1,6 @@
 package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
@@ -43,7 +42,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
     public FavoriteStatementsSplitPanel() {
         super("FavoriteStatementsSplitPanel");
         setName(Lang.getInstance().translate("Favorite Documents"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // not show buttons
         jToolBarRightPanel.setVisible(false);
@@ -57,7 +56,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         favotitesTable = new FavoriteTransactionTableModel();
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new search_tab_filter());
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new search_tab_filter());
         // SET VIDEO
         jTableJScrollPanelLeftPanel = new MTable(this.favotitesTable);
         //	jTableJScrollPanelLeftPanel = search_Table;
@@ -203,7 +202,7 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         public void onChange() {
 
             // GET VALUE
-            String search = searchTextField_SearchToolBar_LeftPanel.getText();
+            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
             // SET FILTER
             //tableModelPersons.getSortableList().setFilter(search);

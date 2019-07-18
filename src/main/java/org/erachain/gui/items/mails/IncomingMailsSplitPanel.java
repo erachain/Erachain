@@ -38,7 +38,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
     public IncomingMailsSplitPanel() {
         super("IncomingMailsSplitPanel");
         this.setName(Lang.getInstance().translate("Incoming Mails"));
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -177,7 +177,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
          * favoriteColumn.setPreferredWidth(50);//.setWidth(30);
          */
         // UPDATE FILTER ON TEXT CHANGE
-        this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
+        this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(incoming_Mails_Model);
         this.jTableJScrollPanelLeftPanel = inciming_Mail_Table;
@@ -236,7 +236,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
 
         public void onChange() {
             // GET VALUE
-            String search = searchTextField_SearchToolBar_LeftPanel.getText();
+            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
             // SET FILTER
             incoming_Mails_Model.fireTableDataChanged();
 

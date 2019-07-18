@@ -28,7 +28,7 @@ public class MyUnionsTab extends SplitPanel {
         // My unions
 
         setName(Lang.getInstance().translate("My Unions"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -63,7 +63,7 @@ public class MyUnionsTab extends SplitPanel {
 
         //CREATE SEARCH FIELD
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 onChange();
             }
@@ -79,7 +79,7 @@ public class MyUnionsTab extends SplitPanel {
             @SuppressWarnings("unchecked")
             public void onChange() {
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
                 // SET FILTER
                 unionsModel.fireTableDataChanged();
                 @SuppressWarnings("rawtypes")
@@ -107,7 +107,7 @@ public class MyUnionsTab extends SplitPanel {
                     union = unionsModel.getItem(tableUnion.convertRowIndexToModel(tableUnion.getSelectedRow())).b;
                     info1.show_Union_002(union);
                     jSplitPanel.setDividerLocation(jSplitPanel.getDividerLocation());
-                    searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+                    searchTextFieldSearchToolBarLeftPanelDocument.setEnabled(true);
                 }
             }
         });

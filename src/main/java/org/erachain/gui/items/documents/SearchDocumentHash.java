@@ -57,9 +57,9 @@ public class SearchDocumentHash extends SplitPanel {
         this.jButton1_jToolBar_RightPanel.setVisible(false);
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
         this.searchMyJCheckBoxLeftPanel.setVisible(false);
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Hash"));
-        this.searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(500, 20));
-        this.searchTextField_SearchToolBar_LeftPanel.setPreferredSize(new Dimension(500, 20));
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Hash"));
+        this.searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(500, 20));
+        this.searchTextFieldSearchToolBarLeftPanelDocument.setPreferredSize(new Dimension(500, 20));
         this.button2ToolBarLeftPanel.setVisible(false);
         this.button1ToolBarLeftPanel.setVisible(false);
         JButton search_Button = new JButton();
@@ -75,19 +75,19 @@ public class SearchDocumentHash extends SplitPanel {
 
                 //Hashs_from_Files();
 
-                model_Hashs.Set_Data(searchTextField_SearchToolBar_LeftPanel.getText());
+                model_Hashs.Set_Data(searchTextFieldSearchToolBarLeftPanelDocument.getText());
 
             }
 
         });
 
-        searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 try {
-                    model_Hashs.Set_Data(searchTextField_SearchToolBar_LeftPanel.getText().toString());
+                    model_Hashs.Set_Data(searchTextFieldSearchToolBarLeftPanelDocument.getText().toString());
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -184,7 +184,7 @@ public class SearchDocumentHash extends SplitPanel {
             String hashe = Base58.encode(Crypto.getInstance().digest(fileInArray));
             //	tableModel.addRow(new Object[] { hashes,
             //			Lang.getInstance().translate("from file ") + file_name });
-            this.searchTextField_SearchToolBar_LeftPanel.setText(hashe);
+            this.searchTextFieldSearchToolBarLeftPanelDocument.setText(hashe);
 
             model_Hashs.Set_Data(hashe);
             //	model_Hashs = new ModelHashesInfo(hashe);

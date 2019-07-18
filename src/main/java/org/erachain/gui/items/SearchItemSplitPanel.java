@@ -23,7 +23,7 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
         super(search_Table_Model1, gui_Name);
         this.search_Table_Model = search_Table_Model1;
         setName(Lang.getInstance().translate(search_Label_Text));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // CHECKBOX FOR FAVORITE
         TableColumn favorite_Column = jTableJScrollPanelLeftPanel.getColumnModel()
@@ -50,7 +50,7 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                searchTextField_SearchToolBar_LeftPanel.setText("");
+                searchTextFieldSearchToolBarLeftPanelDocument.setText("");
                 Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
                 jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                 new Thread() {
@@ -73,13 +73,13 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
 
         // UPDATE FILTER ON TEXT CHANGE
 
-        searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
                 if (search.equals("")) {
                     jScrollPaneJPanelRightPanel.setViewportView(null);
                     search_Table_Model.clear();
