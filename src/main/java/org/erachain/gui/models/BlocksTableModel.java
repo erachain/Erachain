@@ -34,8 +34,6 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
     public static final int COLUMN_dtWV = 7;
     public static final int COLUMN_TRANSACTIONS = 8;
     public static final int COLUMN_FEE = 9;
-    //static Logger logger = LoggerFactory.getLogger(BlocksTableModel.class.getName());
-    //private List<Block.BlockHead> blocks;
 
     public BlocksTableModel() {
         super(new String[]{"Height", "Target", "Timestamp creation block", "Creator account", "Gen.Balance", "Delta Height", "WV", "dtWV", "Transactions", "Fee"}, false);

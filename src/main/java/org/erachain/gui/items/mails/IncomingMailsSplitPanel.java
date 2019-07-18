@@ -138,8 +138,7 @@ public class IncomingMailsSplitPanel extends SplitPanel {
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                             + "?tx=" + transaction.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
             }
         });

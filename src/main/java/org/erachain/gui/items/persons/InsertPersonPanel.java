@@ -29,7 +29,7 @@ import java.util.TimeZone;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class InsertPersonPanel extends IssuePersonPanel {
-    private static final Logger logger = LoggerFactory.getLogger(InsertPersonPanel.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(InsertPersonPanel.class);
     private static final long serialVersionUID = 1L;
 
     private JTextField txtSign = new JTextField();

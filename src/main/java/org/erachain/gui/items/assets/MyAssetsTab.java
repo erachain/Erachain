@@ -360,8 +360,7 @@ public class MyAssetsTab extends SplitPanel {
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                             + "?asset=" + asset.getKey()));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
             }
         });

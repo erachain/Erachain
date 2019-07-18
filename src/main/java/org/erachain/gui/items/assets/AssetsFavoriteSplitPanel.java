@@ -66,8 +66,7 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                             + "?asset=" + itemMenu.getKey()));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
             }
         });

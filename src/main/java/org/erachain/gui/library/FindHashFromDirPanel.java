@@ -20,321 +20,322 @@ import javax.swing.table.DefaultTableModel;
 
 import org.erachain.lang.Lang;
 import org.erachain.utils.FileHash;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FindHashFromDirPanel extends javax.swing.JPanel {
 
-        /**
-     * 
+    /**
+     *
      */
-    private static final long serialVersionUID = 1L;
-        private DefaultTableModel model;
-        public Thread tf;
-        private JButton jButtonStop;
-        public JDialog dialog;
-        private JLabel jLabel;
-        Integer filecount;
-        Integer fileStep = 0;
-       
-        /**
-         * Creates new form HashFindFromDir
-         */
-        public FindHashFromDirPanel() {
-            initComponents();
-            filesPath = new ArrayList<Path>();
-            
-            jButtonSelectDir.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    FileChooser fileopen = new FileChooser();
-                    fileopen.setFileSelectionMode(FileChooser.DIRECTORIES_ONLY);
-                  //  fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
-                    int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set data dir"));
-                    if (ret == FileChooser.APPROVE_OPTION) {
-                        jTextFieldDir.setText(fileopen.getSelectedFile().toString());
-                        
-                    }
-                }
-            });
-            
-            jButtonGo.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    tf = new tt();
-                    dialog = new JDialog();
-                  //  dialog.setModal(true);
-                    dialog.setAlwaysOnTop(true);
-                    dialog.add(new JLabel(Lang.getInstance().translate("Wait")+"..."));
-                    dialog.pack();
-                    dialog.setLocationRelativeTo(null);
-                    dialog.setVisible(true);
-                    fileStep =0;
-                    filecount = 0;
-                    model = new javax.swing.table.DefaultTableModel(
-                            new Object [][] {
-                               
-                            },
-                            new String [] {
-                                "Hash", "File Name"
-                            }
-                        );
-                    jTable1.setModel(model);
-                    FilesFromDir rr1 = new FilesFromDir();
-                    try {
-                        Files.walkFileTree( Paths.get(jTextFieldDir.getText()), rr1);
-                    } catch (IOException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                        dialog.setVisible(false);
-                        progressBar.setValue(0);
-                    }
-                    filecount = rr1.gatcount();
-                    rr1= null;
-                    
-                   tf.start();
-              }
-            });
-            
-            jButtonStop.addActionListener(new ActionListener(){
+    protected Logger logger;
 
-                @SuppressWarnings("deprecation")
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // TODO Auto-generated method stub
-                    rr = true;
-                    jLabel.setText( filecount + "/0"  );
+    private static final long serialVersionUID = 1L;
+    private DefaultTableModel model;
+    public Thread tf;
+    private JButton jButtonStop;
+    public JDialog dialog;
+    private JLabel jLabel;
+    Integer filecount;
+    Integer fileStep = 0;
+
+    /**
+     * Creates new form HashFindFromDir
+     */
+    public FindHashFromDirPanel() {
+
+        logger = LoggerFactory.getLogger(getClass());
+
+        initComponents();
+        filesPath = new ArrayList<Path>();
+
+        jButtonSelectDir.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                FileChooser fileopen = new FileChooser();
+                fileopen.setFileSelectionMode(FileChooser.DIRECTORIES_ONLY);
+                //  fileopen.setCurrentDirectory(new File(textDataFolder.getText()));
+                int ret = fileopen.showDialog(null, Lang.getInstance().translate("Set data dir"));
+                if (ret == FileChooser.APPROVE_OPTION) {
+                    jTextFieldDir.setText(fileopen.getSelectedFile().toString());
+
+                }
+            }
+        });
+
+        jButtonGo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                tf = new tt();
+                dialog = new JDialog();
+                //  dialog.setModal(true);
+                dialog.setAlwaysOnTop(true);
+                dialog.add(new JLabel(Lang.getInstance().translate("Wait") + "..."));
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+                fileStep = 0;
+                filecount = 0;
+                model = new javax.swing.table.DefaultTableModel(
+                        new Object[][]{
+
+                        },
+                        new String[]{
+                                "Hash", "File Name"
+                        }
+                );
+                jTable1.setModel(model);
+                FilesFromDir rr1 = new FilesFromDir();
+                try {
+                    Files.walkFileTree(Paths.get(jTextFieldDir.getText()), rr1);
+                } catch (IOException e1) {
+                    logger.error(e1.getMessage(), e1);
+                    dialog.setVisible(false);
                     progressBar.setValue(0);
                 }
-                
-            });
-            
-        }
+                filecount = rr1.gatcount();
+                rr1 = null;
 
-        /**
-         * This method is called from within the constructor to initialize the form.
-         * WARNING: Do NOT modify this code. The content of this method is always
-         * regenerated by the Form Editor.
-         */
-        
-                              
-        private void initComponents() {
-            java.awt.GridBagConstraints gridBagConstraints;
+                tf.start();
+            }
+        });
 
-            jLabelHash = new javax.swing.JLabel();
-            jTextFieldHash = new javax.swing.JTextField();
-            jLabelDir = new javax.swing.JLabel();
-            jTextFieldDir = new javax.swing.JTextField();
-            jButtonSelectDir = new javax.swing.JButton();
-            jButtonGo = new javax.swing.JButton();
-            jButtonStop = new javax.swing.JButton();
-            jScrollPane1 = new javax.swing.JScrollPane();
-            jTable1 = new javax.swing.JTable();
-            jLabelTitle = new javax.swing.JLabel();
-            progressBar = new JProgressBar();
+        jButtonStop.addActionListener(new ActionListener() {
 
-            java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
-            layout.columnWidths = new int[] {0, 5, 0, 5, 0};
-            layout.rowHeights = new int[] {0, 8, 0, 8, 0, 8, 0, 8, 0};
-            setLayout(layout);
+            @SuppressWarnings("deprecation")
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO Auto-generated method stub
+                rr = true;
+                jLabel.setText(filecount + "/0");
+                progressBar.setValue(0);
+            }
 
-            jLabelHash.setText("Hash");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 2;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            add(jLabelHash, gridBagConstraints);
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 2;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.2;
-            gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-            add(jTextFieldHash, gridBagConstraints);
+        });
 
-            jLabelDir.setText("DIR");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 4;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            add(jLabelDir, gridBagConstraints);
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 4;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.2;
-            add(jTextFieldDir, gridBagConstraints);
+    }
 
-            jButtonSelectDir.setText("Select Dir");
-            jButtonSelectDir.setToolTipText("");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 4;
-            gridBagConstraints.gridy = 4;
-            gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
-            add(jButtonSelectDir, gridBagConstraints);
-            
-                 
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
 
-            jButtonGo.setText("Find");
-            jButtonGo.setToolTipText("");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 6;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.2;
-            add(jButtonGo, gridBagConstraints);
-            
-            jButtonStop.setText("Stop");
-            jButtonStop.setToolTipText("");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 4;
-            gridBagConstraints.gridy = 6;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jLabelHash = new javax.swing.JLabel();
+        jTextFieldHash = new javax.swing.JTextField();
+        jLabelDir = new javax.swing.JLabel();
+        jTextFieldDir = new javax.swing.JTextField();
+        jButtonSelectDir = new javax.swing.JButton();
+        jButtonGo = new javax.swing.JButton();
+        jButtonStop = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jLabelTitle = new javax.swing.JLabel();
+        progressBar = new JProgressBar();
+
+        java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+        layout.columnWidths = new int[]{0, 5, 0, 5, 0};
+        layout.rowHeights = new int[]{0, 8, 0, 8, 0, 8, 0, 8, 0};
+        setLayout(layout);
+
+        jLabelHash.setText("Hash");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(jLabelHash, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
+        add(jTextFieldHash, gridBagConstraints);
+
+        jLabelDir.setText("DIR");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+        add(jLabelDir, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        add(jTextFieldDir, gridBagConstraints);
+
+        jButtonSelectDir.setText("Select Dir");
+        jButtonSelectDir.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 10);
+        add(jButtonSelectDir, gridBagConstraints);
+
+
+        jButtonGo.setText("Find");
+        jButtonGo.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        add(jButtonGo, gridBagConstraints);
+
+        jButtonStop.setText("Stop");
+        jButtonStop.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         //    gridBagConstraints.weightx = 0.2;
-            add(jButtonStop, gridBagConstraints);
-            
-            // slid
-            jLabel = new JLabel("???");
-           
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 7;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            add(jLabel, gridBagConstraints);
+        add(jButtonStop, gridBagConstraints);
 
-            progressBar.setStringPainted(true);
-            progressBar.setMinimum(0);
-            progressBar.setMaximum(100);
-            
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 7;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.2;
-            add(progressBar, gridBagConstraints);
-            
-            
-            model = new javax.swing.table.DefaultTableModel(
-                    new Object [][] {
-                       
-                    },
-                    new String [] {
+        // slid
+        jLabel = new JLabel("???");
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        add(jLabel, gridBagConstraints);
+
+        progressBar.setStringPainted(true);
+        progressBar.setMinimum(0);
+        progressBar.setMaximum(100);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        add(progressBar, gridBagConstraints);
+
+
+        model = new javax.swing.table.DefaultTableModel(
+                new Object[][]{
+
+                },
+                new String[]{
                         "Hash", "File Name"
-                    }
-                );
-            jTable1.setModel(model);
-            jScrollPane1.setViewportView(jTable1);
+                }
+        );
+        jTable1.setModel(model);
+        jScrollPane1.setViewportView(jTable1);
 
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 8;
-            gridBagConstraints.gridwidth = 5;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.weightx = 0.2;
-            gridBagConstraints.weighty = 0.2;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
-            add(jScrollPane1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.weighty = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 10, 10);
+        add(jScrollPane1, gridBagConstraints);
 
-            jLabelTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-            jLabelTitle.setText("Find Hash");
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.gridwidth = 5;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.weightx = 0.2;
-            gridBagConstraints.insets = new java.awt.Insets(11, 10, 0, 10);
-            add(jLabelTitle, gridBagConstraints);
-        }// </editor-fold>                        
+        jLabelTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabelTitle.setText("Find Hash");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.2;
+        gridBagConstraints.insets = new java.awt.Insets(11, 10, 0, 10);
+        add(jLabelTitle, gridBagConstraints);
+    }// </editor-fold>
 
-        public void stop(){
-            rr = true;
-        }
-        
-        // Variables declaration - do not modify                     
-        private javax.swing.JButton jButtonGo;
-        private javax.swing.JButton jButtonSelectDir;
-        private javax.swing.JLabel jLabelDir;
-        private javax.swing.JLabel jLabelHash;
-        private javax.swing.JLabel jLabelTitle;
-        private javax.swing.JScrollPane jScrollPane1;
-        private javax.swing.JTable jTable1;
-        private javax.swing.JTextField jTextFieldDir;
-        private javax.swing.JTextField jTextFieldHash;
-        ArrayList<Path> filesPath;
-        private boolean rr = false;
-        JProgressBar progressBar;
-        // End of variables declaration                   
-    
-        class MyFileVisitor extends SimpleFileVisitor<Path> {
-            String partOfName;
-            String partOfContent;
-           
+    public void stop() {
+        rr = true;
+    }
+
+    // Variables declaration - do not modify
+    private javax.swing.JButton jButtonGo;
+    private javax.swing.JButton jButtonSelectDir;
+    private javax.swing.JLabel jLabelDir;
+    private javax.swing.JLabel jLabelHash;
+    private javax.swing.JLabel jLabelTitle;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField jTextFieldDir;
+    private javax.swing.JTextField jTextFieldHash;
+    ArrayList<Path> filesPath;
+    private boolean rr = false;
+    JProgressBar progressBar;
+    // End of variables declaration
+
+    class MyFileVisitor extends SimpleFileVisitor<Path> {
+        String partOfName;
+        String partOfContent;
+
 
         @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-           
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+
             File ff = file.toFile();
             FileHash gf = new FileHash(ff);
             String hashes1 = gf.getHash();
-            
-            if (hashes1.equals(jTextFieldHash.getText())){
-            model.addRow(new Object[]{hashes1,
-                    Lang.getInstance().translate("from file ") + ff.getPath()});
-            model.fireTableDataChanged();
+
+            if (hashes1.equals(jTextFieldHash.getText())) {
+                model.addRow(new Object[]{hashes1,
+                        Lang.getInstance().translate("from file ") + ff.getPath()});
+                model.fireTableDataChanged();
             }
-            
-            System.out.println(file.getFileName() + "    Hash :"+ hashes1 + "  Size:" + ff.length()/gf.getBufferSize());   
+
+            System.out.println(file.getFileName() + "    Hash :" + hashes1 + "  Size:" + ff.length() / gf.getBufferSize());
             filesPath.add(file.getFileName());
             fileStep++;
-            jLabel.setText( filecount + "/" + fileStep );
-            progressBar.setValue((fileStep*100/filecount));
-            
+            jLabel.setText(filecount + "/" + fileStep);
+            progressBar.setValue((fileStep * 100 / filecount));
+
             if (rr) {
                 rr = false;
                 dialog.setVisible(false);
-                jLabel.setText( filecount + "/0"  );
+                jLabel.setText(filecount + "/0");
                 progressBar.setValue((0));
                 return FileVisitResult.TERMINATE;
-                
+
             }
             return FileVisitResult.CONTINUE;
-                        
-            }
+
         }
-       
-        class tt extends Thread{
-       
-            @Override
-            public void run() {
-                try {
-                    Files.walkFileTree( Paths.get(jTextFieldDir.getText()), new MyFileVisitor());
-                    dialog.setVisible(false);
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                } 
-            }
-        }
-        
-        class FilesFromDir extends SimpleFileVisitor<Path> {
-            int lengh = 0;
-           
+    }
+
+    class tt extends Thread {
 
         @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-           
-            if (!attrs.isDirectory()) lengh++;
-            
-            return FileVisitResult.CONTINUE;
-                        
+        public void run() {
+            try {
+                Files.walkFileTree(Paths.get(jTextFieldDir.getText()), new MyFileVisitor());
+                dialog.setVisible(false);
+            } catch (IOException e1) {
+                logger.error(e1.getMessage(), e1);
             }
-        public int gatcount(){
+        }
+    }
+
+    class FilesFromDir extends SimpleFileVisitor<Path> {
+        int lengh = 0;
+
+
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+
+            if (!attrs.isDirectory()) lengh++;
+
+            return FileVisitResult.CONTINUE;
+
+        }
+
+        public int gatcount() {
             return lengh;
         }
-        }
-        
-        
-        
-       
-        
-        
+    }
+
+
 }
 

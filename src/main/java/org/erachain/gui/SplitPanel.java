@@ -6,11 +6,14 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
+import org.erachain.gui.items.persons.InsertPersonPanel;
 import org.erachain.gui.library.MSplitPane;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -25,7 +28,7 @@ import java.util.HashMap;
  */
 public class SplitPanel extends JPanel {
 
-
+    protected Logger logger;
 
     /**
      *
@@ -63,6 +66,8 @@ public class SplitPanel extends JPanel {
 
     public SplitPanel(String str) {
         super();
+
+        logger = LoggerFactory.getLogger(getClass());
 
         cnt = Controller.getInstance();
 

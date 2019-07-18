@@ -110,8 +110,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                             + "?person=" + th.itemMenu.getKey()));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
             }
         });

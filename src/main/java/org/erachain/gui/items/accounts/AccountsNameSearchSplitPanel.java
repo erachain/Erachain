@@ -52,7 +52,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class);
     protected FileChooser chooser;
     protected int row;
     private AccountsNameTableModel tableModelImprints;
@@ -287,8 +287,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
                     Pair<String, Tuple2<String, String>> ac = tableModelImprints.getPairItem(row);
                     db.delete(ac.getA());
                 } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
 
             }

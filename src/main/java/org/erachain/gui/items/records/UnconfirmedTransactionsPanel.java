@@ -32,12 +32,15 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
 import org.erachain.utils.URLViewer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("serial")
 public class UnconfirmedTransactionsPanel extends JPanel
 
 {
+    protected Logger logger;
 
     private static UnconfirmedTransactionsPanel instance;
     private UnconfirmedTransactionsTableModel transactionsModel;
@@ -49,6 +52,9 @@ public class UnconfirmedTransactionsPanel extends JPanel
         this.setLayout(new GridBagLayout());
         // this.setLayout(new ScrollPaneLayout());
         // ScrollPaneLayout
+
+        logger = LoggerFactory.getLogger(getClass());
+
 
         // PADDING
         // this.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -243,8 +249,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                             + "?tx=" + trans.viewSignature()));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
             }
         });

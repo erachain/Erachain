@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 public class MyTemplatesTab extends SplitPanel {
 
@@ -282,8 +283,7 @@ public class MyTemplatesTab extends SplitPanel {
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                             + "?template=" + asset.getKey()));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
             }
         });

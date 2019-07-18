@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class AssetInfo extends JTextPane {
 
     // in pack toByte and Parse - reference not included
-    static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
+    static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Transaction.class);
 
     //private BalancesTableModel balancesTableModel;
     private static String img_Local_URL = "http:\\img";

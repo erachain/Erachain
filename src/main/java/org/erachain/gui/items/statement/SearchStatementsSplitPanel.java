@@ -224,6 +224,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                             + "?tx=" + transaction.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
                 }
             }
         });

@@ -18,7 +18,7 @@ public class ImprintsSearchTableModel extends SearchItemsTableModel {
         super(DCSet.getInstance().getItemImprintMap(), new String[]{"Key", "Name", "Birthday", "Publisher", "Favorite"},
                 new Boolean[]{false, true, true, false},
                 COLUMN_FAVORITE);
-        logger = LoggerFactory.getLogger(ImprintsSearchTableModel.class.getName());
+        logger = LoggerFactory.getLogger(ImprintsSearchTableModel.class);
     }
 
     @Override
