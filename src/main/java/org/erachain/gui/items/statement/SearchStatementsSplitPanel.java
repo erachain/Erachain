@@ -209,21 +209,21 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) {
                     return;
+                }
 
                 Transaction transaction = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
                         .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-                if (transaction == null)
+                if (transaction == null) {
                     return;
+                }
 
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                             + "?tx=" + transaction.viewHeightSeq()));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
                 }
             }
         });

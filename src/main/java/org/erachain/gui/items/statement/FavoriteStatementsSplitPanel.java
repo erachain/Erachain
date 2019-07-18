@@ -97,13 +97,15 @@ public class FavoriteStatementsSplitPanel extends SplitPanel {
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) {
                     return;
+                }
 
                 Transaction transaction = (Transaction) favotitesTable.getItem(jTableJScrollPanelLeftPanel
                         .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-                if (transaction == null)
+                if (transaction == null) {
                     return;
+                }
 
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()

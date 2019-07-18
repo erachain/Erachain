@@ -164,8 +164,9 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
                 Block.BlockHead blockHead = myBlocksModel.getItem(jTableMyBlock
                         .convertRowIndexToModel(jTableMyBlock.getSelectedRow()));
-                if (blockHead == null)
+                if (blockHead == null) {
                     return;
+                }
 
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
@@ -229,8 +230,9 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
                 Block.BlockHead blockHead = allBlocksTableModel.getItem(jTableAllBlock
                         .convertRowIndexToModel(jTableAllBlock.getSelectedRow()));
-                if (blockHead == null)
+                if (blockHead == null) {
                     return;
+                }
 
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()

@@ -57,8 +57,9 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) {
                     return;
+                }
 
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()

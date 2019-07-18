@@ -123,13 +123,15 @@ public class IncomingMailsSplitPanel extends SplitPanel {
         setSeeInBlockexplorer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0)
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) {
                     return;
+                }
 
                 Transaction transaction = incoming_Mails_Model.getTransaction(jTableJScrollPanelLeftPanel
                         .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
-                if (transaction == null)
+                if (transaction == null) {
                     return;
+                }
 
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()

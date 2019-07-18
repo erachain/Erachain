@@ -195,8 +195,9 @@ public class MyTransactionsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                if (selectedTransaction == null)
+                if (selectedTransaction == null) {
                     return;
+                }
 
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
