@@ -179,7 +179,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         });
 
         menuMy.add(setSeeInBlockexplorerMy);
-        TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menuMy);
+        TableMenuPopupUtil.installContextMenu(jTableMyBlock, menuMy);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -219,7 +219,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         jScrollPaneAllBlockTable.setBorder(null);
         jScrollPaneAllBlockTable.setViewportView(jTableAllBlock);
 
-        JPopupMenu menu = new JPopupMenu();
+        JPopupMenu menuAll = new JPopupMenu();
 
         JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
@@ -243,8 +243,8 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
             }
         });
 
-        menu.add(setSeeInBlockexplorer);
-        TableMenuPopupUtil.installContextMenu(jTableAllBlock, menu);
+        menuAll.add(setSeeInBlockexplorer);
+        TableMenuPopupUtil.installContextMenu(jTableAllBlock, menuAll);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
