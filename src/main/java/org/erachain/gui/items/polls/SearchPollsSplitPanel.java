@@ -22,11 +22,9 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
      */
     private static final long serialVersionUID = 1L;
     private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
-    private SearchPollsSplitPanel th;
 
     public SearchPollsSplitPanel() {
         super(tableModelPolls, "Search_Popll_Tab", "Search_Poll_Tab");
-        th = this;
 
         // ADD MENU ITEMS
         JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
@@ -75,7 +73,7 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
                 }
             }
         });
-        th.menuTable.add(setSeeInBlockexplorer);
+        menuTable.add(setSeeInBlockexplorer);
 
     }
 	

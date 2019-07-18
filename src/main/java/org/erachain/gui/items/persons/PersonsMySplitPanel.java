@@ -22,13 +22,10 @@ import java.net.URL;
 public class PersonsMySplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
 
-    private PersonsMySplitPanel th;
-
     public PersonsMySplitPanel() {
         super(new WalletItemPersonsTableModel(), "PersonsMySplitPanel");
 
         this.setName(Lang.getInstance().translate("My Persons"));
-        th = this;
 //      add items in menu
 
         JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set Status to Person"));
@@ -38,7 +35,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 @SuppressWarnings("unused")
-                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.itemMenu);
+                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) itemMenu);
 
             }
         });
@@ -52,7 +49,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
 
 
                 @SuppressWarnings("unused")
-                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.itemMenu, th.itemMenu.getOwner());
+                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) itemMenu, itemMenu.getOwner());
 
             }
         });
@@ -63,7 +60,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                PersonCls per = (PersonCls) th.itemMenu;
+                PersonCls per = (PersonCls) itemMenu;
                 byte[] ref = per.getReference();
                 Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                 int blockNo = transaction.getBlockHeight();
@@ -85,7 +82,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?person=" + th.itemMenu.getKey()));
+                            + "?person=" + itemMenu.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }

@@ -19,23 +19,21 @@ import java.net.URL;
 
 public class TemplatesFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private TemplatesFavoriteSplitPanel th;
 
     public TemplatesFavoriteSplitPanel() {
         super(new FavoriteTemplatesTableModel(), "TemplatesFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Templates"));
-        th = this;
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(((TemplateCls) th.itemMenu).getReference());
+                Transaction trans = db.getTransactionFinalMap().get(itemMenu.getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });
-        th.menuTable.add(vouch_menu);
+        menuTable.add(vouch_menu);
 
         menuTable.addSeparator();
 

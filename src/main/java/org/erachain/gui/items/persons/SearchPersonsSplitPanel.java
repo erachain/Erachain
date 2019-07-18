@@ -25,12 +25,8 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
 
-    private SearchPersonsSplitPanel th;
-
     public SearchPersonsSplitPanel() {
         super(new ItemsPersonsTableModel(), "SearchPersonsSplitPanel", "SearchPersonsSplitPanel");
-
-        this.th = this;
 
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
@@ -39,7 +35,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, (PersonCls) th.itemMenu, null));
+                        null, null, (PersonCls) itemMenu, null));
 
             }
         });
@@ -52,7 +48,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) th.itemMenu));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) itemMenu));
             }
         });
 
@@ -67,7 +63,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 @SuppressWarnings("unused")
-                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.itemMenu);
+                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) itemMenu);
 
             }
         });
@@ -81,7 +77,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
 
 
                 @SuppressWarnings("unused")
-                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.itemMenu, th.itemMenu.getOwner());
+                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) itemMenu, itemMenu.getOwner());
 
             }
         });
@@ -92,7 +88,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                PersonCls per = (PersonCls) th.itemMenu;
+                PersonCls per = (PersonCls) itemMenu;
                 byte[] ref = per.getReference();
                 Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                 int blockNo = transaction.getBlockHeight();
@@ -114,7 +110,7 @@ public class SearchPersonsSplitPanel extends SearchItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?person=" + th.itemMenu.getKey()));
+                            + "?person=" + itemMenu.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
