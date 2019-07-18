@@ -1,6 +1,7 @@
 package org.erachain.gui.items.other;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.block.Block;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
@@ -11,12 +12,18 @@ import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.WalletBlocksTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -32,7 +39,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
     private MTable jTableAllBlock;
 
     // TRANSACTIONS
-    private WalletBlocksTableModel blocksModel = new WalletBlocksTableModel();
+    private WalletBlocksTableModel myBlocksModel = new WalletBlocksTableModel();
     private MTable jTableMyBlock;
     private JPopupMenu peersMenu = new JPopupMenu();
     private Peer itemPeerMenu;
@@ -125,7 +132,7 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
         jTableAllBlock = new MTable(allBlocksTableModel);
 
-        jTableMyBlock = new MTable(blocksModel);
+        jTableMyBlock = new MTable(myBlocksModel);
 
         JPanel jPanel7 = new JPanel(new GridBagLayout());
         JLabel jLabelMyBlockTitle = new JLabel(Lang.getInstance().translate("My Generated Blocks"));
@@ -146,6 +153,33 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         jScrollPaneMyBlockTable.setBorder(null);
 
         jScrollPaneMyBlockTable.setViewportView(jTableMyBlock);
+
+        JPopupMenu menuMy = new JPopupMenu();
+
+        JMenuItem setSeeInBlockexplorerMy = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorerMy.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Block.BlockHead blockHead = myBlocksModel.getItem(jTableMyBlock
+                        .convertRowIndexToModel(jTableMyBlock.getSelectedRow()));
+                if (blockHead == null) {
+                    return;
+                }
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?block=" + blockHead.heightBlock));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        menuMy.add(setSeeInBlockexplorerMy);
+        TableMenuPopupUtil.installContextMenu(jTableMyBlock, menuMy);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -185,6 +219,33 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
         jScrollPaneAllBlockTable.setBorder(null);
         jScrollPaneAllBlockTable.setViewportView(jTableAllBlock);
 
+        JPopupMenu menuAll = new JPopupMenu();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                Block.BlockHead blockHead = allBlocksTableModel.getItem(jTableAllBlock
+                        .convertRowIndexToModel(jTableAllBlock.getSelectedRow()));
+                if (blockHead == null) {
+                    return;
+                }
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?block=" + blockHead.heightBlock));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        menuAll.add(setSeeInBlockexplorer);
+        TableMenuPopupUtil.installContextMenu(jTableAllBlock, menuAll);
+
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -211,9 +272,9 @@ public class OtherSplitPanel extends SplitPanel implements Observer {
 
     @Override
     public void onClose() {
-        blocksModel.deleteObservers();
+        myBlocksModel.deleteObservers();
         peersTableModel.deleteObservers();
-        allBlocksTableModel.removeObservers();
+        allBlocksTableModel.deleteObservers();
         Controller.getInstance().deleteObserver(syncButton);
 
     }

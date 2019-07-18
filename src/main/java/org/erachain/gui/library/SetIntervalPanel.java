@@ -42,7 +42,7 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
         ADD_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_ADD);
         REMOVE_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
 
-        LOGGER = LoggerFactory.getLogger(getClass().getName());
+        LOGGER = LoggerFactory.getLogger(getClass());
 
         initComponents();
 

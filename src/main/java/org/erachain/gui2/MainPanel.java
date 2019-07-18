@@ -54,6 +54,7 @@ import org.erachain.gui.items.statuses.SearchStatusesSplitPanel;
 import org.erachain.gui.items.statuses.StatusesFavoriteSplitPanel;
 import org.erachain.gui.items.templates.IssueTemplatePanel;
 import org.erachain.gui.items.templates.SearchTemplatesSplitPanel;
+import org.erachain.gui.items.templates.TemplateMySplitPanel;
 import org.erachain.gui.items.templates.TemplatesFavoriteSplitPanel;
 import org.erachain.gui.items.unions.IssueUnionPanel;
 import org.erachain.gui.items.unions.MyUnionsTab;
@@ -417,6 +418,11 @@ public class MainPanel extends javax.swing.JPanel {
             return;
         }
 
+
+        if (str.equals(Lang.getInstance().translate("My Templates")) || str.equals("TemplateMySplitPanel")) {
+            insertTab(Lang.getInstance().translate("My Templates"), new TemplateMySplitPanel());
+            return;
+        }
         if (str.equals(Lang.getInstance().translate("Search Templates")) || str.equals("SearchTemplatesSplitPanel")) {
             insertTab(Lang.getInstance().translate("Search Templates"), new SearchTemplatesSplitPanel());
             return;

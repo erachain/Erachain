@@ -48,6 +48,8 @@ public class BlockChain {
     public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9067 : 9047;
     public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9068 : 9048;
 
+    public static final String DEFAULT_EXPLORER = "explorer.erachain.org";
+
     //public static final String TIME_ZONE = "GMT+3";
     //
     public static final boolean ROBINHOOD_USE = false;

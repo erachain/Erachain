@@ -42,27 +42,27 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected Logger logger;
 
     public TimerTableModelCls(String[] columnNames, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.columnNames = columnNames;
         this.descending = descending;
     }
 
     public TimerTableModelCls(DBMap map, String[] columnNames, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.descending = descending;
     }
 
     public TimerTableModelCls(String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
     }
 
     public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
@@ -70,7 +70,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
@@ -79,7 +79,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     public TimerTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.name = name;

@@ -29,7 +29,7 @@ public class Polls_My_SplitPanel extends SplitPanel {
     public Polls_My_SplitPanel() {
         super("Polls_My_SplitPanel");
         this.setName(Lang.getInstance().translate("My Polls"));
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -54,7 +54,7 @@ public class Polls_My_SplitPanel extends SplitPanel {
         confirmedColumn.setPreferredWidth(50);// .setWidth(30);
 
         // UPDATE FILTER ON TEXT CHANGE
-        this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
+        this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(my_Poll_Model);
         this.jTableJScrollPanelLeftPanel = my_Poll_table;
@@ -109,7 +109,7 @@ public class Polls_My_SplitPanel extends SplitPanel {
 
         public void onChange() {
             // GET VALUE
-            String search = searchTextField_SearchToolBar_LeftPanel.getText();
+            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
             // SET FILTER
             my_Poll_Model.fireTableDataChanged();
 

@@ -13,6 +13,8 @@ import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
@@ -23,6 +25,8 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -45,7 +49,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         this.setName(Lang.getInstance().translate("Search Records"));
 
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Insert height block or block-seqNo") + ":");
         this.toolBarLeftPanel.add(new JLabel(Lang.getInstance().translate("Set account, signature or title") + ":"));
         searchString = new JTextField();
         searchString.setToolTipText("");
@@ -80,15 +84,15 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
         // 	Records_Table_Model records_Model = new Records_Table_Model();
         // 	this.jTableJScrollPanelLeftPanel = new JTable(records_Model);
 
-        MenuPopupUtil.installContextMenu(this.searchTextField_SearchToolBar_LeftPanel);
-        this.searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        MenuPopupUtil.installContextMenu(this.searchTextFieldSearchToolBarLeftPanelDocument);
+        this.searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 //searchString.setText("");
                 transactionsTableModel.clear();
-                transactionsTableModel.setBlockNumber(searchTextField_SearchToolBar_LeftPanel.getText());
+                transactionsTableModel.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
 
             }
 
@@ -137,9 +141,30 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
 
         mainMenu.add(item_Save);
 
-       // this.jTableJScrollPanelLeftPanel.setComponentPopupMenu(mainMenu);
-        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+        mainMenu.addSeparator();
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
 
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                int row = jTableJScrollPanelLeftPanel.getSelectedRow();
+                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+                Transaction trans = transactionsTableModel.getItem(row);
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + trans.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+        mainMenu.add(setSeeInBlockexplorer);
+
+        // this.jTableJScrollPanelLeftPanel.setComponentPopupMenu(mainMenu);
+        TableMenuPopupUtil.installContextMenu(this.jTableJScrollPanelLeftPanel, mainMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
         this.jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
@@ -210,7 +235,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
     }
 
     public void listener() {
-        transactionsTableModel.setBlockNumber(searchTextField_SearchToolBar_LeftPanel.getText());
+        transactionsTableModel.setBlockNumber(searchTextFieldSearchToolBarLeftPanelDocument.getText());
     }
 
     // listener select row

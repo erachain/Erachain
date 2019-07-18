@@ -24,7 +24,7 @@ public class OtherSeasrchBlocksTableModel extends AbstractTableModel {
     public static final int COLUMN_BASETARGET = 3;
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = LoggerFactory.getLogger(OtherSeasrchBlocksTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(OtherSeasrchBlocksTableModel.class);
     private List<Block> blocks;
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"Height", "Timestamp", "Generator", "GB pH WV dtWV", // "Generating

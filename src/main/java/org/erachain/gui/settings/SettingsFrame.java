@@ -35,7 +35,7 @@ import org.erachain.utils.SaveStrToFile;
 
 @SuppressWarnings("serial")
 public class SettingsFrame extends JDialog {
-    static Logger LOGGER = LoggerFactory.getLogger(SettingsFrame.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(SettingsFrame.class);
 
     public JSONObject settingsJSONbuf;
     private SettingsTabPane settingsTabPane;
