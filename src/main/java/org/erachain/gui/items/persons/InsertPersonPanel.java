@@ -71,7 +71,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
     private void init() {
         titleJLabel.setText(Lang.getInstance().translate("Enter Person"));
-        //textPersonNumber.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
         txtHeight.setText("");
@@ -87,7 +86,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
         addImageLabel.setVisible(false);
         comboBoxGender.setVisible(false);
         txtGenderTxt.setEditable(false);
-        //textPersonNumber.setEditable(false);
         txtBirthLatitude.setEditable(false);
         txtBirthLongitudeLatitude.setEditable(false);
         txtSkinColor.setEditable(false);
@@ -210,9 +208,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
             comboBoxGender.setSelectedIndex(person.getGender());
             txtGenderTxt.setText(comboBoxGender.getSelectedItem().toString());
 
-            //if (person.getRace() != null) {
-            //    textPersonNumber.setText(person.getRace());
-            //}
             txtBirthLatitude.setText("" + person.getBirthLatitude() + ", " + person.getBirthLongitude());
             if (person.getSkinColor() != null) {
                 txtSkinColor.setText(person.getSkinColor());
@@ -327,7 +322,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtName.setText("");
         txtareaDescription.setText("");
         txtGenderTxt.setText("");
-        //textPersonNumber.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
         txtSkinColor.setText("");
