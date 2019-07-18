@@ -1558,20 +1558,20 @@ public class Controller extends Observable {
         this.network.broadcast(message, false);
     }
 
-    public boolean broadcastTelegram(Transaction transaction, boolean store) {
+    public int broadcastTelegram(Transaction transaction, boolean store) {
 
         // CREATE MESSAGE
         Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
-        boolean notAdded = this.network.addTelegram((TelegramMessage) telegram);
+        int notAdded = this.network.addTelegram((TelegramMessage) telegram);
 
-        if (!store || !notAdded) {
+        if (!store || notAdded == 0) {
             // BROADCAST MESSAGE
             this.network.broadcast(telegram, false);
             // save DB
             Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
         }
 
-        return !notAdded;
+        return notAdded;
 
     }
 

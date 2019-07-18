@@ -91,7 +91,7 @@ public class TelegramManager extends Thread {
 
         onMessageProcessTiming = System.nanoTime();
 
-        if (add((TelegramMessage) message))
+        if (add((TelegramMessage) message) != 0)
             return;
 
         onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
@@ -525,7 +525,7 @@ public class TelegramManager extends Thread {
      * @param telegram  телеграмма котрую надо добавить
      * @return TRUE if not added
      */
-    public boolean add(TelegramMessage telegram) {
+    public int add(TelegramMessage telegram) {
 
         Transaction transaction;
 
@@ -533,30 +533,25 @@ public class TelegramManager extends Thread {
 
         // CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
         Account creator = transaction.getCreator();
-        if (creator == null || !transaction.isSignatureValid(DCSet.getInstance())) {
-            // DISHONEST PEER
-            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-            ///		"ban PeerOnError - invalid telegram signature");
-            return true;
+        if (creator == null) {
+            return Transaction.INVALID_CREATOR;
+        }
+
+        if(!transaction.isSignatureValid(DCSet.getInstance())) {
+            return Transaction.INVALID_SIGNATURE;
         }
 
         long timestamp = transaction.getTimestamp();
         if (timestamp > NTP.getTime() + 10000) {
-            // DISHONEST PEER
-            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-            ///		"ban PeerOnError - invalid telegram timestamp >>");
-            return true;
+            return Transaction.INVALID_TIMESTAMP;
         } else if (30000 + timestamp < NTP.getTime()) {
-            // DISHONEST PEER
-            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-            ///		"ban PeerOnError - invalid telegram timestamp <<");
-            return true;
+            return Transaction.INVALID_TIMESTAMP;
         }
 
         // TRY DO COMMANDS
         if (!try_command(transaction)) {
             // go broadcast
-            return false;
+            return 0;
         }
 
         String signatureKey;
@@ -566,7 +561,7 @@ public class TelegramManager extends Thread {
         signatureKey = Base58.encode(transaction.getSignature());
 
         if (this.handledTelegrams.containsKey(signatureKey))
-            return true;
+            return Transaction.ITEM_DUPLICATE;
 
         // CHECK IF LIST IS FULL
         if (this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE) {
@@ -631,7 +626,7 @@ public class TelegramManager extends Thread {
         }
 
 
-        return false;
+        return 0;
 
     }
 

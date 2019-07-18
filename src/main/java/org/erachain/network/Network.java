@@ -374,7 +374,7 @@ public class Network extends Observable {
         return incomedPeers;
     }
 
-    public boolean addTelegram(TelegramMessage telegram) {
+    public int addTelegram(TelegramMessage telegram) {
         return this.telegramer.add(telegram);
     }
 
