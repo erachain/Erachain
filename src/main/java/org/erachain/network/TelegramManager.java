@@ -542,9 +542,9 @@ public class TelegramManager extends Thread {
         }
 
         long timestamp = transaction.getTimestamp();
-        if (timestamp > NTP.getTime() + 10000) {
+        if (timestamp > NTP.getTime() + 120000) {
             return Transaction.INVALID_TIMESTAMP;
-        } else if (30000 + timestamp < NTP.getTime()) {
+        } else if (200000 + timestamp < NTP.getTime()) {
             return Transaction.INVALID_TIMESTAMP;
         }
 

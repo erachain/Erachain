@@ -738,7 +738,6 @@ public class API {
         }
     }
 
-    // http://127.0.0.1:9047/api/broadcastTelegram1?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
     public JSONObject broadcastTelegram_1(String rawDataBase58) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
