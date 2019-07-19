@@ -765,10 +765,12 @@ public class API {
             return out;
         }
 
-        if (Controller.getInstance().broadcastTelegram(transaction, true)) {
+        int status = Controller.getInstance().broadcastTelegram(transaction, true);
+        if (status == 0) {
             out.put("status", "ok");
         } else {
-            out.put("status", "exist");
+            out.put("status", "error");
+            out.put("error", OnDealClick.resultMess(status));
         }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out;
