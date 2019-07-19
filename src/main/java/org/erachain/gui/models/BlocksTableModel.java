@@ -143,4 +143,14 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
         }
     }
 
+    @Override
+    public void addObservers() {
+        DCSet.getInstance().getBlockMap().addObserver(this);
+    }
+
+    @Override
+    public void deleteObservers() {
+        DCSet.getInstance().getBlockMap().deleteObserver(this);
+    }
+
 }
