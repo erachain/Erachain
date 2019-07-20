@@ -44,6 +44,8 @@ public class WebTransactionsHTML {
     public HashMap get_HTML(Transaction transaction, JSONObject langObj) {
         // TODO: надо переделать тут так чтобы на строне клиента HTML собиралось с его локальным временм из timestamp
 
+        transaction.setDC(DCSet.getInstance());
+
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
         tt.add(transaction);
