@@ -21,6 +21,7 @@ import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -481,28 +482,34 @@ public class DepositExchange extends JPanel {
         // [TOKEN]/[ADDRESS]
         String urlGetDetails = "https://api.face2face.cash/apipay/history.json/";
 
-        switch ((int) asset.getKey()) {
-            case 1:
-                urlGetDetails += "ERA/"; // BTC -> eBTC
-                break;
-            case 12:
-                urlGetDetails += "@BTC/"; // BTC -> eBTC
-                break;
-            case 14:
-                urlGetDetails += "@ETH/"; // BTC -> eBTC
-                break;
-            case 92:
-                urlGetDetails += "@RUB/"; // BTC -> eUSD
-                break;
-            case 95:
-                urlGetDetails += "@USD/"; // BTC -> eUSD
-                break;
-            default:
-                urlGetDetails += "COMPU/"; // BTC -> COMPU
+        if (asset == null) {
+            // значит это биткоин как стандарт вывода
+            urlGetDetails += "BTC/";
+        } else {
+
+            switch ((int) asset.getKey()) {
+                case 1:
+                    urlGetDetails += "ERA/"; // BTC -> eBTC
+                    break;
+                case 12:
+                    urlGetDetails += "@BTC/"; // BTC -> eBTC
+                    break;
+                case 14:
+                    urlGetDetails += "@ETH/"; // BTC -> eBTC
+                    break;
+                case 92:
+                    urlGetDetails += "@RUB/"; // BTC -> eUSD
+                    break;
+                case 95:
+                    urlGetDetails += "@USD/"; // BTC -> eUSD
+                    break;
+                default:
+                    urlGetDetails += "COMPU/"; // BTC -> COMPU
+            }
+
         }
 
         urlGetDetails += address;
-
 
         String inputText = "";
         try {
@@ -547,6 +554,18 @@ public class DepositExchange extends JPanel {
                 }
 
                 String resultText = "<html>";
+
+                JSONObject deal_acc = (JSONObject) jsonObject.get("deal_acc");
+                BigDecimal to_pay = new BigDecimal(deal_acc.get("to_pay").toString());
+                if (to_pay.signum() != 0) {
+                    resultText += Lang.getInstance().translate("Awaiting for payout")
+                            + ": " + to_pay.toPlainString()
+                    + " (" + Lang.getInstance().translate("maybe volume is too small for payout") + ")";
+                }
+                if (false && deal_acc.containsKey("message")) {
+                    resultText += deal_acc.get("message");
+                }
+
                 JSONArray unconfirmed = (JSONArray) jsonObject.get("unconfirmed");
                 if (!unconfirmed.isEmpty()) {
                     resultText += "<h3>" + Lang.getInstance().translate("Pending") + "</h3>";
@@ -604,20 +623,55 @@ public class DepositExchange extends JPanel {
                      *  "amount_in": 0.02, "created": "2019-06-21 16:03:10", "confitmations": 1,
                      *  "txid": "3C82efTYLiPjDgPpJqgeU8Kp5b9Bwe2aKsc1aXjtnXHhxpo9QbuuNrr3juhkEhcBTaV7fxeUynYdkPFSuXb6trU5"},
                      */
+
+                    /** есди выплаты не было и платеж со статусом ожидания и т.д.
+                     * {"done": [{"acc": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "stasus": "added",
+                     *      "curr_in": {"abbrev": "COMPU", "id": 10}, "curr_out": {"abbrev": "BTC", "id": 3},
+                     *      "amount_in": 0.0065, "created": "2019-07-20 09:33:29", "confitmations": 1,
+                     *      "status_mess": "2.426e-05", "txid": "3Bwqtmdu58Jn4pMo4558LTUasFdQ2wBwzuy78a4HgpjERiYTekJGHXzkhNxnLDdKh3Q2CW4amt1JAdTthNosfJVu"}
+                     *      ],
+                     * "deal_acc": {"payed_month": 0.02621535, "gift_pick": 2.6e-06,
+                     * "name": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "price": 0.0,
+                     * "payed": 0.02621535, "to_pay": 0.00028671, "gift_payed": 8.02e-06,
+                     * "message": "<div class=\"row\"><div class=\"col-sm-12\" style=\"\"><h3>Congratulations! You have a gift <b>1.821e-05</b> <i class=\"fa fa-rub\" style=\"color:chartreuse;\"></i></h3>Use the gift code to receive more gifts. Gift code can be taken from our partners.<br />The probability to get <b>2.6e-06</b> them in the following payment is: <b>1</b>. You've already got 8.02e-06</div></div><div class=\"row\"><div class=\"col-sm-12\" style=\"\"><h4>\u0412\u0430\u0448\u0430 \u043f\u0435\u0440\u0435\u043f\u043b\u0430\u0442\u0430 <b>0.00028671 <i class=\"fa fa-rub\"\"></i></b> <small style=\"color:white\">\u041e\u043d\u0430 \u0431\u0443\u0434\u0435\u0442 \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0430 \u043a \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c\u0443 \u043f\u043b\u0430\u0442\u0435\u0436\u0443</small></h4></div></div>", "curr_out_id": 3, "id": 108, "gift_amount": 1.821e-05}, "in_process": [], "deal": {"MAX": 0.0, "name": "to COIN", "id": 2}, "unconfirmed": []}
+                     */
                     for (Object item : done) {
                         try {
                             JSONObject json = (JSONObject) item;
+
                             JSONObject curr_in = (JSONObject) json.get("curr_in");
                             JSONObject curr_out = (JSONObject) json.get("curr_out");
-                            JSONObject pay_out = (JSONObject) json.get("pay_out");
+                            String amount_in = json.get("amount_in").toString();
 
-                            resultText += json.get("amount_in") + " " + curr_in.get("abbrev")
-                                    + " :: " + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
-                                    + " - " + pay_out.get("created_on")
-                                    + "  <span style='font-size:0.8em'>" + pay_out.get("txid") + "</span><br>";
+                            if (json.containsKey("pay_out")) {
+                                JSONObject pay_out = (JSONObject) json.get("pay_out");
+
+                                resultText += amount_in + " " + curr_in.get("abbrev")
+                                        + " :: " + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
+                                        + " - " + pay_out.get("created_on")
+                                        + "  <span style='font-size:0.8em'>" + pay_out.get("txid").toString().substring(0, 10) + "...</span>";
+                            } else if (json.containsKey("stasus")) {
+                                /**
+                                "acc": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "stasus": "added",
+                                "curr_in": {"abbrev": "COMPU", "id": 10}, "curr_out": {"abbrev": "BTC", "id": 3},
+                                "amount_in": 0.0065, "created": "2019-07-20 09:33:29", "confitmations": 1,
+                                "status_mess": "2.426e-05", "txid": "3Bwqtmdu58Jn4pMo4558LTUasFdQ2wBwzuy78a4HgpjERiYTekJGHXzkhNxnLDdKh3Q2CW4amt1JAdTthNosfJVu"
+                                 */
+
+                                resultText += json.get("created") + " - " + json.get("amount_in") + " " + curr_in.get("abbrev")
+                                        + " <span style='font-size:0.8em'>" + json.get("txid").toString().substring(0, 10) + "...</span>"
+                                        + " :: " + curr_out.get("abbrev") + " <b>[" + json.get("stasus") + "]</b>";
+
+                                if (json.containsKey("status_mess")) {
+                                    resultText += "<b>" + json.get("status_mess").toString() + "</b>";
+                                }
+                            }
+
                         } catch (Exception e) {
-                            resultText += item.toString() + "<br>";
+                            resultText += item.toString();
                         }
+
+                        resultText += "<br>";
                     }
                 }
 
