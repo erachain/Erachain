@@ -8,7 +8,9 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
+import org.erachain.utils.URLViewer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -16,14 +18,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class DepositExchange extends JPanel {
@@ -441,7 +445,7 @@ public class DepositExchange extends JPanel {
         add(jTextField_Details_Check, gridBagConstraints);
 
         //////////////////////////
-        JLabel jText_History = new JLabel();
+        JTextPane jText_History = new JTextPane();
 
         gridy += 3;
 
@@ -464,6 +468,27 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
 
         add(jButtonHistory, gridBagConstraints);
+
+        jText_History.setContentType("text/html");
+        jText_History.setEditable(false);
+
+        jText_History.addHyperlinkListener(new HyperlinkListener() {
+
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent arg0) {
+                // TODO Auto-generated method stub
+                HyperlinkEvent.EventType type = arg0.getEventType();
+                if (type != HyperlinkEvent.EventType.ACTIVATED)
+                    return;
+
+                try {
+                    URLViewer.openWebpage(new URL(arg0.getDescription()));
+                } catch (MalformedURLException e1) {
+                    LOGGER.error(e1.getMessage(), e1);
+                }
+
+            }
+        });
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -560,7 +585,7 @@ public class DepositExchange extends JPanel {
                 if (to_pay.signum() != 0) {
                     resultText += Lang.getInstance().translate("Awaiting for payout")
                             + ": " + to_pay.toPlainString()
-                    + " (" + Lang.getInstance().translate("maybe volume is too small for payout") + ")";
+                    + " (" + Lang.getInstance().translate("maybe volume is too small for payout, please send more") + ")";
                 }
                 if (false && deal_acc.containsKey("message")) {
                     resultText += deal_acc.get("message");
@@ -611,30 +636,7 @@ public class DepositExchange extends JPanel {
                 JSONArray done = (JSONArray) jsonObject.get("done");
                 if (!done.isEmpty()) {
                     resultText += "<h3>" + Lang.getInstance().translate("Done") + "</h3>";
-                    /**
-                     * {"acc": "7KJjTKrj7Zmm7cYJANWHmLfmNPoZbwmbiy", "stasus": "ok",
-                     * "curr_in": {"abbrev": "COMPU", "id": 10},
-                     * "curr_out": {"abbrev": "COMPU", "id": 10},
-                     * "pay_out": {"status": null, "info": null, "created_ts": 1561122345.0, "amo_in": 0.02, "amo_taken": 0.01890641, "tax_mess": null,
-                     *      "vars": {"payment_id": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ", "status": "success"},
-                     *      "created_on": "2019-06-21 16:05:45", "txid": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ",
-                     *      "amount": 0.01888609, "amo_to_pay": 0.0, "amo_gift": 2.032e-05, "id": 77, "amo_partner": 0.0
-                     *      },
-                     *  "amount_in": 0.02, "created": "2019-06-21 16:03:10", "confitmations": 1,
-                     *  "txid": "3C82efTYLiPjDgPpJqgeU8Kp5b9Bwe2aKsc1aXjtnXHhxpo9QbuuNrr3juhkEhcBTaV7fxeUynYdkPFSuXb6trU5"},
-                     */
 
-                    /** есди выплаты не было и платеж со статусом ожидания и т.д.
-                     * {"done": [{"acc": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "stasus": "added",
-                     *      "curr_in": {"abbrev": "COMPU", "id": 10}, "curr_out": {"abbrev": "BTC", "id": 3},
-                     *      "amount_in": 0.0065, "created": "2019-07-20 09:33:29", "confitmations": 1,
-                     *      "status_mess": "2.426e-05", "txid": "3Bwqtmdu58Jn4pMo4558LTUasFdQ2wBwzuy78a4HgpjERiYTekJGHXzkhNxnLDdKh3Q2CW4amt1JAdTthNosfJVu"}
-                     *      ],
-                     * "deal_acc": {"payed_month": 0.02621535, "gift_pick": 2.6e-06,
-                     * "name": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "price": 0.0,
-                     * "payed": 0.02621535, "to_pay": 0.00028671, "gift_payed": 8.02e-06,
-                     * "message": "<div class=\"row\"><div class=\"col-sm-12\" style=\"\"><h3>Congratulations! You have a gift <b>1.821e-05</b> <i class=\"fa fa-rub\" style=\"color:chartreuse;\"></i></h3>Use the gift code to receive more gifts. Gift code can be taken from our partners.<br />The probability to get <b>2.6e-06</b> them in the following payment is: <b>1</b>. You've already got 8.02e-06</div></div><div class=\"row\"><div class=\"col-sm-12\" style=\"\"><h4>\u0412\u0430\u0448\u0430 \u043f\u0435\u0440\u0435\u043f\u043b\u0430\u0442\u0430 <b>0.00028671 <i class=\"fa fa-rub\"\"></i></b> <small style=\"color:white\">\u041e\u043d\u0430 \u0431\u0443\u0434\u0435\u0442 \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0430 \u043a \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c\u0443 \u043f\u043b\u0430\u0442\u0435\u0436\u0443</small></h4></div></div>", "curr_out_id": 3, "id": 108, "gift_amount": 1.821e-05}, "in_process": [], "deal": {"MAX": 0.0, "name": "to COIN", "id": 2}, "unconfirmed": []}
-                     */
                     for (Object item : done) {
                         try {
                             JSONObject json = (JSONObject) item;
@@ -644,27 +646,72 @@ public class DepositExchange extends JPanel {
                             String amount_in = json.get("amount_in").toString();
 
                             if (json.containsKey("pay_out")) {
-                                JSONObject pay_out = (JSONObject) json.get("pay_out");
 
-                                resultText += amount_in + " " + curr_in.get("abbrev")
-                                        + " :: " + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
-                                        + " - " + pay_out.get("created_on")
-                                        + "  <span style='font-size:0.8em'>" + pay_out.get("txid").toString().substring(0, 10) + "...</span>";
-                            } else if (json.containsKey("stasus")) {
                                 /**
-                                "acc": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "stasus": "added",
-                                "curr_in": {"abbrev": "COMPU", "id": 10}, "curr_out": {"abbrev": "BTC", "id": 3},
-                                "amount_in": 0.0065, "created": "2019-07-20 09:33:29", "confitmations": 1,
-                                "status_mess": "2.426e-05", "txid": "3Bwqtmdu58Jn4pMo4558LTUasFdQ2wBwzuy78a4HgpjERiYTekJGHXzkhNxnLDdKh3Q2CW4amt1JAdTthNosfJVu"
+                                 * {"acc": "7KJjTKrj7Zmm7cYJANWHmLfmNPoZbwmbiy", "stasus": "ok",
+                                 * "curr_in": {"abbrev": "COMPU", "id": 10},
+                                 * "curr_out": {"abbrev": "COMPU", "id": 10},
+                                 * "pay_out": {"status": null, "info": null, "created_ts": 1561122345.0, "amo_in": 0.02, "amo_taken": 0.01890641, "tax_mess": null,
+                                 *      "vars": {"payment_id": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ", "status": "success"},
+                                 *      "created_on": "2019-06-21 16:05:45", "txid": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ",
+                                 *      "amount": 0.01888609, "amo_to_pay": 0.0, "amo_gift": 2.032e-05, "id": 77, "amo_partner": 0.0
+                                 *      },
+                                 *  "amount_in": 0.02, "created": "2019-06-21 16:03:10", "confitmations": 1,
+                                 *  "txid": "3C82efTYLiPjDgPpJqgeU8Kp5b9Bwe2aKsc1aXjtnXHhxpo9QbuuNrr3juhkEhcBTaV7fxeUynYdkPFSuXb6trU5"},
                                  */
 
+                                JSONObject pay_out = (JSONObject) json.get("pay_out");
+
+                                String txURL;
+                                txURL = "http://" + Settings.getInstance().getBlockexplorerURL()
+                                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                            + "?tx=";
+
+                                resultText += amount_in + " " + curr_in.get("abbrev")
+                                        + " <a href='" + txURL + json.get("txid").toString() + "'>(TX)</a>";
+
+                                if (curr_out.get("abbrev").equals("BTC")) {
+                                    txURL = "https://www.blockchain.com/ru/btc/tx/";
+                                } else if (curr_out.get("abbrev").equals("BTC")) {
+                                    txURL = "https://www.blockchain.com/ru/eth/tx/";
+                                } else {
+                                    txURL = "";
+                                }
+
+                                resultText +=
+                                        //+ " &#9654; "
+                                         " &#10144; "
+                                        + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
+                                        + " - " + pay_out.get("created_on")
+                                        + " <a href='" + txURL + pay_out.get("txid").toString() + "'>(TX)</a>"
+                                ;
+                            } else if (json.containsKey("stasus")) {
+                                /** есди выплаты не было и платеж со статусом ожидания и т.д.
+                                 * {"done": [{"acc": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "stasus": "added",
+                                 *      "curr_in": {"abbrev": "COMPU", "id": 10}, "curr_out": {"abbrev": "BTC", "id": 3},
+                                 *      "amount_in": 0.0065, "created": "2019-07-20 09:33:29", "confitmations": 1,
+                                 *      "status_mess": "2.426e-05", "txid": "3Bwqtmdu58Jn4pMo4558LTUasFdQ2wBwzuy78a4HgpjERiYTekJGHXzkhNxnLDdKh3Q2CW4amt1JAdTthNosfJVu"}
+                                 *      ],
+                                 * "deal_acc": {"payed_month": 0.02621535, "gift_pick": 2.6e-06,
+                                 * "name": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "price": 0.0,
+                                 * "payed": 0.02621535, "to_pay": 0.00028671, "gift_payed": 8.02e-06,
+                                 * "message": "<div class=\"row\"><div class=\"col-sm-12\" style=\"\"><h3>Congratulations! You have a gift <b>1.821e-05</b> <i class=\"fa fa-rub\" style=\"color:chartreuse;\"></i></h3>Use the gift code to receive more gifts. Gift code can be taken from our partners.<br />The probability to get <b>2.6e-06</b> them in the following payment is: <b>1</b>. You've already got 8.02e-06</div></div><div class=\"row\"><div class=\"col-sm-12\" style=\"\"><h4>\u0412\u0430\u0448\u0430 \u043f\u0435\u0440\u0435\u043f\u043b\u0430\u0442\u0430 <b>0.00028671 <i class=\"fa fa-rub\"\"></i></b> <small style=\"color:white\">\u041e\u043d\u0430 \u0431\u0443\u0434\u0435\u0442 \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0430 \u043a \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c\u0443 \u043f\u043b\u0430\u0442\u0435\u0436\u0443</small></h4></div></div>", "curr_out_id": 3, "id": 108, "gift_amount": 1.821e-05}, "in_process": [], "deal": {"MAX": 0.0, "name": "to COIN", "id": 2}, "unconfirmed": []}
+                                 */
+
+                                String txURL;
+                                txURL = "http://" + Settings.getInstance().getBlockexplorerURL()
+                                        + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                        + "?tx=";
+
                                 resultText += json.get("created") + " - " + json.get("amount_in") + " " + curr_in.get("abbrev")
-                                        + " <span style='font-size:0.8em'>" + json.get("txid").toString().substring(0, 10) + "...</span>"
-                                        + " :: " + curr_out.get("abbrev") + " <b>[" + json.get("stasus") + "]</b>";
+                                        + " <a href='" + txURL + json.get("txid").toString() + "'>(TX)</a>"
+                                        //+ " &#9654; "
+                                        + " &#10144; ";
 
                                 if (json.containsKey("status_mess")) {
-                                    resultText += "<b>" + json.get("status_mess").toString() + "</b>";
+                                    resultText += " <b>" + json.get("status_mess").toString() + "</b>";
                                 }
+                                resultText += " " + curr_out.get("abbrev") + " " + json.get("stasus");
                             }
 
                         } catch (Exception e) {

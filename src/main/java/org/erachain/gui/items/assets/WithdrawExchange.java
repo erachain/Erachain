@@ -5,18 +5,25 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
+import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
+import org.erachain.utils.URLViewer;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.Style;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
@@ -334,8 +342,8 @@ public class WithdrawExchange extends JPanel {
         add(jLabel_Adress_Check, gridBagConstraints);
 
         //////////////////////////
-
-        JLabel jText_History = new JLabel();
+        JEditorPane jText_History = new JEditorPane();
+        jText_History.setBackground(this.getBackground());
 
         gridy += 2;
 
@@ -354,6 +362,27 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
         add(jButton_ShowForm, gridBagConstraints);
+
+        jText_History.setContentType("text/html");
+        jText_History.setEditable(false);
+
+        jText_History.addHyperlinkListener(new HyperlinkListener() {
+
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent arg0) {
+                // TODO Auto-generated method stub
+                HyperlinkEvent.EventType type = arg0.getEventType();
+                if (type != HyperlinkEvent.EventType.ACTIVATED)
+                    return;
+
+                try {
+                    URLViewer.openWebpage(new URL(arg0.getDescription()));
+                } catch (MalformedURLException e1) {
+                    LOGGER.error(e1.getMessage(), e1);
+                }
+
+            }
+        });
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
