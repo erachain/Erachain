@@ -318,20 +318,18 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        // gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-        gridBagConstraints.insets = new Insets(21, 27, 0, 0);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jLabel_Asset, gridBagConstraints);
 
-        GridBagConstraints favoritesGBC = new GridBagConstraints();
-        favoritesGBC.insets = new Insets(21, 0, 0, 13);
-        favoritesGBC.fill = GridBagConstraints.HORIZONTAL;
-        favoritesGBC.anchor = GridBagConstraints.LINE_END;
-        favoritesGBC.gridwidth = 3;
-        favoritesGBC.gridx = 2;
-        favoritesGBC.gridy = gridy;
-
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
-        this.add(cbxAssets, favoritesGBC);
+        this.add(cbxAssets, gridBagConstraints);
 
         JLabel detailsHead = new JLabel();
 
@@ -376,8 +374,6 @@ public class DepositExchange extends JPanel {
 
         //////////////// BUTTONS
 
-        gridy += 3;
-
         jButton_getDetails = new MButton(Lang.getInstance().translate("Get Payment Details"), 2);
         jButton_getDetails.setToolTipText("");
         jButton_getDetails.addActionListener(new ActionListener() {
@@ -394,16 +390,16 @@ public class DepositExchange extends JPanel {
         });
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
-        gridBagConstraints.insets = new Insets(1, 0, 29, 0);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jButton_getDetails, gridBagConstraints);
 
         ////////////// DETAILS
-        gridy += 3;
-
+        gridy += 1;
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -448,7 +444,7 @@ public class DepositExchange extends JPanel {
         JTextPane jText_History = new JTextPane();
         //jText_History.setStyledDocument(styleDocument);
 
-        gridy += 3;
+        gridy += 1;
 
         jButtonHistory = new MButton(Lang.getInstance().translate("See Deposit History"), 2);
         jButtonHistory.addActionListener(new ActionListener() {
@@ -459,7 +455,6 @@ public class DepositExchange extends JPanel {
 
             }
         });
-
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -673,28 +668,44 @@ public class DepositExchange extends JPanel {
 
                                 JSONObject pay_out = (JSONObject) json.get("pay_out");
 
-                                String txURL;
-                                txURL = "http://" + Settings.getInstance().getBlockexplorerURL()
+                                if (isWithdraw) {
+                                    txURLin = "http://" + Settings.getInstance().getBlockexplorerURL()
                                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
                                             + "?tx=";
 
-                                resultText += amount_in + " " + curr_in.get("abbrev")
-                                        + " <a href='" + txURL + json.get("txid").toString() + "'>(TX)</a>";
+                                    if (curr_out.get("abbrev").equals("BTC")) {
+                                        txURLout = "https://www.blockchain.com/ru/btc/tx/";
+                                    } else if (curr_out.get("abbrev").equals("BTC")) {
+                                        txURLout = "https://www.blockchain.com/ru/eth/tx/";
+                                    } else {
+                                        txURLout = "";
+                                    }
 
-                                if (curr_out.get("abbrev").equals("BTC")) {
-                                    txURL = "https://www.blockchain.com/ru/btc/tx/";
-                                } else if (curr_out.get("abbrev").equals("BTC")) {
-                                    txURL = "https://www.blockchain.com/ru/eth/tx/";
                                 } else {
-                                    txURL = "";
+                                    if (curr_in.get("abbrev").equals("BTC")) {
+                                        txURLin = "https://www.blockchain.com/ru/btc/tx/";
+                                    } else if (curr_in.get("abbrev").equals("BTC")) {
+                                        txURLin = "https://www.blockchain.com/ru/eth/tx/";
+                                    } else {
+                                        txURLin = "";
+                                    }
+
+                                    txURLout = "http://" + Settings.getInstance().getBlockexplorerURL()
+                                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                            + "?tx=";
+
                                 }
+
+                                resultText += amount_in + " " + curr_in.get("abbrev")
+                                        + " <a href='" + txURLin + json.get("txid").toString() + "'>(TX)</a>";
+
 
                                 resultText +=
                                         //+ " &#9654; "
                                          " &#10144; "
                                         + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
                                         + " - " + pay_out.get("created_on")
-                                        + " <a href='" + txURL + pay_out.get("txid").toString() + "'>(TX)</a>"
+                                        + " <a href='" + txURLout + pay_out.get("txid").toString() + "'>(TX)</a>"
                                 ;
                             } else if (json.containsKey("stasus")) {
                                 /** есди выплаты не было и платеж со статусом ожидания и т.д.
