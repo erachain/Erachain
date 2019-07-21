@@ -446,6 +446,7 @@ public class DepositExchange extends JPanel {
 
         //////////////////////////
         JTextPane jText_History = new JTextPane();
+        //jText_History.setStyledDocument(styleDocument);
 
         gridy += 3;
 
@@ -471,6 +472,8 @@ public class DepositExchange extends JPanel {
 
         jText_History.setContentType("text/html");
         jText_History.setEditable(false);
+        jText_History.setBackground(UIManager.getColor("Panel.background"));
+        // не пашет - надо внутри ручками в тексте jText_History.setFont(UIManager.getFont("Label.font"));
 
         jText_History.addHyperlinkListener(new HyperlinkListener() {
 
@@ -507,7 +510,10 @@ public class DepositExchange extends JPanel {
         // [TOKEN]/[ADDRESS]
         String urlGetDetails = "https://api.face2face.cash/apipay/history.json/";
 
-        if (asset == null) {
+        String txURLin;
+        String txURLout;
+        boolean isWithdraw = asset == null;
+        if (isWithdraw) {
             // значит это биткоин как стандарт вывода
             urlGetDetails += "BTC/";
         } else {
@@ -578,7 +584,12 @@ public class DepositExchange extends JPanel {
                     tip.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
                 }
 
-                String resultText = "<html>";
+                //String color = "#" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB()).substring(2);
+                String resultText = "<body style='font-family:" + UIManager.getFont("Label.font").getFamily()
+                        + "; font-size: " + UIManager.getFont("Label.font").getSize() + "pt;"
+                        //+ "background:" + color
+                        + "'>";
+                //String resultText = "<body>";
 
                 JSONObject deal_acc = (JSONObject) jsonObject.get("deal_acc");
                 BigDecimal to_pay = new BigDecimal(deal_acc.get("to_pay").toString());
@@ -725,7 +736,6 @@ public class DepositExchange extends JPanel {
                 if (unconfirmed.isEmpty() && in_process.isEmpty() && done.isEmpty()) {
                     resultText += "<h3>" + Lang.getInstance().translate("Not Found") + "</h3>";
                 }
-                resultText += "</html>";
                 return resultText;
 
             } else {

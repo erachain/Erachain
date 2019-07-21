@@ -343,7 +343,11 @@ public class WithdrawExchange extends JPanel {
 
         //////////////////////////
         JEditorPane jText_History = new JEditorPane();
-        jText_History.setBackground(this.getBackground());
+        jText_History.setContentType("text/html");
+        jText_History.setEditable(false);
+
+        jText_History.setBackground(UIManager.getColor("Panel.background"));
+        // не пашет - надо внутри ручками в тексте jText_History.setFont(UIManager.getFont("Label.font"));
 
         gridy += 2;
 
@@ -363,8 +367,6 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
         add(jButton_ShowForm, gridBagConstraints);
 
-        jText_History.setContentType("text/html");
-        jText_History.setEditable(false);
 
         jText_History.addHyperlinkListener(new HyperlinkListener() {
 
@@ -388,7 +390,7 @@ public class WithdrawExchange extends JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.weightx = 0;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.LINE_START;
         gridBagConstraints.insets = new Insets(0, 0, 0, 0);
