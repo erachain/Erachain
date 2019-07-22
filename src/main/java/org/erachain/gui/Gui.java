@@ -79,7 +79,6 @@ public class Gui extends JFrame {
 
         //DEFAULT SORT DESCENDING
         rowSorter.toggleSortOrder(defaultSort);
-        rowSorter.toggleSortOrder(defaultSort);
 
         //ADD TO TABLE
         table.setRowSorter(rowSorter);
