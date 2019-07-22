@@ -742,7 +742,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> implements Fil
 
     public Transaction getRecord(String refStr) {
         try {
-            String[] strA = refStr.split("\\-");
+            String[] strA = refStr. split("\\-");
             int height = Integer.parseInt(strA[0]);
             int seq = Integer.parseInt(strA[1]);
 

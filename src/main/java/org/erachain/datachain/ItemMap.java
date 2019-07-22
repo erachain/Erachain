@@ -299,7 +299,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
     public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
         String filterLower = filter.toLowerCase();
-        String[] filterArray = filterLower.split(" ");
+        String[] filterArray = filterLower.split(DCSet.SPLIT_CHARS);
 
         Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
         if (result.getA() > 0) {
