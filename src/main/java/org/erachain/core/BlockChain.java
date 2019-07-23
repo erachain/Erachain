@@ -34,7 +34,7 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
     public static final boolean HARD_WORK = false;
     public static final int BLOCK_COUNT = 0; ////
     static public boolean TEST_DB_TXS_OFF = false;
@@ -970,7 +970,7 @@ public class BlockChain {
     public void updateTXProcessTimingAverage(long processTiming, int counter) {
         if (processTiming < 999999999999l) {
             // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
+            // в микросекундах подсчет делаем
             processTiming = processTiming / 1000 / (Controller.BLOCK_AS_TX_COUNT + counter);
             if (transactionProcessTimingCounter < 1 << 5) {
                 transactionProcessTimingCounter++;

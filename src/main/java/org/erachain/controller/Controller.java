@@ -360,12 +360,54 @@ public class Controller extends Observable {
         jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
         jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
         jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
-        jsonObj.put("msgTimingAvrg", cnt.getInstance().network.telegramer.messageTimingAverage);
-        jsonObj.put("unconfMsgTimingAvrg", cnt.getInstance().getUnconfigmedMessageTimingAverage());
-        jsonObj.put("transactionWinnedTimingAvrg", cnt.getInstance().getBlockChain().transactionWinnedTimingAverage);
-        jsonObj.put("transactionMakeTimingAvrg", cnt.getInstance().getTransactionMakeTimingAverage());
-        jsonObj.put("transactionValidateTimingAvrg", cnt.getInstance().getBlockChain().transactionValidateTimingAverage);
-        jsonObj.put("transactionProcessTimingAvrg", cnt.getInstance().getBlockChain().transactionProcessTimingAverage);
+
+        long timing = cnt.getInstance().network.telegramer.messageTimingAverage;
+        if (timing > 0) {
+            timing = 1000000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("msgTimingAvrg", timing);
+
+        timing = cnt.getInstance().getUnconfigmedMessageTimingAverage();
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("unconfMsgTimingAvrg", timing);
+
+        timing = cnt.getInstance().getBlockChain().transactionWinnedTimingAverage;
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("transactionWinnedTimingAvrg", timing);
+
+        timing = cnt.getInstance().getTransactionMakeTimingAverage();
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("transactionMakeTimingAvrg", timing);
+
+        timing = cnt.getInstance().getBlockChain().transactionValidateTimingAverage;
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("transactionValidateTimingAvrg", timing);
+
+        timing = cnt.getInstance().getBlockChain().transactionProcessTimingAverage;
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("transactionProcessTimingAvrg", timing);
 
         return jsonObj;
     }
