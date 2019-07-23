@@ -140,6 +140,7 @@ public class API {
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
         help.put("GET info by node", " GET api/info");
+        help.put("GET benchmark info by node", " GET api/bench");
 
         help.put("POST Broadcast", "/broadcast JSON {raw=raw(BASE58)}");
         help.put("GET Broadcast", "/broadcast/{raw(BASE58)}");
