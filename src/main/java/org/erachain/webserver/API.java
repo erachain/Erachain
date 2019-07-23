@@ -710,6 +710,19 @@ public class API {
 
     }
 
+    @POST
+    @Path("broadcast")
+    public Response broadcastFromRawPost(@Context HttpServletRequest request,
+                                         String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .build();
+
+    }
+
     // http://127.0.0.1:9047/api/broadcast?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
     public JSONObject broadcastFromRaw_1(String rawDataBase58) {
         int step = 1;
@@ -1771,6 +1784,12 @@ public class API {
      * ************* TOOLS **************
      */
 
+    /**
+     * wiury2876rw7yer8923y63riyrf9287y6r87wyr9737yriwuyr3yr978ry48732y3rsiouyvbkshefiuweyriuwer
+     * {"trtr": 293847}
+     * @param x
+     * @return
+     */
     @POST
     @Path("verifysignature")
     public Response verifysignature(String x) {
