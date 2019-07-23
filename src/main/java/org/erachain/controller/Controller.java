@@ -356,7 +356,7 @@ public class Controller extends Observable {
 
         jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
         jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
-        jsonObj.put("activePeersCounter", cnt.getInstance().network.getKnownPeers());
+        jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false));
         jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
         jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
         jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
