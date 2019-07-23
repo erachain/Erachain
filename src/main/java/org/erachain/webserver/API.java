@@ -696,7 +696,7 @@ public class API {
     }
 
     @POST
-    @Path("broadcast")
+    @Path("broadcastjson")
     public Response broadcastFromRawPost(@Context HttpServletRequest request,
                                          MultivaluedMap<String, String> form) {
 
@@ -803,7 +803,7 @@ public class API {
     }
 
     @POST
-    @Path("broadcasttelegram")
+    @Path("broadcasttelegramjson")
     public Response broadcastTelegramPost(@Context HttpServletRequest request,
                                           MultivaluedMap<String, String> form) {
 
@@ -833,6 +833,7 @@ public class API {
     /*
      * ********** ADDRESS **********
      */
+    // TODO перименовать бы LastTimestamp - так более понятно
     @GET
     @Path("addresslastreference/{address}")
     public Response getAddressLastReference(@PathParam("address") String address) {
