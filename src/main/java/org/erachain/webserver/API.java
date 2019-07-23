@@ -1884,4 +1884,11 @@ public class API {
                 .entity(jsonObject.toJSONString())
                 .build();
     }
+
+    @GET
+    @Path("bench")
+    public String getSpeedInfo() {
+        return Controller.getInstance().getBenchmarks().toJSONString();
+    }
+
 }

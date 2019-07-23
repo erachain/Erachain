@@ -55,6 +55,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -346,6 +347,27 @@ public class Controller extends Observable {
 
     public void setTransactionMakeTimingAverage(long transactionMakeTimingAverage) {
         this.transactionMakeTimingAverage = transactionMakeTimingAverage;
+    }
+
+    public JSONObject getBenchmarks() {
+
+        JSONObject jsonObj = new JSONObject();
+        Controller cnt = Controller.getInstance();
+
+        jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
+        jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
+        jsonObj.put("activePeersCounter", cnt.getInstance().network.getKnownPeers());
+        jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
+        jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
+        jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
+        jsonObj.put("msgTimingAvrg", cnt.getInstance().network.telegramer.messageTimingAverage);
+        jsonObj.put("unconfMsgTimingAvrg", cnt.getInstance().getUnconfigmedMessageTimingAverage());
+        jsonObj.put("transactionWinnedTimingAvrg", cnt.getInstance().getBlockChain().transactionWinnedTimingAverage);
+        jsonObj.put("transactionMakeTimingAvrg", cnt.getInstance().getTransactionMakeTimingAverage());
+        jsonObj.put("transactionValidateTimingAvrg", cnt.getInstance().getBlockChain().transactionValidateTimingAverage);
+        jsonObj.put("transactionProcessTimingAvrg", cnt.getInstance().getBlockChain().transactionProcessTimingAverage);
+
+        return jsonObj;
     }
 
 

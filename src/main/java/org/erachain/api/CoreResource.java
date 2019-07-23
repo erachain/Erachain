@@ -131,27 +131,7 @@ public class CoreResource {
     @GET
     @Path("/info/speed")
     public String getSpeedInfo() {
-        JSONObject jsonObj = new JSONObject();
-        Controller cnt = Controller.getInstance();
-
-        if (BlockChain.DEVELOP_USE) {
-            jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
-            jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
-            jsonObj.put("activePeersCounter", cnt.getInstance().network.getKnownPeers());
-            jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
-            jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
-            jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
-            jsonObj.put("msgTimingAvrg", cnt.getInstance().network.telegramer.messageTimingAverage);
-            jsonObj.put("unconfMsgTimingAvrg", cnt.getInstance().getUnconfigmedMessageTimingAverage());
-            jsonObj.put("transactionWinnedTimingAvrg", cnt.getInstance().getBlockChain().transactionWinnedTimingAverage);
-            jsonObj.put("transactionMakeTimingAvrg", cnt.getInstance().getTransactionMakeTimingAverage());
-            jsonObj.put("transactionValidateTimingAvrg", cnt.getInstance().getBlockChain().transactionValidateTimingAverage);
-            jsonObj.put("transactionProcessTimingAvrg", cnt.getInstance().getBlockChain().transactionProcessTimingAverage);
-        }
-        else {
-            jsonObj.put("null", "null");
-        }
-        return jsonObj.toJSONString();
+        return Controller.getInstance().getBenchmarks().toJSONString();
     }
 
 }
