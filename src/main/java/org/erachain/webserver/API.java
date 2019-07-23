@@ -817,6 +817,19 @@ public class API {
 
     }
 
+    @POST
+    @Path("broadcasttelegram")
+    public Response broadcastTelegramPost(@Context HttpServletRequest request,
+                                          String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .build();
+
+    }
+
     /*
      * ********** ADDRESS **********
      */
