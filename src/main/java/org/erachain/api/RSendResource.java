@@ -360,7 +360,7 @@ public class RSendResource {
 
                     Transaction transaction = cnt.r_Send(creator,
                             0, recipient,
-                            2l, null, "Safe-Pay " + ++counter,
+                            2l, null, "Safe-Pay " + counter,
                             "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
                             new byte[]{(byte) 1});
 
@@ -373,8 +373,11 @@ public class RSendResource {
 
 
                     // CHECK VALIDATE MESSAGE
-                    if (result != Transaction.VALIDATE_OK) {
+                    if (result == Transaction.VALIDATE_OK) {
 
+                        counter++;
+
+                    } else {
                         if (result == Transaction.RECEIVER_NOT_PERSONALIZED
                                 || result == Transaction.CREATOR_NOT_PERSONALIZED
                                 || result == Transaction.NO_BALANCE
@@ -382,8 +385,9 @@ public class RSendResource {
                                 || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
 
                             try {
-                                Thread.sleep(10);
+                                Thread.sleep(1);
                             } catch (InterruptedException e) {
+                                break;
                             }
 
                             continue;
@@ -393,6 +397,7 @@ public class RSendResource {
                         try {
                             Thread.sleep(10000);
                         } catch (InterruptedException e) {
+                            break;
                         }
                         continue;
                     }
