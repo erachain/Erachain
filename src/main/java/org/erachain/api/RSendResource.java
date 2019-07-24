@@ -324,6 +324,11 @@ public class RSendResource {
         // CACHE private keys
         test1Creators = Controller.getInstance().getPrivateKeyAccounts();
 
+        // запомним счетчики для счетов
+        HashMap<String, Long> counters = new HashMap<String, Long>();
+        for (Account crestor: test1Creators) {
+            counters.put(crestor.getAddress(), 0L);
+        }
 
         JSONObject out = new JSONObject();
 
@@ -337,8 +342,6 @@ public class RSendResource {
 
             Random random = new Random();
             Controller cnt = Controller.getInstance();
-
-            int counter = 0;
 
             do {
 
@@ -358,10 +361,12 @@ public class RSendResource {
                     } while (recipient.equals(creator));
 
 
+                    String address = creator.getAddress();
+                    long counter = counters.get(address);
                     Transaction transaction = cnt.r_Send(creator,
                             0, recipient,
-                            2l, null, "Safe-Pay " + counter,
-                            "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                            2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
+                            (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
                             new byte[]{(byte) 1});
 
                     if (cnt.isOnStopping())
@@ -375,7 +380,7 @@ public class RSendResource {
                     // CHECK VALIDATE MESSAGE
                     if (result == Transaction.VALIDATE_OK) {
 
-                        counter++;
+                        counters.put(address, counter + 1);
 
                     } else {
                         if (result == Transaction.RECEIVER_NOT_PERSONALIZED
