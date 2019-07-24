@@ -695,43 +695,56 @@ public class Account {
     }
 
     public Long getLastTimestamp(DCSet dcSet) {
-        return dcSet.getReferenceMap().getLast(this.getAddress());
+        return dcSet.getReferenceMap().get(shortBytes);
     }
 
     public void setLastTimestamp(Long timestamp, DCSet dcSet) {
-        byte[] key = Base58.decode(this.getAddress());
+
+        if (this.equals("74sb8eigg9rsouDRU6dFv3fLmHoPmDJHSg")) {
+            int error = 1;
+        }
+
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET CURRENT REFERENCE
-        Long reference = map.get(key);
+        Long reference = map.get(shortBytes);
 
-        // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(key, Longs.toByteArray(timestamp));
+        if (reference != null) {
+            // MAKE KEY for this TIMESTAMP
+            byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
 
-        // set NEW LAST TIMESTAMP as REFERENCE
-        map.set(keyTimestamp, reference);
+            // set NEW LAST TIMESTAMP as REFERENCE
+            map.set(keyTimestamp, reference);
+
+        }
 
         // SET NEW REFERENCE
-        map.set(key, timestamp);
+        map.set(shortBytes, timestamp);
     }
 
     public void removeLastTimestamp(DCSet dcSet) {
-        byte[] key = Base58.decode(this.getAddress());
+
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET LAST TIMESTAMP
-        Long timestamp = map.get(key);
+        Long timestamp = map.get(shortBytes);
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(key, Longs.toByteArray(timestamp));
+        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
 
         // GET REFERENCE
-        Long reference = map.get(keyTimestamp);
-
         // DELETE TIMESTAMP - REFERENCE
-        map.delete(keyTimestamp);
-        // SET OLD REFERENCE
-        map.set(key, reference);
+        Long reference = map.delete(keyTimestamp);
+
+        if (reference != null) {
+
+            if (this.equals("74sb8eigg9rsouDRU6dFv3fLmHoPmDJHSg") && reference < 1563956101781L + 1000) {
+                int error = 1;
+            }
+
+            // SET OLD REFERENCE
+            map.set(shortBytes, reference);
+        }
     }
 
     // TOSTRING

@@ -53,20 +53,4 @@ public class ReferenceMap extends DCMap<byte[], Long> {
         return 0L;
     }
 
-    public Long get(String address, Long timestamp) {
-        return get(Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp)));
-    }
-
-    public void set(String address, Long timestamp, Long reference) {
-        set(Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp)), reference);
-    }
-
-    public void delete(String address, Long timestamp) {
-        delete(Bytes.concat(Base58.decode(address), Longs.toByteArray(timestamp)));
-    }
-
-    public Long getLast(String address) {
-        return get(Base58.decode(address));
-    }
-
 }

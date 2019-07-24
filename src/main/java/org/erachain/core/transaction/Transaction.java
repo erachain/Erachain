@@ -92,6 +92,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_WALLET_ADDRESS = 3;
     public static final int INVALID_MAKER_ADDRESS = 5;
     public static final int INVALID_REFERENCE = 6;
+    /**
+     * Если откат был в ДЕВЕЛОПе и в этом блоке была первая транзакция то потом откат
+     */
     public static final int INVALID_TIMESTAMP = 7;
     public static final int INVALID_ADDRESS = 8;
     public static final int INVALID_FEE_POWER = 9;
