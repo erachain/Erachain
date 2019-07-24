@@ -56,10 +56,6 @@ public class Account {
     Tuple2<Integer, PersonCls> person;
     int viewBalancePosition = 0;
 
-    protected Account() {
-        // this.generatingBalance = 0l;
-    }
-
     public Account(String address) {
 
         // ///test address
@@ -700,23 +696,16 @@ public class Account {
 
     public void setLastTimestamp(Long timestamp, DCSet dcSet) {
 
-        if (this.equals("74sb8eigg9rsouDRU6dFv3fLmHoPmDJHSg")) {
-            int error = 1;
-        }
-
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET CURRENT REFERENCE
         Long reference = map.get(shortBytes);
 
-        if (reference != null) {
-            // MAKE KEY for this TIMESTAMP
-            byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
+        // MAKE KEY for this TIMESTAMP
+        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
 
-            // set NEW LAST TIMESTAMP as REFERENCE
-            map.set(keyTimestamp, reference);
-
-        }
+        // set NEW LAST TIMESTAMP as REFERENCE
+        map.set(keyTimestamp, reference);
 
         // SET NEW REFERENCE
         map.set(shortBytes, timestamp);
@@ -729,22 +718,20 @@ public class Account {
         // GET LAST TIMESTAMP
         Long timestamp = map.get(shortBytes);
 
+        if (timestamp == null)
+            timestamp = 0L;
+
         // MAKE KEY for this TIMESTAMP
         byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
 
         // GET REFERENCE
         // DELETE TIMESTAMP - REFERENCE
         Long reference = map.delete(keyTimestamp);
+        if (reference == null)
+            reference = 0L;
 
-        if (reference != null) {
-
-            if (this.equals("74sb8eigg9rsouDRU6dFv3fLmHoPmDJHSg") && reference < 1563956101781L + 1000) {
-                int error = 1;
-            }
-
-            // SET OLD REFERENCE
-            map.set(shortBytes, reference);
-        }
+        // SET OLD REFERENCE
+        map.set(shortBytes, reference);
     }
 
     // TOSTRING
