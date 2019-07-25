@@ -474,9 +474,7 @@ public class Block implements ExplorerJsonLine {
             //MAKE TRANSACTIONS HASH
             for (Transaction transaction : transactions) {
                 data = Bytes.concat(data, transaction.getSignature());
-                transaction = null;
             }
-            transactions = null;
 
         }
 

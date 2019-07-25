@@ -522,7 +522,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     @Override
     public void run() {
 
-        TransactionMap transactionsMap = dcSet.getTransactionMap();
+        //TransactionMap transactionsMap = dcSet.getTransactionMap();
 
         int heapOverflowCount = 0;
 
