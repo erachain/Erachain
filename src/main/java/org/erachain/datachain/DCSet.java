@@ -346,9 +346,13 @@ public class DCSet extends DBASet implements Observer {
      * @throws Exception
      */
 
-    public static DCSet getInstance(boolean withObserver, boolean dynamicGUI) throws Exception {
+    public static DCSet getInstance(boolean withObserver, boolean dynamicGUI, boolean inMemory) throws Exception {
         if (instance == null) {
-            reCreateDB(withObserver, dynamicGUI);
+            if (inMemory) {
+                reCreateDBinMEmory(withObserver, dynamicGUI);
+            } else {
+                reCreateDB(withObserver, dynamicGUI);
+            }
         }
 
         return instance;
@@ -432,11 +436,21 @@ public class DCSet extends DBASet implements Observer {
 
     }
 
-    /**
-     * make data set in memory. For tests
-     *
-     * @return
-     */
+    public static void reCreateDBinMEmory(boolean withObserver, boolean dynamicGUI) {
+        DB database = DBMaker
+                .newMemoryDB()
+                //.newMemoryDirectDB()
+                .make();
+
+        instance = new DCSet(null, database, withObserver, dynamicGUI, true);
+
+    }
+
+        /**
+         * make data set in memory. For tests
+         *
+         * @return
+         */
     public static DCSet createEmptyDatabaseSet() {
         DB database = DBMaker
                 .newMemoryDB()

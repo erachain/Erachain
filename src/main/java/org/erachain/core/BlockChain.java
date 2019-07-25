@@ -487,7 +487,7 @@ public class BlockChain {
 
                 try {
                     dcSet.close();
-                    dcSet = Controller.getInstance().reCreateDC();
+                    dcSet = Controller.getInstance().reCreateDC(Controller.getInstance().inMemoryDC);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                     Controller.getInstance().stopAll(6);

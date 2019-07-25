@@ -178,6 +178,7 @@ public class Controller extends Observable {
     public boolean noUseWallet;
     public boolean noDataWallet;
     public boolean onlyProtocolIndexing;
+    public boolean inMemoryDC;
 
     public static String getVersion() {
         return version;
@@ -645,7 +646,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
             LOGGER.info("Try Open DataChain");
-            this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI);
+            this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
             LOGGER.info("DataChain OK");
@@ -655,7 +656,7 @@ public class Controller extends Observable {
             LOGGER.error(e.getMessage(), e);
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
             try {
-                reCreateDC();
+                reCreateDC(inMemoryDC);
             } catch (Throwable e1) {
                 stopAll(5);
             }
@@ -689,7 +690,7 @@ public class Controller extends Observable {
                 LOGGER.error(e.getMessage(), e);
             }
             try {
-                reCreateDC();
+                reCreateDC(inMemoryDC);
             } catch (Throwable e) {
                 stopAll(5);
             }
@@ -874,34 +875,41 @@ public class Controller extends Observable {
         this.wallet.replaseFavoriteItems(type);
     }
 
-    public DCSet reCreateDC() throws IOException, Exception {
-        File dataChain = new File(Settings.getInstance().getDataDir());
-        File dataChainBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
-                + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
-        // del datachain
-        if (dataChain.exists()) {
-            try {
-                Files.walkFileTree(dataChain.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
+    public DCSet reCreateDC(boolean inMemory) throws IOException, Exception {
+
+        if (inMemory) {
+            DCSet.reCreateDBinMEmory(this.dcSetWithObserver, this.dynamicGUI);
+        } else {
+            File dataChain = new File(Settings.getInstance().getDataDir());
+            File dataChainBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
+                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+            // del datachain
+            if (dataChain.exists()) {
+                try {
+                    Files.walkFileTree(dataChain.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
-        }
-        // copy Back dir to DataChain
-        if (dataChainBackUp.exists()) {
+            // copy Back dir to DataChain
+            if (dataChainBackUp.exists()) {
 
-            try {
-                FileUtils.copyDirectory(dataChainBackUp, dataChain);
-                LOGGER.info("Restore BackUp/DataChain to DataChain is Ok");
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
+                try {
+                    FileUtils.copyDirectory(dataChainBackUp, dataChain);
+                    LOGGER.info("Restore BackUp/DataChain to DataChain is Ok");
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+
             }
 
-        }
+            DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
 
-        DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
+        }
         this.dcSet = DCSet.getInstance();
         return this.dcSet;
     }
+
 
     // recreate DB locate
     public DLSet reCreateDB() throws IOException, Exception {
@@ -3388,6 +3396,11 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.toLowerCase().equals("-inmemory")) {
+                inMemoryDC = true;
+                continue;
+            }
+
             if (arg.equals("-backup")) {
                 // backUP data
                 backUP = true;
@@ -3435,6 +3448,9 @@ public class Controller extends Observable {
 
         if (onlyProtocolIndexing)
             LOGGER.info("-only protocol indexing");
+
+        if (inMemoryDC)
+            LOGGER.info("-in Memory DC");
 
         if (noDataWallet)
             LOGGER.info("-no data wallet");
