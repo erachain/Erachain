@@ -122,6 +122,76 @@ public abstract class PollCls extends ItemCls {
         return votes;
     }
 
+    /**
+     * список всех персон голосующих
+     * @param dcSet
+     * @return
+     */
+    public List<Pair<Account, Integer>> getPersonVotes(DCSet dcSet) {
+        List<Pair<Account, Integer>> votes = new ArrayList<Pair<Account, Integer>>();
+
+        VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
+        NavigableSet<Tuple3> optionVoteKeys;
+        Pair<Account, Integer> vote;
+        Account voter;
+
+        optionVoteKeys = map.getVotes(this.key);
+        for (Tuple3<Long, Integer, BigInteger> key : optionVoteKeys) {
+            voter = Account.makeAccountFromShort(key.c);
+            if (voter.isPerson(dcSet, 0)) {
+                vote = new Pair<Account, Integer>(voter, key.b);
+                votes.add(vote);
+            }
+        }
+
+        return votes;
+    }
+
+    public List<Long> getPersonCountVotes(DCSet dcSet) {
+        List<Long> votes = new ArrayList<>();
+
+        VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
+        NavigableSet<Tuple3> optionVoteKeys;
+        Pair<Account, Integer> vote;
+        Account voter;
+
+        optionVoteKeys = map.getVotes(this.key);
+        for (Tuple3<Long, Integer, BigInteger> key : optionVoteKeys) {
+            voter = Account.makeAccountFromShort(key.c);
+            Integer optionNo = key.b;
+            if (voter.isPerson(dcSet, 0)) {
+                Long count = votes.get(optionNo);
+                if (count == null) {
+                    votes.add(optionNo, 0L);
+                } else {
+                    votes.add(optionNo, count + 1L);
+                }
+            }
+        }
+
+        return votes;
+    }
+
+    public long getPersonCountTotalVotes(DCSet dcSet) {
+        long votes = 0L;
+
+        VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
+        NavigableSet<Tuple3> optionVoteKeys;
+        Pair<Account, Integer> vote;
+        Account voter;
+
+        optionVoteKeys = map.getVotes(this.key);
+        for (Tuple3<Long, Integer, BigInteger> key : optionVoteKeys) {
+            voter = Account.makeAccountFromShort(key.c);
+            Integer optionNo = key.b;
+            if (voter.isPerson(dcSet, 0)) {
+                ++votes;
+            }
+        }
+
+        return votes;
+    }
+
     public List<Pair<Account, Integer>> getVotes(DCSet dcSet, List<Account> accounts) {
         List<Pair<Account, Integer>> votes = new ArrayList<Pair<Account, Integer>>();
 

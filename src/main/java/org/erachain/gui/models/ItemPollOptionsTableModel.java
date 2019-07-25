@@ -8,6 +8,7 @@ import org.erachain.utils.NumberAsString;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class ItemPollOptionsTableModel extends AbstractTableModel {
@@ -59,29 +60,28 @@ public class ItemPollOptionsTableModel extends AbstractTableModel {
 
             case COLUMN_PERSONAL_VOTES:
 
-                //return NumberAsString.formatAsString(poll.getVotes(this.asset.getKey(DCSet.getInstance())));
-                return NumberAsString.formatAsString(poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance())));
+                List<Long> personsVotes = this.poll.getPersonCountVotes(DCSet.getInstance());
+                return personsVotes.get(row);
 
             case COLUMN_PERSONAL_PERCENTAGE:
 
-                BigDecimal total = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()));
-                BigDecimal votes = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()), row);
+                long totalPerson = this.poll.getPersonCountTotalVotes(DCSet.getInstance());
+                Long personVotes = this.poll.getPersonCountVotes(DCSet.getInstance()).get(row);
 
-                if (votes.compareTo(BigDecimal.ZERO) == 0) {
+                if (personVotes == 0 || totalPerson == 0) {
                     return "0 %";
                 }
 
-                return votes.divide(total, BigDecimal.ROUND_UP).multiply(BigDecimal.valueOf(100)).toPlainString() + " %";
+                return 100.0 * personVotes / totalPerson + " %";
 
             case COLUMN_VOTES:
 
-                //return NumberAsString.formatAsString(poll.getVotes(this.asset.getKey(DCSet.getInstance())));
                 return NumberAsString.formatAsString(poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance())));
 
             case COLUMN_PERCENTAGE:
 
-                total = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()));
-                votes = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()), row);
+                BigDecimal total = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()));
+                BigDecimal votes = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()), row);
 
                 if (votes.compareTo(BigDecimal.ZERO) == 0) {
                     return "0 %";
