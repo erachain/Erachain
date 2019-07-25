@@ -1041,8 +1041,10 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping message processor")));
 
-        LOGGER.info("Stopping message processor");
-        this.network.stop();
+        if (this.network != null) {
+            LOGGER.info("Stopping message processor");
+            this.network.stop();
+        }
 
 
         if (this.webService != null) {
@@ -1119,11 +1121,13 @@ public class Controller extends Observable {
         LOGGER.info("Closing database");
         this.dcSet.close();
 
-        // CLOSE WALLET
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing wallet")));
-        LOGGER.info("Closing wallet");
-        this.wallet.close();
+        if (this.wallet != null) {
+            // CLOSE WALLET
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing wallet")));
+            LOGGER.info("Closing wallet");
+            this.wallet.close();
+        }
 
         // CLOSE LOCAL
         this.setChanged();
@@ -1131,11 +1135,13 @@ public class Controller extends Observable {
         LOGGER.info("Closing Local database");
         this.dlSet.close();
 
-        // CLOSE telegram
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
-        LOGGER.info("Closing telegram");
-        this.telegramStore.close();
+        if (telegramStore != null) {
+            // CLOSE telegram
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
+            LOGGER.info("Closing telegram");
+            this.telegramStore.close();
+        }
 
         LOGGER.info("Closed.");
         // FORCE CLOSE
