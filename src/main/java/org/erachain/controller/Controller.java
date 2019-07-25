@@ -1306,6 +1306,10 @@ public class Controller extends Observable {
 
     }
 
+    public Synchronizer getSynchronizer() {
+        return synchronizer;
+    }
+
     /**
      * при установке коннекта нельзя сразу пинговать - это тормозит и толку ноль - пинги не проходят
      * а вот после уже передачи неподтвержденных трнзакций - можно пингануть - тогда вроде норм все проходит

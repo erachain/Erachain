@@ -9,6 +9,7 @@ import org.erachain.at.ATController;
 import org.erachain.at.ATException;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.Synchronizer;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -25,6 +26,8 @@ import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
+import org.erachain.utils.APIUtils;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
@@ -1451,7 +1454,29 @@ public class Block implements ExplorerJsonLine {
                 if (cnt.isOnStopping())
                     return false;
 
-                seqNo++; /// (!!)
+                seqNo++;
+
+                if (false) {
+                    /**
+                     * короче какая-то фиггня была - прилетал блок при тестах в котром транзакции были по номерам перепуьаны
+                     * и ХЭШ блока не сходился с расчитываемым тут - как это могло произойти?
+                     * Я ловил где было не совпадение - оно было в 6 на 7 трнзакции в блоке 264590
+                     * потом этот блок откатился ситемой и заново пересобрался и все норм стало
+                     */
+                    String peerIP = Controller.getInstance().getSynchronizer().getPeer().getAddress().getHostName();
+                    String txStr = APIUtils.openUrl(
+                            //"http://138.68.225.51:9047/apirecords/getbynumber/"
+                            "http://" + peerIP + ":" + Settings.getInstance().getWebPort() + "/apirecords/getbynumber/"
+                        + this.heightBlock + "-" + seqNo);
+                    if (txStr == null) {
+                        Long error = null;
+                    }
+                    if (!txStr.contains(transaction.viewSignature())) {
+                        Long error = null;
+                    }
+                    LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
+                            + " good!");
+                }
 
                 if (!transaction.isWiped()) {
 

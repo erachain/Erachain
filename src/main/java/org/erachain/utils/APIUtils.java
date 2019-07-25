@@ -27,7 +27,12 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.*;
 import javax.ws.rs.WebApplicationException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 //import test.org.erachain.records.TestRecTemplate;
 
@@ -37,7 +42,42 @@ public class APIUtils {
 
 
 
+    public static String openUrl(String command) {
 
+        String inputText = null;
+        try {
+            // CREATE CONNECTION
+            URL url = new URL(command);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            // EXECUTE
+            int resCode = connection.getResponseCode();
+
+            //READ RESULT
+            InputStream stream;
+            if (resCode == 400) {
+                stream = connection.getErrorStream();
+            } else {
+                stream = connection.getInputStream();
+            }
+
+            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+            //String result = new BufferedReader(isReader).readLine();
+
+            BufferedReader bufferedReader = new BufferedReader(isReader);
+            String inputLine;
+            inputText = "";
+            while ((inputLine = bufferedReader.readLine()) != null)
+                inputText += inputLine;
+            bufferedReader.close();
+
+        } catch (Exception e) {
+
+        }
+
+        return inputText;
+
+    }
 
     public static String errorMess(int error, String message) {
         return "{ \"error\":" + error + ", \"message\": \"" + message + "\" }";
