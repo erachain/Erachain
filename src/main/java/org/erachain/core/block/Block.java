@@ -566,17 +566,13 @@ public class Block implements ExplorerJsonLine {
         //READ TRANSACTIONS COUNT
         byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
         int transactionCount = Ints.fromByteArray(transactionCountBytes);
-        if (transactionCount < 0 || transactionCount > 20000) {
+        if (transactionCount < 0 || transactionCount > BlockChain.MAX_BLOCK_SIZE) {
             throw new Exception("Block parse - transactionCount error for useHeight[" + useHeight + "] with height:" + height);
         }
         position += TRANSACTIONS_COUNT_LENGTH;
 
         //SET TRANSACTIONDATA
-
         block.setTransactionData(transactionCount, Arrays.copyOfRange(data, position, data.length));
-
-        //SET TRANSACTIONS SIGNATURE
-        // transaction only in raw here - block.makeTransactionsHash();
 
         return block;
     }
@@ -676,35 +672,6 @@ public class Block implements ExplorerJsonLine {
         emittedFee = blockHead.emittedFee;
         //this.transactionCount = blockHead.transactionsCount;
         //this.version = blockHead.version;
-    }
-
-	/*
-	// NEED CALCULATE BEFORE add in BlockMap
-	public void calcHeadMind(DCSet dcSet)
-	{
-		
-		if (this.version == 0) {
-			this.heightBlock = 1;
-			this.forgingValue = BlockChain.GENESIS_WIN_VALUE;
-			this.winValue = BlockChain.GENESIS_WIN_VALUE;
-			this.target = BlockChain.GENESIS_WIN_VALUE;
-
-		} else { 
-			this.parentBlockHead = this.getParent(dcSet);
-			this.heightBlock = this.parentBlockHead.getHeight(dcSet) + 1;
-			//Tuple2<Integer, Integer> forgingPoint = this.creator.getForgingData(dcSet, this.heightBlock);
-			//this.creatorPreviousHeightBlock = forgingPoint.a;
-			this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-			this.winValue = calcWinValue(dcSet);
-			this.target = BlockChain.calcTarget(heightBlock, parentBlockHead.getTarget(), this.winValue);
-		}
-	}
-	*/
-
-    public Tuple5<Integer, byte[], byte[], Integer, byte[]> getHeadFace() {
-
-        return new Tuple5<Integer, byte[], byte[], Integer, byte[]>(
-                this.version, this.creator.getPublicKey(), this.signature, this.transactionCount, this.transactionsHash);
     }
 
     public Block getChild(DCSet db) {
@@ -900,7 +867,6 @@ public class Block implements ExplorerJsonLine {
                     //PARSE TRANSACTION
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
                     Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
-                    ///transaction.setBlock(this, i + 1);
 
                     //ADD TO TRANSACTIONS
                     this.transactions.add(transaction);
@@ -921,6 +887,10 @@ public class Block implements ExplorerJsonLine {
         return this.transactions;
     }
 
+    /**
+     * need only for TESTs
+     * @param transactions
+     */
     public void setTransactions(List<Transaction> transactions) {
         this.setTransactions(transactions, transactions == null ? 0 : transactions.size());
     }
@@ -931,29 +901,6 @@ public class Block implements ExplorerJsonLine {
         //this.atBytes = null;
         if (this.transactionsHash == null)
             this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
-    }
-
-	/*
-	public int getTransactionIndex(byte[] signature)
-	{
-
-		int i = 0;
-
-		for(Transaction transaction: this.getTransactions())
-		{
-			if(Arrays.equals(transaction.getSignature(), signature))
-			{
-				return i;
-			}
-			i++;
-		}
-
-		return -1;
-	}
-	 */
-
-    public void setATBytes(byte[] atBytes) {
-        this.atBytes = atBytes;
     }
 
     public int getTransactionSeq(byte[] signature) {
