@@ -299,10 +299,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 //CHECK IF ENOUGH ROOM
-                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                if (++counter > BlockChain.MAX_BLOCK_SIZE) {
+                    counter--;
+                    break;
+                }
 
-                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTE
-                        || ++counter > BlockChain.MAX_BLOCK_SIZE) {
+                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN) {
                     counter--;
                     break;
                 }
@@ -409,8 +412,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 //CHECK IF ENOUGH ROOM
                 totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
 
-                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTE
-                        || ++counter > BlockChain.MAX_BLOCK_SIZE) {
+                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN
+                        || ++counter > BlockChain.MAX_BLOCK_SIZE_GEN) {
                     counter--;
                     break;
                 }

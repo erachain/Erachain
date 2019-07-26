@@ -64,11 +64,7 @@ public class Block implements ExplorerJsonLine {
     public static final int FEE_LENGTH = 8;
 
     public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
-            //+ GENERATING_BALANCE_LENGTH
             + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
-    public static final int MAX_TRANSACTION_BYTES = BlockChain.MAX_BLOCK_BYTES - BASE_LENGTH;
-    //private static final int AT_FEES_LENGTH = 8;
-    //private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
     static Logger LOGGER = LoggerFactory.getLogger(Block.class.getName());
     /// HEAD of BLOCK ///
@@ -1401,7 +1397,7 @@ public class Block implements ExplorerJsonLine {
 
                 seqNo++;
 
-                if (true) {
+                if (false) {
                     /**
                      * короче какая-то фиггня была - прилетал блок при тестах в котром транзакции были по номерам перепуьаны
                      * и ХЭШ блока не сходился с расчитываемым тут - как это могло произойти?
@@ -1417,7 +1413,7 @@ public class Block implements ExplorerJsonLine {
                         Long error = null;
                         LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
                                 + " NOT FOUND");
-                        break;
+                        //break;
                     } else if (!txStr.contains(transaction.viewSignature())) {
                         Long error = null;
                         LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo

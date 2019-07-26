@@ -195,7 +195,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
         /**
-         * Используется для получения трнзакций для сборки блока
+         * Используется для получения транзакций для сборки блока
          * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
          * @param timestamp
          * @param notSetDCSet
@@ -220,11 +220,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 // мы используем отсортированный индекс, поэтому можно обрывать
                 break;
 
-            if (count++ > BlockChain.MAX_BLOCK_SIZE)
+            if (++count > BlockChain.MAX_BLOCK_SIZE_GEN)
                 break;
 
             bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTE + (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)) {
+            if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN
+                    ///+ (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)
+                    ) {
                 break;
             }
 
