@@ -1592,6 +1592,10 @@ public class Block implements ExplorerJsonLine {
             if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
                 byte[] digest = makeTransactionsHash(creator.getPublicKey(), transactions, null);
 
+                boolean isSigned = isSignatureValid();
+                this.transactionsHash = transactionsSignatures;
+                boolean isSignedCalced = isSignatureValid();
+
                 LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
                 return false;
             }
