@@ -1401,7 +1401,7 @@ public class Block implements ExplorerJsonLine {
 
                 seqNo++;
 
-                if (false) {
+                if (true) {
                     /**
                      * короче какая-то фиггня была - прилетал блок при тестах в котром транзакции были по номерам перепуьаны
                      * и ХЭШ блока не сходился с расчитываемым тут - как это могло произойти?
@@ -1415,12 +1415,18 @@ public class Block implements ExplorerJsonLine {
                         + this.heightBlock + "-" + seqNo);
                     if (txStr == null) {
                         Long error = null;
-                    }
-                    if (!txStr.contains(transaction.viewSignature())) {
+                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
+                                + " NOT FOUND");
+                        break;
+                    } else if (!txStr.contains(transaction.viewSignature())) {
                         Long error = null;
+                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
+                                + " WRONG SIGNATURE");
+                        break;
+                    } else {
+                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
+                                + " good!");
                     }
-                    LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
-                            + " good!");
                 }
 
                 if (!transaction.isWiped()) {
@@ -1584,6 +1590,8 @@ public class Block implements ExplorerJsonLine {
 
             transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
             if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
+                byte[] digest = makeTransactionsHash(creator.getPublicKey(), transactions, null);
+
                 LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
                 return false;
             }
