@@ -36,7 +36,7 @@ import java.util.Observer;
 public class DCSet extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTE << 3;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE << 3;
     private static final int CASH_SIZE = BlockChain.HARD_WORK ? 1024 << 2 : 1024;
 
     private static boolean isStoped = false;

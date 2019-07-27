@@ -18,6 +18,7 @@ import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
@@ -39,7 +40,6 @@ import java.nio.charset.StandardCharsets;
 public class APIUtils {
     
     static Logger LOGGER = LoggerFactory.getLogger(APIUtils.class.getName());
-
 
 
     public static String openUrl(String command) {
@@ -403,5 +403,35 @@ public class APIUtils {
         }
         
     }
-    
+
+    /**
+     * короче какая-то фиггня была - прилетал блок при тестах в котром транзакции были по номерам перепуьаны
+     * и ХЭШ блока не сходился с расчитываемым тут - как это могло произойти?
+     * Я ловил где было не совпадение - оно было в 6 на 7 трнзакции в блоке 264590
+     * потом этот блок откатился ситемой и заново пересобрался и все норм стало
+     */
+    public static boolean testTxSigns(int heightBlock, int seqNo, String signatureStr) {
+            String peerIP = Controller.getInstance().getSynchronizer().getPeer().getAddress().getHostName();
+            String txStr = APIUtils.openUrl(
+                    //"http://138.68.225.51:9047/apirecords/getbynumber/"
+                    "http://" + peerIP + ":" + Settings.getInstance().getWebPort() + "/apirecords/getbynumber/"
+                            + heightBlock + "-" + seqNo);
+            if (txStr == null) {
+                Long error = null;
+                LOGGER.debug(peerIP + " -- " + heightBlock + "-" + seqNo
+                        + " NOT FOUND");
+                //break;
+            } else if (!txStr.contains(signatureStr)) {
+                Long error = null;
+                LOGGER.debug(peerIP + " -- " + heightBlock + "-" + seqNo
+                        + " WRONG SIGNATURE");
+                return false;
+            } else {
+                LOGGER.debug(peerIP + " -- " + heightBlock + "-" + seqNo
+                        + " good!");
+            }
+
+        return true;
+
+    }
 }

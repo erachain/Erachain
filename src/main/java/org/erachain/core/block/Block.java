@@ -64,11 +64,7 @@ public class Block implements ExplorerJsonLine {
     public static final int FEE_LENGTH = 8;
 
     public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
-            //+ GENERATING_BALANCE_LENGTH
             + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
-    public static final int MAX_TRANSACTION_BYTES = BlockChain.MAX_BLOCK_BYTES - BASE_LENGTH;
-    //private static final int AT_FEES_LENGTH = 8;
-    //private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
     static Logger LOGGER = LoggerFactory.getLogger(Block.class.getName());
     /// HEAD of BLOCK ///
@@ -431,7 +427,6 @@ public class Block implements ExplorerJsonLine {
         this.creator = creator;
         this.heightBlock = heightBlock;
 
-        this.transactionCount = transactionCount;
         this.transactionsHash = transactionsHash;
 
         this.signature = signature;
@@ -1401,32 +1396,9 @@ public class Block implements ExplorerJsonLine {
 
                 seqNo++;
 
-                if (false) {
-                    /**
-                     * короче какая-то фиггня была - прилетал блок при тестах в котром транзакции были по номерам перепуьаны
-                     * и ХЭШ блока не сходился с расчитываемым тут - как это могло произойти?
-                     * Я ловил где было не совпадение - оно было в 6 на 7 трнзакции в блоке 264590
-                     * потом этот блок откатился ситемой и заново пересобрался и все норм стало
-                     */
-                    String peerIP = Controller.getInstance().getSynchronizer().getPeer().getAddress().getHostName();
-                    String txStr = APIUtils.openUrl(
-                            //"http://138.68.225.51:9047/apirecords/getbynumber/"
-                            "http://" + peerIP + ":" + Settings.getInstance().getWebPort() + "/apirecords/getbynumber/"
-                        + this.heightBlock + "-" + seqNo);
-                    if (txStr == null) {
-                        Long error = null;
-                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
-                                + " NOT FOUND");
+                if(false) {
+                    if (!APIUtils.testTxSigns(this.heightBlock, seqNo, transaction.viewSignature()))
                         break;
-                    } else if (!txStr.contains(transaction.viewSignature())) {
-                        Long error = null;
-                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
-                                + " WRONG SIGNATURE");
-                        break;
-                    } else {
-                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
-                                + " good!");
-                    }
                 }
 
                 if (!transaction.isWiped()) {
@@ -1590,8 +1562,6 @@ public class Block implements ExplorerJsonLine {
 
             transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
             if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-                byte[] digest = makeTransactionsHash(creator.getPublicKey(), transactions, null);
-
                 LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
                 return false;
             }
