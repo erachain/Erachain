@@ -90,16 +90,17 @@ public class BlockChain {
 
     public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
     //public static final int GENERATING_MAX_BLOCK_TIME = 1000;
-    public static final int MAX_BLOCK_SIZE_BYTES = 1 << 22; //4 * 1048576;
+    public static final int MAX_BLOCK_SIZE_BYTES = 1 << 24; //4 * 1048576;
     public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
-    public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_SIZE_BYTES >>1;
+    public static final int MAX_REC_DATA_BYTES = 1 << 20; // MAX_BLOCK_SIZE_BYTES >>1;
 
     public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE<<3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
 
     // отдельно для генерации сейчас
-    public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK? 26333: 100;
-    public static final int MAX_BLOCK_SIZE_BYTES_GEN = 1000; //MAX_BLOCK_SIZE_GEN << 7; // x 256
+    ////public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK? 26333: 5000;
+    public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK? 26333: MAX_BLOCK_SIZE;
+    public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN * 200;
 
 
     public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;
