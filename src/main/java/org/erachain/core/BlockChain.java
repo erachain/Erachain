@@ -99,7 +99,7 @@ public class BlockChain {
 
     // отдельно для генерации сейчас
     public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK? 26333: 100;
-    public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN << 8; // x 256
+    public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN << 7; // x 256
 
 
     public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;

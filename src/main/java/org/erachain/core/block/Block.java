@@ -427,7 +427,6 @@ public class Block implements ExplorerJsonLine {
         this.creator = creator;
         this.heightBlock = heightBlock;
 
-        this.transactionCount = transactionCount;
         this.transactionsHash = transactionsHash;
 
         this.signature = signature;
