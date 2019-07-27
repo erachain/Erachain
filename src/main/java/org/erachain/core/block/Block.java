@@ -1396,32 +1396,9 @@ public class Block implements ExplorerJsonLine {
 
                 seqNo++;
 
-                if (false) {
-                    /**
-                     * короче какая-то фиггня была - прилетал блок при тестах в котром транзакции были по номерам перепуьаны
-                     * и ХЭШ блока не сходился с расчитываемым тут - как это могло произойти?
-                     * Я ловил где было не совпадение - оно было в 6 на 7 трнзакции в блоке 264590
-                     * потом этот блок откатился ситемой и заново пересобрался и все норм стало
-                     */
-                    String peerIP = Controller.getInstance().getSynchronizer().getPeer().getAddress().getHostName();
-                    String txStr = APIUtils.openUrl(
-                            //"http://138.68.225.51:9047/apirecords/getbynumber/"
-                            "http://" + peerIP + ":" + Settings.getInstance().getWebPort() + "/apirecords/getbynumber/"
-                        + this.heightBlock + "-" + seqNo);
-                    if (txStr == null) {
-                        Long error = null;
-                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
-                                + " NOT FOUND");
-                        //break;
-                    } else if (!txStr.contains(transaction.viewSignature())) {
-                        Long error = null;
-                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
-                                + " WRONG SIGNATURE");
+                if(false) {
+                    if (!APIUtils.testTxSigns(this.heightBlock, seqNo, transaction.viewSignature()))
                         break;
-                    } else {
-                        LOGGER.debug(peerIP + " -- " + this.heightBlock + "-" + seqNo
-                                + " good!");
-                    }
                 }
 
                 if (!transaction.isWiped()) {
@@ -1585,12 +1562,6 @@ public class Block implements ExplorerJsonLine {
 
             transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
             if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-                byte[] digest = makeTransactionsHash(creator.getPublicKey(), transactions, null);
-
-                boolean isSigned = isSignatureValid();
-                this.transactionsHash = transactionsSignatures;
-                boolean isSignedCalced = isSignatureValid();
-
                 LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
                 return false;
             }
