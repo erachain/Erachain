@@ -97,7 +97,7 @@ public class BlockChain {
     public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE<<3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
 
-    // отдельно для генерации сейчас
+    // отдельно для генерации блока - так чтобы от протокольных ограничений отвязаться
     ////public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK? 26333: 5000;
     public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK? 26333: MAX_BLOCK_SIZE;
     public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN * 200;

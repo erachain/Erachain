@@ -461,7 +461,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // CHECK IF REFERENCE IS OK
         if (asDeal > Transaction.FOR_PACK) {
             Long reference = this.creator.getLastTimestamp(dcSet);
-            if (reference.compareTo(this.timestamp) >= 0) {
+            if (reference.compareTo(this.timestamp) >= 0
+                    // при откатах для нового счета который первый раз сделал транзакцию
+                    // из нулевого баланса - Референс будеть ошибочный
+                    // поэтому отключим эту проверку тут
+                    && !BlockChain.DEVELOP_USE
+                    ) {
                 return INVALID_TIMESTAMP;
             }
         }
