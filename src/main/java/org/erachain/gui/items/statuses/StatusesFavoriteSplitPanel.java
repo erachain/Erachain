@@ -30,7 +30,7 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get((itemMenu).getReference());
+                Transaction trans = db.getTransactionFinalMap().get(itemTableSelected.getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
@@ -48,7 +48,7 @@ public class StatusesFavoriteSplitPanel extends ItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?status=" + itemMenu.getKey()));
+                            + "?status=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }

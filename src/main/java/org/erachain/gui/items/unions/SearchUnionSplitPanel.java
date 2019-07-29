@@ -32,7 +32,7 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
         JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
         confirm_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new UnionConfirmDialog(th, (UnionCls) itemMenu);
+                new UnionConfirmDialog(th, (UnionCls) itemTableSelected);
             }
         });
         this.menuTable.add(confirm_Menu);
@@ -40,7 +40,7 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
         JMenuItem setStatus_Menu = new JMenuItem(Lang.getInstance().translate("Set status"));
         setStatus_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new UnionSetStatusDialog(th, (UnionCls) itemMenu);
+                new UnionSetStatusDialog(th, (UnionCls) itemTableSelected);
             }
         });
         this.menuTable.add(setStatus_Menu);
@@ -56,7 +56,7 @@ public class SearchUnionSplitPanel extends SearchItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?union=" + itemMenu.getKey()));
+                            + "?union=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
