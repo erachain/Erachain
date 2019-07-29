@@ -34,7 +34,7 @@ public class IssueStatusDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(statusIssue.getItem().getDescription()));
+        MTextPane txtAreaDescription = new MTextPane(statusIssue.getItem().getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);

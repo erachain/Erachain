@@ -125,7 +125,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 9);
         add(description_jLabel, gridBagConstraints);
 
-        description_jTextArea.setText(Library.to_HTML(imprint.getDescription()));
+        description_jTextArea.setText(imprint.getDescription());
         //description_jTextArea.setColumns(20);
         //description_jTextArea.setRows(5);
         jScrollPane1.setViewportView(description_jTextArea);

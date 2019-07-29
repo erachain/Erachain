@@ -40,7 +40,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(status.getDescription()));
+        MTextPane txtAreaDescription = new MTextPane(status.getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(statusName.getBorder());
         //txtAreaDescription.setEditable(false);
@@ -159,7 +159,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        MTextPane txtAreaItemDescription = new MTextPane(Library.to_HTML(item.getDescription()));
+        MTextPane txtAreaItemDescription = new MTextPane(item.getDescription());
         //txtAreaItemDescription.setRows(4);
         txtAreaItemDescription.setBorder(itemName.getBorder());
         //txtAreaItemDescription.setEditable(false);

@@ -35,7 +35,7 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(poll.getDescription()));
+        MTextPane txtAreaDescription = new MTextPane(poll.getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);

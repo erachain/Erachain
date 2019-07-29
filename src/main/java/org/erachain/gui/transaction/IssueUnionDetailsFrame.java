@@ -35,7 +35,7 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(unionIssue.getItem().getDescription()));
+        MTextPane txtAreaDescription = new MTextPane(unionIssue.getItem().getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);

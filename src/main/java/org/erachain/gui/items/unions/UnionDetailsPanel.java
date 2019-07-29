@@ -75,7 +75,7 @@ public class UnionDetailsPanel extends JPanel {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(union.getDescription()));
+        MTextPane txtAreaDescription = new MTextPane(union.getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(txtName.getBorder());
         //txtAreaDescription.setEditable(false);

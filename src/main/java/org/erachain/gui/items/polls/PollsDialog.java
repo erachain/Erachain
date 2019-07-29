@@ -105,7 +105,7 @@ public class PollsDialog extends JDialog {
         descrGBC.gridwidth = 2;
         descrGBC.insets = new Insets(0, 5, 5, 0);
         descrGBC.fill = GridBagConstraints.BOTH;
-        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(poll.getDescription()));
+        MTextPane txtAreaDescription = new MTextPane(poll.getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);

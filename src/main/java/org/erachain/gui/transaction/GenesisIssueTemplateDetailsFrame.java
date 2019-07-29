@@ -35,7 +35,7 @@ public class GenesisIssueTemplateDetailsFrame extends RecGenesis_DetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(template.getDescription()));
+        MTextPane txtAreaDescription = new MTextPane(template.getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         //txtAreaDescription.setEditable(false);

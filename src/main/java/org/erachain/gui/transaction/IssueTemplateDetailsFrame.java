@@ -33,9 +33,7 @@ public class IssueTemplateDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        String txt = Library.to_HTML(templateIssue.getItem().getDescription());
-
-        MTextPane txtAreaDescription = new MTextPane(txt);
+        MTextPane txtAreaDescription = new MTextPane(templateIssue.getItem().getDescription());
         JScrollPane scroller = new JScrollPane(txtAreaDescription, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroller.setPreferredSize(new Dimension(0,400));
         //txtAreaDescription.setRows(4);

@@ -74,7 +74,7 @@ public class ImprintDetailsPanel extends JPanel {
 
         //DESCRIPTION
         detailGBC.gridy = 3;
-        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(imprint.getDescription()));
+        MTextPane txtAreaDescription = new MTextPane(imprint.getDescription());
         //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(txtName.getBorder());
         //txtAreaDescription.setEditable(false);

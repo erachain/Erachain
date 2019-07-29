@@ -42,7 +42,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         initComponents();
 
         jTextField_Title.setText(template.viewName());
-        jTextArea_Content.setText(Library.to_HTML(template.getDescription()));
+        jTextArea_Content.setText(template.getDescription());
 
     }
 
