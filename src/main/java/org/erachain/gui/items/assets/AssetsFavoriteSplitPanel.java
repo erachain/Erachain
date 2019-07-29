@@ -30,24 +30,24 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
 
         sell.addActionListener(e ->
                 //new ExchangeFrame((AssetCls) itemMenu, null, "To sell", "")
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "To sell", ""))
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""))
         );
 
         JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
         exchange.addActionListener(e ->
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "", ""))
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "", ""))
         );
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(e ->
                 //new ExchangeFrame((AssetCls) itemMenu, null, "Buy", "")
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "Buy", ""))
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""))
         );
 
         JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouchMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();
-            Transaction transaction = db.getTransactionFinalMap().get(itemMenu.getReference());
+            Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
             new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
 
         });
@@ -64,7 +64,7 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?asset=" + itemMenu.getKey()));
+                            + "?asset=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }

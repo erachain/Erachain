@@ -35,7 +35,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 @SuppressWarnings("unused")
-                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) itemMenu);
+                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) itemTableSelected);
 
             }
         });
@@ -49,7 +49,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
 
 
                 @SuppressWarnings("unused")
-                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) itemMenu, itemMenu.getOwner());
+                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) itemTableSelected, itemTableSelected.getOwner());
 
             }
         });
@@ -60,7 +60,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                PersonCls per = (PersonCls) itemMenu;
+                PersonCls per = (PersonCls) itemTableSelected;
                 byte[] ref = per.getReference();
                 Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                 int blockNo = transaction.getBlockHeight();
@@ -82,7 +82,7 @@ public class PersonsMySplitPanel extends ItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?person=" + itemMenu.getKey()));
+                            + "?person=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }

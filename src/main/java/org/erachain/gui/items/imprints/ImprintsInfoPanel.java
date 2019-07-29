@@ -3,7 +3,9 @@ package org.erachain.gui.items.imprints;
 import javax.swing.JLabel;
 
 import org.erachain.core.item.imprints.ImprintCls;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.models.BalancesTableModel;
 import org.erachain.lang.Lang;
 
@@ -27,7 +29,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
     private javax.swing.JLabel Name_jLabel;
     private javax.swing.JTextField Name_jTextField;
     private javax.swing.JLabel description_jLabel;
-    private javax.swing.JTextArea description_jTextArea;
+    private MTextPane description_jTextArea;
     private javax.swing.JLabel holders_jLabel;
     @SuppressWarnings("rawtypes")
     private MTable holders_jTable1;
@@ -61,7 +63,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         Name_jTextField = new javax.swing.JTextField();
         description_jLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        description_jTextArea = new javax.swing.JTextArea();
+        description_jTextArea = new MTextPane();
         owner_jLabel = new javax.swing.JLabel();
         owner_jTextField = new javax.swing.JTextField();
         holders_jLabel = new javax.swing.JLabel();
@@ -123,10 +125,9 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 9);
         add(description_jLabel, gridBagConstraints);
 
-        description_jTextArea.setEditable(false);
         description_jTextArea.setText(imprint.getDescription());
-        description_jTextArea.setColumns(20);
-        description_jTextArea.setRows(5);
+        //description_jTextArea.setColumns(20);
+        //description_jTextArea.setRows(5);
         jScrollPane1.setViewportView(description_jTextArea);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

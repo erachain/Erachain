@@ -52,7 +52,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel_Image;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea_Description;
+    private MTextPane jTextArea_Description;
     private javax.swing.JTextField jTextField1;
     private MAccoutnTextField jTextField_Creator;
     private javax.swing.JTextField jTextField_Date_Born;
@@ -84,7 +84,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         jLabel_Gender = new javax.swing.JLabel();
         jTextField_Gender = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea_Description = new javax.swing.JTextArea();
+        jTextArea_Description = new MTextPane();
         jLabel_Creator = new javax.swing.JLabel();
 //		jTextField_Creator = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
@@ -167,7 +167,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         jPanel1.add(lbl_Block, gridBagConstraints);
 
 
-        JTextField txt_Block = new JTextField(issue_record.getBlockHeight() + "-" + issue_record.getSeqNo());
+        JTextField txt_Block = new JTextField(issue_record.viewHeightSeq());
 
         txt_Block.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -279,12 +279,12 @@ public class PersonInfo002 extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 2);
         jPanel3.add(jLabel_Description, gridBagConstraints);
 
-        jTextArea_Description.setRows(5);
+        //jTextArea_Description.setRows(5);
 
         MenuPopupUtil.installContextMenu(jTextArea_Description);
-        jTextArea_Description.setEditable(false);
-        jTextArea_Description.setWrapStyleWord(true);
-        jTextArea_Description.setLineWrap(true);
+        //jTextArea_Description.setEditable(false);
+        //jTextArea_Description.setWrapStyleWord(true);
+        //jTextArea_Description.setLineWrap(true);
 
 
         String descript = Lang.getInstance().translate("Gender") + ":";
@@ -297,20 +297,20 @@ public class PersonInfo002 extends javax.swing.JPanel {
         long de = person.getDeathday();
         String biStr = person.getBirthdayStr();
         if (!person.isAlive(0l)) { //NTP.getTime())) {
-            //descript =descript+"\n"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
-            descript = descript + "\n" + biStr + " - " + person.getDeathdayStr();
+            //descript =descript+"<br>"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
+            descript = descript + "<br>" + biStr + " - " + person.getDeathdayStr();
 
         } else {
 
-            //descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
-            descript = descript + "\n" + Lang.getInstance().translate("Birthday") + ":" + biStr;
+            //descript = descript+"<br>" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
+            descript = descript + "<br>" + Lang.getInstance().translate("Birthday") + ":" + biStr;
 
         }
 
-        descript = descript + "\n" + Lang.getInstance().translate("Coordinates of Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
-        descript = descript + "\n" + Lang.getInstance().translate("P.Height") + ": " + person.getHeight();
+        descript = descript + "<br>" + Lang.getInstance().translate("Coordinates of Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
+        descript = descript + "<br>" + Lang.getInstance().translate("P.Height") + ": " + person.getHeight();
 
-        descript = descript + "\n" + person.getDescription();
+        descript = descript + "<br>" + Library.to_HTML(person.getDescription());
         jTextArea_Description.setText(descript);
 
         jScrollPane1.setViewportView(jTextArea_Description);

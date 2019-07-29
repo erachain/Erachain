@@ -2,9 +2,6 @@ package org.erachain.gui.transaction;
 // 30/03
 
 import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MTextPane;
@@ -13,14 +10,12 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 @SuppressWarnings("serial")
@@ -86,7 +81,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
             jTextArea_Messge.text_pane.setEditable(false);
             jTextArea_Messge.text_pane.setContentType("text/html");
 
-            jTextArea_Messge.set_text(r_Send.viewData());
+            jTextArea_Messge.setText(r_Send.viewData());
 
             MenuPopupUtil.installContextMenu(jTextArea_Messge.text_pane);
             //jTextArea_Messge.setText();
@@ -147,9 +142,9 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                                     r_Send.getRecipient(), r_Send.getData());
 
                             if (decryptedData == null) {
-                                jTextArea_Messge.set_text(Lang.getInstance().translate("Decrypt Error!"));
+                                jTextArea_Messge.setText(Lang.getInstance().translate("Decrypt Error!"));
                             } else {
-                                jTextArea_Messge.set_text(r_Send.isText() ?
+                                jTextArea_Messge.setText(r_Send.isText() ?
                                         new String(decryptedData, Charset.forName("UTF-8"))
                                         : Converter.toHex(decryptedData));
 
@@ -157,7 +152,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                             }
 
                         } else {
-                            jTextArea_Messge.set_text(r_Send.viewData());
+                            jTextArea_Messge.setText(r_Send.viewData());
                         }
                     }
                 });

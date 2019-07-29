@@ -21,23 +21,26 @@ import java.net.URL;
 
 public class PollsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private PollsFavoriteSplitPanel th;
 
     public PollsFavoriteSplitPanel() {
         super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Polls"));
-        th = this;
+
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setMaxWidth(200);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(100);
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction transaction = db.getTransactionFinalMap().get(((TemplateCls) th.itemMenu).getReference());
+                Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
                 new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
 
             }
         });
-        th.menuTable.add(vouch_menu);
+        menuTable.add(vouch_menu);
         JMenuItem setVote_Menu = new JMenuItem(Lang.getInstance().translate("Voting"));
         setVote_Menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -47,7 +50,7 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
                 new PollsDialog(poll, 0, AssetCls);
             }
         });
-        th.menuTable.add(setVote_Menu);
+        menuTable.add(setVote_Menu);
 
         menuTable.addSeparator();
 
@@ -60,13 +63,13 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?poll=" + itemMenu.getKey()));
+                            + "?poll=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
             }
         });
-        th.menuTable.add(setSeeInBlockexplorer);
+        menuTable.add(setSeeInBlockexplorer);
     }
 
     // show details

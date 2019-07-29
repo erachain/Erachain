@@ -2,9 +2,13 @@ package org.erachain.gui.items.statuses;
 
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.statuses.StatusCls;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
+
+import javax.swing.*;
 
 // Info for status
 public class StatusInfo extends MTextPane {
@@ -27,6 +31,13 @@ public class StatusInfo extends MTextPane {
         } else {
             message = "" + status.getKey();
         }
+
+
+        Transaction issue_record = Transaction.findByDBRef(DCSet.getInstance(), status.getReference());
+        message = "<div><b>" + Lang.getInstance().translate("Created") + ":" + "</b> : "
+                + issue_record.viewTimestamp() + " [" + issue_record.viewHeightSeq() + "]" + "</div>";
+
+
         message = "<div><b>" + message + "</b> : " + status.viewName() + "</div>";
 
         message += "<div>" + Library.to_HTML(status.getDescription()) + "</div>";
@@ -40,7 +51,7 @@ public class StatusInfo extends MTextPane {
     }
 
     public void show_001(StatusCls status) {
-        set_text("<html>" + Get_HTML_Status_Info_001(status) + "</html>");
+        setText(Get_HTML_Status_Info_001(status));
     }
 
     public void delay_on_Close() {

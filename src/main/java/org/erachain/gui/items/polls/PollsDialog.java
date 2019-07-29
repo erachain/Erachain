@@ -13,6 +13,8 @@ import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
 import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.OptionsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -103,10 +105,10 @@ public class PollsDialog extends JDialog {
         descrGBC.gridwidth = 2;
         descrGBC.insets = new Insets(0, 5, 5, 0);
         descrGBC.fill = GridBagConstraints.BOTH;
-        JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
-        txtAreaDescription.setRows(4);
+        MTextPane txtAreaDescription = new MTextPane(poll.getDescription());
+        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
-        txtAreaDescription.setEditable(false);
+        //txtAreaDescription.setEditable(false);
         JScrollPane ss = new JScrollPane();
         ss.setViewportView(txtAreaDescription);
 

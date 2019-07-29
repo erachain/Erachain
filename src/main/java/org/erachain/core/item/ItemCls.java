@@ -280,6 +280,11 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
     }
 
+    public Transaction getIssueTransaction(DCSet dcSet) {
+        return dcSet.getTransactionFinalMap().get(this.reference);
+
+    }
+
     public boolean isConfirmed() {
         return isConfirmed(DCSet.getInstance());
     }

@@ -28,6 +28,7 @@ public class ItemPollsTableModel extends SortedListTableModelCls<Long, ItemCls> 
 
     public void setAsset(AssetCls asset) {
         this.asset = asset;
+
         this.fireTableDataChanged();
     }
 
@@ -52,15 +53,7 @@ public class ItemPollsTableModel extends SortedListTableModelCls<Long, ItemCls> 
         switch (column) {
             case COLUMN_NAME:
 
-                String key = poll.getName();
-
-                //CHECK IF ENDING ON A SPACE
-                if (key.endsWith(" ")) {
-                    key = key.substring(0, key.length() - 1);
-                    key += ".";
-                }
-
-                return key;
+                return poll.getName();
 
             case COLUMN_CREATOR:
 
