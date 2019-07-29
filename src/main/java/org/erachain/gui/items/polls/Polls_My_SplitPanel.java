@@ -35,9 +35,6 @@ import java.net.URL;
 
 public class Polls_My_SplitPanel extends ItemSplitPanel {
 
-    protected ItemCls itemTableSelected = null;
-
-
     public Polls_My_SplitPanel() {
         super(new WalletItemPollsTableModel(), "Polls_My_SplitPanel");
         this.setName(Lang.getInstance().translate("My Polls"));
