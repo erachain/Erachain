@@ -1,7 +1,9 @@
 package org.erachain.datachain;
 
+import org.erachain.core.account.Account;
 import org.erachain.database.DBMap;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -9,6 +11,7 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -18,10 +21,10 @@ import java.util.*;
  * byte[] - un CORAMPABLE
  *
  * Ключ: Номер Голосвания + Номер выбора + Счет Короткий
- * Значение: СТЭК ссылок на трнзакцию голосвания
+ * Значение: СТЭК ссылок на транзакцию голосвания
  *
- * TODO: передлать ссылку на запись на Лонг
  * TODO: передлать короткий Счет на байты
+ * TODO: передаьт Тупле 2 на Лонг - на ссылку сразу как ключ для поиска транзакции
  */
 public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
 

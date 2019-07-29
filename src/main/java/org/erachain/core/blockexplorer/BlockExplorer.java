@@ -674,57 +674,20 @@ public class BlockExplorer {
         pollJSON.put("owner", poll.getOwner().getAddress());
         pollJSON.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
 
-        long[] personVotes = new long[optionsSize];
-        long personsTotal = 0;
-
-        BigDecimal[] optionVotes = new BigDecimal[optionsSize];
-        for (int i = 0; i < optionVotes.length; i++) {
-            optionVotes[i] = BigDecimal.ZERO;
-        }
-
-        BigDecimal votesSum = BigDecimal.ZERO;
-
-        Set personsVotedSet = new HashSet<Long>();
-        Iterable<Pair<Account, Integer>> votes = poll.getVotes(DCSet.getInstance());
-        Iterator iterator = votes.iterator();
-        while (iterator.hasNext()) {
-
-            Pair<Account, Integer> item = (Pair<Account, Integer>)iterator.next();
-
-            int option = item.getB();
-            // voter = Account.makeAccountFromShort(item.getA());
-
-            Account voter = item.getA();
-            Tuple4<Long, Integer, Integer, Integer> personInfo = voter.getPersonDuration(dcSet);
-
-            // запретим голосовать много раз разными счетами одной персоне
-            if (personInfo != null
-                    && !personsVotedSet.contains(personInfo.a)) {
-                personVotes[option]++;
-                personsTotal++;
-
-                // запомним что он голосовал
-                personsVotedSet.add(personInfo.a);
-            }
-
-            BigDecimal votesVol = voter.getBalanceUSE(assetKey);
-            optionVotes[option] = optionVotes[option].add(votesVol);
-            votesSum = votesSum.add(votesVol);
-
-        }
+        Tuple4<Integer, long[], BigDecimal, BigDecimal[]> votes = poll.votesWithPersons(dcSet, assetKey, 0);
 
         JSONArray array = new JSONArray();
         for (int i = 0; i < optionsSize; i++) {
             Map itemMap = new LinkedHashMap();
             itemMap.put("name", options.get(i));
-            itemMap.put("persons", personVotes[i]);
-            itemMap.put("votes", optionVotes[i]);
+            itemMap.put("persons", votes.b[i]);
+            itemMap.put("votes", votes.d[i]);
             array.add(itemMap);
         }
 
         pollJSON.put("votes", array);
-        pollJSON.put("personsTotal", personsTotal);
-        pollJSON.put("votesTotal", votesSum);
+        pollJSON.put("personsTotal", votes.a);
+        pollJSON.put("votesTotal", votes.c);
 
         output.put("poll", pollJSON);
 
