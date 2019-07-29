@@ -107,7 +107,14 @@ public class PollDetailPanel extends JPanel {
         // OPTIONS
         detailGBC.gridy = 5;
         pollOptionsTableModel = new ItemPollOptionsTableModel(poll, asset);
+
         optionsTable = Gui.createSortableTable(pollOptionsTableModel, 0);
+        optionsTable.getColumnModel().getColumn(0).setPreferredWidth(5);
+        optionsTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+        optionsTable.getColumnModel().getColumn(2).setPreferredWidth(10);
+        optionsTable.getColumnModel().getColumn(3).setPreferredWidth(5);
+        optionsTable.getColumnModel().getColumn(4).setPreferredWidth(50);
+        optionsTable.getColumnModel().getColumn(5).setPreferredWidth(10);
 
         TableRowSorter<PollOptionsTableModel> sorter = (TableRowSorter<PollOptionsTableModel>) optionsTable.getRowSorter();
         sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
@@ -176,27 +183,14 @@ public class PollDetailPanel extends JPanel {
         MTextPane txtAreaDescription = new MTextPane();
         txtAreaDescription.setText(poll.getDescription());
         txtAreaDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        txtAreaDescription.setPreferredSize(new Dimension(30, 260));
 
         GridBagConstraints gbc_txtAreaDescription = new GridBagConstraints();
-        if (false) {
-            txtAreaDescription.setSize(10, 10);
-            //JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(poll.getDescription()));
-            //txtAreaDescription.setRows(4);
-            //txtAreaDescription.setEditable(false);
-            gbc_txtAreaDescription.fill = GridBagConstraints.HORIZONTAL;
-            gbc_txtAreaDescription.insets = new Insets(0, 0, 5, 5);
-            gbc_txtAreaDescription.gridx = 2;
-            gbc_txtAreaDescription.gridy = 3;
-            gbc_txtAreaDescription.gridwidth = 10;
-        } else {
-            gbc_txtAreaDescription.gridx = 2;
-            gbc_txtAreaDescription.gridy = 3;
-            //gbc_txtAreaDescription.gridwidth = 3;
-            //gbc_txtAreaDescription.fill = java.awt.GridBagConstraints.BOTH;
-            //gbc_txtAreaDescription.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            gbc_txtAreaDescription.weighty = 0.6;
-
-        }
+        gbc_txtAreaDescription.fill = GridBagConstraints.HORIZONTAL;
+        gbc_txtAreaDescription.insets = new Insets(0, 0, 5, 5);
+        gbc_txtAreaDescription.gridx = 2;
+        gbc_txtAreaDescription.gridy = 3;
+        gbc_txtAreaDescription.gridwidth = 10;
         this.add(txtAreaDescription, gbc_txtAreaDescription);
         txtAreaDescription.setBorder(name.getBorder());
 
