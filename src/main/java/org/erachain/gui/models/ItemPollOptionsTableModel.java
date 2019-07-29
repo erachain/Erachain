@@ -110,6 +110,7 @@ public class ItemPollOptionsTableModel extends AbstractTableModel {
 
     public void setAsset(AssetCls asset) {
         this.asset = asset;
+        votesWithPersons = poll.votesWithPersons(DCSet.getInstance(), asset.getKey(), 0);
         this.fireTableDataChanged();
     }
 }

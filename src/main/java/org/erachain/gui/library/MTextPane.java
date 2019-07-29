@@ -38,7 +38,8 @@ public class MTextPane extends JScrollPane {
                 + " body{ font-family:"
                 + UIManager.getFont("Label.font").getFamily() + "; font-size:" + font_saze + "px;"
                 + "word-wrap:break-word;}"
-                + "</style> </head><body><div style='style='word-wrap: break-word; '>" + str + "</body>";
+                //+ "</style> </head><body><div style='style='word-wrap: break-word; '>" + str + "</body>";
+                + "</style></head><body>" + str + "</body>";
         text_pane.setText(str);
 
 

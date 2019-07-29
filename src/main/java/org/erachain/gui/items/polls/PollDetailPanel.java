@@ -174,18 +174,33 @@ public class PollDetailPanel extends JPanel {
         this.add(descriptionLabel, gbc_descriptionLabel);
 
         MTextPane txtAreaDescription = new MTextPane();
-        txtAreaDescription.setText(Library.to_HTML(poll.getDescription()));
-        //JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(poll.getDescription()));
-        //txtAreaDescription.setRows(4);
-        //txtAreaDescription.setEditable(false);
-        GridBagConstraints gbc_txtAreaDescription = new GridBagConstraints();
-        gbc_txtAreaDescription.fill = GridBagConstraints.HORIZONTAL;
-        gbc_txtAreaDescription.insets = new Insets(0, 0, 5, 5);
-        gbc_txtAreaDescription.gridx = 2;
-        gbc_txtAreaDescription.gridy = 3;
-        this.add(txtAreaDescription, gbc_txtAreaDescription);
+        txtAreaDescription.setText(poll.getDescription());
+        txtAreaDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+        GridBagConstraints gbc_txtAreaDescription = new GridBagConstraints();
+        if (false) {
+            txtAreaDescription.setSize(10, 10);
+            //JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(poll.getDescription()));
+            //txtAreaDescription.setRows(4);
+            //txtAreaDescription.setEditable(false);
+            gbc_txtAreaDescription.fill = GridBagConstraints.HORIZONTAL;
+            gbc_txtAreaDescription.insets = new Insets(0, 0, 5, 5);
+            gbc_txtAreaDescription.gridx = 2;
+            gbc_txtAreaDescription.gridy = 3;
+            gbc_txtAreaDescription.gridwidth = 10;
+        } else {
+            gbc_txtAreaDescription.gridx = 2;
+            gbc_txtAreaDescription.gridy = 3;
+            //gbc_txtAreaDescription.gridwidth = 3;
+            //gbc_txtAreaDescription.fill = java.awt.GridBagConstraints.BOTH;
+            //gbc_txtAreaDescription.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gbc_txtAreaDescription.weighty = 0.6;
+
+        }
+        this.add(txtAreaDescription, gbc_txtAreaDescription);
         txtAreaDescription.setBorder(name.getBorder());
+
+
         JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
         GridBagConstraints gbc_optionsLabel = new GridBagConstraints();
         gbc_optionsLabel.insets = new Insets(0, 0, 5, 5);

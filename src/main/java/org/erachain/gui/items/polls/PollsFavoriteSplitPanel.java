@@ -21,7 +21,6 @@ import java.net.URL;
 
 public class PollsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private PollsFavoriteSplitPanel th;
 
     public PollsFavoriteSplitPanel() {
         super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel");
@@ -65,7 +64,7 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
                 }
             }
         });
-        th.menuTable.add(setSeeInBlockexplorer);
+        menuTable.add(setSeeInBlockexplorer);
     }
 
     // show details
