@@ -1,13 +1,11 @@
 package org.erachain.gui.items.mails;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.VoushLibraryPanel;
-import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
 import org.slf4j.LoggerFactory;
@@ -207,8 +205,8 @@ public class MailInfo extends javax.swing.JPanel {
         //     jTextArea_Messge.setColumns(20);
         //     jTextArea_Messge.setRows(5);
         //     jTextArea_Messge.setLineWrap(true);
-        //jTextArea_Messge.set_text(descript_Mesage());
-        jTextArea_Messge.set_text(trans.viewData());
+        //jTextArea_Messge.setText(descript_Mesage());
+        jTextArea_Messge.setText(trans.viewData());
         jTextArea_Messge.setPreferredSize(new Dimension(300, 200));
         //      jTextArea_Messge.setMaximumSize(new Dimension(600,800));
         MenuPopupUtil.installContextMenu(jTextArea_Messge.text_pane);
@@ -315,9 +313,9 @@ public class MailInfo extends javax.swing.JPanel {
                     trans.getRecipient(), trans.getData());
 
             if (decryptedData == null) {
-                jTextArea_Messge.set_text(Lang.getInstance().translate("Decrypt Error!"));
+                jTextArea_Messge.setText(Lang.getInstance().translate("Decrypt Error!"));
             } else {
-                jTextArea_Messge.set_text(trans.isText() ?
+                jTextArea_Messge.setText(trans.isText() ?
                         new String(decryptedData, Charset.forName("UTF-8"))
                         : Converter.toHex(decryptedData));
 
@@ -325,7 +323,7 @@ public class MailInfo extends javax.swing.JPanel {
                 encrypted = !encrypted;
             }
         } else {
-            jTextArea_Messge.set_text(trans.viewData());
+            jTextArea_Messge.setText(trans.viewData());
             jButton1.setText(Lang.getInstance().translate("Decrypt"));
             encrypted = !encrypted;
         }

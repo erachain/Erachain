@@ -2,6 +2,7 @@ package org.erachain.gui.items.imprints;
 
 import org.erachain.core.item.imprints.ImprintCls;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -73,10 +74,10 @@ public class ImprintDetailsPanel extends JPanel {
 
         //DESCRIPTION
         detailGBC.gridy = 3;
-        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(imprint.getDescription()));
-        txtAreaDescription.setRows(4);
+        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(imprint.getDescription()));
+        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(txtName.getBorder());
-        txtAreaDescription.setEditable(false);
+        //txtAreaDescription.setEditable(false);
         this.add(txtAreaDescription, detailGBC);
 
         //LABEL OWNER

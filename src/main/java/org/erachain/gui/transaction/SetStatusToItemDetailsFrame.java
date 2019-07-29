@@ -4,6 +4,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
@@ -39,10 +40,10 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(status.getDescription()));
-        txtAreaDescription.setRows(4);
+        MTextPane txtAreaDescription = new MTextPane(Library.to_HTML(status.getDescription()));
+        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(statusName.getBorder());
-        txtAreaDescription.setEditable(false);
+        //txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
         this.add(txtAreaDescription, detailGBC);
 
@@ -158,10 +159,10 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaItemDescription = new JTextArea("<html>" + Library.to_HTML(item.getDescription()));
-        txtAreaItemDescription.setRows(4);
+        MTextPane txtAreaItemDescription = new MTextPane(Library.to_HTML(item.getDescription()));
+        //txtAreaItemDescription.setRows(4);
         txtAreaItemDescription.setBorder(itemName.getBorder());
-        txtAreaItemDescription.setEditable(false);
+        //txtAreaItemDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaItemDescription);
         this.add(txtAreaItemDescription, detailGBC);
 

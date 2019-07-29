@@ -7,6 +7,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.models.ItemPollOptionsTableModel;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
@@ -66,6 +67,8 @@ public class PollDetailPanel extends JPanel {
         // CREATOR
         detailGBC.gridy = 4;
 
+        Transaction issue_record = Transaction.findByDBRef(DCSet.getInstance(), poll.getReference());
+
         // LABEL NAME
         labelGBC.gridy = 2;
         JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
@@ -88,18 +91,6 @@ public class PollDetailPanel extends JPanel {
 
         // LABEL DATE
         labelGBC.gridy = 3;
-
-        String dateTime = "";
-
-        List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap()
-                .getTransactionsByTypeAndAddress(poll.getOwner().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
-        for (Transaction transaction : transactions) {
-            CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
-            if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
-                dateTime = DateTimeFormat.timestamptoString(createPollTransaction.getTimestamp());
-                break;
-            }
-        }
 
         // DATE
         detailGBC.gridy = 3;
@@ -159,14 +150,14 @@ public class PollDetailPanel extends JPanel {
         gbc_name.gridy = 1;
         this.add(name, gbc_name);
 
-        JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date:"));
+        JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation") + ":");
         GridBagConstraints gbc_dateLabel = new GridBagConstraints();
         gbc_dateLabel.insets = new Insets(0, 0, 5, 5);
         gbc_dateLabel.gridx = 1;
         gbc_dateLabel.gridy = 2;
         this.add(dateLabel, gbc_dateLabel);
 
-        JTextField date = new JTextField(dateTime);
+        JTextField date = new JTextField(issue_record.viewTimestamp() + " [" + issue_record.viewHeightSeq() + "]");
         date.setEditable(false);
         GridBagConstraints gbc_date = new GridBagConstraints();
         gbc_date.fill = GridBagConstraints.HORIZONTAL;
@@ -182,9 +173,11 @@ public class PollDetailPanel extends JPanel {
         gbc_descriptionLabel.gridy = 3;
         this.add(descriptionLabel, gbc_descriptionLabel);
 
-        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(poll.getDescription()));
-        txtAreaDescription.setRows(4);
-        txtAreaDescription.setEditable(false);
+        MTextPane txtAreaDescription = new MTextPane();
+        txtAreaDescription.setText(Library.to_HTML(poll.getDescription()));
+        //JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(poll.getDescription()));
+        //txtAreaDescription.setRows(4);
+        //txtAreaDescription.setEditable(false);
         GridBagConstraints gbc_txtAreaDescription = new GridBagConstraints();
         gbc_txtAreaDescription.fill = GridBagConstraints.HORIZONTAL;
         gbc_txtAreaDescription.insets = new Insets(0, 0, 5, 5);

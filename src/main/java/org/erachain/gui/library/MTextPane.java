@@ -26,12 +26,12 @@ public class MTextPane extends JScrollPane {
         //text_pane.setEditable(false);
 
         //text_pane.setContentType("text/html");
-        set_text(str);
+        setText(str);
         //setViewportView(text_pane);
 
     }
 
-    public void set_text(String str) {
+    public void setText(String str) {
         str = Library.viewDescriptionHTML(str);
         int font_saze = UIManager.getFont("Label.font").getSize();
         str = "<head><style>"
