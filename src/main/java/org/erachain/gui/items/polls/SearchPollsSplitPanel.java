@@ -24,10 +24,12 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
     private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
 
     public SearchPollsSplitPanel() {
-        super(tableModelPolls, "Search_Popll_Tab", "Search_Poll_Tab");
+        super(tableModelPolls, "Search_Poll_Tab", "Search_Poll_Tab");
 
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(15);
-        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(15);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setMaxWidth(200);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(100);
 
         // ADD MENU ITEMS
         JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
