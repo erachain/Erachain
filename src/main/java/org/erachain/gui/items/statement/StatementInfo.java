@@ -6,6 +6,7 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MSplitPane;
 import org.erachain.gui.library.MAttachedFilesPanel;
 import org.erachain.gui.library.VoushLibraryPanel;
@@ -113,7 +114,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
                     int i = 1;
                     for (String s : kS) {
-                        hasHes += i + " " + s + " " + params.get(s) + "\n";
+                        hasHes += i + " " + s + " " + params.get(s) + "<br>";
                     }
                 }
 
@@ -121,7 +122,8 @@ public class StatementInfo extends javax.swing.JPanel {
                     jLabel_Title.setText(Lang.getInstance().translate("Title") + ": " + data.get("Title").toString());
 
                 if (data.containsKey("Message"))
-                    jTextArea_Body.setText(description + "\n\n" + data.get("Message") + "\n\n" + hasHes + "\n\n"
+                    jTextArea_Body.setText("<html>" + Library.to_HTML(description) + "<br><br>"
+                                    + Library.to_HTML(data.get("Message").toString()) + "<br><br>" + hasHes + "<br><br>"
                             // + files +"\n"
 
                     );
@@ -150,7 +152,8 @@ public class StatementInfo extends javax.swing.JPanel {
                     }
                 }
 
-                jTextArea_Body.setText(template.viewName() + "\n\n" + description + "\n\n"
+                jTextArea_Body.setText("<html>" + template.viewName() + "<br><br>"
+                        + Library.to_HTML(description) + "<br><br>"
                         + new String(statement.getData(), Charset.forName("UTF-8")));
 
             }
@@ -373,7 +376,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
                 int i = 1;
                 for (String s : kS) {
-                    hasHes += i + " " + s + " " + params.get(s) + "\n";
+                    hasHes += i + " " + s + " " + params.get(s) + "<br>";
                 }
             }
             // 2.1
@@ -386,7 +389,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
                 int i = 1;
                 for (String s : kS) {
-                    hasHes += i + " " + s + " " + params.get(s) + "\n";
+                    hasHes += i + " " + s + " " + params.get(s) + "<br>";
                 }
             }
 
@@ -398,7 +401,8 @@ public class StatementInfo extends javax.swing.JPanel {
             if (jSON.containsKey("MS"))
                 message = (String) jSON.get("MS");
 
-            jTextArea_Body.setText(description + "\n\n" + message + "\n\n" + hasHes + "\n\n");
+            jTextArea_Body.setText("<html>" + Library.to_HTML(description) + "<br><br>"
+                    + Library.to_HTML(message) + "<br><br>" + hasHes + "<br><br>");
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

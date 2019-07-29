@@ -6,6 +6,7 @@ import org.erachain.core.transaction.CreatePollTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.models.ItemPollOptionsTableModel;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
@@ -181,7 +182,7 @@ public class PollDetailPanel extends JPanel {
         gbc_descriptionLabel.gridy = 3;
         this.add(descriptionLabel, gbc_descriptionLabel);
 
-        JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
+        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(poll.getDescription()));
         txtAreaDescription.setRows(4);
         txtAreaDescription.setEditable(false);
         GridBagConstraints gbc_txtAreaDescription = new GridBagConstraints();

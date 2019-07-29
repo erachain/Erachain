@@ -2,6 +2,7 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.IssuePersonRecord;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -33,7 +34,7 @@ public class IssuePersonDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(personIssue.getItem().getDescription());
+        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(personIssue.getItem().getDescription()));
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);

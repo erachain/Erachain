@@ -297,21 +297,21 @@ public class PersonInfo002 extends javax.swing.JPanel {
         long de = person.getDeathday();
         String biStr = person.getBirthdayStr();
         if (!person.isAlive(0l)) { //NTP.getTime())) {
-            //descript =descript+"\n"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
-            descript = descript + "\n" + biStr + " - " + person.getDeathdayStr();
+            //descript =descript+"<br>"+ new Date(person.getBirthday()).toString() + " - "+ new Date(person.getDeathday()).toString();
+            descript = descript + "<br>" + biStr + " - " + person.getDeathdayStr();
 
         } else {
 
-            //descript = descript+"\n" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
-            descript = descript + "\n" + Lang.getInstance().translate("Birthday") + ":" + biStr;
+            //descript = descript+"<br>" + Lang.getInstance().translate("Birthday") + ":" + new Date(person.getBirthday()) + "";
+            descript = descript + "<br>" + Lang.getInstance().translate("Birthday") + ":" + biStr;
 
         }
 
-        descript = descript + "\n" + Lang.getInstance().translate("Coordinates of Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
-        descript = descript + "\n" + Lang.getInstance().translate("P.Height") + ": " + person.getHeight();
+        descript = descript + "<br>" + Lang.getInstance().translate("Coordinates of Birth") + ": " + ((Float) person.getBirthLatitude()).toString() + "," + ((Float) person.getBirthLongitude()).toString();
+        descript = descript + "<br>" + Lang.getInstance().translate("P.Height") + ": " + person.getHeight();
 
-        descript = descript + "\n" + person.getDescription();
-        jTextArea_Description.setText(descript);
+        descript = descript + "<br>" + Library.to_HTML(person.getDescription());
+        jTextArea_Description.setText("<html>" + descript);
 
         jScrollPane1.setViewportView(jTextArea_Description);
 

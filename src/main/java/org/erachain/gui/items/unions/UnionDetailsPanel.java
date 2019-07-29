@@ -2,6 +2,7 @@ package org.erachain.gui.items.unions;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -73,7 +74,7 @@ public class UnionDetailsPanel extends JPanel {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(union.getDescription());
+        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(union.getDescription()) + "</html>");
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(txtName.getBorder());
         txtAreaDescription.setEditable(false);

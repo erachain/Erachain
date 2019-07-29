@@ -3,6 +3,7 @@ package org.erachain.gui.items.imprints;
 import javax.swing.JLabel;
 
 import org.erachain.core.item.imprints.ImprintCls;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.BalancesTableModel;
 import org.erachain.lang.Lang;
@@ -124,7 +125,7 @@ public class ImprintsInfoPanel extends javax.swing.JPanel {
         add(description_jLabel, gridBagConstraints);
 
         description_jTextArea.setEditable(false);
-        description_jTextArea.setText(imprint.getDescription());
+        description_jTextArea.setText("<html>" + Library.to_HTML(imprint.getDescription()));
         description_jTextArea.setColumns(20);
         description_jTextArea.setRows(5);
         jScrollPane1.setViewportView(description_jTextArea);

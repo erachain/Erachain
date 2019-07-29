@@ -2,6 +2,7 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.IssuePollRecord;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -33,7 +34,7 @@ public class IssuePollDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
+        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(poll.getDescription()));
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);

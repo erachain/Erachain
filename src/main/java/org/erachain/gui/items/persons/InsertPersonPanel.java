@@ -11,6 +11,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.transaction.IssuePersonDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
@@ -203,7 +204,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
             }
             TimeZone.setDefault(TimeZone.getDefault());
 
-            txtareaDescription.setText(person.getDescription() == null ? "" : person.getDescription());
+            txtareaDescription.setText(person.getDescription() == null ? "" : ("<html>" + Library.to_HTML(person.getDescription())));
 
             comboBoxGender.setSelectedIndex(person.getGender());
             txtGenderTxt.setText(comboBoxGender.getSelectedItem().toString());

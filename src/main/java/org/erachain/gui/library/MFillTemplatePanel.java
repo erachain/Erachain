@@ -242,7 +242,7 @@ public class MFillTemplatePanel extends JPanel {
 
         }
         jTextPane_Message_Public.pars.clear();
-        jTextPane_Message_Public.set_Text(ww);
+        jTextPane_Message_Public.set_Text("<html>" + Library.to_HTML(ww));
         HashMap<String, String> ss = jTextPane_Message_Public.get_Params();
         Set<String> sk = ss.keySet();
 

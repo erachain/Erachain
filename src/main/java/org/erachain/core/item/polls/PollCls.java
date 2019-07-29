@@ -148,7 +148,12 @@ public abstract class PollCls extends ItemCls {
     }
 
     public List<Long> getPersonCountVotes(DCSet dcSet) {
-        List<Long> votes = new ArrayList<>();
+
+
+        List<Long> votes = new ArrayList<>(this.options.size());
+        for (int i = 0; i < options.size(); i++) {
+            votes.add(0L);
+        }
 
         VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
         NavigableSet<Tuple3> optionVoteKeys;
@@ -161,11 +166,7 @@ public abstract class PollCls extends ItemCls {
             Integer optionNo = key.b;
             if (voter.isPerson(dcSet, 0)) {
                 Long count = votes.get(optionNo);
-                if (count == null) {
-                    votes.add(optionNo, 0L);
-                } else {
-                    votes.add(optionNo, count + 1L);
-                }
+                votes.add(optionNo, count + 1L);
             }
         }
 

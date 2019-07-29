@@ -1,6 +1,7 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.IssueImprintRecord;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -30,7 +31,7 @@ public class IssueImprintDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(imprintIssue.getItem().getDescription());
+        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(imprintIssue.getItem().getDescription()));
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);

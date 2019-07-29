@@ -3,6 +3,7 @@ package org.erachain.gui.items.templates;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MAccoutnTextField;
 import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.lang.Lang;
@@ -40,7 +41,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         initComponents();
 
         jTextField_Title.setText(template.viewName());
-        jTextArea_Content.setText(template.getDescription());
+        jTextArea_Content.setText("<html>" + Library.to_HTML(template.getDescription()) + "</html>");
 
     }
 

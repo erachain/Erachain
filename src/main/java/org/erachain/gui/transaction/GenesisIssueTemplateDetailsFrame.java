@@ -2,6 +2,7 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.GenesisIssueTemplateRecord;
+import org.erachain.gui.library.Library;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -33,7 +34,7 @@ public class GenesisIssueTemplateDetailsFrame extends RecGenesis_DetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(template.getDescription());
+        JTextArea txtAreaDescription = new JTextArea("<html>" + Library.to_HTML(template.getDescription()));
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);
