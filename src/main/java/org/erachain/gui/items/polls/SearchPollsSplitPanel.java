@@ -26,6 +26,9 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
     public SearchPollsSplitPanel() {
         super(tableModelPolls, "Search_Popll_Tab", "Search_Poll_Tab");
 
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(15);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(15);
+
         // ADD MENU ITEMS
         JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
         confirm_Menu.addActionListener(new ActionListener() {

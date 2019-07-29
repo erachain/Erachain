@@ -26,6 +26,9 @@ public class PollsFavoriteSplitPanel extends ItemSplitPanel {
         super(new FavoritePollsTableModel(), "PollsFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Polls"));
 
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(15);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(15);
+
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

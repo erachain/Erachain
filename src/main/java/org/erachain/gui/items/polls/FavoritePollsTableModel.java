@@ -13,13 +13,13 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_CONFIRMED = 3;
+    public static final int COLUMN_TOTAL_VOTES = 3;
     public static final int COLUMN_FAVORITE = 4;
 
     public FavoritePollsTableModel() {
         super(DCSet.getInstance().getItemPollMap(),
                 Controller.getInstance().wallet.database.getPollFavoritesSet(),
-                new String[]{"Key", "Name", "Publisher", "Confirmed", "Favorite"},
+                new String[]{"Key", "Name", "Publisher", "Votes", "Favorite"},
                 new Boolean[]{false, true, true, false, false},
                 ObserverMessage.WALLET_RESET_POLL_FAVORITES_TYPE,
                 ObserverMessage.WALLET_ADD_POLL_FAVORITES_TYPE,
@@ -34,31 +34,31 @@ public class FavoritePollsTableModel extends FavoriteItemModelTable implements O
             return null;
         }
 
-        PollCls status = (PollCls) this.list.get(row);
-        if (status == null)
+        PollCls poll = (PollCls) this.list.get(row);
+        if (poll == null)
             return null;
 
 
         switch (column) {
             case COLUMN_KEY:
 
-                return status.getKey(DCSet.getInstance());
+                return poll.getKey(DCSet.getInstance());
 
             case COLUMN_NAME:
 
-                return status;
+                return poll;
 
             case COLUMN_ADDRESS:
 
-                return status.getOwner().getPersonAsString();
+                return poll.getOwner().getPersonAsString();
 
-            case COLUMN_CONFIRMED:
+            case COLUMN_TOTAL_VOTES:
 
-                return status.isConfirmed();
+                return DCSet.getInstance().getVoteOnItemPollMap().countVotes(poll.getKey());
 
             case COLUMN_FAVORITE:
 
-                return status.isFavorite();
+                return poll.isFavorite();
 
         }
 

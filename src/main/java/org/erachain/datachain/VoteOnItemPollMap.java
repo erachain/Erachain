@@ -122,6 +122,16 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
         return key != null;
     }
 
+    public long countVotes(Long pollKey) {
+        BTreeMap map = (BTreeMap) this.map;
+
+        //FILTER ALL KEYS
+        return  ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+                Fun.t3(pollKey, null, null),
+                Fun.t3(pollKey, Fun.HI(), Fun.HI())).size();
+
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public boolean hasVotes(Long pollKey, Integer option) {
         BTreeMap map = (BTreeMap) this.map;
