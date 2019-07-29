@@ -86,7 +86,9 @@ public class ItemSplitPanel extends SplitPanel {
                 // TODO почемуто при выборе персоны сюда 2 раза прилетает и перерисовка дважды идет
                 jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
             } catch (Exception e) {
+                logger.error(e.getMessage(),e);
                 jScrollPaneJPanelRightPanel.setViewportView(null);
+
             }
             //	itemTableSelected = null;
 
@@ -94,8 +96,6 @@ public class ItemSplitPanel extends SplitPanel {
 
         // UPDATE FILTER ON TEXT CHANGE
 
-
-        // jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
         // mouse from favorine column
         jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override

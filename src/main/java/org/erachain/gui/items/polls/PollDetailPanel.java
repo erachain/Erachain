@@ -67,7 +67,7 @@ public class PollDetailPanel extends JPanel {
         // CREATOR
         detailGBC.gridy = 4;
 
-        Transaction issue_record = Transaction.findByDBRef(DCSet.getInstance(), poll.getReference());
+        Transaction issue_record = poll.getIssueTransaction(DCSet.getInstance());
 
         // LABEL NAME
         labelGBC.gridy = 2;

@@ -50,7 +50,7 @@ public class WalletItemPollsTableModel extends WalletAutoKeyTableModel<Tuple2<Lo
 
             case COLUMN_NAME:
 
-                return poll.getName();
+                return poll;
 
             case COLUMN_ADDRESS:
 
