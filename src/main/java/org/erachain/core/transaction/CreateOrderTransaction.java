@@ -230,22 +230,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 reference, signatureBytes, feeLong);
     }
 
-    /*
-    public void setDC(DCSet dcSet, int asDeal) {
+    public void setDC(DCSet dcSet) {
 
-        super.setDC(dcSet, asDeal);
+        super.setDC(dcSet);
 
-        this.haveAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.haveKey);
-        this.wantAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.wantKey);
+        if (dcSet != null && dcSet.getItemAssetMap() != null) {
+            this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
+            this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
+        }
 
-    }
-    */
-
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
-
-        this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
-        this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
     }
 
     public Long getOrderId() {

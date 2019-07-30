@@ -168,6 +168,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
                             record_stpit.jScrollPaneJPanelRightPanel.setViewportView(panel);
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
+                                logger.error(e.getMessage(), e);
                                 record_stpit.jScrollPaneJPanelRightPanel.setViewportView(null);
                             }
                         }
