@@ -520,15 +520,16 @@ public class TradeResource {
                         AssetCls want = null;
                         BigDecimal wantAmount = null;
 
-
-                        if (random.nextInt(2) > 1) {
+                        if (random.nextInt(2) == 0) {
                             have = haveStart;
-                            haveAmount = amounHaveStart.multiply(new BigDecimal((350.0 - random.nextInt(100)) / 300.0));
+                            haveAmount = amounHaveStart;
                             want = wantStart;
-                            wantAmount = amounWantStart;
+                            wantAmount = amounWantStart.multiply(new BigDecimal((1050.0 - random.nextInt(100)) / 1000.0))
+                                    .setScale(wantStart.getScale(), RoundingMode.HALF_DOWN);
                         } else {
                             have = wantStart;
-                            haveAmount = amounWantStart.multiply(new BigDecimal((350.0 - random.nextInt(100)) / 300.0));
+                            haveAmount = amounWantStart.multiply(new BigDecimal((1050.0 - random.nextInt(100)) / 1000.0))
+                                    .setScale(wantStart.getScale(), RoundingMode.HALF_DOWN);
                             want = haveStart;
                             wantAmount = amounHaveStart;
                         }
@@ -584,6 +585,8 @@ public class TradeResource {
 
                 } catch (Exception e10) {
                     // not see in Thread - logger.error(e10.getMessage(), e10);
+                    String error = e10.getMessage();
+                    error += "";
                 }
 
             } while (true);
