@@ -6,6 +6,8 @@ import org.erachain.core.transaction.CreatePollTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.Gui;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.models.ItemPollOptionsTableModel;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
@@ -65,6 +67,8 @@ public class PollDetailPanel extends JPanel {
         // CREATOR
         detailGBC.gridy = 4;
 
+        Transaction issue_record = poll.getIssueTransaction(DCSet.getInstance());
+
         // LABEL NAME
         labelGBC.gridy = 2;
         JLabel creatorLabel = new JLabel(Lang.getInstance().translate("Creator") + ":");
@@ -76,7 +80,7 @@ public class PollDetailPanel extends JPanel {
 
         // NAME
         detailGBC.gridy = 2;
-        JTextField creator = new JTextField(poll.getOwner().getAddress());
+        JTextField creator = new JTextField(poll.getOwner().getPersonAsString());
         creator.setEditable(false);
         GridBagConstraints gbc_creator = new GridBagConstraints();
         gbc_creator.fill = GridBagConstraints.HORIZONTAL;
@@ -87,18 +91,6 @@ public class PollDetailPanel extends JPanel {
 
         // LABEL DATE
         labelGBC.gridy = 3;
-
-        String dateTime = "";
-
-        List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap()
-                .getTransactionsByTypeAndAddress(poll.getOwner().getAddress(), Transaction.CREATE_POLL_TRANSACTION, 0);
-        for (Transaction transaction : transactions) {
-            CreatePollTransaction createPollTransaction = ((CreatePollTransaction) transaction);
-            if (createPollTransaction.getPoll().getName().equals(poll.getName())) {
-                dateTime = DateTimeFormat.timestamptoString(createPollTransaction.getTimestamp());
-                break;
-            }
-        }
 
         // DATE
         detailGBC.gridy = 3;
@@ -115,7 +107,14 @@ public class PollDetailPanel extends JPanel {
         // OPTIONS
         detailGBC.gridy = 5;
         pollOptionsTableModel = new ItemPollOptionsTableModel(poll, asset);
+
         optionsTable = Gui.createSortableTable(pollOptionsTableModel, 0);
+        optionsTable.getColumnModel().getColumn(0).setPreferredWidth(5);
+        optionsTable.getColumnModel().getColumn(1).setPreferredWidth(200);
+        optionsTable.getColumnModel().getColumn(2).setPreferredWidth(10);
+        optionsTable.getColumnModel().getColumn(3).setPreferredWidth(5);
+        optionsTable.getColumnModel().getColumn(4).setPreferredWidth(50);
+        optionsTable.getColumnModel().getColumn(5).setPreferredWidth(10);
 
         TableRowSorter<PollOptionsTableModel> sorter = (TableRowSorter<PollOptionsTableModel>) optionsTable.getRowSorter();
         sorter.setComparator(PollOptionsTableModel.COLUMN_VOTES, new BigDecimalStringComparator());
@@ -158,14 +157,14 @@ public class PollDetailPanel extends JPanel {
         gbc_name.gridy = 1;
         this.add(name, gbc_name);
 
-        JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation date:"));
+        JLabel dateLabel = new JLabel(Lang.getInstance().translate("Creation") + ":");
         GridBagConstraints gbc_dateLabel = new GridBagConstraints();
         gbc_dateLabel.insets = new Insets(0, 0, 5, 5);
         gbc_dateLabel.gridx = 1;
         gbc_dateLabel.gridy = 2;
         this.add(dateLabel, gbc_dateLabel);
 
-        JTextField date = new JTextField(dateTime);
+        JTextField date = new JTextField(issue_record.viewTimestamp() + " [" + issue_record.viewHeightSeq() + "]");
         date.setEditable(false);
         GridBagConstraints gbc_date = new GridBagConstraints();
         gbc_date.fill = GridBagConstraints.HORIZONTAL;
@@ -181,17 +180,21 @@ public class PollDetailPanel extends JPanel {
         gbc_descriptionLabel.gridy = 3;
         this.add(descriptionLabel, gbc_descriptionLabel);
 
-        JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
-        txtAreaDescription.setRows(4);
-        txtAreaDescription.setEditable(false);
+        MTextPane txtAreaDescription = new MTextPane();
+        txtAreaDescription.setText(poll.getDescription());
+        txtAreaDescription.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        txtAreaDescription.setPreferredSize(new Dimension(30, 260));
+
         GridBagConstraints gbc_txtAreaDescription = new GridBagConstraints();
         gbc_txtAreaDescription.fill = GridBagConstraints.HORIZONTAL;
         gbc_txtAreaDescription.insets = new Insets(0, 0, 5, 5);
         gbc_txtAreaDescription.gridx = 2;
         gbc_txtAreaDescription.gridy = 3;
+        gbc_txtAreaDescription.gridwidth = 10;
         this.add(txtAreaDescription, gbc_txtAreaDescription);
-
         txtAreaDescription.setBorder(name.getBorder());
+
+
         JLabel optionsLabel = new JLabel(Lang.getInstance().translate("Options") + ":");
         GridBagConstraints gbc_optionsLabel = new GridBagConstraints();
         gbc_optionsLabel.insets = new Insets(0, 0, 5, 5);

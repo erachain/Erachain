@@ -2,6 +2,8 @@ package org.erachain.gui.items.unions;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.unions.UnionCls;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -73,10 +75,10 @@ public class UnionDetailsPanel extends JPanel {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(union.getDescription());
-        txtAreaDescription.setRows(4);
+        MTextPane txtAreaDescription = new MTextPane(union.getDescription());
+        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(txtName.getBorder());
-        txtAreaDescription.setEditable(false);
+        //txtAreaDescription.setEditable(false);
         this.add(txtAreaDescription, detailGBC);
 
         //LABEL CREAtoR

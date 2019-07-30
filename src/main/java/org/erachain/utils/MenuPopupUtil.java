@@ -1,5 +1,6 @@
 package org.erachain.utils;
 
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 
 import javax.swing.*;
@@ -135,6 +136,43 @@ public class MenuPopupUtil {
                     item = new JMenuItem(new DefaultEditorKit.PasteAction());
                     item.setText(Lang.getInstance().translate("Paste"));
                     item.setEnabled(component.isEditable());
+                    menu.add(item);
+                    menu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+    }
+
+    public static void installContextMenu(final MTextPane component) {
+        component.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    showMenu(e);
+                }
+            }
+
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    showMenu(e);
+                }
+            }
+
+            public void showMenu(final MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    component.requestFocus();
+                    final JPopupMenu menu = new JPopupMenu();
+                    JMenuItem item;
+                    item = new JMenuItem(new DefaultEditorKit.CopyAction());
+                    item.setText(Lang.getInstance().translate("Copy"));
+                    item.setEnabled(false);
+                    menu.add(item);
+                    item = new JMenuItem(new DefaultEditorKit.CutAction());
+                    item.setText(Lang.getInstance().translate("Cut"));
+                    item.setEnabled(false);
+                    menu.add(item);
+                    item = new JMenuItem(new DefaultEditorKit.PasteAction());
+                    item.setText(Lang.getInstance().translate("Paste"));
+                    item.setEnabled(false);
                     menu.add(item);
                     menu.show(e.getComponent(), e.getX(), e.getY());
                 }

@@ -2,6 +2,8 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.IssueUnionRecord;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -33,10 +35,10 @@ public class IssueUnionDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(unionIssue.getItem().getDescription());
-        txtAreaDescription.setRows(4);
+        MTextPane txtAreaDescription = new MTextPane(unionIssue.getItem().getDescription());
+        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
-        txtAreaDescription.setEditable(false);
+        //txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
         this.add(txtAreaDescription, detailGBC);
 

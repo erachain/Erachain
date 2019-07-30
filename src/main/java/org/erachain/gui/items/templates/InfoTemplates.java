@@ -3,7 +3,9 @@ package org.erachain.gui.items.templates;
 import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MAccoutnTextField;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
@@ -28,7 +30,7 @@ public class InfoTemplates extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel_Content;
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea_Content;
+    private MTextPane jTextArea_Content;
     private MAccoutnTextField jTextField_Account_Creator;
     private javax.swing.JTextField jTextField_Title;
     private javax.swing.JPanel jPanel_Image;
@@ -52,7 +54,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         jLabel2 = new javax.swing.JLabel();
 
-        jTextArea_Content = new javax.swing.JTextArea();
+        jTextArea_Content = new MTextPane();
         jPanel_Image = new javax.swing.JPanel();
         new javax.swing.JScrollPane();
         new javax.swing.JTable();
@@ -143,12 +145,12 @@ public class InfoTemplates extends javax.swing.JPanel {
         gridBagConstraints_2.weighty = 0.2;
         jPanel_Image.add(jLabel2, gridBagConstraints_2);
 
-        jTextArea_Content.setColumns(20);
-        jTextArea_Content.setRows(6);
+        //jTextArea_Content.setColumns(20);
+        //jTextArea_Content.setRows(6);
         jTextArea_Content.setAlignmentY(1.0F);
-        jTextArea_Content.setWrapStyleWord(true);
-        jTextArea_Content.setLineWrap(true);
-        jTextArea_Content.setEditable(false);
+        //jTextArea_Content.setWrapStyleWord(true);
+        //jTextArea_Content.setLineWrap(true);
+        //jTextArea_Content.setEditable(false);
         MenuPopupUtil.installContextMenu(jTextArea_Content);
         jScrollPane1.setViewportView(jTextArea_Content);
 

@@ -35,7 +35,7 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                TemplateCls template = (TemplateCls) th.itemMenu;
+                TemplateCls template = (TemplateCls) itemTableSelected;
                 if (template == null) return;
                 Transaction trans = DCSet.getInstance().getTransactionFinalMap().get(template.getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
@@ -54,7 +54,7 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?template=" + itemMenu.getKey()));
+                            + "?template=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }

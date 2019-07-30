@@ -42,7 +42,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?asset=" + itemMenu.getKey()));
+                            + "?asset=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }
@@ -53,7 +53,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "To sell", ""));
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""));
 
             }
         });
@@ -61,7 +61,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls)th.itemMenu, null, "", ""));
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls)th.itemTableSelected, null, "", ""));
 
             }
         });
@@ -69,7 +69,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) th.itemMenu, null, "Buy", ""));
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) th.itemTableSelected, null, "Buy", ""));
 
             }
         });
@@ -78,7 +78,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(th.itemMenu.getReference());
+                Transaction trans = db.getTransactionFinalMap().get(th.itemTableSelected.getReference());
 
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 

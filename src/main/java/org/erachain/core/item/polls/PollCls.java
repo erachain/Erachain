@@ -11,15 +11,14 @@ import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.VoteOnItemPollMap;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.Pair;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NavigableSet;
+import java.util.*;
 
 public abstract class PollCls extends ItemCls {
 
@@ -147,8 +146,18 @@ public abstract class PollCls extends ItemCls {
         return votes;
     }
 
+    /**
+     * тут ошибка так как при переголосвании не учитывается повторное голосование - используй votesWithPersons
+     * @param dcSet
+     * @return
+     */
     public List<Long> getPersonCountVotes(DCSet dcSet) {
-        List<Long> votes = new ArrayList<>();
+
+
+        List<Long> votes = new ArrayList<>(this.options.size());
+        for (int i = 0; i < options.size(); i++) {
+            votes.add(0L);
+        }
 
         VoteOnItemPollMap map = dcSet.getVoteOnItemPollMap();
         NavigableSet<Tuple3> optionVoteKeys;
@@ -161,15 +170,69 @@ public abstract class PollCls extends ItemCls {
             Integer optionNo = key.b;
             if (voter.isPerson(dcSet, 0)) {
                 Long count = votes.get(optionNo);
-                if (count == null) {
-                    votes.add(optionNo, 0L);
-                } else {
-                    votes.add(optionNo, count + 1L);
-                }
+                votes.add(optionNo, count + 1L);
             }
         }
 
         return votes;
+    }
+
+    /**
+     * Можно задавать как номер актива так и позицию баланса. Если позиция = 0 то берем Имею + Долг
+     * @param dcSet
+     * @param assetKey
+     * @param balancePosition
+     * @return
+     */
+    public Fun.Tuple4<Integer, long[], BigDecimal, BigDecimal[]> votesWithPersons(DCSet dcSet, long assetKey, int balancePosition) {
+
+        int optionsSize = options.size();
+        long[] personVotes = new long[optionsSize];
+        int personsTotal = 0;
+
+        BigDecimal[] optionVotes = new BigDecimal[optionsSize];
+        for (int i = 0; i < optionVotes.length; i++) {
+            optionVotes[i] = BigDecimal.ZERO;
+        }
+
+        BigDecimal votesSum = BigDecimal.ZERO;
+
+        Set personsVotedSet = new HashSet<Long>();
+        Iterable<Pair<Account, Integer>> votes = getVotes(dcSet);
+        Iterator iterator = votes.iterator();
+        while (iterator.hasNext()) {
+
+            Pair<Account, Integer> item = (Pair<Account, Integer>)iterator.next();
+
+            int option = item.getB();
+            // voter = Account.makeAccountFromShort(item.getA());
+
+            Account voter = item.getA();
+            Fun.Tuple4<Long, Integer, Integer, Integer> personInfo = voter.getPersonDuration(dcSet);
+
+            // запретим голосовать много раз разными счетами одной персоне
+            if (personInfo != null
+                    && !personsVotedSet.contains(personInfo.a)) {
+                personVotes[option]++;
+                personsTotal++;
+
+                // запомним что он голосовал
+                personsVotedSet.add(personInfo.a);
+            }
+
+            BigDecimal votesVol;
+            if (balancePosition > 0) {
+                votesVol = voter.getBalanceInPosition(dcSet, assetKey, balancePosition).b;
+            } else {
+                votesVol = voter.getBalanceUSE(assetKey, dcSet);
+            }
+
+            optionVotes[option] = optionVotes[option].add(votesVol);
+            votesSum = votesSum.add(votesVol);
+
+        }
+
+        return new Fun.Tuple4<>(personsTotal, personVotes, votesSum, optionVotes);
     }
 
     public long getPersonCountTotalVotes(DCSet dcSet) {

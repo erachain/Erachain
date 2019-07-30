@@ -61,7 +61,7 @@ public class IssueConfirmDialog extends javax.swing.JDialog {
         if (insest <= 7) insest = 8;
         initComponents();
         jTitle_Label.setText(title_Text);
-        jTextPane1.set_text(text);
+        jTextPane1.setText(text);
         if (transaction != null) {
             String feeText = "" + Lang.getInstance().translate("Size") + ":&nbsp;"
                     + transaction.viewSize(Transaction.FOR_NETWORK) + " Bytes, ";
