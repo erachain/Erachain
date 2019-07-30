@@ -454,4 +454,167 @@ public class RSendResource {
 
     }
 
+    private static long test2Delay = 0;
+    private static Thread threadTest2;
+    private static List<PrivateKeyAccount> test2Creators;
+
+    /**
+     * GET r_send/test2/0.85/1000
+     * @param probability - с вероятностью. 1 = каждый раз
+     * @param delay
+     * @param password
+     * @return
+     */
+    @GET
+    @Path("test2/{probability}/{delay}")
+    public String test2(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
+
+        if (!BlockChain.DEVELOP_USE
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+        )
+            return "not LOCAL && not DEVELOP";
+
+        APIUtils.askAPICallAllowed(password, "GET test2\n ", request, true);
+
+        this.test2Delay = delay;
+
+        if (threadTest2 != null) {
+            JSONObject out = new JSONObject();
+            if (delay <= 0) {
+                threadTest2 = null;
+                out.put("status", "STOP");
+                LOGGER.info("r_send/test2 STOP");
+            } else {
+                out.put("delay", delay);
+                LOGGER.info("r_send/test2 DELAY UPDATE:" + delay);
+            }
+            return out.toJSONString();
+        }
+
+        // CACHE private keys
+        test2Creators = Controller.getInstance().getPrivateKeyAccounts();
+
+        // запомним счетчики для счетов
+        HashMap<String, Long> counters = new HashMap<String, Long>();
+        for (Account crestor: test2Creators) {
+            counters.put(crestor.getAddress(), 0L);
+        }
+
+        JSONObject out = new JSONObject();
+
+        if (test2Creators.size() <= 1) {
+            out.put("error", "too small accounts");
+
+            return out.toJSONString();
+        }
+
+        threadTest2 = new Thread(() -> {
+
+            Random random = new Random();
+            Controller cnt = Controller.getInstance();
+
+            do {
+
+                if (this.test2Delay <= 0) {
+                    return;
+                }
+
+                if (cnt.isOnStopping())
+                    return;
+
+                // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
+                if (probability < 1 && probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / probability) );
+                    if (rrr > 100) {
+                        try {
+                            Thread.sleep(this.test2Delay);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+
+                        continue;
+                    }
+                }
+
+                try {
+
+                    PrivateKeyAccount creator = test2Creators.get(random.nextInt(test2Creators.size()));
+                    Account recipient;
+                    do {
+                        recipient = test2Creators.get(random.nextInt(test2Creators.size()));
+                    } while (recipient.equals(creator));
+
+
+                    String address = creator.getAddress();
+                    long counter = counters.get(address);
+                    Transaction transaction = cnt.r_Send(creator,
+                            0, recipient,
+                            1l, new BigDecimal("0.00000001"), "LoadTestSend_" + address.substring(1, 5) + " " + counter,
+                            (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                            new byte[]{(byte) 1});
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                    // CLEAR for HEAP
+                    transaction.setDC(null);
+
+
+                    // CHECK VALIDATE MESSAGE
+                    if (result == Transaction.VALIDATE_OK) {
+
+                        counters.put(address, counter + 1);
+
+                    } else {
+                        if (result == Transaction.RECEIVER_NOT_PERSONALIZED
+                                || result == Transaction.CREATOR_NOT_PERSONALIZED
+                                || result == Transaction.NO_BALANCE
+                                || result == Transaction.NOT_ENOUGH_FEE
+                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
+
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+
+                            continue;
+                        }
+
+                        // not work in Threads - logger.info("test2: " + OnDealClick.resultMess(result));
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                        continue;
+                    }
+
+                    try {
+                        Thread.sleep(this.test2Delay);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                } catch (Exception e10) {
+                    // not see in Thread - logger.error(e10.getMessage(), e10);
+                }
+
+            } while (true);
+        });
+
+        threadTest2.setName("RSend.test2");
+        threadTest2.start();
+
+        out.put("delay", test2Delay);
+        LOGGER.info("r_send/test2 STARTED for delay: " + test2Delay);
+
+        return out.toJSONString();
+
+    }
+
 }
