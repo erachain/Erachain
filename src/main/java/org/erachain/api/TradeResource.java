@@ -1,6 +1,7 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
@@ -28,9 +29,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.Charset;
+import java.util.*;
 
 @Path("trade")
 @Produces(MediaType.APPLICATION_JSON)
@@ -375,4 +375,147 @@ public class TradeResource {
 
         return out.toJSONString();
     }
+
+    private static long test1Delay = 0;
+    private static Thread threadTest1;
+    private static List<PrivateKeyAccount> test1Creators;
+
+    @GET
+    @Path("test1/{delay}")
+    public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
+
+        if (!BlockChain.DEVELOP_USE
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+        )
+            return "not LOCAL && not DEVELOP";
+
+        APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
+
+        this.test1Delay = delay;
+
+        if (threadTest1 != null) {
+            JSONObject out = new JSONObject();
+            if (delay <= 0) {
+                threadTest1 = null;
+                out.put("status", "STOP");
+                LOGGER.info("trade/test1 STOP");
+            } else {
+                out.put("delay", delay);
+                LOGGER.info("trade/test1 DELAY UPDATE:" + delay);
+            }
+            return out.toJSONString();
+        }
+
+        // CACHE private keys
+        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+
+        // запомним счетчики для счетов
+        HashMap<String, Long> counters = new HashMap<String, Long>();
+        for (Account crestor: test1Creators) {
+            counters.put(crestor.getAddress(), 0L);
+        }
+
+        JSONObject out = new JSONObject();
+
+        if (test1Creators.size() <= 1) {
+            out.put("error", "too small accounts");
+
+            return out.toJSONString();
+        }
+
+        threadTest1 = new Thread(() -> {
+
+            Random random = new Random();
+            Controller cnt = Controller.getInstance();
+
+            do {
+
+                try {
+
+                    if (this.test1Delay <= 0) {
+                        return;
+                    }
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                    PrivateKeyAccount creator = test1Creators.get(random.nextInt(test1Creators.size()));
+                    Account recipient;
+                    do {
+                        recipient = test1Creators.get(random.nextInt(test1Creators.size()));
+                    } while (recipient.equals(creator));
+
+                    AssetCls have = null;
+                    BigDecimal haveAmount = null;
+                    AssetCls want = null;
+                    BigDecimal wantAmount = null;
+
+                    have = random.nextInt(2);
+
+                    String address = creator.getAddress();
+                    long counter = counters.get(address);
+                    Transaction transaction = cnt.createOrder(creator,
+                            have, want, haveAmount, wantAmount, 0);
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                    // CLEAR for HEAP
+                    transaction.setDC(null);
+
+
+                    // CHECK VALIDATE MESSAGE
+                    if (result == Transaction.VALIDATE_OK) {
+
+                        counters.put(address, counter + 1);
+
+                    } else {
+                        if (result == Transaction.NO_BALANCE
+                                || result == Transaction.NOT_ENOUGH_FEE
+                                ) {
+
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+
+                            continue;
+                        }
+
+                        // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                        continue;
+                    }
+
+                    try {
+                        Thread.sleep(this.test1Delay);
+                    } catch (InterruptedException e) {
+                    }
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                } catch (Exception e10) {
+                    // not see in Thread - logger.error(e10.getMessage(), e10);
+                }
+
+            } while (true);
+        });
+
+        threadTest1.setName("RSend.Test1");
+        threadTest1.start();
+
+        out.put("delay", test1Delay);
+        LOGGER.info("trade/test1 STARTED for delay: " + test1Delay);
+
+        return out.toJSONString();
+
+    }
+
 }
