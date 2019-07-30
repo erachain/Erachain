@@ -382,9 +382,16 @@ public class TradeResource {
     private static Thread threadTest1;
     private static List<PrivateKeyAccount> test1Creators;
 
+    /**
+     * GET trade/test1/0.85/1000
+     * @param probability
+     * @param delay
+     * @param password
+     * @return
+     */
     @GET
-    @Path("test1/{delay}")
-    public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
+    @Path("test1/{probability}/{delay}")
+    public String test1(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
         if (!BlockChain.DEVELOP_USE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
@@ -446,17 +453,31 @@ public class TradeResource {
 
             do {
 
+                if (this.test1Delay <= 0) {
+                    return;
+                }
+
+                if (cnt.isOnStopping())
+                    return;
+
+                // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
+                if (probability < 1 && probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / probability) );
+                    if (rrr > 100) {
+                        try {
+                            Thread.sleep(this.test1Delay);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+
+                        continue;
+                    }
+                }
+
                 String address;
                 long counter;
 
                 try {
-
-                    if (this.test1Delay <= 0) {
-                        return;
-                    }
-
-                    if (cnt.isOnStopping())
-                        return;
 
                     Transaction transaction;
 
@@ -520,15 +541,16 @@ public class TradeResource {
                         AssetCls want = null;
                         BigDecimal wantAmount = null;
 
-
-                        if (random.nextInt(2) > 1) {
+                        if (random.nextBoolean()) {
                             have = haveStart;
-                            haveAmount = amounHaveStart.multiply(new BigDecimal((350.0 - random.nextInt(100)) / 300.0));
+                            haveAmount = amounHaveStart;
                             want = wantStart;
-                            wantAmount = amounWantStart;
+                            wantAmount = amounWantStart.multiply(new BigDecimal((1050.0 - random.nextInt(100)) / 1000.0))
+                                    .setScale(wantStart.getScale(), RoundingMode.HALF_DOWN);
                         } else {
                             have = wantStart;
-                            haveAmount = amounWantStart.multiply(new BigDecimal((350.0 - random.nextInt(100)) / 300.0));
+                            haveAmount = amounWantStart.multiply(new BigDecimal((1050.0 - random.nextInt(100)) / 1000.0))
+                                    .setScale(wantStart.getScale(), RoundingMode.HALF_DOWN);
                             want = haveStart;
                             wantAmount = amounHaveStart;
                         }
@@ -584,6 +606,8 @@ public class TradeResource {
 
                 } catch (Exception e10) {
                     // not see in Thread - logger.error(e10.getMessage(), e10);
+                    String error = e10.getMessage();
+                    error += "";
                 }
 
             } while (true);

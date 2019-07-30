@@ -295,9 +295,16 @@ public class RSendResource {
     private static Thread threadTest1;
     private static List<PrivateKeyAccount> test1Creators;
 
+    /**
+     * GET r_send/test1/0.85/1000
+     * @param probability - с вероятностью. 1 = каждый раз
+     * @param delay
+     * @param password
+     * @return
+     */
     @GET
-    @Path("test1/{delay}")
-    public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
+    @Path("test1/{probability}/{delay}")
+    public String test1(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
         if (!BlockChain.DEVELOP_USE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
@@ -345,14 +352,28 @@ public class RSendResource {
 
             do {
 
-                try {
+                if (this.test1Delay <= 0) {
+                    return;
+                }
 
-                    if (this.test1Delay <= 0) {
-                        return;
+                if (cnt.isOnStopping())
+                    return;
+
+                // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
+                if (probability < 1 && probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / probability) );
+                    if (rrr > 100) {
+                        try {
+                            Thread.sleep(this.test1Delay);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+
+                        continue;
                     }
+                }
 
-                    if (cnt.isOnStopping())
-                        return;
+                try {
 
                     PrivateKeyAccount creator = test1Creators.get(random.nextInt(test1Creators.size()));
                     Account recipient;
@@ -410,6 +431,7 @@ public class RSendResource {
                     try {
                         Thread.sleep(this.test1Delay);
                     } catch (InterruptedException e) {
+                        break;
                     }
 
                     if (cnt.isOnStopping())
