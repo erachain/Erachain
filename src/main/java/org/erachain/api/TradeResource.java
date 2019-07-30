@@ -448,8 +448,19 @@ public class TradeResource {
             BigDecimal amounHaveStart = new BigDecimal("100");
             BigDecimal amounWantStart = amounHaveStart.multiply(rateStart);
 
-            // created orders
             HashMap<String, String> orders = new HashMap<>();
+            // check all created orders
+            for (PrivateKeyAccount account: test1Creators) {
+                List<Order> addressOrders = dcSet.getOrderMap().getOrdersForAddress(account.getAddress(), haveStart.getKey(), wantStart.getKey());
+                for (Order order: addressOrders) {
+                    Transaction createTx = dcSet.getTransactionFinalMap().get(order.getId());
+                    if (createTx != null) {
+                        // add as my orders
+                        orders.put(createTx.viewSignature(), order.getCreator().getAddress());
+                    }
+                }
+            }
+
 
             do {
 
@@ -481,7 +492,7 @@ public class TradeResource {
 
                     Transaction transaction;
 
-                    if (orders.size() / test1Creators.size() > 10) {
+                    if (orders.size() / test1Creators.size() >= 5) {
                         // если уже много ордеров на один счет то попробуем удалить какие-то
                         for (String txSign: orders.keySet()) {
 
@@ -500,6 +511,7 @@ public class TradeResource {
                                 for (PrivateKeyAccount crestor: test1Creators) {
                                     if (crestor.equals(orderCreateTx.getCreator())) {
                                         privateKey = crestor;
+                                        break;
                                     }
                                 }
 
