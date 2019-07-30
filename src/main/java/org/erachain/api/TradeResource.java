@@ -1,6 +1,7 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
@@ -13,6 +14,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.utils.Pair;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.erachain.gui.transaction.OnDealClick;
@@ -28,9 +30,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.RoundingMode;
+import java.nio.charset.Charset;
+import java.util.*;
 
 @Path("trade")
 @Produces(MediaType.APPLICATION_JSON)
@@ -375,4 +377,262 @@ public class TradeResource {
 
         return out.toJSONString();
     }
+
+    private static long test1Delay = 0;
+    private static Thread threadTest1;
+    private static List<PrivateKeyAccount> test1Creators;
+
+    /**
+     * GET trade/test1/0.85/1000
+     * @param probability
+     * @param delay
+     * @param password
+     * @return
+     */
+    @GET
+    @Path("test1/{probability}/{delay}")
+    public String test1(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
+
+        if (!BlockChain.DEVELOP_USE
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+        )
+            return "not LOCAL && not DEVELOP";
+
+        APIUtils.askAPICallAllowed(password, "GET trade/test1\n ", request, true);
+
+        this.test1Delay = delay;
+
+        if (threadTest1 != null) {
+            JSONObject out = new JSONObject();
+            if (delay <= 0) {
+                threadTest1 = null;
+                out.put("status", "STOP");
+                LOGGER.info("trade/test1 STOP");
+            } else {
+                out.put("delay", delay);
+                LOGGER.info("trade/test1 DELAY UPDATE:" + delay);
+            }
+            return out.toJSONString();
+        }
+
+        // CACHE private keys
+        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+
+        // запомним счетчики для счетов
+        HashMap<String, Long> counters = new HashMap<String, Long>();
+        for (Account crestor: test1Creators) {
+            counters.put(crestor.getAddress(), 0L);
+        }
+
+        JSONObject out = new JSONObject();
+
+        if (test1Creators.size() <= 1) {
+            out.put("error", "too small accounts");
+
+            return out.toJSONString();
+        }
+
+        threadTest1 = new Thread(() -> {
+
+            DCSet dcSet = DCSet.getInstance();
+
+            Random random = new Random();
+            Controller cnt = Controller.getInstance();
+
+            AssetCls haveStart = Controller.getInstance().getAsset(1L);
+            AssetCls wantStart = Controller.getInstance().getAsset(2L);
+
+            BigDecimal rateStart = new BigDecimal("0.005");
+            BigDecimal rateStartRev = BigDecimal.ONE.divide(rateStart, 8, RoundingMode.HALF_DOWN);
+
+            BigDecimal amounHaveStart = new BigDecimal("100");
+            BigDecimal amounWantStart = amounHaveStart.multiply(rateStart);
+
+            HashMap<String, String> orders = new HashMap<>();
+            // check all created orders
+            for (PrivateKeyAccount account: test1Creators) {
+                List<Order> addressOrders = dcSet.getOrderMap().getOrdersForAddress(account.getAddress(), haveStart.getKey(), wantStart.getKey());
+                for (Order order: addressOrders) {
+                    Transaction createTx = dcSet.getTransactionFinalMap().get(order.getId());
+                    if (createTx != null) {
+                        // add as my orders
+                        orders.put(createTx.viewSignature(), order.getCreator().getAddress());
+                    }
+                }
+            }
+
+
+            do {
+
+                if (this.test1Delay <= 0) {
+                    return;
+                }
+
+                if (cnt.isOnStopping())
+                    return;
+
+                // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
+                if (probability < 1 && probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / probability) );
+                    if (rrr > 100) {
+                        try {
+                            Thread.sleep(this.test1Delay);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+
+                        continue;
+                    }
+                }
+
+                String address;
+                long counter;
+
+                try {
+
+                    Transaction transaction;
+
+                    if (orders.size() / test1Creators.size() >= 5) {
+                        // если уже много ордеров на один счет то попробуем удалить какие-то
+                        for (String txSign: orders.keySet()) {
+
+                            Transaction orderCreateTx = dcSet.getTransactionFinalMap().get(Base58.decode(txSign));
+                            if (orderCreateTx == null) {
+                                // еше не подтвердилась
+                                continue;
+                            }
+
+                            if (dcSet.getOrderMap().contains(orderCreateTx.getDBRef())) {
+                                // создаем отмену ордера
+                                address = orderCreateTx.getCreator().getAddress();
+                                counter = counters.get(address);
+
+                                PrivateKeyAccount privateKey = null;
+                                for (PrivateKeyAccount crestor: test1Creators) {
+                                    if (crestor.equals(orderCreateTx.getCreator())) {
+                                        privateKey = crestor;
+                                        break;
+                                    }
+                                }
+
+                                if (privateKey == null)
+                                    continue;
+
+                                Pair<Transaction, Integer> cancelResult = cnt.cancelOrder(privateKey, orderCreateTx.getSignature(), 0);
+                                int result = cancelResult.getB();
+
+                                if (result == Transaction.VALIDATE_OK) {
+                                    counters.put(address, counter - 1);
+                                    orders.remove(txSign);
+                                    break;
+
+                                } else {
+                                    // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
+                                    try {
+                                        Thread.sleep(10000);
+                                    } catch (InterruptedException e) {
+                                        break;
+                                    }
+                                    continue;
+                                }
+                            }
+
+                        }
+
+                        continue;
+
+                    } else {
+                        PrivateKeyAccount creator = test1Creators.get(random.nextInt(test1Creators.size()));
+                        Account recipient;
+                        do {
+                            recipient = test1Creators.get(random.nextInt(test1Creators.size()));
+                        } while (recipient.equals(creator));
+
+                        AssetCls have = null;
+                        BigDecimal haveAmount = null;
+                        AssetCls want = null;
+                        BigDecimal wantAmount = null;
+
+                        if (random.nextBoolean()) {
+                            have = haveStart;
+                            haveAmount = amounHaveStart;
+                            want = wantStart;
+                            wantAmount = amounWantStart.multiply(new BigDecimal((1050.0 - random.nextInt(100)) / 1000.0))
+                                    .setScale(wantStart.getScale(), RoundingMode.HALF_DOWN);
+                        } else {
+                            have = wantStart;
+                            haveAmount = amounWantStart.multiply(new BigDecimal((1050.0 - random.nextInt(100)) / 1000.0))
+                                    .setScale(wantStart.getScale(), RoundingMode.HALF_DOWN);
+                            want = haveStart;
+                            wantAmount = amounHaveStart;
+                        }
+
+                        address = creator.getAddress();
+                        counter = counters.get(address);
+                        transaction = cnt.createOrder(creator,
+                                have, want, haveAmount, wantAmount, 0);
+
+                        if (cnt.isOnStopping())
+                            return;
+                    }
+
+                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                    // CLEAR for HEAP
+                    transaction.setDC(null);
+
+                    // CHECK VALIDATE MESSAGE
+                    if (result == Transaction.VALIDATE_OK) {
+                        orders.put(transaction.viewSignature(), address);
+                        counters.put(address, counter + 1);
+
+                    } else {
+                        if (result == Transaction.NO_BALANCE
+                                || result == Transaction.NOT_ENOUGH_FEE
+                        ) {
+
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+
+                            continue;
+                        }
+
+                        // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                        continue;
+                    }
+
+                    try {
+                        Thread.sleep(this.test1Delay);
+                    } catch (InterruptedException e) {
+                    }
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                } catch (Exception e10) {
+                    // not see in Thread - logger.error(e10.getMessage(), e10);
+                    String error = e10.getMessage();
+                    error += "";
+                }
+
+            } while (true);
+        });
+
+        threadTest1.setName("Trade.Test1");
+        threadTest1.start();
+
+        out.put("delay", test1Delay);
+        LOGGER.info("trade/test1 STARTED for delay: " + test1Delay);
+
+        return out.toJSONString();
+
+    }
+
 }
