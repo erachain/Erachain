@@ -77,8 +77,10 @@ public class HandledMap<K, V> extends ConcurrentHashMap {
 
         // REMOVE first KEY
         Object key = this.handledList.remove(0);
-        // REMOVE this KEY in HANDLED HASHMAP
-        super.remove(key);
+        if (key != null) {
+            // REMOVE this KEY in HANDLED HASHMAP
+            super.remove(key);
+        }
 
         return true;
     }
