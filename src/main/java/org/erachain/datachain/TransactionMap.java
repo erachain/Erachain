@@ -38,7 +38,7 @@ import java.util.*;
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 1;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class);
+    //private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class);
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -490,9 +490,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
 
-        LOGGER.debug("get ITERATOR");
+        //LOGGER.debug("get ITERATOR");
         Iterator<Long> iterator = this.getIterator(indexID, descending);
-        LOGGER.debug("get ITERATOR - DONE");
+        //LOGGER.debug("get ITERATOR - DONE");
 
         Transaction transaction;
         for (int i = 0; i < count; i++) {
