@@ -3476,6 +3476,9 @@ public class Controller extends Observable {
         if (onlyProtocolIndexing)
             LOGGER.info("-only protocol indexing");
 
+        if (HARD_WORK > 0)
+            LOGGER.info("-hard work = " + HARD_WORK);
+
         if (inMemoryDC)
             LOGGER.info("-in Memory DC");
 
