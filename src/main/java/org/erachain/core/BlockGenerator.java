@@ -234,7 +234,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
 
@@ -299,7 +298,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 //CHECK IF ENOUGH ROOM
-                if (++counter > BlockChain.MAX_BLOCK_SIZE) {
+                if (++counter > BlockChain.MAX_BLOCK_SIZE_GEN) {
                     counter--;
                     break;
                 }

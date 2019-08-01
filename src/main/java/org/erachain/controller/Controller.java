@@ -128,7 +128,10 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+
+    public static int HARD_WORK = 0;
     public boolean useGui = true;
+
     private List<Thread> threads = new ArrayList<Thread>();
     public static long buildTimestamp;
     private static Controller instance;
@@ -3430,7 +3433,7 @@ public class Controller extends Observable {
                         hartWork = 8;
                     }
                     if (hartWork > 0) {
-                        BlockChain.HARD_WORK = hartWork;
+                        HARD_WORK = hartWork;
                     }
                 } catch (Exception e) {
                 }

@@ -2,7 +2,6 @@ package org.erachain.webserver;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
@@ -98,7 +97,7 @@ public class APITelegramsResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
-        int limit = 1024 << (BlockChain.HARD_WORK >> 1);
+        int limit = 1024 << (Controller.HARD_WORK >> 1);
         JSONArray array = new JSONArray();
         for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(address, timestamp, filter)) {
             if (--limit < 0)
@@ -116,7 +115,7 @@ public class APITelegramsResource {
     public Response getTelegramsLimited(@PathParam("timestamp") long timestamp,
                                       @QueryParam("filter") String filter) {
 
-        int limit = 1024 << (BlockChain.HARD_WORK>>1);
+        int limit = 1024 << (Controller.HARD_WORK>>1);
         JSONArray array = new JSONArray();
         for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, null, filter)) {
             if (--limit < 0)

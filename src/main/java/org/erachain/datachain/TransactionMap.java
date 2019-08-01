@@ -1,10 +1,8 @@
 package org.erachain.datachain;
 
-import com.google.common.collect.ForwardingNavigableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
-import org.erachain.api.TransactionsResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -16,8 +14,6 @@ import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -261,8 +257,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             Long key = iterator.next();
             transaction = this.map.get(key);
             long deadline = transaction.getDeadline();
-            if (((BlockChain.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
-                    || BlockChain.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+            if (((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
+                    || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                     || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                 keys.add(key);
             } else {
