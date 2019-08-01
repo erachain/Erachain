@@ -35,7 +35,10 @@ public class BlockChain {
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
     public static final boolean DEVELOP_USE = true;
-    public static final boolean HARD_WORK = false;
+    /**
+     * 0 - default. 1-8 - HART UP. Start param^ -hardwork=3
+     */
+    public static int HARD_WORK = 0;
 
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
@@ -59,7 +62,7 @@ public class BlockChain {
     //
     public static final boolean ROBINHOOD_USE = false;
     public static final boolean ANONIM_SERT_USE = false;
-    public static final int NEED_PEERS_FOR_UPDATE = HARD_WORK ? 2 : 1;
+    //public static final int NEED_PEERS_FOR_UPDATE = HARD_WORK ? 2 : 1;
 
     public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
     public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
@@ -99,7 +102,7 @@ public class BlockChain {
 
     // отдельно для генерации блока - так чтобы от протокольных ограничений отвязаться
     ////public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK? 26333: 5000;
-    public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK? 26333: MAX_BLOCK_SIZE;
+    public static final int MAX_BLOCK_SIZE_GEN = HARD_WORK > 3? MAX_BLOCK_SIZE : MAX_BLOCK_SIZE >> 4;
     public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN * 200;
 
 

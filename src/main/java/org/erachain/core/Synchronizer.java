@@ -31,7 +31,7 @@ import java.util.TreeMap;
  */
 public class Synchronizer {
 
-    public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3;
+    public static final int GET_BLOCK_TIMEOUT = 30000 + BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> (6 - BlockChain.HARD_WORK >> 1);
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
     private static final int BYTES_MAX_GET = 1024 << 10;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);

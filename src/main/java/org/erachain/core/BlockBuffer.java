@@ -144,8 +144,7 @@ public class BlockBuffer extends Thread {
         this.counter = this.signatures.indexOf(signature);
 
         //
-        block = this.blocks.get(signature).poll(BlockChain.HARD_WORK?30000 : (Synchronizer.GET_BLOCK_TIMEOUT),
-                TimeUnit.MILLISECONDS);
+        block = this.blocks.get(signature).poll(Synchronizer.GET_BLOCK_TIMEOUT, TimeUnit.MILLISECONDS);
         if (block == null) {
             throw new Exception("Block buffer error 3 =null");
         }

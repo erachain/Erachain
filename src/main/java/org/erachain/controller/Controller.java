@@ -3422,6 +3422,20 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.startsWith("-hardwork=") && arg.length() > 10) {
+                try {
+                    int hartWork = Integer.parseInt(arg.substring(10));
+
+                    if (hartWork > 8) {
+                        hartWork = 8;
+                    }
+                    if (hartWork > 0) {
+                        BlockChain.HARD_WORK = hartWork;
+                    }
+                } catch (Exception e) {
+                }
+                continue;
+            }
             if (arg.startsWith("-seed=") && arg.length() > 6) {
                 seedCommand = arg.substring(6).split(":");
                 continue;

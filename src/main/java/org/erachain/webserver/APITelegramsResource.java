@@ -98,7 +98,7 @@ public class APITelegramsResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
         }
 
-        int limit = BlockChain.HARD_WORK? 10000 : 1000;
+        int limit = 1024 << (BlockChain.HARD_WORK >> 1);
         JSONArray array = new JSONArray();
         for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(address, timestamp, filter)) {
             if (--limit < 0)
@@ -116,7 +116,7 @@ public class APITelegramsResource {
     public Response getTelegramsLimited(@PathParam("timestamp") long timestamp,
                                       @QueryParam("filter") String filter) {
 
-        int limit = BlockChain.HARD_WORK? 10000 : 1000;
+        int limit = 1024 << (BlockChain.HARD_WORK>>1);
         JSONArray array = new JSONArray();
         for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, null, filter)) {
             if (--limit < 0)

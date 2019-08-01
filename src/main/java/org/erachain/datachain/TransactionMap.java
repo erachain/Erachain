@@ -261,8 +261,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             Long key = iterator.next();
             transaction = this.map.get(key);
             long deadline = transaction.getDeadline();
-            if (((BlockChain.HARD_WORK || cutDeadTime) && deadline < timestamp)
-                    || !BlockChain.HARD_WORK && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+            if (((BlockChain.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
+                    || BlockChain.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                     || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                 keys.add(key);
             } else {

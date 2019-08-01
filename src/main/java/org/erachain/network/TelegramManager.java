@@ -27,12 +27,12 @@ public class TelegramManager extends Thread {
     /**
      * count telegrams
      */
-    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 8000;
+    private static final int MAX_HANDLED_TELEGRAMS_SIZE = 1024 << (4 + BlockChain.HARD_WORK);
 
     /**
      * time to live telegram
      */
-    private static final int KEEP_TIME = 60000 * 60 * (BlockChain.HARD_WORK ? 2 : 24);
+    private static final int KEEP_TIME = 60000 * 60 * (25 - 3 * BlockChain.HARD_WORK);
     static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getName());
     private Network network;
     private boolean run;
