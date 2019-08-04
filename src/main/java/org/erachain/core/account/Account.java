@@ -509,14 +509,9 @@ public class Account {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getAddress(), key);
         if (BlockChain.DEVELOP_USE) {
-            if (key == 1)
-                return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(10000))),
-                        balance.b, balance.c, balance.d, balance.e);
-            else if (key == 2)
-                return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.TEN)), balance.b,
-                        balance.c, balance.d, balance.e);
+            return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key))),
+                    balance.b, balance.c, balance.d, balance.e);
         }
         return balance;
 
@@ -531,13 +526,9 @@ public class Account {
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             if (BlockChain.DEVELOP_USE) {
-                if (key == 1)
-                    return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(1000)));
-                else if (key == 2)
-                    return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.TEN));
+                return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
             }
 
-            return balance.a;
         } else if (actionType == TransactionAmount.ACTION_DEBT)
             return balance.b;
         else if (actionType == TransactionAmount.ACTION_HOLD)
