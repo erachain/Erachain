@@ -94,21 +94,21 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         this.addUses();
 
         try {
-            if (this.map.containsKey(key)) {
-                U u = this.map.get(key);
+            U u = this.map.get(key);
+            if (u != null) {
                 this.outUses();
                 return u;
-            } else {
+            }
+
+            if (parent != null) {
                 if (this.deleted == null || !this.deleted.containsKey(key)) {
-                    if (this.parent != null) {
-                        U u = this.parent.get(key);
-                        this.outUses();
-                        return u;
-                    }
+                    u = this.parent.get(key);
+                    this.outUses();
+                    return u;
                 }
             }
 
-            U u = this.getDefaultValue();
+            u = this.getDefaultValue();
             this.outUses();
             return u;
         } catch (Exception e) {
@@ -155,8 +155,6 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         try {
 
             U old = this.map.put(key, value);
-
-            U test = this.map.get(key);
 
             if (this.parent != null) {
                 //if (old != null)
@@ -209,22 +207,29 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
         value = this.map.remove(key);
 
-        if (value == null) {
-            if (this.parent != null) {
-                if (this.deleted == null) {
+        if (this.parent != null) {
+            // это форкнутая таблица
 
-                    //this.deleted = new ConcurrentHashMap(1024 , 0.75f, 4);
-                    this.deleted = new HashMap(1024 , 0.75f);
-                }
-                if (this.parent.contains(key)) {
-                    this.deleted.put(key, EMPTY);
-                    value = this.parent.get(key);
-                }
+            if (this.deleted == null) {
+                this.deleted = new HashMap(1024 , 0.75f);
             }
+
+            // добавляем в любом случае, так как
+            // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+            // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+            // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+            // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+            this.deleted.put(key, EMPTY);
+
+            if (value == null) {
+                // если тут нету то создадим пометку что удалили
+                value = this.parent.get(key);
+            }
+
             this.outUses();
             return value;
 
-        } else if (this.parent == null) {
+        } else {
 
             // NOTIFY
             if (this.observableData != null) {
