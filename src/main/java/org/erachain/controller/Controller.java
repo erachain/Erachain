@@ -1660,7 +1660,7 @@ public class Controller extends Observable {
     // SYNCHRONIZE
 
     public void orphanInPipe(Block block) throws Exception {
-        this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, false);
+        this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, false, false);
     }
 
     public boolean checkStatus(int shift) {
@@ -2562,7 +2562,7 @@ public class Controller extends Observable {
         LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
 
         try {
-            this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true);
+            this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
             this.network.clearHandledWinBlockMessages();
 
         } catch (Exception e) {
