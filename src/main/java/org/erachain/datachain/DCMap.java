@@ -32,7 +32,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
     //ConcurrentHashMap deleted;
     HashMap deleted;
-    Boolean EMPTY = true;
+    Boolean EXIST = true;
     int shiftSize;
 
 
@@ -219,7 +219,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
             // и это есть в основной базе, то в воркнутую будет помещена так же запись.
             // Получаем что запись есть и в Родителе и в Форкнутой таблице!
             // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
-            this.deleted.put(key, EMPTY);
+            this.deleted.put(key, EXIST);
 
             if (value == null) {
                 // если тут нету то создадим пометку что удалили
