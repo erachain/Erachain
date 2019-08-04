@@ -564,7 +564,7 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (!Controller.getInstance().isTestNet()
+        if (!DEVELOP_USE && !Controller.getInstance().isTestNet()
                 && height > VERS_4_11
                 && base > targetedWinValue) {
             return -targetedWinValue;
