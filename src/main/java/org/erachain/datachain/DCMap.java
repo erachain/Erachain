@@ -33,7 +33,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
     //ConcurrentHashMap deleted;
     HashMap deleted;
     Boolean EMPTY = true;
-    int shiftSize = 0;
+    int shiftSize;
 
 
     public DCMap(IDB databaseSet, DB database) {
