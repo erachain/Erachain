@@ -644,7 +644,7 @@ public class BlockChain {
                 previousForgingPoint = creator.getLastForgingData(dcSet);
             }
 
-            if (previousForgingPoint == null && previousForgingPoint.a.equals(height)) {
+            if (previousForgingPoint == null || previousForgingPoint.a.equals(height)) {
                 // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
                 previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
                 }
