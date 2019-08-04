@@ -491,6 +491,16 @@ public class Account {
 
     // REFERENCE
 
+    private BigDecimal addDEVAmount(long key) {
+        if (key == 1)
+            return BigDecimal.valueOf(( 512000 + 1000 * this.getShortAddressBytes()[10]) >> 6);
+        else if (key == 2)
+            return new BigDecimal("100.0");
+
+        return BigDecimal.ZERO;
+
+    }
+
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
             DCSet db, long key) {
         if (key < 0)
