@@ -334,7 +334,9 @@ public class Synchronizer {
             }
             LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
             LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
-            this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
+
+            // так как выше мы запоминаем откаченные транзакции то тут их не будем сохранять в базу
+            this.pipeProcessOrOrphan(dcSet, lastBlock, true, false, true);
 
             lastBlock = dcSet.getBlockMap().last();
         }
@@ -361,7 +363,7 @@ public class Synchronizer {
 
             // SYNCHRONIZED PROCESSING
             LOGGER.debug("*** begin PIPE");
-            this.pipeProcessOrOrphan(dcSet, block, false, false);
+            this.pipeProcessOrOrphan(dcSet, block, false, false, false);
 
             LOGGER.debug("*** begin REMOVE orphanedTransactions");
             for (Transaction transaction : block.getTransactions()) {
@@ -531,8 +533,8 @@ public class Synchronizer {
                 try {
                     // PROCESS BLOCK
 
-                    LOGGER.debug("try pipeProcessOrOrphan");
-                    this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);
+                    LOGGER.debug("try PROCESS");
+                    this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false, false);
 
                     LOGGER.debug("synchronize BLOCK END process");
                     blockBuffer.clearBlock(blockFromPeer.getSignature());
@@ -814,7 +816,7 @@ public class Synchronizer {
 
     // SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
     // SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
-    public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush)
+    public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush, boolean notStoreTXs)
             throws Exception {
         Controller cnt = Controller.getInstance();
 
@@ -841,7 +843,7 @@ public class Synchronizer {
         if (doOrphan) {
 
             try {
-                block.orphan(dcSet);
+                block.orphan(dcSet, notStoreTXs);
                 dcSet.getBlockMap().setProcessing(false);
                 //dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
