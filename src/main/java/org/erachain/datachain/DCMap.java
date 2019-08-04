@@ -3,7 +3,6 @@ package org.erachain.datachain;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.database.IDB;
-import org.erachain.database.wallet.DWSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -25,8 +24,17 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
     protected DCMap<T, U> parent;
-    protected List<T> deleted;
-    private int shiftSize;
+
+    /**
+     * пометка какие индексы не используются - отключим для ускорения
+     */
+    boolean OLD_USED_NOW = false;
+
+    //ConcurrentHashMap deleted;
+    HashMap deleted;
+    Boolean EMPTY = true;
+    int shiftSize = 0;
+
 
     public DCMap(IDB databaseSet, DB database) {
         super(databaseSet, database);
@@ -91,7 +99,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
                 this.outUses();
                 return u;
             } else {
-                if (this.deleted == null || !this.deleted.contains(key)) {
+                if (this.deleted == null || !this.deleted.containsKey(key)) {
                     if (this.parent != null) {
                         U u = this.parent.get(key);
                         this.outUses();
@@ -154,7 +162,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
                 //if (old != null)
                 //	++this.shiftSize;
                 if (this.deleted != null) {
-                    if (this.deleted.remove(key))
+                    if (this.deleted.remove(key) != null)
                         ++this.shiftSize;
                 }
             } else {
@@ -204,10 +212,12 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         if (value == null) {
             if (this.parent != null) {
                 if (this.deleted == null) {
-                    this.deleted = new ArrayList<T>();
+
+                    //this.deleted = new ConcurrentHashMap(1024 , 0.75f, 4);
+                    this.deleted = new HashMap(1024 , 0.75f);
                 }
                 if (this.parent.contains(key)) {
-                    this.deleted.add(key);
+                    this.deleted.put(key, EMPTY);
                     value = this.parent.get(key);
                 }
             }
@@ -252,7 +262,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
             this.outUses();
             return true;
         } else {
-            if (this.deleted == null || !this.deleted.contains(key)) {
+            if (this.deleted == null || !this.deleted.containsKey(key)) {
                 if (this.parent != null) {
                     boolean u = this.parent.contains(key);
 
