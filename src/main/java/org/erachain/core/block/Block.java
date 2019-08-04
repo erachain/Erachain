@@ -1279,6 +1279,9 @@ public class Block implements ExplorerJsonLine {
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
         if (this.winValue < 1) {
+            this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+            this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
             LOGGER.debug("*** forgingValue: " + this.forgingValue);
             return false;
@@ -1289,7 +1292,9 @@ public class Block implements ExplorerJsonLine {
         long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
         if (targetedWinValue < 1) {
-            //targetedWinValue = this.calcWinValueTargeted(dcSet);
+            this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+            this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+            targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
             LOGGER.debug("*** Block[" + this.heightBlock + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
             return false;
         }

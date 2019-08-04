@@ -635,17 +635,19 @@ public class BlockChain {
 
         Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
-        if (previousForgingPoint == null) {
-            // IF BLOCK not inserted in MAP
-            previousForgingPoint = creator.getLastForgingData(dcSet);
-            if (previousForgingPoint == null)
-                if (DEVELOP_USE)
-                    // - (height > VERS_4_11? 100 : 10), 1000);
-                    previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
-                else
-                    return 0l;
-        }
+        if (DEVELOP_USE) {
+            if (previousForgingPoint == null) {
+                // IF BLOCK not inserted in MAP
+                previousForgingPoint = creator.getLastForgingData(dcSet);
+            }
 
+            if (previousForgingPoint == null && previousForgingPoint.a == height) {
+                // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
+                previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
+                }
+        } else {
+            return 0l;
+        }
         int previousForgingHeight = previousForgingPoint.a;
 
         // OWN + RENT balance - in USE
