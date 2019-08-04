@@ -100,7 +100,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
 
             if (this.deleted != null) {
                 //DELETE DELETED
-                for (Tuple2 deleted : this.deleted) {
+                for (Object deleted : this.deleted.keySet()) {
                     states.remove(deleted);
                 }
             }

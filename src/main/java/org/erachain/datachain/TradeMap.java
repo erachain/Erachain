@@ -217,9 +217,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
             if (this.deleted != null) {
                 //DELETE DELETED
-                for (Tuple2 deleted : this.deleted) {
-                    combinedKeys.remove(deleted);
-                }
+                combinedKeys.removeAll(this.deleted.keySet());
             }
 
             //CONVERT SET BACK TO COLLECTION
