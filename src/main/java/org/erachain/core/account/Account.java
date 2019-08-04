@@ -529,6 +529,8 @@ public class Account {
                 return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
             }
 
+            return balance.a;
+
         } else if (actionType == TransactionAmount.ACTION_DEBT)
             return balance.b;
         else if (actionType == TransactionAmount.ACTION_HOLD)
