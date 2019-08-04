@@ -1282,7 +1282,7 @@ public class Block implements ExplorerJsonLine {
 
         this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
 
-        long currentTarget = this.parentBlockHead.target;
+        final long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
         if (targetedWinValue < 1) {
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
