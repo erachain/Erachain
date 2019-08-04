@@ -1,10 +1,8 @@
 package org.erachain.datachain;
 
-import com.google.common.collect.ForwardingNavigableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
-import org.erachain.api.TransactionsResource;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -278,6 +276,18 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     @Override
     public void update(Observable o, Object arg) {
+
+    }
+
+    public boolean set(Long key, Transaction transaction) {
+
+        int maxSize = Controller.getInstance().isStatusOK()?
+                BlockChain.MAX_BLOCK_SIZE_GEN << 3 : BlockChain.MAX_BLOCK_SIZE_GEN >> 1;
+        if (this.size() > maxSize) {
+            clearByDeadTimeAndLimit(0, false);
+        }
+
+        return this.set(key, transaction);
 
     }
 
