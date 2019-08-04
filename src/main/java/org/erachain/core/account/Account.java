@@ -493,7 +493,7 @@ public class Account {
 
     private BigDecimal addDEVAmount(long key) {
         if (key == 1)
-            return BigDecimal.valueOf(( 512000 + 1000 * this.getShortAddressBytes()[10]) >> 6);
+            return BigDecimal.valueOf(( 512000 + 500 * this.getShortAddressBytes()[10]) >> 6);
         else if (key == 2)
             return new BigDecimal("100.0");
 
