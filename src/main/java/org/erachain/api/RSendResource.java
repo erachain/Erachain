@@ -120,11 +120,11 @@ public class RSendResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("{creator}/{recipient}")
     public String sendPost(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                          @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
-                          @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
-                          String message,
-                          @QueryParam("encoding") int encoding,
-                          @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
+                           @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                           @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
+                           String message,
+                           @QueryParam("encoding") int encoding,
+                           @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
 
         return sendGet(creatorStr, recipientStr, feePowStr, assetKey, amount, title, message,encoding,encrypt, password);
 
@@ -292,6 +292,7 @@ public class RSendResource {
     }
 
     private static long test1Delay = 0;
+    private static float test1probability = 0;
     private static Thread threadTest1;
     private static List<PrivateKeyAccount> test1Creators;
 
@@ -308,12 +309,13 @@ public class RSendResource {
 
         if (!BlockChain.DEVELOP_USE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
-                )
+        )
             return "not LOCAL && not DEVELOP";
 
         APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
 
         this.test1Delay = delay;
+        this.test1probability = probability;
 
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
@@ -360,8 +362,8 @@ public class RSendResource {
                     return;
 
                 // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
-                if (probability < 1 && probability > 0) {
-                    int rrr = random.nextInt((int) (100.0 / probability) );
+                if (test1probability < 1 && test1probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / test1probability) );
                     if (rrr > 100) {
                         try {
                             Thread.sleep(this.test1Delay);
@@ -455,6 +457,7 @@ public class RSendResource {
     }
 
     private static long test2Delay = 0;
+    private static float test2probability = 0;
     private static Thread threadTest2;
     private static List<PrivateKeyAccount> test2Creators;
 
@@ -477,6 +480,7 @@ public class RSendResource {
         APIUtils.askAPICallAllowed(password, "GET test2\n ", request, true);
 
         this.test2Delay = delay;
+        this.test2probability = probability;
 
         if (threadTest2 != null) {
             JSONObject out = new JSONObject();
@@ -523,8 +527,8 @@ public class RSendResource {
                     return;
 
                 // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
-                if (probability < 1 && probability > 0) {
-                    int rrr = random.nextInt((int) (100.0 / probability) );
+                if (test2probability < 1 && test2probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / test2probability) );
                     if (rrr > 100) {
                         try {
                             Thread.sleep(this.test2Delay);
@@ -547,9 +551,10 @@ public class RSendResource {
 
                     String address = creator.getAddress();
                     long counter = counters.get(address);
+                    // ERA - она еще форжинговые балансы изменяет - поэтому КОМПУ лучше всего
                     Transaction transaction = cnt.r_Send(creator,
                             0, recipient,
-                            1l, new BigDecimal("0.00000001"), "LoadTestSend_" + address.substring(1, 5) + " " + counter,
+                            2l, new BigDecimal("0.00000001"), "LoadTestSend_" + address.substring(1, 5) + " " + counter,
                             (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
                             new byte[]{(byte) 1});
 
