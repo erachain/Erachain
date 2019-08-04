@@ -295,6 +295,6 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         if (parent == null)  {
             return getClass().getName();
         }
-        return parent.getClass().getName() + ".parent";
+        return getClass().getName() + ".FORK";
     }
 }
