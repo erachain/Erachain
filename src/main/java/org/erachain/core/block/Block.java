@@ -3,17 +3,14 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.Synchronizer;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
@@ -26,7 +23,6 @@ import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.ntp.NTP;
-import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
@@ -1050,15 +1046,23 @@ public class Block implements ExplorerJsonLine {
         transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
         data = Bytes.concat(data, transactionCountBytes);
 
-        for (Transaction transaction : this.getTransactions()) {
-            //WRITE TRANSACTION LENGTH
-            int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-            transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
-            data = Bytes.concat(data, transactionLengthBytes);
+        if (transactionCount > 0) {
+            if (rawTransactions == null) {
+                // нужно заново создавать
+                for (Transaction transaction : this.getTransactions()) {
+                    //WRITE TRANSACTION LENGTH
+                    int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                    byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
+                    transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
+                    data = Bytes.concat(data, transactionLengthBytes);
 
-            //WRITE TRANSACTION
-            data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
+                    //WRITE TRANSACTION
+                    data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
+                }
+            } else {
+                // уже есть готовые сырые данные
+                data = Bytes.concat(data, rawTransactions);
+            }
         }
 
         return data;
