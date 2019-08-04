@@ -2011,7 +2011,7 @@ public class Block implements ExplorerJsonLine {
     }
 
     public void orphan(DCSet dcSet) throws Exception {
-        orphan(DCSet dcSet, false);
+        orphan(dcSet, false);
     }
 
     private void orphanTransactions(DCSet dcSet, int height, boolean notStoreTXs) throws Exception {
