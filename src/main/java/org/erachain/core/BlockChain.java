@@ -652,6 +652,7 @@ public class BlockChain {
             if (previousForgingPoint == null)
                 return 0l;
         }
+
         int previousForgingHeight = previousForgingPoint.a;
 
         // OWN + RENT balance - in USE
