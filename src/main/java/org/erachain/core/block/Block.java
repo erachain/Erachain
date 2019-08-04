@@ -3,17 +3,14 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.apache.commons.net.util.Base64;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
-import org.erachain.core.Synchronizer;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
@@ -26,7 +23,6 @@ import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.ntp.NTP;
-import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
@@ -1934,7 +1930,7 @@ public class Block implements ExplorerJsonLine {
 
     }
 
-    public void orphan(DCSet dcSet) throws Exception {
+    public void orphan(DCSet dcSet, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
         if (cnt.isOnStopping())
@@ -1962,7 +1958,7 @@ public class Block implements ExplorerJsonLine {
 
         //ORPHAN TRANSACTIONS
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
-        this.orphanTransactions(dcSet, heightBlock);
+        this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
 
@@ -2014,7 +2010,11 @@ public class Block implements ExplorerJsonLine {
 
     }
 
-    private void orphanTransactions(DCSet dcSet, int height) throws Exception {
+    public void orphan(DCSet dcSet) throws Exception {
+        orphan(DCSet dcSet, false);
+    }
+
+    private void orphanTransactions(DCSet dcSet, int height, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
         //DLSet dbSet = Controller.getInstance().getDBSet();
@@ -2050,8 +2050,10 @@ public class Block implements ExplorerJsonLine {
             }
 
             if (notFork) {
-                //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-                unconfirmedMap.add(transaction);
+                if (!notStoreTXs) {
+                    //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
+                    unconfirmedMap.add(transaction);
+                }
 
                 Long key = Transaction.makeDBRef(height, seqNo);
 
