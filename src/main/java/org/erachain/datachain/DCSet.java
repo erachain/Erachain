@@ -392,9 +392,9 @@ public class DCSet extends DBASet implements Observer {
                 //////
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
-                .cacheHardRefEnable()
+                //.cacheHardRefEnable()
                 //.cacheLRUEnable()
-                ///.cacheSoftRefEnable()
+                .cacheSoftRefEnable()
                 ///.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
