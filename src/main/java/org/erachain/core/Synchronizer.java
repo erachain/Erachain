@@ -159,7 +159,8 @@ public class Synchronizer {
                 assert (sss == hhh);
             }
 
-            lastBlock.orphan(fork);
+            // тут нам не нужно сохранять откаченные транзакции - так как это форкнутая проверка
+            lastBlock.orphan(fork, true);
             DCSet.getInstance().clearCache();
 
             if (BlockChain.DEVELOP_USE) {
