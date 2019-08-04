@@ -649,7 +649,8 @@ public class BlockChain {
                 previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
                 }
         } else {
-            return 0l;
+            if (previousForgingPoint == null)
+                return 0l;
         }
         int previousForgingHeight = previousForgingPoint.a;
 
