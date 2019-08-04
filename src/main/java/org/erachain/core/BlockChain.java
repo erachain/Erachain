@@ -39,6 +39,9 @@ public class BlockChain {
 
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
+
+    static final public boolean CHECK_BUGS = true;
+
     /**
      * если задан - первое подключение к нему
      */
@@ -184,7 +187,7 @@ public class BlockChain {
                     //Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
                     //Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
                     //Base58.decode("23bci9zcrPunGppKCm6hKvfRoAStWv4JV2xe16tBEVZSmkCrhw7bXAFzPvv2jqZJXcbA8cmr8oMUfdmS1HJGab7s"),
-                    
+
                     //Base58.decode("54xdM25ommdxTbAVvP7C9cFYPmwaAexkWHfkhgb8yhfCVvvRNrs166q8maYuXWpk4w9ft2HvctaFaafnKNfjyoKR"),
                     //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };
@@ -393,7 +396,7 @@ public class BlockChain {
             /// Права для Кибальникова в Боевой Версии
             NOVA_ASSETS.put("ERG",
                     new Pair<Integer, byte[]>(20, new Account("7GiE2pKyrULF2iQhAXvdUusXYqiKRQx68m").getShortAddressBytes()));
-            
+
             //NOVA_ASSETS.put("@@USD",
             //		new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
             //NOVA_ASSETS.put("¤¤RUB",
@@ -635,17 +638,19 @@ public class BlockChain {
 
         Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
-        if (previousForgingPoint == null) {
-            // IF BLOCK not inserted in MAP
-            previousForgingPoint = creator.getLastForgingData(dcSet);
-            if (previousForgingPoint == null)
-                if (DEVELOP_USE)
-                    // - (height > VERS_4_11? 100 : 10), 1000);
-                    previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
-                else
-                    return 0l;
-        }
+        if (DEVELOP_USE) {
+            if (previousForgingPoint == null) {
+                // IF BLOCK not inserted in MAP
+                previousForgingPoint = creator.getLastForgingData(dcSet);
+            }
 
+            if (previousForgingPoint == null && previousForgingPoint.a == height) {
+                // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
+                previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
+                }
+        } else {
+            return 0l;
+        }
         int previousForgingHeight = previousForgingPoint.a;
 
         // OWN + RENT balance - in USE
