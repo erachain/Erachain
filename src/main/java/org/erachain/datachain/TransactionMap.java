@@ -277,6 +277,18 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     }
 
+    public boolean set(Long key, Transaction transaction) {
+
+        int maxSize = Controller.getInstance().isStatusOK()?
+                BlockChain.MAX_BLOCK_SIZE_GEN << 3 : BlockChain.MAX_BLOCK_SIZE_GEN >> 1;
+        if (this.size() > maxSize) {
+            clearByDeadTimeAndLimit(0, false);
+        }
+
+        return this.set(key, transaction);
+
+    }
+
     public boolean set(byte[] signature, Transaction transaction) {
 
         Long key = Longs.fromByteArray(signature);
