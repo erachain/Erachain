@@ -1747,7 +1747,13 @@ public class Block implements ExplorerJsonLine {
                 int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
                 if (privousForgingPoint == null) {
                     if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                        account.setForgingData(dcSet, this.heightBlock, currentForgingBalance);
+                        if (BlockChain.DEVELOP_USE) {
+                            // запоминаем чтобы не было отказов в сборке блоков
+                            account.setForgingData(dcSet, this.heightBlock - BlockChain.DEVELOP_FORGING_START,
+                                    currentForgingBalance);
+                        } else {
+                            account.setForgingData(dcSet, this.heightBlock, currentForgingBalance);
+                        }
                     }
                 } else {
                     // если это не инициализация то может на счете ранее нулевой баланс был
