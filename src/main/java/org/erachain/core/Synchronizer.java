@@ -200,7 +200,7 @@ public class Synchronizer {
         long myWeight = myHW.b;
         int newHeight = lastBlock.getHeight() + newBlocks.size();
         // проверять СИЛУ цепочки только если лна не на много лучше моей высоты
-        boolean checkFullWeight = testHeight + 2 > newHeight;
+        boolean checkFullWeight = !BlockChain.DEVELOP_USE && testHeight > newHeight;
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
@@ -783,10 +783,11 @@ public class Synchronizer {
         /**
          * Нам не нужно тут большую цепочку брать так как с откатом будет проверка блоков сначала и это может занять
          * слишком много времени - так что сначала синхронизируемся до ближайшего верхнего + 2
-         * Чтобы проверить правильность и силу цепочки
+         * Чтобы проверить правильность и силу цепочки/
          */
         int commonBockHeight = dcSet.getBlockSignsMap().get(lastCommonBlockSignature);
-        int needChainLenght = 2 + myChainHeight - commonBockHeight;
+        // Так же дальше будет проверка на силу цепочки - поэтому надо 3 блока добавить
+        int needChainLenght = 3 + myChainHeight - commonBockHeight;
         if (headers.size() > needChainLenght) {
             headers = headers.subList(0, needChainLenght);
         }
