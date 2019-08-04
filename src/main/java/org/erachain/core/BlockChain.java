@@ -95,12 +95,12 @@ public class BlockChain {
     public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
     public static final int MAX_REC_DATA_BYTES = 1 << 20; // MAX_BLOCK_SIZE_BYTES >>1;
 
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE<<3;
-    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
-
     // переопределим размеры по HARD
     public static final int MAX_BLOCK_SIZE_GEN = 10 * MAX_BLOCK_SIZE / (2 + Controller.HARD_WORK);
     public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN * 200;
+
+    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN<<3;
+    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
 
     public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
