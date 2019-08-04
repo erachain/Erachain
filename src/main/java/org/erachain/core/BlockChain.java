@@ -441,7 +441,7 @@ public class BlockChain {
 
         Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
-        if (DEVELOP_USE) {
+        if (true || DEVELOP_USE) {
             if (previousForgingPoint == null) {
                 // IF BLOCK not inserted in MAP
                 previousForgingPoint = creator.getLastForgingData(dcSet);
