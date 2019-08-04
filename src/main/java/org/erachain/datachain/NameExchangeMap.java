@@ -93,10 +93,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
 
             if (this.deleted != null) {
                 //DELETE DELETED
-                for (String deleted : this.deleted) {
-                    nameSales.remove(deleted);
-                }
-
+                nameSales.removeAll(deleted.keySet());
             }
         }
 
