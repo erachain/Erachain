@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Random;
 
 /**
  * набор таблиц. Поидее тут нужно хранить список таблиц и ссылку на родителя при Форке базы.
@@ -1315,17 +1316,14 @@ public class DCSet extends DBASet implements Observer {
 
     private DB getHardBase() {
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataDir(), "fork.dat");
+        File dbFile = new File(Settings.getInstance().getDataDir(), " fork" + new Random().nextInt());
         dbFile.getParentFile().mkdirs();
 
         /// https://jankotek.gitbooks.io/mapdb/performance/
         //CREATE DATABASE
         DB database = DBMaker.newFileDB(dbFile)
-                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
 
-                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCache(); --
-                ///.cacheDisable()
+                .deleteFilesAfterClose()
 
                 ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
                 //////
