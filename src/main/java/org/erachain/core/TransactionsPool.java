@@ -145,17 +145,22 @@ public class TransactionsPool extends MonitoredThread {
         }
 
         // проверяем на переборт трнзакций в пуле чтобы лишние очистить
-        if ((++clearCount >> 10) > 0) {
+        if (++clearCount > 1000) {
 
             clearCount = 0;
 
             if (controller.isStatusOK()) {
-                if (txMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE + 10000) {
+                if (txMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                     controller.clearUnconfirmedRecords(true);
                 }
             } else {
                 // если идет синхронизация, то удаляем все что есть не на текущее время
-                if (txMap.size() > BlockChain.MAX_BLOCK_SIZE_GEN >> 2) {
+                // и так как даже если мы вот-вот засинхримся мы все равно блок не сможем сразу собрать
+                // из-за мягкой синхронизации с сетью - а значит и нам не нужно заботиться об удаленных трнзакциях
+                // у нас - они будут включены другими нодами которые полностью в синхре
+                // мы выстыпаем лишь как ретрнслятор - при этом у нас запас по времени хранения все равно должен быть
+                // чтобы помнить какие транзакции мы уже словили и ретранслировали
+                if (txMap.size() > BlockChain.MAX_BLOCK_SIZE_GEN >> 1) {
                     txMap.clearByDeadTimeAndLimit(NTP.getTime(), true);
                 }
             }
