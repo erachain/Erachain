@@ -243,94 +243,92 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
-        if (idDatabase != null)
-            this.database = idDatabase;
+        this.database = idDatabase;
 
         this.parent = parent;
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
 
-        this.addressForging = new AddressForging(parent.addressForging);
-        this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap);
-        this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
-        this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs);
-        this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
-        this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
-        this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
-        //this.kKPollStatusMap = new KKUnionPollMap(parent.kKUnionStatusMap);
-        this.kKUnionStatusMap = new KKUnionStatusMap(parent.kKUnionStatusMap);
-        this.kKAssetUnionMap = new KKAssetUnionMap(parent.kKAssetUnionMap);
-        this.kKPersonUnionMap = new KKPersonUnionMap(parent.kKPersonUnionMap);
-        this.kKPollUnionMap = new KKPollUnionMap(parent.kKPollUnionMap);
+        this.addressForging = new AddressForging(parent.addressForging, this);
+        this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
+        this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap, this);
+        this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs, this);
+        this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap, this);
+        this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap, this);
+        this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap, this);
+        this.kKUnionStatusMap = new KKUnionStatusMap(parent.kKUnionStatusMap, this);
+        this.kKAssetUnionMap = new KKAssetUnionMap(parent.kKAssetUnionMap, this);
+        this.kKPersonUnionMap = new KKPersonUnionMap(parent.kKPersonUnionMap, this);
+        this.kKPollUnionMap = new KKPollUnionMap(parent.kKPollUnionMap, this);
+        this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap, this);
 
-        this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap);
-        this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap);
-        this.personAddressMap = new PersonAddressMap(parent.personAddressMap);
-        this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable);
+        this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap, this);
+        this.personAddressMap = new PersonAddressMap(parent.personAddressMap, this);
+        this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable, this);
         this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
-        this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns);
+        this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns, this);
         this.transactionMap = new TransactionMap(parent.transactionMap, this);
-        this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap);
-        this.hashesMap = new HashesMap(parent.hashesMap);
-        this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap);
+        this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
+        this.hashesMap = new HashesMap(parent.hashesMap, this);
+        this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
 
-        this.addressTime_SignatureMap = new AddressTimeSignatureMap(parent.addressTime_SignatureMap);
+        this.addressTime_SignatureMap = new AddressTimeSignatureMap(parent.addressTime_SignatureMap, this);
         this.blockMap = new BlockMap(parent.blockMap, this);
-        //this.blockCreatorMap = new BlockCreatorMap(parent.blockCreatorMap);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
         this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
-        this.referenceMap = new ReferenceMap(parent.referenceMap);
-        this.nameMap = new NameMap(parent.nameMap);
-        this.nameStorageMap = new NameStorageMap(parent.nameStorageMap);
-        this.orphanNameStorageMap = new OrphanNameStorageMap(parent.orphanNameStorageMap);
-        this.sharedPostsMap = new SharedPostsMap(parent.sharedPostsMap);
+        this.referenceMap = new ReferenceMap(parent.referenceMap, this);
+        //this.nameMap = new NameMap(parent.nameMap);
+        //this.nameStorageMap = new NameStorageMap(parent.nameStorageMap);
+        //this.orphanNameStorageMap = new OrphanNameStorageMap(parent.orphanNameStorageMap);
+        //this.sharedPostsMap = new SharedPostsMap(parent.sharedPostsMap);
 
-        this.postCommentMap = new PostCommentMap(parent.postCommentMap);
-        this.commentPostMap = new CommentPostMap(parent.commentPostMap);
-        this.orphanNameStorageHelperMap = new OrphanNameStorageHelperMap(parent.orphanNameStorageHelperMap);
-        this.localDataMap = new LocalDataMap(parent.localDataMap);
-        this.blogPostMap = new BlogPostMap(parent.blogPostMap);
-        this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
-        this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
-        this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
-        this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
+        //this.postCommentMap = new PostCommentMap(parent.postCommentMap);
+        //this.commentPostMap = new CommentPostMap(parent.commentPostMap);
+        //this.orphanNameStorageHelperMap = new OrphanNameStorageHelperMap(parent.orphanNameStorageHelperMap);
+        //this.localDataMap = new LocalDataMap(parent.localDataMap);
+        //this.blogPostMap = new BlogPostMap(parent.blogPostMap);
+        //this.hashtagPostMap = new HashtagPostMap(parent.hashtagPostMap);
+        //this.nameExchangeMap = new NameExchangeMap(parent.nameExchangeMap);
+        //this.updateNameMap = new UpdateNameMap(parent.updateNameMap);
+        //this.cancelSellNameMap = new CancelSellNameMap(parent.cancelSellNameMap);
 
-        this.pollMap = new PollMap(parent.pollMap);
-        this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
-        this.voteOnItemPollMap = new VoteOnItemPollMap(parent.voteOnItemPollMap);
+        //this.pollMap = new PollMap(parent.pollMap);
+        //this.voteOnPollMap = new VoteOnPollMap(parent.voteOnPollMap);
 
-        this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap);
-        this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap());
+        this.voteOnItemPollMap = new VoteOnItemPollMap(parent.voteOnItemPollMap, this);
+
+        this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap, this);
+        this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap(), this);
         this.orderMap = new OrderMap(parent.orderMap, this);
-        this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap);
+        this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap, this);
         this.tradeMap = new TradeMap(parent.tradeMap, this);
 
-        this.itemImprintMap = new ItemImprintMap(parent.itemImprintMap);
-        this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap);
+        this.itemImprintMap = new ItemImprintMap(parent.itemImprintMap, this);
+        this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap, this);
 
-        this.itemTemplateMap = new ItemTemplateMap(parent.itemTemplateMap);
-        this.issueTemplateMap = new IssueTemplateMap(parent.getIssueTemplateMap());
+        this.itemTemplateMap = new ItemTemplateMap(parent.itemTemplateMap, this);
+        this.issueTemplateMap = new IssueTemplateMap(parent.getIssueTemplateMap(), this);
 
-        this.itemStatementMap = new ItemStatementMap(parent.itemStatementMap);
-        this.issueStatementMap = new IssueStatementMap(parent.issueStatementMap);
+        this.itemStatementMap = new ItemStatementMap(parent.itemStatementMap, this);
+        this.issueStatementMap = new IssueStatementMap(parent.issueStatementMap, this);
 
-        this.itemPersonMap = new ItemPersonMap(parent.getItemPersonMap());
-        this.issuePersonMap = new IssuePersonMap(parent.getIssuePersonMap());
+        this.itemPersonMap = new ItemPersonMap(parent.getItemPersonMap(), this);
+        this.issuePersonMap = new IssuePersonMap(parent.getIssuePersonMap(), this);
 
-        this.itemPollMap = new ItemPollMap(parent.itemPollMap);
-        this.issuePollMap = new IssuePollMap(parent.issuePollMap);
+        this.itemPollMap = new ItemPollMap(parent.itemPollMap, this);
+        this.issuePollMap = new IssuePollMap(parent.issuePollMap, this);
 
-        this.itemStatusMap = new ItemStatusMap(parent.itemStatusMap);
-        this.issueStatusMap = new IssueStatusMap(parent.issueStatusMap);
+        this.itemStatusMap = new ItemStatusMap(parent.itemStatusMap, this);
+        this.issueStatusMap = new IssueStatusMap(parent.issueStatusMap, this);
 
-        this.itemUnionMap = new ItemUnionMap(parent.itemUnionMap);
-        this.issueUnionMap = new IssueUnionMap(parent.issueUnionMap);
+        this.itemUnionMap = new ItemUnionMap(parent.itemUnionMap, this);
+        this.issueUnionMap = new IssueUnionMap(parent.issueUnionMap, this);
 
-        this.atMap = new ATMap(parent.atMap);
-        this.atStateMap = new ATStateMap(parent.atStateMap);
+        this.atMap = new ATMap(parent.atMap, this);
+        this.atStateMap = new ATStateMap(parent.atStateMap, this);
 
-        this.atTransactionMap = new ATTransactionMap(parent.atTransactionMap);
+        this.atTransactionMap = new ATTransactionMap(parent.atTransactionMap, this);
 
         this.outUses();
     }
@@ -1318,6 +1316,62 @@ public class DCSet extends DBASet implements Observer {
         return this.atTransactionMap;
     }
 
+    private DB getHardBase() {
+        //OPEN DB
+        File dbFile = new File(Settings.getInstance().getDataDir(), "fork.dat");
+        dbFile.getParentFile().mkdirs();
+
+        /// https://jankotek.gitbooks.io/mapdb/performance/
+        //CREATE DATABASE
+        DB database = DBMaker.newFileDB(dbFile)
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
+
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCache(); --
+                ///.cacheDisable()
+
+                ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
+                //////
+                // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                // у другого типа КЭША происходит утечка памяти
+                //.cacheHardRefEnable()
+                //.cacheLRUEnable()
+                ///.cacheSoftRefEnable()
+                .cacheWeakRefEnable()
+
+                // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
+                .cacheSize(10000)
+
+                .checksumEnable()
+                .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
+                .commitFileSyncDisable() // ++
+
+                //.snapshotEnable()
+                //.asyncWriteEnable()
+                //.asyncWriteFlushDelay(100)
+                //.cacheHardRefEnable()
+
+                // если при записи на диск блока процессор сильно нагружается - то уменьшить это
+                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+
+                //.compressionEnable()
+
+                /*
+                .cacheSize(CASH_SIZE)
+                //.checksumEnable()
+                .cacheHardRefEnable()
+                .commitFileSyncDisable()
+                //////.transactionDisable()
+                //.asyncWriteEnable() ///
+                //.asyncWriteFlushDelay(1000) //
+                //.mmapFileEnableIfSupported()
+                 */
+                .make();
+
+        return database;
+    }
+
     /**
      * создать форк
      * @return
@@ -1326,7 +1380,7 @@ public class DCSet extends DBASet implements Observer {
         this.addUses();
 
         try {
-            DCSet fork = new DCSet(this, null);
+            DCSet fork = new DCSet(this, getHardBase());
 
             this.outUses();
             return fork;

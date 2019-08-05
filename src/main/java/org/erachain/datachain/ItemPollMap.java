@@ -1,6 +1,5 @@
 package org.erachain.datachain;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.serializer.ItemSerializer;
 import org.mapdb.DB;
@@ -29,8 +28,8 @@ public class ItemPollMap extends ItemMap {
 
     }
 
-    public ItemPollMap(ItemPollMap parent) {
-        super(parent);
+    public ItemPollMap(ItemPollMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     // type+name not initialized yet! - it call as Super in New

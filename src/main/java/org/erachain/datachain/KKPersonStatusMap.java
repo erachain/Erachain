@@ -37,8 +37,8 @@ public class KKPersonStatusMap extends KKMap {
         );
     }
 
-    public KKPersonStatusMap(KKPersonStatusMap parent) {
-        super(parent);
+    public KKPersonStatusMap(KKPersonStatusMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

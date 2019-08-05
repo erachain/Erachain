@@ -42,8 +42,8 @@ public class ATMap extends DCMap<String, AT> {
         }
     }
 
-    public ATMap(ATMap parent) {
-        super(parent, null);
+    public ATMap(ATMap parent, DCSet dcSet) {
+        super(parent, dcSet);
         this.parentATMap = parent;
 
     }

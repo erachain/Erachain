@@ -1,9 +1,7 @@
 package org.erachain.datachain;
 
-import org.erachain.core.account.Account;
 import org.erachain.database.DBMap;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -11,7 +9,6 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -40,8 +37,8 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
 
     }
 
-    public VoteOnItemPollMap(VoteOnItemPollMap parent) {
-        super(parent, null);
+    public VoteOnItemPollMap(VoteOnItemPollMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

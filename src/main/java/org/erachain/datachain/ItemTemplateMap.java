@@ -26,8 +26,8 @@ public class ItemTemplateMap extends ItemMap {
         );
     }
 
-    public ItemTemplateMap(ItemTemplateMap parent) {
-        super(parent);
+    public ItemTemplateMap(ItemTemplateMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     // type+name not initialized yet! - it call as Super in New

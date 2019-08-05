@@ -29,8 +29,8 @@ public class ItemUnionMap extends ItemMap {
 
     }
 
-    public ItemUnionMap(ItemUnionMap parent) {
-        super(parent);
+    public ItemUnionMap(ItemUnionMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     // type+name not initialized yet! - it call as Super in New

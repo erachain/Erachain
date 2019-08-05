@@ -16,8 +16,8 @@ public class IssuePollMap extends IssueItemMap {
         super(databaseSet, database);
     }
 
-    public IssuePollMap(IssuePollMap parent) {
-        super(parent);
+    public IssuePollMap(IssuePollMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

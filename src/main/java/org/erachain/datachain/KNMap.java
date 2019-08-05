@@ -47,8 +47,8 @@ public class KNMap extends DCMap<
 
     }
 
-    public KNMap(KNMap parent) {
-        super(parent, null);
+    public KNMap(KNMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 
