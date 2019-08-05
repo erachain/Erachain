@@ -9,6 +9,8 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -60,6 +62,8 @@ public class RSend extends TransactionAmount {
     public static final int NO_DATA_MASK = 128; // 0x10000000
     public static final int MAX_DATA_VIEW = 64;
     //private static int position;
+
+    static Logger LOGGER = LoggerFactory.getLogger(RSend.class.getName());
 
     protected static final int LOAD_LENGTH = IS_TEXT_LENGTH + ENCRYPTED_LENGTH + DATA_SIZE_LENGTH;
 
