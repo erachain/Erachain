@@ -417,8 +417,10 @@ public class TradeResource {
             return out.toJSONString();
         }
 
+        Controller controller = Controller.getInstance();
+
         // CACHE private keys
-        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+        test1Creators = controller.getPrivateKeyAccounts();
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();
@@ -439,10 +441,10 @@ public class TradeResource {
             DCSet dcSet = DCSet.getInstance();
 
             Random random = new Random();
-            Controller cnt = Controller.getInstance();
+            Controller cnt = controller;
 
-            AssetCls haveStart = Controller.getInstance().getAsset(1L);
-            AssetCls wantStart = Controller.getInstance().getAsset(2L);
+            AssetCls haveStart = controller.getAsset(1L);
+            AssetCls wantStart = controller.getAsset(2L);
 
             BigDecimal rateStart = new BigDecimal("0.0005");
             BigDecimal rateStartRev = BigDecimal.ONE.divide(rateStart, 8, RoundingMode.HALF_DOWN);
@@ -450,6 +452,8 @@ public class TradeResource {
             BigDecimal amounHaveStart = new BigDecimal("0.1");
             BigDecimal amounWantStart = amounHaveStart.multiply(rateStart);
 
+            Transaction transaction;
+            HashMap<String, String> orders = new HashMap<>();
 
             do {
 
@@ -479,23 +483,27 @@ public class TradeResource {
 
                 try {
 
-                    Transaction transaction;
+                    // если отключены непротокольные индексы то не найдем ничего для счета этого
+                    if (controller.onlyProtocolIndexing) {
 
-                    HashMap<String, String> orders = new HashMap<>();
-                    // check all created orders
-                    for (PrivateKeyAccount account: test1Creators) {
-                        List<Order> addressOrders = dcSet.getOrderMap().getOrdersForAddress(account.getAddress(), haveStart.getKey(), wantStart.getKey());
-                        for (Order order: addressOrders) {
-                            Transaction createTx = dcSet.getTransactionFinalMap().get(order.getId());
-                            if (createTx != null) {
-                                // add as my orders
-                                DCSet forkCreator = cnt.getTransactionCreator().getFork();
-                                if (forkCreator != null && !order.isActive(forkCreator)) {
-                                    // если заказ уже был отменен но в неподтвержденных отмена лежит
-                                    continue;
+                    } else {
+
+
+                        // check all created orders
+                        for (PrivateKeyAccount account : test1Creators) {
+                            List<Order> addressOrders = dcSet.getOrderMap().getOrdersForAddress(account.getAddress(), haveStart.getKey(), wantStart.getKey());
+                            for (Order order : addressOrders) {
+                                Transaction createTx = dcSet.getTransactionFinalMap().get(order.getId());
+                                if (createTx != null) {
+                                    // add as my orders
+                                    DCSet forkCreator = cnt.getTransactionCreator().getFork();
+                                    if (forkCreator != null && !order.isActive(forkCreator)) {
+                                        // если заказ уже был отменен но в неподтвержденных отмена лежит
+                                        continue;
+                                    }
+
+                                    orders.put(createTx.viewSignature(), order.getCreator().getAddress());
                                 }
-
-                                orders.put(createTx.viewSignature(), order.getCreator().getAddress());
                             }
                         }
                     }
@@ -543,6 +551,9 @@ public class TradeResource {
                                     }
                                     continue;
                                 }
+                            } else {
+                                // уже сыгранный
+                                orders.remove(txSign);
                             }
 
                         }
