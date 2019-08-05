@@ -1314,9 +1314,10 @@ public class DCSet extends DBASet implements Observer {
         return this.atTransactionMap;
     }
 
+    Random randFork = new Random();
     private DB getHardBase() {
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataDir(), " fork" + new Random().nextInt());
+        File dbFile = new File(Settings.getInstance().getDataDir(), "fork" + randFork.nextInt());
         dbFile.getParentFile().mkdirs();
 
         /// https://jankotek.gitbooks.io/mapdb/performance/
