@@ -22,8 +22,8 @@ public class UnionAssetsBalance extends BalanceMap {
         );
     }
 
-    public UnionAssetsBalance(UnionAssetsBalance parent) {
-        super(parent);
+    public UnionAssetsBalance(UnionAssetsBalance parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

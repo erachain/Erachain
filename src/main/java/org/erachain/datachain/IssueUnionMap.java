@@ -16,8 +16,8 @@ public class IssueUnionMap extends IssueItemMap {
         super(databaseSet, database);
     }
 
-    public IssueUnionMap(IssueUnionMap parent) {
-        super(parent);
+    public IssueUnionMap(IssueUnionMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

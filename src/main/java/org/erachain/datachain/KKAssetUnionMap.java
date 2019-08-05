@@ -20,8 +20,8 @@ public class KKAssetUnionMap extends KKMap {
         );
     }
 
-    public KKAssetUnionMap(KKAssetUnionMap parent) {
-        super(parent);
+    public KKAssetUnionMap(KKAssetUnionMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

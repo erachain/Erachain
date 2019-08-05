@@ -21,8 +21,8 @@ public class KKUnionStatusMap extends KKMap {
         );
     }
 
-    public KKUnionStatusMap(KKUnionStatusMap parent) {
-        super(parent);
+    public KKUnionStatusMap(KKUnionStatusMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

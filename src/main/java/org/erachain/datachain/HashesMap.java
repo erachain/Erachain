@@ -4,7 +4,6 @@ import com.google.common.primitives.UnsignedBytes;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -16,8 +15,8 @@ public class HashesMap extends DCMap<byte[], byte[]> {
         super(databaseSet, database);
     }
 
-    public HashesMap(HashesMap parent) {
-        super(parent, null);
+    public HashesMap(HashesMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

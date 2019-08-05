@@ -24,8 +24,8 @@ public class KKKMapPersonStatusUnion extends KKKMap {
         );
     }
 
-    public KKKMapPersonStatusUnion(KKKMapPersonStatusUnion parent) {
-        super(parent);
+    public KKKMapPersonStatusUnion(KKKMapPersonStatusUnion parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

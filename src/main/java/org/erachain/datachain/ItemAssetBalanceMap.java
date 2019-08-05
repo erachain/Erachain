@@ -12,7 +12,6 @@ import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -51,8 +50,8 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<String, Long>, Tuple5<
         }
     }
 
-    public ItemAssetBalanceMap(ItemAssetBalanceMap parent) {
-        super(parent, null);
+    public ItemAssetBalanceMap(ItemAssetBalanceMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

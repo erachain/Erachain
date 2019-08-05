@@ -31,8 +31,8 @@ public class AddressTimeSignatureMap extends DCMap<Tuple2<String, Long>, byte[]>
         super(databaseSet, database);
     }
 
-    public AddressTimeSignatureMap(AddressTimeSignatureMap parent) {
-        super(parent, null);
+    public AddressTimeSignatureMap(AddressTimeSignatureMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

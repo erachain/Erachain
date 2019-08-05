@@ -63,8 +63,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
         }
     }
 
-    public ItemMap(ItemMap parent) {
-        super(parent, null);
+    public ItemMap(ItemMap parent, DCSet dcSet) {
+        super(parent, dcSet);
         key = parent.getLastKey();
     }
 
