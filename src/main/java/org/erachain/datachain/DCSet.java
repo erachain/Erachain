@@ -34,7 +34,7 @@ import java.util.Random;
  * Но почемуто парент хранится в каждой таблице - хотя там сразу ссылка на форкнутую таблицу есть
  * а в ней уже хранится объект набора DCSet
  */
-public class DCSet extends DBASet implements Observer {
+public class DCSet<forkRand> extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE << 3;
@@ -1314,9 +1314,11 @@ public class DCSet extends DBASet implements Observer {
         return this.atTransactionMap;
     }
 
+    Random randFork = new Random();
     private DB getHardBase() {
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataDir(), " fork" + new Random().nextInt());
+        String forkName = "fork" + randFork.nextInt();
+        File dbFile = new File(Settings.getInstance().getDataDir(), forkName);
         dbFile.getParentFile().mkdirs();
 
         /// https://jankotek.gitbooks.io/mapdb/performance/
