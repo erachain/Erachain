@@ -1325,6 +1325,7 @@ public class DCSet extends DBASet implements Observer {
         DB database = DBMaker.newFileDB(dbFile)
 
                 .deleteFilesAfterClose()
+                .transactionDisable()
 
                 ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
                 //////
@@ -1358,7 +1359,6 @@ public class DCSet extends DBASet implements Observer {
                 //.checksumEnable()
                 .cacheHardRefEnable()
                 .commitFileSyncDisable()
-                //////.transactionDisable()
                 //.asyncWriteEnable() ///
                 //.asyncWriteFlushDelay(1000) //
                 //.mmapFileEnableIfSupported()
