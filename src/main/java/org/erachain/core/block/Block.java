@@ -1046,7 +1046,7 @@ public class Block implements ExplorerJsonLine {
         data = Bytes.concat(data, transactionCountBytes);
 
         if (transactionCount > 0) {
-            if (rawTransactions == null) {
+            if (rawTransactions == null || rawTransactions.length == 0) {
                 // нужно заново создавать
                 for (Transaction transaction : this.getTransactions()) {
                     //WRITE TRANSACTION LENGTH
