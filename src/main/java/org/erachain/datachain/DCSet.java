@@ -464,17 +464,7 @@ public class DCSet extends DBASet implements Observer {
      */
     public static DB createForkbase() {
 
-        //OPEN DB
-        File dbFile = new File(Settings.getInstance().getLocalDir(), "fork.dat");
-        dbFile.getParentFile().mkdirs();
-
-        /// https://jankotek.gitbooks.io/mapdb/performance/
-        //CREATE DATABASE
-        return DBMaker.newFileDB(dbFile)
-                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
-                .mmapFileEnableIfSupported() // -- error on asyncWriteEnable
-                .commitFileSyncDisable()
-                .make();
+        return getHardBase();
     }
 
     public static boolean isStoped() {
@@ -1314,10 +1304,16 @@ public class DCSet extends DBASet implements Observer {
         return this.atTransactionMap;
     }
 
-    Random randFork = new Random();
-    private DB getHardBase() {
+    static Random randFork = new Random();
+    private static DB getHardBase() {
         //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataDir(), "fork" + randFork.nextInt());
+
+        // найдем новый не созданный уже файл
+        File dbFile;
+        do {
+            dbFile = new File(Settings.getInstance().getDataDir(), "fork" + randFork.nextInt() + ".dat");
+        } while (dbFile.exists());
+
         dbFile.getParentFile().mkdirs();
 
         /// https://jankotek.gitbooks.io/mapdb/performance/
@@ -1392,28 +1388,6 @@ public class DCSet extends DBASet implements Observer {
 
     }
 
-    /**
-     * форк на диске
-     * @return
-     */
-    public DCSet forkinFile() {
-        this.addUses();
-        try {
-            DCSet fork = new DCSet(this, createForkbase());
-
-            this.outUses();
-
-            return fork;
-        } catch (java.lang.OutOfMemoryError e) {
-            LOGGER.error(e.getMessage(), e);
-
-            this.outUses();
-
-            Controller.getInstance().stopAll(14);
-            return null;
-        }
-
-    }
     @Override
     public void close() {
         if (this.database != null) {
