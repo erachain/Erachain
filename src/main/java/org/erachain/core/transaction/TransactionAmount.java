@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -13,6 +14,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
@@ -467,6 +469,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // поэтому отключим эту проверку тут
                     && !BlockChain.DEVELOP_USE
                     ) {
+
+                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
+                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
+                        + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+
                 return INVALID_TIMESTAMP;
             }
         }
