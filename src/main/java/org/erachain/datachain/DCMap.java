@@ -57,9 +57,9 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
         // OPEN MAP
         if (dcSet.getDatabase() == null) {
-            this.map = this.getMap(dcSet.getDatabase());
-        } else {
             this.map = this.getMemoryMap();
+        } else {
+            this.map = this.getMap(dcSet.getDatabase());
         }
 
     }
