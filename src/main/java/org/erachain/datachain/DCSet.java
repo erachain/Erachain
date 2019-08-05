@@ -121,8 +121,6 @@ public class DCSet extends DBASet implements Observer {
     private TransactionFinalMapSigns transactionFinalMapSigns;
     private TransactionMap transactionMap;
 
-
-    private DB database;
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
     public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
@@ -131,7 +129,6 @@ public class DCSet extends DBASet implements Observer {
         this.inMemory = inMemory;
 
         try {
-            this.database = database;
             this.actions = 0L;
 
             this.blockMap = new BlockMap(this, database);
