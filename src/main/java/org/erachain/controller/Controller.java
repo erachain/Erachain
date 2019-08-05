@@ -1732,9 +1732,10 @@ public class Controller extends Observable {
         checkStatus(shift);
         if (statusOld != this.status) {
             // NOTIFY
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
-
+            new Thread(() -> {
+                setChanged();
+                notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+            }).start();
         }
 
         return this.status;
