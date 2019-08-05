@@ -36,6 +36,10 @@ abstract public class DBASet implements IDB {
         this.database = database;
     }
 
+    public DB getDatabase() {
+        return this.database;
+    }
+
     public int getVersion() {
         this.uses++;
         int u = this.database.getAtomicInteger(VERSION).intValue();

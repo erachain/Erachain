@@ -22,8 +22,8 @@ public class AddressStatementRefs extends AddressItemRefs {
         );
     }
 
-    public AddressStatementRefs(AddressStatementRefs parent) {
-        super(parent);
+    public AddressStatementRefs(AddressStatementRefs parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }
