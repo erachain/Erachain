@@ -9,20 +9,18 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
+import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.*;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 
-import javax.swing.text.html.HTMLDocument;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -559,16 +557,26 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> implements Fil
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressLimit(String address, int limit) {
+    public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge) {
         Iterator iterator = getIteratorByAddress(address);
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
         Long key;
-        while (iterator.hasNext() && (limit == -1 || limit-- > 0)) {
+        while (iterator.hasNext() && (limit == -1 || limit > 0)) {
             key = (Long) iterator.next();
             item = this.map.get(key);
+            if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
+                RCalculated tx = (RCalculated) item;
+                String mess = tx.getMessage();
+                if (mess != null && mess.equals("forging")) {
+                    continue;
+                }
+            }
+
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+            --limit;
 
             txs.add(item);
         }
