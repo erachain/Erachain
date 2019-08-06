@@ -55,6 +55,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -93,8 +94,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.11.16 beta dev";
-    public static String buildTime = "2019-07-04 13:33:33 UTC";
+    public static String version = "4.11.16 dev";
+    public static String buildTime = "2019-07-10 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -127,7 +128,10 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+
+    public static int HARD_WORK = 0;
     public boolean useGui = true;
+
     private List<Thread> threads = new ArrayList<Thread>();
     public static long buildTimestamp;
     private static Controller instance;
@@ -177,6 +181,7 @@ public class Controller extends Observable {
     public boolean noUseWallet;
     public boolean noDataWallet;
     public boolean onlyProtocolIndexing;
+    public boolean inMemoryDC;
 
     public static String getVersion() {
         return version;
@@ -346,6 +351,69 @@ public class Controller extends Observable {
 
     public void setTransactionMakeTimingAverage(long transactionMakeTimingAverage) {
         this.transactionMakeTimingAverage = transactionMakeTimingAverage;
+    }
+
+    public JSONObject getBenchmarks() {
+
+        JSONObject jsonObj = new JSONObject();
+        Controller cnt = Controller.getInstance();
+
+        jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
+        jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
+        jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false));
+        jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
+        jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
+        jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
+
+        long timing = cnt.getInstance().network.telegramer.messageTimingAverage;
+        if (timing > 0) {
+            timing = 1000000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("msgTimingAvrg", timing);
+
+        timing = cnt.getInstance().getUnconfigmedMessageTimingAverage();
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("unconfMsgTimingAvrg", timing);
+
+        timing = cnt.getInstance().getBlockChain().transactionWinnedTimingAverage;
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("transactionWinnedTimingAvrg", timing);
+
+        timing = cnt.getInstance().getTransactionMakeTimingAverage();
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("transactionMakeTimingAvrg", timing);
+
+        timing = cnt.getInstance().getBlockChain().transactionValidateTimingAverage;
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("transactionValidateTimingAvrg", timing);
+
+        timing = cnt.getInstance().getBlockChain().transactionProcessTimingAverage;
+        if (timing > 0) {
+            timing = 1000000L / timing;
+        } else {
+            timing = 0;
+        }
+        jsonObj.put("transactionProcessTimingAvrg", timing);
+
+        return jsonObj;
     }
 
 
@@ -581,7 +649,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Try Open DataChain")));
             LOGGER.info("Try Open DataChain");
-            this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI);
+            this.dcSet = DCSet.getInstance(this.dcSetWithObserver, this.dynamicGUI, inMemoryDC);
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataChain OK")));
             LOGGER.info("DataChain OK");
@@ -591,7 +659,7 @@ public class Controller extends Observable {
             LOGGER.error(e.getMessage(), e);
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
             try {
-                reCreateDC();
+                reCreateDC(inMemoryDC);
             } catch (Throwable e1) {
                 stopAll(5);
             }
@@ -625,7 +693,7 @@ public class Controller extends Observable {
                 LOGGER.error(e.getMessage(), e);
             }
             try {
-                reCreateDC();
+                reCreateDC(inMemoryDC);
             } catch (Throwable e) {
                 stopAll(5);
             }
@@ -810,34 +878,41 @@ public class Controller extends Observable {
         this.wallet.replaseFavoriteItems(type);
     }
 
-    public DCSet reCreateDC() throws IOException, Exception {
-        File dataChain = new File(Settings.getInstance().getDataDir());
-        File dataChainBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
-                + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
-        // del datachain
-        if (dataChain.exists()) {
-            try {
-                Files.walkFileTree(dataChain.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
+    public DCSet reCreateDC(boolean inMemory) throws IOException, Exception {
+
+        if (inMemory) {
+            DCSet.reCreateDBinMEmory(this.dcSetWithObserver, this.dynamicGUI);
+        } else {
+            File dataChain = new File(Settings.getInstance().getDataDir());
+            File dataChainBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
+                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+            // del datachain
+            if (dataChain.exists()) {
+                try {
+                    Files.walkFileTree(dataChain.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
-        }
-        // copy Back dir to DataChain
-        if (dataChainBackUp.exists()) {
+            // copy Back dir to DataChain
+            if (dataChainBackUp.exists()) {
 
-            try {
-                FileUtils.copyDirectory(dataChainBackUp, dataChain);
-                LOGGER.info("Restore BackUp/DataChain to DataChain is Ok");
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
+                try {
+                    FileUtils.copyDirectory(dataChainBackUp, dataChain);
+                    LOGGER.info("Restore BackUp/DataChain to DataChain is Ok");
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+
             }
 
-        }
+            DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
 
-        DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
+        }
         this.dcSet = DCSet.getInstance();
         return this.dcSet;
     }
+
 
     // recreate DB locate
     public DLSet reCreateDB() throws IOException, Exception {
@@ -969,8 +1044,10 @@ public class Controller extends Observable {
         this.setChanged();
         this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Stopping message processor")));
 
-        LOGGER.info("Stopping message processor");
-        this.network.stop();
+        if (this.network != null) {
+            LOGGER.info("Stopping message processor");
+            this.network.stop();
+        }
 
 
         if (this.webService != null) {
@@ -1047,11 +1124,13 @@ public class Controller extends Observable {
         LOGGER.info("Closing database");
         this.dcSet.close();
 
-        // CLOSE WALLET
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing wallet")));
-        LOGGER.info("Closing wallet");
-        this.wallet.close();
+        if (this.wallet != null) {
+            // CLOSE WALLET
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing wallet")));
+            LOGGER.info("Closing wallet");
+            this.wallet.close();
+        }
 
         // CLOSE LOCAL
         this.setChanged();
@@ -1059,11 +1138,13 @@ public class Controller extends Observable {
         LOGGER.info("Closing Local database");
         this.dlSet.close();
 
-        // CLOSE telegram
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
-        LOGGER.info("Closing telegram");
-        this.telegramStore.close();
+        if (telegramStore != null) {
+            // CLOSE telegram
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
+            LOGGER.info("Closing telegram");
+            this.telegramStore.close();
+        }
 
         LOGGER.info("Closed.");
         // FORCE CLOSE
@@ -1232,6 +1313,10 @@ public class Controller extends Observable {
 
         return peer.isUsed();
 
+    }
+
+    public Synchronizer getSynchronizer() {
+        return synchronizer;
     }
 
     /**
@@ -1558,27 +1643,27 @@ public class Controller extends Observable {
         this.network.broadcast(message, false);
     }
 
-    public boolean broadcastTelegram(Transaction transaction, boolean store) {
+    public int broadcastTelegram(Transaction transaction, boolean store) {
 
         // CREATE MESSAGE
         Message telegram = MessageFactory.getInstance().createTelegramMessage(transaction);
-        boolean notAdded = this.network.addTelegram((TelegramMessage) telegram);
+        int notAdded = this.network.addTelegram((TelegramMessage) telegram);
 
-        if (!store || !notAdded) {
+        if (!store || notAdded == 0) {
             // BROADCAST MESSAGE
             this.network.broadcast(telegram, false);
             // save DB
             Controller.getInstance().wallet.database.getTelegramsMap().add(transaction.viewSignature(), transaction);
         }
 
-        return !notAdded;
+        return notAdded;
 
     }
 
     // SYNCHRONIZE
 
     public void orphanInPipe(Block block) throws Exception {
-        this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, false);
+        this.synchronizer.pipeProcessOrOrphan(this.dcSet, block, true, false, false);
     }
 
     public boolean checkStatus(int shift) {
@@ -1650,9 +1735,10 @@ public class Controller extends Observable {
         checkStatus(shift);
         if (statusOld != this.status) {
             // NOTIFY
-            this.setChanged();
-            this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
-
+            new Thread(() -> {
+                setChanged();
+                notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+            }).start();
         }
 
         return this.status;
@@ -2480,7 +2566,7 @@ public class Controller extends Observable {
         LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
 
         try {
-            this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true);
+            this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
             this.network.clearHandledWinBlockMessages();
 
         } catch (Exception e) {
@@ -3324,6 +3410,11 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.toLowerCase().equals("-inmemory")) {
+                inMemoryDC = true;
+                continue;
+            }
+
             if (arg.equals("-backup")) {
                 // backUP data
                 backUP = true;
@@ -3335,6 +3426,20 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.startsWith("-hardwork=") && arg.length() > 10) {
+                try {
+                    int hartWork = Integer.parseInt(arg.substring(10));
+
+                    if (hartWork > 8) {
+                        hartWork = 8;
+                    }
+                    if (hartWork > 0) {
+                        HARD_WORK = hartWork;
+                    }
+                } catch (Exception e) {
+                }
+                continue;
+            }
             if (arg.startsWith("-seed=") && arg.length() > 6) {
                 seedCommand = arg.substring(6).split(":");
                 continue;
@@ -3371,6 +3476,12 @@ public class Controller extends Observable {
 
         if (onlyProtocolIndexing)
             LOGGER.info("-only protocol indexing");
+
+        if (HARD_WORK > 0)
+            LOGGER.info("-hard work = " + HARD_WORK);
+
+        if (inMemoryDC)
+            LOGGER.info("-in Memory DC");
 
         if (noDataWallet)
             LOGGER.info("-no data wallet");

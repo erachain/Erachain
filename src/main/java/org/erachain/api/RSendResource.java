@@ -120,11 +120,11 @@ public class RSendResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Path("{creator}/{recipient}")
     public String sendPost(@PathParam("creator") String creatorStr, @PathParam("recipient") String recipientStr,
-                          @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
-                          @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
-                          String message,
-                          @QueryParam("encoding") int encoding,
-                          @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
+                           @QueryParam("feePow") int feePowStr, @QueryParam("assetKey") long assetKey,
+                           @QueryParam("amount") BigDecimal amount, @QueryParam("title") String title,
+                           String message,
+                           @QueryParam("encoding") int encoding,
+                           @QueryParam("encrypt") boolean encrypt, @QueryParam("password") String password) {
 
         return sendGet(creatorStr, recipientStr, feePowStr, assetKey, amount, title, message,encoding,encrypt, password);
 
@@ -292,21 +292,30 @@ public class RSendResource {
     }
 
     private static long test1Delay = 0;
+    private static float test1probability = 0;
     private static Thread threadTest1;
     private static List<PrivateKeyAccount> test1Creators;
 
+    /**
+     * GET r_send/test1/0.85/1000
+     * @param probability - с вероятностью. 1 = каждый раз
+     * @param delay
+     * @param password
+     * @return
+     */
     @GET
-    @Path("test1/{delay}")
-    public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
+    @Path("test1/{probability}/{delay}")
+    public String test1(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
         if (!BlockChain.DEVELOP_USE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
-                )
+        )
             return "not LOCAL && not DEVELOP";
 
         APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
 
         this.test1Delay = delay;
+        this.test1probability = probability;
 
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
@@ -324,6 +333,11 @@ public class RSendResource {
         // CACHE private keys
         test1Creators = Controller.getInstance().getPrivateKeyAccounts();
 
+        // запомним счетчики для счетов
+        HashMap<String, Long> counters = new HashMap<String, Long>();
+        for (Account crestor: test1Creators) {
+            counters.put(crestor.getAddress(), 0L);
+        }
 
         JSONObject out = new JSONObject();
 
@@ -338,18 +352,30 @@ public class RSendResource {
             Random random = new Random();
             Controller cnt = Controller.getInstance();
 
-            int counter = 0;
-
             do {
 
-                try {
+                if (this.test1Delay <= 0) {
+                    return;
+                }
 
-                    if (this.test1Delay <= 0) {
-                        return;
+                if (cnt.isOnStopping())
+                    return;
+
+                // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
+                if (test1probability < 1 && test1probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / test1probability) );
+                    if (rrr > 100) {
+                        try {
+                            Thread.sleep(this.test1Delay);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+
+                        continue;
                     }
+                }
 
-                    if (cnt.isOnStopping())
-                        return;
+                try {
 
                     PrivateKeyAccount creator = test1Creators.get(random.nextInt(test1Creators.size()));
                     Account recipient;
@@ -358,10 +384,12 @@ public class RSendResource {
                     } while (recipient.equals(creator));
 
 
+                    String address = creator.getAddress();
+                    long counter = counters.get(address);
                     Transaction transaction = cnt.r_Send(creator,
                             0, recipient,
-                            2l, null, "Safe-Pay " + ++counter,
-                            "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                            2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
+                            (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
                             new byte[]{(byte) 1});
 
                     if (cnt.isOnStopping())
@@ -373,8 +401,11 @@ public class RSendResource {
 
 
                     // CHECK VALIDATE MESSAGE
-                    if (result != Transaction.VALIDATE_OK) {
+                    if (result == Transaction.VALIDATE_OK) {
 
+                        counters.put(address, counter + 1);
+
+                    } else {
                         if (result == Transaction.RECEIVER_NOT_PERSONALIZED
                                 || result == Transaction.CREATOR_NOT_PERSONALIZED
                                 || result == Transaction.NO_BALANCE
@@ -382,8 +413,9 @@ public class RSendResource {
                                 || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
 
                             try {
-                                Thread.sleep(10);
+                                Thread.sleep(1);
                             } catch (InterruptedException e) {
+                                break;
                             }
 
                             continue;
@@ -393,6 +425,7 @@ public class RSendResource {
                         try {
                             Thread.sleep(10000);
                         } catch (InterruptedException e) {
+                            break;
                         }
                         continue;
                     }
@@ -400,6 +433,7 @@ public class RSendResource {
                     try {
                         Thread.sleep(this.test1Delay);
                     } catch (InterruptedException e) {
+                        break;
                     }
 
                     if (cnt.isOnStopping())
@@ -417,6 +451,172 @@ public class RSendResource {
 
         out.put("delay", test1Delay);
         LOGGER.info("r_send/test1 STARTED for delay: " + test1Delay);
+
+        return out.toJSONString();
+
+    }
+
+    private static long test2Delay = 0;
+    private static float test2probability = 0;
+    private static Thread threadTest2;
+    private static List<PrivateKeyAccount> test2Creators;
+
+    /**
+     * GET r_send/test2/0.85/1000
+     * @param probability - с вероятностью. 1 = каждый раз
+     * @param delay
+     * @param password
+     * @return
+     */
+    @GET
+    @Path("test2/{probability}/{delay}")
+    public String test2(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
+
+        if (!BlockChain.DEVELOP_USE
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+        )
+            return "not LOCAL && not DEVELOP";
+
+        APIUtils.askAPICallAllowed(password, "GET test2\n ", request, true);
+
+        this.test2Delay = delay;
+        this.test2probability = probability;
+
+        if (threadTest2 != null) {
+            JSONObject out = new JSONObject();
+            if (delay <= 0) {
+                threadTest2 = null;
+                out.put("status", "STOP");
+                LOGGER.info("r_send/test2 STOP");
+            } else {
+                out.put("delay", delay);
+                LOGGER.info("r_send/test2 DELAY UPDATE:" + delay);
+            }
+            return out.toJSONString();
+        }
+
+        // CACHE private keys
+        test2Creators = Controller.getInstance().getPrivateKeyAccounts();
+
+        // запомним счетчики для счетов
+        HashMap<String, Long> counters = new HashMap<String, Long>();
+        for (Account crestor: test2Creators) {
+            counters.put(crestor.getAddress(), 0L);
+        }
+
+        JSONObject out = new JSONObject();
+
+        if (test2Creators.size() <= 1) {
+            out.put("error", "too small accounts");
+
+            return out.toJSONString();
+        }
+
+        threadTest2 = new Thread(() -> {
+
+            Random random = new Random();
+            Controller cnt = Controller.getInstance();
+
+            do {
+
+                if (this.test2Delay <= 0) {
+                    return;
+                }
+
+                if (cnt.isOnStopping())
+                    return;
+
+                // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
+                if (test2probability < 1 && test2probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / test2probability) );
+                    if (rrr > 100) {
+                        try {
+                            Thread.sleep(this.test2Delay);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+
+                        continue;
+                    }
+                }
+
+                try {
+
+                    PrivateKeyAccount creator = test2Creators.get(random.nextInt(test2Creators.size()));
+                    Account recipient;
+                    do {
+                        recipient = test2Creators.get(random.nextInt(test2Creators.size()));
+                    } while (recipient.equals(creator));
+
+
+                    String address = creator.getAddress();
+                    long counter = counters.get(address);
+                    // ERA - она еще форжинговые балансы изменяет - поэтому КОМПУ лучше всего
+                    Transaction transaction = cnt.r_Send(creator,
+                            0, recipient,
+                            2l, new BigDecimal("0.00000001"), "LoadTestSend_" + address.substring(1, 5) + " " + counter,
+                            (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                            new byte[]{(byte) 1});
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                    // CLEAR for HEAP
+                    transaction.setDC(null);
+
+
+                    // CHECK VALIDATE MESSAGE
+                    if (result == Transaction.VALIDATE_OK) {
+
+                        counters.put(address, counter + 1);
+
+                    } else {
+                        if (result == Transaction.RECEIVER_NOT_PERSONALIZED
+                                || result == Transaction.CREATOR_NOT_PERSONALIZED
+                                || result == Transaction.NO_BALANCE
+                                || result == Transaction.NOT_ENOUGH_FEE
+                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
+
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                break;
+                            }
+
+                            continue;
+                        }
+
+                        // not work in Threads - logger.info("test2: " + OnDealClick.resultMess(result));
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                        continue;
+                    }
+
+                    try {
+                        Thread.sleep(this.test2Delay);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+
+                    if (cnt.isOnStopping())
+                        return;
+
+                } catch (Exception e10) {
+                    // not see in Thread - logger.error(e10.getMessage(), e10);
+                }
+
+            } while (true);
+        });
+
+        threadTest2.setName("RSend.test2");
+        threadTest2.start();
+
+        out.put("delay", test2Delay);
+        LOGGER.info("r_send/test2 STARTED for delay: " + test2Delay);
 
         return out.toJSONString();
 

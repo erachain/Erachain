@@ -11,11 +11,15 @@ import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
@@ -33,7 +37,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, (PersonCls) th.itemMenu, null));
+                        null, null, (PersonCls) th.itemTableSelected, null));
 
             }
         });
@@ -43,7 +47,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) th.itemMenu));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) th.itemTableSelected));
             }
         });
 
@@ -58,7 +62,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 @SuppressWarnings("unused")
-                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.itemMenu);
+                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.itemTableSelected);
 
             }
         });
@@ -71,7 +75,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 @SuppressWarnings("unused")
-                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.itemMenu, th.itemMenu.getOwner());
+                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.itemTableSelected, th.itemTableSelected.getOwner());
 
             }
         });
@@ -82,7 +86,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                PersonCls per = (PersonCls) th.itemMenu;
+                PersonCls per = (PersonCls) th.itemTableSelected;
                 byte[] ref = per.getReference();
                 Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                 int blockNo = transaction.getBlockHeight();
@@ -92,6 +96,26 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             }
         });
         this.menuTable.add(vouchPerson_Item);
+
+        menuTable.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?person=" + th.itemTableSelected.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        menuTable.add(setSeeInBlockexplorer);
 
     }
 

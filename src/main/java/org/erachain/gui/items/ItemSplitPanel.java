@@ -26,9 +26,9 @@ public class ItemSplitPanel extends SplitPanel {
     protected TimerTableModelCls tableModel;
     protected JMenuItem favoriteMenuItems;
     protected JPopupMenu menuTable;
-    protected ItemCls itemMenu;
+    //protected ItemCls itemMenu;
     protected ItemCls itemTableSelected = null;
-    private static Logger logger = LoggerFactory.getLogger(ItemSplitPanel.class.getName());
+    protected static Logger logger = LoggerFactory.getLogger(ItemSplitPanel.class);
 
 
     @SuppressWarnings("rawtypes")
@@ -86,7 +86,9 @@ public class ItemSplitPanel extends SplitPanel {
                 // TODO почемуто при выборе персоны сюда 2 раза прилетает и перерисовка дважды идет
                 jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
             } catch (Exception e) {
+                logger.error(e.getMessage(),e);
                 jScrollPaneJPanelRightPanel.setViewportView(null);
+
             }
             //	itemTableSelected = null;
 
@@ -94,8 +96,6 @@ public class ItemSplitPanel extends SplitPanel {
 
         // UPDATE FILTER ON TEXT CHANGE
 
-
-        // jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
         // mouse from favorine column
         jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
@@ -143,11 +143,11 @@ public class ItemSplitPanel extends SplitPanel {
 
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                itemMenu = getItem(jTableJScrollPanelLeftPanel.getSelectedRow());
+                itemTableSelected = getItem(jTableJScrollPanelLeftPanel.getSelectedRow());
                 // IF ASSET CONFIRMED AND NOT ERM
                 favoriteMenuItems.setVisible(true);
                 // CHECK IF FAVORITES
-                if (Controller.getInstance().isItemFavorite(itemMenu)) {
+                if (Controller.getInstance().isItemFavorite(itemTableSelected)) {
                     favoriteMenuItems.setText(Lang.getInstance().translate("Remove Favorite"));
                 } else {
                     favoriteMenuItems.setText(Lang.getInstance().translate("Add Favorite"));
@@ -157,6 +157,7 @@ public class ItemSplitPanel extends SplitPanel {
         });
 
         menuTable.add(favoriteMenuItems);
+
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menuTable);
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 

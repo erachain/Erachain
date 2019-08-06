@@ -773,7 +773,8 @@ public class Wallet extends Observable implements Observer {
     // asynchronous RUN from BlockGenerator
     public void synchronize(boolean reset) {
         if (!reset && Controller.getInstance().isProcessingWalletSynchronize()
-                || Controller.getInstance().isOnStopping()) {
+                || Controller.getInstance().isOnStopping()
+			|| Controller.getInstance().noDataWallet || Controller.getInstance().noUseWallet) {
             return;
         }
 

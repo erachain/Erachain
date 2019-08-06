@@ -3,8 +3,10 @@ package org.erachain.core;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.TransactionMessage;
+import org.erachain.ntp.NTP;
 import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +28,13 @@ public class TransactionsPool extends MonitoredThread {
     private Controller controller;
     private BlockChain blockChain;
     private DCSet dcSet;
+    private TransactionMap txMap;
 
     public TransactionsPool(Controller controller, BlockChain blockChain, DCSet dcSet) {
         this.controller = controller;
         this.blockChain = blockChain;
         this.dcSet = dcSet;
+        this.txMap = dcSet.getTransactionMap();
 
         this.setName("Transactions Pool[" + this.getId() + "]");
 
@@ -48,6 +52,7 @@ public class TransactionsPool extends MonitoredThread {
         return result;
     }
 
+    private int clearCount;
     public void processMessage(Message message) {
 
         if (message == null)
@@ -89,11 +94,11 @@ public class TransactionsPool extends MonitoredThread {
         if (LOG_UNCONFIRMED_PROCESS)
             timeCheck = System.currentTimeMillis();
 
-        if (this.dcSet.getTransactionMap().contains(signature)) {
+        if (txMap.contains(signature)) {
             if (LOG_UNCONFIRMED_PROCESS) {
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 20) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess CONTAINS in UNC period: " + timeCheck);
+                    LOGGER.debug("TRANSACTION_TYPE process CONTAINS in UNC period: " + timeCheck);
                 }
             }
             return;
@@ -120,7 +125,7 @@ public class TransactionsPool extends MonitoredThread {
         }
 
         // ADD TO UNCONFIRMED TRANSACTIONS
-        this.dcSet.getTransactionMap().add(transaction);
+        txMap.add(transaction);
 
         if (LOG_UNCONFIRMED_PROCESS) {
             timeCheck = System.currentTimeMillis() - timeCheck;
@@ -139,14 +144,34 @@ public class TransactionsPool extends MonitoredThread {
                     + onMessageProcessTiming - this.controller.unconfigmedMessageTimingAverage) >> 8;
         }
 
-        if (controller.isStatusOK()) {
-            // если мы не в синхронизации - так как мы тогда
-            // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
-            // так как непонятно - протухла она или нет
+        // проверяем на переборт трнзакций в пуле чтобы лишние очистить
+        if (++clearCount > 1000) {
 
-            // BROADCAST
-            controller.network.broadcast(message, false);
+            clearCount = 0;
+
+            if (controller.isStatusOK()) {
+                if (txMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                    controller.clearUnconfirmedRecords(true);
+                }
+            } else {
+                // если идет синхронизация, то удаляем все что есть не на текущее время
+                // и так как даже если мы вот-вот засинхримся мы все равно блок не сможем сразу собрать
+                // из-за мягкой синхронизации с сетью - а значит и нам не нужно заботиться об удаленных трнзакциях
+                // у нас - они будут включены другими нодами которые полностью в синхре
+                // мы выстыпаем лишь как ретрнслятор - при этом у нас запас по времени хранения все равно должен быть
+                // чтобы помнить какие транзакции мы уже словили и ретранслировали
+                if (txMap.size() > BlockChain.MAX_BLOCK_SIZE_GEN >> 1) {
+                    txMap.clearByDeadTimeAndLimit(NTP.getTime(), true);
+                }
+            }
         }
+
+        // если мы не в синхронизации - так как мы тогда
+        // не знаем время текущее цепочки и не понимаем можно ли борадкастить дальше трнзакцию
+        // так как непонятно - протухла она или нет
+
+        // BROADCAST
+        controller.network.broadcast(message, false);
 
         return;
     }

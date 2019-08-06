@@ -7,11 +7,15 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 @SuppressWarnings("serial")
 public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
@@ -23,6 +27,7 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
         super(tableModelTemplates, "SearchTemplatesSplitPanel", "SearchTemplatesSplitPanel");
         this.th = this;
         setName(Lang.getInstance().translate("Search Templates"));
+
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
 
         vouch_Item.addActionListener(new ActionListener() {
@@ -30,13 +35,33 @@ public class SearchTemplatesSplitPanel extends SearchItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                TemplateCls template = (TemplateCls) th.itemMenu;
+                TemplateCls template = (TemplateCls) itemTableSelected;
                 if (template == null) return;
                 Transaction trans = DCSet.getInstance().getTransactionFinalMap().get(template.getReference());
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
             }
         });
         this.menuTable.add(vouch_Item);
+
+        menuTable.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?template=" + itemTableSelected.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+        menuTable.add(setSeeInBlockexplorer);
+
     }
 
 

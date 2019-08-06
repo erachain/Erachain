@@ -1,6 +1,8 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.IssueImprintRecord;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -30,10 +32,10 @@ public class IssueImprintDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(imprintIssue.getItem().getDescription());
-        txtAreaDescription.setRows(4);
+        MTextPane txtAreaDescription = new MTextPane(imprintIssue.getItem().getDescription());
+        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
-        txtAreaDescription.setEditable(false);
+        //txtAreaDescription.setEditable(false);
         MenuPopupUtil.installContextMenu(txtAreaDescription);
         this.add(txtAreaDescription, detailGBC);
 

@@ -11,6 +11,8 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.TableMenuPopupUtil;
 
@@ -23,6 +25,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 public class MyTransactionsSplitPanel extends SplitPanel {
@@ -182,7 +186,30 @@ public class MyTransactionsSplitPanel extends SplitPanel {
         });
 
         menu.add(item_Save);
-        
+
+        menu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (selectedTransaction == null) {
+                    return;
+                }
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + selectedTransaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+        menu.add(setSeeInBlockexplorer);
+
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);
         menu.addAncestorListener(new AncestorListener() {
 
@@ -214,9 +241,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
             }
 
-
         });
-
 
     }
 

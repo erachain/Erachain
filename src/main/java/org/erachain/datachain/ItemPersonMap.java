@@ -1,17 +1,11 @@
 package org.erachain.datachain;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.database.serializer.ItemSerializer;
 import org.mapdb.DB;
-import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.ReverseComparator;
 
 import java.util.Map;
-import java.util.NavigableSet;
 
 /**
  * Хранение активов.<br>
@@ -35,8 +29,8 @@ public class ItemPersonMap extends ItemMap {
         );
     }
 
-    public ItemPersonMap(ItemMap parent) {
-        super(parent);
+    public ItemPersonMap(ItemMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     // type+name not initialized yet! - it call as Super in New

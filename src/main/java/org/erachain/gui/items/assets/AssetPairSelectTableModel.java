@@ -6,10 +6,13 @@ import org.erachain.controller.Controller;
 import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.database.SortableList;
+import org.erachain.database.wallet.FavoriteItemMapAsset;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.gui.models.TimerTableModelCls;
+import org.erachain.utils.Pair;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple6;
@@ -44,6 +47,22 @@ public class AssetPairSelectTableModel extends TimerTableModelCls<ItemCls> imple
         this.key = key;
         this.all = BlockExplorer.getInstance().calcForAsset(DCSet.getInstance().getOrderMap().getOrders(this.key),
                 DCSet.getInstance().getTradeMap().getTrades(this.key));
+
+
+        ItemAssetMap assetMap = DCSet.getInstance().getItemAssetMap();
+        FavoriteItemMapAsset favoriteMap = Controller.getInstance().wallet.database.getAssetFavoritesSet();
+
+        Collection<Long> favorites = favoriteMap.getFromToKeys(0, Long.MAX_VALUE);
+        //favorites.sort();
+
+        list = new ArrayList<>();
+        for (Long itemKey: favorites) {
+            AssetCls asset = assetMap.get(itemKey);
+            if (asset == null){
+                continue;
+            }
+            list.add(asset);
+        }
 
     }
 

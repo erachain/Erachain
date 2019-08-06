@@ -205,7 +205,7 @@ public class OnDealClick {
                 mess = "Invalid duplicte option";
                 break;
             case Transaction.POLL_ALREADY_CREATED:
-                mess = "Pool already created";
+                mess = "Poll already created";
                 break;
             case Transaction.POLL_ALREADY_HAS_VOTES:
                 mess = "Poll already has votes";

@@ -121,7 +121,7 @@ public class DebugTabPane extends JTabbedPane {
 
         this.transactionsTableModel.deleteObservers();
 
-        this.blocksTableModel.removeObservers();
+        this.blocksTableModel.deleteObservers();
 
         this.loggerTextArea.removeNotify();
     }

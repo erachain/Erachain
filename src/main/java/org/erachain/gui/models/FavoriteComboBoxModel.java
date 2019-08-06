@@ -39,7 +39,7 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
     public FavoriteComboBoxModel(int item_type) {
         this.item_type = item_type;
 
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         addObservers();
     }
 

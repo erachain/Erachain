@@ -3,11 +3,13 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.Observable;
@@ -93,12 +95,20 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
 
             case COLUMN_AMOUNT_WANT:
 
-                amountStr = order.getCreator().getPersonAsString();
+                String personStr;
+                Fun.Tuple2<Integer, PersonCls> person = order.getCreator().getPerson();
+                if (person == null || person.b == null) {
+                    personStr = order.getCreator().getAddress();
+                    if (isMine)
+                        personStr = "<html><b>" + personStr + "</b></html>";
+                } else {
+                    personStr = "<b>[" + person.b.getKey() + "]</b> "
+                            + (isMine? "<b>" + person.b.getName() + "</b>" : person.b.getName());
 
-                if (isMine)
-                    amountStr = "<html><b>" + amountStr + "</b></html>";
+                    personStr = "<html>" + personStr + "</html>";
+                }
 
-                return amountStr;
+                return personStr;
 
         }
 

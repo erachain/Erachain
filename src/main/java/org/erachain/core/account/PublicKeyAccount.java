@@ -29,10 +29,6 @@ public class PublicKeyAccount extends Account {
         this(Base58.decode(publicKey));
     }
 
-    protected PublicKeyAccount() {
-
-    }
-
     //CHECK IF IS VALID PUBLIC KEY and MAKE NEW
     public static boolean isValidPublicKey(byte[] publicKey) {
         if (publicKey == null

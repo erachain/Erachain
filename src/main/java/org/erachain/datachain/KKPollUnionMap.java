@@ -20,8 +20,8 @@ public class KKPollUnionMap extends KKMap {
         );
     }
 
-    public KKPollUnionMap(KKPollUnionMap parent) {
-        super(parent);
+    public KKPollUnionMap(KKPollUnionMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

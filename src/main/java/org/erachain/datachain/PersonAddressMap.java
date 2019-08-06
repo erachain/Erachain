@@ -6,7 +6,6 @@ import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -49,8 +48,8 @@ public class PersonAddressMap extends DCMap<
         }
     }
 
-    public PersonAddressMap(PersonAddressMap parent) {
-        super(parent, null);
+    public PersonAddressMap(PersonAddressMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

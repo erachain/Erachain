@@ -18,10 +18,10 @@ import java.util.*;
  * byte[] - un CORAMPABLE
  *
  * Ключ: Номер Голосвания + Номер выбора + Счет Короткий
- * Значение: СТЭК ссылок на трнзакцию голосвания
+ * Значение: СТЭК ссылок на транзакцию голосвания
  *
- * TODO: передлать ссылку на запись на Лонг
  * TODO: передлать короткий Счет на байты
+ * TODO: передаьт Тупле 2 на Лонг - на ссылку сразу как ключ для поиска транзакции
  */
 public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
 
@@ -37,8 +37,8 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
 
     }
 
-    public VoteOnItemPollMap(VoteOnItemPollMap parent) {
-        super(parent, null);
+    public VoteOnItemPollMap(VoteOnItemPollMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {
@@ -117,6 +117,16 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
 
         //RETURN
         return key != null;
+    }
+
+    public long countVotes(Long pollKey) {
+        BTreeMap map = (BTreeMap) this.map;
+
+        //FILTER ALL KEYS
+        return  ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+                Fun.t3(pollKey, null, null),
+                Fun.t3(pollKey, Fun.HI(), Fun.HI())).size();
+
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

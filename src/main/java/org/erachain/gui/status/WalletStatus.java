@@ -17,7 +17,7 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class WalletStatus extends JLabel implements Observer {
-    static Logger LOGGER = LoggerFactory.getLogger(WalletStatus.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WalletStatus.class);
 
     private ImageIcon unlockedIcon;
     private ImageIcon lockedIcon;

@@ -140,6 +140,7 @@ public class API {
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
         help.put("GET info by node", " GET api/info");
+        help.put("GET benchmark info by node", " GET api/bench");
 
         help.put("POST Broadcast", "/broadcast JSON {raw=raw(BASE58)}");
         help.put("GET Broadcast", "/broadcast/{raw(BASE58)}");
@@ -696,11 +697,24 @@ public class API {
     }
 
     @POST
-    @Path("broadcast")
+    @Path("broadcastjson")
     public Response broadcastFromRawPost(@Context HttpServletRequest request,
                                          MultivaluedMap<String, String> form) {
 
         String raw = form.getFirst("raw");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcast")
+    public Response broadcastFromRawPost(@Context HttpServletRequest request,
+                                         String raw) {
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -738,7 +752,6 @@ public class API {
         }
     }
 
-    // http://127.0.0.1:9047/api/broadcastTelegram1?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
     public JSONObject broadcastTelegram_1(String rawDataBase58) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
@@ -765,10 +778,12 @@ public class API {
             return out;
         }
 
-        if (Controller.getInstance().broadcastTelegram(transaction, true)) {
+        int status = Controller.getInstance().broadcastTelegram(transaction, true);
+        if (status == 0) {
             out.put("status", "ok");
         } else {
-            out.put("status", "exist");
+            out.put("status", "error");
+            out.put("error", OnDealClick.resultMess(status));
         }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out;
@@ -789,7 +804,7 @@ public class API {
     }
 
     @POST
-    @Path("broadcasttelegram")
+    @Path("broadcasttelegramjson")
     public Response broadcastTelegramPost(@Context HttpServletRequest request,
                                           MultivaluedMap<String, String> form) {
 
@@ -803,9 +818,23 @@ public class API {
 
     }
 
+    @POST
+    @Path("broadcasttelegram")
+    public Response broadcastTelegramPost(@Context HttpServletRequest request,
+                                          String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .build();
+
+    }
+
     /*
      * ********** ADDRESS **********
      */
+    // TODO перименовать бы LastTimestamp - так более понятно
     @GET
     @Path("addresslastreference/{address}")
     public Response getAddressLastReference(@PathParam("address") String address) {
@@ -1770,6 +1799,12 @@ public class API {
      * ************* TOOLS **************
      */
 
+    /**
+     * wiury2876rw7yer8923y63riyrf9287y6r87wyr9737yriwuyr3yr978ry48732y3rsiouyvbkshefiuweyriuwer
+     * {"trtr": 293847}
+     * @param x
+     * @return
+     */
     @POST
     @Path("verifysignature")
     public Response verifysignature(String x) {
@@ -1850,4 +1885,15 @@ public class API {
                 .entity(jsonObject.toJSONString())
                 .build();
     }
+
+    @GET
+    @Path("bench")
+    public Response getSpeedInfo() {
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Controller.getInstance().getBenchmarks().toJSONString())
+                .build();
+    }
+
 }

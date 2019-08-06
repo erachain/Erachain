@@ -6,7 +6,6 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -37,8 +36,8 @@ public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     }
 
 
-    public AddressItemRefs(AddressItemRefs parent) {
-        super(parent, null);
+    public AddressItemRefs(AddressItemRefs parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

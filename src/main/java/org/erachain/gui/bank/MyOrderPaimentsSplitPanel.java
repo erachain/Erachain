@@ -29,7 +29,7 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel {
         super("PersonsMySplitPanel");
 
         //	this.setName(Lang.getInstance().translate("My Persons"));
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         this.button1ToolBarLeftPanel.setVisible(false);
         this.button2ToolBarLeftPanel.setVisible(false);
@@ -84,7 +84,7 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel {
         confirmedColumn.setPreferredWidth(50);//.setWidth(30);
 
         // UPDATE FILTER ON TEXT CHANGE
-        this.searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new My_Search());
+        this.searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new My_Search());
         // SET VIDEO
         this.jTableJScrollPanelLeftPanel.setModel(payment_Orders_model);
         this.jTableJScrollPanelLeftPanel = payment_Orders_table;
@@ -167,7 +167,7 @@ public class MyOrderPaimentsSplitPanel extends SplitPanel {
 
         public void onChange() {
             // GET VALUE
-            String search = searchTextField_SearchToolBar_LeftPanel.getText();
+            String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
             // SET FILTER
             payment_Orders_model.fireTableDataChanged();
 

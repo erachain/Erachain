@@ -38,7 +38,7 @@ import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 @SuppressWarnings("serial")
 public class IssuePersonPanel extends JPanel {
-    private static final Logger logger = LoggerFactory.getLogger(IssuePersonPanel.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(IssuePersonPanel.class);
     protected JLabel titleJLabel = new JLabel();
     protected JComboBox<Account> cbxFrom = new JComboBox<>();
     protected JComboBox<String> txtFeePow = new JComboBox<>();
@@ -47,7 +47,7 @@ public class IssuePersonPanel extends JPanel {
     protected JDateChooser txtBirthday;
     protected JDateChooser txtDeathday;
     protected JComboBox<String> comboBoxGender = new JComboBox<>();
-    protected JTextField textPersonNumber = new JTextField();
+    //protected JTextField textPersonNumber = new JTextField();
     protected JTextField txtBirthLatitude = new JTextField();
     protected JTextField txtBirthLongitudeLatitude = new JTextField("0");
     protected JTextField txtSkinColor = new JTextField();
@@ -66,7 +66,7 @@ public class IssuePersonPanel extends JPanel {
     private JLabel jlabelhairColor = new JLabel(Lang.getInstance().translate("Hair color") + ":");
     private JLabel jLabelHeight = new JLabel(Lang.getInstance().translate("Growth") + ":");
     private JLabel jLabelName = new JLabel(Lang.getInstance().translate("Full name") + ":");
-    private JLabel jLabelPersonNumber = new JLabel(Lang.getInstance().translate("Person number") + ":");
+    //private JLabel jLabelPersonNumber = new JLabel(Lang.getInstance().translate("Person number") + ":");
     protected JPanel jPanelHead = new JPanel();
     protected JScrollPane scrollPaneDescription = new JScrollPane();
     protected AddImageLabel addImageLabel;
@@ -292,7 +292,7 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.gridy = 8;
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-        mainPanel.add(jLabelPersonNumber, gridBagConstraints);
+        //mainPanel.add(jLabelPersonNumber, gridBagConstraints);
 
         // EyeColor
         gridBagConstraints = new GridBagConstraints();
@@ -309,8 +309,6 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.insets = new Insets(0, 10, 0, 0);
         mainPanel.add(jLabelHeight, gridBagConstraints);
-
-
 
 
 
@@ -332,7 +330,7 @@ public class IssuePersonPanel extends JPanel {
         gridBagConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new Insets(0, 0, 0, 16);
-        mainPanel.add(textPersonNumber, gridBagConstraints);
+        //mainPanel.add(textPersonNumber, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 8;
@@ -573,7 +571,9 @@ public class IssuePersonPanel extends JPanel {
         }
 
         Pair<Transaction, Integer> result = Controller.getInstance().issuePerson(forIssue, creator,
-                txtName.getText(), feePow, birthday, deathday, gender, textPersonNumber.getText(), birthLatitude,
+                txtName.getText(), feePow, birthday, deathday, gender,
+                "", //textPersonNumber.getText(),
+                birthLatitude,
                 birthLongitude, txtSkinColor.getText(), txtEyeColor.getText(), txtHairColor.getText(),
                 height, null, addImageLabel.getImgBytes(), txtareaDescription.getText(),
                 creator, null);

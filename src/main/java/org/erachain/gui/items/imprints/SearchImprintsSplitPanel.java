@@ -23,8 +23,8 @@ public class SearchImprintsSplitPanel extends SplitPanel {
         super("SearchImprintsSplitPanel");
 
         setName(Lang.getInstance().translate("Search Imprints"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
-        searthLabel_SearchToolBar_LeftPanel.setVisible(true);
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setVisible(true);
 // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -50,7 +50,7 @@ public class SearchImprintsSplitPanel extends SplitPanel {
         RowSorter sorter = new TableRowSorter(this.tableModelImprints);
         imprintsTable.setRowSorter(sorter);
 // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
             public void changedUpdate(DocumentEvent e) {
                 onChange();
             }
@@ -66,7 +66,7 @@ public class SearchImprintsSplitPanel extends SplitPanel {
             public void onChange() {
 
 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
 // SET FILTER
                 tableModelImprints.fireTableDataChanged();
@@ -94,7 +94,7 @@ public class SearchImprintsSplitPanel extends SplitPanel {
                 //	info.show_001(person);
 
                 //	search_Person_SplitPanel.jSplitPanel.setDividerLocation(search_Person_SplitPanel.jSplitPanel.getDividerLocation());
-                //	search_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+                //	search_Person_SplitPanel.searchTextFieldSearchToolBarLeftPanelDocument.setEnabled(true);
                 ImprintsInfoPanel info_panel = new ImprintsInfoPanel(imprint);
                 info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width - 50, jScrollPaneJPanelRightPanel.getSize().height - 50));
                 jScrollPaneJPanelRightPanel.setViewportView(info_panel);

@@ -15,9 +15,8 @@ import java.util.*;
 public abstract class TimerTableModelCls<U> extends AbstractTableModel implements Observer {
 
     private String name;
-    private long timeout;
     protected String[] columnNames;
-    private Timer timer;
+    //private Timer timer;
     protected boolean needUpdate;
     protected boolean descending;
 
@@ -42,27 +41,27 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected Logger logger;
 
     public TimerTableModelCls(String[] columnNames, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.columnNames = columnNames;
         this.descending = descending;
     }
 
     public TimerTableModelCls(DBMap map, String[] columnNames, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.descending = descending;
     }
 
     public TimerTableModelCls(String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
     }
 
     public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
@@ -70,46 +69,12 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
         this.COLUMN_FAVORITE = favoriteColumn;
-    }
-
-    public TimerTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
-        this.map = map;
-        this.columnNames = columnNames;
-        this.name = name;
-        this.timeout = timeout;
-        this.columnAutoHeight = columnAutoHeight;
-        this.descending = descending;
-    }
-
-    public void initTimer() {
-        if (this.timer == null && name != null) {
-            this.timer = new Timer(name);
-
-            TimerTask action = new TimerTask() {
-                public void run() {
-                    try {
-                        if (needUpdate) {
-                            getInterval();
-                            fireTableDataChanged();
-                            needUpdate = false;
-                        }
-                    } catch (Exception e) {
-                        //logger.error(e.getMessage(),e);
-                        String err = e.getMessage();
-                    }
-                }
-            };
-
-            this.timer.schedule(action, 100, timeout);
-        }
-
     }
 
     public Boolean[] getColumnAutoHeight() {
@@ -225,40 +190,23 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     public void addObservers() {
-        if (timeout > 0)
-            initTimer();
-        else {
-            Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
-            if (map != null) {
+        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+        if (map != null) {
 
-                RESET_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_RESET);
-                LIST_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_LIST);
-                ADD_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_ADD);
-                DELETE_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+            RESET_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_RESET);
+            LIST_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_LIST);
+            ADD_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_ADD);
+            DELETE_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
 
-                map.addObserver(this);
-            }
+            map.addObserver(this);
         }
-
     }
 
     public void deleteObservers() {
-        if (timeout > 0)
-            stopTimer();
-        else {
-            Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
-            if (map != null) {
-                map.deleteObserver(this);
-            }
+        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+        if (map != null) {
+            map.deleteObserver(this);
         }
-    }
-
-    public void stopTimer() {
-        if (this.timer != null){
-            this.timer.cancel();
-            this.timer = null;
-        }
-
     }
 
 }

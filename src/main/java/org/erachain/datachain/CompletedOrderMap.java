@@ -1,6 +1,5 @@
 package org.erachain.datachain;
 
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.OrderSerializer;
@@ -8,14 +7,8 @@ import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 import org.erachain.utils.ObserverMessage;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -37,8 +30,8 @@ public class CompletedOrderMap extends DCMap<Long, Order> {
         }
     }
 
-    public CompletedOrderMap(CompletedOrderMap parent) {
-        super(parent, null);
+    public CompletedOrderMap(CompletedOrderMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

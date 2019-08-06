@@ -11,6 +11,8 @@ import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.PlaySound;
 import org.erachain.utils.SysTray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -31,6 +33,8 @@ import org.jvnet.substance.skin.SubstanceNebulaBrickWallLookAndFeel;
  */
 
 public class Library {
+
+    protected static Logger logger = LoggerFactory.getLogger(Library.class);
 
     // PLAY SOUND
     public static void notifySysTrayRecord(Transaction transaction) {
@@ -134,8 +138,7 @@ public class Library {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
                     | UnsupportedLookAndFeelException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+                logger.error(e1.getMessage(), e1);
             }
         }
 

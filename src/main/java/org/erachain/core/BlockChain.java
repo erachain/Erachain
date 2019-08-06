@@ -34,10 +34,17 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
-    public static final boolean HARD_WORK = false;
+    public static final boolean DEVELOP_USE = false;
+
     public static final int BLOCK_COUNT = 0; ////
-    static public boolean TEST_DB_TXS_OFF = false;
+    static final public boolean TEST_DB_TXS_OFF = false;
+
+    static final public boolean CHECK_BUGS = true;
+
+    /**
+     * если задан - первое подключение к нему
+     */
+    public static final byte[] START_PEER = null; //new byte[]{(byte)138, (byte)197, (byte)135, (byte)122};
 
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
@@ -48,11 +55,12 @@ public class BlockChain {
     public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9097 : 9047;
     public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9098 : 9048;
 
+    public static final String DEFAULT_EXPLORER = "explorer.erachain.org";
+
     //public static final String TIME_ZONE = "GMT+3";
     //
     public static final boolean ROBINHOOD_USE = false;
     public static final boolean ANONIM_SERT_USE = false;
-    public static final int NEED_PEERS_FOR_UPDATE = HARD_WORK ? 2 : 1;
 
     public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
     public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
@@ -73,7 +81,6 @@ public class BlockChain {
     public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 4);
     static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
-    public static final int MAX_BLOCK_SIZE = HARD_WORK ? 22222 : 5000;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
     public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 2000: 15000;
@@ -81,15 +88,20 @@ public class BlockChain {
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE<<2;
-    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
-
 
     public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
     //public static final int GENERATING_MAX_BLOCK_TIME = 1000;
-    public static final int MAX_BLOCK_BYTES = 2 << 21; //4 * 1048576;
-    public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_BYTES >> 1;
-    public static final int MAX_BLOCK_SIZE_BYTE = HARD_WORK ? MAX_BLOCK_BYTES : MAX_BLOCK_BYTES >> 2;
+    public static final int MAX_BLOCK_SIZE_BYTES = 1 << 24; //4 * 1048576;
+    public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
+    public static final int MAX_REC_DATA_BYTES = 1 << 20; // MAX_BLOCK_SIZE_BYTES >>1;
+
+    // переопределим размеры по HARD
+    public static final int MAX_BLOCK_SIZE_GEN = 10 * MAX_BLOCK_SIZE / (2 + Controller.HARD_WORK);
+    public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN * 200;
+
+    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN<<3;
+    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
+
     public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
@@ -166,7 +178,7 @@ public class BlockChain {
                     //Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
                     //Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
                     //Base58.decode("23bci9zcrPunGppKCm6hKvfRoAStWv4JV2xe16tBEVZSmkCrhw7bXAFzPvv2jqZJXcbA8cmr8oMUfdmS1HJGab7s"),
-                    
+
                     //Base58.decode("54xdM25ommdxTbAVvP7C9cFYPmwaAexkWHfkhgb8yhfCVvvRNrs166q8maYuXWpk4w9ft2HvctaFaafnKNfjyoKR"),
                     //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };
@@ -297,6 +309,7 @@ public class BlockChain {
 
     // dcSet_in = db() - for test
     public BlockChain(DCSet dcSet_in) throws Exception {
+
         //CREATE GENESIS BLOCK
         genesisBlock = new GenesisBlock();
         genesisTimestamp = genesisBlock.getTimestamp();
@@ -373,7 +386,7 @@ public class BlockChain {
             /// Права для Кибальникова в Боевой Версии
             NOVA_ASSETS.put("ERG",
                     new Pair<Integer, byte[]>(20, new Account("7GiE2pKyrULF2iQhAXvdUusXYqiKRQx68m").getShortAddressBytes()));
-            
+
             //NOVA_ASSETS.put("@@USD",
             //		new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
             //NOVA_ASSETS.put("¤¤RUB",
@@ -477,7 +490,7 @@ public class BlockChain {
 
                 try {
                     dcSet.close();
-                    dcSet = Controller.getInstance().reCreateDC();
+                    dcSet = Controller.getInstance().reCreateDC(Controller.getInstance().inMemoryDC);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                     Controller.getInstance().stopAll(6);
@@ -615,15 +628,19 @@ public class BlockChain {
 
         Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
-        if (previousForgingPoint == null) {
-            // IF BLOCK not inserted in MAP
-            previousForgingPoint = creator.getLastForgingData(dcSet);
+        if (DEVELOP_USE) {
+            if (previousForgingPoint == null) {
+                // IF BLOCK not inserted in MAP
+                previousForgingPoint = creator.getLastForgingData(dcSet);
+            }
+
+            if (previousForgingPoint == null || previousForgingPoint.a.equals(height)) {
+                // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
+                previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
+                }
+        } else {
             if (previousForgingPoint == null)
-                if (DEVELOP_USE)
-                    // - (height > VERS_4_11? 100 : 10), 1000);
-                    previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
-                else
-                    return 0l;
+                return 0l;
         }
 
         int previousForgingHeight = previousForgingPoint.a;
@@ -734,7 +751,7 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (!Controller.getInstance().isTestNet()
+        if (!DEVELOP_USE && !Controller.getInstance().isTestNet()
                 && height > VERS_4_11
                 && base > targetedWinValue) {
             return -targetedWinValue;
@@ -961,7 +978,7 @@ public class BlockChain {
     public void updateTXProcessTimingAverage(long processTiming, int counter) {
         if (processTiming < 999999999999l) {
             // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
+            // в микросекундах подсчет делаем
             processTiming = processTiming / 1000 / (Controller.BLOCK_AS_TX_COUNT + counter);
             if (transactionProcessTimingCounter < 1 << 5) {
                 transactionProcessTimingCounter++;
@@ -1038,126 +1055,6 @@ public class BlockChain {
         return dcSet.getBlockMap().last();
     }
 
-
-	/*
-	// IT IS RIGHTS ONLY WHEN BLOCK is MAKING
-	// MABE used only in isValid and in Block Generator
-	public static int calcGeneratingBalance(DCSet dcSet, Account creator, int height)
-	{
-
-		long incomed_amount = 0l;
-		//long amount;
-
-		int previousForgingHeight = getPreviousForgingHeightForCalcWin(dcSet, creator, height);
-		int previousForgingHeight = creator.getForgingData(dcSet, height);
-		if (previousForgingHeight == -1) {
-			// IF BLOCK not inserted in MAP
-			previousForgingHeight = creator.getLastForgingData(dcSet);
-		}
-
-		if (false && !BlockChain.DEVELOP_USE) {
-			if (height > 87090 && height - previousForgingHeight < 10 ) {
-				return -1;
-			}
-		}
-
-		if (previousForgingHeight > height) {
-			return height;
-		}
-
-		previousForgingHeight++;
-		if (previousForgingHeight < height) {
-
-			// for recipient only
-			List<Transaction> txs = dcSet.getTransactionFinalMap().findTransactions(null, null, creator.getAddress(),
-					previousForgingHeight, height,
-					0, 0, false, 0, 0);
-
-			//amount = 0l;
-			for(Transaction transaction: txs)
-			{
-				if ( transaction.getAbsKey() != Transaction.RIGHTS_KEY )
-					continue;
-
-				transaction.setDC(dcSet, false);
-				if (transaction instanceof TransactionAmount) {
-					TransactionAmount recordAmount = (TransactionAmount) transaction;
-					if (recordAmount.isBackward())
-						continue;
-
-					int amo_sign = recordAmount.getAmount().signum();
-					if (amo_sign > 0) {
-						// SEND or DEBT
-						incomed_amount += recordAmount.getAmount().longValue();
-					} else {
-						continue;
-					}
-					//} else if (transaction instanceof CreateOrderTransaction) {
-					//	amount = transaction.getAmount().longValue();
-				} else {
-					continue;
-				}
-				//incomed_amount += amount;
-			}
-
-			// for creator
-			txs = dcSet.getTransactionFinalMap().findTransactions(null, creator.getAddress(), null,
-					previousForgingHeight, height,
-					0, 0, false, 0, 0);
-
-			//amount = 0l;
-			for(Transaction transaction: txs)
-			{
-				transaction.setDC(dcSet, false);
-
-				if (false && transaction instanceof RSertifyPubKeys) {
-					//	amount = BlockChain.GIFTED_ERA_AMOUNT.intValue();
-					//	incomed_amount += amount;
-
-				} else if (transaction instanceof TransactionAmount) {
-
-					if ( transaction.getAbsKey() != Transaction.RIGHTS_KEY )
-						continue;
-
-					TransactionAmount recordAmount = (TransactionAmount) transaction;
-					// TODO: delete  on new CHAIN
-					if (height > 45281 && recordAmount.isBackward()
-							&& Account.actionType(recordAmount.getKey(), recordAmount.getAmount()) == 2) {
-						// RE DEBT to me
-						long amount = transaction.getAmount().abs().longValue();
-						if (amount < 200) {
-							continue;
-						} else if (amount < 1000) {
-							amount >>=2;
-						} else {
-							amount >>=1;
-						}
-						incomed_amount += amount;
-					} else {
-						continue;
-					}
-				} else {
-					continue;
-				}
-
-				//incomed_amount += amount;
-			}
-			txs = null;
-		}
-
-		// OWN + RENT balance - in USE
-		long used_amount = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).longValue();
-		if (used_amount < BlockChain.MIN_GENERATING_BALANCE)
-			return 0;
-
-		if (used_amount - incomed_amount < BlockChain.MIN_GENERATING_BALANCE ) {
-			return BlockChain.MIN_GENERATING_BALANCE;
-		} else {
-			return (int)(used_amount - incomed_amount);
-		}
-	}
-	OLD
-	 */
 
     public byte[] getLastBlockSignature(DCSet dcSet) {
         return dcSet.getBlockMap().getLastBlockSignature();

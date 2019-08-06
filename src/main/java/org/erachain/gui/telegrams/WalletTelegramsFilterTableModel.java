@@ -32,7 +32,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
 
     public static final int COLUMN_MESSAGE = 0;
   //  public static final int COLUMN_DATE = 0;
-    static Logger LOGGER = LoggerFactory.getLogger(WalletTelegramsFilterTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WalletTelegramsFilterTableModel.class);
     // ItemAssetMap dbItemAssetMap;
     private SortableList<String, Transaction> transactions;
     private String[] columnNames = Lang.getInstance().translate(new String[] { "Message" });

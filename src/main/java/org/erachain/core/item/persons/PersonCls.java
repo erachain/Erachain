@@ -308,16 +308,18 @@ public abstract class PersonCls extends ItemCls {
     public String toString(DCSet db) {
         long key = this.getKey(db);
         return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
-                + this.name + "♥"
-                + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC");
+                + this.name // + "♥"
+                ///+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
+                ;
     }
 
     @Override
     public String getShort(DCSet db) {
         long key = this.getKey(db);
         return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
-                + this.name.substring(0, Math.min(this.name.length(), 20)) + "♥"
-                + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC");
+                + this.name.substring(0, Math.min(this.name.length(), 20)) //"♥"
+                //+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
+                ;
     }
 
     @SuppressWarnings("unchecked")

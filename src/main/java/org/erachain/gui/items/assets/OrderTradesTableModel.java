@@ -55,6 +55,9 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
         Order initiatorOrder = Order.getOrder(db, trade.getInitiator());
         Order targetOrder = Order.getOrder(db, trade.getTarget());
 
+        boolean isMine = Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
+                || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress());
+
         switch (column) {
             case COLUMN_TIMESTAMP:
 
@@ -69,7 +72,7 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
                 else
                     result = initiatorOrder.getCreator().getPersonAsString();
 
-                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())) {
+                if (isMine) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
@@ -79,22 +82,23 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
                 if (isSell)
                     return "<html><span style='color:green'>▲</span>"
-                            + NumberAsString.formatAsString(trade.calcPrice())
+                            + (isMine? "<b>" + NumberAsString.formatAsString(trade.calcPrice()) + "</b>"
+                                : NumberAsString.formatAsString(trade.calcPrice()))
                             + "</html>";
                 else
                     return "<html><span style='color:red'>▼</span>"
-                            + NumberAsString.formatAsString(trade.calcPriceRevers())
+                            + (isMine? "<b>" + NumberAsString.formatAsString(trade.calcPriceRevers()) + "</b>"
+                                : NumberAsString.formatAsString(trade.calcPriceRevers()))
                             + "</html>";
 
             case COLUMN_WHO_AMOUNT:
 
                 if (isSell)
                     result = initiatorOrder.getCreator().getPersonAsString();
-                    //result = NumberAsString.formatAsString(trade.getAmountWant());
                 else
                     result = NumberAsString.formatAsString(trade.getAmountHave());
 
-                if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+                if (isMine) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 

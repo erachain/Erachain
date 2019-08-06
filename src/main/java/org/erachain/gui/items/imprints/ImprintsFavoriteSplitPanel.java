@@ -30,7 +30,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
                 MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, (PersonCls) th.itemMenu, null));
+                        null, null, (PersonCls) th.itemTableSelected, null));
 
             }
         });
@@ -40,7 +40,7 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) th.itemMenu));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) th.itemTableSelected));
             }
         });
 

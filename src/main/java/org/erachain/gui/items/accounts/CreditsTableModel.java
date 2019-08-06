@@ -46,7 +46,7 @@ public class CreditsTableModel extends SortedListTableModelCls<Tuple2<Long, Long
         super(DCSet.getInstance().getCredit_AddressesMap(),
                 new String[]{"Account", "Amount", "Type"}, false);
 
-        logger = LoggerFactory.getLogger(CreditsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(CreditsTableModel.class);
 
     }
 

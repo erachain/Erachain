@@ -28,11 +28,7 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
     public SortedListTableModelCls(DBMap map, String[] columnNames, Boolean[] column_AutoHeight, int favoriteColumn, boolean descending) {
         super(map, columnNames, column_AutoHeight, favoriteColumn, descending);
     }
-
-    public SortedListTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
-        super(map, name, timeout, columnNames, column_AutoHeight, descending);
-    }
-
+    
     @Override
     public U getItem(int k) {
         return this.listSorted.get(k).getB();

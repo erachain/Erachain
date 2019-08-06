@@ -56,10 +56,6 @@ public class Account {
     Tuple2<Integer, PersonCls> person;
     int viewBalancePosition = 0;
 
-    protected Account() {
-        // this.generatingBalance = 0l;
-    }
-
     public Account(String address) {
 
         // ///test address
@@ -495,6 +491,16 @@ public class Account {
 
     // REFERENCE
 
+    private BigDecimal addDEVAmount(long key) {
+        if (key == 1)
+            return BigDecimal.valueOf(( 512000 + 500 * this.getShortAddressBytes()[10]) >> 6);
+        else if (key == 2)
+            return new BigDecimal("100.0");
+
+        return BigDecimal.ZERO;
+
+    }
+
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
             DCSet db, long key) {
         if (key < 0)
@@ -503,14 +509,9 @@ public class Account {
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getAddress(), key);
         if (BlockChain.DEVELOP_USE) {
-            if (key == 1)
-                return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(10000))),
-                        balance.b, balance.c, balance.d, balance.e);
-            else if (key == 2)
-                return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.TEN)), balance.b,
-                        balance.c, balance.d, balance.e);
+            return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key))),
+                    balance.b, balance.c, balance.d, balance.e);
         }
         return balance;
 
@@ -525,13 +526,11 @@ public class Account {
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             if (BlockChain.DEVELOP_USE) {
-                if (key == 1)
-                    return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(1000)));
-                else if (key == 2)
-                    return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.TEN));
+                return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
             }
 
             return balance.a;
+
         } else if (actionType == TransactionAmount.ACTION_DEBT)
             return balance.b;
         else if (actionType == TransactionAmount.ACTION_HOLD)
@@ -695,43 +694,47 @@ public class Account {
     }
 
     public Long getLastTimestamp(DCSet dcSet) {
-        return dcSet.getReferenceMap().getLast(this.getAddress());
+        return dcSet.getReferenceMap().get(shortBytes);
     }
 
     public void setLastTimestamp(Long timestamp, DCSet dcSet) {
-        byte[] key = Base58.decode(this.getAddress());
+
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET CURRENT REFERENCE
-        Long reference = map.get(key);
+        Long reference = map.get(shortBytes);
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(key, Longs.toByteArray(timestamp));
+        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
 
         // set NEW LAST TIMESTAMP as REFERENCE
         map.set(keyTimestamp, reference);
 
         // SET NEW REFERENCE
-        map.set(key, timestamp);
+        map.set(shortBytes, timestamp);
     }
 
     public void removeLastTimestamp(DCSet dcSet) {
-        byte[] key = Base58.decode(this.getAddress());
+
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET LAST TIMESTAMP
-        Long timestamp = map.get(key);
+        Long timestamp = map.get(shortBytes);
+
+        if (timestamp == null)
+            timestamp = 0L;
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(key, Longs.toByteArray(timestamp));
+        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
 
         // GET REFERENCE
-        Long reference = map.get(keyTimestamp);
-
         // DELETE TIMESTAMP - REFERENCE
-        map.delete(keyTimestamp);
+        Long reference = map.delete(keyTimestamp);
+        if (reference == null)
+            reference = 0L;
+
         // SET OLD REFERENCE
-        map.set(key, reference);
+        map.set(shortBytes, reference);
     }
 
     // TOSTRING

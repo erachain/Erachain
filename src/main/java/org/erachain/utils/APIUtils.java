@@ -18,6 +18,7 @@ import org.erachain.gui.PasswordPane;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple3;
@@ -27,7 +28,12 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.swing.*;
 import javax.ws.rs.WebApplicationException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 //import test.org.erachain.records.TestRecTemplate;
 
@@ -36,8 +42,42 @@ public class APIUtils {
     static Logger LOGGER = LoggerFactory.getLogger(APIUtils.class.getName());
 
 
+    public static String openUrl(String command) {
 
+        String inputText = null;
+        try {
+            // CREATE CONNECTION
+            URL url = new URL(command);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
+            // EXECUTE
+            int resCode = connection.getResponseCode();
+
+            //READ RESULT
+            InputStream stream;
+            if (resCode == 400) {
+                stream = connection.getErrorStream();
+            } else {
+                stream = connection.getInputStream();
+            }
+
+            InputStreamReader isReader = new InputStreamReader(stream, "UTF-8");
+            //String result = new BufferedReader(isReader).readLine();
+
+            BufferedReader bufferedReader = new BufferedReader(isReader);
+            String inputLine;
+            inputText = "";
+            while ((inputLine = bufferedReader.readLine()) != null)
+                inputText += inputLine;
+            bufferedReader.close();
+
+        } catch (Exception e) {
+
+        }
+
+        return inputText;
+
+    }
 
     public static String errorMess(int error, String message) {
         return "{ \"error\":" + error + ", \"message\": \"" + message + "\" }";
@@ -363,5 +403,35 @@ public class APIUtils {
         }
         
     }
-    
+
+    /**
+     * короче какая-то фиггня была - прилетал блок при тестах в котром транзакции были по номерам перепуьаны
+     * и ХЭШ блока не сходился с расчитываемым тут - как это могло произойти?
+     * Я ловил где было не совпадение - оно было в 6 на 7 трнзакции в блоке 264590
+     * потом этот блок откатился ситемой и заново пересобрался и все норм стало
+     */
+    public static boolean testTxSigns(int heightBlock, int seqNo, String signatureStr) {
+            String peerIP = Controller.getInstance().getSynchronizer().getPeer().getAddress().getHostName();
+            String txStr = APIUtils.openUrl(
+                    //"http://138.68.225.51:9047/apirecords/getbynumber/"
+                    "http://" + peerIP + ":" + Settings.getInstance().getWebPort() + "/apirecords/getbynumber/"
+                            + heightBlock + "-" + seqNo);
+            if (txStr == null) {
+                Long error = null;
+                LOGGER.debug(peerIP + " -- " + heightBlock + "-" + seqNo
+                        + " NOT FOUND");
+                //break;
+            } else if (!txStr.contains(signatureStr)) {
+                Long error = null;
+                LOGGER.debug(peerIP + " -- " + heightBlock + "-" + seqNo
+                        + " WRONG SIGNATURE");
+                return false;
+            } else {
+                LOGGER.debug(peerIP + " -- " + heightBlock + "-" + seqNo
+                        + " good!");
+            }
+
+        return true;
+
+    }
 }

@@ -2,6 +2,7 @@ package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.IssueTemplateRecord;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -32,9 +33,7 @@ public class IssueTemplateDetailsFrame extends RecDetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        String txt = "<HTML>" + Library.to_HTML(templateIssue.getItem().getDescription());
-
-        JLabel txtAreaDescription = new JLabel(txt);
+        MTextPane txtAreaDescription = new MTextPane(templateIssue.getItem().getDescription());
         JScrollPane scroller = new JScrollPane(txtAreaDescription, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scroller.setPreferredSize(new Dimension(0,400));
         //txtAreaDescription.setRows(4);

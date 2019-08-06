@@ -98,9 +98,10 @@ function poll(data) {
         '</b></td><td><b>' + data.label_table_option_votes +
         '</b></td><td><b>%%</b></td></tr></thead>';
 
+    var number = 1;
     for (var i in data.poll.votes) {
         var item = data.poll.votes[i];
-        output += '<tr><td><b>' + i + ' - ' + item.name + ':</b></td>';
+        output += '<tr><td><b>' + number++ + ' - ' + item.name + ':</b></td>';
         output += '<td>' + item.persons + '</td>';
         output += '<td>' + (100.0 * item.persons / data.poll.personsTotal).toPrecision(6)  + '</td>';
         output += '<td>' + item.votes + '</td>';

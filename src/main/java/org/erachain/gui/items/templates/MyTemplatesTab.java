@@ -6,7 +6,9 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -14,6 +16,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MyTemplatesTab extends SplitPanel {
 
@@ -30,7 +34,7 @@ public class MyTemplatesTab extends SplitPanel {
         super("MyTemplatesTab");
 
         this.setName("My Template");
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -91,7 +95,7 @@ public class MyTemplatesTab extends SplitPanel {
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 onChange();
@@ -110,7 +114,7 @@ public class MyTemplatesTab extends SplitPanel {
             public void onChange() {
 
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
                 // SET FILTER
                 assetsModel.fireTableDataChanged();
@@ -157,8 +161,8 @@ public class MyTemplatesTab extends SplitPanel {
 
 
         //MENU
-        JPopupMenu assetsMenu = new JPopupMenu();
-        assetsMenu.addAncestorListener(new AncestorListener() {
+        JPopupMenu itemMenu = new JPopupMenu();
+        itemMenu.addAncestorListener(new AncestorListener() {
 
 
             @Override
@@ -166,7 +170,7 @@ public class MyTemplatesTab extends SplitPanel {
                 // TODO Auto-generated method stub
                 row = table.getSelectedRow();
                 if (row < 1) {
-                    assetsMenu.disable();
+                    itemMenu.disable();
                 }
 
                 row = table.convertRowIndexToModel(row);
@@ -189,7 +193,9 @@ public class MyTemplatesTab extends SplitPanel {
 
         });
 
-        JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
+        JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
+
+        JMenuItem favorite = new JMenuItem();
         favorite.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -199,99 +205,46 @@ public class MyTemplatesTab extends SplitPanel {
             }
         });
 
-        JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
-        sell.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
-                //	String account = assetsModel..getAccount(row);
-                //	AssetPairSelect a = new AssetPairSelect(asset.getKey(), "To sell", "");
+        itemMenu.add(vouch_Item);
 
+        itemMenu.addPopupMenuListener(new PopupMenuListener() {
+
+                @Override
+                public void popupMenuCanceled(PopupMenuEvent arg0) {
+                    // TODO Auto-generated method stub
+
+                }
+
+                @Override
+                public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
+                    // TODO Auto-generated method stub
+
+                }
+
+                @Override
+                public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
+                    // TODO Auto-generated method stub
+
+                    row = table.getSelectedRow();
+                    row = table.convertRowIndexToModel(row);
+                    AssetCls asset = assetsModel.getItem(row).b;
+
+                    //IF ASSET CONFIRMED AND NOT ERM
+
+                    favorite.setVisible(true);
+                    //CHECK IF FAVORITES
+                    if (Controller.getInstance().isItemFavorite(asset)) {
+                        favorite.setText(Lang.getInstance().translate("Remove Favorite"));
+                    } else {
+                        favorite.setText(Lang.getInstance().translate("Add Favorite"));
+                    }
+                }
 
             }
-        });
-
-
-        JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
-        excahge.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
-                //		new AssetPairSelect(asset.getKey(), "","");
-            }
-        });
-        assetsMenu.add(excahge);
-
-
-        JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
-        buy.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                AssetCls asset = assetsModel.getItem(row).b;
-                //		new AssetPairSelect(asset.getKey(), "Buy","");
-            }
-        });
-
-        assetsMenu.addSeparator();
-        assetsMenu.add(buy);
-
-        assetsMenu.add(sell);
-        assetsMenu.addSeparator();
-
-
-        assetsMenu.addPopupMenuListener(new PopupMenuListener() {
-
-                                            @Override
-                                            public void popupMenuCanceled(PopupMenuEvent arg0) {
-                                                // TODO Auto-generated method stub
-
-                                            }
-
-                                            @Override
-                                            public void popupMenuWillBecomeInvisible(PopupMenuEvent arg0) {
-                                                // TODO Auto-generated method stub
-
-                                            }
-
-                                            @Override
-                                            public void popupMenuWillBecomeVisible(PopupMenuEvent arg0) {
-                                                // TODO Auto-generated method stub
-
-                                                row = table.getSelectedRow();
-                                                row = table.convertRowIndexToModel(row);
-                                                AssetCls asset = assetsModel.getItem(row).b;
-
-                                                //IF ASSET CONFIRMED AND NOT ERM
-
-                                                favorite.setVisible(true);
-                                                //CHECK IF FAVORITES
-                                                if (Controller.getInstance().isItemFavorite(asset)) {
-                                                    favorite.setText(Lang.getInstance().translate("Remove Favorite"));
-                                                } else {
-                                                    favorite.setText(Lang.getInstance().translate("Add Favorite"));
-                                                }
-				/*
-				//this.favoritesButton.setPreferredSize(new Dimension(200, 25));
-				this.favoritesButton.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(ActionEvent e)
-					{
-						onFavoriteClick();
-					}
-				});
-				this.add(this.favoritesButton, labelGBC);
-				 */
-
-
-                                            }
-
-                                        }
 
         );
 
-
-        assetsMenu.add(favorite);
-
+        itemMenu.add(favorite);
 
         JMenuItem details = new JMenuItem(Lang.getInstance().translate("Details"));
         details.addActionListener(new ActionListener() {
@@ -310,9 +263,33 @@ public class MyTemplatesTab extends SplitPanel {
                 //		new PayDividendFrame(asset);
             }
         });
-        assetsMenu.add(dividend);
-     //   table.setComponentPopupMenu(assetsMenu);
-        TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
+        itemMenu.add(dividend);
+
+        itemMenu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                row = table.getSelectedRow();
+                row = table.convertRowIndexToModel(row);
+                AssetCls asset = assetsModel.getItem(row).b;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?template=" + asset.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+        itemMenu.add(setSeeInBlockexplorer);
+
+        //   table.setComponentPopupMenu(assetsMenu);
+        TableMenuPopupUtil.installContextMenu(table, itemMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
         //MOUSE ADAPTER

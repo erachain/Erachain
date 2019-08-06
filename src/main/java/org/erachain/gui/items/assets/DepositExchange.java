@@ -8,7 +8,9 @@ import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.FundTokensComboBoxModel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.StrJSonFine;
+import org.erachain.utils.URLViewer;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -16,13 +18,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.math.BigDecimal;
+import java.net.*;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class DepositExchange extends JPanel {
@@ -140,24 +145,35 @@ public class DepositExchange extends JPanel {
                 String help;
 
                 String incomeAssetName = "bitcoins";
+                String incomeName = "BTC";
+                String outcomeAssetName;
                 asset = (AssetCls) cbxAssets.getSelectedItem();
                 switch ((int) asset.getKey()) {
                     case 1:
+                        outcomeAssetName = "ERA";
                         help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
-                                .replace("%1", incomeAssetName) + " <b>ERA</B>"
+                                .replace("%1", incomeAssetName) + " <b>" + outcomeAssetName + "</b>"
                                 + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
-                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> ERA";
+                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetName;
                         break;
                     case 2:
+                        outcomeAssetName = "COMPU";
                         help = Lang.getInstance().translate("Transfer <b>%1</b> to this address for buy")
-                                .replace("%1", incomeAssetName) + " <b>COMPU</B>"
+                                .replace("%1", incomeAssetName) + " <b>" + outcomeAssetName + "</b>"
                                 + " " + Lang.getInstance().translate("by rate") + ": <b>" + rate + "</b>"
-                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> COMPU";
+                                + ", " + Lang.getInstance().translate("max buy amount") + ": <b>" + bal + "</b> " + outcomeAssetName;
                         break;
                     default:
                         help = Lang.getInstance().translate("Transfer <b>%1</B> to this address for deposit your account on Exchange")
                                 .replace("%1", incomeAssetName);
                 }
+
+                if (jsonObject.containsKey("may_pay")) {
+                    help += "<br>" + Lang.getInstance().translate("You may pay maximum") + ": " + jsonObject.get("may_pay").toString()
+                        + incomeName;
+                }
+
+                help += "<br>" + Lang.getInstance().translate("Minimal payment in equivalent <b>%1 BTC</b>").replace("%1","0.0005");
 
                 jTextField_Details.setText(jsonObject.get("addr_in").toString());
                 jTextField_Details_Check.setText("<html>" + help + "</html>");
@@ -302,20 +318,18 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = ++gridy;
         gridBagConstraints.anchor = GridBagConstraints.LINE_END;
-        // gridBagConstraints.insets = new java.awt.Insets(0, 27, 0, 0);
-        gridBagConstraints.insets = new Insets(21, 27, 0, 0);
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jLabel_Asset, gridBagConstraints);
 
-        GridBagConstraints favoritesGBC = new GridBagConstraints();
-        favoritesGBC.insets = new Insets(21, 0, 0, 13);
-        favoritesGBC.fill = GridBagConstraints.HORIZONTAL;
-        favoritesGBC.anchor = GridBagConstraints.LINE_END;
-        favoritesGBC.gridwidth = 3;
-        favoritesGBC.gridx = 2;
-        favoritesGBC.gridy = gridy;
-
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = gridy;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         cbxAssets = new JComboBox<AssetCls>(new FundTokensComboBoxModel(true));
-        this.add(cbxAssets, favoritesGBC);
+        this.add(cbxAssets, gridBagConstraints);
 
         JLabel detailsHead = new JLabel();
 
@@ -360,8 +374,6 @@ public class DepositExchange extends JPanel {
 
         //////////////// BUTTONS
 
-        gridy += 3;
-
         jButton_getDetails = new MButton(Lang.getInstance().translate("Get Payment Details"), 2);
         jButton_getDetails.setToolTipText("");
         jButton_getDetails.addActionListener(new ActionListener() {
@@ -378,16 +390,16 @@ public class DepositExchange extends JPanel {
         });
 
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = gridy;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        //gridBagConstraints.anchor = GridBagConstraints.PAGE_START;
-        gridBagConstraints.insets = new Insets(1, 0, 29, 0);
+        gridBagConstraints.weightx = 0.1;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.LINE_END;
+        gridBagConstraints.insets = new Insets(0, 0, 0, 0);
         add(jButton_getDetails, gridBagConstraints);
 
         ////////////// DETAILS
-        gridy += 3;
-
+        gridy += 1;
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -429,9 +441,10 @@ public class DepositExchange extends JPanel {
         add(jTextField_Details_Check, gridBagConstraints);
 
         //////////////////////////
-        JLabel jText_History = new JLabel();
+        JTextPane jText_History = new JTextPane();
+        //jText_History.setStyledDocument(styleDocument);
 
-        gridy += 3;
+        gridy += 1;
 
         jButtonHistory = new MButton(Lang.getInstance().translate("See Deposit History"), 2);
         jButtonHistory.addActionListener(new ActionListener() {
@@ -443,7 +456,6 @@ public class DepositExchange extends JPanel {
             }
         });
 
-
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = gridy;
@@ -452,6 +464,29 @@ public class DepositExchange extends JPanel {
         gridBagConstraints.insets = new Insets(1, 0, 29, 0);
 
         add(jButtonHistory, gridBagConstraints);
+
+        jText_History.setContentType("text/html");
+        jText_History.setEditable(false);
+        jText_History.setBackground(UIManager.getColor("Panel.background"));
+        // не пашет - надо внутри ручками в тексте jText_History.setFont(UIManager.getFont("Label.font"));
+
+        jText_History.addHyperlinkListener(new HyperlinkListener() {
+
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent arg0) {
+                // TODO Auto-generated method stub
+                HyperlinkEvent.EventType type = arg0.getEventType();
+                if (type != HyperlinkEvent.EventType.ACTIVATED)
+                    return;
+
+                try {
+                    URLViewer.openWebpage(new URL(arg0.getDescription()));
+                } catch (MalformedURLException e1) {
+                    LOGGER.error(e1.getMessage(), e1);
+                }
+
+            }
+        });
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -470,28 +505,37 @@ public class DepositExchange extends JPanel {
         // [TOKEN]/[ADDRESS]
         String urlGetDetails = "https://api.face2face.cash/apipay/history.json/";
 
-        switch ((int) asset.getKey()) {
-            case 1:
-                urlGetDetails += "ERA/"; // BTC -> eBTC
-                break;
-            case 12:
-                urlGetDetails += "@BTC/"; // BTC -> eBTC
-                break;
-            case 14:
-                urlGetDetails += "@ETH/"; // BTC -> eBTC
-                break;
-            case 92:
-                urlGetDetails += "@RUB/"; // BTC -> eUSD
-                break;
-            case 95:
-                urlGetDetails += "@USD/"; // BTC -> eUSD
-                break;
-            default:
-                urlGetDetails += "COMPU/"; // BTC -> COMPU
+        String txURLin;
+        String txURLout;
+        boolean isWithdraw = asset == null;
+        if (isWithdraw) {
+            // значит это биткоин как стандарт вывода
+            urlGetDetails += "BTC/";
+        } else {
+
+            switch ((int) asset.getKey()) {
+                case 1:
+                    urlGetDetails += "ERA/"; // BTC -> eBTC
+                    break;
+                case 12:
+                    urlGetDetails += "@BTC/"; // BTC -> eBTC
+                    break;
+                case 14:
+                    urlGetDetails += "@ETH/"; // BTC -> eBTC
+                    break;
+                case 92:
+                    urlGetDetails += "@RUB/"; // BTC -> eUSD
+                    break;
+                case 95:
+                    urlGetDetails += "@USD/"; // BTC -> eUSD
+                    break;
+                default:
+                    urlGetDetails += "COMPU/"; // BTC -> COMPU
+            }
+
         }
 
         urlGetDetails += address;
-
 
         String inputText = "";
         try {
@@ -535,7 +579,24 @@ public class DepositExchange extends JPanel {
                     tip.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
                 }
 
-                String resultText = "<html>";
+                //String color = "#" + Integer.toHexString(UIManager.getColor("Panel.background").getRGB()).substring(2);
+                String resultText = "<body style='font-family:" + UIManager.getFont("Label.font").getFamily()
+                        + "; font-size: " + UIManager.getFont("Label.font").getSize() + "pt;"
+                        //+ "background:" + color
+                        + "'>";
+                //String resultText = "<body>";
+
+                JSONObject deal_acc = (JSONObject) jsonObject.get("deal_acc");
+                BigDecimal to_pay = new BigDecimal(deal_acc.get("to_pay").toString());
+                if (to_pay.signum() != 0) {
+                    resultText += Lang.getInstance().translate("Awaiting for payout")
+                            + ": " + to_pay.toPlainString()
+                    + " (" + Lang.getInstance().translate("maybe volume is too small for payout, please send more") + ")";
+                }
+                if (false && deal_acc.containsKey("message")) {
+                    resultText += deal_acc.get("message");
+                }
+
                 JSONArray unconfirmed = (JSONArray) jsonObject.get("unconfirmed");
                 if (!unconfirmed.isEmpty()) {
                     resultText += "<h3>" + Lang.getInstance().translate("Pending") + "</h3>";
@@ -581,39 +642,111 @@ public class DepositExchange extends JPanel {
                 JSONArray done = (JSONArray) jsonObject.get("done");
                 if (!done.isEmpty()) {
                     resultText += "<h3>" + Lang.getInstance().translate("Done") + "</h3>";
-                    /**
-                     * {"acc": "7KJjTKrj7Zmm7cYJANWHmLfmNPoZbwmbiy", "stasus": "ok",
-                     * "curr_in": {"abbrev": "COMPU", "id": 10},
-                     * "curr_out": {"abbrev": "COMPU", "id": 10},
-                     * "pay_out": {"status": null, "info": null, "created_ts": 1561122345.0, "amo_in": 0.02, "amo_taken": 0.01890641, "tax_mess": null,
-                     *      "vars": {"payment_id": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ", "status": "success"},
-                     *      "created_on": "2019-06-21 16:05:45", "txid": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ",
-                     *      "amount": 0.01888609, "amo_to_pay": 0.0, "amo_gift": 2.032e-05, "id": 77, "amo_partner": 0.0
-                     *      },
-                     *  "amount_in": 0.02, "created": "2019-06-21 16:03:10", "confitmations": 1,
-                     *  "txid": "3C82efTYLiPjDgPpJqgeU8Kp5b9Bwe2aKsc1aXjtnXHhxpo9QbuuNrr3juhkEhcBTaV7fxeUynYdkPFSuXb6trU5"},
-                     */
+
                     for (Object item : done) {
                         try {
                             JSONObject json = (JSONObject) item;
+
                             JSONObject curr_in = (JSONObject) json.get("curr_in");
                             JSONObject curr_out = (JSONObject) json.get("curr_out");
-                            JSONObject pay_out = (JSONObject) json.get("pay_out");
+                            String amount_in = json.get("amount_in").toString();
 
-                            resultText += json.get("amount_in") + " " + curr_in.get("abbrev")
-                                    + " :: " + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
-                                    + " - " + pay_out.get("created_on")
-                                    + "  <span style='font-size:0.8em'>" + pay_out.get("txid") + "</span><br>";
+                            if (json.containsKey("pay_out")) {
+
+                                /**
+                                 * {"acc": "7KJjTKrj7Zmm7cYJANWHmLfmNPoZbwmbiy", "stasus": "ok",
+                                 * "curr_in": {"abbrev": "COMPU", "id": 10},
+                                 * "curr_out": {"abbrev": "COMPU", "id": 10},
+                                 * "pay_out": {"status": null, "info": null, "created_ts": 1561122345.0, "amo_in": 0.02, "amo_taken": 0.01890641, "tax_mess": null,
+                                 *      "vars": {"payment_id": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ", "status": "success"},
+                                 *      "created_on": "2019-06-21 16:05:45", "txid": "4g1bxW9aA8moR1vEwefmma6B3DpYawtrL2NaBHAaPFsibPgs8UAVZnJ6zytWew8KXNCyt28oL76EYKbJRasjfqUQ",
+                                 *      "amount": 0.01888609, "amo_to_pay": 0.0, "amo_gift": 2.032e-05, "id": 77, "amo_partner": 0.0
+                                 *      },
+                                 *  "amount_in": 0.02, "created": "2019-06-21 16:03:10", "confitmations": 1,
+                                 *  "txid": "3C82efTYLiPjDgPpJqgeU8Kp5b9Bwe2aKsc1aXjtnXHhxpo9QbuuNrr3juhkEhcBTaV7fxeUynYdkPFSuXb6trU5"},
+                                 */
+
+                                JSONObject pay_out = (JSONObject) json.get("pay_out");
+
+                                if (isWithdraw) {
+                                    txURLin = "http://" + Settings.getInstance().getBlockexplorerURL()
+                                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                            + "?tx=";
+
+                                    if (curr_out.get("abbrev").equals("BTC")) {
+                                        txURLout = "https://www.blockchain.com/ru/btc/tx/";
+                                    } else if (curr_out.get("abbrev").equals("BTC")) {
+                                        txURLout = "https://www.blockchain.com/ru/eth/tx/";
+                                    } else {
+                                        txURLout = "";
+                                    }
+
+                                } else {
+                                    if (curr_in.get("abbrev").equals("BTC")) {
+                                        txURLin = "https://www.blockchain.com/ru/btc/tx/";
+                                    } else if (curr_in.get("abbrev").equals("BTC")) {
+                                        txURLin = "https://www.blockchain.com/ru/eth/tx/";
+                                    } else {
+                                        txURLin = "";
+                                    }
+
+                                    txURLout = "http://" + Settings.getInstance().getBlockexplorerURL()
+                                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                            + "?tx=";
+
+                                }
+
+                                resultText += amount_in + " " + curr_in.get("abbrev")
+                                        + " <a href='" + txURLin + json.get("txid").toString() + "'>(TX)</a>";
+
+
+                                resultText +=
+                                        //+ " &#9654; "
+                                         " &#10144; "
+                                        + pay_out.get("amo_taken") + " " + curr_out.get("abbrev")
+                                        + " - " + pay_out.get("created_on")
+                                        + " <a href='" + txURLout + pay_out.get("txid").toString() + "'>(TX)</a>"
+                                ;
+                            } else if (json.containsKey("stasus")) {
+                                /** есди выплаты не было и платеж со статусом ожидания и т.д.
+                                 * {"done": [{"acc": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "stasus": "added",
+                                 *      "curr_in": {"abbrev": "COMPU", "id": 10}, "curr_out": {"abbrev": "BTC", "id": 3},
+                                 *      "amount_in": 0.0065, "created": "2019-07-20 09:33:29", "confitmations": 1,
+                                 *      "status_mess": "2.426e-05", "txid": "3Bwqtmdu58Jn4pMo4558LTUasFdQ2wBwzuy78a4HgpjERiYTekJGHXzkhNxnLDdKh3Q2CW4amt1JAdTthNosfJVu"}
+                                 *      ],
+                                 * "deal_acc": {"payed_month": 0.02621535, "gift_pick": 2.6e-06,
+                                 * "name": "1JiKoayUWVaPwzKq8oM8oaZ6TwYznLmNfJ", "price": 0.0,
+                                 * "payed": 0.02621535, "to_pay": 0.00028671, "gift_payed": 8.02e-06,
+                                 * "message": "<div class=\"row\"><div class=\"col-sm-12\" style=\"\"><h3>Congratulations! You have a gift <b>1.821e-05</b> <i class=\"fa fa-rub\" style=\"color:chartreuse;\"></i></h3>Use the gift code to receive more gifts. Gift code can be taken from our partners.<br />The probability to get <b>2.6e-06</b> them in the following payment is: <b>1</b>. You've already got 8.02e-06</div></div><div class=\"row\"><div class=\"col-sm-12\" style=\"\"><h4>\u0412\u0430\u0448\u0430 \u043f\u0435\u0440\u0435\u043f\u043b\u0430\u0442\u0430 <b>0.00028671 <i class=\"fa fa-rub\"\"></i></b> <small style=\"color:white\">\u041e\u043d\u0430 \u0431\u0443\u0434\u0435\u0442 \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d\u0430 \u043a \u0441\u043b\u0435\u0434\u0443\u044e\u0449\u0435\u043c\u0443 \u043f\u043b\u0430\u0442\u0435\u0436\u0443</small></h4></div></div>", "curr_out_id": 3, "id": 108, "gift_amount": 1.821e-05}, "in_process": [], "deal": {"MAX": 0.0, "name": "to COIN", "id": 2}, "unconfirmed": []}
+                                 */
+
+                                String txURL;
+                                txURL = "http://" + Settings.getInstance().getBlockexplorerURL()
+                                        + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                                        + "?tx=";
+
+                                resultText += json.get("created") + " - " + json.get("amount_in") + " " + curr_in.get("abbrev")
+                                        + " <a href='" + txURL + json.get("txid").toString() + "'>(TX)</a>"
+                                        //+ " &#9654; "
+                                        + " &#10144; ";
+
+                                if (json.containsKey("status_mess")) {
+                                    resultText += " <b>" + json.get("status_mess").toString() + "</b>";
+                                }
+                                resultText += " " + curr_out.get("abbrev") + " " + json.get("stasus");
+                            }
+
                         } catch (Exception e) {
-                            resultText += item.toString() + "<br>";
+                            resultText += item.toString();
                         }
+
+                        resultText += "<br>";
                     }
                 }
 
                 if (unconfirmed.isEmpty() && in_process.isEmpty() && done.isEmpty()) {
                     resultText += "<h3>" + Lang.getInstance().translate("Not Found") + "</h3>";
                 }
-                resultText += "</html>";
                 return resultText;
 
             } else {

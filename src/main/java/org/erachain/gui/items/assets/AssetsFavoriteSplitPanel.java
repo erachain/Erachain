@@ -10,11 +10,14 @@ import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
@@ -27,34 +30,57 @@ public class AssetsFavoriteSplitPanel extends ItemSplitPanel {
 
         sell.addActionListener(e ->
                 //new ExchangeFrame((AssetCls) itemMenu, null, "To sell", "")
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "To sell", ""))
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""))
         );
 
         JMenuItem exchange = new JMenuItem(Lang.getInstance().translate("Exchange"));
         exchange.addActionListener(e ->
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "", ""))
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "", ""))
         );
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(e ->
                 //new ExchangeFrame((AssetCls) itemMenu, null, "Buy", "")
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "Buy", ""))
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""))
         );
 
         JMenuItem vouchMenu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouchMenu.addActionListener(e -> {
             DCSet db = DCSet.getInstance();
-            Transaction transaction = db.getTransactionFinalMap().get(itemMenu.getReference());
+            Transaction transaction = db.getTransactionFinalMap().get(itemTableSelected.getReference());
             new VouchRecordDialog(transaction.getBlockHeight(), transaction.getSeqNo());
 
         });
-        menuTable.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) {
+                    return;
+                }
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?asset=" + itemTableSelected.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
         menuTable.add(exchange);
         menuTable.addSeparator();
         menuTable.add(buy);
         menuTable.add(sell);
         menuTable.addSeparator();
         menuTable.add(vouchMenu);
+
+        menuTable.addSeparator();
+        menuTable.add(setSeeInBlockexplorer);
+
     }
 
     // show details

@@ -16,8 +16,8 @@ public class IssueImprintMap extends IssueItemMap {
         super(databaseSet, database);
     }
 
-    public IssueImprintMap(IssueImprintMap parent) {
-        super(parent);
+    public IssueImprintMap(IssueImprintMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

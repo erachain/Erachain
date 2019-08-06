@@ -234,7 +234,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
 
@@ -299,10 +298,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 //CHECK IF ENOUGH ROOM
-                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                if (++counter > BlockChain.MAX_BLOCK_SIZE_GEN) {
+                    counter--;
+                    break;
+                }
 
-                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTE
-                        || ++counter > BlockChain.MAX_BLOCK_SIZE) {
+                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN) {
                     counter--;
                     break;
                 }
@@ -407,11 +409,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 //CHECK IF ENOUGH ROOM
-                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                if (++counter > (BlockChain.MAX_BLOCK_SIZE << 2)) {
+                    break;
+                }
 
-                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTE
-                        || ++counter > BlockChain.MAX_BLOCK_SIZE) {
-                    counter--;
+                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                if (totalBytes > (BlockChain.MAX_BLOCK_SIZE_BYTES_GEN << 2)) {
                     break;
                 }
 
@@ -522,7 +525,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     @Override
     public void run() {
 
-        TransactionMap transactionsMap = dcSet.getTransactionMap();
+        //TransactionMap transactionsMap = dcSet.getTransactionMap();
 
         int heapOverflowCount = 0;
 
@@ -674,7 +677,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     ctrl.checkStatusAndObserve(1);
 
                     if (forgingStatus == ForgingStatus.FORGING_WAIT
-                            && timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) < NTP.getTime())
+                            && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) < NTP.getTime()
+                                || BlockChain.DEVELOP_USE && height < 100
+                                || height < 10))
                         setForgingStatus(ForgingStatus.FORGING);
 
                     if (//true ||

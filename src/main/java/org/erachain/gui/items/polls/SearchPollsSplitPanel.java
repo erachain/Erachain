@@ -6,11 +6,15 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.SearchItemSplitPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class SearchPollsSplitPanel extends SearchItemSplitPanel {
     /**
@@ -18,11 +22,14 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
      */
     private static final long serialVersionUID = 1L;
     private static PollsItemsTableModel tableModelPolls = new PollsItemsTableModel();
-    private SearchPollsSplitPanel th;
 
     public SearchPollsSplitPanel() {
-        super(tableModelPolls, "Search_Popll_Tab", "Search_Poll_Tab");
-        th = this;
+        super(tableModelPolls, "Search_Poll_Tab", "Search_Poll_Tab");
+
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setMaxWidth(200);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(3).setPreferredWidth(100);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setMaxWidth(200);
+        jTableJScrollPanelLeftPanel.getColumnModel().getColumn(4).setPreferredWidth(100);
 
         // ADD MENU ITEMS
         JMenuItem confirm_Menu = new JMenuItem(Lang.getInstance().translate("Confirm"));
@@ -53,6 +60,25 @@ public class SearchPollsSplitPanel extends SearchItemSplitPanel {
             }
         });
         this.menuTable.add(setVote_Menu);
+
+        menuTable.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?poll=" + itemTableSelected.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+        menuTable.add(setSeeInBlockexplorer);
 
     }
 	

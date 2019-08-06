@@ -30,8 +30,8 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransact
         }
     }
 
-    public ATTransactionMap(ATTransactionMap parent) {
-        super(parent, null);
+    public ATTransactionMap(ATTransactionMap parent, DCSet dcSet) {
+        super(parent, dcSet);
 
     }
 

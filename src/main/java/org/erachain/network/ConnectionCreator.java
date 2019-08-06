@@ -12,6 +12,7 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.util.List;
 
 //
@@ -165,6 +166,16 @@ public class ConnectionCreator extends MonitoredThread {
             this.setName("ConnectionCreator - " + this.getId()
                     + " white:" + network.getActivePeersCounter(true)
                     + " total:" + network.getActivePeersCounter(false));
+
+            if (BlockChain.START_PEER != null) {
+                // TRY CONNECT to WHITE peers of this PEER
+                try {
+                    Peer startPeer = new Peer(InetAddress.getByAddress(BlockChain.START_PEER));
+                    connectToPeersOfThisPeer(startPeer, 1, true);
+                } catch (Exception e) {
+
+                }
+            }
 
             //CHECK IF WE NEED NEW CONNECTIONS
             if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {

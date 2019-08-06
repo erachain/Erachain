@@ -27,8 +27,8 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
         super(databaseSet, database);
     }
 
-    public CreditAddressesMap(CreditAddressesMap parent) {
-        super(parent, null);
+    public CreditAddressesMap(CreditAddressesMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

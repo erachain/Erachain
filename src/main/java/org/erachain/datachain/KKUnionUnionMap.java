@@ -23,8 +23,8 @@ public class KKUnionUnionMap extends KKMap {
         );
     }
 
-    public KKUnionUnionMap(KKUnionUnionMap parent) {
-        super(parent);
+    public KKUnionUnionMap(KKUnionUnionMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

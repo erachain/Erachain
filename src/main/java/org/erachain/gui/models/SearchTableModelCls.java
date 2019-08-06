@@ -37,7 +37,7 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
 
     public SearchTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight,
                                boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;

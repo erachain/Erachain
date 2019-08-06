@@ -31,13 +31,13 @@ import java.util.TreeMap;
  */
 public class Synchronizer {
 
-    public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3;
+    public static final int GET_BLOCK_TIMEOUT = 10000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> (5 - (Controller.HARD_WORK >> 1)));
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
-    private static final int BYTES_MAX_GET = 1024 << 10;
+    private static final int BYTES_MAX_GET = BlockChain.MAX_BLOCK_SIZE_BYTES << 1;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 16;
-    private static int MAX_ORPHAN_TRANSACTIONS = BlockChain.DEVELOP_USE? 200000: 50000;
+    private static int MAX_ORPHAN_TRANSACTIONS = (BlockChain.MAX_BLOCK_SIZE << 5) << (Controller.HARD_WORK >> 1);
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
@@ -159,7 +159,8 @@ public class Synchronizer {
                 assert (sss == hhh);
             }
 
-            lastBlock.orphan(fork);
+            // тут нам не нужно сохранять откаченные транзакции - так как это форкнутая проверка
+            lastBlock.orphan(fork, true);
             DCSet.getInstance().clearCache();
 
             if (BlockChain.DEVELOP_USE) {
@@ -199,7 +200,7 @@ public class Synchronizer {
         long myWeight = myHW.b;
         int newHeight = lastBlock.getHeight() + newBlocks.size();
         // проверять СИЛУ цепочки только если лна не на много лучше моей высоты
-        boolean checkFullWeight = testHeight + 2 > newHeight;
+        boolean checkFullWeight = !BlockChain.DEVELOP_USE && testHeight > newHeight;
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
@@ -333,7 +334,9 @@ public class Synchronizer {
             }
             LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
             LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
-            this.pipeProcessOrOrphan(dcSet, lastBlock, true, false);
+
+            // так как выше мы запоминаем откаченные транзакции то тут их не будем сохранять в базу
+            this.pipeProcessOrOrphan(dcSet, lastBlock, true, false, true);
 
             lastBlock = dcSet.getBlockMap().last();
         }
@@ -360,7 +363,7 @@ public class Synchronizer {
 
             // SYNCHRONIZED PROCESSING
             LOGGER.debug("*** begin PIPE");
-            this.pipeProcessOrOrphan(dcSet, block, false, false);
+            this.pipeProcessOrOrphan(dcSet, block, false, false, false);
 
             LOGGER.debug("*** begin REMOVE orphanedTransactions");
             for (Transaction transaction : block.getTransactions()) {
@@ -530,8 +533,8 @@ public class Synchronizer {
                 try {
                     // PROCESS BLOCK
 
-                    LOGGER.debug("try pipeProcessOrOrphan");
-                    this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false);
+                    LOGGER.debug("try PROCESS");
+                    this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false, false);
 
                     LOGGER.debug("synchronize BLOCK END process");
                     blockBuffer.clearBlock(blockFromPeer.getSignature());
@@ -696,14 +699,14 @@ public class Synchronizer {
         // int myChainHeight =
         // Controller.getInstance().getBlockChain().getHeight();
         //int maxChainHeight = dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
-        int maxChainHeight = dcSet.getBlockMap().size();
-        if (maxChainHeight < checkPointHeight) {
+        final int myChainHeight = dcSet.getBlockMap().size();
+        if (myChainHeight < checkPointHeight) {
             String mess = "Dishonest peer: my checkPointHeight[" + checkPointHeight + "\n -> not found";
             peer.ban(BAN_BLOCK_TIMES, mess);
             throw new Exception(mess);
         }
 
-        LOGGER.info("findHeaders " + " maxChainHeight: " + maxChainHeight + " to minHeight: " + checkPointHeight);
+        LOGGER.info("findHeaders maxChainHeight: " + myChainHeight + " to minHeight: " + checkPointHeight);
 
         // try get check point block from peer
         // GENESIS block nake ERROR in org.erachain.network.Peer.sendMessage(Message) ->
@@ -734,30 +737,31 @@ public class Synchronizer {
         // int step = BlockChain.SYNCHRONIZE_PACKET>>2;
         byte[] lastCommonBlockSignature;
         int step = 2;
+        int currentCheckChainHeight = myChainHeight;
         do {
             if (cnt.isOnStopping()) {
                 throw new Exception("on stopping");
             }
 
-            maxChainHeight -= step;
+            currentCheckChainHeight -= step;
 
-            if (maxChainHeight < checkPointHeight) {
-                maxChainHeight = checkPointHeight;
+            if (currentCheckChainHeight < checkPointHeight) {
+                currentCheckChainHeight = checkPointHeight;
                 lastCommonBlockSignature = checkPointHeightCommonBlock.getSignature();
             } else {
-                lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(maxChainHeight).signature;
+                lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(currentCheckChainHeight).signature;
             }
 
             LOGGER.debug(
-                    "findHeaders try found COMMON header" + " step: " + step + " maxChainHeight: " + maxChainHeight);
+                    "findHeaders try found COMMON header" + " step: " + step + " currentMaxChainHeight: " + currentCheckChainHeight);
 
             headers = this.getBlockSignatures(lastCommonBlockSignature, peer);
 
             LOGGER.debug("findHeaders try found COMMON header" + " founded headers: " + headers.size());
 
             if (headers.size() > 1) {
-                if (maxChainHeight < checkPointHeight) {
-                    String mess = "Dishonest peer by maxChainHeight < checkPointHeight " + peer;
+                if (currentCheckChainHeight < checkPointHeight) {
+                    String mess = "Dishonest peer by currentMaxChainHeight < checkPointHeight " + peer;
                     peer.ban(BAN_BLOCK_TIMES, mess);
                     throw new Exception(mess);
                 }
@@ -767,13 +771,25 @@ public class Synchronizer {
             if (step < 10000)
                 step <<= 1;
 
-        } while (maxChainHeight > checkPointHeight && headers.isEmpty());
+        } while (currentCheckChainHeight > checkPointHeight && headers.isEmpty());
 
         LOGGER.info("findHeaders AFTER try found COMMON header" + " founded headers: " + headers.size());
 
         // CLEAR head of common headers exclude LAST!
         while (headers.size() > 1 && dcSet.getBlockSignsMap().contains(headers.get(0))) {
             lastCommonBlockSignature = headers.remove(0);
+        }
+
+        /**
+         * Нам не нужно тут большую цепочку брать так как с откатом будет проверка блоков сначала и это может занять
+         * слишком много времени - так что сначала синхронизируемся до ближайшего верхнего + 2
+         * Чтобы проверить правильность и силу цепочки/
+         */
+        int commonBockHeight = dcSet.getBlockSignsMap().get(lastCommonBlockSignature);
+        // Так же дальше будет проверка на силу цепочки - поэтому надо 3 блока добавить
+        int needChainLenght = 3 + myChainHeight - commonBockHeight;
+        if (headers.size() > needChainLenght) {
+            headers = headers.subList(0, needChainLenght);
         }
 
         LOGGER.info("findHeaders headers CLEAR" + "now headers: " + headers.size());
@@ -800,10 +816,6 @@ public class Synchronizer {
             if (block == null)
                 break;
 
-            // NOW generating balance not was send by NET
-            // need to SET it!
-            ////block.setCalcGeneratingBalance(dcSet);
-
             blocks.add(block);
             bytesGet += 1500 + block.getDataLength(false);
             ///logger.debug("block added with RECS:" + block.getTransactionCount() + " bytesGet kb: " + bytesGet / 1000);
@@ -817,7 +829,7 @@ public class Synchronizer {
 
     // SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
     // SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
-    public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush)
+    public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush, boolean notStoreTXs)
             throws Exception {
         Controller cnt = Controller.getInstance();
 
@@ -844,7 +856,7 @@ public class Synchronizer {
         if (doOrphan) {
 
             try {
-                block.orphan(dcSet);
+                block.orphan(dcSet, notStoreTXs);
                 dcSet.getBlockMap().setProcessing(false);
                 //dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size

@@ -92,6 +92,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_WALLET_ADDRESS = 3;
     public static final int INVALID_MAKER_ADDRESS = 5;
     public static final int INVALID_REFERENCE = 6;
+    /**
+     * Если откат был в ДЕВЕЛОПе и в этом блоке была первая транзакция то потом откат
+     */
     public static final int INVALID_TIMESTAMP = 7;
     public static final int INVALID_ADDRESS = 8;
     public static final int INVALID_FEE_POWER = 9;
@@ -1249,6 +1252,10 @@ public abstract class Transaction implements ExplorerJsonLine {
             Long reference = this.creator.getLastTimestamp(dcSet);
             if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0
                     && height > BlockChain.VERS_4_11) {
+                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
+                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
+                        + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+
                 return INVALID_TIMESTAMP;
             }
         }

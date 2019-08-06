@@ -34,8 +34,8 @@ public class SearchLinkedHash extends SplitPanel {
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
         this.searchMyJCheckBoxLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(true);
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Hash"));
-        this.searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(500, 20));
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Hash"));
+        this.searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(500, 20));
         this.button2ToolBarLeftPanel.setVisible(false);
         this.button1ToolBarLeftPanel.setText(Lang.getInstance().translate("Search hash"));
 
@@ -54,7 +54,7 @@ public class SearchLinkedHash extends SplitPanel {
         tamleModel = new TableModelSearchHash();
         Table_Hash = new JTable(tamleModel);
 
-        searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -94,7 +94,7 @@ public class SearchLinkedHash extends SplitPanel {
     }
 
     private void find() {
-        String search = searchTextField_SearchToolBar_LeftPanel.getText();
+        String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
         if (search.equals("")) {
             jScrollPaneJPanelRightPanel.setViewportView(null);
             tamleModel.clear();
@@ -192,7 +192,7 @@ public class SearchLinkedHash extends SplitPanel {
             String hashe = Base58.encode(Crypto.getInstance().digest(fileInArray));
             // tableModel.addRow(new Object[] { hashes,
             // Lang.getInstance().translate("from file ") + file_name });
-            this.searchTextField_SearchToolBar_LeftPanel.setText(hashe);
+            this.searchTextFieldSearchToolBarLeftPanelDocument.setText(hashe);
             find();
 
         }
