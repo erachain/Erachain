@@ -26,7 +26,12 @@ public class BlocksRequest extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 50 : 50;
+    private static final int QUEUE_LENGTH = 10 + (256 >> (Controller.HARD_WORK >> 1));
+    /**
+     * число выданных транзакций
+     */
+    private static final int TX_COUNTER_WAIT = 1000 << Controller.HARD_WORK;
+
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -131,10 +136,10 @@ public class BlocksRequest extends MonitoredThread {
             }
 
             // FREEZE sometimes
-            if (counter > 333) {
+            if (counter > TX_COUNTER_WAIT) {
                 counter = 0;
                 try {
-                    Thread.sleep(100);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     break;
                 }
