@@ -2,16 +2,13 @@ package org.erachain.gui.models;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.Pair;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -74,7 +71,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         if (account != null) {
             // ИЩЕМ по СЧЕТУ
-            list = ((TransactionFinalMap)map).getTransactionsByAddressLimit(account.getAddress(), 1000);
+            list = ((TransactionFinalMap)map).getTransactionsByAddressLimit(account.getAddress(), 1000, true);
         } else {
 
             try {

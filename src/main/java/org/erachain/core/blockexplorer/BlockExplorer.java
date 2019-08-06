@@ -308,7 +308,7 @@ public class BlockExplorer {
                         break;
                     case "addresses":
                         //search addresses
-                        output.putAll(jsonQueryAddress(search, (int) start));
+                        output.putAll(jsonQueryAddress(search, (int) start, false));
                         break;
                     case "persons":
                         //search persons
@@ -451,7 +451,8 @@ public class BlockExplorer {
         ///////////////////////////// ADDRESSES //////////////////////
         // address
         else if (info.getQueryParameters().containsKey("address")) {
-            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int) start));
+            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int) start,
+                    info.getQueryParameters().getFirst("noforge") != null));
         }
         else if (info.getQueryParameters().containsKey("addresses")) {
             jsonQueryAddresses();
@@ -2560,7 +2561,7 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryAddress(String address, int start) {
+    public Map jsonQueryAddress(String address, int start, boolean noForge) {
 
         output.put("type", "address");
         output.put("search", "addresses");
@@ -2568,7 +2569,7 @@ public class BlockExplorer {
         output.put("search_message", address);
 
         int limit = 100;
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit);
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit, noForge);
         LinkedHashMap output = new LinkedHashMap();
         output.put("address", address);
 
