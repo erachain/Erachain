@@ -26,11 +26,11 @@ public class BlocksRequest extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
 
-    private static final int QUEUE_LENGTH = BlockChain.HARD_WORK? 100 : 1000;
+    private static final int QUEUE_LENGTH = 10 + (256 >> (Controller.HARD_WORK >> 1));
     /**
      * число выданных транзакций
      */
-    private static final int TX_COUNTER_WAIT = BlockChain.HARD_WORK? 1000 : 100;
+    private static final int TX_COUNTER_WAIT = 1000 << Controller.HARD_WORK;
 
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
