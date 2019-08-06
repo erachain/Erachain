@@ -139,7 +139,13 @@ public class BlocksRequest extends MonitoredThread {
             if (counter > TX_COUNTER_WAIT) {
                 counter = 0;
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            } else {
+                try {
+                    Thread.sleep(2);
                 } catch (InterruptedException e) {
                     break;
                 }
