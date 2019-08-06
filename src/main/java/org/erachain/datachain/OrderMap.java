@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.*;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
@@ -415,6 +416,27 @@ public class OrderMap extends DCMap<Long, Order> {
                 Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
     }
     */
+
+    public boolean set(Long id, Order order) {
+        if (BlockChain.CHECK_BUGS) {
+            if (((DCSet)this.getDBSet()).getCompletedOrderMap().contains(id)) {
+                // если он есть в уже завершенных
+                assert("".equals("already in Completed"));
+            }
+        }
+
+        return super.set(id, order);
+    }
+
+    public Order delete(Long id) {
+        if (BlockChain.CHECK_BUGS) {
+            if (((DCSet)this.getDBSet()).getCompletedOrderMap().contains(id)) {
+                // если он есть в уже завершенных
+                assert("".equals("already in Completed"));
+            }
+        }
+        return super.delete(id);
+    }
 
     public void add(Order order) {
 
