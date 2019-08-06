@@ -26,7 +26,11 @@ public class BlocksRequest extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
 
-    private static final int QUEUE_LENGTH = 10 + (256 >> (Controller.HARD_WORK >> 1));
+    /**
+     * запросов может быть много - они очередь не сильно нагружают - так чтобы разрывов часто не было
+     * иначе buffer-3 = null ошибка на той стороне вылетает
+     */
+    private static final int QUEUE_LENGTH = 300 + (256 >> (Controller.HARD_WORK >> 1));
     /**
      * число выданных транзакций
      */
@@ -139,11 +143,18 @@ public class BlocksRequest extends MonitoredThread {
             if (counter > TX_COUNTER_WAIT) {
                 counter = 0;
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            } else {
+                try {
+                    Thread.sleep(2);
                 } catch (InterruptedException e) {
                     break;
                 }
             }
+
         }
 
         LOGGER.info("Block Request halted");
