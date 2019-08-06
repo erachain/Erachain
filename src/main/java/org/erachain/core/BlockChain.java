@@ -39,6 +39,8 @@ public class BlockChain {
 
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
+
+    static final public boolean CHECK_BUGS = false;
     /**
      * если задан - первое подключение к нему
      */
