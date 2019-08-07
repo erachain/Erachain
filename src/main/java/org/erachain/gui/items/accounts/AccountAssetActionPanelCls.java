@@ -108,7 +108,11 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
 
-        this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
+        } else {
+            this.jTextArea_Account_Description.setText(asset.viewDescription());
+        }
 
         for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
             ItemCls item = jComboBox_Asset.getItemAt(i);
