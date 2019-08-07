@@ -104,12 +104,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public boolean checkWeightPeers() {
         // MAY BE PAT SITUATION
 
-        if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 2 : 4))
+        if (ctrl.getActivePeersCounter() < 2)
             return false;
 
         //logger.debug("try check better WEIGHT peers");
 
-        Peer peer = null;
+        Peer peer;
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
         Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, false);
         if (maxPeer.c != null) {
@@ -646,13 +646,16 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // осмотр сети по СИЛЕ
                     // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
 
-                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                    if (BlockChain.DEVELOP_USE ||
-                            myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
+                    if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
                         // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                         checkWeightPeers();
+                    } else {
+                        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+                        if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
+                            // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                            checkWeightPeers();
+                        }
                     }
-
                 }
 
                 // is WALLET
