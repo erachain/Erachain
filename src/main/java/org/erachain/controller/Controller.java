@@ -440,7 +440,7 @@ public class Controller extends Observable {
     }
 
     public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
-        if (peerHWeight != null) {
+        if (hWeight != null) {
             peerHWeight.put(peer, hWeight);
         } else {
             peerHWeight.remove(peer);
