@@ -172,8 +172,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 } else {
                     LOGGER.debug("I to orphan x2 - peer has better Weight " + maxPeer);
                     try {
+                        // да - там другой блок - откатим тогда свой
                         ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        //ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                         return true;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
@@ -184,6 +184,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
                 try {
                     ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                    return true;
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                     ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
@@ -192,8 +193,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // more then 2 - need to UPDATE
                 LOGGER.debug("to update - peers " + maxPeer
                         + " headers: " + headersSize);
+                return true;
             }
-            return true;
 
         }
 
