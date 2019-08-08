@@ -104,28 +104,28 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public boolean checkWeightPeers() {
         // MAY BE PAT SITUATION
 
-        if (ctrl.getActivePeersCounter() < 2)
-            return false;
-
         //logger.debug("try check better WEIGHT peers");
 
-        Peer peer;
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-        Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, false);
-        if (maxPeer.c != null) {
-            // если мы не в синхроне то выход
-            LOGGER.debug("need UPDATE from " + maxPeer );
-            return false;
-        }
 
+        Peer peer;
         this.setMonitorStatus("checkWeightPeers");
 
-        int counter = ctrl.getActivePeersCounter();
-        do {
+        int counter = 0;
+        // на всякий случай поставим ораничение
+        while (counter++ < 30) {
+
+            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
+            peer = maxPeer.c;
+
+            if (peer == null) {
+                return false;
+            }
 
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
+                break;
             }
 
             if (ctrl.isOnStopping()) {
@@ -133,21 +133,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
 
-            maxPeer = ctrl.getMaxPeerHWeight(0, true);
-            if (maxPeer.c == null)
-                return false;
-
-            peer = maxPeer.c;
-
-            if (myHW.a >= maxPeer.a && myHW.b >= maxPeer.b)
-                return false;
-
-            if (myHW.a < 2)
-                return false;
-
             LOGGER.debug("better WEIGHT peers found: "
-                    //+ peer
-                    //+ " - HW: " + maxPeer.a + ":" + maxPeer.b);
                     + peer);
 
             SignaturesMessage response = null;
@@ -208,7 +194,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         + " headers: " + headersSize);
             }
             return true;
-        } while (--counter > 0);
+
+        }
 
         return false;
 
@@ -682,8 +669,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     if (forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) < NTP.getTime()
                                 || BlockChain.DEVELOP_USE && height < 100
-                                || height < 10))
+                                || height < 10)) {
+
                         setForgingStatus(ForgingStatus.FORGING);
+                    }
 
                     if (//true ||
                             (forgingStatus == ForgingStatus.FORGING // FORGING enabled
