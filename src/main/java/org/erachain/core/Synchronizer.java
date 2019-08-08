@@ -880,6 +880,8 @@ public class Synchronizer {
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
+
+                    LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
                 }
             } finally {
