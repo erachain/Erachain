@@ -88,7 +88,9 @@ public class BlockBuffer extends Thread {
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
                     //ERROR
-                    LOGGER.debug("ERROR block BUFFER response == null, timeSOT[s]:" + timeSOT / 1000);
+                    LOGGER.debug("ERROR block BUFFER response == null, timeSOT[s]:" + timeSOT / 1000
+                            + " " + peer
+                            + " " + BlockBuffer.this.getName() + " :: " + getName());
                     error = true;
                     return;
                 }
