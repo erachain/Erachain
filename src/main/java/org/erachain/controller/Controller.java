@@ -1989,6 +1989,7 @@ public class Controller extends Observable {
             }
         } catch (Exception e) {
             // PEER REMOVED WHILE ITERATING
+            LOGGER.error(e.getMessage(), e);
         }
 
         return new Tuple3<Integer, Long, Peer>(height, weight, maxPeer);
