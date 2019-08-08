@@ -122,19 +122,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 return false;
             }
 
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                break;
-            }
-
-            if (ctrl.isOnStopping()) {
-                return true;
-            }
-
-
             LOGGER.debug("better WEIGHT peers found: "
-                    + peer);
+                    + maxPeer);
 
             SignaturesMessage response = null;
             try {
@@ -162,6 +151,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             List<byte[]> headers = response.getSignatures();
             byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
             int headersSize = headers.size();
+            LOGGER.debug("FOUND head SIZE: " + headersSize);
             if (headersSize == 3 || headersSize == 2) {
                 if (Arrays.equals(headers.get(headersSize - 1), lastSignature)) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
