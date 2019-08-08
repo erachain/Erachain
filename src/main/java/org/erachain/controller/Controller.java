@@ -3430,8 +3430,8 @@ public class Controller extends Observable {
                 try {
                     int hartWork = Integer.parseInt(arg.substring(10));
 
-                    if (hartWork > 8) {
-                        hartWork = 8;
+                    if (hartWork > 12) {
+                        hartWork = 12;
                     }
                     if (hartWork > 0) {
                         HARD_WORK = hartWork;
