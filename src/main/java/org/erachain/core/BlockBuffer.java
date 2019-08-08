@@ -44,9 +44,10 @@ public class BlockBuffer extends Thread {
         while (this.run) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
-                if (Controller.getInstance().isOnStopping()) {
+                if (Controller.getInstance().isOnStopping()
+                        || !peer.isUsed()) {
                     stopThread();
-                    break;
+                    return;
                 }
 
                 byte[] signature = this.signatures.get(i);
@@ -57,6 +58,13 @@ public class BlockBuffer extends Thread {
                     // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
                     this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 1));
 
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        //ERROR SLEEPING
+                        return;
+                    }
+
                 }
             }
 
@@ -64,7 +72,7 @@ public class BlockBuffer extends Thread {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
-                break;
+                return;
             }
         }
     }
@@ -88,9 +96,11 @@ public class BlockBuffer extends Thread {
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
                     //ERROR
-                    LOGGER.debug("ERROR block BUFFER response == null, timeSOT[s]:" + timeSOT / 1000
-                            + " " + peer
-                            + " " + BlockBuffer.this.getName() + " :: " + getName());
+                    if (peer.isUsed()) {
+                        LOGGER.debug("ERROR block BUFFER response == null, timeSOT[s]:" + timeSOT / 1000
+                                + " " + peer
+                                + " " + BlockBuffer.this.getName() + " :: " + getName());
+                    }
                     error = true;
                     return;
                 }
@@ -98,7 +108,9 @@ public class BlockBuffer extends Thread {
                 Block block = response.getBlock();
                 //CHECK BLOCK SIGNATURE
                 if (block == null) {
-                    LOGGER.debug("ERROR block BUFFER block");
+                    if (peer.isUsed()) {
+                        LOGGER.debug("ERROR block BUFFER block");
+                    }
                     error = true;
                     return;
                 }
