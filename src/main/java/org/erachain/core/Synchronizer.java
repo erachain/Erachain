@@ -873,6 +873,8 @@ public class Synchronizer {
                     return;
 
             } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+
                 error = new Exception(e);
 
             } catch (Exception e) {
@@ -891,7 +893,6 @@ public class Synchronizer {
 
                 if (error != null) {
                     dcSet.rollback();
-                    LOGGER.error(error.getMessage(), error);
 
                     if (error instanceof IOException) {
                         cnt.stopAll(22);
