@@ -22,7 +22,7 @@ public class TransactionsPool extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionsPool.class);
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE ? 200 : 300;
+    private static final int QUEUE_LENGTH = BlockChain.MAX_BLOCK_SIZE_GEN;
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Controller controller;
