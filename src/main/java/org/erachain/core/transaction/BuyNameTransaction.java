@@ -94,7 +94,7 @@ public class BuyNameTransaction extends Transaction {
 
         //READ SELLER
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + SELLER_LENGTH);
-        Account seller = new Account(Base58.encode(recipientBytes));
+        Account seller = new Account(recipientBytes);
         position += SELLER_LENGTH;
 
         //READ FEE POWER
