@@ -336,6 +336,7 @@ public class Peer extends MonitoredThread {
         return this.socket != null && this.socket.isConnected() && this.runed;
     }
 
+    private long countAlarmMess = 0;
     public void run() {
         byte[] messageMagic = null;
 
@@ -439,13 +440,14 @@ public class Peer extends MonitoredThread {
                 }
 
                 parsePoint = (System.nanoTime() - parsePoint) / 1000;
-                if (parsePoint < 999999999l) {
+                if (System.currentTimeMillis() - countAlarmMess > 1000 && parsePoint < 999999999l) {
                     if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 10000
                             || parsePoint > 1000000
                     ) {
                             LOGGER.debug(this + message.viewPref(false) + message
                                 + " PARSE: " + parsePoint + "[us]");
                     }
+                    countAlarmMess = System.currentTimeMillis();
                 }
 
                 if (USE_MONITOR) this.setMonitorStatus("in.message process");

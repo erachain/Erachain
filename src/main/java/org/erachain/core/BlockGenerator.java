@@ -104,51 +104,26 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public boolean checkWeightPeers() {
         // MAY BE PAT SITUATION
 
-        if (ctrl.getActivePeersCounter() < 2)
-            return false;
-
         //logger.debug("try check better WEIGHT peers");
 
-        Peer peer;
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-        Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, false);
-        if (maxPeer.c != null) {
-            // если мы не в синхроне то выход
-            LOGGER.debug("need UPDATE from " + maxPeer );
-            return false;
-        }
 
+        Peer peer;
         this.setMonitorStatus("checkWeightPeers");
 
-        int counter = ctrl.getActivePeersCounter();
-        do {
+        int counter = 0;
+        // на всякий случай поставим ораничение
+        while (counter++ < 30) {
 
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
-
-            if (ctrl.isOnStopping()) {
-                return true;
-            }
-
-
-            maxPeer = ctrl.getMaxPeerHWeight(0, true);
-            if (maxPeer.c == null)
-                return false;
-
+            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
             peer = maxPeer.c;
 
-            if (myHW.a >= maxPeer.a && myHW.b >= maxPeer.b)
+            if (peer == null) {
                 return false;
-
-            if (myHW.a < 2)
-                return false;
+            }
 
             LOGGER.debug("better WEIGHT peers found: "
-                    //+ peer
-                    //+ " - HW: " + maxPeer.a + ":" + maxPeer.b);
-                    + peer);
+                    + maxPeer);
 
             SignaturesMessage response = null;
             try {
@@ -176,6 +151,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             List<byte[]> headers = response.getSignatures();
             byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
             int headersSize = headers.size();
+            LOGGER.debug("FOUND head SIZE: " + headersSize);
             if (headersSize == 3 || headersSize == 2) {
                 if (Arrays.equals(headers.get(headersSize - 1), lastSignature)) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
@@ -186,8 +162,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 } else {
                     LOGGER.debug("I to orphan x2 - peer has better Weight " + maxPeer);
                     try {
+                        // да - там другой блок - откатим тогда свой
                         ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        //ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                         return true;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
@@ -198,6 +174,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
                 try {
                     ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                    return true;
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
                     ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
@@ -206,9 +183,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // more then 2 - need to UPDATE
                 LOGGER.debug("to update - peers " + maxPeer
                         + " headers: " + headersSize);
+                return true;
             }
-            return true;
-        } while (--counter > 0);
+
+        }
 
         return false;
 
@@ -646,15 +624,20 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // осмотр сети по СИЛЕ
                     // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
 
+                    boolean needCheck = false;
                     if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
                         // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                        checkWeightPeers();
+                        needCheck = true;
                     } else {
                         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
                         if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
                             // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                            checkWeightPeers();
+                            needCheck = true;
                         }
+                    }
+                    if (needCheck && checkWeightPeers()) {
+                        // было отставание по силе цепочки - запретим сборку блока нам - так как мы откатились чуток и нужна синхронизация
+                        setForgingStatus(ForgingStatus.FORGING_WAIT);
                     }
                 }
 
@@ -682,8 +665,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     if (forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) < NTP.getTime()
                                 || BlockChain.DEVELOP_USE && height < 100
-                                || height < 10))
+                                || height < 10)) {
+
                         setForgingStatus(ForgingStatus.FORGING);
+                    }
 
                     if (//true ||
                             (forgingStatus == ForgingStatus.FORGING // FORGING enabled

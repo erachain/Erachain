@@ -127,8 +127,8 @@ public class Synchronizer {
         // ============ by EQUAL SIGNATURE !!!!!
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
-            LOGGER.debug("*** ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK ["
-                    + lastBlock.getHeight() + "]");
+            LOGGER.debug("*** ORPHAN LAST BLOCK [" + lastBlock.getHeight() + "] in FORK_DB UNTIL WE HAVE REACHED COMMON BLOCK ["
+                    + lastCommonBlock.getHeight() + "]");
             if (checkPointHeight > lastBlock.getHeight()) {
                 String mess = "Dishonest peer by not valid lastCommonBlock[" + lastCommonBlock.getHeight() + "] < ["
                         + checkPointHeight + "] checkPointHeight";
@@ -237,7 +237,7 @@ public class Synchronizer {
                 }
             }
 
-            LOGGER.debug("*** checkNewBlocks - VALIDATE [" + height + "]");
+            LOGGER.debug("*** checkNewBlocks - VALIDATE in FORK [" + height + "]");
 
             // CHECK IF VALID
             if (!block.isSignatureValid()) {
@@ -873,6 +873,8 @@ public class Synchronizer {
                     return;
 
             } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
+
                 error = new Exception(e);
 
             } catch (Exception e) {
@@ -880,6 +882,8 @@ public class Synchronizer {
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
+
+                    LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
                 }
             } finally {
@@ -889,7 +893,6 @@ public class Synchronizer {
 
                 if (error != null) {
                     dcSet.rollback();
-                    LOGGER.error(error.getMessage(), error);
 
                     if (error instanceof IOException) {
                         cnt.stopAll(22);

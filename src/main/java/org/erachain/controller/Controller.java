@@ -440,7 +440,7 @@ public class Controller extends Observable {
     }
 
     public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
-        if (peerHWeight != null) {
+        if (hWeight != null) {
             peerHWeight.put(peer, hWeight);
         } else {
             peerHWeight.remove(peer);
@@ -1989,6 +1989,7 @@ public class Controller extends Observable {
             }
         } catch (Exception e) {
             // PEER REMOVED WHILE ITERATING
+            LOGGER.error(e.getMessage(), e);
         }
 
         return new Tuple3<Integer, Long, Peer>(height, weight, maxPeer);
