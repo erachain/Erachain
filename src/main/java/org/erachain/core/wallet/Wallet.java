@@ -1712,6 +1712,9 @@ public class Wallet extends Observable implements Observer {
 	@SuppressWarnings("unchecked")
     @Override
     public void update(Observable o, Object arg) {
+    	if (Controller.getInstance().noUseWallet || Controller.getInstance().noDataWallet)
+    		return;
+
         try {
             this.syncUpdate(o, arg);
         } catch (Exception e) {

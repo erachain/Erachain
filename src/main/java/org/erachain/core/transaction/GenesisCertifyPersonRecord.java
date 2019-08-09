@@ -49,7 +49,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
 
         //READ RECIPIENT
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-        Account recipient = new Account(Base58.encode(recipientBytes));
+        Account recipient = new Account(recipientBytes);
         position += RECIPIENT_LENGTH;
 
         //READ KEY
