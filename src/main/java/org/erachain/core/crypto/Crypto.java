@@ -1,6 +1,5 @@
 package org.erachain.core.crypto;
 
-import com.google.common.primitives.Bytes;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.slf4j.LoggerFactory;
@@ -9,9 +8,7 @@ import org.erachain.utils.Pair;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Crypto {
 
@@ -60,30 +57,24 @@ public class Crypto {
         }
     }
 
-    public String getAddressFromShort(byte[] addressShort) {
+    public byte[] getAddressFromShort(byte type, byte[] addressShort) {
 
-        //CONVERT TO LIST
-        List<Byte> addressList = new ArrayList<Byte>();
+        byte[] addressBytes = new byte[Account.ADDRESS_LENGTH];
 
         //ADD VERSION BYTE
-        Byte versionByte = Byte.valueOf(ADDRESS_VERSION);
-        addressList.add(versionByte);
+        addressBytes[0] = type;
 
-        addressList.addAll(Bytes.asList(addressShort));
+        System.arraycopy(addressShort, 0, addressBytes, 1, addressShort.length);
 
         //GENERATE CHECKSUM
-        byte[] checkSum = this.doubleDigest(Bytes.toArray(addressList));
+        byte[] checkSum = this.doubleDigest(Arrays.copyOfRange(addressBytes, 0, 21));
+        System.arraycopy(checkSum, 0, addressBytes, 21, 4);
 
-        //ADD FIRST 4 BYTES OF CHECKSUM TO ADDRESS
-        addressList.add(checkSum[0]);
-        addressList.add(checkSum[1]);
-        addressList.add(checkSum[2]);
-        addressList.add(checkSum[3]);
+        return addressBytes;
+    }
 
-        //BASE58 ENCODE ADDRESS
-        String address = Base58.encode(Bytes.toArray(addressList));
-
-        return address;
+    public String getAddressFromShort(byte[] addressShort) {
+        return Base58.encode(getAddressFromShort(ADDRESS_VERSION, addressShort));
     }
 
     public String getAddress(byte[] publicKey) {
@@ -106,28 +97,8 @@ public class Crypto {
         RIPEMD160 ripEmd160 = new RIPEMD160();
         publicKeyHash = ripEmd160.digest(publicKeyHash);
 
-        //CONVERT TO LIST
-        List<Byte> addressList = new ArrayList<Byte>();
+        return Base58.encode(getAddressFromShort(AT_ADDRESS_VERSION, publicKeyHash));
 
-        //ADD VERSION BYTE
-        Byte versionByte = Byte.valueOf(AT_ADDRESS_VERSION);
-        addressList.add(versionByte);
-
-        addressList.addAll(Bytes.asList(publicKeyHash));
-
-        //GENERATE CHECKSUM
-        byte[] checkSum = this.doubleDigest(Bytes.toArray(addressList));
-
-        //ADD FIRST 4 BYTES OF CHECKSUM TO ADDRESS
-        addressList.add(checkSum[0]);
-        addressList.add(checkSum[1]);
-        addressList.add(checkSum[2]);
-        addressList.add(checkSum[3]);
-
-        //BASE58 ENCODE ADDRESS
-        String address = Base58.encode(Bytes.toArray(addressList));
-
-        return address;
     }
 
     public boolean isValidAddress(String address) {
@@ -141,20 +112,18 @@ public class Crypto {
             }
 
             //CHECK VERSION
-            if (addressBytes[0] == ADDRESS_VERSION) {
-                //CONVERT TO LIST
-                List<Byte> addressList = new ArrayList<Byte>();
-                addressList.addAll(Bytes.asList(addressBytes));
+            if (addressBytes[0] == ADDRESS_VERSION
+                    || addressBytes[0] == AT_ADDRESS_VERSION) {
 
                 //REMOVE CHECKSUM
                 byte[] checkSum = new byte[4];
-                checkSum[3] = addressList.remove(addressList.size() - 1);
-                checkSum[2] = addressList.remove(addressList.size() - 1);
-                checkSum[1] = addressList.remove(addressList.size() - 1);
-                checkSum[0] = addressList.remove(addressList.size() - 1);
+                checkSum[3] = addressBytes[Account.ADDRESS_LENGTH - 1];
+                checkSum[2] = addressBytes[Account.ADDRESS_LENGTH - 2];
+                checkSum[1] = addressBytes[Account.ADDRESS_LENGTH - 3];
+                checkSum[0] = addressBytes[Account.ADDRESS_LENGTH - 4];
 
                 //GENERATE ADDRESS CHECKSUM
-                byte[] digest = this.doubleDigest(Bytes.toArray(addressList));
+                byte[] digest = this.doubleDigest(Arrays.copyOfRange(addressBytes, 0, 21));
                 byte[] checkSumTwo = new byte[4];
                 checkSumTwo[0] = digest[0];
                 checkSumTwo[1] = digest[1];
@@ -163,33 +132,6 @@ public class Crypto {
 
                 //CHECK IF CHECKSUMS ARE THE SAME
                 return Arrays.equals(checkSum, checkSumTwo);
-            } else if (addressBytes[0] == AT_ADDRESS_VERSION) {
-                //TODO CHECK IF AT WITH THAT ID EXISTS
-                //if (AT.getAT(addressBytes) != null)
-                //{
-                List<Byte> addressList = new ArrayList<Byte>();
-
-
-                addressList.addAll(Bytes.asList(addressBytes));
-
-                //REMOVE CHECKSUM
-                byte[] checkSum = new byte[4];
-                checkSum[3] = addressList.remove(addressList.size() - 1);
-                checkSum[2] = addressList.remove(addressList.size() - 1);
-                checkSum[1] = addressList.remove(addressList.size() - 1);
-                checkSum[0] = addressList.remove(addressList.size() - 1);
-
-                //GENERATE ADDRESS CHECKSUM
-                byte[] digest = this.doubleDigest(Bytes.toArray(addressList));
-                byte[] checkSumTwo = new byte[4];
-                checkSumTwo[0] = digest[0];
-                checkSumTwo[1] = digest[1];
-                checkSumTwo[2] = digest[2];
-                checkSumTwo[3] = digest[3];
-
-
-                return Arrays.equals(checkSum, checkSumTwo);
-                //}
             }
 
             return false;
