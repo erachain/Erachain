@@ -74,7 +74,7 @@ public class WinBlockSelector extends MonitoredThread {
 
         if (!newBlock.isValidHead(dcSet)) {
             // то проверим заголовок
-            info = "Block[" + newBlock.toString() + "] HEAD is Invalid - ignore";
+            info = "Block HEAD is Invalid - ignore " + newBlock.toString();
             LOGGER.info(info);
             return;
         }
