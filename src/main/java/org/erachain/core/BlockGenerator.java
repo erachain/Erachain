@@ -654,7 +654,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     //CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
                     // если на 1 высота выше хотябы то переходим на синхронизацию
-                    // по\тому сдвиг = 0
+                    // поэтому сдвиг = 0
                     ctrl.checkStatusAndObserve(0);
 
                     if (forgingStatus == ForgingStatus.FORGING_WAIT
