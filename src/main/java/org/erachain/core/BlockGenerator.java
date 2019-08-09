@@ -653,17 +653,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.setMonitorStatus("local_status " + viewStatus());
 
                     //CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-                    ////syncForgingStatus();
-
-                    //Timestamp timestamp = new Timestamp(NTP.getTime());
-                    //logger.info("NTP.getTime() " + timestamp);
-
-                    //waitWin = bchain.getWaitWinBuffer();
-
-                    ctrl.checkStatusAndObserve(1);
+                    // если на 1 высота выше хотябы то переходим на синхронизацию
+                    // по\тому сдвиг = 0
+                    ctrl.checkStatusAndObserve(0);
 
                     if (forgingStatus == ForgingStatus.FORGING_WAIT
-                            && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) < NTP.getTime()
+                            && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) < NTP.getTime()
                                 || BlockChain.DEVELOP_USE && height < 100
                                 || height < 10)) {
 
@@ -903,7 +898,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
-                ctrl.checkStatusAndObserve(1);
+                // сдвиг 0 делаем
+                ctrl.checkStatusAndObserve(0);
                 if (!ctrl.needUpToDate()) {
 
                     // try solve and flush new block from Win Buffer
@@ -999,7 +995,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (timeUpdate > 0)
                     continue;
 
-                if (timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0
+                if (false   // так как сейчас в начале цикла проверяем вокруг узла на более сильную цепочку даже
+                            // с той же высотой то тут не нуно делать провкеу на патовую ситуацмю
+
+                        && timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0
                         && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
                     // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
                     // если есть сильнее то сделаем откат у себя

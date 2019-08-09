@@ -474,9 +474,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     && !BlockChain.DEVELOP_USE
                     ) {
 
-                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
-                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
-                        + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                if (BlockChain.CHECK_BUGS) {
+                    LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
+                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
+                            + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                }
 
                 return INVALID_TIMESTAMP;
             }
