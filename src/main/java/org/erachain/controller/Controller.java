@@ -128,7 +128,10 @@ public class Controller extends Observable {
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
     private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+
+    public static int HARD_WORK = 0;
     public boolean useGui = true;
+
     private List<Thread> threads = new ArrayList<Thread>();
     public static long buildTimestamp;
     private static Controller instance;
@@ -3422,6 +3425,20 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.startsWith("-hardwork=") && arg.length() > 10) {
+                try {
+                    int hartWork = Integer.parseInt(arg.substring(10));
+
+                    if (hartWork > 8) {
+                        hartWork = 8;
+                    }
+                    if (hartWork > 0) {
+                        HARD_WORK = hartWork;
+                    }
+                } catch (Exception e) {
+                }
+                continue;
+            }
             if (arg.startsWith("-seed=") && arg.length() > 6) {
                 seedCommand = arg.substring(6).split(":");
                 continue;
@@ -3458,6 +3475,9 @@ public class Controller extends Observable {
 
         if (onlyProtocolIndexing)
             LOGGER.info("-only protocol indexing");
+
+        if (HARD_WORK > 0)
+            LOGGER.info("-hard work = " + HARD_WORK);
 
         if (inMemoryDC)
             LOGGER.info("-in Memory DC");

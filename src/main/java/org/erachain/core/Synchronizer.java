@@ -31,13 +31,13 @@ import java.util.TreeMap;
  */
 public class Synchronizer {
 
-    public static final int GET_BLOCK_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 3;
+    public static final int GET_BLOCK_TIMEOUT = 10000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> (5 - (Controller.HARD_WORK >> 1)));
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
-    private static final int BYTES_MAX_GET = 1024 << 10;
+    private static final int BYTES_MAX_GET = BlockChain.MAX_BLOCK_SIZE_BYTES << 1;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 16;
-    private static int MAX_ORPHAN_TRANSACTIONS = BlockChain.DEVELOP_USE? 200000: 50000;
+    private static int MAX_ORPHAN_TRANSACTIONS = (BlockChain.MAX_BLOCK_SIZE << 5) << (Controller.HARD_WORK >> 1);
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
@@ -799,10 +799,6 @@ public class Synchronizer {
             Block block = getBlock(signature, peer, true);
             if (block == null)
                 break;
-
-            // NOW generating balance not was send by NET
-            // need to SET it!
-            ////block.setCalcGeneratingBalance(dcSet);
 
             blocks.add(block);
             bytesGet += 1500 + block.getDataLength(false);
