@@ -446,7 +446,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         int height = this.height > 0 ? this.height : this.getBlockHeightByParentOrLast(dcSet);
         boolean wrong = true;
-        
+
         // CHECK IF RECIPIENT IS VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(this.recipient.getAddress())) {
             if (true || height == 120000) {
@@ -474,10 +474,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     && !BlockChain.DEVELOP_USE
                     ) {
 
-                if (BlockChain.CHECK_BUGS > 5) {
+                if (height > 0 || BlockChain.CHECK_BUGS > 5) {
                     LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
                             + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
-                            + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                            + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
                 }
 
                 return INVALID_TIMESTAMP;
