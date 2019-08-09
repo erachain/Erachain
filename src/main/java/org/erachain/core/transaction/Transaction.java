@@ -1252,6 +1252,10 @@ public abstract class Transaction implements ExplorerJsonLine {
             Long reference = this.creator.getLastTimestamp(dcSet);
             if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0
                     && height > BlockChain.VERS_4_11) {
+                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
+                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
+                        + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+
                 return INVALID_TIMESTAMP;
             }
         }
