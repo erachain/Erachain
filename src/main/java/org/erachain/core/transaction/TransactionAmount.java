@@ -2,6 +2,7 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -13,9 +14,12 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -66,7 +70,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public static final byte[][] VALID_REC = new byte[][]{
         //Base58.decode("2PLy4qTVeYnwAiESvaeaSUTWuGcERQr14bpGj3qo83c4vTP8RRMjnmRXnd6USsbvbLwWUNtjErcdvs5KtZMpyREC"),
     };
-    
+
+    static Logger LOGGER = LoggerFactory.getLogger(TransactionAmount.class.getName());
+
     public static final int SCALE_MASK = 31;
     public static final int SCALE_MASK_HALF = (SCALE_MASK + 1) >> 1;
     public static final int maxSCALE = TransactionAmount.SCALE_MASK_HALF + BlockChain.AMOUNT_DEDAULT_SCALE - 1;
@@ -467,6 +473,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     // поэтому отключим эту проверку тут
                     && !BlockChain.DEVELOP_USE
                     ) {
+
+                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
+                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
+                        + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+
                 return INVALID_TIMESTAMP;
             }
         }
