@@ -418,7 +418,7 @@ public class OrderMap extends DCMap<Long, Order> {
     */
 
     public boolean set(Long id, Order order) {
-        if (BlockChain.CHECK_BUGS) {
+        if (BlockChain.CHECK_BUGS > 0) {
             if (((DCSet)this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 assert("".equals("already in Completed"));
@@ -429,7 +429,7 @@ public class OrderMap extends DCMap<Long, Order> {
     }
 
     public Order delete(Long id) {
-        if (BlockChain.CHECK_BUGS) {
+        if (BlockChain.CHECK_BUGS > 1) {
             if (((DCSet)this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 assert("".equals("already in Completed"));
