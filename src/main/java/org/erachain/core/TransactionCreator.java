@@ -115,6 +115,13 @@ public class TransactionCreator {
         }
     }
 
+    public DCSet getFork() {
+        if (this.fork == null) {
+            this.fork = DCSet.getInstance().fork();
+        }
+        return this.fork;
+    }
+
     public long getReference(PublicKeyAccount creator) {
         this.checkUpdate();
         return 0l;

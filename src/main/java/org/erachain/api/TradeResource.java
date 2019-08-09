@@ -255,7 +255,7 @@ public class TradeResource {
     @Path("orders/{have}/{want}")
     // orders/1/2?imit=4
     public static String getOrders(@PathParam("have") Long have, @PathParam("want") Long want,
-                              @DefaultValue("20") @QueryParam("limit") Long limit) {
+                                   @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 
@@ -326,8 +326,8 @@ public class TradeResource {
     @Path("trades/{have}/{want}")
     // /trades/1/2?timestamp=3&limit=4
     public static String getTradesFromTimestamp(@PathParam("have") Long have, @PathParam("want") Long want,
-                                           @DefaultValue("0") @QueryParam("timestamp") Long timestamp,
-                                           @DefaultValue("50") @QueryParam("limit") Long limit) {
+                                                @DefaultValue("0") @QueryParam("timestamp") Long timestamp,
+                                                @DefaultValue("50") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
         // DOES ASSETID EXIST
@@ -379,6 +379,7 @@ public class TradeResource {
     }
 
     private static long test1Delay = 0;
+    private static float test1probability = 0;
     private static Thread threadTest1;
     private static List<PrivateKeyAccount> test1Creators;
 
@@ -401,6 +402,7 @@ public class TradeResource {
         APIUtils.askAPICallAllowed(password, "GET trade/test1\n ", request, true);
 
         this.test1Delay = delay;
+        this.test1probability = probability;
 
         if (threadTest1 != null) {
             JSONObject out = new JSONObject();
@@ -415,8 +417,10 @@ public class TradeResource {
             return out.toJSONString();
         }
 
+        Controller controller = Controller.getInstance();
+
         // CACHE private keys
-        test1Creators = Controller.getInstance().getPrivateKeyAccounts();
+        test1Creators = controller.getPrivateKeyAccounts();
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();
@@ -437,30 +441,19 @@ public class TradeResource {
             DCSet dcSet = DCSet.getInstance();
 
             Random random = new Random();
-            Controller cnt = Controller.getInstance();
+            Controller cnt = controller;
 
-            AssetCls haveStart = Controller.getInstance().getAsset(1L);
-            AssetCls wantStart = Controller.getInstance().getAsset(2L);
+            AssetCls haveStart = controller.getAsset(1L);
+            AssetCls wantStart = controller.getAsset(2L);
 
-            BigDecimal rateStart = new BigDecimal("0.005");
+            BigDecimal rateStart = new BigDecimal("0.0005");
             BigDecimal rateStartRev = BigDecimal.ONE.divide(rateStart, 8, RoundingMode.HALF_DOWN);
 
-            BigDecimal amounHaveStart = new BigDecimal("100");
+            BigDecimal amounHaveStart = new BigDecimal("0.1");
             BigDecimal amounWantStart = amounHaveStart.multiply(rateStart);
 
+            Transaction transaction;
             HashMap<String, String> orders = new HashMap<>();
-            // check all created orders
-            for (PrivateKeyAccount account: test1Creators) {
-                List<Order> addressOrders = dcSet.getOrderMap().getOrdersForAddress(account.getAddress(), haveStart.getKey(), wantStart.getKey());
-                for (Order order: addressOrders) {
-                    Transaction createTx = dcSet.getTransactionFinalMap().get(order.getId());
-                    if (createTx != null) {
-                        // add as my orders
-                        orders.put(createTx.viewSignature(), order.getCreator().getAddress());
-                    }
-                }
-            }
-
 
             do {
 
@@ -472,8 +465,8 @@ public class TradeResource {
                     return;
 
                 // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
-                if (probability < 1 && probability > 0) {
-                    int rrr = random.nextInt((int) (100.0 / probability) );
+                if (test1probability < 1 && test1probability > 0) {
+                    int rrr = random.nextInt((int) (100.0 / test1probability) );
                     if (rrr > 100) {
                         try {
                             Thread.sleep(this.test1Delay);
@@ -490,7 +483,30 @@ public class TradeResource {
 
                 try {
 
-                    Transaction transaction;
+                    // если отключены непротокольные индексы то не найдем ничего для счета этого
+                    if (controller.onlyProtocolIndexing) {
+
+                    } else {
+
+
+                        // check all created orders
+                        for (PrivateKeyAccount account : test1Creators) {
+                            List<Order> addressOrders = dcSet.getOrderMap().getOrdersForAddress(account.getAddress(), haveStart.getKey(), wantStart.getKey());
+                            for (Order order : addressOrders) {
+                                Transaction createTx = dcSet.getTransactionFinalMap().get(order.getId());
+                                if (createTx != null) {
+                                    // add as my orders
+                                    DCSet forkCreator = cnt.getTransactionCreator().getFork();
+                                    if (forkCreator != null && !order.isActive(forkCreator)) {
+                                        // если заказ уже был отменен но в неподтвержденных отмена лежит
+                                        continue;
+                                    }
+
+                                    orders.put(createTx.viewSignature(), order.getCreator().getAddress());
+                                }
+                            }
+                        }
+                    }
 
                     if (orders.size() / test1Creators.size() >= 5) {
                         // если уже много ордеров на один счет то попробуем удалить какие-то
@@ -535,6 +551,9 @@ public class TradeResource {
                                     }
                                     continue;
                                 }
+                            } else {
+                                // уже сыгранный
+                                orders.remove(txSign);
                             }
 
                         }
