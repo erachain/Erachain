@@ -120,6 +120,11 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
     private void refresh() {
 
         String mess;
+
+        if (counter < 0) {
+            counter = map.size();
+        }
+
         if (counter > 0) {
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
             mess = "<HTML>| <A href = ' '>" + Lang.getInstance().translate("Unconfirmed Records") + ": " + counter
