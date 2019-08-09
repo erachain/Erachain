@@ -143,7 +143,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
         list = new ArrayList<>();
 
         int counter = 0;
-        while (keysIterator.hasNext() && counter < 333) {
+        while (keysIterator.hasNext() && counter < 999) {
             Tuple2<Long, Long> key = keysIterator.next();
             Transaction transaction = ((Tuple2<Long, Transaction>) map.get(key)).b;
             if (trans_Parse(transaction)) {
@@ -165,6 +165,14 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
                 // все для Компушек
                 && this.asset.getKey() != Transaction.FEE_KEY)
             return false;
+
+        if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+            RCalculated tx = (RCalculated) transaction;
+            String mess = tx.getMessage();
+            if (mess != null && mess.equals("forging")) {
+                return false;
+            }
+        }
 
         Trans trr = new Trans();
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
