@@ -1045,15 +1045,23 @@ public class Block implements ExplorerJsonLine {
         transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
         data = Bytes.concat(data, transactionCountBytes);
 
-        for (Transaction transaction : this.getTransactions()) {
-            //WRITE TRANSACTION LENGTH
-            int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-            transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
-            data = Bytes.concat(data, transactionLengthBytes);
+        if (transactionCount > 0) {
+            if (rawTransactions == null || rawTransactions.length == 0) {
+                // нужно заново создавать
+                for (Transaction transaction : this.getTransactions()) {
+                    //WRITE TRANSACTION LENGTH
+                    int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                    byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
+                    transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
+                    data = Bytes.concat(data, transactionLengthBytes);
 
-            //WRITE TRANSACTION
-            data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
+                    //WRITE TRANSACTION
+                    data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
+                }
+            } else {
+                // уже есть готовые сырые данные
+                data = Bytes.concat(data, rawTransactions);
+            }
         }
 
         return data;
