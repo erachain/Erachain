@@ -24,9 +24,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Network extends Observable {
 
-    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024 << 3;
-    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024 << 1;
-    private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = BlockChain.HARD_WORK ? 100 : 300;
+    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = 1024 << (3 + Controller.HARD_WORK);
+    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = 1024 << (1 + Controller.HARD_WORK >> 1);
+    private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = 128 >> (Controller.HARD_WORK >> 1);
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
 
     private Controller controller;
