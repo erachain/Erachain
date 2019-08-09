@@ -57,12 +57,26 @@ public class Account {
     int viewBalancePosition = 0;
 
     public Account(String address) {
-
-        // ///test address
-        assert (Base58.decode(address) instanceof byte[]);
         this.bytes = Base58.decode(address);
         this.shortBytes = Arrays.copyOfRange(this.bytes, 1, this.bytes.length - 4);
         this.address = address;
+    }
+
+    public Account(byte[] addressBytes) {
+        if (addressBytes.length == ADDRESS_LENGTH - 4) {
+            // AS SHORT BYTES
+            this.shortBytes = addressBytes;
+            this.bytes = Crypto.getInstance().getAddressFromShortBytes(addressBytes);
+        } else if (addressBytes.length == ADDRESS_LENGTH) {
+            // AS FULL 25 byres
+            this.bytes = addressBytes;
+            this.shortBytes = Arrays.copyOfRange(addressBytes, 1, this.bytes.length - 4);
+
+        } else {
+            assert(addressBytes.length == 25);
+        }
+
+        this.address = Base58.encode(addressBytes);
     }
 
     public static Account makeAccountFromShort(byte[] addressShort) {

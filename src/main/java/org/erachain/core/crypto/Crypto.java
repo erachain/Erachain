@@ -73,6 +73,10 @@ public class Crypto {
         return addressBytes;
     }
 
+    public byte[] getAddressFromShortBytes(byte[] addressShort) {
+        return getAddressFromShort(ADDRESS_VERSION, addressShort);
+    }
+
     public String getAddressFromShort(byte[] addressShort) {
         return Base58.encode(getAddressFromShort(ADDRESS_VERSION, addressShort));
     }
@@ -86,6 +90,17 @@ public class Crypto {
         publicKeyHash = ripEmd160.digest(publicKeyHash);
 
         return this.getAddressFromShort(publicKeyHash);
+
+    }
+    public byte[] getAddressBytes(byte[] publicKey) {
+        //SHA256 PUBLICKEY FOR PROTECTION
+        byte[] publicKeyHash = this.digest(publicKey);
+
+        //RIPEMD160 TO CREATE A SHORTER ADDRESS
+        RIPEMD160 ripEmd160 = new RIPEMD160();
+        publicKeyHash = ripEmd160.digest(publicKeyHash);
+
+        return this.getAddressFromShortBytes(publicKeyHash);
 
     }
 
