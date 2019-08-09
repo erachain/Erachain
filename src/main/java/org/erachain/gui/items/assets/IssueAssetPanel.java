@@ -323,8 +323,12 @@ public class IssueAssetPanel extends JPanel {
                     + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
                     + Lang.getInstance().translate(asset.viewAssetType() + "") + "<br>"
                     + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
-                    + Lang.getInstance().translate("Description") + ":<br>"
-                    + Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
+                    + Lang.getInstance().translate("Description") + ":<br>";
+            if (asset.getKey() > 0 && asset.getKey() < 1000) {
+                text += Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "<br>";
+            } else {
+                text += Library.to_HTML(asset.viewDescription()) + "<br>";
+            }
             String statusText = "";
 
             IssueConfirmDialog confirmDialog = new IssueConfirmDialog(MainFrame.getInstance(),

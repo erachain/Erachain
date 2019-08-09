@@ -867,7 +867,11 @@ public class BlockExplorer {
 
         assetJSON.put("key", asset.getKey());
         assetJSON.put("name", asset.getName());
-        assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        } else {
+            assetJSON.put("description", asset.viewDescription());
+        }
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", asset.getQuantity());
         assetJSON.put("scale", asset.getScale());
@@ -875,7 +879,11 @@ public class BlockExplorer {
         assetJSON.put("key", asset.getKey());
         assetJSON.put("name", asset.getName());
         assetJSON.put("operations", orders.size() + trades.size());
-        assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        } else {
+            assetJSON.put("description", asset.viewDescription());
+        }
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
         assetJSON.put("scale", asset.getScale());
@@ -946,7 +954,11 @@ public class BlockExplorer {
             pairJSON.put("tradeAmountVolume", pair.getValue().f.toPlainString());
             pairJSON.put("asset", pair.getKey());
             pairJSON.put("assetName", assetWant.getName());
-            pairJSON.put("description", Lang.getInstance().translateFromLangObj(assetWant.viewDescription(), langObj));
+            if (assetWant.getKey() > 0 && assetWant.getKey() < 1000) {
+                pairJSON.put("description", Lang.getInstance().translateFromLangObj(assetWant.viewDescription(), langObj));
+            } else {
+                pairJSON.put("description", assetWant.viewDescription());
+            }
             pairsJSON.put(pair.getKey(), pairJSON);
         }
 
@@ -1516,7 +1528,11 @@ public class BlockExplorer {
 
         assetJSON.put("key", asset.getKey());
         assetJSON.put("name", asset.getName());
-        assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        } else {
+            assetJSON.put("description", asset.viewDescription());
+        }
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
         assetJSON.put("scale", asset.getScale());
