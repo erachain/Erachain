@@ -395,7 +395,8 @@ public class DCSet extends DBASet implements Observer {
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
-                .cacheSize(10000)
+                // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
+                .cacheSize(10)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
@@ -1334,7 +1335,8 @@ public class DCSet extends DBASet implements Observer {
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
-                .cacheSize(10000)
+                // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
+                .cacheSize(10)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
