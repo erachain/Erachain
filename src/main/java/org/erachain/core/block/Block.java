@@ -1949,7 +1949,7 @@ public class Block implements ExplorerJsonLine {
 
     }
 
-    public void orphan(DCSet dcSet) throws Exception {
+    public void orphan(DCSet dcSet, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
         if (cnt.isOnStopping())
@@ -1977,7 +1977,7 @@ public class Block implements ExplorerJsonLine {
 
         //ORPHAN TRANSACTIONS
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
-        this.orphanTransactions(dcSet, heightBlock);
+        this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
 
@@ -2029,7 +2029,11 @@ public class Block implements ExplorerJsonLine {
 
     }
 
-    private void orphanTransactions(DCSet dcSet, int height) throws Exception {
+    public void orphan(DCSet dcSet) throws Exception {
+        orphan(dcSet, false);
+    }
+
+    private void orphanTransactions(DCSet dcSet, int height, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
         //DLSet dbSet = Controller.getInstance().getDBSet();
@@ -2065,8 +2069,10 @@ public class Block implements ExplorerJsonLine {
             }
 
             if (notFork) {
-                //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-                unconfirmedMap.add(transaction);
+                if (!notStoreTXs) {
+                    //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
+                    unconfirmedMap.add(transaction);
+                }
 
                 Long key = Transaction.makeDBRef(height, seqNo);
 
