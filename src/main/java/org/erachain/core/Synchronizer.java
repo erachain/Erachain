@@ -199,7 +199,7 @@ public class Synchronizer {
         long myWeight = myHW.b;
         int newHeight = lastBlock.getHeight() + newBlocks.size();
         // проверять СИЛУ цепочки только если лна не на много лучше моей высоты
-        boolean checkFullWeight = testHeight + 2 > newHeight;
+        boolean checkFullWeight = !BlockChain.DEVELOP_USE && testHeight > newHeight;
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
@@ -696,14 +696,14 @@ public class Synchronizer {
         // int myChainHeight =
         // Controller.getInstance().getBlockChain().getHeight();
         //int maxChainHeight = dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
-        int maxChainHeight = dcSet.getBlockMap().size();
-        if (maxChainHeight < checkPointHeight) {
+        final int myChainHeight = dcSet.getBlockMap().size();
+        if (myChainHeight < checkPointHeight) {
             String mess = "Dishonest peer: my checkPointHeight[" + checkPointHeight + "\n -> not found";
             peer.ban(BAN_BLOCK_TIMES, mess);
             throw new Exception(mess);
         }
 
-        LOGGER.info("findHeaders " + " maxChainHeight: " + maxChainHeight + " to minHeight: " + checkPointHeight);
+        LOGGER.info("findHeaders maxChainHeight: " + myChainHeight + " to minHeight: " + checkPointHeight);
 
         // try get check point block from peer
         // GENESIS block nake ERROR in org.erachain.network.Peer.sendMessage(Message) ->
@@ -734,30 +734,31 @@ public class Synchronizer {
         // int step = BlockChain.SYNCHRONIZE_PACKET>>2;
         byte[] lastCommonBlockSignature;
         int step = 2;
+        int currentCheckChainHeight = myChainHeight;
         do {
             if (cnt.isOnStopping()) {
                 throw new Exception("on stopping");
             }
 
-            maxChainHeight -= step;
+            currentCheckChainHeight -= step;
 
-            if (maxChainHeight < checkPointHeight) {
-                maxChainHeight = checkPointHeight;
+            if (currentCheckChainHeight < checkPointHeight) {
+                currentCheckChainHeight = checkPointHeight;
                 lastCommonBlockSignature = checkPointHeightCommonBlock.getSignature();
             } else {
-                lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(maxChainHeight).signature;
+                lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(currentCheckChainHeight).signature;
             }
 
             LOGGER.debug(
-                    "findHeaders try found COMMON header" + " step: " + step + " maxChainHeight: " + maxChainHeight);
+                    "findHeaders try found COMMON header" + " step: " + step + " currentMaxChainHeight: " + currentCheckChainHeight);
 
             headers = this.getBlockSignatures(lastCommonBlockSignature, peer);
 
             LOGGER.debug("findHeaders try found COMMON header" + " founded headers: " + headers.size());
 
             if (headers.size() > 1) {
-                if (maxChainHeight < checkPointHeight) {
-                    String mess = "Dishonest peer by maxChainHeight < checkPointHeight " + peer;
+                if (currentCheckChainHeight < checkPointHeight) {
+                    String mess = "Dishonest peer by currentMaxChainHeight < checkPointHeight " + peer;
                     peer.ban(BAN_BLOCK_TIMES, mess);
                     throw new Exception(mess);
                 }
@@ -767,13 +768,25 @@ public class Synchronizer {
             if (step < 10000)
                 step <<= 1;
 
-        } while (maxChainHeight > checkPointHeight && headers.isEmpty());
+        } while (currentCheckChainHeight > checkPointHeight && headers.isEmpty());
 
         LOGGER.info("findHeaders AFTER try found COMMON header" + " founded headers: " + headers.size());
 
         // CLEAR head of common headers exclude LAST!
         while (headers.size() > 1 && dcSet.getBlockSignsMap().contains(headers.get(0))) {
             lastCommonBlockSignature = headers.remove(0);
+        }
+
+        /**
+         * Нам не нужно тут большую цепочку брать так как с откатом будет проверка блоков сначала и это может занять
+         * слишком много времени - так что сначала синхронизируемся до ближайшего верхнего + 2
+         * Чтобы проверить правильность и силу цепочки/
+         */
+        int commonBockHeight = dcSet.getBlockSignsMap().get(lastCommonBlockSignature);
+        // Так же дальше будет проверка на силу цепочки - поэтому надо 3 блока добавить
+        int needChainLenght = 3 + myChainHeight - commonBockHeight;
+        if (headers.size() > needChainLenght) {
+            headers = headers.subList(0, needChainLenght);
         }
 
         LOGGER.info("findHeaders headers CLEAR" + "now headers: " + headers.size());
