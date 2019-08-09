@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
-import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.*;
 import org.erachain.database.DBMap;
@@ -172,8 +171,8 @@ public class OrderMap extends DCMap<Long, Order> {
             // REMOVE those who DELETED here
             if (this.deleted != null) {
                 //DELETE DELETED
-                for (Long deleted : this.deleted) {
-                    parentKeys.remove(deleted);
+                for (Object deleted : this.deleted.keySet()) {
+                    parentKeys.remove((Long)deleted);
                 }
             }
 

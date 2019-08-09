@@ -3,7 +3,6 @@ package org.erachain.datachain;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBMap;
 import org.erachain.database.IDB;
-import org.erachain.database.wallet.DWSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -25,8 +24,17 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
     protected DCMap<T, U> parent;
-    protected List<T> deleted;
-    private int shiftSize;
+
+    /**
+     * пометка какие индексы не используются - отключим для ускорения
+     */
+    boolean OLD_USED_NOW = false;
+
+    //ConcurrentHashMap deleted;
+    HashMap deleted;
+    Boolean EXIST = true;
+    int shiftSize;
+
 
     public DCMap(IDB databaseSet, DB database) {
         super(databaseSet, database);
@@ -86,21 +94,21 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         this.addUses();
 
         try {
-            if (this.map.containsKey(key)) {
-                U u = this.map.get(key);
+            U u = this.map.get(key);
+            if (u != null) {
                 this.outUses();
                 return u;
-            } else {
-                if (this.deleted == null || !this.deleted.contains(key)) {
-                    if (this.parent != null) {
-                        U u = this.parent.get(key);
-                        this.outUses();
-                        return u;
-                    }
+            }
+
+            if (parent != null) {
+                if (this.deleted == null || !this.deleted.containsKey(key)) {
+                    u = this.parent.get(key);
+                    this.outUses();
+                    return u;
                 }
             }
 
-            U u = this.getDefaultValue();
+            u = this.getDefaultValue();
             this.outUses();
             return u;
         } catch (Exception e) {
@@ -148,13 +156,11 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
             U old = this.map.put(key, value);
 
-            U test = this.map.get(key);
-
             if (this.parent != null) {
                 //if (old != null)
                 //	++this.shiftSize;
                 if (this.deleted != null) {
-                    if (this.deleted.remove(key))
+                    if (this.deleted.remove(key) != null)
                         ++this.shiftSize;
                 }
             } else {
@@ -201,20 +207,29 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
         value = this.map.remove(key);
 
-        if (value == null) {
-            if (this.parent != null) {
-                if (this.deleted == null) {
-                    this.deleted = new ArrayList<T>();
-                }
-                if (this.parent.contains(key)) {
-                    this.deleted.add(key);
-                    value = this.parent.get(key);
-                }
+        if (this.parent != null) {
+            // это форкнутая таблица
+
+            if (this.deleted == null) {
+                this.deleted = new HashMap(1024 , 0.75f);
             }
+
+            // добавляем в любом случае, так как
+            // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+            // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+            // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+            // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+            this.deleted.put(key, EXIST);
+
+            if (value == null) {
+                // если тут нету то создадим пометку что удалили
+                value = this.parent.get(key);
+            }
+
             this.outUses();
             return value;
 
-        } else if (this.parent == null) {
+        } else {
 
             // NOTIFY
             if (this.observableData != null) {
@@ -252,7 +267,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
             this.outUses();
             return true;
         } else {
-            if (this.deleted == null || !this.deleted.contains(key)) {
+            if (this.deleted == null || !this.deleted.containsKey(key)) {
                 if (this.parent != null) {
                     boolean u = this.parent.contains(key);
 
@@ -280,6 +295,6 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         if (parent == null)  {
             return getClass().getName();
         }
-        return parent.getClass().getName() + ".parent";
+        return getClass().getName() + ".FORK";
     }
 }
