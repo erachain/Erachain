@@ -46,7 +46,7 @@ public class BlockBuffer extends Thread {
 
                 if (Controller.getInstance().isOnStopping()) {
                     stopThread();
-                    break;
+                    return;
                 }
 
                 byte[] signature = this.signatures.get(i);
@@ -58,13 +58,19 @@ public class BlockBuffer extends Thread {
                     this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 1));
 
                 }
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    //ERROR SLEEPING
+                    return;
+                }
             }
 
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
-                break;
+                return;
             }
         }
     }
@@ -88,7 +94,11 @@ public class BlockBuffer extends Thread {
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
                     //ERROR
-                    LOGGER.debug("ERROR block BUFFER response == null, timeSOT[s]:" + timeSOT / 1000);
+                    if (peer.isUsed()) {
+                        LOGGER.debug("ERROR block BUFFER response == null, timeSOT[s]:" + timeSOT / 1000
+                                + " " + peer
+                                + " " + BlockBuffer.this.getName() + " :: " + getName());
+                    }
                     error = true;
                     return;
                 }
@@ -96,7 +106,9 @@ public class BlockBuffer extends Thread {
                 Block block = response.getBlock();
                 //CHECK BLOCK SIGNATURE
                 if (block == null) {
-                    LOGGER.debug("ERROR block BUFFER block");
+                    if (peer.isUsed()) {
+                        LOGGER.debug("ERROR block BUFFER block");
+                    }
                     error = true;
                     return;
                 }
