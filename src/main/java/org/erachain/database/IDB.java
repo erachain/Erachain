@@ -1,19 +1,23 @@
 package org.erachain.database;
 
+import org.mapdb.DB;
+
 public interface IDB {
 
-    public boolean isWithObserver();
+    DB getDatabase();
 
-    public boolean isDynamicGUI();
+    boolean isWithObserver();
 
-    public void commit();
+    boolean isDynamicGUI();
 
-    public void addUses();
+    void commit();
 
-    public void outUses();
+    void addUses();
 
-    public boolean isBusy();
+    void outUses();
 
-    public void close();
+    boolean isBusy();
+
+    void close();
 
 }
