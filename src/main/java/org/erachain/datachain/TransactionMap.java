@@ -249,7 +249,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         Iterator<Long> iterator = this.getIterator(0, false);
         Transaction transaction;
 
-        List<Long> keys = new ArrayList<Long>();
+        long realTime = System.currentTimeMillis();
 
         timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 
@@ -257,19 +257,15 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             Long key = iterator.next();
             transaction = this.map.get(key);
             long deadline = transaction.getDeadline();
-            if (((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
+            if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
+                    || ((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
                     || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                     || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                keys.add(key);
+                this.delete(key);
             } else {
                 break;
             }
         }
-
-        for (Long key : keys) {
-            this.delete(key);
-        }
-
     }
 
     @Override
