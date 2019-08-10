@@ -1097,7 +1097,8 @@ public class Block implements ExplorerJsonLine {
         if (transactionCount > 0) {
             if (rawTransactionsLength == 0 ) {
                 // нужно заново создавать
-                byte[] rawTransactionsTemp =
+                // запомним откуда идет сборка чтобы потом перекатать в сырые данные
+                int startRAW = pos;
                 for (Transaction transaction : this.getTransactions()) {
                     //WRITE TRANSACTION LENGTH
                     int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
@@ -1111,6 +1112,9 @@ public class Block implements ExplorerJsonLine {
                     System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, data, pos, transactionLength);
                     pos += transactionLength;
                 }
+                // сырые данные теперь запомним на всякий случай
+                System.arraycopy(data, startRAW, rawTransactions, 0, pos);
+                rawTransactionsLength = pos - startRAW;
             } else {
                 // уже есть готовые сырые данные
                 data = Bytes.concat(data, rawTransactions);
@@ -1135,7 +1139,6 @@ public class Block implements ExplorerJsonLine {
         System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
         pos += REFERENCE_LENGTH;
 
-        data = Bytes.concat(data, this.transactionsHash);
         System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);
 
         return data;
