@@ -26,7 +26,7 @@ public class BlocksRequest extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
 
-    private static final int QUEUE_LENGTH = BlockChain.HARD_WORK? 100 : 1000;
+    private static final int QUEUE_LENGTH = Controller.getInstance().HARD_WORK? 100 : 1000;
     /**
      * число выданных транзакций
      */
