@@ -11,7 +11,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
@@ -474,9 +473,11 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     && !BlockChain.DEVELOP_USE
                     ) {
 
-                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
-                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
-                        + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                if (height > 0 || BlockChain.CHECK_BUGS > 5) {
+                    LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
+                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
+                            + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                }
 
                 return INVALID_TIMESTAMP;
             }
