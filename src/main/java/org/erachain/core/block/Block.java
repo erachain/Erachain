@@ -61,6 +61,7 @@ public class Block implements ExplorerJsonLine {
     public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
             + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
+    public static final int DATA_SIGN_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TRANSACTIONS_HASH_LENGTH;
     static Logger LOGGER = LoggerFactory.getLogger(Block.class.getName());
     /// HEAD of BLOCK ///
     // FACE
@@ -88,6 +89,7 @@ public class Block implements ExplorerJsonLine {
     // BODY
     protected List<Transaction> transactions;
     protected byte[] rawTransactions = null;
+    protected int rawTransactionsLength;
     //protected Long atFees;
     protected byte[] atBytes;
 
@@ -195,61 +197,74 @@ public class Block implements ExplorerJsonLine {
         }
 
         public byte[] toBytes() {
-            byte[] data = new byte[0];
+
+            int pos = 0;
+            byte[] data = new byte[BASE_LENGTH];
 
             //WRITE VERSION
             byte[] versionBytes = Ints.toByteArray(this.version);
             versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
-            data = Bytes.concat(data, versionBytes);
+            System.arraycopy(versionBytes, 0, data, pos, VERSION_LENGTH);
+            pos += VERSION_LENGTH;
 
             //WRITE REFERENCE
             byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-            data = Bytes.concat(data, referenceBytes);
+            System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+            pos += REFERENCE_LENGTH;
 
             //WRITE GENERATOR
             byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
-            data = Bytes.concat(data, generatorBytes);
+            System.arraycopy(generatorBytes, 0, data, pos, CREATOR_LENGTH);
+            pos += CREATOR_LENGTH;
 
             //WRITE TRANSACTION COUNT
             byte[] transactionCountBytes = Ints.toByteArray(this.transactionsCount);
             transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
-            data = Bytes.concat(data, transactionCountBytes);
+            System.arraycopy(transactionCountBytes, 0, data, pos, TRANSACTIONS_COUNT_LENGTH);
+            pos += TRANSACTIONS_COUNT_LENGTH;
 
             //WRITE TRANSACTIONS HASH
-            data = Bytes.concat(data, this.transactionsHash);
+            System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);
+            pos += TRANSACTIONS_HASH_LENGTH;
 
             //WRITE SIGNATURE
-            data = Bytes.concat(data, this.signature);
+            System.arraycopy(signature, 0, data, pos, SIGNATURE_LENGTH);
+            pos += SIGNATURE_LENGTH;
 
             //WRITE HEIGHT
             byte[] heightBytes = Ints.toByteArray(this.heightBlock);
             heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
-            data = Bytes.concat(data, heightBytes);
+            System.arraycopy(heightBytes, 0, data, pos, HEIGHT_LENGTH);
+            pos += HEIGHT_LENGTH;
 
             //WRITE GENERATING BALANCE
             byte[] generatingBalanceBytes = Ints.toByteArray(this.forgingValue);
             generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
-            data = Bytes.concat(data, generatingBalanceBytes);
+            System.arraycopy(generatingBalanceBytes, 0, data, pos, GENERATING_BALANCE_LENGTH);
+            pos += GENERATING_BALANCE_LENGTH;
 
             //WRITE WIN VALUE
             byte[] winValueBytes = Longs.toByteArray(this.winValue);
             winValueBytes = Bytes.ensureCapacity(winValueBytes, WIN_VALUE_LENGTH, 0);
-            data = Bytes.concat(data, winValueBytes);
+            System.arraycopy(winValueBytes, 0, data, pos, WIN_VALUE_LENGTH);
+            pos += WIN_VALUE_LENGTH;
 
             //WRITE TARGET
             byte[] targetBytes = Longs.toByteArray(this.target);
             targetBytes = Bytes.ensureCapacity(targetBytes, WIN_VALUE_LENGTH, 0);
-            data = Bytes.concat(data, targetBytes);
+            System.arraycopy(targetBytes, 0, data, pos, WIN_VALUE_LENGTH);
+            pos += WIN_VALUE_LENGTH;
 
             //WRITE TOTAL FEE
             byte[] totalFeeBytes = Longs.toByteArray(this.totalFee);
             totalFeeBytes = Bytes.ensureCapacity(totalFeeBytes, FEE_LENGTH, 0);
-            data = Bytes.concat(data, totalFeeBytes);
+            System.arraycopy(totalFeeBytes, 0, data, pos, FEE_LENGTH);
+            pos += FEE_LENGTH;
 
             //WRITE EMITTED FEE
             byte[] emittedFeeBytes = Longs.toByteArray(this.emittedFee);
             emittedFeeBytes = Bytes.ensureCapacity(emittedFeeBytes, FEE_LENGTH, 0);
-            data = Bytes.concat(data, emittedFeeBytes);
+            System.arraycopy(emittedFeeBytes, 0, data, pos, FEE_LENGTH);
 
             return data;
         }
@@ -261,7 +276,7 @@ public class Block implements ExplorerJsonLine {
             }
 
             //CHECK IF WE HAVE MINIMUM BLOCK LENGTH
-            if (data.length < BlockHead.BASE_LENGTH) {
+            if (data.length < BASE_LENGTH) {
                 throw new Exception("Data is less then minimum blockHead length");
             }
 
@@ -550,9 +565,6 @@ public class Block implements ExplorerJsonLine {
             block = new Block(version, reference, generator, height, transactionsHash, new byte[0], signature);
         }
 
-        //if (forDB)
-        //	block.setGeneratingBalance(generatingBalance);
-
         //READ TRANSACTIONS COUNT
         byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
         int transactionCount = Ints.fromByteArray(transactionCountBytes);
@@ -835,6 +847,7 @@ public class Block implements ExplorerJsonLine {
 
         this.transactionCount = transactionCount;
         this.rawTransactions = rawTransactions;
+        this.rawTransactionsLength = rawTransactions.length;
     }
 
     public int getTransactionCount() {
@@ -988,30 +1001,37 @@ public class Block implements ExplorerJsonLine {
     }
 
     public byte[] toBytes(boolean withSign, boolean forDB) {
-        byte[] data = new byte[0];
+
+        int pos = 0;
+        byte[] data = new byte[getDataLength(forDB)];
 
         //WRITE VERSION
         byte[] versionBytes = Ints.toByteArray(this.version);
         versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
-        data = Bytes.concat(data, versionBytes);
+        System.arraycopy(versionBytes, 0, data, pos, VERSION_LENGTH);
+        pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
         byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+        pos += REFERENCE_LENGTH;
 
         //WRITE GENERATOR
         byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
-        data = Bytes.concat(data, generatorBytes);
+        System.arraycopy(generatorBytes, 0, data, pos, CREATOR_LENGTH);
+        pos += CREATOR_LENGTH;
 
         if (forDB) {
             //WRITE HEIGHT
             byte[] heightBytes = Ints.toByteArray(this.heightBlock);
             heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
-            data = Bytes.concat(data, heightBytes);
+            System.arraycopy(heightBytes, 0, data, pos, HEIGHT_LENGTH);
+            pos += HEIGHT_LENGTH;
         }
 
         //WRITE TRANSACTIONS HASH
-        data = Bytes.concat(data, this.transactionsHash);
+        System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);
+        pos += TRANSACTIONS_HASH_LENGTH;
 
         if (!withSign) {
             // make HEAD data for signature
@@ -1019,21 +1039,25 @@ public class Block implements ExplorerJsonLine {
         }
 
         //WRITE GENERATOR SIGNATURE
-        data = Bytes.concat(data, this.signature);
+        System.arraycopy(signature, 0, data, pos, SIGNATURE_LENGTH);
+        pos += SIGNATURE_LENGTH;
 
         //ADD ATs BYTES
         if (this.version > 1) {
             if (atBytes != null) {
                 byte[] atBytesCount = Ints.toByteArray(atBytes.length);
-                data = Bytes.concat(data, atBytesCount);
+                System.arraycopy(atBytesCount, 0, data, pos, AT_BYTES_LENGTH);
+                pos += AT_BYTES_LENGTH;
 
-                data = Bytes.concat(data, atBytes);
+                System.arraycopy(atBytes, 0, data, pos, atBytes.length);
+                pos += atBytes.length;
 
                 //byte[] atByteFees = Longs.toByteArray(atFees);
                 //data = Bytes.concat(data,atByteFees);
             } else {
-                byte[] atBytesCount = Ints.toByteArray(0);
-                data = Bytes.concat(data, atBytesCount);
+                byte[] atBytesCount = new byte[AT_BYTES_LENGTH];
+                System.arraycopy(atBytesCount, 0, data, pos, AT_BYTES_LENGTH);
+                pos += AT_BYTES_LENGTH;
 
                 //byte[] atByteFees = Longs.toByteArray(0L);
                 //data = Bytes.concat(data,atByteFees);
@@ -1043,20 +1067,25 @@ public class Block implements ExplorerJsonLine {
         //WRITE TRANSACTION COUNT
         byte[] transactionCountBytes = Ints.toByteArray(this.getTransactionCount());
         transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
-        data = Bytes.concat(data, transactionCountBytes);
+        System.arraycopy(transactionCountBytes, 0, data, pos, TRANSACTIONS_COUNT_LENGTH);
+        pos += TRANSACTIONS_COUNT_LENGTH;
 
         if (transactionCount > 0) {
-            if (rawTransactions == null || rawTransactions.length == 0) {
+            if (rawTransactionsLength == 0 ) {
                 // нужно заново создавать
+                byte[] rawTransactionsTemp =
                 for (Transaction transaction : this.getTransactions()) {
                     //WRITE TRANSACTION LENGTH
                     int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
                     byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
                     transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
-                    data = Bytes.concat(data, transactionLengthBytes);
+                    System.arraycopy(transactionLengthBytes, 0, data, pos, TRANSACTION_SIZE_LENGTH);
+                    pos += TRANSACTION_SIZE_LENGTH;
 
                     //WRITE TRANSACTION
-                    data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
+                    //data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
+                    System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, data, pos, transactionLength);
+                    pos += transactionLength;
                 }
             } else {
                 // уже есть готовые сырые данные
@@ -1068,18 +1097,22 @@ public class Block implements ExplorerJsonLine {
     }
 
     public byte[] toBytesForSign() {
-        byte[] data = new byte[0];
+        int pos = 0;
+        byte[] data = new byte[DATA_SIGN_LENGTH];
 
         //WRITE VERSION
         byte[] versionBytes = Ints.toByteArray(this.version);
         versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
-        data = Bytes.concat(data, versionBytes);
+        System.arraycopy(versionBytes, 0, data, pos, VERSION_LENGTH);
+        pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
         byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+        pos += REFERENCE_LENGTH;
 
         data = Bytes.concat(data, this.transactionsHash);
+        System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);
 
         return data;
     }
@@ -1090,13 +1123,13 @@ public class Block implements ExplorerJsonLine {
     }
 
     private int dataLength = -1;
-    public int getDataLength(boolean withHeight) {
+    public int getDataLength(boolean forDB) {
 
         if (dataLength >= 0)
             return dataLength;
 
         int length = BASE_LENGTH;
-        if (withHeight)
+        if (forDB)
             length += HEIGHT_LENGTH;
 
         if (this.version > 1) {
@@ -1106,8 +1139,22 @@ public class Block implements ExplorerJsonLine {
             }
         }
 
-        for (Transaction transaction : this.getTransactions()) {
-            length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
+        if (transactionCount > 0) {
+            if (true) {
+                if (rawTransactionsLength == 0) {
+                    // прийдется с нуля собирать размер
+                    for (Transaction transaction : this.getTransactions()) {
+                        length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                    }
+                } else {
+                    length += rawTransactionsLength;
+                }
+            } else {
+                // это очень долгое и трудоемкий код
+                for (Transaction transaction : this.getTransactions()) {
+                    length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                }
+            }
         }
 
         return length;
