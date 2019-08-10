@@ -111,8 +111,13 @@ public class AssetInfo extends JTextPane {
         if (record != null)
             text += "<td><div  style='float:left'><div><b>" + Lang.getInstance().translate("Block-SeqNo") + ": </b>" + record.viewHeightSeq() + "</div>";
         text += "<div><b>" + Lang.getInstance().translate("Name") + ": </b>" + asset.viewName() + "</div>";
-        text += "<div   style='word-wrap: break-word; '>"
-                + Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "</div>";
+        text += "<div   style='word-wrap: break-word; '>";
+
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            text += Library.to_HTML(Lang.getInstance().translate(asset.viewDescription())) + "</div>";
+        } else {
+            text += Library.to_HTML(asset.viewDescription()) + "</div>";
+        }
         text += "<div>" + Lang.getInstance().translate("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
         text += "<div>" + Lang.getInstance().translate("TYPE") + ": <b>" + Lang.getInstance().translate(asset.viewAssetType()) + "</b>,";
         text += " " + Lang.getInstance().translate("accuracy") + ": <b>" + asset.getScale() + "</b>,";

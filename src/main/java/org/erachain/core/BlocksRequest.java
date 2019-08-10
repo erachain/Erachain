@@ -4,8 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
-import org.erachain.network.Peer;
-import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.GetBlockMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
@@ -13,8 +11,6 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
