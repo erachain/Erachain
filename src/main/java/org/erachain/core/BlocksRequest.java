@@ -4,8 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
-import org.erachain.network.Peer;
-import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.GetBlockMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
@@ -13,8 +11,6 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -26,11 +22,15 @@ public class BlocksRequest extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
 
-    private static final int QUEUE_LENGTH = Controller.getInstance().HARD_WORK? 100 : 1000;
+    /**
+     * запросов может быть много - они очередь не сильно нагружают - так чтобы разрывов часто не было
+     * иначе buffer-3 = null ошибка на той стороне вылетает
+     */
+    private static final int QUEUE_LENGTH = 300 + (256 >> (Controller.HARD_WORK >> 1));
     /**
      * число выданных транзакций
      */
-    private static final int TX_COUNTER_WAIT = BlockChain.HARD_WORK? 1000 : 100;
+    private static final int TX_COUNTER_WAIT = 1000 << Controller.HARD_WORK;
 
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
@@ -150,6 +150,7 @@ public class BlocksRequest extends MonitoredThread {
                     break;
                 }
             }
+
         }
 
         LOGGER.info("Block Request halted");
