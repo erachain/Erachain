@@ -90,7 +90,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE RECIPIENT
-        data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+        data = Bytes.concat(data, this.recipient.getAddressBytes());
 
         //WRITE KEY
         byte[] keyBytes = Longs.toByteArray(this.key);

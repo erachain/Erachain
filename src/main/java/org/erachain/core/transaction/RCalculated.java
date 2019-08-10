@@ -163,7 +163,7 @@ public class RCalculated extends TransactionAmount {
         data = Bytes.concat(data, referenceBytes);
 
         // WRITE RECIPIENT
-        data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+        data = Bytes.concat(data, this.recipient.getAddressBytes());
 
         if (this.amount != null) {
 

@@ -164,7 +164,7 @@ public class BuyNameTransaction extends Transaction {
         data = Bytes.concat(data, this.nameSale.toBytes());
 
         //WRITE SELLER
-        data = Bytes.concat(data, Base58.decode(this.seller.getAddress()));
+        data = Bytes.concat(data, this.seller.getAddressBytes());
 
         //WRITE FEE POWER
         byte[] feePowBytes = new byte[1];

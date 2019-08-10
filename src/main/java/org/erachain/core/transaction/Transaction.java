@@ -1408,8 +1408,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     // public abstract void process(DLSet db);
     public void process(Block block, int asDeal) {
 
-        if (this.signature != null && Base58.encode(this.signature)
-                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+        if (false
+                //this.signature != null && Base58.encode(this.signature)
+                //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+                ) {
             int error = 0;
             error++;
         }
@@ -1452,8 +1454,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public void orphan(Block block, int asDeal) {
 
-        if (Base58.encode(this.signature)
-                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+        if (false
+                //Base58.encode(this.signature)
+                //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+                ) {
             int error = 0;
             error++;
         }
@@ -1540,7 +1544,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (signature == null) {
             return getClass().getName() + ":" + viewFullTypeName();
         }
-        return Base58.encode(signature);
+        return getClass().getName() + ":" + viewFullTypeName() + Base58.encode(signature);
     }
 
 }
