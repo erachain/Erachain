@@ -464,7 +464,8 @@ public class GenesisBlock extends Block {
 
         //GENERATE AND VALIDATE TRANSACTIONS
         this.transactionCount = transactions.size();
-        this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
+
+        makeTransactionsRAWandHASH();
 
         // SIGN simple as HASH
         this.signature = generateHeadHash();

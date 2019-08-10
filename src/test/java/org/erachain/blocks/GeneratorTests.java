@@ -136,7 +136,7 @@ public class GeneratorTests {
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
-            newBlock.makeTransactionsHash();
+            newBlock.makeTransactionsRAWandHASH();
             newBlock.sign(generator);
 
             //CHECK IF BLOCK SIGNATURE IS VALID
@@ -405,7 +405,7 @@ public class GeneratorTests {
 
             //ADD TRANSACTION SIGNATURE
             byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
-            newBlock.makeTransactionsHash();
+            newBlock.makeTransactionsRAWandHASH();
             newBlock.sign(generator);
 
             //CHECK IF BLOCK SIGNATURE IS VALID

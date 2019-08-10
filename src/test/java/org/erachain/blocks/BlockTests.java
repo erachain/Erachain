@@ -435,7 +435,7 @@ public class BlockTests {
 
         //ADD TRANSACTION SIGNATURE
         //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
-        newBlock.makeTransactionsHash();
+        newBlock.makeTransactionsRAWandHASH();
 
         //CHECK IF VALID
         assertEquals(true, newBlock.isValid(db, false));

@@ -76,7 +76,7 @@ public class SynchronizerTests {
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
-            newBlock.makeTransactionsHash();
+            newBlock.makeTransactionsRAWandHASH();
 
             //PROCESS NEW BLOCK
             try {
@@ -236,7 +236,7 @@ public class SynchronizerTests {
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
-            newBlock.makeTransactionsHash();
+            newBlock.makeTransactionsRAWandHASH();
 
             //PROCESS NEW BLOCK
             try {
@@ -263,7 +263,7 @@ public class SynchronizerTests {
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator2, newBlock.getSignature());
-            newBlock.makeTransactionsHash();
+            newBlock.makeTransactionsRAWandHASH();
 
             //PROCESS NEW BLOCK
             try {

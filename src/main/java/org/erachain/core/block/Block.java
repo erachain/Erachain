@@ -478,9 +478,10 @@ public class Block implements ExplorerJsonLine {
         this.heightBlock = heightBlock;
 
         this.transactions = transactionsItem.a;
-        this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, this.atBytes);
         this.transactionCount = transactionsItem.b;
         this.atBytes = atBytes;
+
+        makeTransactionsRAWandHASH();
 
         this.forgingValue = forgingValue;
         this.winValue = winValue;
@@ -492,6 +493,13 @@ public class Block implements ExplorerJsonLine {
 
 
     public static byte[] makeTransactionsHash(byte[] creator, List<Transaction> transactions, byte[] atBytes) {
+
+        int atLength;
+        if (atBytes != null) {
+            atLength = atBytes.length;
+        } else {
+            atLength = 0;
+        }
 
         byte[] data = new byte[0];
 
@@ -510,8 +518,58 @@ public class Block implements ExplorerJsonLine {
         if (atBytes != null)
             data = Bytes.concat(data, atBytes);
 
+        //this.rawTransactions = data;
+        //this.rawTransactionsLength = rawTransactions.length;
 
         return Crypto.getInstance().digest(data);
+
+    }
+
+    /**
+     * делает Хэш и сырые данные из набора транзакций
+     * @return
+     */
+    public void makeTransactionsRAWandHASH() {
+
+        int atBytesLength;
+        if (atBytes == null) {
+            atBytesLength = 0;
+        } else {
+            atBytesLength = atBytes.length;
+        }
+        byte[] hashData = new byte[transactionCount * SIGNATURE_LENGTH + atBytesLength];
+        rawTransactions = new byte[getDataLengthTXs()];
+
+        int rawPos = 0;
+        int hashPos = 0;
+
+        //MAKE TRANSACTIONS HASH
+        for (Transaction transaction : transactions) {
+            //WRITE TRANSACTION LENGTH
+            int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
+            byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
+            transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
+            System.arraycopy(transactionLengthBytes, 0, rawTransactions, rawPos, TRANSACTION_SIZE_LENGTH);
+            rawPos += TRANSACTION_SIZE_LENGTH;
+
+            //WRITE TRANSACTION
+            //data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
+            System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, rawTransactions, rawPos, transactionLength);
+            rawPos += transactionLength;
+
+            System.arraycopy(transaction.getSignature(), 0, hashData, hashPos, SIGNATURE_LENGTH);
+            hashPos += SIGNATURE_LENGTH;
+
+        }
+
+        // сырые данные теперь запомним на всякий случай
+        rawTransactionsLength = rawPos;
+
+        if (atBytesLength > 0) {
+            System.arraycopy(atBytes, 0, hashData, hashPos, atBytesLength);
+        }
+
+        transactionsHash = Crypto.getInstance().digest(hashData);
 
     }
 
@@ -927,7 +985,7 @@ public class Block implements ExplorerJsonLine {
         this.transactionCount = count;
         //this.atBytes = null;
         if (this.transactionsHash == null)
-            this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
+            makeTransactionsRAWandHASH();
     }
 
     public int getTransactionSeq(byte[] signature) {
@@ -980,10 +1038,6 @@ public class Block implements ExplorerJsonLine {
     }
 
     //PARSE/CONVERT
-
-    public void makeTransactionsHash() {
-        this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), this.getTransactions(), this.atBytes);
-    }
 
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
@@ -1149,6 +1203,14 @@ public class Block implements ExplorerJsonLine {
         this.signature = Crypto.getInstance().sign(account, data);
     }
 
+    public int getDataLengthTXs() {
+        int length = 0;
+        for (Transaction transaction : transactions) {
+            length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
+        }
+        return length;
+    }
+
     private int dataLength = -1;
     public int getDataLength(boolean forDB) {
 
@@ -1170,9 +1232,7 @@ public class Block implements ExplorerJsonLine {
             if (true) {
                 if (rawTransactionsLength == 0) {
                     // прийдется с нуля собирать размер
-                    for (Transaction transaction : this.getTransactions()) {
-                        length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
-                    }
+                    length += getDataLengthTXs();
                 } else {
                     length += rawTransactionsLength;
                 }
