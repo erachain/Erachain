@@ -440,13 +440,17 @@ public class Controller extends Observable {
     }
 
     public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
-        if (peerHWeight != null) {
+        if (hWeight != null) {
             peerHWeight.put(peer, hWeight);
         } else {
             peerHWeight.remove(peer);
         }
     }
 
+    /**
+     * set my getHWeightFull to PEER
+     * @param peer
+     */
     public void resetWeightOfPeer(Peer peer) {
         peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
     }
@@ -1989,6 +1993,7 @@ public class Controller extends Observable {
             }
         } catch (Exception e) {
             // PEER REMOVED WHILE ITERATING
+            LOGGER.error(e.getMessage(), e);
         }
 
         return new Tuple3<Integer, Long, Peer>(height, weight, maxPeer);
@@ -3430,8 +3435,8 @@ public class Controller extends Observable {
                 try {
                     int hartWork = Integer.parseInt(arg.substring(10));
 
-                    if (hartWork > 8) {
-                        hartWork = 8;
+                    if (hartWork > 12) {
+                        hartWork = 12;
                     }
                     if (hartWork > 0) {
                         HARD_WORK = hartWork;

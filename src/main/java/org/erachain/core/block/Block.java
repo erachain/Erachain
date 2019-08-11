@@ -101,7 +101,7 @@ public class Block implements ExplorerJsonLine {
     protected boolean wasValidated;
 
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
-    public static class BlockHead {
+    public static class BlockHead implements ExplorerJsonLine {
 
         public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
                 + TRANSACTIONS_COUNT_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH
@@ -194,6 +194,10 @@ public class Block implements ExplorerJsonLine {
         public long getTimestamp() {
             BlockChain blockChain = Controller.getInstance().getBlockChain();
             return blockChain.getTimestamp(this.heightBlock);
+        }
+
+        public String viewFeeAsBigDecimal() {
+            return NumberAsString.formatAsString(BigDecimal.valueOf(totalFee, BlockChain.FEE_SCALE));
         }
 
         public byte[] toBytes() {
@@ -372,6 +376,26 @@ public class Block implements ExplorerJsonLine {
             return head;
         }
 
+        public JSONObject jsonForExplorerPage(JSONObject langObj) {
+            JSONObject blockJSON = new JSONObject();
+            blockJSON.put("height", heightBlock);
+            blockJSON.put("signature", Base58.encode(signature));
+            blockJSON.put("generator", creator.getAddress());
+            blockJSON.put("transactionsCount", transactionsCount);
+            blockJSON.put("timestamp", getTimestamp());
+
+            ///loadHeadMind(DCSet.getInstance());
+            blockJSON.put("totalFee", viewFeeAsBigDecimal());
+            Tuple2<Integer, Integer> forgingPoint = creator.getForgingData(DCSet.getInstance(), heightBlock);
+            if (forgingPoint != null) {
+                blockJSON.put("deltaHeight", heightBlock - forgingPoint.a);
+            }
+            blockJSON.put("generatingBalance", forgingValue);
+            blockJSON.put("target", target);
+            blockJSON.put("winValue", winValue);
+            blockJSON.put("winValueTargeted", calcWinValueTargeted());
+            return blockJSON;
+        }
 
     }
 
