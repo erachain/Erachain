@@ -1512,19 +1512,25 @@ import java.util.*;
 
         //CHECK TRANSACTIONS
 
+        int atBytesLength;
+        if (atBytes != null && atBytes.length > 0) {
+            atBytesLength = atBytes.length;
+        } else {
+            atBytesLength = 0;
+        }
+        byte[] transactionsSignatures;
+        int transactionsSignaturesPos = 0;
+
         if (this.transactionCount == 0) {
-            // empty transactions
+            // empty transactions - USE CREATOR for HASH
+            transactionsSignatures = new byte[CREATOR_LENGTH + atBytesLength];
+            System.arraycopy(creator.getPublicKey(), 0, transactionsSignatures, 0, CREATOR_LENGTH);
+            transactionsSignaturesPos += CREATOR_LENGTH;
+
         } else {
 
-            int atBytesLength;
-            if (atBytes != null && atBytes.length > 0) {
-                atBytesLength = atBytes.length;
-            } else {
-                atBytesLength = 0;
-            }
-            byte[] transactionsSignatures = new byte[SIGNATURE_LENGTH * transactionCount + atBytesLength];
+            transactionsSignatures = new byte[SIGNATURE_LENGTH * transactionCount + atBytesLength];
             byte[] transactionSignature;
-            int transactionsSignaturesPos = 0;
 
             this.getTransactions();
 
@@ -1574,7 +1580,7 @@ import java.util.*;
             //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
             TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
-            TransactionFinalMapSigns transFinalMapSinds = validatingDC.getTransactionFinalMapSigns();
+            TransactionFinalMapSigns transFinalMapSigns = validatingDC.getTransactionFinalMapSigns();
 
             int seqNo = 0;
             // need for CLOSE DBFork
@@ -1693,11 +1699,11 @@ import java.util.*;
                                 timerFinalMap_set += processTimingLocalDiff / 1000;
 
                             processTimingLocal = System.nanoTime();
-                            transFinalMapSinds.set(transactionSignature, key);
-                            List<byte[]> signatures = transaction.getSignatures();
+                            transFinalMapSigns.set(transactionSignature, key);
+                            List<byte[]> signatures = transaction.getOtherSignatures();
                             if (signatures != null) {
                                 for (byte[] itemSignature : signatures) {
-                                    transFinalMapSinds.set(itemSignature, key);
+                                    transFinalMapSigns.set(itemSignature, key);
                                 }
                             }
                             processTimingLocalDiff = System.nanoTime() - processTimingLocal;
@@ -1724,11 +1730,11 @@ import java.util.*;
                                 timerFinalMap_set += processTimingLocalDiff / 1000;
 
                             processTimingLocal = System.nanoTime();
-                            transFinalMapSinds.set(transactionSignature, key);
-                            List<byte[]> signatures = transaction.getSignatures();
+                            transFinalMapSigns.set(transactionSignature, key);
+                            List<byte[]> signatures = transaction.getOtherSignatures();
                             if (signatures != null) {
                                 for (byte[] itemSignature : signatures) {
-                                    transFinalMapSinds.set(itemSignature, key);
+                                    transFinalMapSigns.set(itemSignature, key);
                                 }
                             }
                             processTimingLocalDiff = System.nanoTime() - processTimingLocal;
@@ -1748,17 +1754,6 @@ import java.util.*;
                     // закроем ее
                     validatingDC.close();
                 }
-            }
-
-            // ADD AT_BYTES
-            if (atBytesLength > 0) {
-                System.arraycopy(atBytes, 0, transactionsSignatures, transactionsSignaturesPos, atBytesLength);
-            }
-
-            transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
-            if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-                LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
-                return false;
             }
 
             if (!dcSet.isFork()) {
@@ -1788,6 +1783,17 @@ import java.util.*;
                 );
             }
 
+        }
+
+        // ADD AT_BYTES
+        if (atBytesLength > 0) {
+            System.arraycopy(atBytes, 0, transactionsSignatures, transactionsSignaturesPos, atBytesLength);
+        }
+
+        transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
+        if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
+            return false;
         }
 
         //BLOCK IS VALID
@@ -2108,7 +2114,7 @@ import java.util.*;
                     //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
                     timerStart = System.currentTimeMillis();
                     transFinalMapSinds.set(transactionSignature, key);
-                    List<byte[]> signatures = transaction.getSignatures();
+                    List<byte[]> signatures = transaction.getOtherSignatures();
                     if (signatures != null) {
                         for (byte[] itemSignature : signatures) {
                             transFinalMapSinds.set(itemSignature, key);
@@ -2266,7 +2272,7 @@ import java.util.*;
 
                 finalMap.delete(key);
                 transFinalMapSinds.delete(transaction.getSignature());
-                List<byte[]> signatures = transaction.getSignatures();
+                List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {
                     for (byte[] itemSignature : signatures) {
                         transFinalMapSinds.delete(itemSignature);

@@ -285,7 +285,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
     }
 
     @Override
-    public List<byte[]> getSignatures() {
+    public List<byte[]> getOtherSignatures() {
         return sertifiedSignatures;
     }
 

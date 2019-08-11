@@ -151,7 +151,7 @@ public class IssuePersonRecord extends IssueItemRecord {
     }
 
     @Override
-    public List<byte[]> getSignatures() {
+    public List<byte[]> getOtherSignatures() {
         PersonHuman person = (PersonHuman) this.item;
         if (person.isMustBeSigned()) {
             List<byte[]> items = new ArrayList<byte[]>();
