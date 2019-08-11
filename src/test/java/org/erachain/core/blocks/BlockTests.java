@@ -145,7 +145,7 @@ public class BlockTests {
         List<Transaction> transactions = gb.getTransactions();
         transactions.add(new GenesisTransferAssetTransaction(
                 new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"), 1l, BigDecimal.valueOf(1)));
-        gb.setTransactions(transactions);
+        gb.setTransactionsForTests(transactions);
 
         // SIGNATURE invalid
         assertEquals(false, gb.isSignatureValid());
@@ -167,7 +167,7 @@ public class BlockTests {
         List<Transaction> transactions = gb.getTransactions();
         transactions.add(new GenesisTransferAssetTransaction(
                 new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"), 1l, BigDecimal.valueOf(-1000)));
-        gb.setTransactions(transactions);
+        gb.setTransactionsForTests(transactions);
 
         //CHECK IF INVALID
         assertEquals(false, gb.isValid(db, false));
@@ -345,7 +345,7 @@ public class BlockTests {
         transactions.add(payment);
 
         // SET TRANSACTIONS to BLOCK
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
 
         //CHECK IF SIGNATURE INVALID
         assertEquals(false, newBlock.isSignatureValid());
@@ -356,7 +356,7 @@ public class BlockTests {
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
         newBlock.sign(generator);
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
 
         ///CHECK IF SIGNATURE INVALID
         assertEquals(false, newBlock.isSignatureValid());
@@ -376,7 +376,7 @@ public class BlockTests {
         transactions.add(payment);
 
         //ADD TRANSACTION SIGNATURE
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
 
         //CHECK VALID TRANSACTION SIGNATURE
         assertEquals(false, newBlock.isSignatureValid());
@@ -396,7 +396,7 @@ public class BlockTests {
         transactions.add(payment);
 
         //ADD TRANSACTION SIGNATURE
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
         newBlock.sign(generator);
 
         //CHECK INVALID TRANSACTION SIGNATURE
@@ -452,7 +452,7 @@ public class BlockTests {
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
-        invalidBlock.setTestReference(new byte[Block.SIGNATURE_LENGTH]);
+        invalidBlock.setReferenceForTests(new byte[Block.SIGNATURE_LENGTH]);
         invalidBlock.sign(generator);
 
         //CHECK IF INVALID
@@ -478,7 +478,7 @@ public class BlockTests {
         transactions.add(payment);
 
         //ADD TRANSACTION SIGNATURE
-        invalidBlock.setTransactions(transactions);
+        invalidBlock.setTransactionsForTests(transactions);
         invalidBlock.sign(generator);
 
         //CHECK IF INVALID
@@ -494,7 +494,7 @@ public class BlockTests {
         transactions.add(transaction);
 
         //ADD TRANSACTION SIGNATURE
-        invalidBlock.setTransactions(transactions);
+        invalidBlock.setTransactionsForTests(transactions);
         invalidBlock.sign(generator);
 
         //CHECK IF INVALID
@@ -555,7 +555,7 @@ public class BlockTests {
         transactions.add(payment2);
 
         //ADD TRANSACTION SIGNATURE
-        block.setTransactions(transactions);
+        block.setTransactionsForTests(transactions);
         block.sign(generator);
 
         //CONVERT TO BYTES
@@ -653,7 +653,7 @@ public class BlockTests {
         transactions.add(payment2);
 
         //ADD TRANSACTION SIGNATURE
-        block.setTransactions(transactions);
+        block.setTransactionsForTests(transactions);
 
         ////generator.setLastForgingData(db, block.getHeightByParent(db));
         generator.setForgingData(db, block.getHeight(), payment2.getAmount().intValue());

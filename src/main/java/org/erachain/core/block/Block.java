@@ -493,7 +493,23 @@ import java.util.*;
     //GETTERS/SETTERS
 
 
-    public static byte[] makeTransactionsHash(byte[] creator, List<Transaction> transactions, byte[] atBytes) {
+    /**
+     * USE only for TESTS !
+     *
+     * @param resference
+     */
+    public void setReferenceForTests(byte[] resference) {
+        this.reference = resference;
+    }
+
+    /**
+     * Медленное создание и используется для Тестов
+     * @param creator
+     * @param transactions
+     * @param atBytes
+     * @return
+     */
+    public static byte[] makeTransactionsHashForTests(byte[] creator, List<Transaction> transactions, byte[] atBytes) {
 
         int atLength;
         if (atBytes != null) {
@@ -516,23 +532,11 @@ import java.util.*;
 
         }
 
-        if (atBytes != null)
+        if (atLength > 0)
             data = Bytes.concat(data, atBytes);
-
-        //this.rawTransactions = data;
-        //this.rawTransactionsLength = rawTransactions.length;
 
         return Crypto.getInstance().digest(data);
 
-    }
-
-    /**
-     * USE only for TESTS !
-     *
-     * @param resference
-     */
-    public void setTestReference(byte[] resference) {
-        this.reference = resference;
     }
 
     /**
@@ -548,39 +552,56 @@ import java.util.*;
         } else {
             atBytesLength = atBytes.length;
         }
-        byte[] hashData = new byte[transactionCount * SIGNATURE_LENGTH + atBytesLength];
-        rawTransactions = new byte[getDataLengthTXs()];
 
-        int rawPos = 0;
-        int hashPos = 0;
+        byte[] hashData;
+        if (transactionCount == 0) {
+            hashData = new byte[CREATOR_LENGTH + atBytesLength];
+            System.arraycopy(creator.getPublicKey(), 0, hashData, 0, SIGNATURE_LENGTH);
+            if (atBytesLength > 0) {
+                System.arraycopy(atBytes, 0, hashData, SIGNATURE_LENGTH, atBytesLength);
+            }
 
-        //MAKE TRANSACTIONS HASH
-        for (Transaction transaction : transactions) {
-            //WRITE TRANSACTION LENGTH
-            int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-            transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
-            System.arraycopy(transactionLengthBytes, 0, rawTransactions, rawPos, TRANSACTION_SIZE_LENGTH);
-            rawPos += TRANSACTION_SIZE_LENGTH;
+            // SAVE RAW
+            rawTransactionsLength = 0;
+            rawTransactions = new byte[0];
 
-            //WRITE TRANSACTION
-            //data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
-            System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, rawTransactions, rawPos, transactionLength);
-            rawPos += transactionLength;
+        } else {
+            hashData = new byte[transactionCount * SIGNATURE_LENGTH + atBytesLength];
 
-            System.arraycopy(transaction.getSignature(), 0, hashData, hashPos, SIGNATURE_LENGTH);
-            hashPos += SIGNATURE_LENGTH;
+            rawTransactionsLength = getDataLengthTXs();
+            rawTransactions = new byte[rawTransactionsLength];
 
-        }
+            int rawPos = 0;
+            int hashPos = 0;
 
-        // сырые данные теперь запомним на всякий случай
-        rawTransactionsLength = rawPos;
+            //MAKE TRANSACTIONS HASH
+            for (Transaction transaction : transactions) {
+                //WRITE TRANSACTION LENGTH
+                int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
+                transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
+                System.arraycopy(transactionLengthBytes, 0, rawTransactions, rawPos, TRANSACTION_SIZE_LENGTH);
+                rawPos += TRANSACTION_SIZE_LENGTH;
 
-        if (atBytesLength > 0) {
-            System.arraycopy(atBytes, 0, hashData, hashPos, atBytesLength);
+                //WRITE TRANSACTION
+                System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, rawTransactions, rawPos, transactionLength);
+                rawPos += transactionLength;
+
+                // ACUMULATE SINGNs FOR HASH
+                System.arraycopy(transaction.getSignature(), 0, hashData, hashPos, SIGNATURE_LENGTH);
+                hashPos += SIGNATURE_LENGTH;
+
+            }
+
+            if (atBytesLength > 0) {
+                System.arraycopy(atBytes, 0, hashData, hashPos, atBytesLength);
+            }
+
         }
 
         transactionsHash = Crypto.getInstance().digest(hashData);
+        byte[] hashTest = makeTransactionsHashForTests(creator.getPublicKey(), transactions, atBytes);
+        assert (Arrays.equals(transactionsHash, hashTest));
 
     }
 
@@ -1015,8 +1036,8 @@ import java.util.*;
      *
      * @param transactions
      */
-    public void setTransactions(List<Transaction> transactions) {
-        this.setTransactions(transactions, transactions == null ? 0 : transactions.size());
+    public void setTransactionsForTests(List<Transaction> transactions) {
+        this.setTransactionsForTests(transactions, transactions == null ? 0 : transactions.size());
     }
 
     /**
@@ -1025,7 +1046,7 @@ import java.util.*;
      * @param transactions
      * @param count
      */
-    public void setTransactions(List<Transaction> transactions, int count) {
+    public void setTransactionsForTests(List<Transaction> transactions, int count) {
         this.transactions = transactions;
         this.transactionCount = count;
         this.atBytes = null;
@@ -1194,25 +1215,28 @@ import java.util.*;
 
         if (transactionCount > 0) {
             if (rawTransactionsLength == 0) {
-                // нужно заново создавать
-                // запомним откуда идет сборка чтобы потом перекатать в сырые данные
-                int startRAW = pos;
-                for (Transaction transaction : this.getTransactions()) {
-                    //WRITE TRANSACTION LENGTH
-                    int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
-                    byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-                    transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
-                    System.arraycopy(transactionLengthBytes, 0, data, pos, TRANSACTION_SIZE_LENGTH);
-                    pos += TRANSACTION_SIZE_LENGTH;
+                if (true) {
+                    assert(false);
+                } else {
+                    // нужно заново создавать
+                    // запомним откуда идет сборка чтобы потом перекатать в сырые данные
+                    int startRAW = pos;
+                    for (Transaction transaction : this.getTransactions()) {
+                        //WRITE TRANSACTION LENGTH
+                        int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                        byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
+                        transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
+                        System.arraycopy(transactionLengthBytes, 0, data, pos, TRANSACTION_SIZE_LENGTH);
+                        pos += TRANSACTION_SIZE_LENGTH;
 
-                    //WRITE TRANSACTION
-                    //data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
-                    System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, data, pos, transactionLength);
-                    pos += transactionLength;
+                        //WRITE TRANSACTION
+                        System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, data, pos, transactionLength);
+                        pos += transactionLength;
+                    }
+                    // сырые данные теперь запомним на всякий случай
+                    System.arraycopy(data, startRAW, rawTransactions, 0, pos);
+                    rawTransactionsLength = pos - startRAW;
                 }
-                // сырые данные теперь запомним на всякий случай
-                System.arraycopy(data, startRAW, rawTransactions, 0, pos);
-                rawTransactionsLength = pos - startRAW;
             } else {
                 // уже есть готовые сырые данные
                 System.arraycopy(rawTransactions, 0, data, pos, rawTransactionsLength);
@@ -1274,18 +1298,11 @@ import java.util.*;
         }
 
         if (transactionCount > 0) {
-            if (true) {
-                if (rawTransactionsLength == 0) {
-                    // прийдется с нуля собирать размер
-                    length += getDataLengthTXs();
-                } else {
-                    length += rawTransactionsLength;
-                }
+            if (rawTransactionsLength == 0) {
+                // прийдется с нуля собирать размер
+                length += getDataLengthTXs();
             } else {
-                // это очень долгое и трудоемкий код
-                for (Transaction transaction : this.getTransactions()) {
-                    length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
-                }
+                length += rawTransactionsLength;
             }
         }
 
@@ -1499,9 +1516,15 @@ import java.util.*;
             // empty transactions
         } else {
 
-            byte[] blockSignature = this.getSignature();
+            int atBytesLength;
+            if (atBytes != null && atBytes.length > 0) {
+                atBytesLength = atBytes.length;
+            } else {
+                atBytesLength = 0;
+            }
+            byte[] transactionsSignatures = new byte[SIGNATURE_LENGTH * transactionCount + atBytesLength];
             byte[] transactionSignature;
-            byte[] transactionsSignatures = new byte[0];
+            int transactionsSignaturesPos = 0;
 
             this.getTransactions();
 
@@ -1714,7 +1737,9 @@ import java.util.*;
                         }
                     }
 
-                    transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
+                    System.arraycopy(transactionSignature, 0, transactionsSignatures, transactionsSignaturesPos, SIGNATURE_LENGTH);
+                    transactionsSignaturesPos += SIGNATURE_LENGTH;
+
                 }
 
             } finally {
@@ -1723,6 +1748,11 @@ import java.util.*;
                     // закроем ее
                     validatingDC.close();
                 }
+            }
+
+            // ADD AT_BYTES
+            if (atBytesLength > 0) {
+                System.arraycopy(atBytes, 0, transactionsSignatures, transactionsSignaturesPos, atBytesLength);
             }
 
             transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
@@ -1743,8 +1773,10 @@ import java.util.*;
                     // это тоже время требует...
                     Controller.getInstance().getBlockChain().updateTXValidateTimingAverage(processTiming, this.transactionCount);
                 }
+            }
 
-                long tickets = System.currentTimeMillis() - timerStart;
+            long tickets = System.currentTimeMillis() - timerStart;
+            if (!dcSet.isFork() || tickets > 1000) {
                 LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
                         + this.transactionCount + " " + tickets + "[ms] " + tickets / this.transactionCount + "[ms/tx]"
                         + " Proc[us]: " + timerProcess

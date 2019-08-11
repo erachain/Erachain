@@ -611,13 +611,13 @@ public class GeneratorTests {
         Tuple2<List<Transaction>, Integer> transactionsItem = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l);
         transactions = transactionsItem.a;
         // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHash(generator.getPrivateKey(), transactions, null);
+        byte[] transactionsHash = Block.makeTransactionsHashForTests(generator.getPublicKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
 
         //CHECK IF BLOCK IS VALID
         assertEquals(true, newBlock.isValid(dcSet, false));
@@ -692,13 +692,13 @@ public class GeneratorTests {
         assertEquals(true, max_count > transactions.size());
 
         // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHash(generator.getPrivateKey(), transactions, null);
+        byte[] transactionsHash = Block.makeTransactionsHashForTests(generator.getPublicKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
 
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
         assertEquals(transactions.size(), newBlock.getTransactionCount());
@@ -758,13 +758,13 @@ public class GeneratorTests {
         transactions = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l).a;
 
         // CALCULATE HASH for that transactions
-        byte[] transactionsHash = Block.makeTransactionsHash(userAccount1.getPrivateKey(), transactions, null);
+        byte[] transactionsHash = Block.makeTransactionsHashForTests(userAccount1.getPublicKey(), transactions, null);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(userAccount1,
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
         try {
             newBlock.process(dcSet);
         } catch (Exception e) {
