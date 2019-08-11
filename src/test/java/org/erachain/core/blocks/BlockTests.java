@@ -1,5 +1,6 @@
-package org.erachain.blocks;
+package org.erachain.core.blocks;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
@@ -51,6 +52,8 @@ public class BlockTests {
     Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
     Transaction payment;
     //CREATE EMPTY MEMORY DATABASE
+
+    private Controller cntrl;
     private DCSet db;
     private BlockChain blockChain;
     private GenesisBlock gb;
@@ -60,13 +63,18 @@ public class BlockTests {
     private void init() {
 
         db = DCSet.createEmptyDatabaseSet();
+        cntrl = Controller.getInstance();
+        cntrl.initBlockChain(db);
+        blockChain = cntrl.getBlockChain();
+        gb = blockChain.getGenesisBlock();
+        //gb.process(db);
         try {
-            blockChain = new BlockChain(db);
+            //blockChain = new BlockChain(db);
         } catch (Exception e) {
         }
 
         blockGenerator = new BlockGenerator(db, blockChain, false);
-        gb = blockChain.getGenesisBlock();
+        //gb = blockChain.getGenesisBlock();
         gbTransactions = gb.getTransactions();
 
         generator.setLastTimestamp(gb.getTimestamp(), db);
@@ -149,6 +157,7 @@ public class BlockTests {
     @Test
     public void validateGenesisBlock() {
 
+        db = DCSet.createEmptyDatabaseSet();
         gb = new GenesisBlock();
 
         //CHECK IF VALID
@@ -214,6 +223,10 @@ public class BlockTests {
 
         //CHECK GENERATOR
         assertEquals(gb.getCreator().getAddress(), parsedBlock.getCreator().getAddress());
+
+        Transaction tx = gb.getTransaction(gb.getTransactionCount());
+        Transaction txParsed = parsedBlock.getTransaction(parsedBlock.getTransactionCount());
+        assertEquals(tx.getFee(), txParsed.getFee());
 
         //CHECK INSTANCE
         ////assertEquals(true, parsedBlock instanceof GenesisBlock);
@@ -395,12 +408,6 @@ public class BlockTests {
     @Test
     public void validateBlock() {
         init();
-        try {
-            gb.process(db);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
         //CREATE KNOWN ACCOUNT
         byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -430,12 +437,11 @@ public class BlockTests {
         //BigDecimal genBal = generator.getGeneratingBalance(db);
         BlockGenerator blockGenerator = new BlockGenerator(db, null, false);
         Block newBlock = blockGenerator.generateNextBlock(generator, gb,
-                orderedTransactions, 3,
+                orderedTransactions, 2,
                 1000, 1000l, 1000l);
 
-        //ADD TRANSACTION SIGNATURE
-        //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
-        newBlock.makeTransactionsRAWandHASH();
+        // SET WIN VALUE and TARGET
+        newBlock.makeHeadMind(db);
 
         //CHECK IF VALID
         assertEquals(true, newBlock.isValid(db, false));
@@ -446,8 +452,16 @@ public class BlockTests {
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
+        invalidBlock.setTestReference(new byte[Block.SIGNATURE_LENGTH]);
         invalidBlock.sign(generator);
 
+        //CHECK IF INVALID
+        assertEquals(false, invalidBlock.isValid(db, false));
+
+        //VRON NUMBER
+        invalidBlock = blockGenerator.generateNextBlock(generator, gb,
+                orderedTransactions, 4,
+                1000, 1000l, 1000l);
         //CHECK IF INVALID
         assertEquals(false, invalidBlock.isValid(db, false));
 

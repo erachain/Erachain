@@ -204,7 +204,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         atBytes = new byte[0];
 
         //CREATE NEW BLOCK
-        Block newBlock = new Block(version, parentBlock.getSignature(), account, height,
+        Block newBlock = new Block(version, parentBlock, account, height,
                 transactionsItem, atBytes,
                 forgingValue, winValue, previousTarget);
         newBlock.sign(account);

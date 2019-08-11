@@ -40,7 +40,7 @@ import java.util.*;
 /**
  * обработка блоков - все что с ними связано. Без базы данных - сухие данные в вакууме
  */
-public class Block implements ExplorerJsonLine {
+    public class Block implements ExplorerJsonLine {
 
     static private HashMap totalCOMPUtest = new HashMap();
 
@@ -467,13 +467,13 @@ public class Block implements ExplorerJsonLine {
 
     }
 
-    public Block(int version, byte[] reference, PublicKeyAccount generator, int heightBlock,
+    public Block(int version, Block parentBlock, PublicKeyAccount generator, int heightBlock,
                  Tuple2<List<Transaction>, Integer> transactionsItem,
                  byte[] atBytes,
                  int forgingValue, long winValue, long target) {
         // TODO Auto-generated constructor stub
         this.version = version;
-        this.reference = reference;
+        this.reference = parentBlock.signature;
         this.creator = generator;
         this.heightBlock = heightBlock;
 
@@ -483,6 +483,7 @@ public class Block implements ExplorerJsonLine {
 
         makeTransactionsRAWandHASH();
 
+        this.parentBlockHead = parentBlock.blockHead;
         this.forgingValue = forgingValue;
         this.winValue = winValue;
         this.target = target;
@@ -526,7 +527,17 @@ public class Block implements ExplorerJsonLine {
     }
 
     /**
+     * USE only for TESTS !
+     *
+     * @param resference
+     */
+    public void setTestReference(byte[] resference) {
+        this.reference = resference;
+    }
+
+    /**
      * делает Хэш и сырые данные из набора транзакций
+     *
      * @return
      */
     public void makeTransactionsRAWandHASH() {
@@ -758,6 +769,32 @@ public class Block implements ExplorerJsonLine {
         //this.version = blockHead.version;
     }
 
+    /**
+     * если parentBlockHead == null возьмет его из базы данных
+     *
+     * @param dcSet
+     */
+    public void makeHeadMind(DCSet dcSet) {
+        this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+
+        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+
+        if (this.parentBlockHead == null) {
+            this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
+        }
+
+        final long currentTarget = this.parentBlockHead.target;
+        int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
+        this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
+
+        // STORE in HEAD
+        this.blockHead = new BlockHead(this);
+    }
+
+    public void setParentHeadMind(BlockHead parentHead) {
+        this.parentBlockHead = parentHead;
+    }
+
     public Block getChild(DCSet db) {
         return db.getBlockMap().get(this.getHeight() + 1);
     }
@@ -831,6 +868,7 @@ public class Block implements ExplorerJsonLine {
      * Копит все для каждого счета результирующее и потом разом в блоке изменим
      * Так обходится неопределенность при откате - если несколько транзакций для одного счета
      * меняли инфо по форжингу
+     *
      * @param account
      */
     public void addForgingInfoUpdate(Account account) {
@@ -841,7 +879,7 @@ public class Block implements ExplorerJsonLine {
         }
 
         // проверим может уже естьт ам такой счет
-        for (Account item: this.forgingInfoUpdate) {
+        for (Account item : this.forgingInfoUpdate) {
             if (account.equals(item))
                 return;
         }
@@ -974,18 +1012,24 @@ public class Block implements ExplorerJsonLine {
 
     /**
      * need only for TESTs
+     *
      * @param transactions
      */
     public void setTransactions(List<Transaction> transactions) {
         this.setTransactions(transactions, transactions == null ? 0 : transactions.size());
     }
 
+    /**
+     * clear old data and set new Transactions
+     *
+     * @param transactions
+     * @param count
+     */
     public void setTransactions(List<Transaction> transactions, int count) {
         this.transactions = transactions;
         this.transactionCount = count;
-        //this.atBytes = null;
-        if (this.transactionsHash == null)
-            makeTransactionsRAWandHASH();
+        this.atBytes = null;
+        makeTransactionsRAWandHASH();
     }
 
     public int getTransactionSeq(byte[] signature) {
@@ -1149,7 +1193,7 @@ public class Block implements ExplorerJsonLine {
         pos += TRANSACTIONS_COUNT_LENGTH;
 
         if (transactionCount > 0) {
-            if (rawTransactionsLength == 0 ) {
+            if (rawTransactionsLength == 0) {
                 // нужно заново создавать
                 // запомним откуда идет сборка чтобы потом перекатать в сырые данные
                 int startRAW = pos;
@@ -1212,6 +1256,7 @@ public class Block implements ExplorerJsonLine {
     }
 
     private int dataLength = -1;
+
     public int getDataLength(boolean forDB) {
 
         if (dataLength >= 0)
@@ -1422,6 +1467,10 @@ public class Block implements ExplorerJsonLine {
         }
 
         this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
+        if (parentBlockHead == null) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] not form broken CHAIN - not found Parent Block");
+            return false;
+        }
 
         final long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
@@ -1774,7 +1823,7 @@ public class Block implements ExplorerJsonLine {
             String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
             if (!rich.equals(this.creator.getAddress())) {
-                emittedFee = this.blockHead.totalFee>>1;
+                emittedFee = this.blockHead.totalFee >> 1;
 
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
@@ -1846,11 +1895,11 @@ public class Block implements ExplorerJsonLine {
 
                     ballParent = (BigDecimal) parentBalanses.get(key.a);
                     if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
-                            ||  ballParent == null && ball.a.b.signum() != 0) {
+                            || ballParent == null && ball.a.b.signum() != 0) {
                         LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + key.a
-                                + " balParent : " + (ballParent==null?"NULL":ballParent.toPlainString())
-                                + " ---> " + (ball==null?"NULL":ball.a.b.toPlainString())
-                                + " == " + ball.a.b.subtract(ballParent==null?BigDecimal.ZERO:ballParent));
+                                + " balParent : " + (ballParent == null ? "NULL" : ballParent.toPlainString())
+                                + " ---> " + (ball == null ? "NULL" : ball.a.b.toPlainString())
+                                + " == " + ball.a.b.subtract(ballParent == null ? BigDecimal.ZERO : ballParent));
 
                         error = true;
                     }
@@ -1880,7 +1929,7 @@ public class Block implements ExplorerJsonLine {
             // Так обходится неопределенность при откате - если несколько транзакций для одного счета
             // меняли инфо по форжингу
 
-            for (Account account: this.forgingInfoUpdate) {
+            for (Account account : this.forgingInfoUpdate) {
 
                 Tuple2<Integer, Integer> privousForgingPoint = account.getLastForgingData(dcSet);
                 int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
@@ -1970,7 +2019,7 @@ public class Block implements ExplorerJsonLine {
         // for DEBUG
         if (this.heightBlock == 65431
                 || this.heightBlock == 86549) {
-            int rrrr =0;
+            int rrrr = 0;
         }
 
         //PROCESS TRANSACTIONS
@@ -2038,7 +2087,7 @@ public class Block implements ExplorerJsonLine {
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
                 if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                        && ((RSend)transaction).getAssetKey() != 1) {
+                        && ((RSend) transaction).getAssetKey() != 1) {
 
                 } else {
 
@@ -2095,7 +2144,7 @@ public class Block implements ExplorerJsonLine {
             return;
         }
 
-        if ( this.heightBlock > 162045 &&  this.heightBlock < 162050 ) {
+        if (this.heightBlock > 162045 && this.heightBlock < 162050) {
             LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
         }
 
@@ -2125,7 +2174,7 @@ public class Block implements ExplorerJsonLine {
             // и разом в тут блоке изменим
             // Так обходится неопределенность при откате - если несколько транзакций для одного счета
             // меняли инфо по форжингу
-            for (Account account: this.forgingInfoUpdate) {
+            for (Account account : this.forgingInfoUpdate) {
                 if (!this.getCreator().equals(account)) {
                     // если этот блок не собирался этим человеком
                     Tuple2<Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
@@ -2233,5 +2282,5 @@ public class Block implements ExplorerJsonLine {
                 + " TX: " + this.transactionCount
                 + " CR:" + this.getCreator().getPersonAsString();
     }
-
 }
+

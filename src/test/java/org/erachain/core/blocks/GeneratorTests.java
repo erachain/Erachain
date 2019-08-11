@@ -1,4 +1,4 @@
-package org.erachain.blocks;
+package org.erachain.core.blocks;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
