@@ -156,7 +156,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (Arrays.equals(headers.get(headersSize - 1), lastSignature)) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
                     LOGGER.debug("peer has same Weight " + maxPeer);
-                    ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+                    ctrl.resetWeightOfPeer(peer);
                     // продолжим поиск дальше
                     continue;
                 } else {
@@ -167,7 +167,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         return true;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+                        ctrl.resetWeightOfPeer(peer);
                     }
                 }
             } else if (headersSize < 2) {
@@ -177,7 +177,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     return true;
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
-                    ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
+                    ctrl.resetWeightOfPeer(peer);
                 }
             } else {
                 // more then 2 - need to UPDATE
@@ -193,7 +193,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     }
 
     public Block generateNextBlock(PrivateKeyAccount account,
-                  Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
+                                   Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
 
         if (transactionsItem == null) {
             return null;
@@ -204,7 +204,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         atBytes = new byte[0];
 
         //CREATE NEW BLOCK
-        Block newBlock = new Block(version, parentBlock.getSignature(), account, height,
+        Block newBlock = new Block(version, parentBlock, account, height,
                 transactionsItem, atBytes,
                 forgingValue, winValue, previousTarget);
         newBlock.sign(account);
@@ -671,7 +671,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     && (this.solvingReference == null // AND GENERATING NOT MAKED
                                     || !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature())
                             ))
-                            ) {
+                    ) {
 
                         /////////////////////////////// TRY FORGING ////////////////////////
 

@@ -1,13 +1,9 @@
 package org.erachain.database;
 // 30/03 ++
 
-import javafx.beans.Observable;
-import org.erachain.settings.Settings;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
 import java.io.File;
-import java.util.Observer;
 
 //import org.mapdb.Serializer;
 

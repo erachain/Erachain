@@ -705,7 +705,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         return this.reference;
     }
 
-    public List<byte[]> getSignatures() {
+    public List<byte[]> getOtherSignatures() {
         return null;
     }
 

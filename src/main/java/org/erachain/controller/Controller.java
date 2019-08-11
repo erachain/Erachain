@@ -127,7 +127,7 @@ public class Controller extends Observable {
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class.getSimpleName());
 
     public static int HARD_WORK = 0;
     public boolean useGui = true;
@@ -447,6 +447,10 @@ public class Controller extends Observable {
         }
     }
 
+    /**
+     * set my getHWeightFull to PEER
+     * @param peer
+     */
     public void resetWeightOfPeer(Peer peer) {
         peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
     }

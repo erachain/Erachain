@@ -874,7 +874,6 @@ public class Synchronizer {
 
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);
-
                 error = new Exception(e);
 
             } catch (Exception e) {
@@ -882,7 +881,6 @@ public class Synchronizer {
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
-
                     LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
                 }

@@ -77,11 +77,13 @@ public class TestRecAsset {
 
         asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
         // set SCALABLE assets ++
+        asset.setReference(Crypto.getInstance().digest(asset.toBytes(false, false)));
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
         asset.insertToMap(db, 0l);
         key = asset.getKey(db);
 
         assetMovable = new AssetVenture(maker, "movable", icon, image, "...", 0, 8, 500l);
+        assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
 
     }
 
@@ -106,6 +108,7 @@ public class TestRecAsset {
 
         //CREATE ISSUE ASSET TRANSACTION
         Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, 0l);
+        issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
@@ -458,13 +461,13 @@ public class TestRecAsset {
             assertEquals(assetTransfer.getTimestamp(), parsedAssetTransfer.getTimestamp());
 
             //CHECK REFERENCE
-            //assertEquals(assetTransfer.getReference(), parsedAssetTransfer.getReference());
+            assertEquals(assetTransfer.getReference(), parsedAssetTransfer.getReference());
 
             //CHECK CREATOR
             assertEquals(assetTransfer.getCreator().getAddress(), parsedAssetTransfer.getCreator().getAddress());
 
             //CHECK FEE POWER
-            assertEquals(assetTransfer.getFee(), parsedAssetTransfer.getFee());
+            assertEquals(assetTransfer.getFeePow(), parsedAssetTransfer.getFeePow());
 
             //CHECK SIGNATURE
             assertEquals(true, Arrays.equals(assetTransfer.getSignature(), parsedAssetTransfer.getSignature()));
@@ -756,7 +759,7 @@ public class TestRecAsset {
             assertEquals(r_Send.getCreator().getAddress(), parsedAssetTransfer.getCreator().getAddress());
 
             //CHECK FEE POWER
-            assertEquals(r_Send.getFee(), parsedAssetTransfer.getFee());
+            assertEquals(r_Send.getFeePow(), parsedAssetTransfer.getFeePow());
 
             //CHECK SIGNATURE
             assertEquals(true, Arrays.equals(r_Send.getSignature(), parsedAssetTransfer.getSignature()));
