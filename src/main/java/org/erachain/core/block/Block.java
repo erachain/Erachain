@@ -503,7 +503,7 @@ import java.util.*;
     }
 
     /**
-     * Медленное создание и используется для Тестов
+     * Медленное создание и используется для Тестов (Старая версия)
      * @param creator
      * @param transactions
      * @param atBytes
@@ -556,9 +556,9 @@ import java.util.*;
         byte[] hashData;
         if (transactionCount == 0) {
             hashData = new byte[CREATOR_LENGTH + atBytesLength];
-            System.arraycopy(creator.getPublicKey(), 0, hashData, 0, SIGNATURE_LENGTH);
+            System.arraycopy(creator.getPublicKey(), 0, hashData, 0, CREATOR_LENGTH);
             if (atBytesLength > 0) {
-                System.arraycopy(atBytes, 0, hashData, SIGNATURE_LENGTH, atBytesLength);
+                System.arraycopy(atBytes, 0, hashData, CREATOR_LENGTH, atBytesLength);
             }
 
             // SAVE RAW
@@ -600,8 +600,13 @@ import java.util.*;
         }
 
         transactionsHash = Crypto.getInstance().digest(hashData);
-        byte[] hashTest = makeTransactionsHashForTests(creator.getPublicKey(), transactions, atBytes);
-        assert (Arrays.equals(transactionsHash, hashTest));
+        if (BlockChain.CHECK_BUGS > 0) {
+            byte[] hashTest = makeTransactionsHashForTests(creator.getPublicKey(), transactions, atBytes);
+            if (!Arrays.equals(transactionsHash, hashTest)) {
+                Long error = null;
+                error++;
+            }
+        }
 
     }
 
