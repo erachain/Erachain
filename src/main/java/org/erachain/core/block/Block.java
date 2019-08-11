@@ -1215,7 +1215,7 @@ import java.util.*;
                 rawTransactionsLength = pos - startRAW;
             } else {
                 // уже есть готовые сырые данные
-                data = Bytes.concat(data, rawTransactions);
+                System.arraycopy(rawTransactions, 0, data, pos, rawTransactionsLength);
             }
         }
 
@@ -1291,33 +1291,6 @@ import java.util.*;
 
         return length;
     }
-
-    public byte[] getProofHash() {
-        //newSig = sha256(prevSig || pubKey)
-        byte[] data = Bytes.concat(this.reference, creator.getPublicKey());
-
-        return Crypto.getInstance().digest(data);
-    }
-
-	/*
-	public static int getPreviousForgingHeightForIncomes(DLSet dcSet, Account creator, int height) {
-
-		// IF BLOCK in the MAP
-		int previousForgingHeight = creator.getForgingData(dcSet, height);
-		if (previousForgingHeight == -1) {
-			// IF BLOCK not inserted in MAP
-			previousForgingHeight = creator.getLastForgingData(dcSet);
-			if (previousForgingHeight == -1) {
-				// if it is first payment to this account
-				return height;
-			}
-		}
-
-		return previousForgingHeight;
-
-	}
-	 */
-
 
     //VALIDATE
 
