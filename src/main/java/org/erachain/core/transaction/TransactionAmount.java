@@ -446,7 +446,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         boolean wrong = true;
         
         // CHECK IF RECIPIENT IS VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(this.recipient.getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.recipient.getAddressBytes())) {
             if (true || height == 120000) {
                 wrong = true;
                 for (byte[] valid_address : BlockChain.VALID_ADDRESSES) {
