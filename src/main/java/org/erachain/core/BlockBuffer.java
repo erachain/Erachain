@@ -50,6 +50,7 @@ public class BlockBuffer extends Thread {
      */
     public void run() {
 
+        long currentTimestamp = System.currentTimeMillis();
         while (this.run && !this.error) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
@@ -71,7 +72,9 @@ public class BlockBuffer extends Thread {
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
                     // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
-                    this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 2));
+                    long timeSOT = Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 2)
+                            + currentTimestamp - System.currentTimeMillis();
+                    this.loadBlock(signature, timeSOT);
 
                     try {
                         Thread.sleep(1);
