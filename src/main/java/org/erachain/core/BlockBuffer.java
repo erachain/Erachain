@@ -41,12 +41,14 @@ public class BlockBuffer extends Thread {
     }
 
     public void run() {
-        while (this.run) {
+        while (this.run && !this.error) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
                 if (Controller.getInstance().isOnStopping()
                         || !peer.isUsed()) {
                     stopThread();
+                    return;
+                } else if (this.error) {
                     return;
                 }
 
@@ -66,6 +68,7 @@ public class BlockBuffer extends Thread {
                     }
 
                 }
+
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
@@ -166,7 +169,7 @@ public class BlockBuffer extends Thread {
         //
         block = this.blocks.get(signature).poll(Synchronizer.GET_BLOCK_TIMEOUT, TimeUnit.MILLISECONDS);
         if (block == null) {
-            throw new Exception("Block buffer error 3 =null");
+            throw new Exception("Block buffer error 3 = null");
         }
 
         return block;
