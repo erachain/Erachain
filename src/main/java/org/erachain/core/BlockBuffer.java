@@ -58,16 +58,20 @@ public class BlockBuffer extends Thread {
                     stopThread();
                     return;
                 } else if (this.error) {
+                    stopThread();
                     return;
                 }
 
                 byte[] signature = this.signatures.get(i);
+                if (signature == null) {
+                    return;
+                }
 
                 //CHECK IF WE HAVE ALREADY LOADED THIS BLOCK
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
                     // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
-                    this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 1));
+                    this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 2));
 
                     try {
                         Thread.sleep(1);
@@ -75,14 +79,12 @@ public class BlockBuffer extends Thread {
                         //ERROR SLEEPING
                         return;
                     }
-
                 }
-
             }
 
             // передых небольшой
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
                 return;
@@ -184,15 +186,11 @@ public class BlockBuffer extends Thread {
         if (this.blocks.containsKey(signature)) {
             this.blocks.remove(signature);
         }
-
     }
 
     public void stopThread() {
         try {
             this.run = false;
-
-            // CLEAR LOAD BlockingQueue
-            blocks = null;
 
             this.join();
 
