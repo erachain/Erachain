@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * класс для сохранения блоков при асинхронной скачки цепочки с другого пира
  */
 public class BlockBuffer extends Thread {
-    private static final int BUFFER_SIZE = 5 + (64 >> (Controller.HARD_WORK >> 1));
+    private static final int BUFFER_SIZE = 5 + (256 >> Controller.HARD_WORK);
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockBuffer.class);
     private List<byte[]> signatures;
     private Peer peer;
@@ -50,6 +50,7 @@ public class BlockBuffer extends Thread {
      */
     public void run() {
 
+        long currentTimestamp = System.currentTimeMillis();
         while (this.run && !this.error) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
@@ -71,7 +72,9 @@ public class BlockBuffer extends Thread {
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
                     // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
-                    this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 2));
+                    long timeSOT = Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 2)
+                            + currentTimestamp - System.currentTimeMillis();
+                    this.loadBlock(signature, timeSOT);
 
                     try {
                         Thread.sleep(1);
@@ -84,7 +87,7 @@ public class BlockBuffer extends Thread {
 
             // передых небольшой
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
                 return;
