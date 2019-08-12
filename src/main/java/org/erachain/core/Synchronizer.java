@@ -627,13 +627,12 @@ public class Synchronizer {
         try {
             response = (SignaturesMessage) peer.getResponse(message, GET_HEADERS_TIMEOUT);
         } catch (Exception e) {
-            peer.ban("Cannot retrieve headers");
+            peer.ban("Cannot retrieve headers, error SOT: " + GET_HEADERS_TIMEOUT + " " + e.getMessage());
             throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
         }
 
         if (response == null) {
-            // cannot retrieve headers
-            peer.ban("Cannot retrieve headers");
+            peer.ban("Cannot retrieve headers =null, SOT: " + GET_HEADERS_TIMEOUT);
             throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
         }
 

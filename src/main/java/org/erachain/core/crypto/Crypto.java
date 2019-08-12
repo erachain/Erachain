@@ -116,6 +116,43 @@ public class Crypto {
 
     }
 
+    public boolean isValidAddress(byte[] addressBytes) {
+
+        //CHECK BYTES
+        if (addressBytes.length != Account.ADDRESS_LENGTH) {
+            return false;
+        }
+
+        //CHECK VERSION
+        if (addressBytes[0] == ADDRESS_VERSION
+                || addressBytes[0] == AT_ADDRESS_VERSION) {
+
+            //REMOVE CHECKSUM
+            byte[] checkSum = new byte[4];
+            System.arraycopy(addressBytes, Account.ADDRESS_LENGTH - 4, checkSum, 0, 4);
+            //checkSum[3] = addressBytes[Account.ADDRESS_LENGTH - 1];
+            //checkSum[2] = addressBytes[Account.ADDRESS_LENGTH - 2];
+            //checkSum[1] = addressBytes[Account.ADDRESS_LENGTH - 3];
+            //checkSum[0] = addressBytes[Account.ADDRESS_LENGTH - 4];
+
+            //GENERATE ADDRESS CHECKSUM
+            byte[] shortBytes = new byte[Account.ADDRESS_LENGTH - 4];
+            System.arraycopy(addressBytes, 0, shortBytes, 0, Account.ADDRESS_LENGTH - 4);
+            byte[] digest = this.doubleDigest(shortBytes); // Arrays.copyOfRange(addressBytes, 0, 21));
+            byte[] checkSumTwo = new byte[4];
+            System.arraycopy(digest, 0, checkSumTwo, 0, 4);
+            //checkSumTwo[0] = digest[0];
+            //checkSumTwo[1] = digest[1];
+            //checkSumTwo[2] = digest[2];
+            //checkSumTwo[3] = digest[3];
+
+            //CHECK IF CHECKSUMS ARE THE SAME
+            return Arrays.equals(checkSum, checkSumTwo);
+        }
+
+        return false;
+    }
+
     public boolean isValidAddress(String address) {
         try {
             //BASE 58 DECODE

@@ -87,8 +87,10 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
     // height
     public void set(String address, Integer currentHeight, Integer currentForgingVolume) {
 
-        if (address.equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
-                && currentHeight > 291000 && currentHeight < 291050) {
+        if (false
+            //&& address.equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
+                //&& currentHeight > 291000 && currentHeight < 291050
+                ) {
             Tuple2<Integer, Integer> pointPrev = getLast(address);
             if (pointPrev != null) {
                 Tuple2<Integer, Integer> pointPrev1 = get(new Tuple2<>(address, pointPrev.a));
@@ -122,8 +124,10 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
             return;
         }
 
-        if (address.equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
-                && height > 291000 && height < 291056) {
+        if (false
+                //&& address.equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
+                //&& height > 291000 && height < 291056
+                ) {
             Tuple2<Integer, Integer> pointPrev = getLast(address);
             if (pointPrev != null) {
                 Tuple2<Integer, Integer> pointPrev1 = get(new Tuple2<>(address, pointPrev.a));
