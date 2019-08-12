@@ -133,16 +133,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
                         Synchronizer.GET_BLOCK_TIMEOUT >> 2);
             } catch (Exception e) {
-                ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                LOGGER.debug("peers response error " + peer);
+                LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
                 // remove HW from peers
                 ctrl.setWeightOfPeer(peer, null);
                 continue;
             }
 
             if (response == null) {
-                ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                LOGGER.debug("peers is null " + peer);
+                LOGGER.debug("peer RESPONSE is null " + peer);
                 // remove HW from peers
                 ctrl.setWeightOfPeer(peer, null);
                 continue;
