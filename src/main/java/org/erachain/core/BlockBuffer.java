@@ -44,7 +44,8 @@ public class BlockBuffer extends Thread {
         while (this.run) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
-                if (Controller.getInstance().isOnStopping()) {
+                if (Controller.getInstance().isOnStopping()
+                        || !peer.isUsed()) {
                     stopThread();
                     return;
                 }
@@ -56,6 +57,13 @@ public class BlockBuffer extends Thread {
                     //LOAD BLOCK
                     // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
                     this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 1));
+
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        //ERROR SLEEPING
+                        return;
+                    }
 
                 }
                 try {

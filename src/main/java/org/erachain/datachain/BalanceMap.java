@@ -10,7 +10,6 @@ import org.mapdb.Fun.Tuple4;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -47,8 +46,8 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
         }
     }
 
-    public BalanceMap(BalanceMap parent) {
-        super(parent, null);
+    public BalanceMap(BalanceMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

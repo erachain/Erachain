@@ -3,12 +3,8 @@ package org.erachain.datachain;
 //04/01 +- 
 
 import com.google.common.primitives.Longs;
-import org.erachain.database.DBMap;
 import org.mapdb.*;
-import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,8 +18,8 @@ public class TransactionFinalMapSigns extends DCMap<UUID, Long> {
         super(databaseSet, database);
     }
 
-    public TransactionFinalMapSigns(TransactionFinalMapSigns parent) {
-        super(parent, null);
+    public TransactionFinalMapSigns(TransactionFinalMapSigns parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

@@ -444,7 +444,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         int height = this.height > 0 ? this.height : this.getBlockHeightByParentOrLast(dcSet);
         boolean wrong = true;
-        
+
         // CHECK IF RECIPIENT IS VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(this.recipient.getAddress())) {
             if (true || height == 120000) {

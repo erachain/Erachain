@@ -16,8 +16,8 @@ public class IssuePersonMap extends IssueItemMap {
         super(databaseSet, database);
     }
 
-    public IssuePersonMap(IssuePersonMap parent) {
-        super(parent);
+    public IssuePersonMap(IssuePersonMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

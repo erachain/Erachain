@@ -72,7 +72,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         //READ RECIPIENT
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-        Account recipient = new Account(Base58.encode(recipientBytes));
+        Account recipient = new Account(recipientBytes);
         position += RECIPIENT_LENGTH;
 
         //READ KEY
@@ -88,7 +88,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         if (key < 0) {
             //READ OWNER
             byte[] ownerBytes = Arrays.copyOfRange(data, position, position + OWNER_LENGTH);
-            Account owner = new Account(Base58.encode(ownerBytes));
+            Account owner = new Account(ownerBytes);
             position += OWNER_LENGTH;
             return new GenesisTransferAssetTransaction(recipient, key, amount, owner);
         } else {

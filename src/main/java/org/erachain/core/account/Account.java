@@ -57,12 +57,26 @@ public class Account {
     int viewBalancePosition = 0;
 
     public Account(String address) {
-
-        // ///test address
-        assert (Base58.decode(address) instanceof byte[]);
         this.bytes = Base58.decode(address);
         this.shortBytes = Arrays.copyOfRange(this.bytes, 1, this.bytes.length - 4);
         this.address = address;
+    }
+
+    public Account(byte[] addressBytes) {
+        if (addressBytes.length == ADDRESS_LENGTH - 4) {
+            // AS SHORT BYTES
+            this.shortBytes = addressBytes;
+            this.bytes = Crypto.getInstance().getAddressFromShortBytes(addressBytes);
+        } else if (addressBytes.length == ADDRESS_LENGTH) {
+            // AS FULL 25 byres
+            this.bytes = addressBytes;
+            this.shortBytes = Arrays.copyOfRange(addressBytes, 1, this.bytes.length - 4);
+
+        } else {
+            assert(addressBytes.length == 25);
+        }
+
+        this.address = Base58.encode(addressBytes);
     }
 
     public static Account makeAccountFromShort(byte[] addressShort) {
@@ -508,7 +522,7 @@ public class Account {
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getAddress(), key);
-        if (BlockChain.DEVELOP_USE) {
+        if (true || BlockChain.DEVELOP_USE) {
             return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key))),
                     balance.b, balance.c, balance.d, balance.e);
@@ -525,7 +539,7 @@ public class Account {
                 .getAssetBalanceMap().get(getAddress(), key);
 
         if (actionType == TransactionAmount.ACTION_SEND) {
-            if (BlockChain.DEVELOP_USE) {
+            if (true || BlockChain.DEVELOP_USE) {
                 return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
             }
 

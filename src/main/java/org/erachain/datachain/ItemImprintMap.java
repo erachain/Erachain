@@ -28,8 +28,8 @@ public class ItemImprintMap extends ItemMap {
         );
     }
 
-    public ItemImprintMap(ItemImprintMap parent) {
-        super(parent);
+    public ItemImprintMap(ItemImprintMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     // type+name not initialized yet! - it call as Super in New

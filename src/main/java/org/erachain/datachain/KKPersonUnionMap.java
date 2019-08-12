@@ -22,7 +22,7 @@ public class KKPersonUnionMap extends KKMap {
 
     }
 
-    public KKPersonUnionMap(KKPersonUnionMap parent) {
-        super(parent);
+    public KKPersonUnionMap(KKPersonUnionMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 }
