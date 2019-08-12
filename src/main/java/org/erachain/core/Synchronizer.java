@@ -642,7 +642,6 @@ public class Synchronizer {
     static byte[] badCheck = Base58.decode("5SxUGJcgS29XA5rGGhTu9RnjSdoK4qtA8AgHEtANdLei11f386P6Net8MPPBVNKKJqkGKeHoAWg6N116fhCRrh2f");
     public void checkBadBlock(Peer peer) throws Exception {
 
-
         if (BlockChain.DEVELOP_USE) {
             List<byte[]> headersCheck = this.getBlockSignatures(badCheck, peer);
             if (!headersCheck.isEmpty()) {
