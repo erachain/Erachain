@@ -185,10 +185,7 @@ public class BlockBuffer extends Thread {
         try {
             this.run = false;
 
-            for( byte[] signature: signatures) {
-                BlockingQueue<Block> item = blocks.remove(signature);
-                item.add(null);
-            }
+            // CLEAR LOAD BlockingQueue
             blocks = null;
 
             this.join();
