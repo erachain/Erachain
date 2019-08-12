@@ -41,8 +41,8 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
         super(databaseSet, database);
     }
 
-    public AddressForging(AddressForging parent) {
-        super(parent, null);
+    public AddressForging(AddressForging parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

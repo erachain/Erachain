@@ -202,7 +202,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         byte[] data = new byte[]{TYPE_ID};
 
         //WRITE RECIPIENT
-        data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+        data = Bytes.concat(data, this.recipient.getAddressBytes());
 
         //WRITE KEY
         byte[] keyBytes = Longs.toByteArray(this.key);

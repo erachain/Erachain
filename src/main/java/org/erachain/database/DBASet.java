@@ -1,13 +1,9 @@
 package org.erachain.database;
 // 30/03 ++
 
-import javafx.beans.Observable;
-import org.erachain.settings.Settings;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
 import java.io.File;
-import java.util.Observer;
 
 //import org.mapdb.Serializer;
 
@@ -34,6 +30,10 @@ abstract public class DBASet implements IDB {
     public DBASet(File DATA_FILE, DB database, boolean withObserver, boolean dynamicGUI) {
         this(DATA_FILE, withObserver, dynamicGUI);
         this.database = database;
+    }
+
+    public DB getDatabase() {
+        return this.database;
     }
 
     public int getVersion() {

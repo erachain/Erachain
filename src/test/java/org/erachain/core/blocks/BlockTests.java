@@ -1,5 +1,6 @@
-package org.erachain.blocks;
+package org.erachain.core.blocks;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
@@ -51,6 +52,8 @@ public class BlockTests {
     Account recipient = new Account("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
     Transaction payment;
     //CREATE EMPTY MEMORY DATABASE
+
+    private Controller cntrl;
     private DCSet db;
     private BlockChain blockChain;
     private GenesisBlock gb;
@@ -60,13 +63,18 @@ public class BlockTests {
     private void init() {
 
         db = DCSet.createEmptyDatabaseSet();
+        cntrl = Controller.getInstance();
+        cntrl.initBlockChain(db);
+        blockChain = cntrl.getBlockChain();
+        gb = blockChain.getGenesisBlock();
+        //gb.process(db);
         try {
-            blockChain = new BlockChain(db);
+            //blockChain = new BlockChain(db);
         } catch (Exception e) {
         }
 
         blockGenerator = new BlockGenerator(db, blockChain, false);
-        gb = blockChain.getGenesisBlock();
+        //gb = blockChain.getGenesisBlock();
         gbTransactions = gb.getTransactions();
 
         generator.setLastTimestamp(gb.getTimestamp(), db);
@@ -137,7 +145,7 @@ public class BlockTests {
         List<Transaction> transactions = gb.getTransactions();
         transactions.add(new GenesisTransferAssetTransaction(
                 new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"), 1l, BigDecimal.valueOf(1)));
-        gb.setTransactions(transactions);
+        gb.setTransactionsForTests(transactions);
 
         // SIGNATURE invalid
         assertEquals(false, gb.isSignatureValid());
@@ -149,6 +157,7 @@ public class BlockTests {
     @Test
     public void validateGenesisBlock() {
 
+        db = DCSet.createEmptyDatabaseSet();
         gb = new GenesisBlock();
 
         //CHECK IF VALID
@@ -158,7 +167,7 @@ public class BlockTests {
         List<Transaction> transactions = gb.getTransactions();
         transactions.add(new GenesisTransferAssetTransaction(
                 new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"), 1l, BigDecimal.valueOf(-1000)));
-        gb.setTransactions(transactions);
+        gb.setTransactionsForTests(transactions);
 
         //CHECK IF INVALID
         assertEquals(false, gb.isValid(db, false));
@@ -214,6 +223,10 @@ public class BlockTests {
 
         //CHECK GENERATOR
         assertEquals(gb.getCreator().getAddress(), parsedBlock.getCreator().getAddress());
+
+        Transaction tx = gb.getTransaction(gb.getTransactionCount());
+        Transaction txParsed = parsedBlock.getTransaction(parsedBlock.getTransactionCount());
+        assertEquals(tx.getFee(), txParsed.getFee());
 
         //CHECK INSTANCE
         ////assertEquals(true, parsedBlock instanceof GenesisBlock);
@@ -332,7 +345,7 @@ public class BlockTests {
         transactions.add(payment);
 
         // SET TRANSACTIONS to BLOCK
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
 
         //CHECK IF SIGNATURE INVALID
         assertEquals(false, newBlock.isSignatureValid());
@@ -343,7 +356,7 @@ public class BlockTests {
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
         newBlock.sign(generator);
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
 
         ///CHECK IF SIGNATURE INVALID
         assertEquals(false, newBlock.isSignatureValid());
@@ -363,7 +376,7 @@ public class BlockTests {
         transactions.add(payment);
 
         //ADD TRANSACTION SIGNATURE
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
 
         //CHECK VALID TRANSACTION SIGNATURE
         assertEquals(false, newBlock.isSignatureValid());
@@ -383,7 +396,7 @@ public class BlockTests {
         transactions.add(payment);
 
         //ADD TRANSACTION SIGNATURE
-        newBlock.setTransactions(transactions);
+        newBlock.setTransactionsForTests(transactions);
         newBlock.sign(generator);
 
         //CHECK INVALID TRANSACTION SIGNATURE
@@ -395,12 +408,6 @@ public class BlockTests {
     @Test
     public void validateBlock() {
         init();
-        try {
-            gb.process(db);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
 
         //CREATE KNOWN ACCOUNT
         byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -430,12 +437,11 @@ public class BlockTests {
         //BigDecimal genBal = generator.getGeneratingBalance(db);
         BlockGenerator blockGenerator = new BlockGenerator(db, null, false);
         Block newBlock = blockGenerator.generateNextBlock(generator, gb,
-                orderedTransactions, 3,
+                orderedTransactions, 2,
                 1000, 1000l, 1000l);
 
-        //ADD TRANSACTION SIGNATURE
-        //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
-        newBlock.makeTransactionsHash();
+        // SET WIN VALUE and TARGET
+        newBlock.makeHeadMind(db);
 
         //CHECK IF VALID
         assertEquals(true, newBlock.isValid(db, false));
@@ -446,8 +452,16 @@ public class BlockTests {
                 orderedTransactions, 3,
                 1000, 1000l, 1000l);
 
+        invalidBlock.setReferenceForTests(new byte[Block.SIGNATURE_LENGTH]);
         invalidBlock.sign(generator);
 
+        //CHECK IF INVALID
+        assertEquals(false, invalidBlock.isValid(db, false));
+
+        //VRON NUMBER
+        invalidBlock = blockGenerator.generateNextBlock(generator, gb,
+                orderedTransactions, 4,
+                1000, 1000l, 1000l);
         //CHECK IF INVALID
         assertEquals(false, invalidBlock.isValid(db, false));
 
@@ -464,7 +478,7 @@ public class BlockTests {
         transactions.add(payment);
 
         //ADD TRANSACTION SIGNATURE
-        invalidBlock.setTransactions(transactions);
+        invalidBlock.setTransactionsForTests(transactions);
         invalidBlock.sign(generator);
 
         //CHECK IF INVALID
@@ -480,7 +494,7 @@ public class BlockTests {
         transactions.add(transaction);
 
         //ADD TRANSACTION SIGNATURE
-        invalidBlock.setTransactions(transactions);
+        invalidBlock.setTransactionsForTests(transactions);
         invalidBlock.sign(generator);
 
         //CHECK IF INVALID
@@ -541,7 +555,7 @@ public class BlockTests {
         transactions.add(payment2);
 
         //ADD TRANSACTION SIGNATURE
-        block.setTransactions(transactions);
+        block.setTransactionsForTests(transactions);
         block.sign(generator);
 
         //CONVERT TO BYTES
@@ -639,7 +653,7 @@ public class BlockTests {
         transactions.add(payment2);
 
         //ADD TRANSACTION SIGNATURE
-        block.setTransactions(transactions);
+        block.setTransactionsForTests(transactions);
 
         ////generator.setLastForgingData(db, block.getHeightByParent(db));
         generator.setForgingData(db, block.getHeight(), payment2.getAmount().intValue());

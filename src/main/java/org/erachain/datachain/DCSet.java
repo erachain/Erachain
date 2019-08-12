@@ -250,11 +250,11 @@ public class DCSet extends DBASet implements Observer {
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
 
-        this.addressForging = new AddressForging(parent.addressForging);
-        this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap);
-        this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap);
+        this.addressForging = new AddressForging(parent.addressForging, this);
+        this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
+        this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap, this);
         this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs);
-        this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap);
+        this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap, this);
         this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap);
         this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap);
         //this.kKPollStatusMap = new KKUnionPollMap(parent.kKUnionStatusMap);
