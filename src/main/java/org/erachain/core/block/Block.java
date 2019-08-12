@@ -1949,7 +1949,7 @@ import java.util.*;
                 int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
                 if (privousForgingPoint == null) {
                     if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                        if (BlockChain.DEVELOP_USE) {
+                        if (true || BlockChain.DEVELOP_USE) {
                             // запоминаем чтобы не было отказов в сборке блоков
                             account.setForgingData(dcSet, this.heightBlock - BlockChain.DEVELOP_FORGING_START,
                                     currentForgingBalance);
