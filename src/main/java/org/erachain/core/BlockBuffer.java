@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * класс для сохранения блоков при асинхронной скачки цепочки с другого пира
  */
 public class BlockBuffer extends Thread {
-    private static final int BUFFER_SIZE = 1 + (256 >> Controller.HARD_WORK);
+    private static final int BUFFER_SIZE = 5 + (64 >> (Controller.HARD_WORK >> 1));
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockBuffer.class);
     private List<byte[]> signatures;
     private Peer peer;
@@ -44,7 +44,12 @@ public class BlockBuffer extends Thread {
         this.start();
     }
 
+    /**
+     * берет с пира частями нужные блоки и повторяет запрос на блок
+     * и пока вся цепочка блоков не загружена по списку подписей
+     */
     public void run() {
+
         while (this.run && !this.error) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
@@ -75,8 +80,9 @@ public class BlockBuffer extends Thread {
 
             }
 
+            // передых небольшой
             try {
-                Thread.sleep(10);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 //ERROR SLEEPING
                 return;
