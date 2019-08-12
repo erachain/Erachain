@@ -37,6 +37,10 @@ public class BlockBuffer extends Thread {
         this.error = false;
         this.setName("Thread BlockBuffer - " + this.getId() + " for " + peer);
         this.blocks = new HashMap<byte[], BlockingQueue<Block>>(BUFFER_SIZE << 1, 1);
+
+        // Если в момент набора блков пир останвитьь то нужно чтобы этот буфер тоже почитили
+        peer.blockBuffer = this;
+
         this.start();
     }
 
@@ -180,6 +184,12 @@ public class BlockBuffer extends Thread {
     public void stopThread() {
         try {
             this.run = false;
+
+            for( byte[] signature: signatures) {
+                BlockingQueue<Block> item = blocks.remove(signature);
+                item.add(null);
+            }
+            blocks = null;
 
             this.join();
 
