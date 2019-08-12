@@ -1261,7 +1261,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         // CHECK CREATOR
-        if (!Crypto.getInstance().isValidAddress(this.creator.getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.creator.getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 

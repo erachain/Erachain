@@ -113,7 +113,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
     public int isValid(int asDeal, long flags) {
 
         //CHECK IF RECIPIENT IS VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(this.recipient.getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.recipient.getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 

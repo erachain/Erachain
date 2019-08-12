@@ -154,10 +154,18 @@ public class Crypto {
     }
 
     public boolean isValidAddress(String address) {
+
+        byte[] addressBytes;
+
         try {
             //BASE 58 DECODE
-            byte[] addressBytes = Base58.decode(address);
+            addressBytes = Base58.decode(address);
+        } catch (Exception e) {
+            //ERROR DECODING
+            return false;
+        }
 
+        if (false) {
             //CHECK BYTES
             if (addressBytes.length != Account.ADDRESS_LENGTH) {
                 return false;
@@ -187,10 +195,9 @@ public class Crypto {
             }
 
             return false;
-        } catch (Exception e) {
-            //ERROR DECODING
-            return false;
         }
+
+        return isValidAddress(addressBytes);
     }
 
     public byte[] sign(PrivateKeyAccount account, byte[] message) {
