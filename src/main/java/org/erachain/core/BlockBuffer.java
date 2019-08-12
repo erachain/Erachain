@@ -192,14 +192,15 @@ public class BlockBuffer extends Thread {
     }
 
     public void stopThread() {
-        try {
-            this.run = false;
 
-            this.join();
+        this.run = false;
+        LOGGER.debug("STOPPED");
+        ///try {
+            //// это тормозит синхронизатор this.join();
 
-        } catch (InterruptedException e) {
+        //} catch (InterruptedException e) {
             //INTERRUPTED
-        }
+        ///}
     }
 
 }
