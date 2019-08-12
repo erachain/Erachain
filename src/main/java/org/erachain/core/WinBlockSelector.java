@@ -21,7 +21,7 @@ public class WinBlockSelector extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WinBlockSelector.class);
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE ? 20 : 100;
+    private static final int QUEUE_LENGTH = 8 + (64 >> (Controller.HARD_WORK>>1));
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -74,7 +74,7 @@ public class WinBlockSelector extends MonitoredThread {
 
         if (!newBlock.isValidHead(dcSet)) {
             // то проверим заголовок
-            info = "Block[" + newBlock.toString() + "] HEAD is Invalid - ignore";
+            info = "Block HEAD is Invalid - ignore " + newBlock.toString();
             LOGGER.info(info);
             return;
         }

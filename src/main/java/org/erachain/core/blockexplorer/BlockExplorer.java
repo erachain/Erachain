@@ -460,7 +460,7 @@ public class BlockExplorer {
         ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("type", "blocks");
-            output.putAll(jsonQueryPages(Block.class, (int)start, pageSize));
+            output.putAll(jsonQueryPages(Block.BlockHead.class, (int)start, pageSize));
         } else if (info.getQueryParameters().containsKey("block")) {
             output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int)start));
         }
@@ -868,7 +868,11 @@ public class BlockExplorer {
 
         assetJSON.put("key", asset.getKey());
         assetJSON.put("name", asset.getName());
-        assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        } else {
+            assetJSON.put("description", asset.viewDescription());
+        }
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", asset.getQuantity());
         assetJSON.put("scale", asset.getScale());
@@ -876,7 +880,11 @@ public class BlockExplorer {
         assetJSON.put("key", asset.getKey());
         assetJSON.put("name", asset.getName());
         assetJSON.put("operations", orders.size() + trades.size());
-        assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        } else {
+            assetJSON.put("description", asset.viewDescription());
+        }
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
         assetJSON.put("scale", asset.getScale());
@@ -947,7 +955,11 @@ public class BlockExplorer {
             pairJSON.put("tradeAmountVolume", pair.getValue().f.toPlainString());
             pairJSON.put("asset", pair.getKey());
             pairJSON.put("assetName", assetWant.getName());
-            pairJSON.put("description", Lang.getInstance().translateFromLangObj(assetWant.viewDescription(), langObj));
+            if (assetWant.getKey() > 0 && assetWant.getKey() < 1000) {
+                pairJSON.put("description", Lang.getInstance().translateFromLangObj(assetWant.viewDescription(), langObj));
+            } else {
+                pairJSON.put("description", assetWant.viewDescription());
+            }
             pairsJSON.put(pair.getKey(), pairJSON);
         }
 
@@ -1175,8 +1187,6 @@ public class BlockExplorer {
 
         List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
         List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, true);
-
-        // Collections.reverse(ordersWant);
 
         List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 50);
 
@@ -1517,7 +1527,11 @@ public class BlockExplorer {
 
         assetJSON.put("key", asset.getKey());
         assetJSON.put("name", asset.getName());
-        assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
+        } else {
+            assetJSON.put("description", asset.viewDescription());
+        }
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
         assetJSON.put("scale", asset.getScale());
@@ -1784,10 +1798,10 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
 
-        Block lastBlock = getLastBlock();
+        Block.BlockHead lastBlockHead = getLastBlockHead();
 
-        output.put("height", lastBlock.getHeight());
-        output.put("timestamp", lastBlock.getTimestamp());
+        output.put("height", lastBlockHead.heightBlock);
+        output.put("timestamp", lastBlockHead.getTimestamp());
 
         //output.put("timezone", Settings.getInstance().getTimeZone());
         //output.put("timeformat", Settings.getInstance().getTimeFormat());
@@ -3188,7 +3202,7 @@ public class BlockExplorer {
                 block = Controller.getInstance().getBlockByHeight(dcSet, 1);
             }
         } else if (query.equals("last")) {
-            block = getLastBlock();
+            block = Controller.getInstance().getLastBlock();
         } else {
             try {
                 block = Controller.getInstance().getBlock(Base58.decode(query));
@@ -3362,15 +3376,15 @@ public class BlockExplorer {
     }
 
     public int getHeight() {
-        return dcSet.getBlockMap().size();
+        return dcSet.getBlocksHeadsMap().size();
     }
 
     public Tuple2<Integer, Long> getHWeightFull() {
         return Controller.getInstance().getBlockChain().getHWeightFull(dcSet);
     }
 
-    public Block getLastBlock() {
-        return dcSet.getBlockMap().last();
+    public Block.BlockHead getLastBlockHead() {
+        return dcSet.getBlocksHeadsMap().last();
     }
 
     //Секундомер с остановом(stopwatch). При создании "секундомер пошел"
@@ -3457,7 +3471,7 @@ public class BlockExplorer {
                     //out.put("reference", "--");
                     out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
 
-                    out.put("timestamp", dcSet.getBlockMap().get(transaction.getBlockHeight()).getTimestamp());
+                    out.put("timestamp", dcSet.getBlocksHeadsMap().get(transaction.getBlockHeight()).getTimestamp());
 
                     String message = txCalculated.getMessage();
                     String typeName = transaction.viewFullTypeName();

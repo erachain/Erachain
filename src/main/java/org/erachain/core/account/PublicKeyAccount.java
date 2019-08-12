@@ -21,7 +21,7 @@ public class PublicKeyAccount extends Account {
     protected byte[] publicKey;
 
     public PublicKeyAccount(byte[] publicKey) {
-        super(Crypto.getInstance().getAddress(publicKey));
+        super(Crypto.getInstance().getAddressBytes(publicKey));
         this.publicKey = publicKey;
     }
 

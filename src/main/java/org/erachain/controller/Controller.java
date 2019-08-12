@@ -127,7 +127,7 @@ public class Controller extends Observable {
     public static final int STATUS_NO_CONNECTIONS = 0;
     public static final int STATUS_SYNCHRONIZING = 1;
     public static final int STATUS_OK = 2;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Controller.class.getSimpleName());
 
     public static int HARD_WORK = 0;
     public boolean useGui = true;
@@ -440,13 +440,17 @@ public class Controller extends Observable {
     }
 
     public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
-        if (peerHWeight != null) {
+        if (hWeight != null) {
             peerHWeight.put(peer, hWeight);
         } else {
             peerHWeight.remove(peer);
         }
     }
 
+    /**
+     * set my getHWeightFull to PEER
+     * @param peer
+     */
     public void resetWeightOfPeer(Peer peer) {
         peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
     }
@@ -1989,6 +1993,7 @@ public class Controller extends Observable {
             }
         } catch (Exception e) {
             // PEER REMOVED WHILE ITERATING
+            LOGGER.error(e.getMessage(), e);
         }
 
         return new Tuple3<Integer, Long, Peer>(height, weight, maxPeer);

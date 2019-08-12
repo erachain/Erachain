@@ -90,7 +90,7 @@ public class RCalculated extends TransactionAmount {
 
         // READ RECIPIENT
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-        Account recipient = new Account(Base58.encode(recipientBytes));
+        Account recipient = new Account(recipientBytes);
         position += RECIPIENT_LENGTH;
 
         long key = 0;
@@ -163,7 +163,7 @@ public class RCalculated extends TransactionAmount {
         data = Bytes.concat(data, referenceBytes);
 
         // WRITE RECIPIENT
-        data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+        data = Bytes.concat(data, this.recipient.getAddressBytes());
 
         if (this.amount != null) {
 

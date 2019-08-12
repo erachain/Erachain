@@ -94,7 +94,7 @@ public class BuyNameTransaction extends Transaction {
 
         //READ SELLER
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + SELLER_LENGTH);
-        Account seller = new Account(Base58.encode(recipientBytes));
+        Account seller = new Account(recipientBytes);
         position += SELLER_LENGTH;
 
         //READ FEE POWER
@@ -164,7 +164,7 @@ public class BuyNameTransaction extends Transaction {
         data = Bytes.concat(data, this.nameSale.toBytes());
 
         //WRITE SELLER
-        data = Bytes.concat(data, Base58.decode(this.seller.getAddress()));
+        data = Bytes.concat(data, this.seller.getAddressBytes());
 
         //WRITE FEE POWER
         byte[] feePowBytes = new byte[1];

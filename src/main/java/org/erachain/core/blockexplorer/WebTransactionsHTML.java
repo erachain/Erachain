@@ -212,8 +212,14 @@ public class WebTransactionsHTML {
         GenesisIssueAssetTransaction assetIssue = (GenesisIssueAssetTransaction) transaction;
         AssetCls asset = (AssetCls) assetIssue.getItem();
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ": </b>" + asset.getName();
-        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ": </b>"
-                + Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj);
+        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ": </b>";
+
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            out += Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj);
+        } else {
+            out += asset.viewDescription();
+        }
+
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Quantity", langObj) + ": </b>" + asset.getQuantity().toString();
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Scale", langObj) + ": </b>" + Lang.getInstance().translateFromLangObj(asset.getScale() + "", langObj);
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Asset Type", langObj) + ": </b>" + Lang.getInstance().translateFromLangObj(asset.viewAssetType() + "", langObj);

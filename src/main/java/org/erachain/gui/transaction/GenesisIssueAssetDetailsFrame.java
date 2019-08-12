@@ -33,7 +33,12 @@ public class GenesisIssueAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
         //DESCRIPTION
         ++detailGBC.gridy;
-        JTextArea txtAreaDescription = new JTextArea(Lang.getInstance().translate(asset.viewDescription()));
+        JTextArea txtAreaDescription;
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            txtAreaDescription = new JTextArea(Lang.getInstance().translate(asset.viewDescription()));
+        } else {
+            txtAreaDescription = new JTextArea(asset.viewDescription());
+        }
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
         txtAreaDescription.setEditable(false);

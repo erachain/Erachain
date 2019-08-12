@@ -44,6 +44,8 @@ public class Sender extends MonitoredThread {
     private int out_flush_length;
     private long out_flush_time;
 
+    private long loggedPoint;
+
     public Sender(Peer peer) {
         this.peer = peer;
         this.setName("Sender-" + this.getId() + " for: " + peer.getName());
@@ -243,8 +245,9 @@ public class Sender extends MonitoredThread {
             return false;
 
         checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime - 3 > (bytes.length >> 3)
+        if (checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
+            loggedPoint = System.currentTimeMillis();
             LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
         }
 
