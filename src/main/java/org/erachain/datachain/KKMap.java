@@ -6,7 +6,6 @@ import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple5;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -57,8 +56,8 @@ public class KKMap extends DCMap<
 
     }
 
-    public KKMap(KKMap parent) {
-        super(parent, null);
+    public KKMap(KKMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 

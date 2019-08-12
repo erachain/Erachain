@@ -1,13 +1,9 @@
 package org.erachain.datachain;
 
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
-import org.erachain.core.crypto.Base58;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,8 +20,8 @@ public class ReferenceMap extends DCMap<byte[], Long> {
         super(databaseSet, database);
     }
 
-    public ReferenceMap(ReferenceMap parent) {
-        super(parent, null);
+    public ReferenceMap(ReferenceMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

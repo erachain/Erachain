@@ -32,8 +32,8 @@ public class ItemAssetMap extends ItemMap {
                 ObserverMessage.REMOVE_ASSET_TYPE, ObserverMessage.LIST_ASSET_TYPE);
     }
 
-    public ItemAssetMap(ItemAssetMap parent) {
-        super(parent);
+    public ItemAssetMap(ItemAssetMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     // type+name not initialized yet! - it call as Super in New

@@ -4,7 +4,6 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple4;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -34,8 +33,8 @@ public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
         super(databaseSet, database);
     }
 
-    public AddressPersonMap(AddressPersonMap parent) {
-        super(parent, null);
+    public AddressPersonMap(AddressPersonMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

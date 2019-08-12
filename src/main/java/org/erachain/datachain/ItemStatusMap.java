@@ -27,8 +27,8 @@ public class ItemStatusMap extends ItemMap {
         );
     }
 
-    public ItemStatusMap(ItemStatusMap parent) {
-        super(parent);
+    public ItemStatusMap(ItemStatusMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     // type+name not initialized yet! - it call as Super in New

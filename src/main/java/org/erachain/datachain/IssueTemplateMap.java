@@ -16,8 +16,8 @@ public class IssueTemplateMap extends IssueItemMap {
         super(databaseSet, database);
     }
 
-    public IssueTemplateMap(IssueTemplateMap parent) {
-        super(parent);
+    public IssueTemplateMap(IssueTemplateMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override

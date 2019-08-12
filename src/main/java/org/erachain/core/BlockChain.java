@@ -84,7 +84,7 @@ public class BlockChain {
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
     public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 5000: 15000;
-    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = DEVELOP_USE? 1 : 2; // проверить наше цепочку по силе с окружающими
+    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = Controller.HARD_WORK > 3 ? 1 : DEVELOP_USE? 2 : 1; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
@@ -95,14 +95,15 @@ public class BlockChain {
     public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
     public static final int MAX_REC_DATA_BYTES = 1 << 20; // MAX_BLOCK_SIZE_BYTES >>1;
 
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE<<3;
-    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
-
     // переопределим размеры по HARD
     public static final int MAX_BLOCK_SIZE_GEN = 10 * MAX_BLOCK_SIZE / (2 + Controller.HARD_WORK);
     public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN * 200;
 
+    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN<<3;
+    public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
+
     public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;
+
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
@@ -164,7 +165,7 @@ public class BlockChain {
         // TODO добавить потом
         Base58.decode("Xq48dimwhwkXRkFun6pSQFHDSmrDnNqpUbFMkvQHC26nAyoQ3Srip3gE42axNWi5cXSPfTX5yrFkK6R4Hinuq6V"), // 253554 - 1
 
-    };
+            };
 
     /*
      *  SEE in concrete TRANSACTIONS
@@ -277,7 +278,6 @@ public class BlockChain {
     public static final int GIFTED_COMPU_AMOUNT_FOR_PERSON = 250000; //GIFTED_COMPU_AMOUNT << 7;
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
 
-    //private int checkPoint = DEVELOP_USE?1:32400;
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
             DEVELOP_USE?289561 : 235267,
             Base58.decode(DEVELOP_USE?
@@ -630,7 +630,7 @@ public class BlockChain {
     public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
 
         if (forgingBalance < MIN_GENERATING_BALANCE) {
-                return 0l;
+            return 0l;
         }
 
         Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);

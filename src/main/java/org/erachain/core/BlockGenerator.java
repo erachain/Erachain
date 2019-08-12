@@ -580,7 +580,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     try {
                         while (bchain.getHeight(dcSet) >= this.orphanto
                             //    && bchain.getHeight(dcSet) > 157044
-                        ) {
+                            ) {
                             //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
                             //    long iii = 11;
                             //}
@@ -607,7 +607,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS
                             : BlockChain.FLUSH_TIMEPOINT)
                             - BlockChain.UNCONFIRMED_SORT_WAIT_MS
-                    ;
+                        ;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
@@ -659,8 +659,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) < NTP.getTime()
-                            || BlockChain.DEVELOP_USE && height < 100
-                            || height < 10)) {
+                                || BlockChain.DEVELOP_USE && height < 100
+                                || height < 10)) {
 
                         setForgingStatus(ForgingStatus.FORGING);
                     }
@@ -996,7 +996,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     continue;
 
                 if (false   // так как сейчас в начале цикла проверяем вокруг узла на более сильную цепочку даже
-                        // с той же высотой то тут не нуно делать провкеу на патовую ситуацмю
+                            // с той же высотой то тут не нуно делать провкеу на патовую ситуацмю
 
                         && timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0
                         && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
@@ -1104,7 +1104,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         // TARGET_WIN will be small
         if (status != Controller.STATUS_OK
             ///|| ctrl.isProcessingWalletSynchronize()
-        ) {
+                ) {
             setForgingStatus(ForgingStatus.FORGING_ENABLED);
             return;
         }

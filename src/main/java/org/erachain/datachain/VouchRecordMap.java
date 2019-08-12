@@ -4,7 +4,6 @@ package org.erachain.datachain;
 //import java.lang.reflect.Array;
 
 import org.erachain.database.DBMap;
-import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -12,7 +11,6 @@ import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.ObserverMessage;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +38,8 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
         }
     }
 
-    public VouchRecordMap(VouchRecordMap parent) {
-        super(parent, null);
+    public VouchRecordMap(VouchRecordMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     protected void createIndexes(DB database) {

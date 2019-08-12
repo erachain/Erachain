@@ -46,8 +46,8 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
         }
     }
 
-    public AutoIntegerByte(AutoIntegerByte parent) {
-        super(parent, null);
+    public AutoIntegerByte(AutoIntegerByte parent, DCSet dcSet) {
+        super(parent, dcSet);
 
         this.key = parent.size();
     }
