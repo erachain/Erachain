@@ -91,15 +91,16 @@ public class BlockChain {
 
     public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
     //public static final int GENERATING_MAX_BLOCK_TIME = 1000;
-    public static final int MAX_BLOCK_SIZE_BYTES = 1 << 24; //4 * 1048576;
+    public static final int MAX_BLOCK_SIZE_BYTES = 1 << 25; //4 * 1048576;
     public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
     public static final int MAX_REC_DATA_BYTES = 1 << 20; // MAX_BLOCK_SIZE_BYTES >>1;
 
     // переопределим размеры по HARD
-    public static final int MAX_BLOCK_SIZE_GEN = 10 * MAX_BLOCK_SIZE / (2 + Controller.HARD_WORK);
-    public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN * 200;
+    static private final int MAX_BLOCK_SIZE_GEN_TEMP = MAX_BLOCK_SIZE_BYTES / 100 * (5 * Controller.HARD_WORK + 10) ;
+    public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN_TEMP > MAX_BLOCK_SIZE_BYTES? MAX_BLOCK_SIZE_BYTES : MAX_BLOCK_SIZE_GEN_TEMP;
+    public static final int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE_BYTES_GEN >> 8;
 
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN<<3;
+    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN << 3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
 
     public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;
