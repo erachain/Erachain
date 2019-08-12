@@ -1,6 +1,7 @@
 package org.erachain.network;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockBuffer;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -39,6 +40,7 @@ public class Peer extends MonitoredThread {
     public Network network;
     private InetAddress address;
     public Socket socket;
+    public BlockBuffer blockBuffer;
 
     BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
 
@@ -654,6 +656,11 @@ public class Peer extends MonitoredThread {
      * @param message
      */
     public /* synchronized */ void ban(int banForMinutes, String message) {
+
+        if (blockBuffer != null) {
+            blockBuffer.stopThread();
+            blockBuffer = null;
+        }
 
         if (!runed) {
             if (banForMinutes > this.getBanMinutes())
