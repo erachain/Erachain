@@ -1368,7 +1368,7 @@ public class Controller extends Observable {
             }
         }
 
-        if (BlockChain.DEVELOP_USE) {
+        if (false && BlockChain.DEVELOP_USE) {
             try {
                 synchronizer.checkBadBlock(peer);
             } catch (Exception e) {
