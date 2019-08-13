@@ -74,7 +74,7 @@ public class BlockBuffer extends Thread {
                     // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
                     long timeSOT = Synchronizer.GET_BLOCK_TIMEOUT + i * (long)(Synchronizer.GET_BLOCK_TIMEOUT >> 2)
                             + currentTimestamp - System.currentTimeMillis();
-                    if (timeSOT > 600000) {
+                    if (timeSOT > 600000 || timeSOT < 1) {
                         timeSOT = 600000;
                     }
                     this.loadBlock(signature, timeSOT);
