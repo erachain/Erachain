@@ -354,14 +354,14 @@ public class Order implements Comparable<Order> {
             return "Done";
         } else {
 
-            if (DCSet.getInstance().getCompletedOrderMap().contains(id))
-                return "Canceled";
-
+            // сдесь быстрее поисек - меньше записей
             if (DCSet.getInstance().getOrderMap().contains(id)) {
-                if (fulfilledHave.signum() == 0)
-                    return "Active";
-                else
-                    return "Fulfilled";
+                return "Active";
+            }
+
+            // если тут уже нету
+            if (DCSet.getInstance().getCompletedOrderMap().contains(id)) {
+                return "Canceled";
             }
 
             return "Orphaned"; //"unconfirmed";
