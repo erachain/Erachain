@@ -555,6 +555,13 @@ import java.util.*;
 
         byte[] hashData;
         if (transactionCount == 0) {
+            // TODO: убрать в новой версии как ненужное - если трнзакций нету то не используем вообще
+            /**
+             * а на самом деле если нет трнзакций и AT_DATA пустая - а оана пустая
+             * то нет необходимости делать подпись на основе этого хэша -
+             * лучше его пустымх делать - и не использовать чтобы не тормозить лишний раз
+             * хотя когда блоки пустые особо и не тормозится
+             */
             hashData = new byte[CREATOR_LENGTH + atBytesLength];
             System.arraycopy(creator.getPublicKey(), 0, hashData, 0, CREATOR_LENGTH);
             if (atBytesLength > 0) {
@@ -1530,10 +1537,15 @@ import java.util.*;
         int transactionsSignaturesPos = 0;
 
         if (this.transactionCount == 0) {
-            // empty transactions - USE CREATOR for HASH
-            transactionsSignatures = new byte[CREATOR_LENGTH + atBytesLength];
-            System.arraycopy(creator.getPublicKey(), 0, transactionsSignatures, 0, CREATOR_LENGTH);
-            transactionsSignaturesPos += CREATOR_LENGTH;
+            /**
+             * см. ниже - нет необходимости ХЭШ проверять
+             */
+            if (false) {
+                // empty transactions - USE CREATOR for HASH
+                transactionsSignatures = new byte[CREATOR_LENGTH + atBytesLength];
+                System.arraycopy(creator.getPublicKey(), 0, transactionsSignatures, 0, CREATOR_LENGTH);
+                transactionsSignaturesPos += CREATOR_LENGTH;
+            }
 
         } else {
 
@@ -1791,21 +1803,27 @@ import java.util.*;
                 );
             }
 
-        }
 
-        // ADD AT_BYTES
-        if (atBytesLength > 0) {
-            System.arraycopy(atBytes, 0, transactionsSignatures, transactionsSignaturesPos, atBytesLength);
-        }
+            /**
+             * Только если есть транзакции тогда имеет смысл проверять их общий ХЭШ
+             * иначе - пиши туда что хочешь - он просто будет участвовать в подписи
+             * тогда можно разные подписи делать с его помощью?
+             * а может тогда иключить его если нет транзакций?
+             */
 
-        transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
-        if (!Arrays.equals(this.transactionsHash, transactionsSignatures)
-                // TODO: убрать в новой версии
-                && !(BlockChain.DEVELOP_USE && heightBlock > 11482 && heightBlock < 120000)) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
-                + " transactionCount: " + transactionCount
-                + (atBytesLength > 0? " atBytes: " + atBytesLength: ""));
-            return false;
+            // ADD AT_BYTES
+            if (atBytesLength > 0) {
+                System.arraycopy(atBytes, 0, transactionsSignatures, transactionsSignaturesPos, atBytesLength);
+            }
+
+            transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
+            if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
+                LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
+                        + " transactionCount: " + transactionCount
+                        + (atBytesLength > 0? " atBytes: " + atBytesLength: ""));
+                return false;
+            }
+
         }
 
         //BLOCK IS VALID
