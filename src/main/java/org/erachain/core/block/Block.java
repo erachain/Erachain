@@ -1538,7 +1538,7 @@ import java.util.*;
 
         if (this.transactionCount == 0) {
             /**
-             * см. ниже - нет необходимости ХЭШ проверять
+             * см. ниже - нет необходимости ХЭШ проверять для 0 транзакций - пиши сюда что хочешь
              */
             if (false) {
                 // empty transactions - USE CREATOR for HASH
