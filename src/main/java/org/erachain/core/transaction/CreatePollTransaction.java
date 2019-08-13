@@ -266,7 +266,7 @@ public class CreatePollTransaction extends Transaction {
         }
 
         //CHECK POLL CREATOR VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(this.poll.getCreator().getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.poll.getCreator().getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 

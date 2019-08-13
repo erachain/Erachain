@@ -178,7 +178,7 @@ public class SellNameTransaction extends Transaction {
         }
 
         //CHECK CREATOR
-        if (!Crypto.getInstance().isValidAddress(this.nameSale.getName(this.dcSet).getOwner().getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.nameSale.getName(this.dcSet).getOwner().getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 

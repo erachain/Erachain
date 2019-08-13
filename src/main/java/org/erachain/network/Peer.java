@@ -1,6 +1,7 @@
 package org.erachain.network;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockBuffer;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -34,11 +35,12 @@ public class Peer extends MonitoredThread {
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
-    private static int SOCKET_BUFFER_SIZE = 1024 << (8 + Controller.HARD_WORK);
+    private static int SOCKET_BUFFER_SIZE = 1024 << (10 + Controller.HARD_WORK);
     private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE >> 2;
     public Network network;
     private InetAddress address;
     public Socket socket;
+    public BlockBuffer blockBuffer;
 
     BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
 
@@ -654,6 +656,11 @@ public class Peer extends MonitoredThread {
      * @param message
      */
     public /* synchronized */ void ban(int banForMinutes, String message) {
+
+        if (blockBuffer != null) {
+            blockBuffer.stopThread();
+            blockBuffer = null;
+        }
 
         if (!runed) {
             if (banForMinutes > this.getBanMinutes())

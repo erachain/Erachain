@@ -260,7 +260,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         for (Payment payment : this.payments) {
             // CHECK IF RECIPIENT IS VALID ADDRESS
             if (!Crypto.getInstance().isValidAddress(
-                    payment.getRecipient().getAddress())) {
+                    payment.getRecipient().getAddressBytes())) {
                 return INVALID_ADDRESS;
             }
 

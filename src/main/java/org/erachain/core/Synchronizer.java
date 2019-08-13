@@ -31,7 +31,7 @@ import java.util.TreeMap;
  */
 public class Synchronizer {
 
-    public static final int GET_BLOCK_TIMEOUT = 10000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> (5 - (Controller.HARD_WORK >> 1)));
+    public static final int GET_BLOCK_TIMEOUT = 20000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> (6 - (Controller.HARD_WORK >> 1)));
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
     private static final int BYTES_MAX_GET = BlockChain.MAX_BLOCK_SIZE_BYTES << 1;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
@@ -627,13 +627,12 @@ public class Synchronizer {
         try {
             response = (SignaturesMessage) peer.getResponse(message, GET_HEADERS_TIMEOUT);
         } catch (Exception e) {
-            peer.ban("Cannot retrieve headers");
+            peer.ban("Cannot retrieve headers, error SOT: " + GET_HEADERS_TIMEOUT + " " + e.getMessage());
             throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
         }
 
         if (response == null) {
-            // cannot retrieve headers
-            peer.ban("Cannot retrieve headers");
+            peer.ban("Cannot retrieve headers =null, SOT: " + GET_HEADERS_TIMEOUT);
             throw new Exception("Failed to communicate with peer (retrieve headers) - response = null");
         }
 
@@ -642,7 +641,6 @@ public class Synchronizer {
 
     static byte[] badCheck = Base58.decode("5SxUGJcgS29XA5rGGhTu9RnjSdoK4qtA8AgHEtANdLei11f386P6Net8MPPBVNKKJqkGKeHoAWg6N116fhCRrh2f");
     public void checkBadBlock(Peer peer) throws Exception {
-
 
         if (BlockChain.DEVELOP_USE) {
             List<byte[]> headersCheck = this.getBlockSignatures(badCheck, peer);

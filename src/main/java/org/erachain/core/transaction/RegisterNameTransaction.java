@@ -187,7 +187,7 @@ public class RegisterNameTransaction extends Transaction {
         }
 
         //CHECK OWNER
-        if (!Crypto.getInstance().isValidAddress(this.name.getOwner().getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.name.getOwner().getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 

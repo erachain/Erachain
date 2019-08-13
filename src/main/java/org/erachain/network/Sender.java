@@ -1,4 +1,4 @@
-package org.erachain.network;
+ package org.erachain.network;
 // 30/03
 
 import org.erachain.controller.Controller;
@@ -28,7 +28,7 @@ public class Sender extends MonitoredThread {
     private final static boolean logPings = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 200 : 40;
+    private static final int QUEUE_LENGTH = 256 << (Controller.HARD_WORK >> 1);
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Peer peer;

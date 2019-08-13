@@ -220,7 +220,7 @@ public class MultiPaymentTransaction extends Transaction {
         //CHECK PAYMENTS
         for (Payment payment : this.payments) {
             //CHECK IF RECIPIENT IS VALID ADDRESS
-            if (!Crypto.getInstance().isValidAddress(payment.getRecipient().getAddress())) {
+            if (!Crypto.getInstance().isValidAddress(payment.getRecipient().getAddressBytes())) {
                 return INVALID_ADDRESS;
             }
 

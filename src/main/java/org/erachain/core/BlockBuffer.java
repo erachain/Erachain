@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * класс для сохранения блоков при асинхронной скачки цепочки с другого пира
  */
 public class BlockBuffer extends Thread {
-    private static final int BUFFER_SIZE = 1 + (64 >> Controller.HARD_WORK);
+    private static final int BUFFER_SIZE = 5 + (256 >> Controller.HARD_WORK);
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockBuffer.class);
     private List<byte[]> signatures;
     private Peer peer;
@@ -37,26 +37,47 @@ public class BlockBuffer extends Thread {
         this.error = false;
         this.setName("Thread BlockBuffer - " + this.getId() + " for " + peer);
         this.blocks = new HashMap<byte[], BlockingQueue<Block>>(BUFFER_SIZE << 1, 1);
+
+        // Если в момент набора блков пир останвитьь то нужно чтобы этот буфер тоже почитили
+        peer.blockBuffer = this;
+
         this.start();
     }
 
+    /**
+     * берет с пира частями нужные блоки и повторяет запрос на блок
+     * и пока вся цепочка блоков не загружена по списку подписей
+     */
     public void run() {
-        while (this.run) {
+
+        long currentTimestamp = System.currentTimeMillis();
+        while (this.run && !this.error) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
                 if (Controller.getInstance().isOnStopping()
                         || !peer.isUsed()) {
                     stopThread();
                     return;
+                } else if (this.error) {
+                    stopThread();
+                    return;
                 }
 
                 byte[] signature = this.signatures.get(i);
+                if (signature == null) {
+                    return;
+                }
 
                 //CHECK IF WE HAVE ALREADY LOADED THIS BLOCK
                 if (!this.blocks.containsKey(signature)) {
                     //LOAD BLOCK
                     // время ожидания увеличиваем по мере номера блока - он ведь на той тсроне синхронно нам будет посылаться
-                    this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT + i * (Synchronizer.GET_BLOCK_TIMEOUT >> 1));
+                    long timeSOT = Synchronizer.GET_BLOCK_TIMEOUT + i * (long)(Synchronizer.GET_BLOCK_TIMEOUT >> 2)
+                            + currentTimestamp - System.currentTimeMillis();
+                    if (timeSOT > 600000 || timeSOT < 1) {
+                        timeSOT = 600000;
+                    }
+                    this.loadBlock(signature, timeSOT);
 
                     try {
                         Thread.sleep(1);
@@ -64,16 +85,10 @@ public class BlockBuffer extends Thread {
                         //ERROR SLEEPING
                         return;
                     }
-
-                }
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    //ERROR SLEEPING
-                    return;
                 }
             }
 
+            // передых небольшой
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -151,7 +166,7 @@ public class BlockBuffer extends Thread {
 
             //CHECK IF ALREADY LOADED BLOCK
             //LOAD BLOCK
-            this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT >> 1);
+            this.loadBlock(signature, Synchronizer.GET_BLOCK_TIMEOUT);
 
             //GET BLOCK
             if (this.error) {
@@ -166,7 +181,7 @@ public class BlockBuffer extends Thread {
         //
         block = this.blocks.get(signature).poll(Synchronizer.GET_BLOCK_TIMEOUT, TimeUnit.MILLISECONDS);
         if (block == null) {
-            throw new Exception("Block buffer error 3 =null");
+            throw new Exception("Block buffer error 3 = null");
         }
 
         return block;
@@ -177,18 +192,18 @@ public class BlockBuffer extends Thread {
         if (this.blocks.containsKey(signature)) {
             this.blocks.remove(signature);
         }
-
     }
 
     public void stopThread() {
-        try {
-            this.run = false;
 
-            this.join();
+        this.run = false;
+        LOGGER.debug("STOPPED");
+        ///try {
+            //// это тормозит синхронизатор this.join();
 
-        } catch (InterruptedException e) {
+        //} catch (InterruptedException e) {
             //INTERRUPTED
-        }
+        ///}
     }
 
 }
