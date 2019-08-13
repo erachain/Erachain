@@ -77,6 +77,11 @@ public class VoteOnPollTransaction extends Transaction {
 
     //public static String getName() { return "Vote on Poll"; }
 
+    @Override
+    public boolean isWiped() {
+        return true;
+    }
+
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
         int test_len = BASE_LENGTH;
@@ -240,10 +245,6 @@ public class VoteOnPollTransaction extends Transaction {
         if (this.height > BlockChain.ITEM_POLL_FROM)
             return INVALID_TRANSACTION_TYPE;
 
-        if (true)
-            return VALIDATE_OK;
-
-
         //CHECK POLL LENGTH
         int pollLength = this.poll.getBytes(StandardCharsets.UTF_8).length;
         if (pollLength > 400 || pollLength < 10) {
@@ -281,8 +282,6 @@ public class VoteOnPollTransaction extends Transaction {
     //@Override
     @Override
     public void process(Block block, int asDeal) {
-        if (true)
-            return;
 
         //UPDATE CREATOR
         super.process(block, asDeal);
@@ -303,9 +302,6 @@ public class VoteOnPollTransaction extends Transaction {
     //@Override
     @Override
     public void orphan(Block block, int asDeal) {
-
-        if (true)
-            return;
 
         //UPDATE CREATOR
         super.orphan(block, asDeal);
