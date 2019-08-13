@@ -77,6 +77,11 @@ public class VoteOnPollTransaction extends Transaction {
 
     //public static String getName() { return "Vote on Poll"; }
 
+    @Override
+    public boolean isWiped() {
+        return true;
+    }
+
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
         int test_len = BASE_LENGTH;
@@ -277,6 +282,7 @@ public class VoteOnPollTransaction extends Transaction {
     //@Override
     @Override
     public void process(Block block, int asDeal) {
+
         //UPDATE CREATOR
         super.process(block, asDeal);
 
@@ -296,6 +302,7 @@ public class VoteOnPollTransaction extends Transaction {
     //@Override
     @Override
     public void orphan(Block block, int asDeal) {
+
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 
