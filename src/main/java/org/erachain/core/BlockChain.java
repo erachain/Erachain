@@ -77,13 +77,13 @@ public class BlockChain {
     public static final int MIN_GENERATING_BALANCE = 100;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
     //public static final int GENERATING_RETARGET = 10;
-    public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 32 : 288; // 300 PER DAY
+    public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 32 : 32; // 300 PER DAY
     public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 4);
     static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
-    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 5000: 15000;
+    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 1000: 5000;
     public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = Controller.HARD_WORK > 3 ? 1 : DEVELOP_USE? 2 : 1; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
@@ -180,7 +180,7 @@ public class BlockChain {
     //TESTNET
     //   1486444444444l
     //	 1487844444444   1509434273     1509434273
-    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1564996447333l;
+    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1565712729222l;
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
@@ -624,7 +624,7 @@ public class BlockChain {
     }
 
     public int getBlockOnTimestamp(long timestamp) {
-        long diff = timestamp = genesisTimestamp;
+        long diff = timestamp - genesisTimestamp;
         return (int) (diff / GENERATING_MIN_BLOCK_TIME_MS);
     }
 

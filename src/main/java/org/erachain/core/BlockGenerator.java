@@ -543,7 +543,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             SignaturesMessage response;
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 break;
             }
@@ -602,8 +602,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
                     timePointForGenerate = timePoint
-                            + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS
-                            : BlockChain.FLUSH_TIMEPOINT)
+                            + BlockChain.FLUSH_TIMEPOINT
                             - BlockChain.UNCONFIRMED_SORT_WAIT_MS
                         ;
 
@@ -798,7 +797,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     }
 
                                 }
-                                while (this.orphanto <= 0 && wait_step-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+                                while (this.orphanto <= 0 && wait_step-- > 0 && NTP.getTime()
+                                        < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS - BlockChain.FLUSH_TIMEPOINT);
                             }
 
                             if (this.orphanto > 0)
@@ -931,12 +931,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()) {
+                            if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS - BlockChain.FLUSH_TIMEPOINT < NTP.getTime()) {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша
-                                    Thread.sleep(BlockChain.DEVELOP_USE ? 500 : 5000);
+                                    Thread.sleep(1000);
                                 } catch (InterruptedException e) {
+                                    return;
                                 }
                             }
 
@@ -992,26 +993,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
                 if (timeUpdate > 0)
                     continue;
-
-                if (false   // так как сейчас в начале цикла проверяем вокруг узла на более сильную цепочку даже
-                            // с той же высотой то тут не нуно делать провкеу на патовую ситуацмю
-
-                        && timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0
-                        && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
-                    // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
-                    // если есть сильнее то сделаем откат у себя
-                    //logger.debug("try resolve PAT situation");
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                    }
-
-                    if (ctrl.isOnStopping()) {
-                        local_status = -1;
-                        return;
-                    }
-                    checkWeightPeers();
-                }
 
                 /// CHECK PEERS HIGHER
                 // так как в девелопе все гоняют свои цепочки то посмотреть самыю жирную а не длинную
