@@ -237,6 +237,11 @@ public class CreatePollTransaction extends Transaction {
 
         if (this.height > BlockChain.ITEM_POLL_FROM)
             return INVALID_TRANSACTION_TYPE;
+        else
+            // it DEPRECATED
+            if (true)
+                return VALIDATE_OK;
+
 
         //CHECK POLL NAME LENGTH
         int nameLength = this.poll.getName().getBytes(StandardCharsets.UTF_8).length;
