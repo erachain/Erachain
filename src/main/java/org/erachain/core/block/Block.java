@@ -1505,6 +1505,11 @@ import java.util.*;
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
+        if (heightBlock > 11482) {
+            // rro
+            Long test = null;
+        }
+
         // TRY CHECK HEAD
         if (!this.isValidHead(dcSet))
             return false;
@@ -1794,8 +1799,12 @@ import java.util.*;
         }
 
         transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
-        if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
+        if (!Arrays.equals(this.transactionsHash, transactionsSignatures)
+                // TODO: убрать в новой версии
+                && !(BlockChain.DEVELOP_USE && heightBlock > 11482 && heightBlock < 120000)) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
+                + " transactionCount: " + transactionCount
+                + (atBytesLength > 0? " atBytes: " + atBytesLength: ""));
             return false;
         }
 

@@ -306,6 +306,9 @@ public class CreatePollTransaction extends Transaction {
     //@Override
     @Override
     public void process(Block block, int asDeal) {
+        if (true)
+            return;
+
         //UPDATE CREATOR
         super.process(block, asDeal);
 
@@ -317,6 +320,9 @@ public class CreatePollTransaction extends Transaction {
     //@Override
     @Override
     public void orphan(Block block, int asDeal) {
+        if (true)
+            return;
+
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 
