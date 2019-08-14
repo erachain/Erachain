@@ -2156,10 +2156,6 @@ import java.util.*;
                     + "  timerUnconfirmedMap_delete: " + timerUnconfirmedMap_delete + "  timerFinalMap_set:" + timerFinalMap_set
                     + "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
 
-            long tickets = System.currentTimeMillis() - start;
-            LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
-                    + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
-
         }
 
         timerStart = System.currentTimeMillis();
@@ -2169,6 +2165,12 @@ import java.util.*;
         timerStart = System.currentTimeMillis();
         dcSet.getBlockMap().add(this);
         LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+
+        long tickets = System.currentTimeMillis() - start;
+        if (transactionCount > 0 || tickets > 10) {
+            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets * 0.001
+                    + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
+        }
 
     }
 
