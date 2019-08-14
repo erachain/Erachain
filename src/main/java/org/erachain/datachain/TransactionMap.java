@@ -282,11 +282,11 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         }
 
         long ticker = System.currentTimeMillis() - realTime;
-        if ( count > 0 && ticker / count > 1) {
+        if ( true || count > 0 && 10 * ticker / count > 1) {
             LOGGER.debug("CLEAR dead UTXs: " + ticker + " ms, for deleted: " + count);
         }
 
-        if (false && System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+        if (true && System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
             pointReset = System.currentTimeMillis();
             this.reset();
             ticker = System.currentTimeMillis() - pointReset;
