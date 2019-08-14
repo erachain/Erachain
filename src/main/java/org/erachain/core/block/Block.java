@@ -2016,14 +2016,10 @@ import java.util.*;
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
+        long timerStart;
         long start = System.currentTimeMillis();
 
         //ADD TO DB
-        long timerStart = System.currentTimeMillis();
-
-        LOGGER.debug("getBlocksHeadMap().set timer: " + (System.currentTimeMillis() - timerStart));
-
-        //this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
