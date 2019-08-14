@@ -180,7 +180,7 @@ public class PayDividendFrame extends JFrame {
             AssetCls assetToPay = Controller.getInstance().getAsset(assetKey);
 
             //BALANCES
-            SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances
+            SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances
                     = Controller.getInstance().getBalances(this.asset.getKey());
 
             //GET ACCOUNTS AND THEIR TOTAL BALANCE

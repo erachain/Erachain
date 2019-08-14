@@ -29,7 +29,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
     private int scale;
     private String[] columnNames = Lang.getInstance().translate(new String[] { "Account", "In own", "In debt", "In use", "On hand" });
     private Boolean[] column_AutuHeight = new Boolean[] { true, false };
-    private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
     
     public BalancesTableModel(AssetCls asset, int balanceIndex) {
         this.asset = asset;
@@ -78,7 +78,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
             return null;
         }
         
-        Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances
+        Pair<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances
                 .get(row);
         Account account = new Account(aRow.getA().a);
         

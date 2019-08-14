@@ -1862,9 +1862,9 @@ import java.util.*;
 
         if (BlockChain.ROBINHOOD_USE) {
             // find rich account
-            String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
+            byte[] rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
-            if (!rich.equals(this.creator.getAddress())) {
+            if (!this.creator.equals(rich)) {
                 emittedFee = this.blockHead.totalFee >> 1;
 
                 Account richAccount = new Account(rich);
@@ -1908,10 +1908,10 @@ import java.util.*;
 
         // TEST COMPU ORPHANs
         HashMap bals = new HashMap();
-        Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+        Collection<Tuple2<byte[], Long>> keys = dcSet.getAssetBalanceMap().getKeys();
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalNeg = BigDecimal.ZERO;
-        for (Tuple2<String, Long> key : keys) {
+        for (Tuple2<byte[], Long> key : keys) {
             if (key.b == 2l) {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
                         .getAssetBalanceMap().get(key);
@@ -1929,9 +1929,9 @@ import java.util.*;
         if (parentBalanses != null) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
             BigDecimal ballParent;
-            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            Collection<Tuple2<byte[], Long>> keys = dcSet.getAssetBalanceMap().getKeys();
             boolean error = false;
-            for (Tuple2<String, Long> key : keys) {
+            for (Tuple2<byte[], Long> key : keys) {
                 if (key.b == 2l) {
                     ball = dcSet.getAssetBalanceMap().get(key);
 
