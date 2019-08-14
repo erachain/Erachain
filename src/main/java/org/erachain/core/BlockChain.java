@@ -780,18 +780,26 @@ public class BlockChain {
                     + processTiming - transactionValidateTimingAverage) >> 5;
     }
 
+    private long pointProcessAverage;
     public void updateTXProcessTimingAverage(long processTiming, int counter) {
         if (processTiming < 999999999999l) {
             // при переполнении может быть минус
             // в микросекундах подсчет делаем
             processTiming = processTiming / 1000 / (Controller.BLOCK_AS_TX_COUNT + counter);
-            if (transactionProcessTimingCounter < 1 << 5) {
+            if (transactionProcessTimingCounter < 1 << 3) {
                 transactionProcessTimingCounter++;
                 transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
                         + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
             } else
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
-                        + processTiming - transactionProcessTimingAverage) >> 5;
+                if (System.currentTimeMillis() - pointProcessAverage > 10000) {
+                    pointProcessAverage = System.currentTimeMillis();
+                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 1)
+                            + processTiming - transactionProcessTimingAverage) >> 1;
+
+                } else {
+                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 4)
+                            + processTiming - transactionProcessTimingAverage) >> 4;
+                }
         }
     }
 
