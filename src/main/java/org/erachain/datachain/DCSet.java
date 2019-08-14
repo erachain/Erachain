@@ -424,6 +424,10 @@ public class DCSet extends DBASet implements Observer {
                  */
                 .make();
 
+        LOGGER.debug("try COMPACT");
+        database.compact();
+        LOGGER.debug("COMPACTED");
+
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
