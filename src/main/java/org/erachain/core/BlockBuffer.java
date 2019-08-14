@@ -29,6 +29,7 @@ public class BlockBuffer extends Thread {
     private boolean error;
     private Map<byte[], BlockingQueue<Block>> blocks;
     private boolean run = true;
+    private Controller cnt = Controller.getInstance();
 
     public BlockBuffer(List<byte[]> signatures, Peer peer) {
         this.signatures = signatures;
@@ -54,7 +55,7 @@ public class BlockBuffer extends Thread {
         while (this.run && !this.error) {
             for (int i = 0; i < this.signatures.size() && i < this.counter + BUFFER_SIZE; i++) {
 
-                if (Controller.getInstance().isOnStopping()
+                if (cnt.isOnStopping()
                         || !peer.isUsed()) {
                     stopThread();
                     return;
@@ -85,6 +86,14 @@ public class BlockBuffer extends Thread {
                         //ERROR SLEEPING
                         return;
                     }
+                }
+
+                // нужно немного стопорить иначе слишком часто перебор запросов идет
+                try {
+                    Thread.sleep(2);
+                } catch (InterruptedException e) {
+                    //ERROR SLEEPING
+                    return;
                 }
             }
 
