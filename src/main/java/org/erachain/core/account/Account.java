@@ -79,6 +79,10 @@ public class Account {
         this.address = Base58.encode(addressBytes);
     }
 
+    public static byte[] makeShortBytes(String address) {
+        return Arrays.copyOfRange(Base58.decode(address), 1, ADDRESS_LENGTH - 4);
+
+    }
     public static Account makeAccountFromShort(byte[] addressShort) {
 
         String address = Crypto.getInstance().getAddressFromShort(addressShort);
@@ -196,13 +200,13 @@ public class Account {
 
     }
 
-    public static Map<String, BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
-                                                                  Map<String, BigDecimal> values) {
+    public static Map<byte[], BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
+                                                                  Map<byte[], BigDecimal> values) {
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        Iterator<Tuple2<String, Long>> iterator = map.getIterator(0, true);
+        Iterator<Tuple2<byte[], Long>> iterator = map.getIterator(0, true);
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ballance;
 
-        Tuple2<String, Long> iteratorKey;
+        Tuple2<byte[], Long> iteratorKey;
         while (iterator.hasNext()) {
             iteratorKey = iterator.next();
             if (iteratorKey.b == key) {
@@ -220,7 +224,7 @@ public class Account {
 
     }
 
-    public static Map<String, BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<String, BigDecimal> values) {
+    public static Map<byte[], BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<byte[], BigDecimal> values) {
 
         OrderMap map = dcSet.getOrderMap();
         Iterator<Long> iterator = map.getIterator(0, true);
@@ -228,7 +232,7 @@ public class Account {
         while (iterator.hasNext()) {
             order = map.get(iterator.next());
             if (order.getHaveAssetKey() == key) {
-                String address = order.getCreator().getAddress();
+                byte[] address = order.getCreator().getShortAddressBytes();
                 values.put(address, values.get(address).add(order.getAmountHave()));
             }
         }
@@ -243,9 +247,9 @@ public class Account {
     }
 
     // top balance + orders values
-    public static String getRichWithForks(DCSet dcSet, long key) {
+    public static byte[] getRichWithForks(DCSet dcSet, long key) {
 
-        Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
+        Map<byte[], BigDecimal> values = new TreeMap<byte[], BigDecimal>();
 
         values = getKeyBalancesWithForks(dcSet, key, values);
 
@@ -253,9 +257,9 @@ public class Account {
         values = getKeyOrdersWithForks(dcSet, key, values);
 
         // search richest address
-        String rich = null;
+        byte[] rich = null;
         BigDecimal maxValue = BigDecimal.ZERO;
-        for (Map.Entry<String, BigDecimal> entry : values.entrySet()) {
+        for (Map.Entry<byte[], BigDecimal> entry : values.entrySet()) {
             BigDecimal value = entry.getValue();
             if (value.compareTo(maxValue) > 0) {
                 maxValue = value;
@@ -521,7 +525,7 @@ public class Account {
             key = -key;
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), key);
+                .getAssetBalanceMap().get(getShortAddressBytes(), key);
         if (BlockChain.DEVELOP_USE) {
             return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key))),
@@ -536,7 +540,7 @@ public class Account {
             key = -key;
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), key);
+                .getAssetBalanceMap().get(getShortAddressBytes(), key);
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             if (BlockChain.DEVELOP_USE) {
@@ -586,7 +590,7 @@ public class Account {
         */
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), absKey);
+                .getAssetBalanceMap().get(getShortAddressBytes(), absKey);
 
         boolean updateIncomed = !notUpdateIncomed;
 
@@ -627,14 +631,14 @@ public class Account {
                     balance.e);
         }
 
-        db.getAssetBalanceMap().set(getAddress(), absKey, balance);
+        db.getAssetBalanceMap().set(getShortAddressBytes(), absKey, balance);
 
         ////////////// DEBUG TOTAL COMPU
         // несотыковка из-за ордеров на бирже
         if (false && absKey == 2l && this.equals("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS")) {
-            Collection<Tuple2<String, Long>> addrs = db.getAssetBalanceMap().getKeys();
+            Collection<Tuple2<byte[], Long>> addrs = db.getAssetBalanceMap().getKeys();
             BigDecimal total = BigDecimal.ZERO;
-            for (Tuple2<String, Long> addr : addrs) {
+            for (Tuple2<byte[], Long> addr : addrs) {
                 if (addr.b == 2l) {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
                             db.getAssetBalanceMap().get(addr);
