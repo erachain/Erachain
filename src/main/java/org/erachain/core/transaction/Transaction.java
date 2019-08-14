@@ -709,11 +709,6 @@ public abstract class Transaction implements ExplorerJsonLine {
         return null;
     }
 
-    // for isValid - check reference value
-    public boolean isReferenced() {
-        return true;
-    }
-
     public abstract boolean hasPublicText();
 
     public int getJobLevel() {
@@ -1250,7 +1245,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
         if (asDeal > Transaction.FOR_MYPACK) {
             Long reference = this.creator.getLastTimestamp(dcSet);
-            if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0
+            if (reference.compareTo(this.timestamp) >= 0
                     && height > BlockChain.VERS_4_11) {
                 LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
                         + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
@@ -1445,9 +1440,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             // time
 
             // UPDATE REFERENCE OF SENDER
-            if (this.isReferenced())
-                // IT IS REFERENCED RECORD?
-                this.creator.setLastTimestamp(this.timestamp, this.dcSet);
+            this.creator.setLastTimestamp(this.timestamp, this.dcSet);
         }
 
     }

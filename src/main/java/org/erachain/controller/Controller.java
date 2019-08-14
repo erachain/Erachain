@@ -2288,9 +2288,10 @@ public class Controller extends Observable {
     }
 
     // by account addres + timestamp get signature
-    public byte[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
+    public Long getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
 
-        return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
+        //return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
+        return dcSet.getReferenceMap().get(Account.makeShortBytes(address));
     }
 
     public Transaction getTransaction(byte[] signature, DCSet database) {
