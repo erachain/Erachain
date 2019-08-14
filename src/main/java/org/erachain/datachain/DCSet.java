@@ -1316,7 +1316,8 @@ public class DCSet extends DBASet implements Observer {
         // найдем новый не созданный уже файл
         File dbFile;
         do {
-            dbFile = new File(Settings.getInstance().getDataDir(), "fork" + randFork.nextInt() + ".dat");
+            //dbFile = new File(Settings.getInstance().getDataDir(), "fork" + randFork.nextInt() + ".dat");
+            dbFile = new File("/datatemp", "fork" + randFork.nextInt() + ".dat");
         } while (dbFile.exists());
 
         dbFile.getParentFile().mkdirs();
