@@ -244,6 +244,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
      * @param timestamp
      * @param cutDeadTime
      */
+    protected long pointReset;
     public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
 
         Iterator<Long> iterator = this.getIterator(0, false);
@@ -266,6 +267,12 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                 break;
             }
         }
+
+        if (System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+            pointReset = System.currentTimeMillis();
+            this.reset();
+        }
+
     }
 
     @Override
