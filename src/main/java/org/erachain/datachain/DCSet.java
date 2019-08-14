@@ -73,7 +73,6 @@ public class DCSet extends DBASet implements Observer {
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
-    private AddressTimeSignatureMap addressTime_SignatureMap;
     private BlockMap blockMap;
     //private BlockCreatorMap blockCreatorMap;
     private BlockSignsMap blockSignsMap;
@@ -162,7 +161,6 @@ public class DCSet extends DBASet implements Observer {
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
-            this.addressTime_SignatureMap = new AddressTimeSignatureMap(this, database);
             this.nameMap = new NameMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
             this.orphanNameStorageMap = new OrphanNameStorageMap(this, database);
@@ -271,7 +269,6 @@ public class DCSet extends DBASet implements Observer {
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
 
-        this.addressTime_SignatureMap = new AddressTimeSignatureMap(parent.addressTime_SignatureMap, this);
         this.blockMap = new BlockMap(parent.blockMap, this);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
         this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
@@ -895,26 +892,7 @@ public class DCSet extends DBASet implements Observer {
     public ReferenceMap getReferenceMap() {
         return this.referenceMap;
     }
-
-    /**
-     * По адресу и времени найти подпись транзакции
-     * seek reference to tx_Parent by address
-     * // account.addres + tx1.timestamp -> <tx2.signature>
-     *     Ключ: адрес создателя + время создания или только адрес
-     *
-     *     Значение: подпись транзакции или подпись последней транзакции
-     *
-     *     Используется для поиска публичного ключа для данного создателя и для поиска записей в отчетах
-     *
-     *     TODO: заменить подпись на ссылку
-     *
-     * @return
-     */
-    public AddressTimeSignatureMap getAddressTime_SignatureMap() {
-        return this.addressTime_SignatureMap;
-    }
-
-
+    
     /**
      * Транзакции занесенные в цепочку
      *

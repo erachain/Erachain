@@ -1,6 +1,5 @@
 package org.erachain.datachain;
 
-import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
@@ -12,7 +11,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
-import javax.xml.crypto.KeySelector;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Map;
@@ -85,6 +83,7 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
         // - иначе она не сработает так как тут дерево с поиском
         this.assetKeyMap = database.createTreeMap("balances_key_asset")
                 .comparator(Fun.COMPARATOR)
+                //.valuesOutsideNodesEnable()
                 .makeOrGet();
 
         //BIND ASSET KEY

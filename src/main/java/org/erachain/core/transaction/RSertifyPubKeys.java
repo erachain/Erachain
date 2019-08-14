@@ -666,10 +666,12 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             db.getAddressPersonMap().addItem(address, itemA);
             db.getPersonAddressMap().addItem(this.key, address, itemP);
 
-            if (!db.getAddressTime_SignatureMap().contains(address)) {
+
+            if (!db.getReferenceMap().contains(publicAccount.getShortAddressBytes())) {
                 // for quick search public keys by address - use PUB_KEY from Person DATA owner
                 // used in - controller.Controller.getPublicKeyByAddress
-                db.getAddressTime_SignatureMap().set(address, this.signature);
+                db.getReferenceMap().set(
+                        publicAccount.getShortAddressBytes(), new long[]{timestamp, dbRef});
             }
 
         }

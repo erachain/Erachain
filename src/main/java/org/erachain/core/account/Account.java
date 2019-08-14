@@ -707,23 +707,23 @@ public class Account {
         return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(own, rent, hold);
     }
 
-    public Long getLastTimestamp() {
+    public long[] getLastTimestamp() {
         return this.getLastTimestamp(DCSet.getInstance());
     }
 
-    public Long getLastTimestamp(DCSet dcSet) {
+    public long[] getLastTimestamp(DCSet dcSet) {
         return dcSet.getReferenceMap().get(shortBytes);
     }
 
-    public void setLastTimestamp(Long timestamp, DCSet dcSet) {
+    public void setLastTimestamp(long[] timestamp, DCSet dcSet) {
 
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET CURRENT REFERENCE
-        Long reference = map.get(shortBytes);
+        long[] reference = map.get(shortBytes);
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
+        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp[0]));
 
         // set NEW LAST TIMESTAMP as REFERENCE
         map.set(keyTimestamp, reference);
@@ -737,19 +737,19 @@ public class Account {
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET LAST TIMESTAMP
-        Long timestamp = map.get(shortBytes);
+        long[] timestamp = map.get(shortBytes);
 
         if (timestamp == null)
-            timestamp = 0L;
+            timestamp = new long[]{0L, 0L};
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
+        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp[0]));
 
         // GET REFERENCE
         // DELETE TIMESTAMP - REFERENCE
-        Long reference = map.delete(keyTimestamp);
+        long[] reference = map.delete(keyTimestamp);
         if (reference == null)
-            reference = 0L;
+            reference = new long[]{0L, 0L};
 
         // SET OLD REFERENCE
         map.set(shortBytes, reference);

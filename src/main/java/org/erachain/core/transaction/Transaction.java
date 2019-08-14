@@ -16,7 +16,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.datachain.AddressTimeSignatureMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -1244,11 +1243,11 @@ public abstract class Transaction implements ExplorerJsonLine {
         // CHECK IF REFERENCE IS OK
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
         if (asDeal > Transaction.FOR_MYPACK) {
-            Long reference = this.creator.getLastTimestamp(dcSet);
-            if (reference.compareTo(this.timestamp) >= 0
+            long[] reference = this.creator.getLastTimestamp(dcSet);
+            if (reference[0] >= this.timestamp
                     && height > BlockChain.VERS_4_11) {
-                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
-                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
+                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
+                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                         + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
 
                 return INVALID_TIMESTAMP;
@@ -1428,19 +1427,9 @@ public abstract class Transaction implements ExplorerJsonLine {
                                 block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
 
             String creatorAddress = this.creator.getAddress();
-            AddressTimeSignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
-            if (!dbASmap.contains(creatorAddress)) {
-                // for quick search public keys by address - use PUB_KEY from Person DATA owner
-                // used in - controller.Controller.getPublicKeyByAddress
-                dbASmap.set(creatorAddress, signature); // for quick search
-                // public keys
-            }
-            dbASmap.set(creatorAddress, timestamp, signature); // for search
-            // org.erachain.records by
-            // time
 
             // UPDATE REFERENCE OF SENDER
-            this.creator.setLastTimestamp(this.timestamp, this.dcSet);
+            this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
         }
 
     }
@@ -1469,13 +1458,8 @@ public abstract class Transaction implements ExplorerJsonLine {
                         null, null);
 
             // UPDATE REFERENCE OF SENDER
-            if (this.isReferenced()) {
-                // IT IS REFERENCED RECORD?
-                // set last transaction signature for this ACCOUNT
-                this.creator.removeLastTimestamp(this.dcSet);
-            }
-
-            this.dcSet.getAddressTime_SignatureMap().delete(creator, timestamp);
+            // set last transaction signature for this ACCOUNT
+            this.creator.removeLastTimestamp(this.dcSet);
 
         }
 

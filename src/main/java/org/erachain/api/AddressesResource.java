@@ -95,14 +95,14 @@ public class AddressesResource {
         // GET ACCOUNT
         Account account = new Account(address);
 
-        Long lastTimestamp = account.getLastTimestamp();
+        long[] lastTimestamp = account.getLastTimestamp();
 
         // RETURN
 
         if (lastTimestamp == null) {
             return "false";
         } else {
-            return "" + lastTimestamp;
+            return "" + lastTimestamp[0];
         }
     }
 
@@ -125,9 +125,9 @@ public class AddressesResource {
         Controller cntrl = Controller.getInstance();
 
         DCSet db = DCSet.getInstance();
-        Long lastTimestamp = account.getLastTimestamp(db);
+        long[] lastTimestamp = account.getLastTimestamp(db);
         if (lastTimestamp != null) {
-            return "" + lastTimestamp;
+            return "" + lastTimestamp[0];
         }
 
         byte[] signature;
