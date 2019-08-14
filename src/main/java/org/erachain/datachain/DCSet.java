@@ -424,9 +424,11 @@ public class DCSet extends DBASet implements Observer {
                  */
                 .make();
 
-        LOGGER.debug("try COMPACT");
-        database.compact();
-        LOGGER.debug("COMPACTED");
+        if (Controller.getInstance().compactDConStart) {
+            LOGGER.debug("try COMPACT");
+            database.compact();
+            LOGGER.debug("COMPACTED");
+        }
 
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
@@ -1443,7 +1445,9 @@ public class DCSet extends DBASet implements Observer {
             LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%% actions:" + actions);
 
             this.database.commit();
-            if (System.currentTimeMillis() - poinCompact > 9999999) {
+
+            if (false && System.currentTimeMillis() - poinCompact > 9999999) {
+                // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
                 LOGGER.debug("try COMPACT");
                 this.database.compact();

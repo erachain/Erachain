@@ -181,6 +181,7 @@ public class Controller extends Observable {
     public boolean noUseWallet;
     public boolean noDataWallet;
     public boolean onlyProtocolIndexing;
+    public boolean compactDConStart;
     public boolean inMemoryDC;
 
     public static String getVersion() {
@@ -3415,6 +3416,11 @@ public class Controller extends Observable {
                 continue;
             }
 
+            if (arg.toLowerCase().equals("-compactdc")) {
+                compactDConStart = true;
+                continue;
+            }
+
             if (arg.toLowerCase().equals("-inmemory")) {
                 inMemoryDC = true;
                 continue;
@@ -3481,6 +3487,9 @@ public class Controller extends Observable {
 
         if (onlyProtocolIndexing)
             LOGGER.info("-only protocol indexing");
+
+        if (compactDConStart)
+            LOGGER.info("-compact DataChain on start");
 
         if (HARD_WORK > 0)
             LOGGER.info("-hard work = " + HARD_WORK);
