@@ -1422,6 +1422,7 @@ public class DCSet extends DBASet implements Observer {
         this.outUses();
     }
 
+    private long poinCompact;
     public void flush(int size, boolean hardFlush) {
 
         if (parent != null)
@@ -1437,6 +1438,12 @@ public class DCSet extends DBASet implements Observer {
             LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%% actions:" + actions);
 
             this.database.commit();
+            if (System.currentTimeMillis() - poinCompact > 9999999) {
+                poinCompact = System.currentTimeMillis();
+                LOGGER.debug("try COMPACT");
+                this.database.compact();
+                LOGGER.debug("COMPACTED");
+            }
 
             LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%%%  commit time: " + new Double((System.currentTimeMillis() - start)) * 0.001);
             this.actions = 0l;
