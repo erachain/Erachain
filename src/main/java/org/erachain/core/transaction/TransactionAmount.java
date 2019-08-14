@@ -434,6 +434,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     //@Override // - fee + balance - calculate here
+    private long pointLogg;
     public int isValid(int asDeal, boolean isPerson, long flags) {
         
         for (byte[] valid_item : VALID_REC) {
@@ -472,7 +473,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     && !BlockChain.DEVELOP_USE
                     ) {
 
-                if (height > 0 || BlockChain.CHECK_BUGS > 5) {
+                if (height > 0 && (BlockChain.CHECK_BUGS > 7
+                        || System.currentTimeMillis() - pointLogg > 1000)) {
+                    pointLogg = System.currentTimeMillis();
                     LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
                             + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
                             + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
