@@ -135,7 +135,6 @@ public class BlockChain {
      */
 
     public static final byte[][] VALID_ADDRESSES = new byte[][]{
-            Base58.decode("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3")
     };
 
     public static final byte[][] VALID_BAL = DEVELOP_USE ? new byte[][]{} :
@@ -169,9 +168,6 @@ public class BlockChain {
     public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 0;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = new String[]{
-            "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"
-            //"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
-            // "7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv",
     };
     // CHAIN
     public static final int CONFIRMS_HARD = 3; // for reference by signature
@@ -275,9 +271,6 @@ public class BlockChain {
         genesisTimestamp = genesisBlock.getTimestamp();
 
         // GENERAL TRUST
-        TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
-        TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
-        //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
 
 
         if (DEVELOP_USE) {
