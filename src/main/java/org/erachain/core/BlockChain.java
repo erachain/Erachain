@@ -971,16 +971,23 @@ public class BlockChain {
                     + processTiming - transactionWinnedTimingAverage) >> 5;
     }
 
+    private long pointValidateAverage;
     public void updateTXValidateTimingAverage(long processTiming, int counter) {
         // тут всегда Количество больше 0 приходит
         processTiming = processTiming / 1000 / counter;
-        if (transactionValidateTimingCounter < 1 << 5) {
+        if (transactionValidateTimingCounter < 1 << 3) {
             transactionValidateTimingCounter++;
             transactionValidateTimingAverage = ((transactionValidateTimingAverage * transactionValidateTimingCounter)
                     + processTiming - transactionValidateTimingAverage) / transactionValidateTimingCounter;
         } else
-            transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
-                    + processTiming - transactionValidateTimingAverage) >> 5;
+            if (System.currentTimeMillis() - pointValidateAverage > 10000) {
+                pointValidateAverage = System.currentTimeMillis();
+                transactionValidateTimingAverage = ((transactionValidateTimingAverage << 1)
+                        + processTiming - transactionValidateTimingAverage) >> 1;
+            } else {
+                transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
+                        + processTiming - transactionValidateTimingAverage) >> 5;
+            }
     }
 
     private long pointProcessAverage;
@@ -1000,8 +1007,8 @@ public class BlockChain {
                             + processTiming - transactionProcessTimingAverage) >> 1;
 
                 } else {
-                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 4)
-                            + processTiming - transactionProcessTimingAverage) >> 4;
+                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
+                            + processTiming - transactionProcessTimingAverage) >> 5;
                 }
         }
     }
