@@ -280,6 +280,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         if (true && System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
             pointReset = System.currentTimeMillis();
             this.reset();
+            this.databaseSet.getDatabase().compact();
             ticker = System.currentTimeMillis() - pointReset;
             if (ticker > 2999900) {
                 LOGGER.debug("reset UTXs: " + ticker + " ms");
