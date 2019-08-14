@@ -17,6 +17,7 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -250,38 +251,28 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         long realTime = System.currentTimeMillis();
         int count = 0;
 
-        Tuple2 ttt = new Tuple2<Long, Transaction>(1L,null);
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        Transaction transaction;
 
-        if (false) {
-            //FILTER ALL KEYS
-            //Collection<Tuple2> keys = ((BTreeMap<Long, Transaction>) map).tailMap(
-                    //new Tuple2<Long, Transaction>(timestamp - BlockChain.UNCONFIRMED_DEADTIME_MS, null), false);
-            //        ttt, false);
-        } else {
+        timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 
-            Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-            Transaction transaction;
-
-            timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
-
-            while (iterator.hasNext()) {
-                Long key = iterator.next();
-                transaction = this.map.get(key);
-                long deadline = transaction.getDeadline();
-                if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                        || ((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
-                        || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                        || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                    this.delete(key);
-                    count++;
-                } else {
-                    break;
-                }
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            transaction = this.map.get(key);
+            long deadline = transaction.getDeadline();
+            if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
+                    || ((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
+                    || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                    || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                this.delete(key);
+                count++;
+            } else {
+                break;
             }
         }
 
         long ticker = System.currentTimeMillis() - realTime;
-        if ( true || count > 0 && 10 * ticker / count > 1) {
+        if ( ticker > 1000 || count > 0 && ticker / count > 1) {
             LOGGER.debug("CLEAR dead UTXs: " + ticker + " ms, for deleted: " + count);
         }
 
@@ -289,7 +280,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             pointReset = System.currentTimeMillis();
             this.reset();
             ticker = System.currentTimeMillis() - pointReset;
-            if (ticker > 1000) {
+            if (ticker > 2999900) {
                 LOGGER.debug("reset UTXs: " + ticker + " ms");
             }
         }
