@@ -37,6 +37,7 @@ public class Settings {
     //DATA
     public static final String DEFAULT_DATA_DIR = "datachain";
     public static final String DEFAULT_LOCAL_DIR = "datalocal";
+    public static final String DEFAULT_DATATEMP_DIR = "datatemp";
     public static final String DEFAULT_WALLET_DIR = "walletKeys";
     private static final String DEFAULT_DATAWALET_DIR = "dataWallet";
     public static final String DEFAULT_BACKUP_DIR = "backup";
@@ -307,6 +308,10 @@ public class Settings {
 
     public String getLocalDir() {
         return this.getUserPath() + DEFAULT_LOCAL_DIR;
+    }
+
+    public String getDataTempDir() {
+        return this.getUserPath() + DEFAULT_DATATEMP_DIR;
     }
 
     public String getLangDir() {
