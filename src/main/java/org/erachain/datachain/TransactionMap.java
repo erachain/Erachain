@@ -247,30 +247,51 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     protected long pointReset;
     public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
 
-        Iterator<Long> iterator = this.getIterator(0, false);
-        Transaction transaction;
-
         long realTime = System.currentTimeMillis();
+        int count = 0;
 
-        timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+        Tuple2 ttt = new Tuple2<Long, Transaction>(1L,null);
 
-        while (iterator.hasNext()) {
-            Long key = iterator.next();
-            transaction = this.map.get(key);
-            long deadline = transaction.getDeadline();
-            if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                    || ((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
-                    || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                    || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                this.delete(key);
-            } else {
-                break;
+        if (false) {
+            //FILTER ALL KEYS
+            //Collection<Tuple2> keys = ((BTreeMap<Long, Transaction>) map).tailMap(
+                    //new Tuple2<Long, Transaction>(timestamp - BlockChain.UNCONFIRMED_DEADTIME_MS, null), false);
+            //        ttt, false);
+        } else {
+
+            Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+            Transaction transaction;
+
+            timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                transaction = this.map.get(key);
+                long deadline = transaction.getDeadline();
+                if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
+                        || ((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
+                        || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                        || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                    this.delete(key);
+                    count++;
+                } else {
+                    break;
+                }
             }
         }
 
-        if (System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+        long ticker = System.currentTimeMillis() - realTime;
+        if ( count > 0 && ticker / count > 1) {
+            LOGGER.debug("CLEAR dead UTXs: " + ticker + " ms, for deleted: " + count);
+        }
+
+        if (false && System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
             pointReset = System.currentTimeMillis();
             this.reset();
+            ticker = System.currentTimeMillis() - pointReset;
+            if (ticker > 1000) {
+                LOGGER.debug("reset UTXs: " + ticker + " ms");
+            }
         }
 
     }
