@@ -251,13 +251,16 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         long realTime = System.currentTimeMillis();
         int count = 0;
 
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        /////Iterator<Map.Entry<Long, Transaction>> iteratorMap = map.entrySet().iterator();
+
+        //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
         Transaction transaction;
 
         timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 
         while (iterator.hasNext()) {
-            Long key = iterator.next();
+            Long key = iterator.next().b;
             transaction = this.map.get(key);
             long deadline = transaction.getDeadline();
             if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
