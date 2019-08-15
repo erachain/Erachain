@@ -511,7 +511,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         //LOGGER.debug("get ITERATOR");
         Iterator<Long> iterator = this.getIterator(indexID, descending);
-        //LOGGER.debug("get ITERATOR - DONE");
+        //LOGGER.debug("get ITERATOR - DONE"); / for merge
 
         Transaction transaction;
         for (int i = 0; i < count; i++) {
