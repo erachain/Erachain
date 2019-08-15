@@ -257,15 +257,18 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
         Transaction transaction;
 
-        timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+        timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS << (5 - Controller.HARD_WORK >> 1);
 
         while (iterator.hasNext()) {
             Long key = iterator.next().b;
             transaction = this.map.get(key);
             long deadline = transaction.getDeadline();
             if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                    || ((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
-                    || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                    || ((Controller.HARD_WORK > 3
+                            || cutDeadTime)
+                                    && deadline < timestamp)
+                    || Controller.HARD_WORK <= 3
+                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                     || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                 this.delete(key);
                 count++;
@@ -275,17 +278,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         }
 
         long ticker = System.currentTimeMillis() - realTime;
-        if ( ticker > 1000 || count > 0 && ticker / count > 1) {
+        if ( ticker > 1000 || count > 0) {
             LOGGER.debug("CLEAR dead UTXs: " + ticker + " ms, for deleted: " + count);
-        }
-
-        if (true && System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
-            pointReset = System.currentTimeMillis();
-            this.reset();
-            ticker = System.currentTimeMillis() - pointReset;
-            if (ticker > 2999900) {
-                LOGGER.debug("reset UTXs: " + ticker + " ms");
-            }
         }
 
     }
@@ -315,6 +309,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public Transaction delete(byte[] signature) {
         return this.delete(Longs.fromByteArray(signature));
+    }
+
+
+    public long totalDeleted = 0;
+    public Transaction delete(Long key) {
+        totalDeleted++;
+        return super.delete(key);
     }
 
     public boolean contains(byte[] signature) {

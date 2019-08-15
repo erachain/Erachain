@@ -238,6 +238,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         this.setMonitorStatusBefore("getUnconfirmedTransactions");
 
+        long testTime = 0;
         while (iterator.hasNext()) {
 
             if (ctrl.isOnStopping()) {
@@ -252,6 +253,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             Transaction transaction = map.get(iterator.next());
+
+            if (BlockChain.CHECK_BUGS > 7) {
+                LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
+                if (testTime > transaction.getTimestamp()) {
+                    LOGGER.error(" ERROR testTIME " + new Timestamp(testTime));
+                    testTime = transaction.getTimestamp();
+                }
+            }
 
             if (transaction.getTimestamp() > timestamp)
                 break;
@@ -273,7 +282,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
                     needRemoveInvalids.add(transaction.getSignature());
-                    transaction.isValid(Transaction.FOR_NETWORK, 0l);
+                    if (BlockChain.CHECK_BUGS > 1) {
+                        LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0l));
+                    }
                     continue;
                 }
 
@@ -314,7 +325,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         if (newBlockDC != null )
             newBlockDC.close();
 
-        LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
+        LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
+                + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size());
 
         this.setMonitorStatusAfter();
 
@@ -511,7 +523,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long timeToPing = 0;
         long timeTmp;
         long timePoint = 0;
-        long timePointForGenerate = 0;
+        long timePointForValidTX = 0;
+        int diffBroadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
         long flushPoint = 0;
         long timeUpdate = 0;
         int shift_height = 0;
@@ -600,16 +613,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
-                    timePointForGenerate = timePoint
-                            //+ BlockChain.FLUSH_TIMEPOINT
-                            - BlockChain.UNCONFIRMED_SORT_WAIT_MS
-                        ;
+                    timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
                     this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoit);
 
-                    flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
+                    flushPoint = timePoint + BlockChain.FLUSH_TIMEPOINT;
                     this.solvingReference = null;
                     local_status = 0;
 
@@ -746,6 +756,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
                         }
 
+                        if (BlockChain.CHECK_BUGS > 7) {
+                            Tuple2<List<Transaction>, Integer> unconfirmedTransactions
+                                    = getUnconfirmedTransactions(height, timePointForValidTX,
+                                    bchain, winned_winValue);
+                        }
+
                         if (acc_winner != null) {
 
                             if (ctrl.isOnStopping()) {
@@ -754,7 +770,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
 
                             Tuple2<List<Transaction>, Integer> unconfirmedTransactions
-                                    = getUnconfirmedTransactions(height, timePointForGenerate,
+                                    = getUnconfirmedTransactions(height, timePointForValidTX,
                                             bchain, winned_winValue);
 
                             wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
@@ -762,8 +778,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
 
                             // сдвиг на заранее - только на 1/4 максимум
-                            if (wait_new_block_broadcast < BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2) {
-                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
+                            if (wait_new_block_broadcast < diffBroadcast) {
+                                wait_new_block_broadcast = diffBroadcast;
                             } else if (wait_new_block_broadcast > BlockChain.FLUSH_TIMEPOINT) {
                                 wait_new_block_broadcast = BlockChain.FLUSH_TIMEPOINT;
                             }
@@ -985,7 +1001,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         if (needRemoveInvalids != null) {
                             clearInvalids();
                         } else {
-                            checkForRemove(timePointForGenerate);
+                            checkForRemove(timePointForValidTX);
                             clearInvalids();
                         }
                     }
@@ -995,8 +1011,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////// UPDATE ////////////////////
 
-                timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
-                if (timeUpdate > 0)
+                if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2)
+                        > NTP.getTime())
                     continue;
 
                 /// CHECK PEERS HIGHER

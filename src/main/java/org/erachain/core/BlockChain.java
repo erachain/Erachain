@@ -39,7 +39,7 @@ public class BlockChain {
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
 
-    static final public int CHECK_BUGS = 0;
+    static final public int CHECK_BUGS = 5;
 
     /**
      * если задан - первое подключение к нему
@@ -79,7 +79,7 @@ public class BlockChain {
     //public static final int GENERATING_RETARGET = 10;
     public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 32 : 32; // 300 PER DAY
     public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
-    public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 4);
+    public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 3);
     static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
