@@ -715,7 +715,7 @@ public class Account {
         return dcSet.getReferenceMap().get(shortBytes);
     }
 
-    public void setLastTimestamp(long[] timestamp, DCSet dcSet) {
+    public void setLastTimestamp(long[] currentPoint, DCSet dcSet) {
 
         ReferenceMap map = dcSet.getReferenceMap();
 
@@ -723,13 +723,15 @@ public class Account {
         long[] reference = map.get(shortBytes);
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp[0]));
+        byte[] keyCurrentPoint = Bytes.concat(shortBytes, Longs.toByteArray(currentPoint[0]));
 
-        // set NEW LAST TIMESTAMP as REFERENCE
-        map.set(keyTimestamp, reference);
+        if (reference != null) {
+            // set NEW LAST TIMESTAMP as REFERENCE
+            map.set(keyCurrentPoint, reference);
+        }
 
         // SET NEW REFERENCE
-        map.set(shortBytes, timestamp);
+        map.set(shortBytes, currentPoint);
     }
 
     public void removeLastTimestamp(DCSet dcSet) {
@@ -737,22 +739,23 @@ public class Account {
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET LAST TIMESTAMP
-        long[] timestamp = map.get(shortBytes);
+        long[] lastPoint = map.get(shortBytes);
 
-        if (timestamp == null)
-            timestamp = new long[]{0L, 0L};
+        if (lastPoint == null)
+            return;
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp[0]));
+        byte[] keyPrevPoint = Bytes.concat(shortBytes, Longs.toByteArray(lastPoint[0]));
 
         // GET REFERENCE
         // DELETE TIMESTAMP - REFERENCE
-        long[] reference = map.delete(keyTimestamp);
-        if (reference == null)
-            reference = new long[]{0L, 0L};
-
-        // SET OLD REFERENCE
-        map.set(shortBytes, reference);
+        long[] reference = map.delete(keyPrevPoint);
+        if (reference == null) {
+            map.delete(shortBytes);
+        } else {
+            // SET OLD REFERENCE
+            map.set(shortBytes, reference);
+        }
     }
 
     // TOSTRING
