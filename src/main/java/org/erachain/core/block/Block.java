@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -1431,9 +1432,13 @@ import java.util.*;
         long thisTimestamp = NTP.getTime();
         //logger.debug("*** Block[" + height + "] " + new Timestamp(myTime));
 
-        if (blockTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > thisTimestamp) {
+        // необходимо разрешить более ранюю сборку - так чтобы мой собственный блок можно было собрать заранее
+        // и потом его провалидировать и послать куда подальше
+        // свой блок собирается аккурат мо моему NTP.getTime() и поэтому нет смысла вносить большие задержки от смещения мирового
+        // однако если блок прилетел из-вне то мещения мировые могут его сделать невалидными и норм
+        if (blockTime - 100 > thisTimestamp) {
             LOGGER.debug("*** Block[" + this.heightBlock + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
-                    + " \n " + " diff sec: " + (blockTime - thisTimestamp) / 1000);
+                    + " \n Block time: " + new Timestamp(blockTime) + " -- NTP: " + new Timestamp(thisTimestamp));
             return false;
         }
 
