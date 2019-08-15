@@ -884,8 +884,6 @@ public class Synchronizer {
                 }
             } finally {
 
-                dcSet.rollback();
-
                 if (cnt.isOnStopping()) {
                     // was BREAK - try ROLLBACK
                     dcSet.rollback();
