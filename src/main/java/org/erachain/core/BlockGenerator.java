@@ -213,6 +213,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
 
+        Timestamp timestampPoit = new Timestamp(timestamp);
+        LOGGER.debug("* * * * * COLLECT TRANSACTIONS on " + timestampPoit);
+
         long start = System.currentTimeMillis();
 
         //CREATE FORK OF GIVEN DATABASE
@@ -598,7 +601,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
                     timePointForGenerate = timePoint
-                            + BlockChain.FLUSH_TIMEPOINT
+                            //+ BlockChain.FLUSH_TIMEPOINT
                             - BlockChain.UNCONFIRMED_SORT_WAIT_MS
                         ;
 
@@ -637,8 +640,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // is WALLET
                 if (ctrl.doesWalletExists()) {
 
-
-                    if (timePoint + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS > NTP.getTime()) {
+                    if (timePoint > NTP.getTime()) {
                         continue;
                     }
 
@@ -751,6 +753,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 return;
                             }
 
+                            Tuple2<List<Transaction>, Integer> unconfirmedTransactions
+                                    = getUnconfirmedTransactions(height, timePointForGenerate,
+                                            bchain, winned_winValue);
+
                             wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
                             int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
                             wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
@@ -793,8 +799,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     }
 
                                 }
-                                while (this.orphanto <= 0 && wait_step-- > 0 && NTP.getTime()
-                                        < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS - BlockChain.FLUSH_TIMEPOINT);
+                                while (this.orphanto <= 0 && wait_step-- > 0
+                                        && NTP.getTime()
+                                                < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS
+                                                    - BlockChain.FLUSH_TIMEPOINT);
                             }
 
                             if (this.orphanto > 0)
@@ -808,14 +816,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 this.setMonitorStatus("local_status " + viewStatus());
 
                                 // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-                                LOGGER.info("GENERATE my BLOCK");
+                                LOGGER.info("GENERATE my BLOCK for TXs: " + unconfirmedTransactions.b);
 
                                 generatedBlock = null;
                                 try {
                                     processTiming = System.nanoTime();
                                     generatedBlock = generateNextBlock(acc_winner, solvingBlock,
-                                            getUnconfirmedTransactions(height, timePointForGenerate,
-                                                    bchain, winned_winValue),
+                                            unconfirmedTransactions,
                                             height, winned_forgingValue, winned_winValue, previousTarget);
 
                                     processTiming = System.nanoTime() - processTiming;
@@ -845,6 +852,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     ctrl.stopAll(94);
                                     return;
                                 }
+                                LOGGER.info("GENERATE done");
 
                                 solvingBlock = null;
 
