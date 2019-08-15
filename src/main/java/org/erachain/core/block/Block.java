@@ -1410,6 +1410,15 @@ import java.util.*;
             return false;
         }
 
+        if (transactionCount > BlockChain.MAX_BLOCK_SIZE) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE");
+            return false;
+        }
+        if (rawTransactionsLength > BlockChain.MAX_BLOCK_SIZE_BYTES) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE_BYTES");
+            return false;
+        }
+
         // TODO - show it to USER
         long blockTime = this.getTimestamp();
         long thisTimestamp = NTP.getTime();
