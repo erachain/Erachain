@@ -64,11 +64,11 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                         return "GENESIS";
                     }
                     Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
-                    if (forgingPoint == null || forgingPoint.b == null) {
-                        forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
-                    }
                     return forgingPoint.b + " ";
                 case COLUMN_DH:
+                    if (block.target == 0) {
+                        return "GENESIS";
+                    }
                     forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
                     return (block.heightBlock - forgingPoint.a) + "";
                 case COLUMN_WV:
