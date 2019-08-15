@@ -883,11 +883,15 @@ public class Synchronizer {
                     error = new Exception(e);
                 }
             } finally {
+
                 if (cnt.isOnStopping()) {
+                    // was BREAK - try ROLLBACK
+                    dcSet.rollback();
                     throw new Exception("on stopping");
                 }
 
                 if (error != null) {
+                    // was BREAK - try ROLLBACK
                     dcSet.rollback();
 
                     if (error instanceof IOException) {
@@ -956,11 +960,15 @@ public class Synchronizer {
                     error = new Exception(e);
                 }
             } finally {
+
                 if (cnt.isOnStopping()) {
+                    // was BREAK - try ROLLBACK
+                    dcSet.rollback();
                     throw new Exception("on stopping");
                 }
 
                 if (error != null) {
+                    // was BREAK - try ROLLBACK
                     dcSet.rollback();
                     LOGGER.error(error.getMessage(), error);
 

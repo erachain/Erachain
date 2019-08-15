@@ -555,6 +555,13 @@ import java.util.*;
 
         byte[] hashData;
         if (transactionCount == 0) {
+            // TODO: убрать в новой версии как ненужное - если трнзакций нету то не используем вообще
+            /**
+             * а на самом деле если нет трнзакций и AT_DATA пустая - а оана пустая
+             * то нет необходимости делать подпись на основе этого хэша -
+             * лучше его пустымх делать - и не использовать чтобы не тормозить лишний раз
+             * хотя когда блоки пустые особо и не тормозится
+             */
             hashData = new byte[CREATOR_LENGTH + atBytesLength];
             System.arraycopy(creator.getPublicKey(), 0, hashData, 0, CREATOR_LENGTH);
             if (atBytesLength > 0) {
@@ -1410,6 +1417,15 @@ import java.util.*;
             return false;
         }
 
+        if (transactionCount > BlockChain.MAX_BLOCK_SIZE) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE");
+            return false;
+        }
+        if (rawTransactionsLength > BlockChain.MAX_BLOCK_SIZE_BYTES) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE_BYTES");
+            return false;
+        }
+
         // TODO - show it to USER
         long blockTime = this.getTimestamp();
         long thisTimestamp = NTP.getTime();
@@ -1505,6 +1521,11 @@ import java.util.*;
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
+        if (heightBlock > 11482) {
+            // rro
+            Long test = null;
+        }
+
         // TRY CHECK HEAD
         if (!this.isValidHead(dcSet))
             return false;
@@ -1525,10 +1546,15 @@ import java.util.*;
         int transactionsSignaturesPos = 0;
 
         if (this.transactionCount == 0) {
-            // empty transactions - USE CREATOR for HASH
-            transactionsSignatures = new byte[CREATOR_LENGTH + atBytesLength];
-            System.arraycopy(creator.getPublicKey(), 0, transactionsSignatures, 0, CREATOR_LENGTH);
-            transactionsSignaturesPos += CREATOR_LENGTH;
+            /**
+             * см. ниже - нет необходимости ХЭШ проверять для 0 транзакций - пиши сюда что хочешь
+             */
+            if (false) {
+                // empty transactions - USE CREATOR for HASH
+                transactionsSignatures = new byte[CREATOR_LENGTH + atBytesLength];
+                System.arraycopy(creator.getPublicKey(), 0, transactionsSignatures, 0, CREATOR_LENGTH);
+                transactionsSignaturesPos += CREATOR_LENGTH;
+            }
 
         } else {
 
@@ -1785,17 +1811,28 @@ import java.util.*;
                 );
             }
 
-        }
 
-        // ADD AT_BYTES
-        if (atBytesLength > 0) {
-            System.arraycopy(atBytes, 0, transactionsSignatures, transactionsSignaturesPos, atBytesLength);
-        }
+            /**
+             * Только если есть транзакции тогда имеет смысл проверять их общий ХЭШ
+             * иначе - пиши туда что хочешь - он просто будет участвовать в подписи
+             * тогда можно разные подписи делать с его помощью?
+             * а может тогда иключить его из подписи если нет транзакций?
+             * Тогда нельзя будет генерировать разные подписи... да вроде пока и не используется это ни как
+             */
 
-        transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
-        if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
-            return false;
+            // ADD AT_BYTES
+            if (atBytesLength > 0) {
+                System.arraycopy(atBytes, 0, transactionsSignatures, transactionsSignaturesPos, atBytesLength);
+            }
+
+            transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
+            if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
+                LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
+                        + " transactionCount: " + transactionCount
+                        + (atBytesLength > 0? " atBytes: " + atBytesLength: ""));
+                return false;
+            }
+
         }
 
         //BLOCK IS VALID
@@ -2015,14 +2052,10 @@ import java.util.*;
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
+        long timerStart;
         long start = System.currentTimeMillis();
 
         //ADD TO DB
-        long timerStart = System.currentTimeMillis();
-
-        LOGGER.debug("getBlocksHeadMap().set timer: " + (System.currentTimeMillis() - timerStart));
-
-        //this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
@@ -2130,17 +2163,22 @@ import java.util.*;
                     + "  timerUnconfirmedMap_delete: " + timerUnconfirmedMap_delete + "  timerFinalMap_set:" + timerFinalMap_set
                     + "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
 
-            long tickets = System.currentTimeMillis() - start;
-            LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
-                    + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
-
         }
 
+        timerStart = System.currentTimeMillis();
         this.process_after(cnt, dcSet);
+        LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         timerStart = System.currentTimeMillis();
         dcSet.getBlockMap().add(this);
         LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+
+        long tickets = System.currentTimeMillis() - start;
+        if (transactionCount > 0 && tickets > 10 || tickets > 10) {
+            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets * 0.001
+                    + ", TXs= " + this.transactionCount
+                    + (transactionCount == 0? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
+        }
 
     }
 

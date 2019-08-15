@@ -6,6 +6,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
@@ -17,6 +18,7 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -244,17 +246,22 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
      * @param timestamp
      * @param cutDeadTime
      */
+    protected long pointReset;
     public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
 
-        Iterator<Long> iterator = this.getIterator(0, false);
-        Transaction transaction;
-
         long realTime = System.currentTimeMillis();
+        int count = 0;
+
+        /////Iterator<Map.Entry<Long, Transaction>> iteratorMap = map.entrySet().iterator();
+
+        //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+        Transaction transaction;
 
         timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 
         while (iterator.hasNext()) {
-            Long key = iterator.next();
+            Long key = iterator.next().b;
             transaction = this.map.get(key);
             long deadline = transaction.getDeadline();
             if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
@@ -262,10 +269,26 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                     || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                     || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                 this.delete(key);
+                count++;
             } else {
                 break;
             }
         }
+
+        long ticker = System.currentTimeMillis() - realTime;
+        if ( ticker > 1000 || count > 0 && ticker / count > 1) {
+            LOGGER.debug("CLEAR dead UTXs: " + ticker + " ms, for deleted: " + count);
+        }
+
+        if (true && System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+            pointReset = System.currentTimeMillis();
+            this.reset();
+            ticker = System.currentTimeMillis() - pointReset;
+            if (ticker > 2999900) {
+                LOGGER.debug("reset UTXs: " + ticker + " ms");
+            }
+        }
+
     }
 
     @Override
