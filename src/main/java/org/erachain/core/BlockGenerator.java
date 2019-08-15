@@ -764,8 +764,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             // сдвиг на заранее - только на 1/4 максимум
                             if (wait_new_block_broadcast < BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2) {
                                 wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
-                            } else if (wait_new_block_broadcast > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
-                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+                            } else if (wait_new_block_broadcast > BlockChain.FLUSH_TIMEPOINT) {
+                                wait_new_block_broadcast = BlockChain.FLUSH_TIMEPOINT;
                             }
 
                             newWinner = false;
@@ -784,6 +784,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     try {
                                         Thread.sleep(WAIT_STEP_MS);
                                     } catch (InterruptedException e) {
+                                        local_status = -1;
+                                        return;
                                     }
 
                                     if (ctrl.isOnStopping()) {
@@ -799,10 +801,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     }
 
                                 }
-                                while (this.orphanto <= 0 && wait_step-- > 0
-                                        && NTP.getTime()
-                                                < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS
-                                                    - BlockChain.FLUSH_TIMEPOINT);
+                                while (this.orphanto <= 0 && wait_step-- > 0);
                             }
 
                             if (this.orphanto > 0)
@@ -864,7 +863,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                                     LOGGER.info("generateNextBlock is NULL... try wait");
                                     try {
-                                        Thread.sleep(10000);
+                                        Thread.sleep(1000);
                                     } catch (InterruptedException e) {
                                     }
 
@@ -920,6 +919,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             try {
                                 Thread.sleep(WAIT_STEP_MS);
                             } catch (InterruptedException e) {
+                                local_status = -1;
+                                return;
                             }
 
                             if (ctrl.isOnStopping()) {
@@ -935,7 +936,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS - BlockChain.FLUSH_TIMEPOINT < NTP.getTime()) {
+                            if (flushPoint < NTP.getTime()) {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша
