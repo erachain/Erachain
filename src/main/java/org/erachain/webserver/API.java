@@ -849,13 +849,13 @@ public class API {
         // GET ACCOUNT
         Account account = new Account(address);
 
-        Long lastTimestamp = account.getLastTimestamp();
+        long[] lastTimestamp = account.getLastTimestamp();
 
         String out;
         if (lastTimestamp == null) {
             out = "-";
         } else {
-            out = "" + lastTimestamp;
+            out = "" + lastTimestamp[0];
         }
 
         return Response.status(200)

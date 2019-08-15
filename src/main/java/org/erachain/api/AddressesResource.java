@@ -95,14 +95,14 @@ public class AddressesResource {
         // GET ACCOUNT
         Account account = new Account(address);
 
-        Long lastTimestamp = account.getLastTimestamp();
+        long[] lastTimestamp = account.getLastTimestamp();
 
         // RETURN
 
         if (lastTimestamp == null) {
             return "false";
         } else {
-            return "" + lastTimestamp;
+            return "" + lastTimestamp[0];
         }
     }
 
@@ -124,43 +124,25 @@ public class AddressesResource {
 
         Controller cntrl = Controller.getInstance();
 
-        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 10, true);
-
         DCSet db = DCSet.getInstance();
-        Long lastTimestamp = account.getLastTimestamp(db);
-        byte[] signature;
-        if (!(lastTimestamp == null)) {
-            signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
-            transactions.add(cntrl.getTransaction(signature));
+        long[] lastTimestamp = account.getLastTimestamp(db);
+        if (lastTimestamp != null) {
+            return "" + lastTimestamp[0];
         }
 
-        for (Transaction tx : transactions) {
-            if (tx.getCreator().equals(account)) {
-                for (Transaction tx2 : transactions) {
-                    if (tx.getTimestamp() > tx2.getTimestamp()
-                            & tx.getCreator().getAddress().equals(tx2.getCreator().getAddress())) {
-                        // if same address and parent timestamp
-                        isSomeoneReference.add(tx.getSignature());
-                        break;
-                    }
-                }
-            }
-        }
+        byte[] signature;
 
         if (isSomeoneReference.isEmpty()) {
             return getLastReference(address);
         }
 
-        for (Transaction tx : cntrl.getUnconfirmedTransactions(0, 10, true)) {
-            if (tx.getCreator().equals(account)) {
-                if (!isSomeoneReference.contains(tx.getSignature())) {
-                    //return Base58.encode(tx.getSignature());
-                    return "" + tx.getTimestamp();
-                }
-            }
-        }
+        // TODO: тут надо скан взять сразу для заданного адреса и последний
+        // а вообще для чего нафиг это нужно?
+        List<Transaction> items = DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address);
+        if (items.isEmpty())
+            return "false";
 
-        return "false";
+        return "" + items.get(items.size()).getTimestamp();
     }
 
     @GET

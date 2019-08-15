@@ -2294,10 +2294,16 @@ public class Controller extends Observable {
         return getTransaction(signature, this.dcSet);
     }
 
-    // by account addres + timestamp get signature
-    public byte[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
+    public Transaction getTransaction(Long dbREF) {
 
-        return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
+        return getTransaction(dbREF, this.dcSet);
+    }
+
+    // by account addres + timestamp get signature
+    public long[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
+
+        //return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
+        return dcSet.getReferenceMap().get(Account.makeShortBytes(address));
     }
 
     public Transaction getTransaction(byte[] signature, DCSet database) {
@@ -2312,6 +2318,10 @@ public class Controller extends Observable {
             return database.getTransactionFinalMap().get(tuple_Tx);
         }
         return null;
+    }
+
+    public Transaction getTransaction(long refDB, DCSet database) {
+        return database.getTransactionFinalMap().get(refDB);
     }
 
     public List<Transaction> getLastTransactions(Account account, int limit) {
@@ -3257,20 +3267,12 @@ public class Controller extends Observable {
             }
         }
 
-        // DCSet db = this.dcSet;
-        // get last transaction from this address
-        byte[] sign = dcSet.getAddressTime_SignatureMap().get(address);
-        if (sign == null) {
+        long[] makerLastTimestamp = dcSet.getReferenceMap().get(Account.makeShortBytes(address));
+        if (makerLastTimestamp == null) {
             return null;
         }
 
-        /*
-         * long lastReference = db.getReferenceMap().get(address); byte[] sign =
-         * getSignatureByAddrTime(db, address, lastReference); if (sign == null)
-         * return null;
-         */
-
-        Transaction transaction = cntr.getTransaction(sign);
+        Transaction transaction = cntr.getTransaction(makerLastTimestamp[1]);
         if (transaction == null) {
             return null;
         }

@@ -580,33 +580,10 @@ public class BlockExplorer {
 
                 address = account.getAddress();
                 // get reference to parent record for this account
-                Long timestampRef = account.getLastTimestamp();
+                long[] timestampRef = account.getLastTimestamp();
                 // get signature for account + time
-                byte[] signatureBytes = dcSet.getAddressTime_SignatureMap().get(address, timestampRef);
 
                 Controller cntr = Controller.getInstance();
-                do {
-                    // Transaction transaction =
-                    // Controller.getInstance().get(signatureBytes);
-                    Transaction transaction = cntr.getTransaction(signatureBytes);
-                    if (transaction == null) {
-                        break;
-                    }
-                    if (transaction.getCreator() == null && !transaction.getCreator().getAddress().equals(address)) {
-                        break;
-                    }
-
-                    if (transaction.getType() == Transaction.ARBITRARY_TRANSACTION
-                            && ((ArbitraryTransaction) transaction).getService() == 777) {
-                        transactions.add(transaction);
-                    }
-                    // get reference to parent record for this account
-                    // timestampRef = transaction.getReference();
-                    timestampRef = account.getLastTimestamp();
-                    // get signature for account + time
-                    signatureBytes = dcSet.getAddressTime_SignatureMap().get(address, timestampRef);
-
-                } while (true);
 
                 int count = transactions.size();
 

@@ -465,19 +465,19 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         // CHECK IF REFERENCE IS OK
         if (asDeal > Transaction.FOR_PACK) {
-            Long reference = this.creator.getLastTimestamp(dcSet);
-            if (reference.compareTo(this.timestamp) >= 0
+            long[] reference = this.creator.getLastTimestamp(dcSet);
+            if (reference[0] >= this.timestamp
                     // при откатах для нового счета который первый раз сделал транзакцию
                     // из нулевого баланса - Референс будеть ошибочный
                     // поэтому отключим эту проверку тут
                     && !BlockChain.DEVELOP_USE
                     ) {
 
-                if (height > 0 && (BlockChain.CHECK_BUGS > 7
+                if (height > 0 || BlockChain.CHECK_BUGS > 7
                         || System.currentTimeMillis() - pointLogg > 1000)) {
                     pointLogg = System.currentTimeMillis();
-                    LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
-                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
+                    LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
+                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                             + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
                 }
 

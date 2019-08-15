@@ -1690,9 +1690,8 @@ import java.util.*;
                         transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                         //UPDATE REFERENCE OF SENDER
-                        if (transaction.isReferenced())
-                            // IT IS REFERENCED RECORD?
-                            transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), validatingDC);
+                        transaction.getCreator().setLastTimestamp(
+                                new long[]{transaction.getTimestamp(), transaction.getDBRef()}, validatingDC);
                     }
 
                     transactionSignature = transaction.getSignature();
@@ -2117,9 +2116,8 @@ import java.util.*;
                     timerProcess += System.currentTimeMillis() - timerStart;
                 } else {
                     //UPDATE REFERENCE OF SENDER
-                    if (transaction.isReferenced())
-                        // IT IS REFERENCED RECORD?
-                        transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), dcSet);
+                        transaction.getCreator().setLastTimestamp(
+                                new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
                 }
 
                 transactionSignature = transaction.getSignature();
@@ -2297,10 +2295,7 @@ import java.util.*;
                 transaction.orphan(this, Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
-                if (transaction.isReferenced()) {
-                    //UPDATE REFERENCE OF SENDER
-                    transaction.getCreator().removeLastTimestamp(dcSet);
-                }
+                transaction.getCreator().removeLastTimestamp(dcSet);
             }
 
             if (notFork) {

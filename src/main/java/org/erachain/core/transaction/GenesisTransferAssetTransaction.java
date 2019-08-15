@@ -267,7 +267,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         this.recipient.changeBalance(this.dcSet, false, key, this.amount, false);
 
         //UPDATE REFERENCE OF RECIPIENT
-        this.recipient.setLastTimestamp(this.timestamp, this.dcSet);
+        this.recipient.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
 
         if (this.getAbsKey() == Transaction.RIGHTS_KEY) {
             // PROCESS FORGING DATA
