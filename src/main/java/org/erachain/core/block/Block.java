@@ -2044,14 +2044,10 @@ import java.util.*;
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
+        long timerStart;
         long start = System.currentTimeMillis();
 
         //ADD TO DB
-        long timerStart = System.currentTimeMillis();
-
-        LOGGER.debug("getBlocksHeadMap().set timer: " + (System.currentTimeMillis() - timerStart));
-
-        //this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
@@ -2160,17 +2156,22 @@ import java.util.*;
                     + "  timerUnconfirmedMap_delete: " + timerUnconfirmedMap_delete + "  timerFinalMap_set:" + timerFinalMap_set
                     + "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
 
-            long tickets = System.currentTimeMillis() - start;
-            LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
-                    + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
-
         }
 
+        timerStart = System.currentTimeMillis();
         this.process_after(cnt, dcSet);
+        LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         timerStart = System.currentTimeMillis();
         dcSet.getBlockMap().add(this);
         LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+
+        long tickets = System.currentTimeMillis() - start;
+        if (transactionCount > 0 || tickets > 10) {
+            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets * 0.001
+                    + ", TXs= " + this.transactionCount
+                    + (transactionCount == 0? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
+        }
 
     }
 

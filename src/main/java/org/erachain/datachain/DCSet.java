@@ -424,6 +424,12 @@ public class DCSet extends DBASet implements Observer {
                  */
                 .make();
 
+        if (Controller.getInstance().compactDConStart) {
+            LOGGER.debug("try COMPACT");
+            database.compact();
+            LOGGER.debug("COMPACTED");
+        }
+
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
@@ -1312,7 +1318,7 @@ public class DCSet extends DBASet implements Observer {
         // найдем новый не созданный уже файл
         File dbFile;
         do {
-            dbFile = new File(Settings.getInstance().getDataDir(), "fork" + randFork.nextInt() + ".dat");
+            dbFile = new File(Settings.getInstance().getDataTempDir(), "fork" + randFork.nextInt() + ".dat");
         } while (dbFile.exists());
 
         dbFile.getParentFile().mkdirs();
@@ -1422,6 +1428,7 @@ public class DCSet extends DBASet implements Observer {
         this.outUses();
     }
 
+    private long poinCompact;
     public void flush(int size, boolean hardFlush) {
 
         if (parent != null)
@@ -1437,6 +1444,14 @@ public class DCSet extends DBASet implements Observer {
             LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%% actions:" + actions);
 
             this.database.commit();
+
+            if (false && System.currentTimeMillis() - poinCompact > 9999999) {
+                // очень долго делает - лучше ключем при старте
+                poinCompact = System.currentTimeMillis();
+                LOGGER.debug("try COMPACT");
+                this.database.compact();
+                LOGGER.debug("COMPACTED");
+            }
 
             LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%%%  commit time: " + new Double((System.currentTimeMillis() - start)) * 0.001);
             this.actions = 0l;
