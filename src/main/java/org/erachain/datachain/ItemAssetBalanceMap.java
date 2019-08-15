@@ -225,6 +225,10 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
     public SortableList<Tuple2<byte[], Long>, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(Account account) {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            return null;
+
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS

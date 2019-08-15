@@ -1423,10 +1423,12 @@ public class DCSet extends DBASet implements Observer {
 
             this.database.commit();
 
-            if (false && System.currentTimeMillis() - poinCompact > 9999999) {
-                // очень долго делает - лучше ключем при старте
+            if (System.currentTimeMillis() - poinCompact > 9999999
+                    || transactionMap.totalDeleted > 200000) {
+                transactionMap.totalDeleted = 0;
                 poinCompact = System.currentTimeMillis();
                 LOGGER.debug("try COMPACT");
+                // очень долго делает - лучше ключем при старте
                 this.database.compact();
                 LOGGER.debug("COMPACTED");
             }
