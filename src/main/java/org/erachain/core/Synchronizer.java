@@ -883,12 +883,14 @@ public class Synchronizer {
                     error = new Exception(e);
                 }
             } finally {
+
+                dcSet.rollback();
+
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stopping");
                 }
 
                 if (error != null) {
-                    dcSet.rollback();
 
                     if (error instanceof IOException) {
                         cnt.stopAll(22);
@@ -956,12 +958,14 @@ public class Synchronizer {
                     error = new Exception(e);
                 }
             } finally {
+
+                dcSet.rollback();
+
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stopping");
                 }
 
                 if (error != null) {
-                    dcSet.rollback();
                     LOGGER.error(error.getMessage(), error);
 
                     if (error instanceof IOException) {
