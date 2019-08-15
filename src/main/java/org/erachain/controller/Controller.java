@@ -1941,7 +1941,11 @@ public class Controller extends Observable {
 
         // NOTIFY
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+        try {
+            this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
 
         this.statusInfo();
 
