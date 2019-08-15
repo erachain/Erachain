@@ -270,6 +270,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
                     needRemoveInvalids.add(transaction.getSignature());
+                    transaction.isValid(Transaction.FOR_NETWORK, 0l);
                     continue;
                 }
 
@@ -291,9 +292,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 //PROCESS IN NEWBLOCKDB
                 transaction.process(null, Transaction.FOR_NETWORK);
 
-                // GO TO NEXT TRANSACTION
-                continue;
-
             } catch (Exception e) {
 
                 if (ctrl.isOnStopping()) {
@@ -305,8 +303,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 LOGGER.error(e.getMessage(), e);
                 //REMOVE FROM LIST
                 needRemoveInvalids.add(transaction.getSignature());
-
-                continue;
 
             }
 
