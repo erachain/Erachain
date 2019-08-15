@@ -434,6 +434,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     //@Override // - fee + balance - calculate here
+    private static long pointLogg;
     public int isValid(int asDeal, boolean isPerson, long flags) {
         
         for (byte[] valid_item : VALID_REC) {
