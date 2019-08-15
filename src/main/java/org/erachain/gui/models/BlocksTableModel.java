@@ -50,7 +50,6 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                 return null;
             }
             Block.BlockHead block = list.get(row);
-            Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
             switch (column) {
                 case COLUMN_HEIGHT:
                     return block.heightBlock + "";
@@ -64,8 +63,13 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                     if (block.target == 0) {
                         return "GENESIS";
                     }
+                    Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+                    if (forgingPoint == null || forgingPoint.b == null) {
+                        forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+                    }
                     return forgingPoint.b + " ";
                 case COLUMN_DH:
+                    forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
                     return (block.heightBlock - forgingPoint.a) + "";
                 case COLUMN_WV:
                     return block.winValue + "";
