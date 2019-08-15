@@ -213,6 +213,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
 
+        Timestamp timestampPoit = new Timestamp(timestamp);
+        LOGGER.debug("* * * * * COLLECT TRANSACTIONS on " + timestampPoit);
+
         long start = System.currentTimeMillis();
 
         //CREATE FORK OF GIVEN DATABASE
@@ -235,6 +238,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         this.setMonitorStatusBefore("getUnconfirmedTransactions");
 
+        long testTime = 0;
         while (iterator.hasNext()) {
 
             if (ctrl.isOnStopping()) {
@@ -249,6 +253,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             Transaction transaction = map.get(iterator.next());
+
+            if (BlockChain.CHECK_BUGS > 7) {
+                LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
+                if (testTime > transaction.getTimestamp()) {
+                    LOGGER.error(" ERROR testTIME " + new Timestamp(testTime));
+                    testTime = transaction.getTimestamp();
+                }
+            }
 
             if (transaction.getTimestamp() > timestamp)
                 break;
@@ -270,6 +282,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
                     needRemoveInvalids.add(transaction.getSignature());
+                    if (BlockChain.CHECK_BUGS > 1) {
+                        LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0l));
+                    }
                     continue;
                 }
 
@@ -291,9 +306,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 //PROCESS IN NEWBLOCKDB
                 transaction.process(null, Transaction.FOR_NETWORK);
 
-                // GO TO NEXT TRANSACTION
-                continue;
-
             } catch (Exception e) {
 
                 if (ctrl.isOnStopping()) {
@@ -306,8 +318,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 //REMOVE FROM LIST
                 needRemoveInvalids.add(transaction.getSignature());
 
-                continue;
-
             }
 
         }
@@ -315,7 +325,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         if (newBlockDC != null )
             newBlockDC.close();
 
-        LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
+        LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
+                + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size());
 
         this.setMonitorStatusAfter();
 
@@ -512,7 +523,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long timeToPing = 0;
         long timeTmp;
         long timePoint = 0;
-        long timePointForGenerate = 0;
+        long timePointForValidTX = 0;
+        int diffBroadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
         long flushPoint = 0;
         long timeUpdate = 0;
         int shift_height = 0;
@@ -543,7 +555,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             SignaturesMessage response;
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 break;
             }
@@ -578,7 +590,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     try {
                         while (bchain.getHeight(dcSet) >= this.orphanto
                             //    && bchain.getHeight(dcSet) > 157044
-                            ) {
+                        ) {
                             //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
                             //    long iii = 11;
                             //}
@@ -601,17 +613,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
-                    timePointForGenerate = timePoint
-                            + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS
-                            : BlockChain.FLUSH_TIMEPOINT)
-                            - BlockChain.UNCONFIRMED_SORT_WAIT_MS
-                        ;
+                    timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
                     this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoit);
 
-                    flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
+                    flushPoint = timePoint + BlockChain.FLUSH_TIMEPOINT;
                     this.solvingReference = null;
                     local_status = 0;
 
@@ -642,8 +650,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // is WALLET
                 if (ctrl.doesWalletExists()) {
 
-
-                    if (timePoint + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS > NTP.getTime()) {
+                    if (timePoint > NTP.getTime()) {
                         continue;
                     }
 
@@ -657,8 +664,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) < NTP.getTime()
-                                || BlockChain.DEVELOP_USE && height < 100
-                                || height < 10)) {
+                            || BlockChain.DEVELOP_USE && height < 100
+                            || height < 10)) {
 
                         setForgingStatus(ForgingStatus.FORGING);
                     }
@@ -749,6 +756,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
                         }
 
+                        if (BlockChain.CHECK_BUGS > 7) {
+                            Tuple2<List<Transaction>, Integer> unconfirmedTransactions
+                                    = getUnconfirmedTransactions(height, timePointForValidTX,
+                                    bchain, winned_winValue);
+                        }
+
                         if (acc_winner != null) {
 
                             if (ctrl.isOnStopping()) {
@@ -756,15 +769,19 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 return;
                             }
 
+                            Tuple2<List<Transaction>, Integer> unconfirmedTransactions
+                                    = getUnconfirmedTransactions(height, timePointForValidTX,
+                                    bchain, winned_winValue);
+
                             wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
                             int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
                             wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
 
                             // сдвиг на заранее - только на 1/4 максимум
-                            if (wait_new_block_broadcast < BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2) {
-                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
-                            } else if (wait_new_block_broadcast > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
-                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+                            if (wait_new_block_broadcast < diffBroadcast) {
+                                wait_new_block_broadcast = diffBroadcast;
+                            } else if (wait_new_block_broadcast > BlockChain.FLUSH_TIMEPOINT) {
+                                wait_new_block_broadcast = BlockChain.FLUSH_TIMEPOINT;
                             }
 
                             newWinner = false;
@@ -783,6 +800,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     try {
                                         Thread.sleep(WAIT_STEP_MS);
                                     } catch (InterruptedException e) {
+                                        local_status = -1;
+                                        return;
                                     }
 
                                     if (ctrl.isOnStopping()) {
@@ -798,7 +817,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     }
 
                                 }
-                                while (this.orphanto <= 0 && wait_step-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+                                while (this.orphanto <= 0 && wait_step-- > 0);
                             }
 
                             if (this.orphanto > 0)
@@ -812,14 +831,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 this.setMonitorStatus("local_status " + viewStatus());
 
                                 // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-                                LOGGER.info("GENERATE my BLOCK");
+                                LOGGER.info("GENERATE my BLOCK for TXs: " + unconfirmedTransactions.b);
 
                                 generatedBlock = null;
                                 try {
                                     processTiming = System.nanoTime();
                                     generatedBlock = generateNextBlock(acc_winner, solvingBlock,
-                                            getUnconfirmedTransactions(height, timePointForGenerate,
-                                                    bchain, winned_winValue),
+                                            unconfirmedTransactions,
                                             height, winned_forgingValue, winned_winValue, previousTarget);
 
                                     processTiming = System.nanoTime() - processTiming;
@@ -849,6 +867,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     ctrl.stopAll(94);
                                     return;
                                 }
+                                LOGGER.info("GENERATE done");
 
                                 solvingBlock = null;
 
@@ -860,7 +879,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                                     LOGGER.info("generateNextBlock is NULL... try wait");
                                     try {
-                                        Thread.sleep(10000);
+                                        Thread.sleep(1000);
                                     } catch (InterruptedException e) {
                                     }
 
@@ -916,6 +935,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             try {
                                 Thread.sleep(WAIT_STEP_MS);
                             } catch (InterruptedException e) {
+                                local_status = -1;
+                                return;
                             }
 
                             if (ctrl.isOnStopping()) {
@@ -931,12 +952,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()) {
+                            if (flushPoint < NTP.getTime()) {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша
-                                    Thread.sleep(BlockChain.DEVELOP_USE ? 500 : 5000);
+                                    Thread.sleep(1000);
                                 } catch (InterruptedException e) {
+                                    return;
                                 }
                             }
 
@@ -979,7 +1001,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         if (needRemoveInvalids != null) {
                             clearInvalids();
                         } else {
-                            checkForRemove(timePointForGenerate);
+                            checkForRemove(timePointForValidTX);
                             clearInvalids();
                         }
                     }
@@ -989,29 +1011,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////// UPDATE ////////////////////
 
-                timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
-                if (timeUpdate > 0)
+                if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2)
+                        > NTP.getTime())
                     continue;
-
-                if (false   // так как сейчас в начале цикла проверяем вокруг узла на более сильную цепочку даже
-                            // с той же высотой то тут не нуно делать провкеу на патовую ситуацмю
-
-                        && timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0
-                        && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
-                    // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
-                    // если есть сильнее то сделаем откат у себя
-                    //logger.debug("try resolve PAT situation");
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                    }
-
-                    if (ctrl.isOnStopping()) {
-                        local_status = -1;
-                        return;
-                    }
-                    checkWeightPeers();
-                }
 
                 /// CHECK PEERS HIGHER
                 // так как в девелопе все гоняют свои цепочки то посмотреть самыю жирную а не длинную
@@ -1102,7 +1104,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         // TARGET_WIN will be small
         if (status != Controller.STATUS_OK
             ///|| ctrl.isProcessingWalletSynchronize()
-                ) {
+        ) {
             setForgingStatus(ForgingStatus.FORGING_ENABLED);
             return;
         }
