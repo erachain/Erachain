@@ -49,6 +49,8 @@ public class AssetsFavorites implements Observer {
 
         for (Account account : Controller.getInstance().getAccounts()) {
             SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
+            if (balancesList == null)
+                return;
 
             for (Pair<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance : balancesList) {
                 if (balance.getB().a.b.compareTo(BigDecimal.ZERO) != 0
