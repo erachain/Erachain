@@ -1943,6 +1943,8 @@ public class Controller extends Observable {
         this.setChanged();
         try {
             this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+        } catch (ClassCastException e) {
+            LOGGER.error(e.getMessage(), e);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
