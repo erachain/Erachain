@@ -240,7 +240,7 @@ public class MyOrderTab extends SplitPanel {
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
                 Order order = ordersModel.getItem(row).b;
-                if (order.state() == "Active")
+                if (order.isActive(DCSet.getInstance()))
                     orderMenu.getComponent(2).setEnabled(true);
                 else
                     orderMenu.getComponent(2).setEnabled(false);
