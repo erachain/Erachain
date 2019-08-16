@@ -1428,12 +1428,17 @@ public class DCSet extends DBASet implements Observer {
 
             if (System.currentTimeMillis() - poinCompact > 9999999
                     || transactionMap.totalDeleted > 200000) {
-                transactionMap.totalDeleted = 0;
                 poinCompact = System.currentTimeMillis();
                 LOGGER.debug("try COMPACT");
                 // очень долго делает - лучше ключем при старте
-                this.database.compact();
-                LOGGER.debug("COMPACTED");
+                try {
+                    this.database.compact();
+                    transactionMap.totalDeleted = 0;
+                    LOGGER.debug("COMPACTED");
+                } catch (Exception e) {
+                    transactionMap.totalDeleted >>= 1;
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%%%  commit time: " + new Double((System.currentTimeMillis() - start)) * 0.001);
