@@ -858,7 +858,7 @@ public class Synchronizer {
                 dcSet.getBlockMap().setProcessing(false);
                 //dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
-                int blockSize = (3 + block.getTransactionCount()) * 5;
+                int blockSize = 3 + block.getTransactionCount();
                 dcSet.flush(blockSize, false);
 
                 if (cnt.isOnStopping())
@@ -931,7 +931,7 @@ public class Synchronizer {
                 //dcSet.updateTxCounter(block.getTransactionCount());
 
                 // FLUSH not use in each case - only after accumulate size
-                int blockSize = (3 + block.getTransactionCount()) * 5;
+                int blockSize = 3 + block.getTransactionCount();
                 dcSet.flush(blockSize, false);
 
                 // образать список и по времени протухания
