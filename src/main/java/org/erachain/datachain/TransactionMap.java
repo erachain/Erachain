@@ -250,10 +250,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         long realTime = System.currentTimeMillis();
         int count = 0;
 
-        /////Iterator<Map.Entry<Long, Transaction>> iteratorMap = map.entrySet().iterator();
-
         //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
         Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+        long tickerIter = System.currentTimeMillis() - realTime;
+        if ( tickerIter > 100) {
+            LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
+        }
+
         Transaction transaction;
 
         timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS << (5 - Controller.HARD_WORK >> 1);
