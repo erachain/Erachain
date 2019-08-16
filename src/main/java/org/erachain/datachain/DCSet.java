@@ -1409,7 +1409,7 @@ public class DCSet extends DBASet implements Observer {
         this.outUses();
     }
 
-    private long poinCompact;
+    private long poinCompact = System.currentTimeMillis();
     public void flush(int size, boolean hardFlush) {
 
         if (parent != null)
