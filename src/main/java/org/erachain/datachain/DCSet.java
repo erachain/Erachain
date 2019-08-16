@@ -1461,7 +1461,7 @@ public class DCSet extends DBASet implements Observer {
                 }
             }
 
-            LOGGER.debug("%%%%%%%%%%%%%%%%%% " + DCSet.getInstance().getEngineSize() + "   %%%%%%  commit time: "
+            LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " +getEngineSize() + "   %%%%%%  commit time: "
                     + (System.currentTimeMillis() - start) / 1000);
 
             this.actions = 0l;
