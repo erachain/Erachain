@@ -925,6 +925,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     LOGGER.info("To late for FLUSH - need UPDATE !");
                 } else {
 
+                    //// TODO: тут сделать основное ожидание победного блока - до flushPoint
+                    // е сли его нету то ждать еще поеп не появится до следующей границы
+                    // переделать ожидание ниже - убрать там циклл а вместо него FLUSH или нет
+
                     // try solve and flush new block from Win Buffer
                     do {
                         try {
