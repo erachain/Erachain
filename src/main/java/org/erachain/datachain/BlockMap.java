@@ -106,6 +106,9 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     public void resetLastBlockSignature() {
+
+        // TODO: еще вопрос про org.erachain.datachain.BlocksHeadsMap.getFullWeight
+
         lastBlockSignature = ((DCSet)databaseSet).getBlocksHeadsMap().get(this.size()).signature;
     }
 
