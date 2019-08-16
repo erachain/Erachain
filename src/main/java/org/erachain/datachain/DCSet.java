@@ -439,7 +439,8 @@ public class DCSet extends DBASet implements Observer {
             throw new Exception("error in DATACHAIN:" + instance.actions);
         }
 
-        if (Controller.getInstance().compactDConStart) {
+        if (false && Controller.getInstance().compactDConStart) {
+            // NEED LOT of MEMORY by .reset
             UpdateUtil.repopulateTransactionFinalMap(instance);
             LOGGER.debug("REPOPULATED");
         }
