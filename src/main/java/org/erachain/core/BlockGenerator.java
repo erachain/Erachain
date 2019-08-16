@@ -520,11 +520,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long transactionMakeTimingCounter = 0;
         long transactionMakeTimingAverage = 0;
 
-        long timeToPing = 0;
+        /**
+         * время пинга если идет синхронизация например
+         */
+        long pointPing = 0;
         long timeTmp;
         long timePoint = 0;
         long timePointForValidTX = 0;
-        int diffBroadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
+        int timeStartBroadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
         long flushPoint = 0;
         long timeUpdate = 0;
         int shift_height = 0;
@@ -555,7 +558,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             SignaturesMessage response;
 
             try {
-                Thread.sleep(100);
+                Thread.sleep(WAIT_STEP_MS);
             } catch (InterruptedException e) {
                 break;
             }
@@ -571,9 +574,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 // GET real HWeight
                 // пингуем всех тут чтобы знать кому слать свои транакции
-                if (System.currentTimeMillis() - timeToPing > (BlockChain.DEVELOP_USE ? 60000 : 120000)) {
+                // на самом деле они сами присылают свое состояние после апдейта
+                if (NTP.getTime() - pointPing > BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) {
                     // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
-                    timeToPing = System.currentTimeMillis();
+                    pointPing = NTP.getTime();
                     ctrl.pingAllPeers(false);
                 }
 
@@ -624,7 +628,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     local_status = 0;
 
                     // пинганем тут все чтобы знать кому слать вобедный блок
-                    timeToPing = System.currentTimeMillis();
+                    // а так же чтобы знать с кем мы в синхре или кто лучше нас в checkWeightPeers
+                    pointPing = NTP.getTime();
                     ctrl.pingAllPeers(true);
 
                     // осмотр сети по СИЛЕ
@@ -769,17 +774,18 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 return;
                             }
 
+                            // Соберем тут танзакции сразу же чтобы потом не тратить время
                             Tuple2<List<Transaction>, Integer> unconfirmedTransactions
                                     = getUnconfirmedTransactions(height, timePointForValidTX,
                                             bchain, winned_winValue);
 
-                            wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
+                            wait_new_block_broadcast = (timeStartBroadcast + BlockChain.FLUSH_TIMEPOINT) >> 1;
                             int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
                             wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
 
                             // сдвиг на заранее - только на 1/4 максимум
-                            if (wait_new_block_broadcast < diffBroadcast) {
-                                wait_new_block_broadcast = diffBroadcast;
+                            if (wait_new_block_broadcast < timeStartBroadcast) {
+                                wait_new_block_broadcast = timeStartBroadcast;
                             } else if (wait_new_block_broadcast > BlockChain.FLUSH_TIMEPOINT) {
                                 wait_new_block_broadcast = BlockChain.FLUSH_TIMEPOINT;
                             }
@@ -920,51 +926,67 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем
                 ctrl.checkStatusAndObserve(0);
-                if (timeToPing + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()
+                if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()
                         && ctrl.needUpToDate()) {
                     LOGGER.info("To late for FLUSH - need UPDATE !");
                 } else {
-
                     // try solve and flush new block from Win Buffer
-                    do {
+
+                    // FLUSH WINER to DB MAP
+                    LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
+
+                    // ждем основное время просто
+                    while (this.orphanto <= 0 && flushPoint > NTP.getTime()) {
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
                             local_status = -1;
                             return;
                         }
-                        waitWin = bchain.getWaitWinBuffer();
-                    } while (waitWin == null
-                            && this.orphanto <= 0
-                            && flushPoint > NTP.getTime());
 
-                    // not recived
-                    if (waitWin != null) {
+                        if (ctrl.isOnStopping()) {
+                            local_status = -1;
+                            return;
+                        }
+                    }
+
+                    if (this.orphanto > 0)
+                        continue;
+
+                    // если нет ничего в буфере то еще несного подождем
+                    do {
+
+                        waitWin = bchain.getWaitWinBuffer();
+                        if (waitWin != null) {
+                            break;
+                        }
+
+                        try {
+                            Thread.sleep(WAIT_STEP_MS);
+                        } catch (InterruptedException e) {
+                            local_status = -1;
+                            return;
+                        }
+
+                        if (ctrl.isOnStopping()) {
+                            local_status = -1;
+                            return;
+                        }
+                    } while (this.orphanto <= 0
+                            && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP.getTime());
+
+                    if (this.orphanto > 0)
+                        continue;
+
+                    if (waitWin == null) {
+                        LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
+
+                    } else {
 
                         this.solvingReference = null;
 
-                        // FLUSH WINER to DB MAP
-                        LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
-
                         local_status = 1;
                         this.setMonitorStatus("local_status " + viewStatus());
-
-                        while (this.orphanto <= 0 && flushPoint > NTP.getTime()) {
-                            try {
-                                Thread.sleep(WAIT_STEP_MS);
-                            } catch (InterruptedException e) {
-                                local_status = -1;
-                                return;
-                            }
-
-                            if (ctrl.isOnStopping()) {
-                                local_status = -1;
-                                return;
-                            }
-                        }
-
-                        if (this.orphanto > 0)
-                            continue;
 
                         // FLUSH WINER to DB MAP
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
@@ -1022,9 +1044,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             checkForRemove(timePointForValidTX);
                             clearInvalids();
                         }
+
+                        // была обработка буфера, тогда на точку начала вернемся
+                        continue;
                     }
 
-                    continue;
                 }
 
                 ////////////////////////// UPDATE ////////////////////
