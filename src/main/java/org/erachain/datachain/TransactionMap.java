@@ -249,38 +249,60 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         long realTime = System.currentTimeMillis();
         int count = 0;
-
-        //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-        Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
         long tickerIter = System.currentTimeMillis() - realTime;
-        if (tickerIter > 100) {
-            LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-        }
-
-        Transaction transaction;
 
         timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS << (5 - Controller.HARD_WORK >> 1);
 
-        while (iterator.hasNext()) {
-            Long key = iterator.next().b;
-            transaction = this.map.get(key);
-            if (transaction == null) {
-                // такая ошибка уже было
-                return;
+        if (cutDeadTime) {
+
+            timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+            tickerIter = System.currentTimeMillis();
+            SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
+                    timestamp, null));
+            tickerIter = System.currentTimeMillis() - tickerIter;
+            if (tickerIter > 10) {
+                LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
             }
 
-            long deadline = transaction.getDeadline();
-            if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                    || ((Controller.HARD_WORK > 3
-                    || cutDeadTime)
-                    && deadline < timestamp)
-                    || Controller.HARD_WORK <= 3
-                    && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                    || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                this.delete(key);
-                count++;
-            } else {
-                break;
+            for (Tuple2<?, Long> key : subSet) {
+                if (this.contains(key.b))
+                    this.delete(key.b);
+            }
+
+        } else {
+            /**
+             * по несколько секунд итератор берется - при том что таблица пустая -
+             * - дале COMPACT не помогает
+             */
+            //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+            Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+            if (tickerIter > 10) {
+                LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
+            }
+
+            Transaction transaction;
+
+            while (iterator.hasNext()) {
+                Long key = iterator.next().b;
+                transaction = this.map.get(key);
+                if (transaction == null) {
+                    // такая ошибка уже было
+                    return;
+                }
+
+                long deadline = transaction.getDeadline();
+                if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
+                        || ((Controller.HARD_WORK > 3
+                        || cutDeadTime)
+                        && deadline < timestamp)
+                        || Controller.HARD_WORK <= 3
+                        && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                        || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                    this.delete(key);
+                    count++;
+                } else {
+                    break;
+                }
             }
         }
 
@@ -439,7 +461,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,
-                                              int type, boolean desc, int offset, int limit, long timestamp) {
+                                         int type, boolean desc, int offset, int limit, long timestamp) {
 
         Iterable keys = findTransactionsKeys(address, sender, recipient,
                 type, desc, offset, limit, timestamp);
@@ -524,7 +546,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         //LOGGER.debug("get ITERATOR");
         Iterator<Long> iterator = this.getIterator(indexID, descending);
-        //LOGGER.debug("get ITERATOR - DONE");
+        //LOGGER.debug("get ITERATOR - DONE"); / for merge
 
         Transaction transaction;
         for (int i = 0; i < count; i++) {

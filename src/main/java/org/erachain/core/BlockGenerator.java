@@ -366,6 +366,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         TransactionMap map = dcSet.getTransactionMap();
         Iterator<Long> iterator = map.getTimestampIterator();
+        LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 
         needRemoveInvalids = new ArrayList<byte[]>();
 
