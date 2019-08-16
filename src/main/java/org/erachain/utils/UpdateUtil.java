@@ -89,23 +89,23 @@ public class UpdateUtil {
     }
 
 
-    public static void repopulateTransactionFinalMap() {
-        DCSet.getInstance().getTransactionFinalMap().reset();
+    public static void repopulateTransactionFinalMap(DCSet dcSet) {
+        dcSet.getTransactionFinalMap().reset();
 
         Block b = new GenesisBlock();
-        DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
+        dcSet.flush(b.getDataLength(false) >> 7, false);
         do {
             List<Transaction> txs = b.getTransactions();
             int counter = 1;
             for (Transaction tx : txs) {
-                DCSet.getInstance().getTransactionFinalMap().add(b.getHeight(), counter, tx);
+                dcSet.getTransactionFinalMap().add(b.getHeight(), counter, tx);
                 counter++;
             }
             if (b.getHeight() % 2000 == 0) {
                 LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight());
-                DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
+                dcSet.flush(b.getDataLength(false) >> 7, false);
             }
-            b = b.getChild(DCSet.getInstance());
+            b = b.getChild(dcSet);
         } while (b != null);
 
     }

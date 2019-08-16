@@ -426,10 +426,6 @@ public class DCSet extends DBASet implements Observer {
             LOGGER.debug("try COMPACT");
             database.compact();
             LOGGER.debug("COMPACTED");
-            if (true) {
-                UpdateUtil.repopulateTransactionFinalMap();
-                LOGGER.debug("REPOPULATED");
-            }
         }
 
         //CREATE INSTANCE
@@ -438,6 +434,12 @@ public class DCSet extends DBASet implements Observer {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
         }
+
+        if (Controller.getInstance().compactDConStart) {
+            UpdateUtil.repopulateTransactionFinalMap(instance);
+            LOGGER.debug("REPOPULATED");
+        }
+
 
     }
 
