@@ -1438,7 +1438,7 @@ public class DCSet extends DBASet implements Observer {
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
                 || getEngineSize() - engineSize > MAX_ENGINE_BEFORE_COMMIT_KB) {
             long start = System.currentTimeMillis();
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + getEngineSize() + "   %%%%% actions:" + actions);
+            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
 
             this.database.getEngine().clearCache();
 
