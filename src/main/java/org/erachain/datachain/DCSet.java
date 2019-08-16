@@ -133,7 +133,8 @@ public class DCSet extends DBASet implements Observer {
         LOGGER.info("ACTIONS_BEFORE_COMMIT: " + ACTIONS_BEFORE_COMMIT
                     + "MAX_ENGINE_BEFORE_COMMIT_KB: " + MAX_ENGINE_BEFORE_COMMIT_KB);
 
-            this.inMemory = inMemory;
+        this.engineSize = getEngineSize();
+        this.inMemory = inMemory;
 
         try {
             this.actions = 0L;
@@ -1424,6 +1425,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     private long poinCompact = System.currentTimeMillis();
+    private long engineSize;
     public void flush(int size, boolean hardFlush) {
 
         if (parent != null)
@@ -1434,9 +1436,9 @@ public class DCSet extends DBASet implements Observer {
 
         this.actions += size;
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
-                || getEngineSize() > MAX_ENGINE_BEFORE_COMMIT_KB) {
+                || getEngineSize() - engineSize > MAX_ENGINE_BEFORE_COMMIT_KB) {
             long start = System.currentTimeMillis();
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + getEngineSize() + "   %%%%% actions:" + actions);
+            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
 
             this.database.getEngine().clearCache();
 
@@ -1459,7 +1461,9 @@ public class DCSet extends DBASet implements Observer {
 
             LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineSize() + "   %%%%%%  commit time: "
                     + (System.currentTimeMillis() - start) / 1000);
+
             this.actions = 0l;
+            this.engineSize = getEngineSize();
 
         }
 
