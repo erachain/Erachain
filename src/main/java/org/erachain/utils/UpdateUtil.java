@@ -110,6 +110,8 @@ public class UpdateUtil {
 
         } while (b != null);
 
+        dcSet.flush(0, true);
+
     }
 
     public static void repopulateCommentPostMap() {
@@ -130,7 +132,7 @@ public class UpdateUtil {
                     }
                 }
             }
-            if (b.getHeight() % 2000 == 0) {
+            if (b.getHeight() % 1000 == 0) {
                 LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight());
                 DCSet.getInstance().flush(3 + b.getTransactionCount(), false);
             }
