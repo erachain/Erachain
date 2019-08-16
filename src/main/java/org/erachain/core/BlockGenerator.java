@@ -920,7 +920,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем
                 ctrl.checkStatusAndObserve(0);
-                if (!ctrl.needUpToDate()) {
+                if (ctrl.needUpToDate() && timeToPing + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()) {
+                    LOGGER.info("before FLUSH need UPDATE !");
+                } else {
 
                     // try solve and flush new block from Win Buffer
                     waitWin = bchain.getWaitWinBuffer();
