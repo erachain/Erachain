@@ -935,7 +935,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
                         waitWin = bchain.getWaitWinBuffer();
                     } while (waitWin == null
-                        && flushPoint < NTP.getTime());
+                        && flushPoint > NTP.getTime());
 
                     // not recived
                     if (waitWin != null) {
