@@ -1244,7 +1244,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
         if (asDeal > Transaction.FOR_MYPACK) {
             long[] reference = this.creator.getLastTimestamp(dcSet);
-            if (reference[0] >= this.timestamp
+            if (reference != null && reference[0] >= this.timestamp
                     && height > BlockChain.VERS_4_11) {
                 LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
                         + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
