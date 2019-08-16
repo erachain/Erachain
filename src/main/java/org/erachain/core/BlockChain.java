@@ -442,7 +442,7 @@ public class BlockChain {
 
             // TEAM 2
             FREEZED_BALANCES.put("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP",
-                    new int[][]{{225655, 90000}, {333655, 60000}});
+                    new int[][]{{225655, 90000}}); //, {333655, 60000}});
             FREEZED_BALANCES.put("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs",
                     new int[][]{{225655, 80000}, {333655, 53000}});
             FREEZED_BALANCES.put("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G",
