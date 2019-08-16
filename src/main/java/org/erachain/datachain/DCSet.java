@@ -128,7 +128,10 @@ public class DCSet extends DBASet implements Observer {
     public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
         super(dbFile, database, withObserver, dynamicGUI);
 
-        this.inMemory = inMemory;
+        LOGGER.info("ACTIONS_BEFORE_COMMIT: " + ACTIONS_BEFORE_COMMIT
+                    + "MAX_ENGINE_BEFORE_COMMIT_KB: " + MAX_ENGINE_BEFORE_COMMIT_KB);
+
+            this.inMemory = inMemory;
 
         try {
             this.actions = 0L;
