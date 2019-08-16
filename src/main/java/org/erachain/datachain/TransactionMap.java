@@ -17,7 +17,6 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import java.lang.reflect.Array;
 import java.util.*;
-import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -262,6 +261,11 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         while (iterator.hasNext()) {
             Long key = iterator.next().b;
             transaction = this.map.get(key);
+            if (transaction == null) {
+                // такая ошибка уже было
+                return;
+            }
+
             long deadline = transaction.getDeadline();
             if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
                     || ((Controller.HARD_WORK > 3

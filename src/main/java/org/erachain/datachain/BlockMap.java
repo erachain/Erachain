@@ -17,7 +17,6 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -104,6 +103,10 @@ public class BlockMap extends DCMap<Integer, Block> {
             lastBlockSignature = ((DCSet)databaseSet).getBlocksHeadsMap().get(this.size()).signature;
         }
         return lastBlockSignature;
+    }
+
+    public void resetLastBlockSignature() {
+        lastBlockSignature = ((DCSet)databaseSet).getBlocksHeadsMap().get(this.size()).signature;
     }
 
     private void setLastBlockSignature(byte[] signature) {
