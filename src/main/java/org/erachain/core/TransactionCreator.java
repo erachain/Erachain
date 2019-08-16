@@ -53,7 +53,8 @@ public class TransactionCreator {
     //private byte[] icon = new byte[0]; // default value
     //private byte[] image = new byte[0]; // default value
 
-    private void checkUpdate() {
+    // must be a SYNCHRONIZED
+    private synchronized void checkUpdate() {
         //CHECK IF WE ALREADY HAVE A FORK
         if (this.lastBlock == null || this.fork == null) {
             updateFork();
@@ -65,7 +66,7 @@ public class TransactionCreator {
         }
     }
 
-    private void updateFork() {
+    private synchronized void updateFork() {
         //CREATE NEW FORK
         if (this.fork != null) {
             this.fork.close();
