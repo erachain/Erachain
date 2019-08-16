@@ -38,7 +38,8 @@ import java.util.Random;
 public class DCSet extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 4;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 1;
+    private static final int MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 10 ;
     private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
 
     private static boolean isStoped = false;
@@ -1424,12 +1425,14 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
-        this.database.getEngine().clearCache();
 
         this.actions += size;
-        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
+        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
+                || getEngineSize() > MAX_ENGINE_BEFORE_COMMIT_KB) {
             long start = System.currentTimeMillis();
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%% actions:" + actions);
+            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + getEngineSize() + "   %%%%% actions:" + actions);
+
+            this.database.getEngine().clearCache();
 
             this.database.commit();
 
@@ -1448,7 +1451,8 @@ public class DCSet extends DBASet implements Observer {
                 }
             }
 
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%%%  commit time: " + new Double((System.currentTimeMillis() - start)) * 0.001);
+            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineSize() + "   %%%%%%  commit time: "
+                    + (System.currentTimeMillis() - start) / 1000);
             this.actions = 0l;
 
         }
@@ -1460,7 +1464,7 @@ public class DCSet extends DBASet implements Observer {
     public void update(Observable o, Object arg) {
     }
 
-    public long getEngineeSize() {
+    public long getEngineSize() {
 
         return this.database.getEngine().preallocate();
 
@@ -1469,6 +1473,5 @@ public class DCSet extends DBASet implements Observer {
     public String toString() {
         return (this.isFork()? "forked " : "")  + super.toString();
     }
-
 
 }
