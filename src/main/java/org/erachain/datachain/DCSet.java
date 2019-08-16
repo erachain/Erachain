@@ -40,6 +40,8 @@ public class DCSet extends DBASet implements Observer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 1;
     private static final int MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 10 ;
+    private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
+
     private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
 
     private static boolean isStoped = false;
@@ -1440,7 +1442,7 @@ public class DCSet extends DBASet implements Observer {
 
             this.database.commit();
 
-            if (System.currentTimeMillis() - poinCompact > 9999999
+            if (System.currentTimeMillis() - poinCompact > TIME_COMPACT_DB
                     || transactionMap.totalDeleted > 200000) {
                 poinCompact = System.currentTimeMillis();
                 LOGGER.debug("try COMPACT");
