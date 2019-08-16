@@ -1438,6 +1438,7 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
+        this.database.getEngine().clearCache();
 
         this.actions += size;
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
@@ -1445,8 +1446,6 @@ public class DCSet extends DBASet implements Observer {
                 || System.currentTimeMillis() - poinFlush > 3600000) {
             long start = poinFlush = System.currentTimeMillis();
             LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
-
-            this.database.getEngine().clearCache();
 
             this.database.commit();
 
