@@ -38,8 +38,8 @@ import java.util.Random;
 public class DCSet extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 1;
-    private static final int MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 10 ;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 3;
+    private static final int MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 13 ;
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
 
     private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
@@ -131,7 +131,7 @@ public class DCSet extends DBASet implements Observer {
         super(dbFile, database, withObserver, dynamicGUI);
 
         LOGGER.info("ACTIONS_BEFORE_COMMIT: " + ACTIONS_BEFORE_COMMIT
-                    + "MAX_ENGINE_BEFORE_COMMIT_KB: " + MAX_ENGINE_BEFORE_COMMIT_KB);
+                    + ", MAX_ENGINE_BEFORE_COMMIT_KB: " + MAX_ENGINE_BEFORE_COMMIT_KB);
 
         this.engineSize = getEngineSize();
         this.inMemory = inMemory;
