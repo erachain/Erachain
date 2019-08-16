@@ -38,7 +38,7 @@ import java.util.Random;
 public class DCSet extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN << 3;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 4;
     private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
 
     private static boolean isStoped = false;
