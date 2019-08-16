@@ -1424,7 +1424,8 @@ public class DCSet extends DBASet implements Observer {
         this.outUses();
     }
 
-    private long poinCompact = System.currentTimeMillis();
+    private long poinFlush = System.currentTimeMillis();
+    private long poinCompact = poinFlush;
     private long engineSize;
     public void flush(int size, boolean hardFlush) {
 
@@ -1436,8 +1437,9 @@ public class DCSet extends DBASet implements Observer {
 
         this.actions += size;
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
-                || getEngineSize() - engineSize > MAX_ENGINE_BEFORE_COMMIT_KB) {
-            long start = System.currentTimeMillis();
+                || getEngineSize() - engineSize > MAX_ENGINE_BEFORE_COMMIT_KB
+                || System.currentTimeMillis() - poinFlush > 3600000) {
+            long start = poinFlush = System.currentTimeMillis();
             LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
 
             this.database.getEngine().clearCache();
