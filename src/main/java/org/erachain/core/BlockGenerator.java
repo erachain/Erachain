@@ -933,7 +933,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // try solve and flush new block from Win Buffer
 
                     // FLUSH WINER to DB MAP
-                    LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
+                    if (this.solvingReference != null)
+                        LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
 
                     // ждем основное время просто
                     while (this.orphanto <= 0 && flushPoint > NTP.getTime()) {
@@ -979,7 +980,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         continue;
 
                     if (waitWin == null) {
-                        LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
+                        if (this.solvingReference != null)
+                            LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
 
                     } else {
 
