@@ -1894,7 +1894,7 @@ public class Controller extends Observable {
                             return;
                     } catch (Exception e) {
                         if (this.isOnStopping()) {
-                            // on closing this.dcSet.rollback();
+                            // on closing this.blocchain.rollback(dcSet);
                             return;
                         } else if (peer.isBanned()) {
                             ;

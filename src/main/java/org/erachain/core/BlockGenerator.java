@@ -590,7 +590,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     try {
                         while (bchain.getHeight(dcSet) >= this.orphanto
                             //    && bchain.getHeight(dcSet) > 157044
-                            ) {
+                        ) {
                             //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
                             //    long iii = 11;
                             //}
@@ -664,8 +664,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) < NTP.getTime()
-                                || BlockChain.DEVELOP_USE && height < 100
-                                || height < 10)) {
+                            || BlockChain.DEVELOP_USE && height < 100
+                            || height < 10)) {
 
                         setForgingStatus(ForgingStatus.FORGING);
                     }
@@ -1104,7 +1104,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         // TARGET_WIN will be small
         if (status != Controller.STATUS_OK
             ///|| ctrl.isProcessingWalletSynchronize()
-                ) {
+        ) {
             setForgingStatus(ForgingStatus.FORGING_ENABLED);
             return;
         }

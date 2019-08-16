@@ -17,7 +17,6 @@ import org.mapdb.Fun.Tuple2Comparator;
 
 import java.lang.reflect.Array;
 import java.util.*;
-import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -177,7 +176,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     protected Map<Long, Transaction> getMemoryMap() {
         return new TreeMap<Long, Transaction>(
                 //UnsignedBytes.lexicographicalComparator()
-                );
+        );
     }
 
     @Override
@@ -191,14 +190,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return iterator;
     }
 
-        /**
-         * Используется для получения транзакций для сборки блока
-         * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
-         * @param timestamp
-         * @param notSetDCSet
-         * @param cutDeadTime true is need filter by Dead Time
-         * @return
-         */
+    /**
+     * Используется для получения транзакций для сборки блока
+     * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
+     * @param timestamp
+     * @param notSetDCSet
+     * @param cutDeadTime true is need filter by Dead Time
+     * @return
+     */
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
 
         List<Transaction> values = new ArrayList<Transaction>();
@@ -222,8 +221,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
             bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
             if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN
-                    ///+ (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)
-                    ) {
+                ///+ (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)
+            ) {
                 break;
             }
 
@@ -262,6 +261,11 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         while (iterator.hasNext()) {
             Long key = iterator.next().b;
             transaction = this.map.get(key);
+            if (transaction == null) {
+                // такая ошибка уже было
+                return;
+            }
+
             long deadline = transaction.getDeadline();
             if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
                     || ((Controller.HARD_WORK > 3

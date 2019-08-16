@@ -1383,6 +1383,8 @@ public class DCSet extends DBASet implements Observer {
 
                 if (this.getBlockMap().isProcessing()) {
                     this.database.rollback();
+                    // not need on close!
+                    // getBlockMap().resetLastBlockSignature();
                 } else {
                     this.database.commit();
                 }
@@ -1402,6 +1404,7 @@ public class DCSet extends DBASet implements Observer {
     public void rollback() {
         this.addUses();
         this.database.rollback();
+        getBlockMap().resetLastBlockSignature();
         this.actions = 0l;
         this.outUses();
     }
