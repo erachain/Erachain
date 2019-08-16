@@ -926,10 +926,19 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 } else {
 
                     // try solve and flush new block from Win Buffer
-                    waitWin = bchain.getWaitWinBuffer();
-                    if (waitWin == null) {
-                        // LOGGER.info(" wait WIN BUFFER == null");
-                    } else {
+                    do {
+                        try {
+                            Thread.sleep(WAIT_STEP_MS);
+                        } catch (InterruptedException e) {
+                            local_status = -1;
+                            return;
+                        }
+                        waitWin = bchain.getWaitWinBuffer();
+                    } while (waitWin == null
+                        && flushPoint < NTP.getTime());
+
+                    // not recived
+                    if (waitWin != null) {
 
                         this.solvingReference = null;
 
