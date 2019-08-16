@@ -928,7 +928,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // try solve and flush new block from Win Buffer
                     waitWin = bchain.getWaitWinBuffer();
                     if (waitWin == null) {
-                        LOGGER.info(" wait WIN BUFFER == null");
+                        // LOGGER.info(" wait WIN BUFFER == null");
                     } else {
 
                         this.solvingReference = null;
