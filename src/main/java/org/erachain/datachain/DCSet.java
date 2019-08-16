@@ -25,6 +25,7 @@ import org.mapdb.DBMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -1447,7 +1448,7 @@ public class DCSet extends DBASet implements Observer {
             this.database.commit();
 
             if (System.currentTimeMillis() - poinCompact > TIME_COMPACT_DB
-                    || transactionMap.totalDeleted > 200000) {
+                    || transactionMap.totalDeleted > BlockChain.MAX_BLOCK_SIZE_GEN << 8) {
                 poinCompact = System.currentTimeMillis();
                 LOGGER.debug("try COMPACT");
                 // очень долго делает - лучше ключем при старте
