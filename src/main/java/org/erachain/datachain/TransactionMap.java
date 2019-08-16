@@ -253,7 +253,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
         Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
         long tickerIter = System.currentTimeMillis() - realTime;
-        if ( tickerIter > 100) {
+        if (tickerIter > 100) {
             LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
         }
 
