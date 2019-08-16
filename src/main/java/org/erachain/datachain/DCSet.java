@@ -19,6 +19,7 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
+import org.erachain.utils.UpdateUtil;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.slf4j.Logger;
@@ -425,6 +426,8 @@ public class DCSet extends DBASet implements Observer {
             LOGGER.debug("try COMPACT");
             database.compact();
             LOGGER.debug("COMPACTED");
+            UpdateUtil.repopulateTransactionFinalMap();
+            LOGGER.debug("REPOPULATED");
         }
 
         //CREATE INSTANCE
