@@ -321,8 +321,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public long totalDeleted = 0;
     public Transaction delete(Long key) {
-        totalDeleted++;
-        return super.delete(key);
+        Transaction transaction = super.delete(key);
+        if (transaction != null) {
+            // DELETE only if DELETED
+            totalDeleted++;
+        }
+
+        return transaction;
+
     }
 
     public boolean contains(byte[] signature) {
