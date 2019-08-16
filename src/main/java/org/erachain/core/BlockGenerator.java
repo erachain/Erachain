@@ -785,7 +785,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
 
                             newWinner = false;
-                            if (wait_new_block_broadcast > 0) {
+                            if (wait_new_block_broadcast > 0
+                                    // и мы не отстаем
+                                    && NTP.getTime() < timePoint + wait_new_block_broadcast) {
 
                                 local_status = 6;
                                 this.setMonitorStatus("local_status " + viewStatus());
@@ -817,7 +819,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     }
 
                                 }
-                                while (this.orphanto <= 0 && wait_step-- > 0);
+                                while (this.orphanto <= 0 && wait_step-- > 0
+                                    && NTP.getTime() < timePoint + wait_new_block_broadcast);
                             }
 
                             if (this.orphanto > 0)
