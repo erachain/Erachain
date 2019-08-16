@@ -927,7 +927,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     // try solve and flush new block from Win Buffer
                     waitWin = bchain.getWaitWinBuffer();
-                    if (waitWin != null) {
+                    if (waitWin == null) {
+                        LOGGER.info(" wait WIN BUFFER == null");
+                    } else {
 
                         this.solvingReference = null;
 
@@ -958,7 +960,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (flushPoint < NTP.getTime()) {
+                            if (flushPoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()) {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша
