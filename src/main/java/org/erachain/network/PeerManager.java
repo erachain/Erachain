@@ -1,18 +1,12 @@
 package org.erachain.network;
 
 import org.erachain.controller.Controller;
-import org.erachain.network.message.Message;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
-import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -23,7 +17,7 @@ public class PeerManager extends MonitoredThread {
 
     private Network network;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PeerManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PeerManager.class.getSimpleName());
 
     private static final int QUEUE_LENGTH = 20;
     BlockingQueue<Peer> blockingQueue = new ArrayBlockingQueue<Peer>(QUEUE_LENGTH);

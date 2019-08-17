@@ -33,7 +33,7 @@ public class TelegramManager extends Thread {
      * time to live telegram
      */
     private static final int KEEP_TIME = 60000 * 60 * (25 - 3 * Controller.HARD_WORK);
-    static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getSimpleName());
     private Network network;
     private boolean run;
     // pool of messages

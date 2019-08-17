@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class ConnectionAcceptor extends MonitoredThread {
 
-    static Logger LOGGER = LoggerFactory.getLogger(ConnectionAcceptor.class.getSimpleName()());
+    static Logger LOGGER = LoggerFactory.getLogger(ConnectionAcceptor.class.getSimpleName());
     private Network network;
     private ServerSocket socket;
     private boolean isRun;
