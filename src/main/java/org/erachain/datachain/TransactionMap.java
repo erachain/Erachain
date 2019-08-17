@@ -249,11 +249,11 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         long realTime = System.currentTimeMillis();
         int count = 0;
-        long tickerIter = System.currentTimeMillis() - realTime;
+        long tickerIter = realTime;
 
         timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS << (5 - Controller.HARD_WORK >> 1);
 
-        if (cutDeadTime) {
+        if (true || cutDeadTime) {
 
             timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
             tickerIter = System.currentTimeMillis();
@@ -265,7 +265,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             }
 
             for (Tuple2<?, Long> key : subSet) {
-                if (this.contains(key.b))
+                if (true || this.contains(key.b))
                     this.delete(key.b);
             }
 

@@ -34,7 +34,7 @@ public class Synchronizer {
     public static final int GET_BLOCK_TIMEOUT = 20000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> (6 - (Controller.HARD_WORK >> 1)));
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
     private static final int BYTES_MAX_GET = BlockChain.MAX_BLOCK_SIZE_BYTES << 1;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class.getSimpleName());
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 16;
     private static int MAX_ORPHAN_TRANSACTIONS = (BlockChain.MAX_BLOCK_SIZE << 5) << (Controller.HARD_WORK >> 1);
