@@ -14,6 +14,8 @@ import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -38,7 +40,7 @@ import java.util.*;
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 1;
 
-    //private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class);
+    static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
