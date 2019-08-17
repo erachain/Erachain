@@ -308,7 +308,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         long ticker = System.currentTimeMillis() - realTime;
         if ( ticker > 1000 || count > 0) {
-            LOGGER.debug("CLEAR dead UTXs: " + ticker + " ms, for deleted: " + count);
+            LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + count);
         }
 
     }
