@@ -37,7 +37,7 @@ import java.util.TreeMap;
  */
 public class BlockMap extends DCMap<Integer, Block> {
 
-    static Logger logger = LoggerFactory.getLogger(BlockMap.class.getName());
+    static Logger logger = LoggerFactory.getLogger(BlockMap.class.getSimpleName());
 
     public static final int HEIGHT_INDEX = 1; // for GUI
 
