@@ -63,7 +63,7 @@ import java.util.*;
             + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
     public static final int DATA_SIGN_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TRANSACTIONS_HASH_LENGTH;
-    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getSimpleName());
     /// HEAD of BLOCK ///
     // FACE
     protected int version;

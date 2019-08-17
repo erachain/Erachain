@@ -20,7 +20,7 @@ public class BlocksRequest extends MonitoredThread {
     //private final static boolean logPings = true;
     private boolean runned;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class.getSimpleName());
 
     /**
      * запросов может быть много - они очередь не сильно нагружают - так чтобы разрывов часто не было

@@ -243,7 +243,7 @@ public class BlockChain {
     public static HashMap<String, String> LOCKED__ADDRESSES = new HashMap<String, String>();
     public static HashMap<String, Tuple3<String, Integer, Integer>> LOCKED__ADDRESSES_PERIOD = new HashMap<String, Tuple3<String, Integer, Integer>>();
     public static HashMap<Long, PublicKeyAccount> ASSET_OWNERS = new HashMap<Long, PublicKeyAccount>();
-    static Logger LOGGER = LoggerFactory.getLogger(BlockChain.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockChain.class.getSimpleName());
     private GenesisBlock genesisBlock;
     private long genesisTimestamp;
     private Block waitWinBuffer;

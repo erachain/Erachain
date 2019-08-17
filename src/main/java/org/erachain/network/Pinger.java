@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Pinger extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class.getSimpleName());
     private static final int DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
     private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
 

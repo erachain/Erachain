@@ -31,7 +31,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     public static final boolean TEST_001 = false;
 
-    static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
 
     private static int WAIT_STEP_MS = 100;
 

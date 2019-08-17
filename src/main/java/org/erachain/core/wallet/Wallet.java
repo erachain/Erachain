@@ -55,7 +55,7 @@ public class Wallet extends Observable implements Observer {
 
 	private static final long RIGHTS_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
-	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getName());
+	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getSimpleName());
 	public DWSet database;
 	AssetsFavorites assetsFavorites;
 	TemplatesFavorites templatesFavorites;
