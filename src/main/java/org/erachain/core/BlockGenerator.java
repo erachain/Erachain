@@ -223,8 +223,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         Block waitWin;
 
-        start = System.currentTimeMillis();
-
         List<Transaction> transactionsList = new ArrayList<Transaction>();
 
         //	boolean transactionProcessed;
