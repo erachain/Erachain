@@ -78,11 +78,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         NavigableSet<Tuple2<Long, Long>> heightIndex = database
                 .createTreeSet("transactions_index_timestamp")
                 .comparator(comparator)
+                .counterEnable()
                 .makeOrGet();
 
         NavigableSet<Tuple2<Long, Long>> descendingHeightIndex = database
                 .createTreeSet("transactions_index_timestamp_descending")
                 .comparator(new ReverseComparator(comparator))
+                .counterEnable()
                 .makeOrGet();
 
         createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
@@ -118,7 +120,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             // NOT USE SECONDARY INDEXES
             return map;
 
-        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
+
         Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
             @Override
             public Tuple2<String, Long> run(Long key, Transaction val) {
@@ -127,7 +132,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             }
         });
 
-        this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
         Bind.secondaryKeys(map, this.recipientKey,
                 new Fun.Function2<String[], Long, Transaction>() {
                     @Override
@@ -146,7 +153,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                     }
                 });
 
-        this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
         Bind.secondaryKeys(map, this.typeKey,
                 new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
                     @Override
