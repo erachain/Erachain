@@ -296,7 +296,7 @@ public class PersonHuman extends PersonCls {
 
         if (dcSet.getBlocksHeadsMap().size() < BlockChain.SKIP_VALID_SIGN_BEFORE) {
             // for skip NOT VALID SIGNs
-            for (byte[] valid_item : Transaction.VALID_SIGN) {
+            for (byte[] valid_item : BlockChain.VALID_SIGN) {
                 if (Arrays.equals(this.reference, valid_item)) {
                     if (dcSet.getTransactionFinalMapSigns().contains(this.reference))
                         return false;

@@ -269,6 +269,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 newBlockDC = dcSet.fork();
             }
 
+            transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
             if (false // вообще-то все внутренние транзакции уже провверены на подпись!
                     && !transaction.isSignatureValid(newBlockDC)) {
                 needRemoveInvalids.add(transaction.getSignature());
@@ -276,8 +278,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             try {
-
-                transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
                 if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
                     needRemoveInvalids.add(transaction.getSignature());
@@ -381,14 +381,16 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
             if (transaction.getTimestamp() > timestamp)
                 break;
-            if (!transaction.isSignatureValid(newBlockDC)) {
+
+            transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
+            if (false // тут уже все проверено внутри нашей базы
+                    && !transaction.isSignatureValid(newBlockDC)) {
                 needRemoveInvalids.add(transaction.getSignature());
                 continue;
             }
 
             try {
-
-                transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
                 if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
                     needRemoveInvalids.add(transaction.getSignature());
