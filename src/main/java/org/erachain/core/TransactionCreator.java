@@ -98,6 +98,7 @@ public class TransactionCreator {
 
         //VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
         for (Transaction transactionAccount : accountTransactions) {
+
             transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
             if (!transactionAccount.isSignatureValid(this.fork)) {
                 //THE TRANSACTION BECAME INVALID LET

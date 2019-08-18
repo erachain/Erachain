@@ -16,7 +16,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.datachain.AddressTimeSignatureMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -1232,11 +1231,11 @@ public abstract class Transaction implements ExplorerJsonLine {
         // CHECK IF REFERENCE IS OK
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
         if (asDeal > Transaction.FOR_MYPACK) {
-            long[] reference = this.creator.getLastTimestamp(dcSet);
-            if (reference != null && reference[0] >= this.timestamp
+            long reference = this.creator.getLastTimestamp(dcSet);
+            if (reference >= this.timestamp
                     && height > BlockChain.VERS_4_11) {
-                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
-                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
+                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
                         + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
 
                 return INVALID_TIMESTAMP;
@@ -1418,7 +1417,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             String creatorAddress = this.creator.getAddress();
 
             // UPDATE REFERENCE OF SENDER
-            this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
+            this.creator.setLastTimestamp(this.timestamp, this.dcSet);
         }
 
     }
