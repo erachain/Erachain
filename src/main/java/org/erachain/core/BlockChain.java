@@ -847,7 +847,7 @@ public class BlockChain {
     }
 
     public int getBlockOnTimestamp(long timestamp) {
-        long diff = timestamp = genesisTimestamp;
+        long diff = timestamp - genesisTimestamp;
         return (int) (diff / GENERATING_MIN_BLOCK_TIME_MS);
     }
 
