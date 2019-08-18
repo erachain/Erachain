@@ -223,8 +223,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         Block waitWin;
 
-        start = System.currentTimeMillis();
-
         List<Transaction> transactionsList = new ArrayList<Transaction>();
 
         //	boolean transactionProcessed;
@@ -271,7 +269,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 newBlockDC = dcSet.fork();
             }
 
-            if (!transaction.isSignatureValid(newBlockDC)) {
+            if (false // вообще-то все внутренние транзакции уже провверены на подпись!
+                    && !transaction.isSignatureValid(newBlockDC)) {
                 needRemoveInvalids.add(transaction.getSignature());
                 continue;
             }

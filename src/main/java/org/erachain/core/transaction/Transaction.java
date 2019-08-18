@@ -1200,7 +1200,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             return false;
 
         int height = dcSet.getBlocksHeadsMap().size();
-        if (height < 100000) {
+        if (height < BlockChain.SKIP_VALID_SIGN_BEFORE) {
             // for skip NOT VALID SIGNs
             for (byte[] valid_item : VALID_SIGN) {
                 if (Arrays.equals(signature, valid_item)) {

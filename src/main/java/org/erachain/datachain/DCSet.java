@@ -25,7 +25,6 @@ import org.mapdb.DBMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.awt.*;
 import java.io.File;
 import java.util.Observable;
 import java.util.Observer;
@@ -1441,16 +1440,21 @@ public class DCSet extends DBASet implements Observer {
         this.database.getEngine().clearCache();
 
         this.actions += size;
+        long diffUp = getEngineSize() - engineSize;
+        if (diffUp < 0)
+            diffUp = -diffUp;
+
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
-                || getEngineSize() - engineSize > MAX_ENGINE_BEFORE_COMMIT_KB
+                || diffUp > MAX_ENGINE_BEFORE_COMMIT_KB
                 || System.currentTimeMillis() - poinFlush > 3600000) {
             long start = poinFlush = System.currentTimeMillis();
             LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
 
             this.database.commit();
 
-            if (System.currentTimeMillis() - poinCompact > TIME_COMPACT_DB
-                    || transactionMap.totalDeleted > DELETIONS_BEFORE_COMPACT) {
+            // не хватате места на диске - нужно в 2раза болше при создании Компакта
+            if (false && (System.currentTimeMillis() - poinCompact > TIME_COMPACT_DB
+                    || transactionMap.totalDeleted > DELETIONS_BEFORE_COMPACT)) {
                 poinCompact = System.currentTimeMillis();
                 LOGGER.debug("try COMPACT");
                 // очень долго делает - лучше ключем при старте
