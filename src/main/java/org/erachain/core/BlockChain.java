@@ -120,8 +120,6 @@ public class BlockChain {
 
     public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 0;
 
-    public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 100000;
-
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
     public static final int DEVELOP_FORGING_START = 100;
