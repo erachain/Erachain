@@ -1624,6 +1624,7 @@ import java.util.*;
                         return false;
 
                     seqNo++;
+                    transactionSignature = transaction.getSignature();
 
                     if (!transaction.isWiped()) {
 
@@ -1638,13 +1639,21 @@ import java.util.*;
                             return false;
                         }
 
-                        if (!transaction.isSignatureValid(validatingDC)) {
-                            //
-                            LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                    + ":" + transaction.viewFullTypeName()
-                                    + " signature  invalid!"
-                                    + " " + Base58.encode(transaction.getSignature()));
-                            return false;
+                        boolean isSignatureValid = false;
+                        // TRY QUCK check SIGNATURE by FIND in POOL
+                        if (unconfirmedMap.contains(transactionSignature)) {
+                            isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature));
+                        }
+
+                        if (!isSignatureValid) {
+                            if (!transaction.isSignatureValid(validatingDC)) {
+                                //
+                                LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                                        + ":" + transaction.viewFullTypeName()
+                                        + " signature  invalid!"
+                                        + " " + Base58.encode(transaction.getSignature()));
+                                return false;
+                            }
                         }
 
                         //CHECK TIMESTAMP AND DEADLINE
@@ -1698,8 +1707,6 @@ import java.util.*;
                         transaction.getCreator().setLastTimestamp(
                                 new long[]{transaction.getTimestamp(), transaction.getDBRef()}, validatingDC);
                     }
-
-                    transactionSignature = transaction.getSignature();
 
                     if (andProcess) {
 

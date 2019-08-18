@@ -442,6 +442,13 @@ public abstract class Transaction implements ExplorerJsonLine {
         return false;
     }
 
+    public boolean trueEquals(Object transaction) {
+        if (transaction instanceof Transaction)
+            return Arrays.equals(this.toBytes(FOR_NETWORK, true),
+                    ((Transaction) transaction).toBytes(FOR_NETWORK, true));
+        return false;
+    }
+
     // reference in Map - or as signatire or as BlockHeight + seqNo
     public static Transaction findByDBRef(DCSet db, byte[] dbRef) {
 
