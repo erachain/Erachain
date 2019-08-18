@@ -65,6 +65,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         //TIMESTAMP INDEX
         NavigableSet<Tuple2<Long, Tuple2<String, String>>> timestampIndex = database.createTreeSet("blocks_index_timestamp")
                 .comparator(Fun.COMPARATOR)
+                .counterEnable()
                 .makeOrGet();
 
         NavigableSet<Tuple2<Long, Tuple2<String, String>>> descendingTimestampIndex = database.createTreeSet("blocks_index_timestamp_descending")
