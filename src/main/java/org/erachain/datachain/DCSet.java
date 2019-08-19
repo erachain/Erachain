@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -1441,10 +1442,16 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
+        // try repopulate table
         if (System.currentTimeMillis() - poinClear > 900000) {
             poinClear = System.currentTimeMillis();
             LOGGER.debug("try CLEAR UTXs");
+            TransactionMap utxMap = getTransactionMap();
+            Collection<Transaction> items = utxMap.getValues();
             instance.getTransactionMap().reset();
+            for (Transaction item: items) {
+                utxMap.add(item);
+            }
             this.database.getEngine().clearCache();
             LOGGER.debug("CLEARed UTXs");
         }
