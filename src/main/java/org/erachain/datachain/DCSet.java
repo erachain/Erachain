@@ -424,17 +424,19 @@ public class DCSet extends DBASet implements Observer {
                  */
                 .make();
 
-        if (Controller.getInstance().compactDConStart) {
-            LOGGER.debug("try COMPACT");
-            database.compact();
-            LOGGER.debug("COMPACTED");
-        }
-
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
+        }
+
+        // очистим полностью перед компактом
+        instance.getTransactionMap().reset();
+        if (Controller.getInstance().compactDConStart) {
+            LOGGER.debug("try COMPACT");
+            database.compact();
+            LOGGER.debug("COMPACTED");
         }
 
     }
