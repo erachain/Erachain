@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -1426,6 +1427,7 @@ public class DCSet extends DBASet implements Observer {
     private long poinFlush = System.currentTimeMillis();
     private long poinCompact = poinFlush;
     private long engineSize;
+    private long poinClear;
     public void flush(int size, boolean hardFlush) {
 
         if (parent != null)
@@ -1433,7 +1435,21 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
-        this.database.getEngine().clearCache();
+        // try repopulate table
+        if (System.currentTimeMillis() - poinClear > 900000) {
+            poinClear = System.currentTimeMillis();
+            LOGGER.debug("try CLEAR UTXs");
+            TransactionMap utxMap = getTransactionMap();
+            this.actions += utxMap.size();
+            Collection<Transaction> items = utxMap.getValues();
+            instance.getTransactionMap().reset();
+            for (Transaction item: items) {
+                utxMap.add(item);
+            }
+            this.database.getEngine().clearCache();
+            LOGGER.debug("CLEARed UTXs");
+        }
+
 
         this.actions += size;
         long diffUp = getEngineSize() - engineSize;
@@ -1448,10 +1464,10 @@ public class DCSet extends DBASet implements Observer {
 
             this.database.commit();
 
-            // не хватате места на диске - нужно в 2раза болше при создании Компакта
-            if (false && (System.currentTimeMillis() - poinCompact > TIME_COMPACT_DB
-                    || transactionMap.totalDeleted > DELETIONS_BEFORE_COMPACT)) {
+            if (Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
+                // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
+
                 LOGGER.debug("try COMPACT");
                 // очень долго делает - лучше ключем при старте
                 try {
