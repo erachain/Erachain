@@ -1438,9 +1438,10 @@ public class DCSet extends DBASet implements Observer {
         // try repopulate table
         if (System.currentTimeMillis() - poinClear > 900000) {
             poinClear = System.currentTimeMillis();
-            LOGGER.debug("try CLEAR UTXs");
             TransactionMap utxMap = getTransactionMap();
-            this.actions += utxMap.size();
+            int sizeUTX = utxMap.size();
+            LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
+            this.actions += sizeUTX;
             Collection<Transaction> items = utxMap.getValues();
             instance.getTransactionMap().reset();
             for (Transaction item: items) {
