@@ -264,19 +264,19 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS << (5 - Controller.HARD_WORK >> 1);
 
-        if (true || cutDeadTime) {
+        if (false && cutDeadTime) {
 
             timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
             tickerIter = System.currentTimeMillis();
             SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
                     timestamp, null));
             tickerIter = System.currentTimeMillis() - tickerIter;
-            if (tickerIter > 10) {
+            if (tickerIter > 1) {
                 LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
             }
 
             for (Tuple2<?, Long> key : subSet) {
-                if (true || this.contains(key.b))
+                //if (true || this.contains(key.b))
                     this.delete(key.b);
             }
 
@@ -287,7 +287,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
              */
             //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
             Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
-            if (tickerIter > 10) {
+            if (tickerIter > 1) {
                 LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
             }
 
