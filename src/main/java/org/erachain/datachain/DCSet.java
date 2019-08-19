@@ -432,8 +432,9 @@ public class DCSet extends DBASet implements Observer {
         }
 
         // очистим полностью перед компактом
-        instance.getTransactionMap().reset();
         if (Controller.getInstance().compactDConStart) {
+            instance.getTransactionMap().reset();
+            instance.database.commit();
             LOGGER.debug("try COMPACT");
             database.compact();
             LOGGER.debug("COMPACTED");
