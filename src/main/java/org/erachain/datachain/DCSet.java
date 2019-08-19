@@ -1432,9 +1432,10 @@ public class DCSet extends DBASet implements Observer {
         this.outUses();
     }
 
-    private long poinCompact;
+    private long poinFlush = System.currentTimeMillis();
+    private long poinCompact = poinFlush;
+    private long engineSize;
     private long poinClear;
-
     public void flush(int size, boolean hardFlush) {
 
         if (parent != null)
@@ -1459,9 +1460,15 @@ public class DCSet extends DBASet implements Observer {
 
 
         this.actions += size;
-        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
-            long start = System.currentTimeMillis();
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%% actions:" + actions);
+        long diffUp = getEngineSize() - engineSize;
+        if (diffUp < 0)
+            diffUp = -diffUp;
+
+        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
+                //|| diffUp > BlockChain.MAX_ENGINE_BEFORE_COMMIT_KB
+                || System.currentTimeMillis() - poinFlush > 3600000) {
+            long start = poinFlush = System.currentTimeMillis();
+            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
 
             this.database.commit();
 
@@ -1470,12 +1477,22 @@ public class DCSet extends DBASet implements Observer {
                 poinCompact = System.currentTimeMillis();
 
                 LOGGER.debug("try COMPACT");
-                this.database.compact();
-                LOGGER.debug("COMPACTED");
+                // очень долго делает - лучше ключем при старте
+                try {
+                    this.database.compact();
+                    transactionMap.totalDeleted = 0;
+                    LOGGER.debug("COMPACTED");
+                } catch (Exception e) {
+                    transactionMap.totalDeleted >>= 1;
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
 
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%%%  commit time: " + new Double((System.currentTimeMillis() - start)) * 0.001);
+            LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " +getEngineSize() + "   %%%%%%  commit time: "
+                    + (System.currentTimeMillis() - start) / 1000);
+
             this.actions = 0l;
+            this.engineSize = getEngineSize();
 
         }
 
@@ -1486,7 +1503,7 @@ public class DCSet extends DBASet implements Observer {
     public void update(Observable o, Object arg) {
     }
 
-    public long getEngineeSize() {
+    public long getEngineSize() {
 
         return this.database.getEngine().preallocate();
 
