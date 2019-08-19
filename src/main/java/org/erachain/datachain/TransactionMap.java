@@ -287,13 +287,19 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
              */
             //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
             Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+            tickerIter = System.currentTimeMillis() - tickerIter;
             if (tickerIter > 10) {
                 LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
             }
 
             Transaction transaction;
 
+            tickerIter = System.currentTimeMillis();
             long size = this.size();
+            tickerIter = System.currentTimeMillis() - tickerIter;
+            if (tickerIter > 10) {
+                LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
+            }
             while (iterator.hasNext()) {
                 Long key = iterator.next().b;
                 transaction = this.map.get(key);
