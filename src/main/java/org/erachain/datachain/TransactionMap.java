@@ -271,12 +271,12 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
                     timestamp, null));
             tickerIter = System.currentTimeMillis() - tickerIter;
-            if (tickerIter > 1) {
+            if (tickerIter > 10) {
                 LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
             }
 
             for (Tuple2<?, Long> key : subSet) {
-                //if (true || this.contains(key.b))
+                if (true || this.contains(key.b))
                     this.delete(key.b);
             }
 
@@ -287,13 +287,19 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
              */
             //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
             Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
-            if (tickerIter > 1) {
+            tickerIter = System.currentTimeMillis() - tickerIter;
+            if (tickerIter > 10) {
                 LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
             }
 
             Transaction transaction;
 
+            tickerIter = System.currentTimeMillis();
             long size = this.size();
+            tickerIter = System.currentTimeMillis() - tickerIter;
+            if (tickerIter > 10) {
+                LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
+            }
             while (iterator.hasNext()) {
                 Long key = iterator.next().b;
                 transaction = this.map.get(key);
@@ -473,7 +479,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,
-                                         int type, boolean desc, int offset, int limit, long timestamp) {
+                                              int type, boolean desc, int offset, int limit, long timestamp) {
 
         Iterable keys = findTransactionsKeys(address, sender, recipient,
                 type, desc, offset, limit, timestamp);
