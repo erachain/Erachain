@@ -1432,6 +1432,8 @@ public class DCSet extends DBASet implements Observer {
     }
 
     private long poinCompact;
+    private long poinClear;
+
     public void flush(int size, boolean hardFlush) {
 
         if (parent != null)
@@ -1439,7 +1441,16 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
-        this.database.getEngine().clearCache();
+        if (System.currentTimeMillis() - poinClear > 900000) {
+            poinClear = System.currentTimeMillis();
+            LOGGER.debug("try CLEAR UTXs");
+            instance.getTransactionMap().reset();
+            this.database.getEngine().clearCache();
+            LOGGER.debug("CLEARed UTXs");
+        }
+
+        instance.database.commit();
+
 
         this.actions += size;
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
@@ -1448,9 +1459,10 @@ public class DCSet extends DBASet implements Observer {
 
             this.database.commit();
 
-            if (false && System.currentTimeMillis() - poinCompact > 9999999) {
+            if (System.currentTimeMillis() - poinCompact > 9999999) {
                 // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
+
                 LOGGER.debug("try COMPACT");
                 this.database.compact();
                 LOGGER.debug("COMPACTED");
