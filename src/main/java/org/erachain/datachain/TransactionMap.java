@@ -269,6 +269,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
 
+        // получение данных о размере занимает очень много времени кстати если таблица без счетчика
+        long size = this.size();
         while (iterator.hasNext()) {
             Long key = iterator.next().b;
             transaction = this.map.get(key);
@@ -276,7 +278,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
                     || ((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
                     || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                    || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                    || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                 this.delete(key);
                 count++;
             } else {
