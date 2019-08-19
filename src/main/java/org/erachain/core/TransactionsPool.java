@@ -53,6 +53,7 @@ public class TransactionsPool extends MonitoredThread {
     }
 
     private int clearCount;
+    private long pointClear;
     public void processMessage(Message message) {
 
         if (message == null)
@@ -145,7 +146,7 @@ public class TransactionsPool extends MonitoredThread {
         }
 
         // проверяем на переборт трнзакций в пуле чтобы лишние очистить
-        if (++clearCount > 1000) {
+        if (++clearCount > 1000 && System.currentTimeMillis() - pointClear > BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) {
 
             clearCount = 0;
 
@@ -164,6 +165,8 @@ public class TransactionsPool extends MonitoredThread {
                     txMap.clearByDeadTimeAndLimit(NTP.getTime(), true);
                 }
             }
+
+            pointClear = System.currentTimeMillis();
         }
 
         // если мы не в синхронизации - так как мы тогда
