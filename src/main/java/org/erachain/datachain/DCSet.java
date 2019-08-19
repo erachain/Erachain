@@ -432,12 +432,6 @@ public class DCSet extends DBASet implements Observer {
                  */
                 .make();
 
-        if (Controller.getInstance().compactDConStart) {
-            LOGGER.debug("try COMPACT");
-            database.compact();
-            LOGGER.debug("COMPACTED");
-        }
-
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
@@ -445,12 +439,13 @@ public class DCSet extends DBASet implements Observer {
             throw new Exception("error in DATACHAIN:" + instance.actions);
         }
 
-        if (false && Controller.getInstance().compactDConStart) {
-            // NEED LOT of MEMORY by .reset
-            UpdateUtil.repopulateTransactionFinalMap(instance);
-            LOGGER.debug("REPOPULATED");
+        // очистим полностью перед компактом
+        instance.getTransactionMap().reset();
+        if (Controller.getInstance().compactDConStart) {
+            LOGGER.debug("try COMPACT");
+            database.compact();
+            LOGGER.debug("COMPACTED");
         }
-
 
     }
 
@@ -916,7 +911,7 @@ public class DCSet extends DBASet implements Observer {
     public ReferenceMap getReferenceMap() {
         return this.referenceMap;
     }
-    
+
     /**
      * Транзакции занесенные в цепочку
      *
