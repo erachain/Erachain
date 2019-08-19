@@ -293,6 +293,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
             Transaction transaction;
 
+            long size = this.size();
             while (iterator.hasNext()) {
                 Long key = iterator.next().b;
                 transaction = this.map.get(key);
@@ -308,7 +309,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                         && deadline < timestamp)
                         || Controller.HARD_WORK <= 3
                         && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                        || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                        || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                     this.delete(key);
                     count++;
                 } else {
