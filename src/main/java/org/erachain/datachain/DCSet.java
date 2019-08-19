@@ -1447,6 +1447,7 @@ public class DCSet extends DBASet implements Observer {
             poinClear = System.currentTimeMillis();
             LOGGER.debug("try CLEAR UTXs");
             TransactionMap utxMap = getTransactionMap();
+            this.actions += utxMap.size();
             Collection<Transaction> items = utxMap.getValues();
             instance.getTransactionMap().reset();
             for (Transaction item: items) {
@@ -1456,8 +1457,6 @@ public class DCSet extends DBASet implements Observer {
             LOGGER.debug("CLEARed UTXs");
         }
 
-        instance.database.commit();
-
 
         this.actions += size;
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
@@ -1466,7 +1465,7 @@ public class DCSet extends DBASet implements Observer {
 
             this.database.commit();
 
-            if (System.currentTimeMillis() - poinCompact > 9999999) {
+            if (Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
                 // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
 
