@@ -426,7 +426,7 @@ public class Account {
                 .getBalance(dcSet, key);
         BigDecimal ownVol = balance.a.b;
 
-        if (!BlockChain.DEVELOP_USE && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
+        if (!BlockChain.DEVELOP_USE && !BlockChain.ERA_COMPU_ALL_UP && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
             int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
             if (item != null) {
                 if (item[0][0] < 0) {
