@@ -391,7 +391,7 @@ public class DCSet extends DBASet implements Observer {
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
                 ///// добавил dcSet.clearCache(); --
-                ///.cacheDisable()
+                .cacheDisable()
 
                 /**
                  * если не задавать вид КЭШа то берется стандартный - и его размер 10 очень мал и скорость
@@ -408,9 +408,10 @@ public class DCSet extends DBASet implements Observer {
                 // при норм размере и досточной памяти скорость не хуже чем у остальных
                 //.cacheLRUEnable() // скорость зависит от памяти и настроек -
                 //.cacheSize(512 << Controller.HARD_WORK)
+                //.cacheSize(8 << Controller.HARD_WORK)
 
-                .cacheSoftRefEnable()
-                .cacheSize(32 << Controller.HARD_WORK)
+                //.cacheSoftRefEnable()
+                //.cacheSize(32 << Controller.HARD_WORK)
 
                 //.cacheWeakRefEnable()
                 //.cacheSize(32 << Controller.HARD_WORK)
