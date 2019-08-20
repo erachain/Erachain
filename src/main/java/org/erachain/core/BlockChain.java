@@ -38,6 +38,7 @@ public class BlockChain {
 
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
+    public static final boolean ERA_COMPU_ALL_UP = true;
 
     static final public int CHECK_BUGS = 1;
 
@@ -67,7 +68,7 @@ public class BlockChain {
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
     public static final int BASE_TARGET = 100000;///1 << 15;
-    public static final int REPEAT_WIN = DEVELOP_USE ? 4 : 40; // GENESIS START TOP ACCOUNTS
+    public static final int REPEAT_WIN = DEVELOP_USE ? 4 : ERA_COMPU_ALL_UP? 15 : 40; // GENESIS START TOP ACCOUNTS
 
     // RIGHTs
     public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -103,7 +104,7 @@ public class BlockChain {
     public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN << 3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
 
-    public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;
+    public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : BlockChain.ERA_COMPU_ALL_UP? 10000 : 22000;
 
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
@@ -579,7 +580,7 @@ public class BlockChain {
         //return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
         // better accuracy
         long target = (((targetPrevious << TARGET_COUNT_SHIFT) - targetPrevious) + winValue) >> TARGET_COUNT_SHIFT;
-        if (target < 1000 && DEVELOP_USE)
+        if (target < 1000 && (DEVELOP_USE || ERA_COMPU_ALL_UP))
             target = 1000;
 
         return target;
@@ -594,7 +595,7 @@ public class BlockChain {
             // FOR not repeated WINS - not need check BASE_TARGET
             /////base = BlockChain.BASE_TARGET>>1;
             base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET >> 2); // ONLY UP
-        else if (DEVELOP_USE)
+        else if (DEVELOP_USE || ERA_COMPU_ALL_UP)
             base = 1; //BlockChain.BASE_TARGET >>5;
         else if (height < 110000)
             base = (BlockChain.BASE_TARGET >> 3); // + (BlockChain.BASE_TARGET>>4);
@@ -638,7 +639,7 @@ public class BlockChain {
 
         Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
 
-        if (DEVELOP_USE) {
+        if (DEVELOP_USE || ERA_COMPU_ALL_UP) {
             if (previousForgingPoint == null) {
                 // IF BLOCK not inserted in MAP
                 previousForgingPoint = creator.getLastForgingData(dcSet);
@@ -661,13 +662,13 @@ public class BlockChain {
         }
 
         if (forgingBalance < BlockChain.MIN_GENERATING_BALANCE) {
-            if (!Controller.getInstance().isTestNet() && !DEVELOP_USE)
+            if (!DEVELOP_USE && !ERA_COMPU_ALL_UP && !Controller.getInstance().isTestNet())
                 return 0l;
             forgingBalance = BlockChain.MIN_GENERATING_BALANCE;
         }
 
         int difference = height - previousForgingHeight;
-        if (Controller.getInstance().isTestNet() || BlockChain.DEVELOP_USE) {
+        if (DEVELOP_USE || ERA_COMPU_ALL_UP || Controller.getInstance().isTestNet()) {
             if (difference < 10)
                 difference = 10;
             ;
@@ -714,7 +715,7 @@ public class BlockChain {
         else
             win_value = forgingBalance;
 
-        if (Controller.getInstance().isTestNet() || DEVELOP_USE)
+        if (DEVELOP_USE || ERA_COMPU_ALL_UP || Controller.getInstance().isTestNet())
             return win_value;
 
         if (false) {
@@ -761,7 +762,7 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (!DEVELOP_USE && !Controller.getInstance().isTestNet()
+        if (!DEVELOP_USE && !ERA_COMPU_ALL_UP && !Controller.getInstance().isTestNet()
                 && height > VERS_4_11
                 && base > targetedWinValue) {
             return -targetedWinValue;

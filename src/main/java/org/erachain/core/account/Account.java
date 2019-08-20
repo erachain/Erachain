@@ -526,7 +526,7 @@ public class Account {
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getShortAddressBytes(), key);
-        if (true || BlockChain.DEVELOP_USE) {
+        if (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) {
             return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key))),
                     balance.b, balance.c, balance.d, balance.e);
@@ -543,7 +543,7 @@ public class Account {
                 .getAssetBalanceMap().get(getShortAddressBytes(), key);
 
         if (actionType == TransactionAmount.ACTION_SEND) {
-            if (true || BlockChain.DEVELOP_USE) {
+            if (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) {
                 return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
             }
 
