@@ -34,7 +34,7 @@ public class Synchronizer {
     public static final int GET_BLOCK_TIMEOUT = 20000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> (6 - (Controller.HARD_WORK >> 1)));
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
     private static final int BYTES_MAX_GET = BlockChain.MAX_BLOCK_SIZE_BYTES << 1;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class.getSimpleName());
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 16;
     private static int MAX_ORPHAN_TRANSACTIONS = (BlockChain.MAX_BLOCK_SIZE << 5) << (Controller.HARD_WORK >> 1);
@@ -200,7 +200,7 @@ public class Synchronizer {
         long myWeight = myHW.b;
         int newHeight = lastBlock.getHeight() + newBlocks.size();
         // проверять СИЛУ цепочки только если лна не на много лучше моей высоты
-        boolean checkFullWeight = !BlockChain.DEVELOP_USE && testHeight > newHeight;
+        boolean checkFullWeight = !(true || BlockChain.DEVELOP_USE) && testHeight > newHeight;
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
@@ -858,7 +858,7 @@ public class Synchronizer {
                 dcSet.getBlockMap().setProcessing(false);
                 //dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
-                int blockSize = (1 + block.getTransactionCount()) * 1000 + block.getDataLength(false);
+                int blockSize = 3 + block.getTransactionCount();
                 dcSet.flush(blockSize, false);
 
                 if (cnt.isOnStopping())
@@ -883,11 +883,15 @@ public class Synchronizer {
                     error = new Exception(e);
                 }
             } finally {
+
                 if (cnt.isOnStopping()) {
+                    // was BREAK - try ROLLBACK
+                    dcSet.rollback();
                     throw new Exception("on stopping");
                 }
 
                 if (error != null) {
+                    // was BREAK - try ROLLBACK
                     dcSet.rollback();
 
                     if (error instanceof IOException) {
@@ -927,7 +931,7 @@ public class Synchronizer {
                 //dcSet.updateTxCounter(block.getTransactionCount());
 
                 // FLUSH not use in each case - only after accumulate size
-                int blockSize = (1 + block.getTransactionCount()) * 1000 + block.getDataLength(false);
+                int blockSize = 3 + block.getTransactionCount();
                 dcSet.flush(blockSize, false);
 
                 // образать список и по времени протухания
@@ -956,11 +960,15 @@ public class Synchronizer {
                     error = new Exception(e);
                 }
             } finally {
+
                 if (cnt.isOnStopping()) {
+                    // was BREAK - try ROLLBACK
+                    dcSet.rollback();
                     throw new Exception("on stopping");
                 }
 
                 if (error != null) {
+                    // was BREAK - try ROLLBACK
                     dcSet.rollback();
                     LOGGER.error(error.getMessage(), error);
 

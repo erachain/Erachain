@@ -3,7 +3,10 @@ package org.erachain.core.item.persons;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
@@ -17,6 +20,7 @@ import org.json.simple.JSONObject;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Set;
 
 //import java.math.BigDecimal;
@@ -197,7 +201,8 @@ public abstract class PersonCls extends ItemCls {
 
         // тут переключение внутри цикла идет - так же слишком ресурсно
         BigDecimal sum = addresses.stream()
-                .map((address) -> map.get(address, assetKey))
+                .map((adr) -> Account.makeShortBytes(adr))
+                .map((key) -> map.get(key, assetKey))
                 .map((balances) -> {
                     switch (pos) {
                         case 1:

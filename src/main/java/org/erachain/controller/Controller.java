@@ -1894,7 +1894,7 @@ public class Controller extends Observable {
                             return;
                     } catch (Exception e) {
                         if (this.isOnStopping()) {
-                            // on closing this.dcSet.rollback();
+                            // on closing this.blocchain.rollback(dcSet);
                             return;
                         } else if (peer.isBanned()) {
                             ;
@@ -1941,7 +1941,13 @@ public class Controller extends Observable {
 
         // NOTIFY
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+        try {
+            this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+        } catch (ClassCastException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
 
         this.statusInfo();
 
@@ -2288,10 +2294,16 @@ public class Controller extends Observable {
         return getTransaction(signature, this.dcSet);
     }
 
-    // by account addres + timestamp get signature
-    public byte[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
+    public Transaction getTransaction(Long dbREF) {
 
-        return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
+        return getTransaction(dbREF, this.dcSet);
+    }
+
+    // by account addres + timestamp get signature
+    public long[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
+
+        //return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
+        return dcSet.getReferenceMap().get(Account.makeShortBytes(address));
     }
 
     public Transaction getTransaction(byte[] signature, DCSet database) {
@@ -2306,6 +2318,10 @@ public class Controller extends Observable {
             return database.getTransactionFinalMap().get(tuple_Tx);
         }
         return null;
+    }
+
+    public Transaction getTransaction(long refDB, DCSet database) {
+        return database.getTransactionFinalMap().get(refDB);
     }
 
     public List<Transaction> getLastTransactions(Account account, int limit) {
@@ -2601,12 +2617,13 @@ public class Controller extends Observable {
 
     // BALANCES
 
-    public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
+    public SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
             long key) {
         return this.dcSet.getAssetBalanceMap().getBalancesSortableList(key);
     }
 
-    public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
+    public SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+    getBalances(
             Account account) {
 
         return this.dcSet.getAssetBalanceMap().getBalancesSortableList(account);
@@ -3250,20 +3267,12 @@ public class Controller extends Observable {
             }
         }
 
-        // DCSet db = this.dcSet;
-        // get last transaction from this address
-        byte[] sign = dcSet.getAddressTime_SignatureMap().get(address);
-        if (sign == null) {
+        long[] makerLastTimestamp = dcSet.getReferenceMap().get(Account.makeShortBytes(address));
+        if (makerLastTimestamp == null) {
             return null;
         }
 
-        /*
-         * long lastReference = db.getReferenceMap().get(address); byte[] sign =
-         * getSignatureByAddrTime(db, address, lastReference); if (sign == null)
-         * return null;
-         */
-
-        Transaction transaction = cntr.getTransaction(sign);
+        Transaction transaction = cntr.getTransaction(makerLastTimestamp[1]);
         if (transaction == null) {
             return null;
         }

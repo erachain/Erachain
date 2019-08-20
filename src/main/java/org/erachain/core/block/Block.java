@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -62,7 +63,7 @@ import java.util.*;
             + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
     public static final int DATA_SIGN_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TRANSACTIONS_HASH_LENGTH;
-    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getSimpleName());
     /// HEAD of BLOCK ///
     // FACE
     protected int version;
@@ -1417,14 +1418,27 @@ import java.util.*;
             return false;
         }
 
+        if (transactionCount > BlockChain.MAX_BLOCK_SIZE) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE");
+            return false;
+        }
+        if (rawTransactionsLength > BlockChain.MAX_BLOCK_SIZE_BYTES) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE_BYTES");
+            return false;
+        }
+
         // TODO - show it to USER
         long blockTime = this.getTimestamp();
         long thisTimestamp = NTP.getTime();
         //logger.debug("*** Block[" + height + "] " + new Timestamp(myTime));
 
-        if (blockTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > thisTimestamp) {
+        // необходимо разрешить более ранюю сборку - так чтобы мой собственный блок можно было собрать заранее
+        // и потом его провалидировать и послать куда подальше
+        // свой блок собирается аккурат мо моему NTP.getTime() и поэтому нет смысла вносить большие задержки от смещения мирового
+        // однако если блок прилетел из-вне то мещения мировые могут его сделать невалидными и норм
+        if (blockTime - 100 > thisTimestamp) {
             LOGGER.debug("*** Block[" + this.heightBlock + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
-                    + " \n " + " diff sec: " + (blockTime - thisTimestamp) / 1000);
+                    + " \n Block time: " + new Timestamp(blockTime) + " -- NTP: " + new Timestamp(thisTimestamp));
             return false;
         }
 
@@ -1610,6 +1624,7 @@ import java.util.*;
                         return false;
 
                     seqNo++;
+                    transactionSignature = transaction.getSignature();
 
                     if (!transaction.isWiped()) {
 
@@ -1624,13 +1639,21 @@ import java.util.*;
                             return false;
                         }
 
-                        if (!transaction.isSignatureValid(validatingDC)) {
-                            //
-                            LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                    + ":" + transaction.viewFullTypeName()
-                                    + " signature  invalid!"
-                                    + " " + Base58.encode(transaction.getSignature()));
-                            return false;
+                        boolean isSignatureValid = false;
+                        // TRY QUCK check SIGNATURE by FIND in POOL
+                        if (unconfirmedMap.contains(transactionSignature)) {
+                            isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature));
+                        }
+
+                        if (!isSignatureValid) {
+                            if (!transaction.isSignatureValid(validatingDC)) {
+                                //
+                                LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                                        + ":" + transaction.viewFullTypeName()
+                                        + " signature  invalid!"
+                                        + " " + Base58.encode(transaction.getSignature()));
+                                return false;
+                            }
                         }
 
                         //CHECK TIMESTAMP AND DEADLINE
@@ -1681,12 +1704,9 @@ import java.util.*;
                         transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                         //UPDATE REFERENCE OF SENDER
-                        if (transaction.isReferenced())
-                            // IT IS REFERENCED RECORD?
-                            transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), validatingDC);
+                        transaction.getCreator().setLastTimestamp(
+                                new long[]{transaction.getTimestamp(), transaction.getDBRef()}, validatingDC);
                     }
-
-                    transactionSignature = transaction.getSignature();
 
                     if (andProcess) {
 
@@ -1791,7 +1811,7 @@ import java.util.*;
             }
 
             long tickets = System.currentTimeMillis() - timerStart;
-            if (!dcSet.isFork() || tickets > 1000) {
+            if (!dcSet.isFork() || tickets / (transactionCount + 1) > 1) {
                 LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
                         + this.transactionCount + " " + tickets + "[ms] " + tickets / this.transactionCount + "[ms/tx]"
                         + " Proc[us]: " + timerProcess
@@ -1862,9 +1882,9 @@ import java.util.*;
 
         if (BlockChain.ROBINHOOD_USE) {
             // find rich account
-            String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
+            byte[] rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
-            if (!rich.equals(this.creator.getAddress())) {
+            if (!this.creator.equals(rich)) {
                 emittedFee = this.blockHead.totalFee >> 1;
 
                 Account richAccount = new Account(rich);
@@ -1908,10 +1928,10 @@ import java.util.*;
 
         // TEST COMPU ORPHANs
         HashMap bals = new HashMap();
-        Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+        Collection<Tuple2<byte[], Long>> keys = dcSet.getAssetBalanceMap().getKeys();
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalNeg = BigDecimal.ZERO;
-        for (Tuple2<String, Long> key : keys) {
+        for (Tuple2<byte[], Long> key : keys) {
             if (key.b == 2l) {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
                         .getAssetBalanceMap().get(key);
@@ -1929,9 +1949,9 @@ import java.util.*;
         if (parentBalanses != null) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
             BigDecimal ballParent;
-            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            Collection<Tuple2<byte[], Long>> keys = dcSet.getAssetBalanceMap().getKeys();
             boolean error = false;
-            for (Tuple2<String, Long> key : keys) {
+            for (Tuple2<byte[], Long> key : keys) {
                 if (key.b == 2l) {
                     ball = dcSet.getAssetBalanceMap().get(key);
 
@@ -1977,7 +1997,7 @@ import java.util.*;
                 int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
                 if (privousForgingPoint == null) {
                     if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                        if (BlockChain.DEVELOP_USE) {
+                        if (true || BlockChain.DEVELOP_USE) {
                             // запоминаем чтобы не было отказов в сборке блоков
                             account.setForgingData(dcSet, this.heightBlock - BlockChain.DEVELOP_FORGING_START,
                                     currentForgingBalance);
@@ -2061,7 +2081,7 @@ import java.util.*;
         }
 
         //PROCESS TRANSACTIONS
-        byte[] blockSignature = this.getSignature();
+        //byte[] blockSignature = this.getSignature();
         byte[] transactionSignature;
 
         // RESET forginf Info Updates
@@ -2108,9 +2128,8 @@ import java.util.*;
                     timerProcess += System.currentTimeMillis() - timerStart;
                 } else {
                     //UPDATE REFERENCE OF SENDER
-                    if (transaction.isReferenced())
-                        // IT IS REFERENCED RECORD?
-                        transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), dcSet);
+                        transaction.getCreator().setLastTimestamp(
+                                new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
                 }
 
                 transactionSignature = transaction.getSignature();
@@ -2167,7 +2186,7 @@ import java.util.*;
         LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         long tickets = System.currentTimeMillis() - start;
-        if (transactionCount > 0 || tickets > 10) {
+        if (transactionCount > 0 && tickets > 10 || tickets > 10) {
             LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets * 0.001
                     + ", TXs= " + this.transactionCount
                     + (transactionCount == 0? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
@@ -2288,10 +2307,7 @@ import java.util.*;
                 transaction.orphan(this, Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
-                if (transaction.isReferenced()) {
-                    //UPDATE REFERENCE OF SENDER
-                    transaction.getCreator().removeLastTimestamp(dcSet);
-                }
+                transaction.getCreator().removeLastTimestamp(dcSet);
             }
 
             if (notFork) {

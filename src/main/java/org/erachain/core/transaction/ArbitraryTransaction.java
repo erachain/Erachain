@@ -213,7 +213,7 @@ public abstract class ArbitraryTransaction extends Transaction {
 
             // UPDATE REFERENCE OF RECIPIENT
             if (false && payment.getRecipient().getLastTimestamp(this.dcSet) == null) {
-                payment.getRecipient().setLastTimestamp(this.timestamp, this.dcSet);
+                payment.getRecipient().setLastTimestamp(null, this.dcSet);
             }
         }
     }

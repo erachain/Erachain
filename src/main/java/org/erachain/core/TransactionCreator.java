@@ -53,7 +53,8 @@ public class TransactionCreator {
     //private byte[] icon = new byte[0]; // default value
     //private byte[] image = new byte[0]; // default value
 
-    private void checkUpdate() {
+    // must be a SYNCHRONIZED
+    private synchronized void checkUpdate() {
         //CHECK IF WE ALREADY HAVE A FORK
         if (this.lastBlock == null || this.fork == null) {
             updateFork();
@@ -65,7 +66,7 @@ public class TransactionCreator {
         }
     }
 
-    private void updateFork() {
+    private synchronized void updateFork() {
         //CREATE NEW FORK
         if (this.fork != null) {
             this.fork.close();
@@ -98,11 +99,12 @@ public class TransactionCreator {
 
         //VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
         for (Transaction transactionAccount : accountTransactions) {
+
+            transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
             if (!transactionAccount.isSignatureValid(this.fork)) {
                 //THE TRANSACTION BECAME INVALID LET
                 this.fork.getTransactionMap().delete(transactionAccount);
             } else {
-                transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
                 if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0l) == Transaction.VALIDATE_OK) {
                     transactionAccount.process(null, Transaction.FOR_NETWORK);
                 } else {

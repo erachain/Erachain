@@ -17,7 +17,6 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -38,7 +37,7 @@ import java.util.TreeMap;
  */
 public class BlockMap extends DCMap<Integer, Block> {
 
-    static Logger logger = LoggerFactory.getLogger(BlockMap.class.getName());
+    static Logger logger = LoggerFactory.getLogger(BlockMap.class.getSimpleName());
 
     public static final int HEIGHT_INDEX = 1; // for GUI
 
@@ -104,6 +103,13 @@ public class BlockMap extends DCMap<Integer, Block> {
             lastBlockSignature = ((DCSet)databaseSet).getBlocksHeadsMap().get(this.size()).signature;
         }
         return lastBlockSignature;
+    }
+
+    public void resetLastBlockSignature() {
+
+        // TODO: еще вопрос про org.erachain.datachain.BlocksHeadsMap.getFullWeight
+
+        lastBlockSignature = ((DCSet)databaseSet).getBlocksHeadsMap().get(this.size()).signature;
     }
 
     private void setLastBlockSignature(byte[] signature) {

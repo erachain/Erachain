@@ -23,7 +23,7 @@ public class BalancesToAccountTableModel extends AbstractTableModel implements O
     private long key;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Balance"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false};
-    private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
 
     public BalancesToAccountTableModel(long key) {
         this.key = key;
@@ -71,7 +71,7 @@ public class BalancesToAccountTableModel extends AbstractTableModel implements O
             return null;
         }
 
-        Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances.get(row);
+        Pair<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances.get(row);
         Account account = new Account(aRow.getA().a);
 
         switch (column) {

@@ -261,7 +261,7 @@ public class MultiPaymentTransaction extends Transaction {
 
             //UPDATE REFERENCE OF RECIPIENT
             if (false && payment.getRecipient().getLastTimestamp(this.dcSet) == null) {
-                payment.getRecipient().setLastTimestamp(this.timestamp, this.dcSet);
+                payment.getRecipient().setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
             }
         }
     }
@@ -278,7 +278,7 @@ public class MultiPaymentTransaction extends Transaction {
 
             //UPDATE REFERENCE OF RECIPIENT
             if (false && payment.getRecipient().getLastTimestamp(this.dcSet).equals(this.timestamp)) {
-                payment.getRecipient().setLastTimestamp(this.reference, this.dcSet);
+                payment.getRecipient().setLastTimestamp(new long[]{this.reference, dbRef}, this.dcSet);
             }
         }
     }

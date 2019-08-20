@@ -19,12 +19,14 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
+import org.erachain.utils.UpdateUtil;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -37,7 +39,12 @@ import java.util.Random;
 public class DCSet extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE << 3;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN;
+    private static final long MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 8 ;
+    private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
+    private static final long DELETIONS_BEFORE_COMPACT = BlockChain.MAX_BLOCK_SIZE_GEN << 6;
+
+
     private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
 
     private static boolean isStoped = false;
@@ -73,7 +80,6 @@ public class DCSet extends DBASet implements Observer {
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
-    private AddressTimeSignatureMap addressTime_SignatureMap;
     private BlockMap blockMap;
     //private BlockCreatorMap blockCreatorMap;
     private BlockSignsMap blockSignsMap;
@@ -127,6 +133,11 @@ public class DCSet extends DBASet implements Observer {
     public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
         super(dbFile, database, withObserver, dynamicGUI);
 
+        LOGGER.info("UP SIZE BEFORE COMMIT [KB]: " + MAX_ENGINE_BEFORE_COMMIT_KB
+                        + ", ACTIONS BEFORE COMMIT: " + ACTIONS_BEFORE_COMMIT
+                        + ", DELETIONS BEFORE COMPACT: " + DELETIONS_BEFORE_COMPACT);
+
+        this.engineSize = getEngineSize();
         this.inMemory = inMemory;
 
         try {
@@ -162,7 +173,6 @@ public class DCSet extends DBASet implements Observer {
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
-            this.addressTime_SignatureMap = new AddressTimeSignatureMap(this, database);
             this.nameMap = new NameMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
             this.orphanNameStorageMap = new OrphanNameStorageMap(this, database);
@@ -271,7 +281,6 @@ public class DCSet extends DBASet implements Observer {
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
 
-        this.addressTime_SignatureMap = new AddressTimeSignatureMap(parent.addressTime_SignatureMap, this);
         this.blockMap = new BlockMap(parent.blockMap, this);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
         this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
@@ -424,17 +433,20 @@ public class DCSet extends DBASet implements Observer {
                  */
                 .make();
 
-        if (Controller.getInstance().compactDConStart) {
-            LOGGER.debug("try COMPACT");
-            database.compact();
-            LOGGER.debug("COMPACTED");
-        }
-
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
+        }
+
+        // очистим полностью перед компактом
+        if (Controller.getInstance().compactDConStart) {
+            instance.getTransactionMap().reset();
+            instance.database.commit();
+            LOGGER.debug("try COMPACT");
+            database.compact();
+            LOGGER.debug("COMPACTED");
         }
 
     }
@@ -901,25 +913,6 @@ public class DCSet extends DBASet implements Observer {
     public ReferenceMap getReferenceMap() {
         return this.referenceMap;
     }
-
-    /**
-     * По адресу и времени найти подпись транзакции
-     * seek reference to tx_Parent by address
-     * // account.addres + tx1.timestamp -> <tx2.signature>
-     *     Ключ: адрес создателя + время создания или только адрес
-     *
-     *     Значение: подпись транзакции или подпись последней транзакции
-     *
-     *     Используется для поиска публичного ключа для данного создателя и для поиска записей в отчетах
-     *
-     *     TODO: заменить подпись на ссылку
-     *
-     * @return
-     */
-    public AddressTimeSignatureMap getAddressTime_SignatureMap() {
-        return this.addressTime_SignatureMap;
-    }
-
 
     /**
      * Транзакции занесенные в цепочку
@@ -1405,6 +1398,8 @@ public class DCSet extends DBASet implements Observer {
 
                 if (this.getBlockMap().isProcessing()) {
                     this.database.rollback();
+                    // not need on close!
+                    // getBlockMap().resetLastBlockSignature();
                 } else {
                     this.database.commit();
                 }
@@ -1424,11 +1419,15 @@ public class DCSet extends DBASet implements Observer {
     public void rollback() {
         this.addUses();
         this.database.rollback();
+        getBlockMap().resetLastBlockSignature();
         this.actions = 0l;
         this.outUses();
     }
 
-    private long poinCompact;
+    private long poinFlush = System.currentTimeMillis();
+    private long poinCompact = poinFlush;
+    private long engineSize;
+    private long poinClear;
     public void flush(int size, boolean hardFlush) {
 
         if (parent != null)
@@ -1436,25 +1435,57 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
-        this.database.getEngine().clearCache();
+        // try repopulate table
+        if (System.currentTimeMillis() - poinClear > 300000) {
+            poinClear = System.currentTimeMillis();
+            TransactionMap utxMap = getTransactionMap();
+            int sizeUTX = utxMap.size();
+            LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
+            this.actions += sizeUTX;
+            Collection<Transaction> items = utxMap.getValues();
+            instance.getTransactionMap().reset();
+            for (Transaction item: items) {
+                utxMap.add(item);
+            }
+            this.database.getEngine().clearCache();
+            LOGGER.debug("CLEARed UTXs");
+        }
+
 
         this.actions += size;
-        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
-            long start = System.currentTimeMillis();
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%% actions:" + actions);
+        long diffUp = getEngineSize() - engineSize;
+        if (diffUp < 0)
+            diffUp = -diffUp;
+
+        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
+                || diffUp > MAX_ENGINE_BEFORE_COMMIT_KB
+                || System.currentTimeMillis() - poinFlush > 3600000) {
+            long start = poinFlush = System.currentTimeMillis();
+            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
 
             this.database.commit();
 
-            if (false && System.currentTimeMillis() - poinCompact > 9999999) {
+            if (Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
                 // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
+
                 LOGGER.debug("try COMPACT");
-                this.database.compact();
-                LOGGER.debug("COMPACTED");
+                // очень долго делает - лучше ключем при старте
+                try {
+                    this.database.compact();
+                    transactionMap.totalDeleted = 0;
+                    LOGGER.debug("COMPACTED");
+                } catch (Exception e) {
+                    transactionMap.totalDeleted >>= 1;
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
 
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%%%  commit time: " + new Double((System.currentTimeMillis() - start)) * 0.001);
+            LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " +getEngineSize() + "   %%%%%%  commit time: "
+                    + (System.currentTimeMillis() - start) / 1000);
+
             this.actions = 0l;
+            this.engineSize = getEngineSize();
 
         }
 
@@ -1465,7 +1496,7 @@ public class DCSet extends DBASet implements Observer {
     public void update(Observable o, Object arg) {
     }
 
-    public long getEngineeSize() {
+    public long getEngineSize() {
 
         return this.database.getEngine().preallocate();
 
@@ -1474,6 +1505,5 @@ public class DCSet extends DBASet implements Observer {
     public String toString() {
         return (this.isFork()? "forked " : "")  + super.toString();
     }
-
 
 }

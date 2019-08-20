@@ -39,7 +39,7 @@ public class BlockChain {
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
 
-    static final public int CHECK_BUGS = 2;
+    static final public int CHECK_BUGS = 1;
 
     /**
      * если задан - первое подключение к нему
@@ -79,11 +79,11 @@ public class BlockChain {
     //public static final int GENERATING_RETARGET = 10;
     public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
     public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
-    public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 4);
+    public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 3);
     static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
-    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 5000: 15000;
+    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 5000: 5000;
     public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = Controller.HARD_WORK > 3 ? 1 : DEVELOP_USE? 2 : 1; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
@@ -93,10 +93,10 @@ public class BlockChain {
     //public static final int GENERATING_MAX_BLOCK_TIME = 1000;
     public static final int MAX_BLOCK_SIZE_BYTES = 1 << 25; //4 * 1048576;
     public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
-    public static final int MAX_REC_DATA_BYTES = 1 << 20; // MAX_BLOCK_SIZE_BYTES >>1;
+    public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_SIZE_BYTES >> 2;
 
     // переопределим размеры по HARD
-    static private final int MAX_BLOCK_SIZE_GEN_TEMP = MAX_BLOCK_SIZE_BYTES / 100 * (5 * Controller.HARD_WORK + 10) ;
+    static private final int MAX_BLOCK_SIZE_GEN_TEMP = MAX_BLOCK_SIZE_BYTES / 100 * (10 * Controller.HARD_WORK + 10) ;
     public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN_TEMP > MAX_BLOCK_SIZE_BYTES? MAX_BLOCK_SIZE_BYTES : MAX_BLOCK_SIZE_GEN_TEMP;
     public static final int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE_BYTES_GEN >> 8;
 
@@ -117,6 +117,8 @@ public class BlockChain {
 
     public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 430000 : 260120;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 425555 : 260120;
+
+    public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 0;
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
@@ -295,7 +297,7 @@ public class BlockChain {
     public static HashMap<String, String> LOCKED__ADDRESSES = new HashMap<String, String>();
     public static HashMap<String, Tuple3<String, Integer, Integer>> LOCKED__ADDRESSES_PERIOD = new HashMap<String, Tuple3<String, Integer, Integer>>();
     public static HashMap<Long, PublicKeyAccount> ASSET_OWNERS = new HashMap<Long, PublicKeyAccount>();
-    static Logger LOGGER = LoggerFactory.getLogger(BlockChain.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockChain.class.getSimpleName());
     private GenesisBlock genesisBlock;
     private long genesisTimestamp;
     private Block waitWinBuffer;
@@ -820,7 +822,7 @@ public class BlockChain {
     }
 
     public int getBlockOnTimestamp(long timestamp) {
-        long diff = timestamp = genesisTimestamp;
+        long diff = timestamp - genesisTimestamp;
         return (int) (diff / GENERATING_MIN_BLOCK_TIME_MS);
     }
 
@@ -971,30 +973,45 @@ public class BlockChain {
                     + processTiming - transactionWinnedTimingAverage) >> 5;
     }
 
+    private long pointValidateAverage;
     public void updateTXValidateTimingAverage(long processTiming, int counter) {
         // тут всегда Количество больше 0 приходит
         processTiming = processTiming / 1000 / counter;
-        if (transactionValidateTimingCounter < 1 << 5) {
+        if (transactionValidateTimingCounter < 1 << 3) {
             transactionValidateTimingCounter++;
             transactionValidateTimingAverage = ((transactionValidateTimingAverage * transactionValidateTimingCounter)
                     + processTiming - transactionValidateTimingAverage) / transactionValidateTimingCounter;
         } else
-            transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
-                    + processTiming - transactionValidateTimingAverage) >> 5;
+            if (System.currentTimeMillis() - pointValidateAverage > 10000) {
+                pointValidateAverage = System.currentTimeMillis();
+                transactionValidateTimingAverage = ((transactionValidateTimingAverage << 1)
+                        + processTiming - transactionValidateTimingAverage) >> 1;
+            } else {
+                transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
+                        + processTiming - transactionValidateTimingAverage) >> 5;
+            }
     }
 
+    private long pointProcessAverage;
     public void updateTXProcessTimingAverage(long processTiming, int counter) {
         if (processTiming < 999999999999l) {
             // при переполнении может быть минус
             // в микросекундах подсчет делаем
             processTiming = processTiming / 1000 / (Controller.BLOCK_AS_TX_COUNT + counter);
-            if (transactionProcessTimingCounter < 1 << 5) {
+            if (transactionProcessTimingCounter < 1 << 3) {
                 transactionProcessTimingCounter++;
                 transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
                         + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
             } else
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
-                        + processTiming - transactionProcessTimingAverage) >> 5;
+                if (System.currentTimeMillis() - pointProcessAverage > 10000) {
+                    pointProcessAverage = System.currentTimeMillis();
+                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 1)
+                            + processTiming - transactionProcessTimingAverage) >> 1;
+
+                } else {
+                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
+                            + processTiming - transactionProcessTimingAverage) >> 5;
+                }
         }
     }
 
