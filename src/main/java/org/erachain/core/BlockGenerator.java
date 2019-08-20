@@ -33,7 +33,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
 
-    private static int WAIT_STEP_MS = 101;
+    private static int WAIT_STEP_MS = 100;
 
     private static Controller ctrl = Controller.getInstance();
     private static int local_status = 0;

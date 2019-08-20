@@ -200,7 +200,7 @@ public class Synchronizer {
         long myWeight = myHW.b;
         int newHeight = lastBlock.getHeight() + newBlocks.size();
         // проверять СИЛУ цепочки только если лна не на много лучше моей высоты
-        boolean checkFullWeight = !(true || BlockChain.DEVELOP_USE) && testHeight > newHeight;
+        boolean checkFullWeight = !BlockChain.DEVELOP_USE && testHeight > newHeight;
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
