@@ -403,15 +403,17 @@ public class DCSet extends DBASet implements Observer {
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
                 //.cacheHardRefEnable()
-                ////.cacheLRUEnable() // тормознутая КЭШ
-                //.cacheSize(3000)
+                //64 << Controller.HARD_WORK)
 
-                // чуть помедленне
-                //.cacheSoftRefEnable() // на нодах с малой памятью Итератор по 40 секунд берет от пустой таблицы UTX
-                //.cacheSize(3000)
+                // при норм размере и досточной памяти скорость не хуже чем у остальных
+                //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                //.cacheSize(512 << Controller.HARD_WORK)
 
-                .cacheWeakRefEnable() // быстрая КЭШ
-                .cacheSize(1024 << (Controller.HARD_WORK >> 1))
+                .cacheSoftRefEnable()
+                .cacheSize(32 << Controller.HARD_WORK)
+
+                //.cacheWeakRefEnable()
+                //.cacheSize(32 << Controller.HARD_WORK)
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
