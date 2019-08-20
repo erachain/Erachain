@@ -402,14 +402,15 @@ public class DCSet extends DBASet implements Observer {
                 //////
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
-                .cacheHardRefEnable()
-                .cacheSize(64 << Controller.HARD_WORK)
+                //.cacheHardRefEnable()
+                //64 << Controller.HARD_WORK)
 
-                ////.cacheLRUEnable() // скорость зависит от памяти и настроек тут - маленький размер лучше
-                ////.cacheSize(32 << Controller.HARD_WORK)
+                // при норм размере и досточной памяти скорость не хуже чем у остальных
+                //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                //.cacheSize(512 << Controller.HARD_WORK)
 
-                //.cacheSoftRefEnable()
-                //.cacheSize(8 << Controller.HARD_WORK)
+                .cacheSoftRefEnable()
+                .cacheSize(32 << Controller.HARD_WORK)
 
                 //.cacheWeakRefEnable()
                 //.cacheSize(32 << Controller.HARD_WORK)
