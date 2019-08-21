@@ -406,12 +406,12 @@ public class DCSet extends DBASet implements Observer {
                 //64 << Controller.HARD_WORK)
 
                 // при норм размере и досточной памяти скорость не хуже чем у остальных
-                .cacheLRUEnable() // скорость зависит от памяти и настроек -
+                //.cacheLRUEnable() // скорость зависит от памяти и настроек -
                 //.cacheSize(512 << Controller.HARD_WORK)
-                .cacheSize(512 << Controller.HARD_WORK)
+                //.cacheSize(512 << Controller.HARD_WORK)
 
-                //.cacheSoftRefEnable()
-                //.cacheSize(32 << Controller.HARD_WORK)
+                .cacheSoftRefEnable()
+                .cacheSize(32 << Controller.HARD_WORK)
 
                 //.cacheWeakRefEnable()
                 //.cacheSize(32 << Controller.HARD_WORK)
@@ -1478,7 +1478,7 @@ public class DCSet extends DBASet implements Observer {
 
             this.database.commit();
 
-            if (Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
+            if (false && Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
                 // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
 
