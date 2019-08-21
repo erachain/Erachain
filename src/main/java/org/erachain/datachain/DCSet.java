@@ -1449,7 +1449,7 @@ public class DCSet extends DBASet implements Observer {
         this.addUses();
 
         // try repopulate table
-        if (System.currentTimeMillis() - poinClear > 300000) {
+        if (System.currentTimeMillis() - poinClear > 600000) {
             poinClear = System.currentTimeMillis();
             TransactionMap utxMap = getTransactionMap();
             int sizeUTX = utxMap.size();
@@ -1461,7 +1461,7 @@ public class DCSet extends DBASet implements Observer {
                 utxMap.add(item);
             }
             this.database.getEngine().clearCache();
-            LOGGER.debug("CLEARed UTXs");
+            LOGGER.debug("CLEARed UTXs " + (System.currentTimeMillis() - poinClear) + " ms");
         }
 
 
