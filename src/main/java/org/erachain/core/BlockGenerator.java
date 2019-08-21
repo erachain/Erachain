@@ -637,16 +637,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     needCheck = false;
 
-                    if (timePoint == timeTmp) {
-                        if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
+                    if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
+                        // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                        needCheck = true;
+                    } else {
+                        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+                        if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
                             // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                             needCheck = true;
-                        } else {
-                            Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                            if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
-                                // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                                needCheck = true;
-                            }
                         }
                     }
 
