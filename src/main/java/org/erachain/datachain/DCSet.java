@@ -44,6 +44,7 @@ public class DCSet extends DBASet implements Observer {
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
     private static final long DELETIONS_BEFORE_COMPACT = BlockChain.MAX_BLOCK_SIZE_GEN << 6;
 
+    private static boolean needClearCache = false;
 
     private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
 
@@ -391,7 +392,7 @@ public class DCSet extends DBASet implements Observer {
 
                 //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
                 ///// добавил dcSet.clearCache(); --
-                ///.cacheDisable()
+                //.cacheDisable()
 
                 /**
                  * если не задавать вид КЭШа то берется стандартный - и его размер 10 очень мал и скорость
@@ -406,11 +407,12 @@ public class DCSet extends DBASet implements Observer {
                 //64 << Controller.HARD_WORK)
 
                 // при норм размере и досточной памяти скорость не хуже чем у остальных
-                //.cacheLRUEnable() // скорость зависит от памяти и настроек -
-                //.cacheSize(512 << Controller.HARD_WORK)
+                // в этом случае не НУЖНО отчищать кэш каждый раз полсе сборки блоков
+                .cacheLRUEnable() // скорость зависит от памяти и настроек -
+                .cacheSize(512 << Controller.HARD_WORK)
 
-                .cacheSoftRefEnable()
-                .cacheSize(32 << Controller.HARD_WORK)
+                //.cacheSoftRefEnable()
+                //.cacheSize(32 << Controller.HARD_WORK)
 
                 //.cacheWeakRefEnable()
                 //.cacheSize(32 << Controller.HARD_WORK)
@@ -444,6 +446,8 @@ public class DCSet extends DBASet implements Observer {
                 //.mmapFileEnableIfSupported()
                  */
                 .make();
+
+        needClearCache = false;
 
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
@@ -1448,7 +1452,7 @@ public class DCSet extends DBASet implements Observer {
         this.addUses();
 
         // try repopulate table
-        if (System.currentTimeMillis() - poinClear > 300000) {
+        if (needClearCache && System.currentTimeMillis() - poinClear > 600000) {
             poinClear = System.currentTimeMillis();
             TransactionMap utxMap = getTransactionMap();
             int sizeUTX = utxMap.size();
@@ -1460,9 +1464,8 @@ public class DCSet extends DBASet implements Observer {
                 utxMap.add(item);
             }
             this.database.getEngine().clearCache();
-            LOGGER.debug("CLEARed UTXs");
+            LOGGER.debug("CLEARed UTXs - " + (System.currentTimeMillis() - poinClear));
         }
-
 
         this.actions += size;
         long diffUp = getEngineSize() - engineSize;
@@ -1477,7 +1480,7 @@ public class DCSet extends DBASet implements Observer {
 
             this.database.commit();
 
-            if (Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
+            if (false && Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
                 // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
 
