@@ -929,6 +929,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // было отставание по силе цепочки - запретим сборку блока нам - так как мы откатились чуток и нужна синхронизация
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
                 } else {
+                    needCheck = false;
 
                     ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                     // сдвиг 0 делаем
