@@ -247,7 +247,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return values;
     }
 
-    private static long MAX_DEADTIME = 1000 * 60 * 60 * 24;
+    private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
 
     /**
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности

@@ -634,24 +634,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     pointPing = NTP.getTime();
                     ctrl.pingAllPeers(true);
 
-                    // осмотр сети по СИЛЕ
-                    // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
-
-                    boolean needCheck = false;
-                    if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
-                        // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                        needCheck = true;
-                    } else {
-                        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                        if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
-                            // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                            needCheck = true;
-                        }
-                    }
-                    if (needCheck && checkWeightPeers()) {
-                        // было отставание по силе цепочки - запретим сборку блока нам - так как мы откатились чуток и нужна синхронизация
-                        setForgingStatus(ForgingStatus.FORGING_WAIT);
-                    }
                 }
 
                 // is WALLET
@@ -925,6 +907,25 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
                 }
 
+                // осмотр сети по СИЛЕ
+                // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
+
+                boolean needCheck = false;
+                if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
+                    // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                    needCheck = true;
+                } else {
+                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+                    if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
+                        // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                        needCheck = true;
+                    }
+                }
+                if (needCheck && checkWeightPeers()) {
+                    // было отставание по силе цепочки - запретим сборку блока нам - так как мы откатились чуток и нужна синхронизация
+                    setForgingStatus(ForgingStatus.FORGING_WAIT);
+                }
+
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем
                 ctrl.checkStatusAndObserve(0);
@@ -932,6 +933,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         && ctrl.needUpToDate()) {
                     ///LOGGER.info("To late for FLUSH - need UPDATE !");
                 } else {
+
                     // try solve and flush new block from Win Buffer
 
                     // FLUSH WINER to DB MAP
