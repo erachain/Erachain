@@ -58,14 +58,14 @@ public class Settings {
     private static final Integer DEFAULT_FONT_SIZE = 11;
     private static final String DEFAULT_FONT_NAME = "Arial";
     //RPC
-    private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
-    private static final boolean DEFAULT_RPC_ENABLED = false;
+    private static final String DEFAULT_RPC_ALLOWED = ";"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
+    private static final boolean DEFAULT_RPC_ENABLED = true;
     private static final boolean DEFAULT_BACUP_ENABLED = false;
     private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
     //WEB
-    private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
+    private static final String DEFAULT_WEB_ALLOWED = ";";
     private static final boolean DEFAULT_WEB_ENABLED = true;
     // 19 03
     //GUI
