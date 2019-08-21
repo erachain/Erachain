@@ -547,6 +547,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int wait_new_block_broadcast;
         long wait_step;
         boolean newWinner;
+        boolean needCheck = false;
 
         this.initMonitor();
 
@@ -633,6 +634,21 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // а так же чтобы знать с кем мы в синхре или кто лучше нас в checkWeightPeers
                     pointPing = NTP.getTime();
                     ctrl.pingAllPeers(true);
+
+                    needCheck = false;
+
+                    if (timePoint == timeTmp) {
+                        if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
+                            // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                            needCheck = true;
+                        } else {
+                            Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+                            if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
+                                // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
+                                needCheck = true;
+                            }
+                        }
+                    }
 
                 }
 
@@ -910,18 +926,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // осмотр сети по СИЛЕ
                 // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
 
-                boolean needCheck = false;
-                if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
-                    // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                    needCheck = true;
-                } else {
-                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                    if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
-                        // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                        needCheck = true;
-                    }
-                }
                 if (needCheck && checkWeightPeers()) {
+                    needCheck = false;
                     // было отставание по силе цепочки - запретим сборку блока нам - так как мы откатились чуток и нужна синхронизация
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
                 } else {
