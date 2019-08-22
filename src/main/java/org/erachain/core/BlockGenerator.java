@@ -1072,7 +1072,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     ctrl.update(shift_height);
 
-                    betterPeer = null;
                     local_status = 0;
                     this.setMonitorStatus("local_status " + viewStatus());
 

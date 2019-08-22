@@ -1892,6 +1892,7 @@ public class Controller extends Observable {
                 } else {
                     peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
                 }
+                blockGenerator.betterPeer = null;
             }
 
             if (peerHW != null && peerHW.a > myHWeight.a
@@ -1915,6 +1916,10 @@ public class Controller extends Observable {
                             return;
                         } else if (peer.isBanned()) {
                             ;
+                        } else if (blockGenerator.betterPeer != null) {
+                            // найден новый лучший ПИР
+                            isUpToDate = false;
+                            continue;
                         } else {
                             LOGGER.error(e.getMessage(), e);
                             peer.ban(e.getMessage());
