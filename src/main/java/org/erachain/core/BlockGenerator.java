@@ -128,8 +128,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 return false;
             }
 
-            LOGGER.debug("better WEIGHT peers found: "
-                    + maxPeer);
+            ///LOGGER.debug("better WEIGHT peers found: " + maxPeer);
 
             SignaturesMessage response = null;
             try {
@@ -138,14 +137,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         MessageFactory.getInstance().createGetHeadersMessage(lastSignature),
                         Synchronizer.GET_BLOCK_TIMEOUT >> 2);
             } catch (Exception e) {
-                LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
+                ///LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
                 // remove HW from peers
                 ctrl.resetWeightOfPeer(peer);
                 continue;
             }
 
             if (response == null) {
-                LOGGER.debug("peer RESPONSE is null " + peer);
+                ///LOGGER.debug("peer RESPONSE is null " + peer);
                 // remove HW from peers
                 ctrl.resetWeightOfPeer(peer);
                 continue;
@@ -153,7 +152,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
             List<byte[]> headers = response.getSignatures();
             int headersSize = headers.size();
-            LOGGER.debug("FOUND head SIZE: " + headersSize);
+            ///LOGGER.debug("FOUND head SIZE: " + headersSize);
 
             if (headersSize > 0) {
                 boolean isSame = false;
@@ -166,7 +165,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (isSame) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                    LOGGER.debug("peer has same Weight " + maxPeer);
+                    ///LOGGER.debug("peer has same Weight " + maxPeer);
                     ctrl.resetWeightOfPeer(peer);
                     // продолжим поиск дальше
                     continue;
