@@ -324,15 +324,12 @@ public class Synchronizer extends Thread {
         // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
         // ============ by EQUAL SIGNATURE !!!!!
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
-        long count = 0L;
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
             if (cnt.isOnStopping())
                 throw new Exception("on stopping");
 
             // THROWN is new Better Peer
-            if (count % 10000 == 0) {
-                cnt.checkNewBetterPeer(peer);
-            }
+            cnt.checkNewBetterPeer(peer);
 
             // ADD ORPHANED TRANSACTIONS
             // orphanedTransactions.addAll(lastBlock.getTransactions());
@@ -341,8 +338,6 @@ public class Synchronizer extends Thread {
                     throw new Exception("on stopping");
                 orphanedTransactions.put(new BigInteger(1, transaction.getSignature()).toString(16), transaction);
             }
-
-            count += 10 + lastBlock.getTransactionCount();
 
             LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
             LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
@@ -358,13 +353,10 @@ public class Synchronizer extends Thread {
 
         // PROCESS THE NEW BLOCKS
         LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
-        count = 0L;
         for (Block block : newBlocks) {
 
             // THROWN is new Better Peer
-            if (count % 10000 == 0) {
-                cnt.checkNewBetterPeer(peer);
-            }
+            cnt.checkNewBetterPeer(peer);
 
             if (cnt.isOnStopping())
                 throw new Exception("on stopping");
@@ -389,8 +381,6 @@ public class Synchronizer extends Thread {
                 if (orphanedTransactions.containsKey(key))
                     orphanedTransactions.remove(key);
             }
-
-            count += 10 + block.getTransactionCount();
 
         }
 
@@ -466,7 +456,6 @@ public class Synchronizer extends Thread {
             String errorMess = null;
             int banTime = BAN_BLOCK_TIMES >> 2;
 
-            long count = 0L;
             // GET AND PROCESS BLOCK BY BLOCK
             for (byte[] signature : signatures) {
                 if (cnt.isOnStopping()) {
@@ -476,9 +465,7 @@ public class Synchronizer extends Thread {
                 }
 
                 // THROWN is new Better Peer
-                if (count % 10000 == 0) {
-                    cnt.checkNewBetterPeer(peer);
-                }
+                cnt.checkNewBetterPeer(peer);
 
                 // GET BLOCK
                 LOGGER.debug("try get BLOCK from BUFFER");
@@ -555,8 +542,6 @@ public class Synchronizer extends Thread {
 
                     LOGGER.debug("try PROCESS");
                     this.pipeProcessOrOrphan(dcSet, blockFromPeer, false, false, false);
-
-                    count += 10 + blockFromPeer.getTransactionCount();
 
                     LOGGER.debug("synchronize BLOCK END process");
                     blockBuffer.clearBlock(blockFromPeer.getSignature());
