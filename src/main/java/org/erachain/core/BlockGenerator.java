@@ -114,7 +114,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         Peer peer;
         this.setMonitorStatus("checkWeightPeers");
 
-        byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
+        //byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
         byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
 
         int counter = 0;
@@ -135,7 +135,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             try {
 
                 response = (SignaturesMessage) peer.getResponse(
-                        MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
+                        MessageFactory.getInstance().createGetHeadersMessage(lastSignature),
                         Synchronizer.GET_BLOCK_TIMEOUT >> 2);
             } catch (Exception e) {
                 LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
