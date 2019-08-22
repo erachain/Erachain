@@ -245,12 +245,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         while (iterator.hasNext()) {
 
             if (ctrl.isOnStopping()) {
-                return null;
+                break;
             }
 
             if (bchain != null) {
                 waitWin = bchain.getWaitWinBuffer();
-                if (waitWin != null && waitWin.getWinValue() > max_winned_value) {
+                if (betterPeer != null || waitWin != null && waitWin.getWinValue() > max_winned_value) {
                     break;
                 }
             }
@@ -313,7 +313,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             } catch (Exception e) {
 
                 if (ctrl.isOnStopping()) {
-                    return null;
+                    break;
                 }
 
                 //     transactionProcessed = true;
@@ -820,7 +820,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         && betterPeer == null && !ctrl.needUpToDate());
                             }
 
-                            if (this.orphanto > 0)
+                            if (this.orphanto > 0 || betterPeer != null)
                                 continue;
 
                             if (newWinner) {
@@ -917,7 +917,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем
                 ctrl.checkStatusAndObserve(0);
-                if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()
+                if (betterPeer != null || orphanto > 0
+                        || timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()
                         && ctrl.needUpToDate()) {
                     ///LOGGER.info("To late for FLUSH - need UPDATE !");
                 } else {
@@ -1048,7 +1049,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////// UPDATE ////////////////////
 
-                if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2)
+                if (betterPeer == null && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2)
                         > NTP.getTime())
                     continue;
 
