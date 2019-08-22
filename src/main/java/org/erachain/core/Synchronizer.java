@@ -1028,7 +1028,18 @@ public class Synchronizer extends Thread {
         long timeTmp;
         long timePoint = 0;
         DCSet dcSet = DCSet.getInstance();
-        BlockGenerator blockGenerator = cnt.getBlockGenerator();
+        BlockGenerator blockGenerator;
+
+        // INIT wait START
+        do {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                return;
+            }
+
+            blockGenerator = cnt.getBlockGenerator();
+        } while (blockGenerator == null);
 
         boolean needCheck = false;
 
