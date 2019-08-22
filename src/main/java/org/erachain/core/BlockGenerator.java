@@ -151,7 +151,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             int headersSize = headers.size();
             LOGGER.debug("FOUND head SIZE: " + headersSize);
             if (headersSize == 3 || headersSize == 2) {
-                if (Arrays.equals(headers.get(headersSize - 1), lastSignature)) {
+                if (Arrays.equals(headers.get(headersSize - 1), lastSignature)
+                        || Arrays.equals(headers.get(headersSize - 2), lastSignature)) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
                     LOGGER.debug("peer has same Weight " + maxPeer);
                     ctrl.resetWeightOfPeer(peer);
