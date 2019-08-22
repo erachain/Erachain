@@ -732,9 +732,6 @@ public class Controller extends Observable {
          * Setting_Json.put("DB_OPEN", "Open BAD - try reCreateDB"); }
          */
 
-        // CREATE SYNCHRONIZOR
-        this.synchronizer = new Synchronizer();
-
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
 
@@ -743,6 +740,9 @@ public class Controller extends Observable {
 
         // CREATE WinBlock SELECTOR
         this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
+
+        // CREATE SYNCHRONIZOR
+        this.synchronizer = new Synchronizer(this, blockChain);
 
         // CREATE Block REQUESTER
         this.blockRequester = new BlocksRequest(this, blockChain, dcSet);
