@@ -174,7 +174,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
                     try {
                         // да - там другой блок - откатим тогда свой
-                        ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                        //// ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
                         betterPeer = peer;
                         return true;
                     } catch (Exception e) {
@@ -626,6 +626,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
                     timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS;
+                    betterPeer = null;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
                     LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
@@ -667,7 +668,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (//true ||
                             (forgingStatus == ForgingStatus.FORGING // FORGING enabled
-                                    && !ctrl.needUpToDate()
+                                    && betterPeer == null && !ctrl.needUpToDate()
                                     && (this.solvingReference == null // AND GENERATING NOT MAKED
                                     || !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature())
                             ))
@@ -817,7 +818,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 }
                                 while (this.orphanto <= 0 && wait_step-- > 0
                                         && NTP.getTime() < timePoint + wait_new_block_broadcast
-                                        && !ctrl.needUpToDate());
+                                        && betterPeer == null && !ctrl.needUpToDate());
                             }
 
                             if (this.orphanto > 0)
@@ -929,7 +930,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
 
                     // ждем основное время просто
-                    while (this.orphanto <= 0 && flushPoint > NTP.getTime() && !ctrl.needUpToDate()) {
+                    while (this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
@@ -1056,7 +1057,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // так как в девелопе все гоняют свои цепочки то посмотреть самыю жирную а не длинную
                 ctrl.checkStatusAndObserve(shift_height);
                 //CHECK IF WE ARE NOT UP TO DATE
-                if (ctrl.needUpToDate()) {
+                if (betterPeer != null || ctrl.needUpToDate()) {
 
                     if (ctrl.isOnStopping()) {
                         local_status = -1;
@@ -1071,6 +1072,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     ctrl.update(shift_height);
 
+                    betterPeer = null;
                     local_status = 0;
                     this.setMonitorStatus("local_status " + viewStatus());
 

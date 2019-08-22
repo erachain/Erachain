@@ -1857,7 +1857,7 @@ public class Controller extends Observable {
 
         // DLSet dcSet = DLSet.getInstance();
 
-        Peer peer = blockGenerator.betterPeer;
+        Peer peer = null;
         // Block lastBlock = getLastBlock();
         // int lastTrueBlockHeight = this.getMyHeight() -
         // Settings.BLOCK_MAX_SIGNATURES;
@@ -1878,13 +1878,14 @@ public class Controller extends Observable {
             // тут поиск длаем с учетом СИЛЫ
             // но если найдено с такой же высотой как у нас то игнорируем
             Tuple3<Integer, Long, Peer> peerHW;
+            Tuple2<Integer, Long> peerHWdata = null;
             if (blockGenerator.betterPeer == null) {
                 peerHW = this.getMaxPeerHWeight(shift, true);
             } else {
                 // берем пир который нашли в генераторе при осмотре более сильных цепочек
                 // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
                 // так как тут не подвергаются исследованию точность, как это делается в checkWeightPeers
-                Tuple2<Integer, Long> peerHWdata = this.getHWeightOfPeer(blockGenerator.betterPeer);
+                peerHWdata = this.getHWeightOfPeer(blockGenerator.betterPeer);
                 if (peerHWdata == null) {
                     // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
                     peerHW = this.getMaxPeerHWeight(shift, true);
@@ -1892,7 +1893,9 @@ public class Controller extends Observable {
                     peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
                 }
             }
-            if (peerHW != null && peerHW.a > myHWeight.a) {
+
+            if (peerHW != null && peerHW.a > myHWeight.a
+                    || peerHWdata != null) {
                 peer = peerHW.c;
                 if (peer != null) {
                     info = "update from MaxHeightPeer:" + peer + " WH: "
