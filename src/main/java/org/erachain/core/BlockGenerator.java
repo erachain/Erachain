@@ -96,6 +96,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
     }
 
+    public Peer betterPeer;
     /**
      * если цепочка встала из-за патовой ситуации то попробовать ее решить
      ^ путем выбора люолее сильной а не длинной
@@ -107,6 +108,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         //logger.debug("try check better WEIGHT peers");
 
         Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+
+        betterPeer = null;
 
         Peer peer;
         this.setMonitorStatus("checkWeightPeers");
@@ -163,6 +166,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     try {
                         // да - там другой блок - откатим тогда свой
                         ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                        betterPeer = peer;
                         return true;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
@@ -173,6 +177,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
                 try {
                     ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                    betterPeer = peer;
                     return true;
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage(), e);
@@ -182,6 +187,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // more then 2 - need to UPDATE
                 LOGGER.debug("to update - peers " + maxPeer
                         + " headers: " + headersSize);
+                betterPeer = peer;
                 return true;
             }
 
