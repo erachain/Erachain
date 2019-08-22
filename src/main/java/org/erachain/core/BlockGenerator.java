@@ -114,6 +114,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         Peer peer;
         this.setMonitorStatus("checkWeightPeers");
 
+        byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
+        byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
+
         int counter = 0;
         // на всякий случай поставим ораничение
         while (counter++ < 30) {
@@ -131,38 +134,44 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             SignaturesMessage response = null;
             try {
 
-                byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
                 response = (SignaturesMessage) peer.getResponse(
                         MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
                         Synchronizer.GET_BLOCK_TIMEOUT >> 2);
             } catch (Exception e) {
                 LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
                 // remove HW from peers
-                ctrl.setWeightOfPeer(peer, null);
+                ctrl.resetWeightOfPeer(peer);
                 continue;
             }
 
             if (response == null) {
                 LOGGER.debug("peer RESPONSE is null " + peer);
                 // remove HW from peers
-                ctrl.setWeightOfPeer(peer, null);
+                ctrl.resetWeightOfPeer(peer);
                 continue;
             }
 
             List<byte[]> headers = response.getSignatures();
-            byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
             int headersSize = headers.size();
             LOGGER.debug("FOUND head SIZE: " + headersSize);
-            if (headersSize == 3 || headersSize == 2) {
-                if (Arrays.equals(headers.get(headersSize - 1), lastSignature)
-                        || Arrays.equals(headers.get(headersSize - 2), lastSignature)) {
+
+            if (headersSize > 0) {
+                boolean isSame = false;
+                for (byte[] signature : headers) {
+                    if (Arrays.equals(signature, lastSignature)) {
+                        isSame = true;
+                        break;
+                    }
+                }
+
+                if (isSame) {
                     // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
                     LOGGER.debug("peer has same Weight " + maxPeer);
                     ctrl.resetWeightOfPeer(peer);
                     // продолжим поиск дальше
                     continue;
                 } else {
-                    LOGGER.debug("I to orphan x2 - peer has better Weight " + maxPeer);
+                    LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
                     try {
                         // да - там другой блок - откатим тогда свой
                         ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
@@ -172,16 +181,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.error(e.getMessage(), e);
                         ctrl.resetWeightOfPeer(peer);
                     }
-                }
-            } else if (headersSize < 2) {
-                LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
-                try {
-                    ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                    betterPeer = peer;
-                    return true;
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                    ctrl.resetWeightOfPeer(peer);
                 }
             } else {
                 // more then 2 - need to UPDATE
