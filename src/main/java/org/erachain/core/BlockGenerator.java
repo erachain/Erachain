@@ -810,7 +810,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                                 }
                                 while (this.orphanto <= 0 && wait_step-- > 0
-                                    && NTP.getTime() < timePoint + wait_new_block_broadcast);
+                                        && NTP.getTime() < timePoint + wait_new_block_broadcast
+                                        && !ctrl.needUpToDate());
                             }
 
                             if (this.orphanto > 0)
@@ -922,7 +923,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
 
                     // ждем основное время просто
-                    while (this.orphanto <= 0 && flushPoint > NTP.getTime()) {
+                    while (this.orphanto <= 0 && flushPoint > NTP.getTime() && !ctrl.needUpToDate()) {
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
@@ -959,7 +960,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             return;
                         }
                     } while (this.orphanto <= 0
-                            && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP.getTime());
+                            && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP.getTime()
+                            && !ctrl.needUpToDate());
 
                     if (this.orphanto > 0)
                         continue;
