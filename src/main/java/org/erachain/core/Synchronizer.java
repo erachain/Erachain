@@ -1077,9 +1077,6 @@ public class Synchronizer extends Thread {
                     needCheck = false;
                     if (blockGenerator.checkWeightPeers()) {
                         LOGGER.debug("FOUND BETTER CHAIN PEER");
-                        cnt.checkStatusAndObserve(0);
-                        // было отставание по силе цепочки - запретим сборку блока нам - так как мы откатились чуток и нужна синхронизация
-                        blockGenerator.setForgingStatus(BlockGenerator.ForgingStatus.FORGING_WAIT);
                     }
                 }
 
