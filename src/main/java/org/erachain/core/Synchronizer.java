@@ -1030,6 +1030,8 @@ public class Synchronizer extends Thread {
         DCSet dcSet = DCSet.getInstance();
         BlockGenerator blockGenerator;
 
+        long shiftPoint = BlockChain.GENERATING_MIN_BLOCK_TIME_MS
+                + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2);
         // INIT wait START
         do {
             try {
@@ -1052,8 +1054,7 @@ public class Synchronizer extends Thread {
                     break;
                 }
 
-                timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS
-                        + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1);
+                timeTmp = bchain.getTimestamp(dcSet) + shiftPoint;
 
                 if (timePoint == timeTmp || timeTmp > NTP.getTime() || !cnt.isStatusOK())
                     continue;
