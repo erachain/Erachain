@@ -1885,7 +1885,12 @@ public class Controller extends Observable {
                 // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
                 // так как тут не подвергаются исследованию точность, как это делается в checkWeightPeers
                 Tuple2<Integer, Long> peerHWdata = this.getHWeightOfPeer(blockGenerator.betterPeer);
-                peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
+                if (peerHWdata == null) {
+                    // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
+                    peerHW = this.getMaxPeerHWeight(shift, true);
+                } else {
+                    peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
+                }
             }
             if (peerHW != null && peerHW.a > myHWeight.a) {
                 peer = peerHW.c;
