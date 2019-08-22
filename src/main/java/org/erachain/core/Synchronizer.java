@@ -1079,7 +1079,7 @@ public class Synchronizer extends Thread {
                     LOGGER.debug("try CHECK BETTER CHAIN PEER");
                     needCheck = false;
                     if (blockGenerator.checkWeightPeers()) {
-                        LOGGER.debug("FOUND BETTER CHAIN PEER");
+                        LOGGER.debug("FOUND BETTER CHAIN PEER " + blockGenerator.betterPeer);
                     }
                 }
 
