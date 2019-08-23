@@ -338,7 +338,10 @@ public class Peer extends MonitoredThread {
         return this.socket != null && this.socket.isConnected() && this.runed;
     }
 
-    private long countAlarmMess = 0;
+    /**
+     * for all peers ONE
+     */
+    private static long countAlarmMess = 0;
     public void run() {
         byte[] messageMagic = null;
 
