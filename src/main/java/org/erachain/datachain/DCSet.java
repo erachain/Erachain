@@ -426,12 +426,12 @@ public class DCSet extends DBASet implements Observer {
             databaseStruc
 
                     // при норм размере и досточной памяти скорость не хуже чем у остальных
-                    .cacheLRUEnable() // скорость зависит от памяти и настроек -
-                    .cacheSize(2048 + 64 << Controller.HARD_WORK)
+                    //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                    //.cacheSize(2048 + 64 << Controller.HARD_WORK)
 
                     // это чистит сама память если соталось 25% от кучи - так что она безопасная
                     // у другого типа КЭША происходит утечка памяти
-                    ///.cacheHardRefEnable()
+                    .cacheHardRefEnable()
 
                     ///.cacheSoftRefEnable()
                     ///.cacheSize(32 << Controller.HARD_WORK)
@@ -1339,10 +1339,10 @@ public class DCSet extends DBASet implements Observer {
                 //////
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
-                .cacheHardRefEnable()
+                //.cacheHardRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheSoftRefEnable()
-                //.cacheWeakRefEnable()
+                .cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
