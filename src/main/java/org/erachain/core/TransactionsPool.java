@@ -152,7 +152,7 @@ public class TransactionsPool extends MonitoredThread {
 
             if (controller.isStatusOK()) {
                 if (txMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                    controller.clearUnconfirmedRecords(true);
+                    txMap.clearByDeadTimeAndLimit(NTP.getTime(), true);
                 }
             } else {
                 // если идет синхронизация, то удаляем все что есть не на текущее время
