@@ -1339,15 +1339,15 @@ public class DCSet extends DBASet implements Observer {
                 //////
                 // это чистит сама память если соталось 25% от кучи - так что она безопасная
                 // у другого типа КЭША происходит утечка памяти
-                //.cacheHardRefEnable()
+                .cacheHardRefEnable()
                 //.cacheLRUEnable()
                 ///.cacheSoftRefEnable()
-                .cacheWeakRefEnable()
+                //.cacheWeakRefEnable()
 
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
                 // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
-                .cacheSize(10)
+                .cacheSize(1024)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
@@ -1356,22 +1356,10 @@ public class DCSet extends DBASet implements Observer {
                 //.snapshotEnable()
                 //.asyncWriteEnable()
                 //.asyncWriteFlushDelay(100)
-                //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(2) // не нагружать процессор для поиска свободного места в базе данных
 
-                //.compressionEnable()
-
-                /*
-                .cacheSize(CASH_SIZE)
-                //.checksumEnable()
-                .cacheHardRefEnable()
-                .commitFileSyncDisable()
-                //.asyncWriteEnable() ///
-                //.asyncWriteFlushDelay(1000) //
-                //.mmapFileEnableIfSupported()
-                 */
                 .make();
 
         return database;
