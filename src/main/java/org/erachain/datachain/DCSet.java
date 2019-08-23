@@ -1454,7 +1454,7 @@ public class DCSet extends DBASet implements Observer {
                 this.database.getEngine().clearCache();
             }
 
-            LOGGER.debug("CLEARed UTXs: " + sizeUTX);
+            LOGGER.debug("CLEARed UTXs: " + sizeUTX + " for " + (System.currentTimeMillis() - poinClear) + " ms");
         }
 
 
