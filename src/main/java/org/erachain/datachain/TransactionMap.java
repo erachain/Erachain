@@ -278,6 +278,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             for (Tuple2<?, Long> key : subSet) {
                 if (true || this.contains(key.b))
                     this.delete(key.b);
+                count++;
             }
 
         } else {
