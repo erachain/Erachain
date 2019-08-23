@@ -469,7 +469,7 @@ public class BlockChain {
         }
 
         int difference = height - previousForgingHeight;
-        if (true || Controller.getInstance().isTestNet() || BlockChain.DEVELOP_USE) {
+        if (height < 5500 || Controller.getInstance().isTestNet() || BlockChain.DEVELOP_USE) {
             if (difference < 10)
                 difference = 10;
             ;
@@ -483,24 +483,28 @@ public class BlockChain {
                 repeatsMin = BlockChain.GENESIS_ERA_TOTAL / forgingBalance;
                 repeatsMin = (repeatsMin >> 2);
 
-                if (height < 40000) {
-                    if (repeatsMin > 4)
-                        repeatsMin = 4;
-                } else if (height < 100000) {
-                    if (repeatsMin > 6)
-                        repeatsMin = 6;
-                } else if (height < 110000) {
-                    if (repeatsMin > 10) {
+                if (false) {
+                    if (height < 40000) {
+                        if (repeatsMin > 4)
+                            repeatsMin = 4;
+                    } else if (height < 100000) {
+                        if (repeatsMin > 6)
+                            repeatsMin = 6;
+                    } else if (height < 110000) {
+                        if (repeatsMin > 10) {
+                            repeatsMin = 10;
+                        }
+                    } else if (height < 120000) {
+                        if (repeatsMin > 40)
+                            repeatsMin = 40;
+                    } else if (height < VERS_4_11) {
+                        if (repeatsMin > 200)
+                            repeatsMin = 200;
+                    } else if (repeatsMin < 10) {
                         repeatsMin = 10;
                     }
-                } else if (height < 120000) {
-                    if (repeatsMin > 40)
-                        repeatsMin = 40;
-                } else if (height < VERS_4_11) {
-                    if (repeatsMin > 200)
-                        repeatsMin = 200;
-                } else if (repeatsMin < 10) {
-                    repeatsMin = 10;
+                } else if (repeatsMin > DEVELOP_FORGING_START) {
+                    repeatsMin = DEVELOP_FORGING_START;
                 }
             }
 
