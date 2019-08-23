@@ -1470,7 +1470,7 @@ import java.util.*;
 
         this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
         if (parentBlockHead == null) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "] not form broken CHAIN - not found Parent Block");
+            LOGGER.debug("*** Block[" + this.heightBlock + "] not found Parent Block OR my CHAIN was broken");
             return false;
         }
 
