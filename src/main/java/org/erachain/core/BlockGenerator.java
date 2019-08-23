@@ -552,6 +552,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int wait_new_block_broadcast;
         long wait_step;
         boolean newWinner;
+        long pointLogGoUpdate = 0;
         long pointLogWaitFlush = 0;
 
         this.initMonitor();
@@ -983,8 +984,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (waitWin == null) {
                         if (this.solvingReference != null) {
-                            if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2 ) {
-                                pointLogWaitFlush = System.currentTimeMillis();
+                            if (System.currentTimeMillis() - pointLogGoUpdate > BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2 ) {
+                                pointLogGoUpdate = System.currentTimeMillis();
                                 LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
                             }
                         }
