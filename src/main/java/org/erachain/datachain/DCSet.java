@@ -392,9 +392,6 @@ public class DCSet extends DBASet implements Observer {
         DBMaker databaseStruc = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
 
-                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCache(); --
-
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
                 .commitFileSyncDisable() // ++
@@ -402,7 +399,6 @@ public class DCSet extends DBASet implements Observer {
                 //.snapshotEnable()
                 //.asyncWriteEnable()
                 //.asyncWriteFlushDelay(100)
-                //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
@@ -420,35 +416,28 @@ public class DCSet extends DBASet implements Observer {
          */
 
         if (needClearCache) {
-            databaseStruc
-
-                    // при норм размере и досточной памяти скорость не хуже чем у остальных
-                    .cacheLRUEnable() // скорость зависит от памяти и настроек -
-                    .cacheSize(2048 + 512 << Controller.HARD_WORK)
+            //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+            ///// добавил dcSet.clearCache(); --
+            databaseStruc.cacheSize(32 + 32 << Controller.HARD_WORK)
 
             ;
 
         } else {
             databaseStruc
 
+                    // при норм размере и досточной памяти скорость не хуже чем у остальных
+                    .cacheLRUEnable() // скорость зависит от памяти и настроек -
+                    .cacheSize(2048 + 64 << Controller.HARD_WORK)
+
                     // это чистит сама память если соталось 25% от кучи - так что она безопасная
                     // у другого типа КЭША происходит утечка памяти
-                    .cacheHardRefEnable()
+                    ///.cacheHardRefEnable()
 
-                    // при норм размере и досточной памяти скорость не хуже чем у остальных
-                    //.cacheLRUEnable() // скорость зависит от памяти и настроек -
-                    //.cacheSize(512 << Controller.HARD_WORK)
-                    //.cacheSize(512 << Controller.HARD_WORK)
+                    ///.cacheSoftRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
 
-                    .cacheSoftRefEnable()
-                    .cacheSize(32 << Controller.HARD_WORK)
-
-            //.cacheWeakRefEnable()
-            //.cacheSize(32 << Controller.HARD_WORK)
-
-            // количество точек в таблице которые хранятся в HashMap как в КЭШе
-            // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
-            // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
+                    ///.cacheWeakRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
             ;
 
         }
@@ -1459,9 +1448,10 @@ public class DCSet extends DBASet implements Observer {
         this.addUses();
 
         // try repopulate table
-        if (System.currentTimeMillis() - poinClear > 300000) {
+        if (System.currentTimeMillis() - poinClear > 6000000) {
             poinClear = System.currentTimeMillis();
             TransactionMap utxMap = getTransactionMap();
+            LOGGER.debug("try CLEAR UTXs");
             int sizeUTX = utxMap.size();
             LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
             this.actions += sizeUTX;
@@ -1470,8 +1460,13 @@ public class DCSet extends DBASet implements Observer {
             for (Transaction item: items) {
                 utxMap.add(item);
             }
-            this.database.getEngine().clearCache();
-            LOGGER.debug("CLEARed UTXs");
+
+            if (needClearCache) {
+                LOGGER.debug("CLEAR ENGINE CACHE...");
+                this.database.getEngine().clearCache();
+            }
+
+            LOGGER.debug("CLEARed UTXs: " + sizeUTX);
         }
 
 
