@@ -974,8 +974,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         continue;
 
                     if (waitWin == null) {
-                        if (this.solvingReference != null)
-                            LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
+                        if (this.solvingReference != null) {
+                            //LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
+                            ;
+                        }
 
                     } else {
 
