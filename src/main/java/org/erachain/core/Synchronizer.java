@@ -180,7 +180,7 @@ public class Synchronizer extends Thread {
                 assert (sss2 == hhh2);
             }
 
-            LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
+            LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
             lastBlock = blockMap.last();
 
             //fork.getTransactionMap().clearByDeadTimeAndLimit(
@@ -197,7 +197,7 @@ public class Synchronizer extends Thread {
 
         }
 
-        LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
+        LOGGER.debug("*** checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
 
         // VALIDATE THE NEW BLOCKS
 
@@ -249,8 +249,10 @@ public class Synchronizer extends Thread {
                 block.setFromTrustedPeer();
             }
 
-            if (!block.isFromTrustedPeer()) {
-                LOGGER.debug("*** checkNewBlocks - VALIDATE in FORK [" + height + "]");
+            if (block.isFromTrustedPeer()) {
+                LOGGER.debug("*** not VALIDATE  [" + height + "] from trusted PEER");
+            } else {
+                LOGGER.debug("*** VALIDATE in FORK [" + height + "]");
 
                 // CHECK IF VALID
                 if (!block.isSignatureValid()) {
@@ -297,7 +299,7 @@ public class Synchronizer extends Thread {
 
         }
 
-        LOGGER.debug("*** core.Synchronizer.checkNewBlocks - END");
+        LOGGER.debug("*** END");
 
     }
 
@@ -514,7 +516,9 @@ public class Synchronizer extends Thread {
                     throw new Exception("on stopping");
                 }
 
-                if (!blockFromPeer.isFromTrustedPeer()) {
+                if (blockFromPeer.isFromTrustedPeer()) {
+                    LOGGER.debug("*** checkNewBlocks - not VALIDATE from trusted PEER");
+                } else {
                     // если это не довернный узел то полная проверка
                     if (!blockFromPeer.isSignatureValid()) {
                         errorMess = "invalid Sign!";
