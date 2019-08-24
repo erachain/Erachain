@@ -174,7 +174,7 @@ public class Synchronizer {
                 assert (sss2 == hhh2);
             }
 
-            LOGGER.debug("*** core.Synchronizer.checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
+            LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
             lastBlock = blockMap.last();
 
             //fork.getTransactionMap().clearByDeadTimeAndLimit(
@@ -191,7 +191,7 @@ public class Synchronizer {
 
         }
 
-        LOGGER.debug("*** core.Synchronizer.checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
+        LOGGER.debug("*** checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
 
         // VALIDATE THE NEW BLOCKS
 
@@ -244,9 +244,9 @@ public class Synchronizer {
             }
 
             if (block.isFromTrustedPeer()) {
-                LOGGER.debug("*** checkNewBlocks - not VALIDATE  [" + height + "] from trusted PEER");
+                LOGGER.debug("*** not VALIDATE  [" + height + "] from trusted PEER");
             } else {
-                LOGGER.debug("*** checkNewBlocks - VALIDATE in FORK [" + height + "]");
+                LOGGER.debug("*** VALIDATE in FORK [" + height + "]");
 
                 // CHECK IF VALID
                 if (!block.isSignatureValid()) {
@@ -293,7 +293,7 @@ public class Synchronizer {
 
         }
 
-        LOGGER.debug("*** core.Synchronizer.checkNewBlocks - END");
+        LOGGER.debug("*** END");
 
     }
 
