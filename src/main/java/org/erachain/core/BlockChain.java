@@ -122,6 +122,8 @@ public class BlockChain {
 
     public static final int DEVELOP_FORGING_START = 100;
 
+    public HashSet<Peer> trustedPeers = new HashSet<>();
+
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
                     // ORDER on ERG
@@ -321,6 +323,8 @@ public class BlockChain {
         //CREATE GENESIS BLOCK
         genesisBlock = new GenesisBlock();
         genesisTimestamp = genesisBlock.getTimestamp();
+
+        trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
 
         // GENERAL TRUST
         TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
@@ -553,6 +557,10 @@ public class BlockChain {
         } else {
             return BlockChain.MAINNET_PORT;
         }
+    }
+
+    public boolean isPeerTrusted(Peer peer) {
+        return trustedPeers.contains(peer);
     }
 
     /**
