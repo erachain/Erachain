@@ -210,6 +210,8 @@ public class Synchronizer extends Thread {
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
+        boolean isFromTrustedPeer = cnt.getBlockChain().isPeerTrusted(peer);
+
         for (Block block : newBlocks) {
             int height = block.getHeight();
             int bbb = fork.getBlockMap().size();
@@ -243,30 +245,36 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            LOGGER.debug("*** checkNewBlocks - VALIDATE in FORK [" + height + "]");
-
-            // CHECK IF VALID
-            if (!block.isSignatureValid()) {
-                // INVALID BLOCK THROW EXCEPTION
-                String mess = "Dishonest peer by not is Valid block, heigh: " + height;
-                peer.ban(BAN_BLOCK_TIMES << 1, mess);
-                throw new Exception(mess);
+            if (isFromTrustedPeer) {
+                block.setFromTrustedPeer();
             }
 
-            try {
-                block.getTransactions();
-            } catch (Exception e) {
-                LOGGER.debug(e.getMessage(), e);
-                String mess = "Dishonest peer error block.getTransactions PARSE: " + height;
-                peer.ban(BAN_BLOCK_TIMES << 1, mess);
-                throw new Exception(mess);
-            }
+            if (!block.isFromTrustedPeer()) {
+                LOGGER.debug("*** checkNewBlocks - VALIDATE in FORK [" + height + "]");
 
-            if (!block.isValid(fork, true)) {
-                // INVALID BLOCK THROW EXCEPTION
-                String mess = "Dishonest peer by not is Valid block, heigh: " + height;
-                peer.ban(BAN_BLOCK_TIMES << 1, mess);
-                throw new Exception(mess);
+                // CHECK IF VALID
+                if (!block.isSignatureValid()) {
+                    // INVALID BLOCK THROW EXCEPTION
+                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    peer.ban(BAN_BLOCK_TIMES << 1, mess);
+                    throw new Exception(mess);
+                }
+
+                try {
+                    block.getTransactions();
+                } catch (Exception e) {
+                    LOGGER.debug(e.getMessage(), e);
+                    String mess = "Dishonest peer error block.getTransactions PARSE: " + height;
+                    peer.ban(BAN_BLOCK_TIMES << 1, mess);
+                    throw new Exception(mess);
+                }
+
+                if (!block.isValid(fork, true)) {
+                    // INVALID BLOCK THROW EXCEPTION
+                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    peer.ban(BAN_BLOCK_TIMES << 1, mess);
+                    throw new Exception(mess);
+                }
             }
 
             // PROCESS TO VALIDATE NEXT BLOCKS
@@ -416,6 +424,7 @@ public class Synchronizer extends Thread {
     public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception {
 
         Controller cnt = Controller.getInstance();
+        boolean isFromTrustedPeer = cnt.getBlockChain().isPeerTrusted(peer);
 
         if (cnt.isOnStopping())
             throw new Exception("on stopping");
@@ -473,6 +482,9 @@ public class Synchronizer extends Thread {
                 long time1 = System.currentTimeMillis();
                 try {
                     blockFromPeer = blockBuffer.getBlock(signature);
+                    if (isFromTrustedPeer) {
+                        blockFromPeer.setFromTrustedPeer();
+                    }
                 } catch (Exception e) {
                     blockBuffer.stopThread();
                     peer.ban("get block BUFFER - " + e.getMessage());
@@ -502,35 +514,38 @@ public class Synchronizer extends Thread {
                     throw new Exception("on stopping");
                 }
 
-                if (!blockFromPeer.isSignatureValid()) {
-                    errorMess = "invalid Sign!";
-                    banTime = BAN_BLOCK_TIMES << 1;
-                    break;
-                }
-                LOGGER.debug("BLOCK Signature is Valid");
+                if (!blockFromPeer.isFromTrustedPeer()) {
+                    // если это не довернный узел то полная проверка
+                    if (!blockFromPeer.isSignatureValid()) {
+                        errorMess = "invalid Sign!";
+                        banTime = BAN_BLOCK_TIMES << 1;
+                        break;
+                    }
+                    LOGGER.debug("BLOCK Signature is Valid");
 
-                if (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
-                    errorMess = "invalid Timestamp from FUTURE";
-                    break;
-                }
+                    if (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
+                        errorMess = "invalid Timestamp from FUTURE";
+                        break;
+                    }
 
-                try {
-                    // тут может парсинг транзакций упасть
-                    blockFromPeer.getTransactions();
-                } catch (Exception e) {
-                    LOGGER.debug(e.getMessage(), e);
-                    errorMess = "invalid PARSE! " + e.getMessage();
-                    banTime = BAN_BLOCK_TIMES << 1;
-                    break;
-                }
+                    try {
+                        // тут может парсинг транзакций упасть
+                        blockFromPeer.getTransactions();
+                    } catch (Exception e) {
+                        LOGGER.debug(e.getMessage(), e);
+                        errorMess = "invalid PARSE! " + e.getMessage();
+                        banTime = BAN_BLOCK_TIMES << 1;
+                        break;
+                    }
 
-                if (!blockFromPeer.isValid(dcSet, false)) {
+                    if (!blockFromPeer.isValid(dcSet, false)) {
 
-                    errorMess = "invalid BLOCK";
-                    banTime = BAN_BLOCK_TIMES;
-                    break;
+                        errorMess = "invalid BLOCK";
+                        banTime = BAN_BLOCK_TIMES;
+                        break;
+                    }
+                    LOGGER.debug("BLOCK is Valid");
                 }
-                LOGGER.debug("BLOCK is Valid");
 
                 if (cnt.isOnStopping()) {
                     blockBuffer.stopThread();
