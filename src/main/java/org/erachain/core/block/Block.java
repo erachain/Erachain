@@ -94,6 +94,7 @@ import java.util.*;
     //protected Long atFees;
     protected byte[] atBytes;
 
+    private boolean fromTrustedPeer = false;
     // FORGING INFO
     // при обработке трнзакций используем для запоминания что данные менялись
     protected List<Account> forgingInfoUpdate;
@@ -720,6 +721,13 @@ import java.util.*;
         if (obj instanceof Block)
             return Arrays.equals(this.signature, ((Block) obj).signature);
         return false;
+    }
+
+    public void setFromTrustedPeer() {
+        this.fromTrustedPeer = true;
+    }
+    public boolean isFromTrustedPeer() {
+        return this.fromTrustedPeer;
     }
 
     public byte[] getSignature() {
