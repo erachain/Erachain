@@ -243,7 +243,9 @@ public class Synchronizer {
                 block.setFromTrustedPeer();
             }
 
-            if (!block.isFromTrustedPeer()) {
+            if (block.isFromTrustedPeer()) {
+                LOGGER.debug("*** checkNewBlocks - not VALIDATE  [" + height + "] from trusted PEER");
+            } else {
                 LOGGER.debug("*** checkNewBlocks - VALIDATE in FORK [" + height + "]");
 
                 // CHECK IF VALID
@@ -507,7 +509,9 @@ public class Synchronizer {
                     throw new Exception("on stopping");
                 }
 
-                if (!blockFromPeer.isFromTrustedPeer()) {
+                if (blockFromPeer.isFromTrustedPeer()) {
+                    LOGGER.debug("*** checkNewBlocks - not VALIDATE from trusted PEER");
+                } else {
                     // если это не довернный узел то полная проверка
                     if (!blockFromPeer.isSignatureValid()) {
                         errorMess = "invalid Sign!";
