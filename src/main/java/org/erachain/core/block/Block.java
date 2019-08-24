@@ -1478,7 +1478,9 @@ import java.util.*;
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
 
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
-            LOGGER.debug("*** forgingValue: " + this.forgingValue);
+            LOGGER.debug("*** forging Value: " + this.forgingValue
+                + " creator Data: " + creator.getForgingData(dcSet, heightBlock)
+                + " creator LAST Data: " + creator.getLastForgingData(dcSet));
             return false;
         }
 
