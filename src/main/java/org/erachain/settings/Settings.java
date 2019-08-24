@@ -351,7 +351,7 @@ public class Settings {
     /**
      * полностью доверныые пиры от которых данные не проверяются - ни блоки ни транзакции
      */
-    public List<Peer> getTrustedPeers() {
+    public List<String> getTrustedPeers() {
 
         try {
 
@@ -369,7 +369,7 @@ public class Settings {
                 }
 
                 //CREATE JSON OBJECT
-                return new ArrayList<Peer>((JSONArray) JSONValue.parse(jsonString));
+                return new ArrayList<String>((JSONArray) JSONValue.parse(jsonString));
             }
         } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e);

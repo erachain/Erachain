@@ -122,7 +122,7 @@ public class BlockChain {
 
     public static final int DEVELOP_FORGING_START = 100;
 
-    public HashSet<Peer> trustedPeers = new HashSet<>();
+    public HashSet<String> trustedPeers = new HashSet<>();
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
@@ -560,7 +560,7 @@ public class BlockChain {
     }
 
     public boolean isPeerTrusted(Peer peer) {
-        return trustedPeers.contains(peer);
+        return trustedPeers.contains(peer.getAddress().getHostAddress());
     }
 
     /**
