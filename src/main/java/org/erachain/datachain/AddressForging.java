@@ -85,66 +85,54 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
     }
 
     // height
-    public void set(String address, Integer currentHeight, Integer currentForgingVolume) {
+    public boolean set(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
 
-        if (false
-            //&& address.equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
-                //&& currentHeight > 291000 && currentHeight < 291050
-                ) {
-            Tuple2<Integer, Integer> pointPrev = getLast(address);
-            if (pointPrev != null) {
-                Tuple2<Integer, Integer> pointPrev1 = get(new Tuple2<>(address, pointPrev.a));
-                if (pointPrev1 != null) {
-                    Tuple2<Integer, Integer> pointPrev2 = get(new Tuple2<>(address, pointPrev1.a));
-                    if (pointPrev2 != null) {
-                        Tuple2<Integer, Integer> pointPrev3 = get(new Tuple2<>(address, pointPrev2.a));
-                        int a= 0;
-                    }
-                }
-            }
-        }
-
-        Tuple2<Integer, Integer> previousPoint = this.getLast(address);
-        if (previousPoint != null && currentHeight > previousPoint.a) {
+        Tuple2<Integer, Integer> previousPoint = this.getLast(key.a);
+        if (previousPoint != null && currentForgingValue.b > previousPoint.a) {
             // ONLY if not SAME HEIGHT !!! потому что в одном блоке может идти несколько
             // транзакций на один счет инициализирующих - нужно результат в конце поймать
             // и если одниковый блок и форжинговое значение - то обновлять только Последнее,
             // то есть сюда приходит только если НАОБОРОТ - это не Первое значение и Не с темже блоком в Последнее
-            this.set(new Tuple2<String, Integer>(address, currentHeight), previousPoint);
+            super.set(key, previousPoint);
         }
 
-        this.setLast(address, new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
+        this.setLast(key.a, currentForgingValue);
+
+        return true;
 
     }
 
-    public void delete(String address, int height) {
+    // height
+    public void set(String address, Integer currentHeight, Integer currentForgingVolume) {
 
-        if (height < 3) {
+        super.set(new Tuple2<String, Integer>(address, currentHeight),
+                new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
+
+    }
+
+    public Tuple2<Integer, Integer> delete(Tuple2<String, Integer> key) {
+
+        if (key.b < 3) {
             // not delete GENESIS forging data for all accounts
-            return;
+            return null;
         }
 
-        if (false
-                //&& address.equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
-                //&& height > 291000 && height < 291056
-                ) {
-            Tuple2<Integer, Integer> pointPrev = getLast(address);
-            if (pointPrev != null) {
-                Tuple2<Integer, Integer> pointPrev1 = get(new Tuple2<>(address, pointPrev.a));
-                if (pointPrev1 != null) {
-                    Tuple2<Integer, Integer> pointPrev2 = get(new Tuple2<>(address, pointPrev1.a));
-                    if (pointPrev2 != null) {
-                        Tuple2<Integer, Integer> pointPrev3 = get(new Tuple2<>(address, pointPrev2.a));
-                        int a= 0;
-                    }
-                }
+        Tuple2<Integer, Integer> previous = super.delete(key);
+        if (previous != null) {
+            if (previous.a < key.b) {
+                // только если там значение более ранне - его можно установить как последнее
+                // иначе нельзя - так как может быть несколько удалений в один блок
+                this.setLast(key.a, previous);
+            } else {
+                this.setLast(key.a, null);
             }
         }
 
-        Tuple2<String, Integer> key = new Tuple2<String, Integer>(address, height);
-        Tuple2<Integer, Integer> previous = this.delete(key);
-        this.setLast(address, previous);
+        return previous;
+    }
 
+    public void delete(String address, int height) {
+        this.delete(new Tuple2<String, Integer>(address, height));
     }
 
     public Tuple2<Integer, Integer> getLast(String address) {
