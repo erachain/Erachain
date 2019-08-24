@@ -552,6 +552,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int wait_new_block_broadcast;
         long wait_step;
         boolean newWinner;
+        long pointLogGoUpdate = 0;
+        long pointLogWaitFlush = 0;
 
         this.initMonitor();
 
@@ -920,14 +922,21 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (betterPeer != null || orphanto > 0
                         || timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()
                         && ctrl.needUpToDate()) {
-                    ///LOGGER.info("To late for FLUSH - need UPDATE !");
+
+                    if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2 ) {
+                        pointLogWaitFlush = System.currentTimeMillis();
+                        LOGGER.info("To late for FLUSH - need UPDATE !");
+                    }
                 } else {
 
                     // try solve and flush new block from Win Buffer
 
                     // FLUSH WINER to DB MAP
                     if (this.solvingReference != null)
-                        LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
+                        if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2 ) {
+                            pointLogWaitFlush = System.currentTimeMillis();
+                            LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
+                        }
 
                     // ждем основное время просто
                     while (this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
@@ -974,8 +983,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         continue;
 
                     if (waitWin == null) {
-                        if (this.solvingReference != null)
-                            LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
+                        if (this.solvingReference != null) {
+                            if (System.currentTimeMillis() - pointLogGoUpdate > BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2 ) {
+                                pointLogGoUpdate = System.currentTimeMillis();
+                                LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
+                            }
+                        }
 
                     } else {
 

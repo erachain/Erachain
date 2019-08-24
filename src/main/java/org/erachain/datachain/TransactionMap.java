@@ -249,86 +249,113 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
 
+    private boolean clearProcessed = false;
+    private synchronized boolean isClearProcessedAndSet() {
+
+        if (clearProcessed)
+            return true;
+
+        clearProcessed = true;
+
+        return false;
+    }
+
     /**
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
      * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
      * @param timestamp
      * @param cutDeadTime
      */
-    protected long pointReset;
+    protected long pointClear;
     public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
 
-        long realTime = System.currentTimeMillis();
-        int count = 0;
-        long tickerIter = realTime;
+        // займем просецц или установим флаг
+        if (isClearProcessedAndSet())
+            return;
 
-        timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS << (5 - Controller.HARD_WORK >> 1);
+        try {
+            long realTime = System.currentTimeMillis();
 
-        if (false && cutDeadTime) {
-
-            timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
-            tickerIter = System.currentTimeMillis();
-            SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
-                    timestamp, null));
-            tickerIter = System.currentTimeMillis() - tickerIter;
-            if (tickerIter > 10) {
-                LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
+            if (realTime - pointClear < BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) {
+                return;
             }
 
-            for (Tuple2<?, Long> key : subSet) {
-                if (true || this.contains(key.b))
-                    this.delete(key.b);
-            }
+            int count = 0;
+            long tickerIter = realTime;
 
-        } else {
-            /**
-             * по несколько секунд итератор берется - при том что таблица пустая -
-             * - дале COMPACT не помогает
-             */
-            //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-            Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
-            tickerIter = System.currentTimeMillis() - tickerIter;
-            if (tickerIter > 10) {
-                LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-            }
+            timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS << (5 - Controller.HARD_WORK >> 1);
 
-            Transaction transaction;
+            if (false && cutDeadTime) {
 
-            tickerIter = System.currentTimeMillis();
-            long size = this.size();
-            tickerIter = System.currentTimeMillis() - tickerIter;
-            if (tickerIter > 10) {
-                LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
-            }
-            while (iterator.hasNext()) {
-                Long key = iterator.next().b;
-                transaction = this.map.get(key);
-                if (transaction == null) {
-                    // такая ошибка уже было
-                    return;
+                timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+                tickerIter = System.currentTimeMillis();
+                SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
+                        timestamp, null));
+                tickerIter = System.currentTimeMillis() - tickerIter;
+                if (tickerIter > 10) {
+                    LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
                 }
 
-                long deadline = transaction.getDeadline();
-                if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                        || ((Controller.HARD_WORK > 3
-                        || cutDeadTime)
-                        && deadline < timestamp)
-                        || Controller.HARD_WORK <= 3
-                        && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                        || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                    this.delete(key);
+                for (Tuple2<?, Long> key : subSet) {
+                    if (true || this.contains(key.b))
+                        this.delete(key.b);
                     count++;
-                } else {
-                    break;
+                }
+
+            } else {
+                /**
+                 * по несколько секунд итератор берется - при том что таблица пустая -
+                 * - дале COMPACT не помогает
+                 */
+                //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+                Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+                tickerIter = System.currentTimeMillis() - tickerIter;
+                if (tickerIter > 10) {
+                    LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
+                }
+
+                Transaction transaction;
+
+                tickerIter = System.currentTimeMillis();
+                long size = this.size();
+                tickerIter = System.currentTimeMillis() - tickerIter;
+                if (tickerIter > 10) {
+                    LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
+                }
+                while (iterator.hasNext()) {
+                    Long key = iterator.next().b;
+                    transaction = this.map.get(key);
+                    if (transaction == null) {
+                        // такая ошибка уже было
+                        break;
+                    }
+
+                    long deadline = transaction.getDeadline();
+                    if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
+                            || ((Controller.HARD_WORK > 3
+                            || cutDeadTime)
+                            && deadline < timestamp)
+                            || Controller.HARD_WORK <= 3
+                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                            || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                        this.delete(key);
+                        count++;
+                    } else {
+                        break;
+                    }
                 }
             }
-        }
 
-        long ticker = System.currentTimeMillis() - realTime;
-        if ( ticker > 1000 || count > 0) {
-            LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + count);
-        }
+            long ticker = System.currentTimeMillis() - realTime;
+            if (ticker > 1000 || count > 0) {
+                LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + count);
+            }
 
+        } finally {
+            // освободим процесс
+            pointClear = System.currentTimeMillis();
+            clearProcessed = false;
+        }
     }
 
     @Override
