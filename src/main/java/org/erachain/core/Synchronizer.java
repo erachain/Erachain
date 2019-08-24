@@ -250,6 +250,9 @@ public class Synchronizer extends Thread {
             }
 
             if (block.isFromTrustedPeer()) {
+                // нужно все равно просчитать заголовок блока и решить блок
+                block.isValidHead(fork);
+                block.process(fork);
                 LOGGER.debug("*** not VALIDATE  [" + height + "] from trusted PEER");
             } else {
                 LOGGER.debug("*** VALIDATE in FORK [" + height + "]");
@@ -517,6 +520,8 @@ public class Synchronizer extends Thread {
                 }
 
                 if (blockFromPeer.isFromTrustedPeer()) {
+                    // нужно все равно просчитать заголовок блока
+                    blockFromPeer.isValidHead(dcSet);
                     LOGGER.debug("*** checkNewBlocks - not VALIDATE from trusted PEER");
                 } else {
                     // если это не довернный узел то полная проверка
