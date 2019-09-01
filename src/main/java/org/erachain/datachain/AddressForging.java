@@ -66,14 +66,14 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
         return null; //new Tuple2<Integer, Integer>(-1, 0);
     }
 
+    /**
+     * Возвращает ПУСТО если что, тут нельзя Последнее возвращать
+     * @param address
+     * @param height
+     * @return
+     */
     public Tuple2<Integer, Integer> get(String address, int height) {
-        Tuple2<Integer, Integer> point = this.get(new Tuple2<String, Integer>(address, height));
-        if (point == null) {
-            return this.getLast(address);
-        }
-
-        return point;
-
+        return this.get(new Tuple2<String, Integer>(address, height));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -111,7 +111,7 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
             } else if (currentForgingValue.a < lastPoint.a) {
                 // тут ошибка
                 LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + key + " " + currentForgingValue);
-                assert(lastPoint.a >= currentForgingValue.a);
+                assert(currentForgingValue.a >= lastPoint.a);
             } else {
                 // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
                 // просто нужно обновить новое значение кующей величины
@@ -126,7 +126,7 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
     // height
     public void set(String address, Integer currentHeight, Integer currentForgingVolume) {
 
-        super.set(new Tuple2<String, Integer>(address, currentHeight),
+        this.set(new Tuple2<String, Integer>(address, currentHeight),
                 new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
 
     }
@@ -164,7 +164,7 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
             } else {
                 // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
                 // ужа при первом разе все удалилось - тут ничего не делаем
-                boolean test = true;
+                return lastPoint;
             }
         }
 
@@ -186,9 +186,11 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
 
     private void setLast(String address, Tuple2<Integer, Integer> point) {
         if (point == null) {
-            this.delete(new Tuple2<String, Integer>(address, 0));
+            // вызываем супер-класс
+            super.delete(new Tuple2<String, Integer>(address, 0));
         } else {
-            this.set(new Tuple2<String, Integer>(address, 0), point);
+            // вызываем супер-класс
+            super.set(new Tuple2<String, Integer>(address, 0), point);
         }
     }
 }
