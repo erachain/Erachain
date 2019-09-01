@@ -1482,8 +1482,8 @@ import java.util.*;
 
         this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
         if (this.winValue < 1) {
-            this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-            this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+            //this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+            //this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
 
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
             LOGGER.debug("*** forging Value: " + this.forgingValue
@@ -2007,7 +2007,7 @@ import java.util.*;
                 int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
                 if (privousForgingPoint == null) {
                     if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                        if (true || BlockChain.DEVELOP_USE) {
+                        if (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) {
                             // запоминаем чтобы не было отказов в сборке блоков
                             account.setForgingData(dcSet, this.heightBlock - BlockChain.DEVELOP_FORGING_START,
                                     currentForgingBalance);

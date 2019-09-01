@@ -1457,7 +1457,6 @@ public class DCSet extends DBASet implements Observer {
             LOGGER.debug("CLEARed UTXs: " + sizeUTX + " for " + (System.currentTimeMillis() - poinClear) + " ms");
         }
 
-
         this.actions += size;
         long diffUp = getEngineSize() - engineSize;
         if (diffUp < 0)
