@@ -70,8 +70,6 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                         return "GENESIS";
                     }
                     forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
-                    if (forgingPoint == null)
-                        return null;
                     return (block.heightBlock - forgingPoint.a) + "";
                 case COLUMN_WV:
                     return block.winValue + "";
