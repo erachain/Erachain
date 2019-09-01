@@ -477,10 +477,16 @@ public class BlockChain {
         }
 
         int difference = height - previousForgingHeight;
-        if (height < 5650 || Controller.getInstance().isTestNet() || BlockChain.DEVELOP_USE) {
-            if (difference < 10)
+        if (true || Controller.getInstance().isTestNet() || BlockChain.DEVELOP_USE) {
+            if (height < 5650 && difference < 10) {
                 difference = 10;
-            ;
+            }
+
+            // FAST TEST DIFF
+            if (difference < 30) {
+                return difference - 30;
+            }
+
         } else {
 
             int repeatsMin;
