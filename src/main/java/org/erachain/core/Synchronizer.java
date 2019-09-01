@@ -251,9 +251,17 @@ public class Synchronizer extends Thread {
 
             if (block.isFromTrustedPeer()) {
                 // нужно все равно просчитать заголовок блока и решить блок
-                block.isValidHead(fork);
-                block.process(fork);
+                if (!block.isValidHead(fork)) {
+                    // все же может не просчитаться высота блока м цель его из-за ошибки валидации
+                    // поэтому делаем проверку все равно
+                    // INVALID BLOCK THROW EXCEPTION
+                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    peer.ban(BAN_BLOCK_TIMES << 1, mess);
+                    throw new Exception(mess);
+                }
                 LOGGER.debug("*** not VALIDATE  [" + height + "] from trusted PEER");
+
+                block.process(fork);
             } else {
                 LOGGER.debug("*** VALIDATE in FORK [" + height + "]");
 
@@ -521,7 +529,14 @@ public class Synchronizer extends Thread {
 
                 if (blockFromPeer.isFromTrustedPeer()) {
                     // нужно все равно просчитать заголовок блока
-                    blockFromPeer.isValidHead(dcSet);
+                    if (!blockFromPeer.isValidHead(dcSet)) {
+                        // все же может не просчитаться высота блока м цель его из-за ошибки валидации
+                        // поэтому делаем проверку все равно
+                        // INVALID BLOCK THROW EXCEPTION
+                        errorMess = "Dishonest peer by not is Valid block";
+                        banTime = BAN_BLOCK_TIMES << 1;
+                        break;
+                    }
                     LOGGER.debug("*** checkNewBlocks - not VALIDATE from trusted PEER");
                 } else {
                     // если это не довернный узел то полная проверка
