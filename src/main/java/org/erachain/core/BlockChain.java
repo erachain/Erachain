@@ -697,10 +697,15 @@ public class BlockChain {
         }
 
         int difference = height - previousForgingHeight;
-        if (DEVELOP_USE || ERA_COMPU_ALL_UP || Controller.getInstance().isTestNet()) {
-            if (difference < 10)
+
+        if (DEVELOP_USE || Controller.getInstance().isTestNet()) {
+            if (difference < 10) {
                 difference = 10;
-            ;
+            }
+        } else if (ERA_COMPU_ALL_UP) {
+            if (difference < REPEAT_WIN) {
+                return difference - REPEAT_WIN;
+            }
         } else {
 
             int repeatsMin;
