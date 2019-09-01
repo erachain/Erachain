@@ -60,13 +60,13 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                 case COLUMN_GENERATOR:
                     return block.creator.getPersonAsString();
                 case COLUMN_GB:
-                    if (block.target == 0) {
+                    if (block.target == 0 || block.heightBlock == 1) {
                         return "GENESIS";
                     }
                     Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
                     return forgingPoint.b + " ";
                 case COLUMN_DH:
-                    if (block.target == 0) {
+                    if (block.target == 0 || block.heightBlock == 1) {
                         return "GENESIS";
                     }
                     forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
@@ -74,6 +74,9 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                 case COLUMN_WV:
                     return block.winValue + "";
                 case COLUMN_dtWV:
+                    if (block.target == 0 || block.heightBlock == 1) {
+                        return "GENESIS";
+                    }
                     return String.format("%10.3f%%", (100f * (block.winValue - block.target) / block.target));
                 case COLUMN_TRANSACTIONS:
                     return block.transactionsCount;
