@@ -44,7 +44,7 @@ public class BlockChain {
      */
     public static final boolean ERA_COMPU_ALL_UP = false;
 
-    static final public int CHECK_BUGS = 1;
+    static final public int CHECK_BUGS = 2;
 
     /**
      * если задан - первое подключение к нему
@@ -260,7 +260,7 @@ public class BlockChain {
     //TESTNET
     //   1486444444444l
     //	 1487844444444   1509434273     1509434273
-    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
+    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000L : 1487844793333L;
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
