@@ -65,7 +65,7 @@ public class Settings {
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
     //WEB
-    private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
+    private static final String DEFAULT_WEB_ALLOWED = BlockChain.DEVELOP_USE? ";" : "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
     // 19 03
     //GUI

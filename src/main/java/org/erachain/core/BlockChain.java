@@ -34,13 +34,13 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
 
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
 
     /**
-     * set uo all balabces ERA to 10000 and COMPU to 100
+     * set uo all balances ERA to 10000 and COMPU to 100
      */
     public static final boolean ERA_COMPU_ALL_UP = false;
 
