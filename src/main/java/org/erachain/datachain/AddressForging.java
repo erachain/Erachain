@@ -84,19 +84,40 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
         return headers;
     }
 
-    // height
+    /**
+     * заносит новую точку и обновляет Последнюю точку (height & ForgingValue)/
+     * При этом если последняя точка уже с той же высотой - то обновляем только ForgingValue
+     * @param key
+     * @param currentForgingValue
+     * @return
+     */
     public boolean set(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
 
-        Tuple2<Integer, Integer> previousPoint = this.getLast(key.a);
-        if (previousPoint != null && currentForgingValue.b > previousPoint.a) {
-            // ONLY if not SAME HEIGHT !!! потому что в одном блоке может идти несколько
-            // транзакций на один счет инициализирующих - нужно результат в конце поймать
-            // и если одниковый блок и форжинговое значение - то обновлять только Последнее,
-            // то есть сюда приходит только если НАОБОРОТ - это не Первое значение и Не с темже блоком в Последнее
-            super.set(key, previousPoint);
-        }
+        // TODO поставить тут BUGS отлов ЕСЛИ
+        assert(key.b.equals(currentForgingValue.a));
 
-        this.setLast(key.a, currentForgingValue);
+        Tuple2<Integer, Integer> lastPoint = this.getLast(key.a);
+        if (lastPoint == null) {
+            this.setLast(key.a, currentForgingValue);
+            /// там же пусто - поэтому ничего не делаем - super.set(key, previousPoint);
+        } else {
+            if (currentForgingValue.a > lastPoint.a) {
+                // ONLY if not SAME HEIGHT !!! потому что в одном блоке может идти несколько
+                // транзакций на один счет инициализирующих - нужно результат в конце поймать
+                // и если одниковый блок и форжинговое значение - то обновлять только Последнее,
+                // то есть сюда приходит только если НАОБОРОТ - это не Первое значение и Не с темже блоком в Последнее
+                super.set(key, lastPoint);
+                this.setLast(key.a, currentForgingValue);
+            } else if (currentForgingValue.a < lastPoint.a) {
+                // тут ошибка
+                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + key + " " + currentForgingValue);
+                assert(lastPoint.a >= currentForgingValue.a);
+            } else {
+                // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
+                // просто нужно обновить новое значение кующей величины
+                this.setLast(key.a, currentForgingValue);
+            }
+        }
 
         return true;
 
@@ -110,6 +131,13 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
 
     }
 
+    /**
+     * Удаляет текущую точку и обновляет ссылку на Последнюю точку - если из высоты совпали
+     * Так как если нет соапвдения - то удалять нельзя так как уже удалили ранее ее
+     * - по несколько раз при откате может быть удаление текущей точки
+     * @param key
+     * @return
+     */
     public Tuple2<Integer, Integer> delete(Tuple2<String, Integer> key) {
 
         if (key.b < 3) {
@@ -117,24 +145,41 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
             return null;
         }
 
-        Tuple2<Integer, Integer> previous = super.delete(key);
-        if (previous != null) {
-            if (previous.a < key.b) {
-                // только если там значение более ранне - его можно установить как последнее
-                // иначе нельзя - так как может быть несколько удалений в один блок
+        // удалять можно только если последняя точка совпадает с удаляемой
+        // иначе нельзя - так как может быть несколько удалений в один блок
+        Tuple2<Integer, Integer> lastPoint = getLast(key.a);
+        if (lastPoint == null) {
+            // обычно такого не должно случаться!!!
+            LOGGER.error("ERROR LAST forging POINTS = null for KEY: " + key);
+            return super.delete(key);
+        } else {
+            if (lastPoint.a.equals(key.b)) {
+                Tuple2<Integer, Integer> previous = super.delete(key);
                 this.setLast(key.a, previous);
+                return previous;
+            } else if (lastPoint.a > key.b) {
+                // тут ошибка
+                LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
+                assert (lastPoint.a <= key.b);
             } else {
-                this.setLast(key.a, null);
+                // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
+                // ужа при первом разе все удалилось - тут ничего не делаем
+                boolean test = true;
             }
         }
 
-        return previous;
+        return null;
     }
 
     public void delete(String address, int height) {
         this.delete(new Tuple2<String, Integer>(address, height));
     }
 
+    /**
+     *
+     * @param address
+     * @return последний блок собранный и его кующее значение
+     */
     public Tuple2<Integer, Integer> getLast(String address) {
         return this.get(new Tuple2<String, Integer>(address, 0));
     }
