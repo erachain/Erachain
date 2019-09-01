@@ -44,7 +44,7 @@ public class BlockChain {
      */
     public static final boolean ERA_COMPU_ALL_UP = false;
 
-    static final public int CHECK_BUGS = 2;
+    static final public int CHECK_BUGS = 1;
 
     /**
      * если задан - первое подключение к нему
@@ -89,7 +89,7 @@ public class BlockChain {
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
     public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 5000: 5000;
-    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = Controller.HARD_WORK > 3 ? 1 : DEVELOP_USE? 2 : 1; // проверить наше цепочку по силе с окружающими
+    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = 1; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
@@ -128,6 +128,8 @@ public class BlockChain {
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
     public static final int DEVELOP_FORGING_START = 100;
+
+    public HashSet<String> trustedPeers = new HashSet<>();
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
@@ -260,7 +262,7 @@ public class BlockChain {
     //TESTNET
     //   1486444444444l
     //	 1487844444444   1509434273     1509434273
-    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000L : 1487844793333L;
+    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
@@ -353,6 +355,8 @@ public class BlockChain {
         //CREATE GENESIS BLOCK
         genesisBlock = new GenesisBlock();
         genesisTimestamp = genesisBlock.getTimestamp();
+
+        trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
 
         // GENERAL TRUST
         TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
@@ -587,6 +591,10 @@ public class BlockChain {
         }
     }
 
+    public boolean isPeerTrusted(Peer peer) {
+        return trustedPeers.contains(peer.getAddress().getHostAddress());
+    }
+
     /**
      * Calculate Target (Average Win Value for 1024 last blocks) for this block
      * @param height - height of blockchain
@@ -703,7 +711,9 @@ public class BlockChain {
                 difference = 10;
             }
         } else if (ERA_COMPU_ALL_UP) {
-            if (difference < REPEAT_WIN) {
+            if (height < 5650 && difference < REPEAT_WIN) {
+                difference = REPEAT_WIN;
+            } else if (difference < REPEAT_WIN) {
                 return difference - REPEAT_WIN;
             }
         } else {
@@ -716,24 +726,28 @@ public class BlockChain {
                 repeatsMin = BlockChain.GENESIS_ERA_TOTAL / forgingBalance;
                 repeatsMin = (repeatsMin >> 2);
 
-                if (height < 40000) {
-                    if (repeatsMin > 4)
-                        repeatsMin = 4;
-                } else if (height < 100000) {
-                    if (repeatsMin > 6)
-                        repeatsMin = 6;
-                } else if (height < 110000) {
-                    if (repeatsMin > 10) {
+                if (!DEVELOP_USE) {
+                    if (height < 40000) {
+                        if (repeatsMin > 4)
+                            repeatsMin = 4;
+                    } else if (height < 100000) {
+                        if (repeatsMin > 6)
+                            repeatsMin = 6;
+                    } else if (height < 110000) {
+                        if (repeatsMin > 10) {
+                            repeatsMin = 10;
+                        }
+                    } else if (height < 120000) {
+                        if (repeatsMin > 40)
+                            repeatsMin = 40;
+                    } else if (height < VERS_4_11) {
+                        if (repeatsMin > 200)
+                            repeatsMin = 200;
+                    } else if (repeatsMin < 10) {
                         repeatsMin = 10;
                     }
-                } else if (height < 120000) {
-                    if (repeatsMin > 40)
-                        repeatsMin = 40;
-                } else if (height < VERS_4_11) {
-                    if (repeatsMin > 200)
-                        repeatsMin = 200;
-                } else if (repeatsMin < 10) {
-                    repeatsMin = 10;
+                } else if (repeatsMin > DEVELOP_FORGING_START) {
+                    repeatsMin = DEVELOP_FORGING_START;
                 }
             }
 

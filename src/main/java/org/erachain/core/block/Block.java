@@ -94,6 +94,7 @@ import java.util.*;
     //protected Long atFees;
     protected byte[] atBytes;
 
+    private boolean fromTrustedPeer = false;
     // FORGING INFO
     // при обработке трнзакций используем для запоминания что данные менялись
     protected List<Account> forgingInfoUpdate;
@@ -720,6 +721,13 @@ import java.util.*;
         if (obj instanceof Block)
             return Arrays.equals(this.signature, ((Block) obj).signature);
         return false;
+    }
+
+    public void setFromTrustedPeer() {
+        this.fromTrustedPeer = true;
+    }
+    public boolean isFromTrustedPeer() {
+        return this.fromTrustedPeer;
     }
 
     public byte[] getSignature() {
@@ -1478,13 +1486,15 @@ import java.util.*;
             //this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
 
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
-            LOGGER.debug("*** forgingValue: " + this.forgingValue);
+            LOGGER.debug("*** forging Value: " + this.forgingValue
+                + " creator Data: " + creator.getForgingData(dcSet, heightBlock)
+                + " creator LAST Data: " + creator.getLastForgingData(dcSet));
             return false;
         }
 
         this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
         if (parentBlockHead == null) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "] not form broken CHAIN - not found Parent Block");
+            LOGGER.debug("*** Block[" + this.heightBlock + "] not found Parent HEAD OR my BlocksHeadsMap was broken");
             return false;
         }
 

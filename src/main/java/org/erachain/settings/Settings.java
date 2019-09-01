@@ -348,6 +348,36 @@ public class Settings {
     }
 
     @SuppressWarnings("unchecked")
+    /**
+     * полностью доверныые пиры от которых данные не проверяются - ни блоки ни транзакции
+     */
+    public List<String> getTrustedPeers() {
+
+        try {
+
+            File file = new File(this.userPath
+                    + (BlockChain.DEVELOP_USE ? "peers-trusted-dev.json" : "peers-trusted.json"));
+
+            //CREATE FILE IF IT DOESNT EXIST
+            if (file.exists()) {
+                //READ PEERS FILE
+                List<String> lines = Files.readLines(file, Charsets.UTF_8);
+
+                String jsonString = "";
+                for (String line : lines) {
+                    jsonString += line;
+                }
+
+                //CREATE JSON OBJECT
+                return new ArrayList<String>((JSONArray) JSONValue.parse(jsonString));
+            }
+        } catch (Exception e) {
+            LOGGER.debug(e.getMessage(), e);
+        }
+
+        return new ArrayList<>();
+    }
+
     public List<Peer> getKnownPeers() {
         try {
             boolean loadPeersFromInternet = (

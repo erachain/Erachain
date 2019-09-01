@@ -732,9 +732,6 @@ public class Controller extends Observable {
          * Setting_Json.put("DB_OPEN", "Open BAD - try reCreateDB"); }
          */
 
-        // CREATE SYNCHRONIZOR
-        this.synchronizer = new Synchronizer();
-
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
 
@@ -743,6 +740,9 @@ public class Controller extends Observable {
 
         // CREATE WinBlock SELECTOR
         this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
+
+        // CREATE SYNCHRONIZOR
+        this.synchronizer = new Synchronizer(this, blockChain);
 
         // CREATE Block REQUESTER
         this.blockRequester = new BlocksRequest(this, blockChain, dcSet);
@@ -1820,6 +1820,13 @@ public class Controller extends Observable {
     }
 
 
+    /**
+     * вызывается только из синхронизатора в момент синхронизации цепочки.
+     *  Поэтому можно сипользовать внутренню переменную
+     *
+     * @param currentBetterPeer
+     * @throws Exception
+     */
     public synchronized void checkNewBetterPeer(Peer currentBetterPeer) throws Exception {
 
         if (!newPeerConnected)
@@ -1827,10 +1834,12 @@ public class Controller extends Observable {
 
         newPeerConnected = false;
 
-        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, true);
+        // нам не важно отличие в последнем блоке тут - главное чтобы цепочка была длиньше?
+        //blockGenerator.checkWeightPeers();
+        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false);
         if (betterPeerHW != null) {
             Tuple2<Integer, Long> currentHW = getHWeightOfPeer(currentBetterPeer);
-            if (currentHW != null && (currentHW.a > betterPeerHW.a || currentHW.b >= betterPeerHW.b
+            if (currentHW != null && (currentHW.a >= betterPeerHW.a
                     || currentBetterPeer.equals(betterPeerHW.c))) {
                 // новый пир не лучше - продолжим синхронизацию не прерываясь
                 return;
@@ -1877,8 +1886,26 @@ public class Controller extends Observable {
             // withWinBuffer = true
             // тут поиск длаем с учетом СИЛЫ
             // но если найдено с такой же высотой как у нас то игнорируем
-            Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift, true);
-            if (peerHW != null && peerHW.a > myHWeight.a) {
+            Tuple3<Integer, Long, Peer> peerHW;
+            Tuple2<Integer, Long> peerHWdata = null;
+            if (blockGenerator.betterPeer == null) {
+                peerHW = this.getMaxPeerHWeight(shift, false);
+            } else {
+                // берем пир который нашли в генераторе при осмотре более сильных цепочек
+                // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
+                // так как тут не подвергаются исследованию точность, как это делается в checkWeightPeers
+                peerHWdata = this.getHWeightOfPeer(blockGenerator.betterPeer);
+                if (peerHWdata == null) {
+                    // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
+                    peerHW = this.getMaxPeerHWeight(shift, false);
+                } else {
+                    peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
+                }
+                blockGenerator.betterPeer = null;
+            }
+
+            if (peerHW != null && peerHW.a > myHWeight.a
+                    || peerHWdata != null) {
                 peer = peerHW.c;
                 if (peer != null) {
                     info = "update from MaxHeightPeer:" + peer + " WH: "
@@ -1898,6 +1925,10 @@ public class Controller extends Observable {
                             return;
                         } else if (peer.isBanned()) {
                             ;
+                        } else if (blockGenerator.betterPeer != null) {
+                            // найден новый лучший ПИР
+                            isUpToDate = false;
+                            continue;
                         } else {
                             LOGGER.error(e.getMessage(), e);
                             peer.ban(e.getMessage());
@@ -1992,7 +2023,7 @@ public class Controller extends Observable {
                 }
                 Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
                 if (height < whPeer.a
-                        || (useWeight && height == whPeer.a && weight < whPeer.b)) {
+                        || useWeight && weight < whPeer.b) {
                     height = whPeer.a;
                     weight = whPeer.b;
                     maxPeer = peer;

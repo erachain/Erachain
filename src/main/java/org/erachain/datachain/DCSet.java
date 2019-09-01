@@ -44,7 +44,10 @@ public class DCSet extends DBASet implements Observer {
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
     private static final long DELETIONS_BEFORE_COMPACT = BlockChain.MAX_BLOCK_SIZE_GEN << 6;
 
-    private static boolean needClearCache = false;
+    /**
+     * если задано то выбран такой КЭШ который нужнос амим чистиь иначе реперолнение будет
+     */
+    private static final boolean needClearCache = false;
 
     private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
 
@@ -386,40 +389,8 @@ public class DCSet extends DBASet implements Observer {
         dbFile.getParentFile().mkdirs();
 
         /// https://jankotek.gitbooks.io/mapdb/performance/
-        //CREATE DATABASE
-        DB database = DBMaker.newFileDB(dbFile)
+        DBMaker databaseStruc = DBMaker.newFileDB(dbFile)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
-
-                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCache(); --
-                //.cacheDisable()
-
-                /**
-                 * если не задавать вид КЭШа то берется стандартный - и его размер 10 очень мал и скорость
-                 * решения боков в 2-5 раза меньше. Однако если разделить таблицы по разным базам так чтобы блоки особо не кэшировать.
-                 * Тогда возможно этот вид КЭШа будет приемлем для дранзакций
-                 */
-                ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
-                //////
-                // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                // у другого типа КЭША происходит утечка памяти
-                //.cacheHardRefEnable()
-                //64 << Controller.HARD_WORK)
-
-                // при норм размере и досточной памяти скорость не хуже чем у остальных
-                // в этом случае не НУЖНО отчищать кэш каждый раз полсе сборки блоков
-                .cacheLRUEnable() // скорость зависит от памяти и настроек -
-                .cacheSize(512 << Controller.HARD_WORK)
-
-                //.cacheSoftRefEnable()
-                //.cacheSize(32 << Controller.HARD_WORK)
-
-                //.cacheWeakRefEnable()
-                //.cacheSize(32 << Controller.HARD_WORK)
-
-                // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
-                // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
@@ -428,26 +399,51 @@ public class DCSet extends DBASet implements Observer {
                 //.snapshotEnable()
                 //.asyncWriteEnable()
                 //.asyncWriteFlushDelay(100)
-                //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
+                ;
 
-                /*
-                .cacheSize(CASH_SIZE)
-                //.checksumEnable()
-                .cacheHardRefEnable()
-                .commitFileSyncDisable()
-                //////.transactionDisable()
-                //.asyncWriteEnable() ///
-                //.asyncWriteFlushDelay(1000) //
-                //.mmapFileEnableIfSupported()
-                 */
-                .make();
+        /**
+         * если не задавать вид КЭШа то берется стандартный - и его размер 10 очень мал и скорость
+         * решения боков в 2-5 раза меньше. Однако если разделить таблицы по разным базам так чтобы блоки особо не кэшировать.
+         * Тогда возможно этот вид КЭШа будет приемлем для дранзакций
+         * == количество точек в таблице которые хранятся в HashMap как в КЭШе
+         * - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
+         * WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
+         */
 
-        needClearCache = false;
+        if (needClearCache) {
+            //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+            ///// добавил dcSet.clearCache(); --
+            databaseStruc.cacheSize(32 + 32 << Controller.HARD_WORK)
+
+            ;
+
+        } else {
+            databaseStruc
+
+                    // при норм размере и досточной памяти скорость не хуже чем у остальных
+                    //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                    //.cacheSize(2048 + 64 << Controller.HARD_WORK)
+
+                    // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                    // у другого типа КЭША происходит утечка памяти
+                    .cacheHardRefEnable()
+
+                    ///.cacheSoftRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
+
+                    ///.cacheWeakRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
+            ;
+
+        }
+
+        DB database = databaseStruc.make();
+
 
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
@@ -1351,7 +1347,7 @@ public class DCSet extends DBASet implements Observer {
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
                 // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
-                .cacheSize(10)
+                .cacheSize(1024)
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
@@ -1360,22 +1356,10 @@ public class DCSet extends DBASet implements Observer {
                 //.snapshotEnable()
                 //.asyncWriteEnable()
                 //.asyncWriteFlushDelay(100)
-                //.cacheHardRefEnable()
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(2) // не нагружать процессор для поиска свободного места в базе данных
 
-                //.compressionEnable()
-
-                /*
-                .cacheSize(CASH_SIZE)
-                //.checksumEnable()
-                .cacheHardRefEnable()
-                .commitFileSyncDisable()
-                //.asyncWriteEnable() ///
-                //.asyncWriteFlushDelay(1000) //
-                //.mmapFileEnableIfSupported()
-                 */
                 .make();
 
         return database;
@@ -1452,9 +1436,10 @@ public class DCSet extends DBASet implements Observer {
         this.addUses();
 
         // try repopulate table
-        if (needClearCache && System.currentTimeMillis() - poinClear > 600000) {
+        if (System.currentTimeMillis() - poinClear > 6000000) {
             poinClear = System.currentTimeMillis();
             TransactionMap utxMap = getTransactionMap();
+            LOGGER.debug("try CLEAR UTXs");
             int sizeUTX = utxMap.size();
             LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
             this.actions += sizeUTX;
@@ -1463,8 +1448,13 @@ public class DCSet extends DBASet implements Observer {
             for (Transaction item: items) {
                 utxMap.add(item);
             }
-            this.database.getEngine().clearCache();
-            LOGGER.debug("CLEARed UTXs - " + (System.currentTimeMillis() - poinClear));
+
+            if (needClearCache) {
+                LOGGER.debug("CLEAR ENGINE CACHE...");
+                this.database.getEngine().clearCache();
+            }
+
+            LOGGER.debug("CLEARed UTXs: " + sizeUTX + " for " + (System.currentTimeMillis() - poinClear) + " ms");
         }
 
         this.actions += size;
