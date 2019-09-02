@@ -34,7 +34,7 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
 
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
@@ -42,7 +42,7 @@ public class BlockChain {
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
      */
-    public static final boolean ERA_COMPU_ALL_UP = true;
+    public static final boolean ERA_COMPU_ALL_UP = false;
 
     static final public int CHECK_BUGS = 1;
 
@@ -54,11 +54,11 @@ public class BlockChain {
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
-    public static final int TESTNET_PORT = DEVELOP_USE ? 9075 : 9025;
-    public static final int MAINNET_PORT = DEVELOP_USE ? 9076 : 9026;
+    public static final int TESTNET_PORT = DEVELOP_USE ? 9065 : 9045;
+    public static final int MAINNET_PORT = DEVELOP_USE ? 9066 : 9046;
 
-    public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9077 : 9027;
-    public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9078 : 9028;
+    public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9067 : 9047;
+    public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9068 : 9048;
 
     public static final String DEFAULT_EXPLORER = "explorer.erachain.org";
 
@@ -82,7 +82,7 @@ public class BlockChain {
     public static final int MIN_GENERATING_BALANCE = 100;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
     //public static final int GENERATING_RETARGET = 10;
-    public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 32 : 32; // 300 PER DAY
+    public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
     public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 3);
     static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
@@ -115,13 +115,13 @@ public class BlockChain {
 
     public static final long BONUS_STOP_PERSON_KEY = 13l;
 
-    public static final int VERS_4_11 = DEVELOP_USE ? 230000 : 0;
+    public static final int VERS_4_11 = DEVELOP_USE ? 230000 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 430000 : 0;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 425555 : 0;
+    public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 430000 : 260120;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 425555 : 260120;
 
     public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 0;
 
@@ -133,8 +133,48 @@ public class BlockChain {
 
     public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
             new byte[][]{
+                    // ORDER on ERG
+                    Base58.decode("4ycpev6jq5dagkCz49LHoMmo6MM7cQEyC36A7tHKLz6ex25NjjKMkd7hdfPnd8yEmuy3biYVSezQXUuEH8f3HZFv"),
+                    Base58.decode("3JR3Wivtjm1uTmrnzkTHtXRdUvMdxrApcmu2Q5uha82HMucWqFWLgN82SwKqYB7EXQ7ThVtJD5s7iJqR8BwqGxF9"),
+                    Base58.decode("5rh9StwPMPsxu7dRvsT5N3KmYkKwUTnRdfQ4Crhqmzbey6uDMh1i6SudphFSUZkexmDAJYJzrarUGsbdEycYytu4"),
+
             } :
             new byte[][]{
+
+        // WRONG Issue Person #125
+        Base58.decode("zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH"),
+        // WRONG orders by Person 90 Yakovlev
+        Base58.decode("585CPBAusjDWpx9jyx2S2hsHByTd52wofYB3vVd9SvgZqd3igYHSqpS2gWu2THxNevv4LNkk4RRiJDULvHahPRGr"),
+        Base58.decode("4xDHswuk5GsmHAeu82qysfdq9GyTxZ798ZQQGquprirrNBr7ACUeLZxBv7c73ADpkEvfBbhocGMhouM9y13sP8dK"),
+        Base58.decode("3kFoA1giAr8irjA2iSC49ef8gJo9pftMg4Uif72Jcby6qvre9XAdFntpeLVZu2PAdWNi6DWiaeZRZQ8SHNT5GoZz"), // 23168
+        Base58.decode("4x2NkCc9JysnCmyMcYib7NjKaNf2kPoLZ3ywifmTzjc9S8JeiJRfNEGsovCTFrTR6RA1Tazn9emASZ3mK5WBBniV"), // 23424-1
+        Base58.decode("2Y81A7YjBji7NDKxYWMeNapSqFWFr8D4PSxBc4dCxSrCCVia6HPy2ZsezYKgeqZugNibAMra6DYT7NKCk6cSVUWX"), // 24732
+        Base58.decode("4drnqT2e8uYdhqz2TqscPYLNa94LWHhMZk4UD2dgjT5fLGMuSRiKmHyyghfMUMKreDLMZ5nCK2EMzUGz3Ggbc6W9"), //  25242
+        Base58.decode("L3cVbRemVECiPnLW3qdJixVkyc4QyUmjcbLmkAkz4SMMgmwHNq5KhBxNywmvfvAGGLcE3vjYFm4VT65rJktdALD"), //  25249
+        Base58.decode("2hmDQkDU4zdBGdAkmpvjPhTQCHhjGQcvHGwCnyxMfDVSJPiKPiLWeW5CuBW6ZVhHq9N4H5tRFPdkKQimcykqnpv3"), //  25846
+
+        // WRONG Vouch - from FUTURE
+        Base58.decode("x9mDarBVKNuGLXWNNLxkD9hkFcRYDNo19PfSk6TpCWPGxeQ5PJqfmzKkLLp2QcF8fcukYnNQZsmqwdnATZN4Hm6"),
+
+        // CANCEL ORDERS - wrongs after fix exchange
+        ///Base58.decode("3kaJVDpKhiv4jgTt6D1z8J5rfbx9b7tFcCh928cpji3pQnLqEmUK8TKUgXEdw5zjVLQ2eUFgT3YKBBcJaKXz6DAp"), // Cancel Order 29311-1
+        ///Base58.decode("2BiRnFY2hmJLCENMevcXsnC1cwmaJJgfaJtRby5xADmx7EGyFswiffTf23pGyohDmeeeFqB5LYAeatDrvvopHGqN"), // Cancel Order 86549-2
+        ///Base58.decode("5iU3zefyZnWKpv2wd7E8m2hUCmLWASLM96SEfujAfvTKKDm4TA8n1HYFF5YWZkuk1k6vHVNLLv3XCG2MWrT7oHd9"), // Cancel Order 136754-1
+
+        // DELETED base TOKEN (LIA, ERG, etc...
+        Base58.decode("Fb2TRdSLPUY7GvYnLXxhhM27qhJUQTGCRB3sRnZV5uKK3fDa4cuyGLK21xcgJ34GAaWqyh7tx6DMorqgR9s2t5g"), // 924 - 1
+        Base58.decode("sagBYvqLUVTbm6tjJ4rmkCxF1AY9SvC4jJEnfSnrc4F3T9JmqhNgGMZLzotXHxTwwQgGFprhWV4WQWYjv41Niq4"), // 926 - 1
+        Base58.decode("3LppekMMVMMuRcNrJdo14FxWRiwUnVs3KNULpjPAL7wThgqSAcDYy6369pZzSENZEenamWmUVaRUDASr3D9XrfrK"), // 972 - 1
+        Base58.decode("53gxbfbnp61Yjppf2aN33mbzEs5xWYGULsJTDBiUZ8zhdmsibZr7JFP3ZkEfiEXvsUApKmTiWvX1JVamD8YYgowo"), // 1823 - 1
+        Base58.decode("3q8y3fFAqpv8rc6vzQPtXpxHt1RCbSewJ8To4JVmB1D9JzoV37XMgmk3uk9vHzdVfTzTagjNRK1Hm6edXsawsGab"), // 1823 - 2
+        Base58.decode("4rEHZd1n5efcdKbbnodYrcURdyWhSLSQLUjPCwmDwjQ8m9BCzn8whZXrirxN8f94otiit2RSxJcUNggPHwhgK2r8"), // 2541 - 1
+        Base58.decode("2i1jHNAEFDvdaC93d2RjYy22ymiJLRnDMV2NedXdRGZfxpavZL3QnwgWNNATcwUMSAbwG2RtZxQ6TqVx2PkoyDuD"), // 3422 - 1
+        Base58.decode("1ArCghAasj2Jae6ynNEphHjQa1DsTskXqkHXCPLeTzChwzLw631d23FZjFHvnphnUJ6fw4mL2iu6AXBZQTFQkaA"), // 3735 - 1
+
+        // VOTE 2
+        // TODO добавить потом
+        Base58.decode("Xq48dimwhwkXRkFun6pSQFHDSmrDnNqpUbFMkvQHC26nAyoQ3Srip3gE42axNWi5cXSPfTX5yrFkK6R4Hinuq6V"), // 253554 - 1
+
             };
 
     /*
@@ -144,15 +184,44 @@ public class BlockChain {
      */
 
     public static final byte[][] VALID_ADDRESSES = new byte[][]{
+            Base58.decode("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3")
     };
 
     public static final byte[][] DISCREDIR_ADDRESSES = new byte[][]{
+            Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
+            Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
     };
     public static final byte[][] VALID_SIGN = new byte[][]{
+            Base58.decode("5DnTfBxw2y8fDshzkdqppB24y5P98vnc873z4cofQZ31JskfJbnpRPjU5uZMQwfSYJYkJZzMxMYq6EeNCys18sEq"),
+            Base58.decode("4CqzJSD9j4GNGcYVtNvMic98Zq9aQALLdkFkuXMLGnGqUTgdHqHcoSU7wJ24wvaAAukg2g1Kw1SA6UFQo7h3VasN"),
+            Base58.decode("E4pUUdCqQt6HWCJ1pUeEtCDngow7pEJjyRtLZTLEDWFEFwicvxVXAgJbUPyASueZVUobZ28xtX6ZgDLb5cxeXy2"),
+            Base58.decode("4UPo6sAF63fkqhgkAXh94tcF43XYz8d7f6PqBGSX13eo3UWCENptrk72qkLxtXYEEsHs1wS2eH6VnZEVctnPdUkb"),
+            Base58.decode("3aYMNRUVYxVaozihhGkxU8JTeAFT73Ua7JDqUfvrDUpDNPs7mS4pxHUaaDiZsGYi91fK5c2yVLWVQW9tqqDGCK2a"),
+            Base58.decode("KhVG9kHf4nttWSEvM6Rd99wuTtRtFAQvSwwo9ae4WFJ2fWaidY4jF33WTRDvYEtaWWu2cmh6x4tEX7ded6QDSGt"),
+            Base58.decode("2KW1mywfP99GcEo5hV8mdHxgPDkFJj5ABcVjNa7vQd1GPC13HRqBERUPKfLZ5HrQ3Dyp42u8PWrzBKUP3cUHG3N4"),
+            Base58.decode("2SsSCv8EuMnZrGYq4jFhvJ3gRdbdEU92Unp6u4JNwrw4D7SHHaRpH2b9VuLtTA3zuUVx1EqTB5wJQWxeuJbwxYvs"),
+            Base58.decode("4iM1HvHgSV3WTXJ3M4XVMZ4AcfrDaA3bdyFmZcX5BJJkacNTjVURWuhp2gLyhxCJok7eAHkd94nM4q3VcDAc2zCJ"),
+            Base58.decode("3THvTzHcyEDPGisprZAN955RMEhye84ygnBMPxrFRT6bCocQ84xt1jaSaNyD9px9dxq3zCNbebXnmL251JZhfCHm"),
+            Base58.decode("M7jNQ8w2fCjD3Mvo8cH2G5JYFTnGfLYSQv7xCCso7BsmMKJ7Ruc3pnr1rbpFwVrBkQG3auB5SGCmoWbCq9pw8hU"),
+            Base58.decode("m1ryu4QMHLaoALYwx35ugNtQec1QAS1KZe8kkx8bQ8UKcesGGbCbqRYhJrtrPDy3gsxVp4hTQGr7qY3NsndBebr"),
+            Base58.decode("3Lzamim6R4khdsVfpdsCzyuhqbguCM6yQTyJPJmvPC7agsaBk7UhYuRxZ8tduLpRhZEMpJwAVd5ucRAiXY8cX6ZE"),
+            Base58.decode("44chQvtt3NKgRjphBwKTgRfz4rD7YvpHs4k17w1Xvt6drmjBwJWXsFXBfHV97LbMx4kMkzpHCXgN7mNjDUZeTL6M"),
+            Base58.decode("xckfcdNWJN1uoGGTe5nXg5JmGUEyzoJQYkt3bUB6vGUGs8p9j8uhVKeYsY5g2sj67w4pz6CcxdhrVFPzGZnkba2"),
+            Base58.decode("2x8QSztNRFDKmMjotzfTvbAkDo7s7Uqh9HpyFVQTiDqYpfweV4z1wzcMjn6GtVHszqBZp6ynuUr4JP9PAEBPLtiy"),
+            Base58.decode("9UBPJ4XJzRkw7kQAdFvXbEZuroUszFPomH25UAmMkYyTFPfnbyo9qKKTMZffoSjoMHzMssszaTPiFVhxaxEwBrY"),
+            Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
     };
 
     public static final byte[][] VALID_BAL = DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
+                    //Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
+                    //Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
+                    //Base58.decode("5JP71DmsBQAVTQFUHJ1LJXw4qAHHcoBCzXswN9Ez3H5KDzagtqjpWUU2UNofY2JaSC4qAzaC12ER11kbAFWPpukc"),
+                    //Base58.decode("33okYP8EdKkitutgat1PiAnyqJGnnWQHBfV7NyYndk7ZRy6NGogEoQMiuzfwumBTBwZyxchxXj82JaQiQXpFhRcs"),
+                    //Base58.decode("23bci9zcrPunGppKCm6hKvfRoAStWv4JV2xe16tBEVZSmkCrhw7bXAFzPvv2jqZJXcbA8cmr8oMUfdmS1HJGab7s"),
+
+                    //Base58.decode("54xdM25ommdxTbAVvP7C9cFYPmwaAexkWHfkhgb8yhfCVvvRNrs166q8maYuXWpk4w9ft2HvctaFaafnKNfjyoKR"),
+                    //Base58.decode("61Fzu3PhsQ74EoMKrwwxKHMQi3z9fYAU5UeUfxtGdXPRfKbWdgpBQWgAojEnmDHK2LWUKtsmyqWb4WpCEatthdgK"),
             };
 
     // DEX precision
@@ -177,11 +246,14 @@ public class BlockChain {
 
     public static final int ITEM_POLL_FROM = DEVELOP_USE ? 77000 : VERS_4_11;
 
-    public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 1034 : 0;
+    public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 1034 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
-    public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 0;
+    public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = new String[]{
+            "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"
+            //"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
+            // "7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv",
     };
     // CHAIN
     public static final int CONFIRMS_HARD = 3; // for reference by signature
@@ -190,7 +262,7 @@ public class BlockChain {
     //TESTNET
     //   1486444444444l
     //	 1487844444444   1509434273     1509434273
-    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000L : 1566376542222L;
+    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
@@ -242,7 +314,7 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
 
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            DEVELOP_USE?289561 : 0,
+            DEVELOP_USE?289561 : 235267,
             Base58.decode(DEVELOP_USE?
                     "4MhxLvzH3svg5MoVi4sX8LZYVQosamoBubsEbeTo2fqu6Fcv14zJSVPtZDuu93Tc7RuS2nPJDYycWjpvdSYdmm1W"
                     :"2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"));
@@ -287,10 +359,161 @@ public class BlockChain {
         trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
 
         // GENERAL TRUST
+        TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+        TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
+        //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
 
 
         if (DEVELOP_USE) {
+            // права для Кибальникова
+            ASSET_OWNERS.put(7L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
+            ASSET_OWNERS.put(8L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
+
+            // из p130 счета для прорверки
+            NOVA_ASSETS.put("BTC",
+                    new Pair<Integer, byte[]>(12, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
+            NOVA_ASSETS.put("USD",
+                    new Pair<Integer, byte[]>(95, new Account("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz").getShortAddressBytes()));
+
+            LOCKED__ADDRESSES.put("7EPhDbpjsaRDFwB2nY8Cvn7XukF58kGdkz", "7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1");
+            TRUSTED_ANONYMOUS.add("762eatKnsB3xbyy2t9fwjjqUG1GoxQ8Rhx");
+            ANONYMASERS.add("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
+
+
+            ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
+            // ANOMIMASER for incomes from PERSONALIZED
+            ANONYMASERS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+            ANONYMASERS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+            ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
+            ANONYMASERS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh"); // GATE-issuer
+
+
+            // TICKER = KEY + CREATOR
+            NOVA_ASSETS.put("BTC",
+                    new Pair<Integer, byte[]>(12, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("ETH",
+                    new Pair<Integer, byte[]>(14, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("USD",
+                    new Pair<Integer, byte[]>(95, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("EUR",
+                    new Pair<Integer, byte[]>(94, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("CNY",
+                    new Pair<Integer, byte[]>(93, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("RUB",
+                    new Pair<Integer, byte[]>(92, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("JPY",
+                    new Pair<Integer, byte[]>(91, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("GBP",
+                    new Pair<Integer, byte[]>(90, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("CHF",
+                    new Pair<Integer, byte[]>(89, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("AUD",
+                    new Pair<Integer, byte[]>(88, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("SGD",
+                    new Pair<Integer, byte[]>(87, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("TRY",
+                    new Pair<Integer, byte[]>(86, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+
+
+            // COMMODITY
+            NOVA_ASSETS.put("GOLD",
+                    new Pair<Integer, byte[]>(21, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("OIL",
+                    new Pair<Integer, byte[]>(22, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("GAS",
+                    new Pair<Integer, byte[]>(23, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("BREND",
+                    new Pair<Integer, byte[]>(24, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+
+
+            /// Права для Кибальникова в Боевой Версии
+            NOVA_ASSETS.put("ERG",
+                    new Pair<Integer, byte[]>(20, new Account("7GiE2pKyrULF2iQhAXvdUusXYqiKRQx68m").getShortAddressBytes()));
+
+            //NOVA_ASSETS.put("@@USD",
+            //		new Pair<Integer, byte[]>(95, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+            //NOVA_ASSETS.put("¤¤RUB",
+            //		new Pair<Integer, byte[]>(93, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+            //NOVA_ASSETS.put("ERARUB",
+            //		new Pair<Integer, byte[]>(91, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+            //NOVA_ASSETS.put("ERAUSD",
+            //		new Pair<Integer, byte[]>(85, new Account("7JS4ywtcqrcVpRyBxfqyToS2XBDeVrdqZL").getShortBytes()));
+
+            // LOCKED -> to TRUSTED for it address
+            LOCKED__ADDRESSES.put("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh", "79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+            LOCKED__ADDRESSES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6", "79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+
+            // TEAM 0 LOCKS
+            LOCKED__ADDRESSES_PERIOD.put("79kXsWXHRYEb7ESMohm9DXYjXBzPfi1seE", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Vasya
+            LOCKED__ADDRESSES_PERIOD.put("787H1wwYPwu33BEm2KbNeksAgVaRf41b2H", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Natasha
+            LOCKED__ADDRESSES_PERIOD.put("7CT5k4Qqhb53ciHfrxXaR3bGyribLgSoyZ", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Lena
+            LOCKED__ADDRESSES_PERIOD.put("74g61DcTa8qdfvWxzcbTjTf6PhMfAB77HK", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Ivan
+            LOCKED__ADDRESSES_PERIOD.put("7BfB66DpkEx7KJaMN9bzphTJcZR29wprMU", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Ruslan
+            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Sergey
+            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Vladimir
+            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Roman
+
+            // TEST
+            //FOUNDATION_ADDRESSES.add("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
+
+            // ERACHAIN FUNDATION
+            FOUNDATION_ADDRESSES.add("74a73pykkNwmuwkZdh5Lt2xTbK7anG5B6i");
+            FOUNDATION_ADDRESSES.add("7QTDHp15vcHN3F4zP2BTcDXJkeotzQZkG4");
+            FOUNDATION_ADDRESSES.add("7FiXN8VTgjMsLrZUQY9ZBFNfek7SsDP6Uc");
+            FOUNDATION_ADDRESSES.add("74QcLxHgPkuMSPsKTh7zGpJsd5aAxpWpFA");
+            FOUNDATION_ADDRESSES.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+            FOUNDATION_ADDRESSES.add("7P3HR8kdj4ojXPvpTnEtVnpEwenipvrcH1");
+            FOUNDATION_ADDRESSES.add("75Mb8cGchcG4DF31wavhNrnoycWsoLQqP4");
+            FOUNDATION_ADDRESSES.add("75LzKAoxx4TgAAkpMRStve26YEY625TCRE");
+
+            FOUNDATION_ADDRESSES.add("73QYndpFQeFvyMvwBcMUwJRDTp7XaxkSmZ"); // STOLEN
+            FOUNDATION_ADDRESSES.add("7FJUV5GLMuVdopUHSwTLsjmKF4wkPwFEcG"); // LOSED
+            FOUNDATION_ADDRESSES.add("75LK84g7JHoLG2jRUmbJA6srLrFkaXEU5A"); // FREEZED
+
+
+            // TEST
+            //FREEZED_BALANCES.put("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7",
+            //		new int[][]{{9000, 110000}, {3200, 90000}, {138000, 7000}, {547500, 5000}});
+
+            // TEAM 2
+            FREEZED_BALANCES.put("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP",
+                    new int[][]{{225655, 90000}, {333655, 60000}});
+            FREEZED_BALANCES.put("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs",
+                    new int[][]{{225655, 80000}, {333655, 53000}});
+            FREEZED_BALANCES.put("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G",
+                    new int[][]{{225655, 97000}, {333655, 65000}});
+
+            // TEAM 3
+            FREEZED_BALANCES.put("7GMENsugxjV8PToyUyHNUQF7yr9Gy6tJou",
+                    new int[][]{{225655, 197000}, {333655, 131000}});
+            FREEZED_BALANCES.put("7DMJcs8kw7EXUSeEFfNwznRKRLHLrcXJFm",
+                    new int[][]{{225655, 150000}, {333655, 100000}});
+            FREEZED_BALANCES.put("7QUeuMiWQjoQ3MZiriwhKfEG558RJWUUis",
+                    new int[][]{{225655, 150000}, {333655, 100000}});
+            FREEZED_BALANCES.put("7MxscS3mS6VWim8B9K3wEzFAUWYbsMkVon",
+                    new int[][]{{225655, 140000}, {333655, 90000}});
+            FREEZED_BALANCES.put("79NMuuW7thad2JodQ5mKxbMoyf1DjNT9Ap",
+                    new int[][]{{225655, 130000}, {333655, 90000}});
+            FREEZED_BALANCES.put("7MhifBHaZsUcjgckwFN57bAE9fPJVDLDQq",
+                    new int[][]{{225655, 110000}, {333655, 80000}});
+            FREEZED_BALANCES.put("7FRWJ4ww3VstdyAyKFwYfZnucJBK7Y4zmT",
+                    new int[][]{{225655, 100000}, {333655, 70000}});
+            FREEZED_BALANCES.put("7FNAphtSYXtP5ycn88B2KEywuHXzM3XNLK",
+                    new int[][]{{225655, 90000}, {333655, 60000}});
+            FREEZED_BALANCES.put("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u",
+                    new int[][]{{225655, 80000}, {333655, 60000}});
+
+            // TEAM 1
+            FREEZED_BALANCES.put("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y",
+                    new int[][]{{225655, 20000}, {333655, 10000}});
+            FREEZED_BALANCES.put("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV",
+                    new int[][]{{225655, 60000}, {333655, 40000}});
+
+            FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
+                    new int[][]{{225655, 150000}, {333655, 100000}});
+            FREEZED_BALANCES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6",
+                    new int[][]{{115000, 656000}, {225655, 441000}});
         }
 
         DCSet dcSet = dcSet_in;
