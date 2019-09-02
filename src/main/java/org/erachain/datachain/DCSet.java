@@ -488,6 +488,11 @@ public class DCSet extends DBASet implements Observer {
         return instance;
     }
 
+    public static DCSet createEmptyHardDatabaseSet() {
+        instance = new DCSet(null, getHardBase(), false, false, true);
+        return instance;
+    }
+
     /**
      * create FORK of DB
      *

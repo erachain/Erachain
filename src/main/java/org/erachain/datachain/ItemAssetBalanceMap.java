@@ -1,8 +1,10 @@
 package org.erachain.datachain;
 
+import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
@@ -11,13 +13,13 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
+ * Hasher работает неверно! и вообще там 32 битное число 0 INTEGER - чего нифига не хватает!
+ *
  * (пока не используется - по идее для бухгалтерских единиц отдельная таблица)
  * Балансы для заданного адреса на данный актив. balances for all account in blockchain<br>
  * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
@@ -66,13 +68,39 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getMap(DB database) {
         //OPEN MAP
+        BTreeMap<Tuple2<byte[], Long>, Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> treeMap;
         HTreeMap<Tuple2<byte[], Long>, Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> map = database.createHashMap("balances")
-                .keySerializer(SerializerBase.BASIC)
-                .hasher(Hasher.BASIC)
-                .counterEnable()
-                .makeOrGet();
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> hashMap;
+
+        Map<Tuple2<byte[], Long>, Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> map;
+
+        if (false) {
+            hashMap = database.createHashMap("balances")
+                    .keySerializer(SerializerBase.BASIC)
+                    .hasher(Hasher.BASIC) // неверно хеширует массивы внутри - видимо по Ссылке в памяти а не по значениям
+                    .counterEnable()
+                    .makeOrGet();
+            map = hashMap;
+        } else {
+
+            treeMap = database.createTreeMap("balances")
+                    //.keySerializer(BTreeKeySerializer.TUPLE2)
+                    //.keySerializer(BTreeKeySerializer.BASIC)
+                    .keySerializer(new BTreeKeySerializer.Tuple2KeySerializer(
+                            UnsignedBytes.lexicographicalComparator(), // Fun.BYTE_ARRAY_COMPARATOR,
+                            Serializer.BYTE_ARRAY,
+                            Serializer.LONG))
+                    //.comparator(Fun.TUPLE2_COMPARATOR)
+                    //.comparator(UnsignedBytes.lexicographicalComparator())
+                    .counterEnable()
+                    .makeOrGet();
+            map = treeMap;
+        }
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
@@ -95,7 +123,7 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
 				return new Tuple3<Long, BigDecimal, byte[]>(key.b, value.negate(), key.a);
 			}
 		});*/
-        Bind.secondaryKey(map, this.assetKeyMap, new Fun.Function2<Tuple3<Long,
+        Bind.secondaryKey(treeMap, this.assetKeyMap, new Fun.Function2<Tuple3<Long,
                 Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>,
@@ -176,11 +204,19 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
+        boolean test = false;
         if (testAcc.equals(key.a)) {
-            boolean test = true;
+            test = true;
         }
 
-        return super.set(key, value);
+        boolean result = super.set(key, value);
+
+        if (test) {
+            Fun.Tuple5 balance5 = get(key);
+        }
+
+        return result;
+
     }
 
 	/*
