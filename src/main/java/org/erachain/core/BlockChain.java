@@ -34,7 +34,7 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
 
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
@@ -123,7 +123,7 @@ public class BlockChain {
     public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 430000 : 260120;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 425555 : 260120;
 
-    public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 0;
+    public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 44666;
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
@@ -674,15 +674,10 @@ public class BlockChain {
             return 0l;
         }
 
-        Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
+        Tuple2<Integer, Integer> previousForgingPoint = creator.getLastForgingData(dcSet);
 
         if (DEVELOP_USE || ERA_COMPU_ALL_UP) {
             if (previousForgingPoint == null) {
-                // IF BLOCK not inserted in MAP
-                previousForgingPoint = creator.getLastForgingData(dcSet);
-            }
-
-            if (previousForgingPoint == null || previousForgingPoint.a.equals(height)) {
                 // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
                 previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
                 }
