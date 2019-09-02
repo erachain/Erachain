@@ -203,15 +203,15 @@ public class Account {
     public static Map<byte[], BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
                                                                   Map<byte[], BigDecimal> values) {
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        Iterator<Tuple2<byte[], Long>> iterator = map.getIterator(0, true);
+        Iterator<byte[]> iterator = map.getIterator(0, true);
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ballance;
 
-        Tuple2<byte[], Long> iteratorKey;
+        byte[] iteratorKey;
         while (iterator.hasNext()) {
             iteratorKey = iterator.next();
-            if (iteratorKey.b == key) {
+            if (map.getAssetKeyFromKey(iteratorKey) == key) {
                 ballance = map.get(iteratorKey);
-                values.put(iteratorKey.a, ballance.a.b);
+                values.put(map.getShortAccountFromKey(iteratorKey), ballance.a.b);
             }
         }
 
@@ -571,6 +571,8 @@ public class Account {
 
         int actionType = actionType(key, amount_in);
 
+        ItemAssetBalanceMap map = db.getAssetBalanceMap();
+
         BigDecimal amount = amount_in.abs();
         long absKey;
         if (key > 0) {
@@ -589,8 +591,8 @@ public class Account {
         }
         */
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getShortAddressBytes(), absKey);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance =
+                map.get(getShortAddressBytes(), absKey);
 
         boolean updateIncomed = !notUpdateIncomed;
 
@@ -631,17 +633,17 @@ public class Account {
                     balance.e);
         }
 
-        db.getAssetBalanceMap().set(getShortAddressBytes(), absKey, balance);
+        map.set(getShortAddressBytes(), absKey, balance);
 
         ////////////// DEBUG TOTAL COMPU
         // несотыковка из-за ордеров на бирже
         if (false && absKey == 2l && this.equals("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS")) {
-            Collection<Tuple2<byte[], Long>> addrs = db.getAssetBalanceMap().getKeys();
+            Collection<byte[]> addrs = db.getAssetBalanceMap().getKeys();
             BigDecimal total = BigDecimal.ZERO;
-            for (Tuple2<byte[], Long> addr : addrs) {
-                if (addr.b == 2l) {
+            for (byte[] mapKey : addrs) {
+                if (map.getAssetKeyFromKey(mapKey) == 2l) {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
-                            db.getAssetBalanceMap().get(addr);
+                            map.get(mapKey);
 
                     total = total.add(ball.a.b);
                 }

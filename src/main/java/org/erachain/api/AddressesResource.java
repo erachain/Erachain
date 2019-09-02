@@ -10,6 +10,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
@@ -515,13 +516,14 @@ public class AddressesResource {
 
         }
 
-        SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(new Account(address));
 
         JSONObject assetsBalancesJSON = new JSONObject();
 
-        for (Pair<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
-            assetsBalancesJSON.put(assetsBalance.getA().b, tuple5_toJson(assetsBalance.getB()));
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+            assetsBalancesJSON.put(map.getAssetKeyFromKey(assetsBalance.getA()), tuple5_toJson(assetsBalance.getB()));
         }
 
         return assetsBalancesJSON.toJSONString();

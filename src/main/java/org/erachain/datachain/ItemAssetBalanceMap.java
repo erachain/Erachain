@@ -1,5 +1,7 @@
 package org.erachain.datachain;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -32,7 +34,7 @@ import java.util.*;
  */
 // TODO SOFT HARD TRUE
 
-public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
+public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK
@@ -64,18 +66,18 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
 
     @SuppressWarnings({"unchecked"})
     @Override
-    protected Map<Tuple2<byte[], Long>, Tuple5<
+    protected Map<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getMap(DB database) {
         //OPEN MAP
-        BTreeMap<Tuple2<byte[], Long>, Tuple5<
+        BTreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> treeMap;
-        HTreeMap<Tuple2<byte[], Long>, Tuple5<
+        HTreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> hashMap;
 
-        Map<Tuple2<byte[], Long>, Tuple5<
+        Map<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> map;
 
@@ -90,12 +92,13 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
 
             treeMap = database.createTreeMap("balances")
                     //.keySerializer(BTreeKeySerializer.TUPLE2)
-                    //.keySerializer(BTreeKeySerializer.BASIC)
-                    .keySerializer(new BTreeKeySerializer.Tuple2KeySerializer(
-                            UnsignedBytes.lexicographicalComparator(), // Fun.BYTE_ARRAY_COMPARATOR,
-                            Serializer.BYTE_ARRAY,
-                            Serializer.LONG))
+                    .keySerializer(BTreeKeySerializer.BASIC)
+                    //.keySerializer(new BTreeKeySerializer.Tuple2KeySerializer(
+                    //        UnsignedBytes.lexicographicalComparator(), // Fun.BYTE_ARRAY_COMPARATOR,
+                    //        Serializer.BYTE_ARRAY,
+                    //        Serializer.LONG))
                     //.comparator(Fun.TUPLE2_COMPARATOR)
+                    .comparator(Fun.BYTE_ARRAY_COMPARATOR)
                     //.comparator(UnsignedBytes.lexicographicalComparator())
                     .counterEnable()
                     .makeOrGet();
@@ -128,7 +131,7 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>,
                 String>,
-                Tuple2<byte[], Long>,
+                byte[],
                 Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
@@ -137,13 +140,21 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
             public Tuple3<Long, Tuple5<
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>, String>
-            run(Tuple2<byte[], Long> key, Tuple5<
+            run(byte[] key, Tuple5<
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+
+                // Address
+                byte[] shortAddress = new byte[20];
+                System.arraycopy(key, 0, shortAddress, 0, 20);
+                // ASSET KEY
+                byte[] assetKeyBytes = new byte[8];
+                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+
                 return new Tuple3<Long, Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>, String>(
-                        key.b, new Tuple5<
+                        Longs.fromByteArray(assetKeyBytes), new Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                         (new Tuple2<BigDecimal, BigDecimal>(value.a.a.negate(), value.a.b.negate()),
@@ -151,7 +162,7 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
                                 new Tuple2<BigDecimal, BigDecimal>(value.c.a.negate(), value.c.b.negate()),
                                 new Tuple2<BigDecimal, BigDecimal>(value.d.a.negate(), value.d.b.negate()),
                                 new Tuple2<BigDecimal, BigDecimal>(value.e.a.negate(), value.e.b.negate())),
-                        Crypto.getInstance().getAddressFromShort(key.a)
+                        Crypto.getInstance().getAddressFromShort(shortAddress)
                     );
             }
         });
@@ -161,12 +172,12 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
     }
 
     @Override
-    protected Map<Tuple2<byte[], Long>, Tuple5<
+    protected Map<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getMemoryMap() {
-        return new TreeMap<Tuple2<byte[], Long>, Tuple5<
+        return new TreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(Fun.TUPLE2_COMPARATOR);
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(Fun.BYTE_ARRAY_COMPARATOR);
     }
 
     @Override
@@ -190,22 +201,37 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
 	}
 	 */
 
+	public long getAssetKeyFromKey(byte[] key) {
+        // ASSET KEY
+        byte[] assetKeyBytes = new byte[8];
+        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+        return Longs.fromByteArray(assetKeyBytes);
+    }
+
+    public byte[] getShortAccountFromKey(byte[] key) {
+        // ASSET KEY
+        byte[] shortAddressBytes = new byte[20];
+        System.arraycopy(key, 0, shortAddressBytes, 0, 20);
+        return shortAddressBytes;
+
+    }
+
     public void set(byte[] address, long key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
         if (key < 0)
             key = -key;
 
-        this.set(new Tuple2<byte[], Long>(address, key), value);
+        this.set(Bytes.concat(address, Longs.toByteArray(key)), value);
     }
 
     private Account testAcc = new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe");
-    public boolean set(Tuple2<byte[], Long> key, Tuple5<
+    public boolean set(byte[] key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
         boolean test = false;
-        if (testAcc.equals(key.a)) {
+        if (testAcc.equals(key)) {
             test = true;
         }
 
@@ -235,7 +261,8 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
 
         Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value = this.get(new Tuple2<byte[], Long>(address, key));
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value = this.get(
+                        Bytes.concat(address, Longs.toByteArray(key)));
 
 		/*
 		// TODO for TEST
@@ -253,25 +280,25 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<Tuple2<byte[], Long>, Tuple5<
+    public SortableList<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long key) {
         if (key < 0)
             key = -key;
 
         //FILTER ALL KEYS
-        Collection<Tuple2<byte[], Long>> keys = ((BTreeMap<Tuple3, Tuple2<byte[], Long>>) this.assetKeyMap).subMap(
+        Collection<byte[]> keys = ((BTreeMap<Tuple3, byte[]>) this.assetKeyMap).subMap(
                 Fun.t3(key, null, null),
                 Fun.t3(key, Fun.HI(), Fun.HI())).values();
 
         //RETURN
-        return new SortableList<Tuple2<byte[], Long>, Tuple5<
+        return new SortableList<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<Tuple2<byte[], Long>, Tuple5<
+    public SortableList<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(Account account) {
 
@@ -288,7 +315,7 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
         // TODO - ERROR PARENT not userd!
 
         //RETURN
-        return new SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+        return new SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
     }
 
 }

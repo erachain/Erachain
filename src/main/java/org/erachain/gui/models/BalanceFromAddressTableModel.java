@@ -4,6 +4,8 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -27,12 +29,12 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
     public static final int COLUMN_FOR_ICON = 1;
 
     Account account;
-    Pair<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
+    Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
     Tuple2<Long, String> asset;
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"key Asset", "Asset", "Balance A", "Balance B", "Balance C"});
     // balances;
-    private SortableList<Tuple2<byte[], Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
     private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance;
     private ArrayList<Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance1;
 
@@ -44,21 +46,22 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
         tableBalance1 = new ArrayList<>();
         HashSet<Long> assetKeys = new HashSet();
 
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         for (Account account1 : accounts) {
             account = account1;
             balances = Controller.getInstance().getBalances(account);
-            for (Pair<Tuple2<byte[], Long>,
+            for (Pair<byte[],
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance1 : this.balances) {
 
-                if (Controller.getInstance().getAsset(balance1.getA().b) == null) {
+                if (Controller.getInstance().getAsset(map.getAssetKeyFromKey(balance1.getA())) == null) {
                     // SKIP LIA etc.
                     continue;
                 }
 
                 balance = balance1;
                 tableBalance1.add(new Pair(account, new Pair(balance.getA(), balance.getB())));
-                assetKeys.add(balance.getA().b);
+                assetKeys.add(map.getAssetKeyFromKey(balance.getA()));
             }
         }
 

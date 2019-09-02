@@ -18,10 +18,7 @@ import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.datachain.TransactionFinalMapSigns;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.*;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
@@ -1938,15 +1935,16 @@ import java.util.*;
 
         // TEST COMPU ORPHANs
         HashMap bals = new HashMap();
-        Collection<Tuple2<byte[], Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+        Collection<byte[]> keys = dcSet.getAssetBalanceMap().getKeys();
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalNeg = BigDecimal.ZERO;
-        for (Tuple2<byte[], Long> key : keys) {
-            if (key.b == 2l) {
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
-                        .getAssetBalanceMap().get(key);
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        for (byte[] key : keys) {
+            if (map.getAssetKeyFromKey(key) == 2l) {
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
+                    map.get(key);
 
-                bals.put(key.a, ball.a.b);
+                bals.put(map.getShortAccountFromKey(key), ball.a.b);
             }
         }
         totalCOMPUtest.put(height, bals);
@@ -1959,16 +1957,17 @@ import java.util.*;
         if (parentBalanses != null) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
             BigDecimal ballParent;
-            Collection<Tuple2<byte[], Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            Collection<byte[]> keys = dcSet.getAssetBalanceMap().getKeys();
+            ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
             boolean error = false;
-            for (Tuple2<byte[], Long> key : keys) {
-                if (key.b == 2l) {
+            for (byte[] key : keys) {
+                if (map.getAssetKeyFromKey(key) == 2l) {
                     ball = dcSet.getAssetBalanceMap().get(key);
 
-                    ballParent = (BigDecimal) parentBalanses.get(key.a);
+                    ballParent = (BigDecimal) parentBalanses.get(map.getShortAccountFromKey(key));
                     if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
                             || ballParent == null && ball.a.b.signum() != 0) {
-                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + key.a
+                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + map.getShortAccountFromKey(key)
                                 + " balParent : " + (ballParent == null ? "NULL" : ballParent.toPlainString())
                                 + " ---> " + (ball == null ? "NULL" : ball.a.b.toPlainString())
                                 + " == " + ball.a.b.subtract(ballParent == null ? BigDecimal.ZERO : ballParent));
