@@ -387,7 +387,14 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
 
     public long totalDeleted = 0;
-    public Transaction delete(Long key) {
+
+    /**
+     * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
+     * Head Zero - data corrupted
+     * @param key
+     * @return
+     */
+    public synchronized Transaction delete(Long key) {
         Transaction transaction = super.delete(key);
         if (transaction != null) {
             // DELETE only if DELETED

@@ -897,6 +897,7 @@ public class Synchronizer extends Thread {
         }
 
         Exception error = null;
+        Throwable thrown = null;
 
         if (doOrphan) {
 
@@ -929,6 +930,12 @@ public class Synchronizer extends Thread {
                     LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
                 }
+            } catch (Throwable e) {
+                if (cnt.isOnStopping()) {
+                    return;
+                } else {
+                    thrown = new Throwable(e);
+                }
             } finally {
 
                 if (cnt.isOnStopping()) {
@@ -947,6 +954,21 @@ public class Synchronizer extends Thread {
                     }
 
                     throw new Exception(error);
+
+                } else if (thrown != null) {
+
+                    LOGGER.error(thrown.getMessage(), thrown);
+
+                    try {
+                        // was BREAK - try ROLLBACK
+                        dcSet.rollback();
+                    } catch (Throwable e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+
+                    cnt.stopAll(27);
+
+                    throw new Exception(thrown);
 
                 }
 
@@ -1008,7 +1030,7 @@ public class Synchronizer extends Thread {
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
-                    error = new Exception(e);
+                    thrown = new Throwable(e);
                 }
             } finally {
 
@@ -1021,15 +1043,34 @@ public class Synchronizer extends Thread {
                 if (error != null) {
                     LOGGER.error(error.getMessage(), error);
 
-                    // was BREAK - try ROLLBACK
-                    dcSet.rollback();
+                    try {
+                        // was BREAK - try ROLLBACK
+                        dcSet.rollback();
+                    } catch (Throwable e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
 
-                    if (error instanceof IOException) {
+                    if (error instanceof java.io.IOException) {
                         cnt.stopAll(22);
                         return;
                     }
 
                     throw new Exception(error);
+
+                } else if (thrown != null) {
+
+                    LOGGER.error(thrown.getMessage(), thrown);
+
+                    try {
+                        // was BREAK - try ROLLBACK
+                        dcSet.rollback();
+                    } catch (Throwable e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+
+                    cnt.stopAll(27);
+
+                    throw new Exception(thrown);
 
                 }
 
