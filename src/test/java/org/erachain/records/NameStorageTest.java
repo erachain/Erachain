@@ -77,7 +77,7 @@ public class NameStorageTest {
         // CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(null,
                 sender, name, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         //nameRegistration.sign(sender);
 
 
@@ -106,7 +106,7 @@ public class NameStorageTest {
         // ADDING KEY COMPLETE WITH YES
         ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -133,7 +133,7 @@ public class NameStorageTest {
         // ADDING KEY COMPLETE WITH YES
         arbitraryTransaction = new ArbitraryTransactionV3(
                 null, badSender, null, 10, data, (byte) 0,
-                timestamp, badSender.getLastTimestamp(databaseSet));
+                timestamp, badSender.getLastTimestamp(databaseSet)[0]);
 
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -167,7 +167,7 @@ public class NameStorageTest {
         // ADDING KEY COMPLETE WITH YES
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -187,7 +187,7 @@ public class NameStorageTest {
 
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -207,7 +207,7 @@ public class NameStorageTest {
 
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
@@ -237,7 +237,7 @@ public class NameStorageTest {
         // ADDING Skerberus as List key
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -256,7 +256,7 @@ public class NameStorageTest {
         // ADDING vrontis as List key
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -277,7 +277,7 @@ public class NameStorageTest {
         // removing skerberus as List key
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -303,7 +303,7 @@ public class NameStorageTest {
         // removing skerberus as List key
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -329,7 +329,7 @@ public class NameStorageTest {
         // removing skerberus as List key
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -348,7 +348,7 @@ public class NameStorageTest {
 
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -369,7 +369,7 @@ public class NameStorageTest {
 
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -396,7 +396,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -416,7 +416,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
@@ -460,7 +460,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -481,7 +481,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
@@ -502,7 +502,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
@@ -566,7 +566,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -587,7 +587,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
@@ -608,7 +608,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
@@ -689,7 +689,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -710,7 +710,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
@@ -731,7 +731,7 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 

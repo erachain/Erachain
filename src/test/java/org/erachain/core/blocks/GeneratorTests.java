@@ -578,7 +578,7 @@ public class GeneratorTests {
         //PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
-        generator.setLastTimestamp(genesisBlock.getTimestamp(), dcSet);
+        generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
         generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false);
         generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10000), false);
 
@@ -597,7 +597,7 @@ public class GeneratorTests {
         for (int i = 0; i < 10; i++) {
 
             //CREATE VALID PAYMENT
-            Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01), timestamp++, generator.getLastTimestamp(snapshot));
+            Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01), timestamp++, generator.getLastTimestamp(snapshot)[0]);
             payment.sign(generator, Transaction.FOR_NETWORK);
 
             //PROCESS IN DB
@@ -647,7 +647,7 @@ public class GeneratorTests {
         //PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
-        generator.setLastTimestamp(genesisBlock.getTimestamp(), dcSet);
+        generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
         generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false);
         generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(100000), false);
 
@@ -671,7 +671,7 @@ public class GeneratorTests {
             //CREATE VALID PAYMENT
             Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
                     "sss", new byte[3000], new byte[]{1}, new byte[]{0},
-                    timestamp++, generator.getLastTimestamp(snapshot));
+                    timestamp++, generator.getLastTimestamp(snapshot)[0]);
 
             payment.setDC(db, Transaction.FOR_NETWORK, 1, 1);
             payment.sign(generator, Transaction.FOR_NETWORK);
@@ -747,7 +747,7 @@ public class GeneratorTests {
 
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
         Transaction payment = new RSend(userAccount1, FEE_POWER, recipient, ERM_KEY, BigDecimal.valueOf(2000),
-                timestamp++, userAccount1.getLastTimestamp(dcSet));
+                timestamp++, userAccount1.getLastTimestamp(dcSet)[0]);
         payment.sign(userAccount1, Transaction.FOR_NETWORK);
         assertEquals(payment.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 

@@ -12,6 +12,7 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
@@ -168,6 +169,18 @@ public class ItemAssetBalanceMap extends DCMap<Tuple2<byte[], Long>, Tuple5<
             key = -key;
 
         this.set(new Tuple2<byte[], Long>(address, key), value);
+    }
+
+    private Account testAcc = new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe");
+    public boolean set(Tuple2<byte[], Long> key, Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+
+        if (testAcc.equals(key.a)) {
+            boolean test = true;
+        }
+
+        return super.set(key, value);
     }
 
 	/*
