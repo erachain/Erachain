@@ -50,6 +50,10 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                 return null;
             }
             Block.BlockHead block = list.get(row);
+            if (block == null) {
+                return "--";
+            }
+
             switch (column) {
                 case COLUMN_HEIGHT:
                     return block.heightBlock + "";

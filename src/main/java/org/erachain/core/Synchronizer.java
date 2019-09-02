@@ -994,13 +994,17 @@ public class Synchronizer extends Thread {
                 if (cnt.isOnStopping())
                     return;
 
-                // NOTIFY to WALLET
-
             } catch (IOException e) {
                 error = new Exception(e);
 
             } catch (Exception e) {
 
+                if (cnt.isOnStopping()) {
+                    return;
+                } else {
+                    error = new Exception(e);
+                }
+            } catch (Throwable e) {
                 if (cnt.isOnStopping()) {
                     return;
                 } else {
@@ -1015,9 +1019,10 @@ public class Synchronizer extends Thread {
                 }
 
                 if (error != null) {
+                    LOGGER.error(error.getMessage(), error);
+
                     // was BREAK - try ROLLBACK
                     dcSet.rollback();
-                    LOGGER.error(error.getMessage(), error);
 
                     if (error instanceof IOException) {
                         cnt.stopAll(22);
@@ -1027,6 +1032,8 @@ public class Synchronizer extends Thread {
                     throw new Exception(error);
 
                 }
+
+                // NOTIFY to WALLET
 
                 if (observOn) {
 
@@ -1068,7 +1075,6 @@ public class Synchronizer extends Thread {
 
         long timeTmp;
         long timePoint = 0;
-        DCSet dcSet = DCSet.getInstance();
         BlockGenerator blockGenerator;
 
         long shiftPoint = BlockChain.GENERATING_MIN_BLOCK_TIME_MS
@@ -1086,6 +1092,7 @@ public class Synchronizer extends Thread {
 
         boolean needCheck = false;
 
+        DCSet dcSet = DCSet.getInstance();
         while (!cnt.isOnStopping()) {
             try {
 

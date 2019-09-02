@@ -343,7 +343,7 @@ public class BlockChain {
         //GET LAST BLOCK
         ///byte[] lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
         ///return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
-        return dcSet.getBlockMap().size();
+        return dcSet.getBlocksHeadsMap().size();
     }
 
     public static int getCheckPoint(DCSet dcSet) {
