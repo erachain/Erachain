@@ -1482,7 +1482,8 @@ import java.util.*;
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
 
-            LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
+            LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue
+                + " Creator: " + this.creator.getAddress());
             LOGGER.debug("*** forging Value: " + this.forgingValue
                 + " creator Data: " + creator.getForgingData(dcSet, heightBlock)
                 + " creator LAST Data: " + creator.getLastForgingData(dcSet));
@@ -2249,7 +2250,8 @@ import java.util.*;
                 if (!this.getCreator().equals(account)) {
                     // если этот блок не собирался этим человеком
                     Tuple2<Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
-                    if (lastForgingPoint != null && lastForgingPoint.a == heightBlock
+                    if (true // теперь можно удалять полностью - внутри идет проверка
+                            || lastForgingPoint != null && lastForgingPoint.a == heightBlock
                             && !this.getCreator().equals(account)) {
                         account.delForgingData(dcSet, heightBlock);
                     }

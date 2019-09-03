@@ -6,6 +6,7 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
 
     protected Map<Tuple2<String, Integer>, Tuple2<Integer, Integer>> getMap(DB database) {
         //OPEN MAP
-        return database.getTreeMap("address_forging");
+        return database.getHashMap("address_forging");
     }
 
     @Override
@@ -153,9 +154,11 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
             LOGGER.error("ERROR LAST forging POINTS = null for KEY: " + key);
             return super.delete(key);
         } else {
+            LOGGER.debug("last POINT: " + lastPoint);
             if (lastPoint.a.equals(key.b)) {
                 Tuple2<Integer, Integer> previous = super.delete(key);
                 this.setLast(key.a, previous);
+                LOGGER.debug("delete and set prev POINT as last: " + (previous == null? "null" : previous) + " for " + key);
                 return previous;
             } else if (lastPoint.a > key.b) {
                 // тут ошибка
