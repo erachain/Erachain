@@ -81,10 +81,10 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> map;
 
-        if (false) {
+        if (true) {
             hashMap = database.createHashMap("balances")
-                    .keySerializer(SerializerBase.BASIC)
-                    .hasher(Hasher.BASIC) // неверно хеширует массивы внутри - видимо по Ссылке в памяти а не по значениям
+                    .keySerializer(SerializerBase.BYTE_ARRAY)
+                    .hasher(Hasher.BYTE_ARRAY)
                     .counterEnable()
                     .makeOrGet();
             map = hashMap;
@@ -126,7 +126,7 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
 				return new Tuple3<Long, BigDecimal, byte[]>(key.b, value.negate(), key.a);
 			}
 		});*/
-        Bind.secondaryKey(treeMap, this.assetKeyMap, new Fun.Function2<Tuple3<Long,
+        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple3<Long,
                 Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>,
