@@ -977,6 +977,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
                     } while (this.orphanto <= 0
                             && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP.getTime()
+                            // возможно уже надо обновиться - мы отстали
                             && !ctrl.needUpToDate());
 
                     if (this.orphanto > 0)
@@ -990,7 +991,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
                         }
 
-                    } else {
+                    } else if (!ctrl.needUpToDate()) {
+                        // только если мы не отстали
 
                         this.solvingReference = null;
 
