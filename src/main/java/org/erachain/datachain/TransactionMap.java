@@ -394,7 +394,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
      * @param key
      * @return
      */
-    public synchronized Transaction delete(Long key) {
+    public /* synchronized */ Transaction delete(Long key) {
         Transaction transaction = super.delete(key);
         if (transaction != null) {
             // DELETE only if DELETED
