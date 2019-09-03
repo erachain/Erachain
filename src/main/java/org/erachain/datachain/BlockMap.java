@@ -227,26 +227,10 @@ public class BlockMap extends DCMap<Integer, Block> {
         // ORPHAN FORGING DATA
         if (height > 1) {
 
-            //Block.BlockHead head = dcSet.getBlocksHeadsMap().remove();
             dcSet.getBlocksHeadsMap().remove();
 
-            if (creator.getAddress().equals("7CvpXXALviZPkZ9Yn27NncLVz6SkxMA8rh")
-                    && height > 291000 && height < 291056) {
-                Tuple2<String, Integer> key = new Tuple2<String, Integer>(creator.getAddress(), height);
-                Tuple2<Integer, Integer> previous = dcSet.getAddressForging().get(key);
-                int ii = 0;
-            }
-
-                // INITIAL forging DATA no need remove!
-            Tuple2<String, Integer> key = new Tuple2<String, Integer>(creator.getAddress(), height);
-            Tuple2<Integer, Integer> previous = dcSet.getAddressForging().get(key);
-            if (previous != null) {
-                // иногда бывавет что при откате в этом же блок и был собран блок
-                // и была транзакция с ЭРА то два раза пытается откатить - сначала как у транзакции
-                // а потом как у блока - то тут словим на второй раз NULL - и форжинг с него прекращается
-                // однако удаление для прихода монет в ноль должно остаться
-                creator.delForgingData(dcSet, height);
-            }
+            // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
+            creator.delForgingData(dcSet, height);
 
         }
 
