@@ -978,6 +978,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     } while (this.orphanto <= 0
                             && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP.getTime()
                             // возможно уже надо обновиться - мы отстали
+                            && betterPeer == null
                             && !ctrl.needUpToDate());
 
                     if (this.orphanto > 0)
@@ -992,7 +993,21 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
 
                     } else if (ctrl.needUpToDate()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            local_status = -1;
+                            return;
+                        }
                         LOGGER.debug("need UPDATE! skip FLUSH BLOCK");
+                    } else if (betterPeer != null) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            local_status = -1;
+                            return;
+                        }
+                        LOGGER.debug("found better PEER! skip FLUSH BLOCK " + betterPeer);
                     } else {
                         // только если мы не отстали
 
@@ -1066,7 +1081,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////// UPDATE ////////////////////
 
-                if (betterPeer == null && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2)
+                if (betterPeer == null && !ctrl.needUpToDate() && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2)
                         > NTP.getTime())
                     continue;
 
