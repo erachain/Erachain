@@ -202,11 +202,11 @@ public class Synchronizer extends Thread {
         // VALIDATE THE NEW BLOCKS
 
         // Height & Weight
-        int testHeight = myHW.a + 1; // высота на котрой тестировать СИЛУ цепочки
+        int myHeight = myHW.a; // + 1; // высота на котрой тестировать СИЛУ цепочки
         long myWeight = myHW.b;
         int newHeight = lastBlock.getHeight() + newBlocks.size();
         // проверять СИЛУ цепочки только если лна не на много лучше моей высоты
-        boolean checkFullWeight = !BlockChain.DEVELOP_USE && testHeight > newHeight;
+        /// boolean checkFullWeight = !BlockChain.DEVELOP_USE;
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
@@ -290,17 +290,16 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            // PROCESS TO VALIDATE NEXT BLOCKS
-            // runedBlock = block;
-            /// already in Validate block.process(fork);
-            if (checkFullWeight && testHeight == height) {
+            // проверка силы цепочки на уровне нашего блока
+            if (myHeight == height) {
                 if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
                     // суть в том что тут цепоска на этой высоте слабже моей,
                     // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
                     // - может мы лучше цепочку собрем еще
 
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by weak FullWeight, heigh: " + height;
+                    String mess = "Dishonest peer by weak FullWeight, height: " + height
+                            + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
                     peer.ban(mess);
                     throw new Exception(mess);
 
