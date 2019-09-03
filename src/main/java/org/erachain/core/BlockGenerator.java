@@ -769,7 +769,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             // Соберем тут танзакции сразу же чтобы потом не тратить время
                             Tuple2<List<Transaction>, Integer> unconfirmedTransactions
                                     = getUnconfirmedTransactions(height, timePointForValidTX,
-                                            bchain, winned_winValue);
+                                    bchain, winned_winValue);
 
                             wait_new_block_broadcast = (timeStartBroadcast + BlockChain.FLUSH_TIMEPOINT) >> 1;
                             int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
@@ -822,93 +822,99 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         && betterPeer == null && !ctrl.needUpToDate());
                             }
 
-                            if (this.orphanto > 0 || betterPeer != null)
+                            if (this.orphanto > 0) {
                                 continue;
-
-                            if (newWinner) {
-                                LOGGER.info("NEW WINER RECEIVED - drop my block");
+                            } else if (ctrl.needUpToDate()) {
+                                LOGGER.info("skip GENERATING block - need UPDATE");
+                            } else if (betterPeer != null) {
+                                LOGGER.info("skip GENERATING block - better PERR founf: " + betterPeer);
                             } else {
-                                /////////////////////    MAKING NEW BLOCK  //////////////////////
-                                local_status = 7;
-                                this.setMonitorStatus("local_status " + viewStatus());
 
-                                // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-                                LOGGER.info("GENERATE my BLOCK for TXs: " + unconfirmedTransactions.b);
-
-                                generatedBlock = null;
-                                try {
-                                    processTiming = System.nanoTime();
-                                    generatedBlock = generateNextBlock(acc_winner, solvingBlock,
-                                            unconfirmedTransactions,
-                                            height, winned_forgingValue, winned_winValue, previousTarget);
-
-                                    processTiming = System.nanoTime() - processTiming;
-
-                                    // только если вблоке есть стрнзакции то вычислим
-                                    if (generatedBlock.getTransactionCount() > 0
-                                            && processTiming < 999999999999l) {
-                                        // при переполнении может быть минус
-                                        // в миеросекундах подсчет делаем
-                                        // ++ 10 потому что там ФОРК базы делаем - он очень медленный
-                                        processTiming = processTiming / 1000 /
-                                                (Controller.BLOCK_AS_TX_COUNT + generatedBlock.getTransactionCount());
-                                        if (transactionMakeTimingCounter < 1 << 3) {
-                                            transactionMakeTimingCounter++;
-                                            transactionMakeTimingAverage = ((transactionMakeTimingAverage * transactionMakeTimingCounter)
-                                                    + processTiming - transactionMakeTimingAverage) / transactionMakeTimingCounter;
-                                        } else
-                                            transactionMakeTimingAverage = ((transactionMakeTimingAverage << 3)
-                                                    + processTiming - transactionMakeTimingAverage) >> 3;
-
-                                        ctrl.setTransactionMakeTimingAverage(transactionMakeTimingAverage);
-                                    }
-
-                                } catch (java.lang.OutOfMemoryError e) {
-                                    local_status = -1;
-                                    LOGGER.error(e.getMessage(), e);
-                                    ctrl.stopAll(94);
-                                    return;
-                                }
-                                LOGGER.info("GENERATE done");
-
-                                solvingBlock = null;
-
-                                if (generatedBlock == null) {
-                                    if (ctrl.isOnStopping()) {
-                                        this.local_status = -1;
-                                        return;
-                                    }
-
-                                    LOGGER.info("generateNextBlock is NULL... try wait");
-                                    try {
-                                        Thread.sleep(1000);
-                                    } catch (InterruptedException e) {
-                                    }
-
-                                    continue;
+                                if (newWinner) {
+                                    LOGGER.info("NEW WINER RECEIVED - drop my block");
                                 } else {
-                                    //PASS BLOCK TO CONTROLLER
+                                    /////////////////////    MAKING NEW BLOCK  //////////////////////
+                                    local_status = 7;
+                                    this.setMonitorStatus("local_status " + viewStatus());
+
+                                    // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+                                    LOGGER.info("GENERATE my BLOCK for TXs: " + unconfirmedTransactions.b);
+
+                                    generatedBlock = null;
                                     try {
-                                        LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                        if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+                                        processTiming = System.nanoTime();
+                                        generatedBlock = generateNextBlock(acc_winner, solvingBlock,
+                                                unconfirmedTransactions,
+                                                height, winned_forgingValue, winned_winValue, previousTarget);
 
-                                            // need to BROADCAST
-                                            local_status = 8;
-                                            this.setMonitorStatus("local_status " + viewStatus());
+                                        processTiming = System.nanoTime() - processTiming;
 
-                                            ctrl.broadcastWinBlock(generatedBlock);
-                                            local_status = 0;
-                                            this.setMonitorStatus("local_status " + viewStatus());
+                                        // только если вблоке есть стрнзакции то вычислим
+                                        if (generatedBlock.getTransactionCount() > 0
+                                                && processTiming < 999999999999l) {
+                                            // при переполнении может быть минус
+                                            // в миеросекундах подсчет делаем
+                                            // ++ 10 потому что там ФОРК базы делаем - он очень медленный
+                                            processTiming = processTiming / 1000 /
+                                                    (Controller.BLOCK_AS_TX_COUNT + generatedBlock.getTransactionCount());
+                                            if (transactionMakeTimingCounter < 1 << 3) {
+                                                transactionMakeTimingCounter++;
+                                                transactionMakeTimingAverage = ((transactionMakeTimingAverage * transactionMakeTimingCounter)
+                                                        + processTiming - transactionMakeTimingAverage) / transactionMakeTimingCounter;
+                                            } else
+                                                transactionMakeTimingAverage = ((transactionMakeTimingAverage << 3)
+                                                        + processTiming - transactionMakeTimingAverage) >> 3;
 
-                                        } else {
-                                            LOGGER.info("my BLOCK is weak ((...");
+                                            ctrl.setTransactionMakeTimingAverage(transactionMakeTimingAverage);
                                         }
-                                        generatedBlock = null;
+
                                     } catch (java.lang.OutOfMemoryError e) {
                                         local_status = -1;
                                         LOGGER.error(e.getMessage(), e);
                                         ctrl.stopAll(94);
                                         return;
+                                    }
+                                    LOGGER.info("GENERATE done");
+
+                                    solvingBlock = null;
+
+                                    if (generatedBlock == null) {
+                                        if (ctrl.isOnStopping()) {
+                                            this.local_status = -1;
+                                            return;
+                                        }
+
+                                        LOGGER.info("generateNextBlock is NULL... try wait");
+                                        try {
+                                            Thread.sleep(1000);
+                                        } catch (InterruptedException e) {
+                                        }
+
+                                        continue;
+                                    } else {
+                                        //PASS BLOCK TO CONTROLLER
+                                        try {
+                                            LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+
+                                                // need to BROADCAST
+                                                local_status = 8;
+                                                this.setMonitorStatus("local_status " + viewStatus());
+
+                                                ctrl.broadcastWinBlock(generatedBlock);
+                                                local_status = 0;
+                                                this.setMonitorStatus("local_status " + viewStatus());
+
+                                            } else {
+                                                LOGGER.info("my BLOCK is weak ((...");
+                                            }
+                                            generatedBlock = null;
+                                        } catch (java.lang.OutOfMemoryError e) {
+                                            local_status = -1;
+                                            LOGGER.error(e.getMessage(), e);
+                                            ctrl.stopAll(94);
+                                            return;
+                                        }
                                     }
                                 }
                             }
