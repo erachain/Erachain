@@ -991,7 +991,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
                         }
 
-                    } else if (!ctrl.needUpToDate()) {
+                    } else if (ctrl.needUpToDate()) {
+                        LOGGER.debug("need UPDATE! skip FLUSH BLOCK");
+                    } else {
                         // только если мы не отстали
 
                         this.solvingReference = null;
