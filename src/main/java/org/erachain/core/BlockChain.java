@@ -123,7 +123,7 @@ public class BlockChain {
     public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 430000 : 260120;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 425555 : 260120;
 
-    public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 0;
+    public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 44666;
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
