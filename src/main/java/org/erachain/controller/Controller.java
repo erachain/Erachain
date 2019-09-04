@@ -649,6 +649,13 @@ public class Controller extends Observable {
             LOGGER.error("Error during startup detected trying to recreate DataLocale...");
         }
 
+        try {
+            // удалим все в папке Temp
+            File tempDir = new File(Settings.getInstance().getDataTempDir());
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
         // OPENING DATABASES
         try {
             this.setChanged();
@@ -1149,6 +1156,13 @@ public class Controller extends Observable {
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Closing telegram")));
             LOGGER.info("Closing telegram");
             this.telegramStore.close();
+        }
+
+        try {
+            // удалим все в папке Temp
+            File tempDir = new File(Settings.getInstance().getDataTempDir());
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
         }
 
         LOGGER.info("Closed.");
@@ -2641,8 +2655,8 @@ public class Controller extends Observable {
         return true;
     }
 
-    public List<Transaction> getUnconfirmedTransactions(int from, int count, boolean descending) {
-        return this.dcSet.getTransactionMap().getTransactions(from, count, descending);
+    public List<Transaction> getUnconfirmedTransactions(int count, boolean descending) {
+        return this.dcSet.getTransactionMap().getTransactions(count, descending);
 
     }
 

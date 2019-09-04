@@ -10,7 +10,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
@@ -161,7 +160,7 @@ public class TransactionsResource {
     @Path("/network")
     public String getNetworkTransactions() {
         LOGGER.debug("try get");
-        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
+        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(100, true);
         JSONArray array = new JSONArray();
 
         LOGGER.debug("get: " + transactions.size());

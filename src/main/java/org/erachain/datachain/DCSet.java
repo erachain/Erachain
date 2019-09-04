@@ -19,6 +19,7 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.erachain.utils.UpdateUtil;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
@@ -1489,6 +1491,13 @@ public class DCSet extends DBASet implements Observer {
                     transactionMap.totalDeleted >>= 1;
                     LOGGER.error(e.getMessage(), e);
                 }
+            }
+
+            try {
+                // удалим все в папке Temp
+                File tempDir = new File(Settings.getInstance().getDataTempDir());
+                Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+            } catch (Throwable e) {
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " +getEngineSize() + "   %%%%%%  commit time: "

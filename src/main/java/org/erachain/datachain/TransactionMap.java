@@ -52,6 +52,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public TransactionMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
+        DEFAULT_INDEX = TIMESTAMP_INDEX;
+
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
             this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
@@ -198,6 +200,12 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public Iterator<Long> getTimestampIterator() {
 
         Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        return iterator;
+    }
+
+    public Iterator<Long> getCeatorIterator() {
+
+        Iterator<Long> iterator = this.senderKey.iterator();
         return iterator;
     }
 
@@ -557,7 +565,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public List<Transaction> getTransactionsByAddress(String address) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(0, false);
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
         Account account = new Account(address);
 
         Transaction transaction;
@@ -592,12 +600,12 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return values;
     }
 
-    public List<Transaction> getTransactions(int indexID, int count, boolean descending) {
+    public List<Transaction> getTransactions(int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
 
         //LOGGER.debug("get ITERATOR");
-        Iterator<Long> iterator = this.getIterator(indexID, descending);
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
         //LOGGER.debug("get ITERATOR - DONE"); / for merge
 
         Transaction transaction;
@@ -616,7 +624,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        Iterator<Long> iterator = this.getIterator(0, descending);
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
         Account account = new Account(address);
 
         int i = 0;

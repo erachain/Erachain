@@ -221,7 +221,7 @@ public class StatementsTableModelMy extends AbstractTableModel implements Observ
         tran = new ArrayList<Transaction>();
         transactions.clear();
         // база данных
-        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 1000, true)) {
+        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(1000, true)) {
             if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
                 transactions.add(transaction);
             }
