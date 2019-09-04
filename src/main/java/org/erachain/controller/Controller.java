@@ -1158,6 +1158,13 @@ public class Controller extends Observable {
             this.telegramStore.close();
         }
 
+        try {
+            // удалим все в папке Temp
+            File tempDir = new File(Settings.getInstance().getDataTempDir());
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
         LOGGER.info("Closed.");
         // FORCE CLOSE
         if (par != -999999) {
