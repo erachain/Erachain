@@ -290,8 +290,8 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            // проверка силы цепочки на уровне нашего блока
-            if (myHeight == height) {
+            // проверка силы цепочки на уровне нашего блока и если высота новой цепочки чуть больше нашей
+            if (myHeight == height && myHeight > newHeight - 2) {
                 if (myWeight > fork.getBlocksHeadsMap().getFullWeight()) {
                     // суть в том что тут цепоска на этой высоте слабже моей,
                     // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
