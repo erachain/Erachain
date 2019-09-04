@@ -649,6 +649,13 @@ public class Controller extends Observable {
             LOGGER.error("Error during startup detected trying to recreate DataLocale...");
         }
 
+        try {
+            // удалим все в папке Temp
+            File tempDir = new File(Settings.getInstance().getDataTempDir());
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
         // OPENING DATABASES
         try {
             this.setChanged();
