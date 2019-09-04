@@ -203,16 +203,32 @@ public class Account {
     public static Map<byte[], BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
                                                                   Map<byte[], BigDecimal> values) {
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        Iterator<byte[]> iterator = map.getIterator(0, true);
+
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ballance;
 
-        byte[] iteratorKey;
-        while (iterator.hasNext()) {
-            iteratorKey = iterator.next();
-            if (map.getAssetKeyFromKey(iteratorKey) == key) {
-                ballance = map.get(iteratorKey);
-                values.put(map.getShortAccountFromKey(iteratorKey), ballance.a.b);
+        if (true) {
+            // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
+            for (byte[] mapKey: map.getKeys()) {
+                if (map.getAssetKeyFromKey(mapKey) == key) {
+                    ballance = map.get(mapKey);
+                    values.put(map.getShortAccountFromKey(mapKey), ballance.a.b);
+                }
             }
+
+        } else {
+
+            // здесь нужен протокольный итератор! его нету у балансов поэтому через перебор ключей
+            Iterator<byte[]> iterator = map.getIterator(0, true);
+
+            byte[] iteratorKey;
+            while (iterator.hasNext()) {
+                iteratorKey = iterator.next();
+                if (map.getAssetKeyFromKey(iteratorKey) == key) {
+                    ballance = map.get(iteratorKey);
+                    values.put(map.getShortAccountFromKey(iteratorKey), ballance.a.b);
+                }
+            }
+
         }
 
         DCSet dcParent = dcSet.getParent();

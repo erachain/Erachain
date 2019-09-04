@@ -2641,8 +2641,8 @@ public class Controller extends Observable {
         return true;
     }
 
-    public List<Transaction> getUnconfirmedTransactions(int from, int count, boolean descending) {
-        return this.dcSet.getTransactionMap().getTransactions(from, count, descending);
+    public List<Transaction> getUnconfirmedTransactions(int count, boolean descending) {
+        return this.dcSet.getTransactionMap().getTransactions(count, descending);
 
     }
 

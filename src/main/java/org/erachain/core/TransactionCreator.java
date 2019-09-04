@@ -81,7 +81,8 @@ public class TransactionCreator {
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
         ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
         TransactionMap transactionMap = this.fork.getTransactionMap();
-        Iterator<Long> iterator = transactionMap.getIterator(0, false);
+        // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
+        Iterator<Long> iterator = transactionMap.getIterator(TransactionMap.TIMESTAMP_INDEX, false);
         Transaction transaction;
         List<Account> accountMap = Controller.getInstance().getAccounts();
 

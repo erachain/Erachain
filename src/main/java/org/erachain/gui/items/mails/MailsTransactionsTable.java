@@ -37,12 +37,10 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.RSend;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
@@ -93,7 +91,7 @@ public class MailsTransactionsTable extends JTable implements Observer {
 
         transactions = new ArrayList<Transaction>();
 
-        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 1000, true)) {
+        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(1000, true)) {
             if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
                 transactions.add(transaction);
             }

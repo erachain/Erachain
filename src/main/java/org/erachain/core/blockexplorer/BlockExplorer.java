@@ -3337,7 +3337,7 @@ public class BlockExplorer {
         //AssetNames assetNames = new AssetNames();
 
         List<Transaction> all = new ArrayList<>(
-                Controller.getInstance().getUnconfirmedTransactions(0, 100, true));
+                Controller.getInstance().getUnconfirmedTransactions(100, true));
 
         int size = all.size();
 

@@ -293,12 +293,17 @@ public abstract class DBMap<T, U> extends Observable {
                     if (this.size() < 1000) {
                         list = new SortableList<T, U>(this);
                     } else {
-                        // обрезаем полный список в базе до 1000
-                        Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
                         List<T> keys = new ArrayList<T>();
-                        int i = 0;
-                        while (iterator.hasNext() && ++i < 1000) {
-                            keys.add((T) iterator.next());
+                        // тут может быть ошибка если основной индекс не TreeMap
+                        try {
+                            // обрезаем полный список в базе до 1000
+                            Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
+                            int i = 0;
+                            while (iterator.hasNext() && ++i < 1000) {
+                                keys.add((T) iterator.next());
+                            }
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
                         }
 
                         list = new SortableList<T, U>(this, keys);

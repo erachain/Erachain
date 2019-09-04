@@ -91,7 +91,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
     public void recalcWeightFull(DCSet dcSet) {
 
         long weightFull = 0l;
-        Iterator<Integer> iterator = this.getIterator(0, true);
+        Iterator<Integer> iterator = this.getIterator(DEFAULT_INDEX, true);
         while (iterator.hasNext()) {
             Integer key = iterator.next();
             Block.BlockHead item = this.get(key);

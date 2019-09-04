@@ -170,7 +170,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
 
         List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<Pair<Account, Block.BlockHead>>();
 
-        Iterator<Tuple2<String, String>> iterator = this.getIterator(1, true);
+        Iterator<Tuple2<String, String>> iterator = this.getIterator(TIMESTAMP_INDEX, true);
         if (!iterator.hasNext())
             return null;
 
