@@ -1220,7 +1220,7 @@ public class Controller extends Observable {
             return false;
 
         TransactionMap map = this.dcSet.getTransactionMap();
-        Iterator<Long> iterator = map.getIterator(0, false);
+        Iterator<Long> iterator = map.getIterator(TransactionMap.TIMESTAMP_INDEX, false);
         long ping = 0;
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response

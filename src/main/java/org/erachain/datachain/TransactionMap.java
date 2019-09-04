@@ -109,8 +109,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     protected Map<Long, Transaction> getMap(DB database) {
 
         // OPEN MAP
-        BTreeMap<Long, Transaction> map = database.createTreeMap("transactions")
-                .keySerializer(BTreeKeySerializer.BASIC)
+        HTreeMap<Long, Transaction> map = database.createHashMap("transactions")
+                .keySerializer(SerializerBase.BASIC)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
