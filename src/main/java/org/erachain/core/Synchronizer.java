@@ -290,9 +290,9 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            // проверка силы цепочки на уровне нашего блока
-            if (myHeight == height) {
-                if (myWeight >= fork.getBlocksHeadsMap().getFullWeight()) {
+            // проверка силы цепочки на уровне нашего блока и если высота новой цепочки чуть больше нашей
+            if (myHeight == height && myHeight > newHeight - 2) {
+                if (myWeight > fork.getBlocksHeadsMap().getFullWeight()) {
                     // суть в том что тут цепоска на этой высоте слабже моей,
                     // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
                     // - может мы лучше цепочку собрем еще
@@ -302,11 +302,8 @@ public class Synchronizer extends Thread {
                             + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
                     peer.ban(mess);
                     throw new Exception(mess);
-
                 }
-
             }
-
         }
 
         LOGGER.debug("*** END");
