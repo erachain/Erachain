@@ -82,19 +82,15 @@ public class BlockChain {
     public static final int MIN_GENERATING_BALANCE = 100;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
     //public static final int GENERATING_RETARGET = 10;
-    public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
-    public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
-    public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 3);
-    static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
+    //public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
+    //public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
     public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? -5000: -5000;
     public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = 1; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
-    public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
 
-    public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
     //public static final int GENERATING_MAX_BLOCK_TIME = 1000;
     public static final int MAX_BLOCK_SIZE_BYTES = 1 << 25; //4 * 1048576;
     public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
@@ -126,6 +122,8 @@ public class BlockChain {
     public static final int SKIP_VALID_SIGN_BEFORE = DEVELOP_USE? 0 : 44666;
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
+
+    public static final int VERS_30SEC = DEVELOP_USE ? VERS_4_11 : VERS_4_11;
 
     public static final int DEVELOP_FORGING_START = 100;
 
@@ -569,6 +567,43 @@ public class BlockChain {
         return dcSet.getBlocksHeadsMap().size();
     }
 
+    public static int GENERATING_MIN_BLOCK_TIME(int height) {
+
+        if (height <= VERS_30SEC) {
+            return DEVELOP_USE? 120 : 288;
+        }
+
+        return 30;
+    }
+
+    public static int GENERATING_MIN_BLOCK_TIME(DCSet dcSet) {
+        return GENERATING_MIN_BLOCK_TIME(dcSet.getBlocksHeadsMap().size());
+    }
+
+    public static int GENERATING_MIN_BLOCK_TIME_MS(int height) {
+        return GENERATING_MIN_BLOCK_TIME(height) * 1000;
+    }
+
+    public static int GENERATING_MIN_BLOCK_TIME_MS(DCSet dcSet) {
+        return GENERATING_MIN_BLOCK_TIME(dcSet.getBlocksHeadsMap().size());
+    }
+
+    public static int FLUSH_TIMEPOINT(int height) {
+        return GENERATING_MIN_BLOCK_TIME_MS(height) - (GENERATING_MIN_BLOCK_TIME_MS(height) >> 3);
+    }
+
+    public static int WIN_TIMEPOINT(int height) {
+        return GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
+    }
+
+    public static int UNCONFIRMED_DEADTIME_MS(int height) {
+        return DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
+    }
+
+    public static int BLOCKS_PER_DAY(int height) {
+        return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
+    }
+
     public static int getCheckPoint(DCSet dcSet) {
 
         Integer item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
@@ -858,16 +893,34 @@ public class BlockChain {
 	 */
 
     public long getTimestamp(int height) {
-        return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS;
+        if (height <= VERS_30SEC) {
+            return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
+        }
+
+        return this.genesisTimestamp
+                + (long) VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
+                + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
+
     }
 
     public long getTimestamp(DCSet dcSet) {
-        return this.genesisTimestamp + (long) getHeight(dcSet) * GENERATING_MIN_BLOCK_TIME_MS;
+        int height = getHeight(dcSet);
+        return getTimestamp(height);
     }
 
     public int getBlockOnTimestamp(long timestamp) {
         long diff = timestamp - genesisTimestamp;
-        return (int) (diff / GENERATING_MIN_BLOCK_TIME_MS);
+        int height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(1));
+        if (height <= VERS_30SEC)
+            return height;
+
+        // новый шаг между блоками
+        diff -= VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(1);
+
+        height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC + 1));
+
+        return VERS_30SEC + height;
+
     }
 
     // BUFFER of BLOCK for WIN solving

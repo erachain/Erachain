@@ -1516,8 +1516,8 @@ public class Controller extends Observable {
 
                 // TEST TIMESTAMP of PEER
                 Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
-                if (this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS > NTP
-                        .getTime()) {
+                if (this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height)
+                        > NTP.getTime()) {
                     // IT PEER from FUTURE
                     this.banPeerOnError(hWeightMessage.getSender(), "peer from FUTURE");
                     return;

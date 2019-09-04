@@ -470,7 +470,7 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
         // тут индекс не по времени а по номерам блоков как лонг
         int heightStart = Controller.getInstance().getMyHeight();
         //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
-        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY;
+        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(height);
         long refDBend = Transaction.makeDBRef(heightEnd, 0);
 
         //FILTER ALL KEYS

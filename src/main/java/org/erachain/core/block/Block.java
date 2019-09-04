@@ -944,7 +944,7 @@ import java.util.*;
             return BigDecimal.ZERO;
         }
 
-        int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;
+        int inDay30 = BlockChain.BLOCKS_PER_DAY(heightBlock) * 30;
 
         BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
 
@@ -1585,7 +1585,7 @@ import java.util.*;
             long timerTransFinalMapSinds_set = 0;
 
             long timestampEnd = this.getTimestamp()
-                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS : BlockChain.FLUSH_TIMEPOINT)
+                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) : BlockChain.FLUSH_TIMEPOINT(height))
                     - BlockChain.UNCONFIRMED_SORT_WAIT_MS
                     + 10;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()

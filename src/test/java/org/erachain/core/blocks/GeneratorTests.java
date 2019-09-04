@@ -114,7 +114,7 @@ public class GeneratorTests {
         Block lastBlock = genesisBlock;
         for (int i = 0; i < 200; i++) {
 
-            if (NTP.getTime() - lastBlock.getTimestamp() < BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+            if (NTP.getTime() - lastBlock.getTimestamp() < BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height)) {
                 break;
             }
 
@@ -371,7 +371,7 @@ public class GeneratorTests {
         Block lastBlock = genesisBlock;
         for (int i = 2; i < 120; i++) {
 
-            if (NTP.getTime() - lastBlock.getTimestamp() < BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+            if (NTP.getTime() - lastBlock.getTimestamp() < BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height)) {
                 break;
             }
 
@@ -589,7 +589,7 @@ public class GeneratorTests {
                 2,  1000, 1000l, 1000l);
 
         // get timestamp for block
-        long timestamp = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
+        long timestamp = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
 
         //ADD 10 UNCONFIRMED VALID TRANSACTIONS
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -659,7 +659,7 @@ public class GeneratorTests {
                 2,  1000, 1000l, 1000l);
 
         // get timestamp for block
-        long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
+        long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
         long timestamp = timestampStart;
 
         //ADD 10000 UNCONFIRMED VALID TRANSACTIONS
@@ -742,7 +742,7 @@ public class GeneratorTests {
                 2,  1000, 1000l, 1000l);
 
         // get timestamp for block
-        long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
+        long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
         long timestamp = timestampStart;
 
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
