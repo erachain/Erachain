@@ -577,10 +577,6 @@ public class BlockChain {
         return 30;
     }
 
-    public static int GENERATING_MIN_BLOCK_TIME(DCSet dcSet) {
-        return GENERATING_MIN_BLOCK_TIME(dcSet.getBlocksHeadsMap().size());
-    }
-
     public static int GENERATING_MIN_BLOCK_TIME_MS(int height) {
         return GENERATING_MIN_BLOCK_TIME(height) * 1000;
     }
@@ -596,7 +592,7 @@ public class BlockChain {
 
     public static int UNCONFIRMED_SORT_WAIT_MS(int height) {
         if (height <= VERS_30SEC) {
-            return DEVELOP_USE? -5000 : -5000;
+            return -GENERATING_MIN_BLOCK_TIME_MS(height);
         }
         return DEVELOP_USE? 5000 : 5000;
     }
@@ -607,10 +603,6 @@ public class BlockChain {
 
     public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
         int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
-        return DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
-    }
-
-    public static int UNCONFIRMED_DEADTIME_MS(int height) {
         return DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
     }
 

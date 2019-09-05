@@ -1579,10 +1579,7 @@ import java.util.*;
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
-            long timestampEnd = this.getTimestamp()
-                    - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
-            // because time filter used by parent block timestamp on core.BlockGenerator.run()
-            //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
+            long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
 
             DCSet validatingDC;
 
@@ -1665,8 +1662,10 @@ import java.util.*;
                         ) {
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                     + ":" + transaction.viewFullTypeName()
-                                    + " timestampEnd invalid"
-                                    + " " + Base58.encode(transaction.getSignature()));
+                                    + " timestamp Overhead"
+                                    + " for diff: " + (transaction.getTimestamp() - timestampEnd)
+                                    + " " + Base58.encode(transaction.getSignature())
+                            );
                             return false;
                         }
 
