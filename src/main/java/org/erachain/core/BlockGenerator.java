@@ -31,7 +31,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     public static final boolean TEST_001 = false;
 
-    static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
+    private static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
 
     private static int WAIT_STEP_MS = 100;
 
@@ -534,7 +534,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long timeTmp;
         long timePoint = 0;
         long timePointForValidTX = 0;
-        int timeStartBroadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
         long flushPoint = 0;
         long timeUpdate = 0;
         int shift_height = 0;
@@ -558,6 +557,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         this.initMonitor();
 
         while (!ctrl.isOnStopping()) {
+
+            int timeStartBroadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
 
             Block waitWin = null;
             Block generatedBlock;
@@ -626,7 +627,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
-                    timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS;
+                    timePointForValidTX = timePoint - BlockChain.WIN_TIMEPOINT(height);
                     betterPeer = null;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
@@ -921,6 +922,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
                     }
                 }
+
+                height = bchain.getHeight(dcSet);
 
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем

@@ -146,7 +146,8 @@ public class TransactionsPool extends MonitoredThread {
         }
 
         // проверяем на переборт трнзакций в пуле чтобы лишние очистить
-        if (++clearCount > 1000 && System.currentTimeMillis() - pointClear > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 2) {
+        if (++clearCount > 1000 && System.currentTimeMillis() - pointClear
+                > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(transaction.getTimestamp()) << 2) {
 
             clearCount = 0;
 

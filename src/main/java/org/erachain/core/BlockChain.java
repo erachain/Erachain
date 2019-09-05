@@ -34,7 +34,7 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
 
     public static final int BLOCK_COUNT = 0; ////
     static final public boolean TEST_DB_TXS_OFF = false;
@@ -59,6 +59,11 @@ public class BlockChain {
 
     public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9067 : 9047;
     public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9068 : 9048;
+
+    //TESTNET
+    //   1486444444444l
+    //	 1487844444444   1509434273     1509434273
+    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
 
     public static final String DEFAULT_EXPLORER = "explorer.erachain.org";
 
@@ -86,7 +91,6 @@ public class BlockChain {
     //public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
-    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? -5000: -5000;
     public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = 1; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
@@ -124,6 +128,7 @@ public class BlockChain {
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
     public static final int VERS_30SEC = DEVELOP_USE ? VERS_4_11 : VERS_4_11;
+    public static final long VERS_30SEC_TIME = DEFAULT_MAINNET_STAMP + (long)VERS_30SEC * (DEVELOP_USE? 120L :288L);
 
     public static final int DEVELOP_FORGING_START = 100;
 
@@ -257,10 +262,6 @@ public class BlockChain {
     public static final int CONFIRMS_HARD = 3; // for reference by signature
     // MAX orphan CHAIN
     public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
-    //TESTNET
-    //   1486444444444l
-    //	 1487844444444   1509434273     1509434273
-    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
@@ -584,16 +585,29 @@ public class BlockChain {
         return GENERATING_MIN_BLOCK_TIME(height) * 1000;
     }
 
-    public static int GENERATING_MIN_BLOCK_TIME_MS(DCSet dcSet) {
-        return GENERATING_MIN_BLOCK_TIME(dcSet.getBlocksHeadsMap().size());
+    public static int GENERATING_MIN_BLOCK_TIME_MS(long timestamp) {
+        int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
+        return GENERATING_MIN_BLOCK_TIME(height) * 1000;
     }
 
     public static int FLUSH_TIMEPOINT(int height) {
         return GENERATING_MIN_BLOCK_TIME_MS(height) - (GENERATING_MIN_BLOCK_TIME_MS(height) >> 3);
     }
 
+    public static int UNCONFIRMED_SORT_WAIT_MS(int height) {
+        if (height <= VERS_30SEC) {
+            return DEVELOP_USE? -5000 : -5000;
+        }
+        return DEVELOP_USE? 5000 : 5000;
+    }
+
     public static int WIN_TIMEPOINT(int height) {
         return GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
+    }
+
+    public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
+        int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
+        return DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
     }
 
     public static int UNCONFIRMED_DEADTIME_MS(int height) {

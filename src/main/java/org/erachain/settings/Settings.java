@@ -53,7 +53,6 @@ public class Settings {
     // BLOCK
     //public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
     private static final int DEFAULT_CONNECTION_TIMEOUT = 20000;
-    private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height);
     private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
     private static final Integer DEFAULT_FONT_SIZE = 11;
     private static final String DEFAULT_FONT_NAME = "Arial";
@@ -762,14 +761,6 @@ public class Settings {
         }
 
         return DEFAULT_FORGING_ENABLED;
-    }
-
-    public int getPingInterval() {
-        if (this.settingsJSON.containsKey("pinginterval")) {
-            return ((Long) this.settingsJSON.get("pinginterval")).intValue();
-        }
-
-        return DEFAULT_PING_INTERVAL;
     }
 
     public boolean isGeneratorKeyCachingEnabled() {

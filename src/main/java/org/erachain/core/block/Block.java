@@ -1534,11 +1534,6 @@ import java.util.*;
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
-        if (heightBlock > 11482) {
-            // rro
-            Long test = null;
-        }
-
         // TRY CHECK HEAD
         if (!this.isValidHead(dcSet))
             return false;
@@ -1585,8 +1580,8 @@ import java.util.*;
             long timerTransFinalMapSinds_set = 0;
 
             long timestampEnd = this.getTimestamp()
-                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) : BlockChain.FLUSH_TIMEPOINT(height))
-                    - BlockChain.UNCONFIRMED_SORT_WAIT_MS
+                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock) : BlockChain.FLUSH_TIMEPOINT(heightBlock))
+                    - BlockChain.WIN_TIMEPOINT(heightBlock)
                     + 10;
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
             //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);

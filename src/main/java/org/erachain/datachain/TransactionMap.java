@@ -281,21 +281,22 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         if (isClearProcessedAndSet())
             return;
 
+        long keepTime = BlockChain.VERS_30SEC_TIME < timestamp? 600000 : 240000;
         try {
             long realTime = System.currentTimeMillis();
 
-            if (realTime - pointClear < BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 2) {
+            if (realTime - pointClear < keepTime) {
                 return;
             }
 
             int count = 0;
             long tickerIter = realTime;
 
-            timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << (5 - Controller.HARD_WORK >> 1);
+            timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
 
             if (false && cutDeadTime) {
 
-                timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height);
+                timestamp -= keepTime;
                 tickerIter = System.currentTimeMillis();
                 SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
                         timestamp, null));
