@@ -1141,7 +1141,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     return;
                 }
 
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.trace(e.getMessage(), e);
 
             }
         }

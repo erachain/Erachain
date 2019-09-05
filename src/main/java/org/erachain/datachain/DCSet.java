@@ -20,7 +20,6 @@ import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
-import org.erachain.utils.UpdateUtil;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.slf4j.Logger;
@@ -42,7 +41,7 @@ public class DCSet extends DBASet implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN;
-    private static final long MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 8 ;
+    private static final long MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 8;
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
     private static final long DELETIONS_BEFORE_COMPACT = BlockChain.MAX_BLOCK_SIZE_GEN << 6;
 
@@ -140,8 +139,8 @@ public class DCSet extends DBASet implements Observer {
         super(dbFile, database, withObserver, dynamicGUI);
 
         LOGGER.info("UP SIZE BEFORE COMMIT [KB]: " + MAX_ENGINE_BEFORE_COMMIT_KB
-                        + ", ACTIONS BEFORE COMMIT: " + ACTIONS_BEFORE_COMMIT
-                        + ", DELETIONS BEFORE COMPACT: " + DELETIONS_BEFORE_COMPACT);
+                + ", ACTIONS BEFORE COMMIT: " + ACTIONS_BEFORE_COMMIT
+                + ", DELETIONS BEFORE COMPACT: " + DELETIONS_BEFORE_COMPACT);
 
         this.engineSize = getEngineSize();
         this.inMemory = inMemory;
@@ -230,6 +229,7 @@ public class DCSet extends DBASet implements Observer {
             this.atTransactionMap = new ATTransactionMap(this, database);
 
         } catch (Throwable e) {
+            LOGGER.trace(e.getMessage(), e);
             this.close();
             throw e;
         }
@@ -250,7 +250,7 @@ public class DCSet extends DBASet implements Observer {
     /**
      * Make data set as Fork
      *
-     * @param parent parent DCSet
+     * @param parent     parent DCSet
      * @param idDatabase
      */
     protected DCSet(DCSet parent, DB idDatabase) {
@@ -350,10 +350,8 @@ public class DCSet extends DBASet implements Observer {
      * Get instance of DCSet or create new
      *
      * @param withObserver [true] - for switch on GUI observers
-     * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
-
+     * @param dynamicGUI   [true] - for switch on GUI observers fir dynamic interface
      * @return
-
      * @throws Exception
      */
 
@@ -370,7 +368,6 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     *
      * @return
      */
     public static DCSet getInstance() {
@@ -381,7 +378,7 @@ public class DCSet extends DBASet implements Observer {
      * remake data set
      *
      * @param withObserver [true] - for switch on GUI observers
-     * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
+     * @param dynamicGUI   [true] - for switch on GUI observers fir dynamic interface
      * @throws Exception
      */
     public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
@@ -417,32 +414,38 @@ public class DCSet extends DBASet implements Observer {
          * WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
          */
 
-        if (needClearCache) {
-            //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-            ///// добавил dcSet.clearCache(); --
-            databaseStruc.cacheSize(32 + 32 << Controller.HARD_WORK)
+        if (true) {
+            // USE CACHE
+            if (needClearCache) {
+                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                ///// добавил dcSet.clearCache(); --
+                databaseStruc
+                        .cacheSize(32 + 32 << Controller.HARD_WORK)
+                    ;
 
-            ;
+            } else {
+                databaseStruc
 
+                        // при норм размере и досточной памяти скорость не хуже чем у остальных
+                        //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                        //.cacheSize(2048 + 64 << Controller.HARD_WORK)
+
+                        // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                        // у другого типа КЭША происходит утечка памяти
+                        .cacheHardRefEnable()
+
+                        ///.cacheSoftRefEnable()
+                        ///.cacheSize(32 << Controller.HARD_WORK)
+
+                        ///.cacheWeakRefEnable()
+                        ///.cacheSize(32 << Controller.HARD_WORK)
+                    ;
+
+            }
         } else {
-            databaseStruc
-
-                    // при норм размере и досточной памяти скорость не хуже чем у остальных
-                    //.cacheLRUEnable() // скорость зависит от памяти и настроек -
-                    //.cacheSize(2048 + 64 << Controller.HARD_WORK)
-
-                    // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                    // у другого типа КЭША происходит утечка памяти
-                    .cacheHardRefEnable()
-
-                    ///.cacheSoftRefEnable()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
-
-                    ///.cacheWeakRefEnable()
-                    ///.cacheSize(32 << Controller.HARD_WORK)
-            ;
-
+            databaseStruc.cacheDisable();
         }
+
 
         DB database = databaseStruc.make();
 
@@ -1465,15 +1468,18 @@ public class DCSet extends DBASet implements Observer {
         }
 
         this.actions += size;
-        long diffUp = getEngineSize() - engineSize;
-        if (diffUp < 0)
-            diffUp = -diffUp;
+        long diffSizeEngine = getEngineSize() - engineSize;
+        if (diffSizeEngine < 0)
+            diffSizeEngine = -diffSizeEngine;
 
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
-                || diffUp > MAX_ENGINE_BEFORE_COMMIT_KB
+                || diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB
                 || System.currentTimeMillis() - poinFlush > 3600000) {
             long start = poinFlush = System.currentTimeMillis();
-            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
+            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
+                + (this.actions > ACTIONS_BEFORE_COMMIT? "by Actions:" + this.actions : "")
+                + (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB? "by diff Size Engine:" + diffSizeEngine : "")
+                );
 
             this.database.commit();
 
@@ -1498,6 +1504,7 @@ public class DCSet extends DBASet implements Observer {
                 File tempDir = new File(Settings.getInstance().getDataTempDir());
                 Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
             } catch (Throwable e) {
+                LOGGER.trace(e.getMessage(), e);
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " +getEngineSize() + "   %%%%%%  commit time: "
