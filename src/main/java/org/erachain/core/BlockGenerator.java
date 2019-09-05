@@ -558,7 +558,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         while (!ctrl.isOnStopping()) {
 
-            int timeStartBroadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
+            int timeStartBroadcast = BlockChain.WIN_TIMEPOINT(height);
 
             Block waitWin = null;
             Block generatedBlock;
