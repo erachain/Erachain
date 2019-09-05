@@ -127,7 +127,7 @@ public class BlockChain {
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
-    public static final int VERS_30SEC = DEVELOP_USE ? VERS_4_11 : VERS_4_11;
+    public static final int VERS_30SEC = DEVELOP_USE ? 471043 : VERS_4_11;
     public static final long VERS_30SEC_TIME = DEFAULT_MAINNET_STAMP + (long)VERS_30SEC * (DEVELOP_USE? 120L :288L);
 
     public static final int DEVELOP_FORGING_START = 100;
@@ -913,7 +913,7 @@ public class BlockChain {
 
         return this.genesisTimestamp
                 + (long) VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
-                + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
+                + (long) (height - VERS_30SEC) * GENERATING_MIN_BLOCK_TIME_MS(height);
 
     }
 

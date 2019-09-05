@@ -1580,9 +1580,7 @@ import java.util.*;
             long timerTransFinalMapSinds_set = 0;
 
             long timestampEnd = this.getTimestamp()
-                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock) : BlockChain.FLUSH_TIMEPOINT(heightBlock))
-                    - BlockChain.WIN_TIMEPOINT(heightBlock)
-                    + 10;
+                    - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
             // because time filter used by parent block timestamp on core.BlockGenerator.run()
             //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
 
@@ -1660,7 +1658,7 @@ import java.util.*;
                         }
 
                         //CHECK TIMESTAMP AND DEADLINE
-                        if (this.heightBlock > 105999
+                        if ((!BlockChain.DEVELOP_USE && this.heightBlock > 105999 || this.heightBlock > 300000)
                                 && transaction.getTimestamp() > timestampEnd
                             //|| transaction.getDeadline() <= timestampBeg // не нужно так как при слиянии цепочек
                             // могут и должны страрые транзакции заноситься
