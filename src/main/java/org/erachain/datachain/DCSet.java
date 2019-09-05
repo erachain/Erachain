@@ -20,7 +20,6 @@ import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
-import org.erachain.utils.UpdateUtil;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.slf4j.Logger;
@@ -230,6 +229,7 @@ public class DCSet extends DBASet implements Observer {
             this.atTransactionMap = new ATTransactionMap(this, database);
 
         } catch (Throwable e) {
+            LOGGER.trace(e.getMessage(), e);
             this.close();
             throw e;
         }
@@ -1504,6 +1504,7 @@ public class DCSet extends DBASet implements Observer {
                 File tempDir = new File(Settings.getInstance().getDataTempDir());
                 Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
             } catch (Throwable e) {
+                LOGGER.trace(e.getMessage(), e);
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " +getEngineSize() + "   %%%%%%  commit time: "
