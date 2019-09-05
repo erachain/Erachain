@@ -153,6 +153,7 @@ public class SettingsFrame extends JDialog {
         boolean changeWallet = false;
         boolean changeDataDir = false;
         boolean limitConnections = false;
+        boolean localPeerScanner = false;
         boolean changeLang = false;
 
         // save Rate
@@ -301,6 +302,12 @@ public class SettingsFrame extends JDialog {
             limitConnections = true;
         }
 
+        if (Settings.getInstance().isLocalPeersScannerEnabled() != settingsTabPane.settingsBasicPanel.chckbxLocalPeersScannerEnabled.isSelected()) {
+            settingsJSONbuf.put("localpeerscanner", settingsTabPane.settingsBasicPanel.chckbxLocalPeersScannerEnabled.isSelected());
+            localPeerScanner = true;
+        }
+
+
         if (!Settings.getInstance().getWalletDir().equals(settingsTabPane.settingsBasicPanel.textWallet.getText())) {
             settingsJSONbuf.put("walletdir", settingsTabPane.settingsBasicPanel.textWallet.getText());
             changeWallet = true;
@@ -411,6 +418,12 @@ public class SettingsFrame extends JDialog {
         if (limitConnections) {
             JOptionPane.showMessageDialog(
                     new JFrame(), Lang.getInstance().translate("You changed max connections or min connections. You need to restart the wallet for the changes to take effect."),
+                    Lang.getInstance().translate("Attention!"),
+                    JOptionPane.WARNING_MESSAGE);
+        }
+        if (localPeerScanner) {
+            JOptionPane.showMessageDialog(
+                    new JFrame(), Lang.getInstance().translate("You changed local peer discovery. You need to restart the wallet for the changes to take effect."),
                     Lang.getInstance().translate("Attention!"),
                     JOptionPane.WARNING_MESSAGE);
         }

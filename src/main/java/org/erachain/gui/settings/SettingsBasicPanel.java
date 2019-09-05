@@ -22,6 +22,7 @@ public class SettingsBasicPanel extends JPanel {
     public JCheckBox chckbxKeyCaching;
     public JCheckBox chckbxRpcEnabled;
     public JCheckBox chckbxWebEnabled;
+    public JCheckBox chckbxLocalPeersScannerEnabled;
     public JCheckBox chckbxSoundNewTransaction;
     public JCheckBox chckbxSoundReceiveMessage;
     public JCheckBox chckbxSoundReceivePayment;
@@ -331,6 +332,16 @@ public class SettingsBasicPanel extends JPanel {
         gbc_lbllimitConnections.gridy = 12;
         add(lbllimitConnections, gbc_lbllimitConnections);
 
+        chckbxLocalPeersScannerEnabled = new JCheckBox(Lang.getInstance().translate("Local peer discovery"));
+        chckbxLocalPeersScannerEnabled.setHorizontalAlignment(SwingConstants.LEFT);
+        chckbxLocalPeersScannerEnabled.setSelected(Settings.getInstance().isLocalPeersScannerEnabled());
+        GridBagConstraints gbc_chckbxLocalPeersScannerEnabled = new GridBagConstraints();
+        gbc_chckbxLocalPeersScannerEnabled.gridwidth = 2;
+        gbc_chckbxLocalPeersScannerEnabled.fill = GridBagConstraints.BOTH;
+        gbc_chckbxLocalPeersScannerEnabled.insets = new Insets(0, 0, 5, 5);
+        gbc_chckbxLocalPeersScannerEnabled.gridx = 1;
+        gbc_chckbxLocalPeersScannerEnabled.gridy = 13;
+        add(chckbxLocalPeersScannerEnabled, gbc_chckbxLocalPeersScannerEnabled);
 
     }
 }

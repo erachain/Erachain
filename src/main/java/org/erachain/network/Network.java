@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 /**
  * основной класс модуля Сети
@@ -36,6 +37,7 @@ public class Network extends Observable {
     private MessagesProcessor messagesProcessor;
     PeerManager peerManager;
     public TelegramManager telegramer;
+    private LocalPeerScanner localPeerScanner;
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
@@ -125,7 +127,12 @@ public class Network extends Observable {
                 DCSet.getInstance(),
                 this);
 
-        this.messagesProcessor = new MessagesProcessor(this);
+        messagesProcessor = new MessagesProcessor(this);
+
+        if (Settings.getInstance().isLocalPeersScannerEnabled()){
+            localPeerScanner = new LocalPeerScanner(this);
+            localPeerScanner.start();
+        }
 
     }
 
@@ -220,7 +227,7 @@ public class Network extends Observable {
     // IF PEER in exist in NETWORK - get it
     public Peer getKnownPeer(Peer peer, int type) {
 
-        Peer knowmPeer = null;
+        //Peer knowmPeer = null;
         try {
             byte[] address = peer.getAddress().getAddress();
             //FOR ALL connectedPeers
@@ -228,7 +235,7 @@ public class Network extends Observable {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(address, knownPeer.getAddress().getAddress())
                         && (type == ANY_TYPE || type == WHITE_TYPE && knownPeer.isWhite()
-                        || !knowmPeer.isWhite())
+                        || !knownPeer.isWhite())
                 ) {
                     // иначе тут не сработате правильно org.erachain.network.Network.onConnect
                     // поэтому сразу выдаем первый что нашли без каких либо условий
@@ -729,6 +736,9 @@ public class Network extends Observable {
     public void stop() {
 
         this.run = false;
+        if (localPeerScanner != null) {
+            localPeerScanner.interrupt();
+        }
 
         // STOP MESSAGES PROCESSOR
         messagesProcessor.halt();
