@@ -126,6 +126,9 @@ public class PeerMap extends DBMap<byte[], byte[]> {
                         //CHECK IF SOCKET IS NOT LOCALHOST
                         if (Settings.getInstance().isLocalAddress(address))
                             continue;
+                        //CHECK IF SOCKET IS NOT LOCALNET
+                        if (address.isSiteLocalAddress())
+                            continue;
 
                         if ( //use all peers an new and not known Arrays.equals(peerInfo.getStatus(), BYTE_WHITELISTED) &&
                                 peerInfo.banTime < NTP.getTime()) {

@@ -47,6 +47,7 @@ public class Settings {
     //NETWORK
     private static final int DEFAULT_MIN_CONNECTIONS = 10; // for OWN maked connections
     private static final int DEFAULT_MAX_CONNECTIONS = 100;
+    private static final boolean DEFAULT_LOCAL_PEER_SCANNER = false;
     // EACH known PEER may send that whit peers to me - not white peer may be white peer for me
     private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
     private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
@@ -557,6 +558,14 @@ public class Settings {
         }
 
         return DEFAULT_CONNECTION_TIMEOUT;
+    }
+
+    public boolean isLocalPeersScannerEnabled() {
+        if (this.settingsJSON.containsKey("localpeerscanner")) {
+            return ((Boolean) this.settingsJSON.get("localpeerscanner")).booleanValue();
+        }
+
+        return DEFAULT_LOCAL_PEER_SCANNER;
     }
 
     public boolean isTryingConnectToBadPeers() {
