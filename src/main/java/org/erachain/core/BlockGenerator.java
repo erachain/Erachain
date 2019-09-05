@@ -1090,7 +1090,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////// UPDATE ////////////////////
 
-                if (betterPeer == null && !ctrl.needUpToDate() && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2)
+                if (betterPeer == null && !ctrl.needUpToDate() && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) + (BlockChain.WIN_TIMEPOINT(height))
                         > NTP.getTime())
                     continue;
 
