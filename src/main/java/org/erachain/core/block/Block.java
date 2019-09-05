@@ -1584,12 +1584,7 @@ import java.util.*;
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
-            long timestampEnd = this.getTimestamp()
-                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS : BlockChain.FLUSH_TIMEPOINT)
-                    - BlockChain.UNCONFIRMED_SORT_WAIT_MS
-                    + 10;
-            // because time filter used by parent block timestamp on core.BlockGenerator.run()
-            //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
+            long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS;
 
             DCSet validatingDC;
 
