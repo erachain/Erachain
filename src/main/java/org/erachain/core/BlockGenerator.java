@@ -626,7 +626,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
-                    timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS;
+                    timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS; //
                     betterPeer = null;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
