@@ -1468,15 +1468,18 @@ public class DCSet extends DBASet implements Observer {
         }
 
         this.actions += size;
-        long diffUp = getEngineSize() - engineSize;
-        if (diffUp < 0)
-            diffUp = -diffUp;
+        long diffSizeEngine = getEngineSize() - engineSize;
+        if (diffSizeEngine < 0)
+            diffSizeEngine = -diffSizeEngine;
 
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
-                || diffUp > MAX_ENGINE_BEFORE_COMMIT_KB
+                || diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB
                 || System.currentTimeMillis() - poinFlush > 3600000) {
             long start = poinFlush = System.currentTimeMillis();
-            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions);
+            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
+                + (this.actions > ACTIONS_BEFORE_COMMIT? "by Actions:" + this.actions : "")
+                + (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB? "by diff Size Engine:" + diffSizeEngine : "")
+                );
 
             this.database.commit();
 
