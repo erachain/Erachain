@@ -63,7 +63,7 @@ public class Account {
     }
 
     public Account(byte[] addressBytes) {
-        if (addressBytes.length == ADDRESS_LENGTH - 4) {
+        if (addressBytes.length == ADDRESS_LENGTH - 5) {
             // AS SHORT BYTES
             this.shortBytes = addressBytes;
             this.bytes = Crypto.getInstance().getAddressFromShortBytes(addressBytes);

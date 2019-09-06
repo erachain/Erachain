@@ -510,15 +510,15 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             keys = treeKeys;
         }
 
-        limit = (limit == 0) ? Iterables.size(keys) : limit;
+        if (offset > 0) {
+            keys = Iterables.skip(keys, offset);
+        }
 
-        // зачем это тут ?
-        //// Iterable k = Iterables.limit(Iterables.skip(keys, offset), limit);
-        //// getUnconfirmedTransaction(k);
-        //// return Iterables.limit(Iterables.skip(keys, offset), limit);
+        if (limit > 0) {
+            keys = Iterables.limit(keys, limit);
+        }
 
-        return Iterables.limit(Iterables.skip(keys, offset), limit);
-
+        return  keys;
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,
