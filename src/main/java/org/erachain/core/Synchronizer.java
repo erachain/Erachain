@@ -544,7 +544,8 @@ public class Synchronizer extends Thread {
                     LOGGER.debug("BLOCK Signature is Valid");
 
                     if (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
-                        errorMess = "invalid Timestamp from FUTURE";
+                        errorMess = "invalid Timestamp from FUTURE: "
+                                + (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) - NTP.getTime());
                         break;
                     }
 
