@@ -2,20 +2,16 @@ package org.erachain.datachain;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -119,37 +115,23 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
                 //.valuesOutsideNodesEnable()
                 .makeOrGet();
 
-		/*
-		Bind.secondaryKey(map, this.assetKeyMap, new Fun.Function2<Tuple3<Long, BigDecimal, byte[]>, Tuple2<byte[], Long>, BigDecimal>() {
-			@Override
-			public Tuple3<Long, BigDecimal, byte[]> run(Tuple2<byte[], Long> key, BigDecimal value) {
-				return new Tuple3<Long, BigDecimal, byte[]>(key.b, value.negate(), key.a);
-			}
-		});*/
-        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple3<Long,
-                BigDecimal,
-                String>,
+        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple2<Long, BigDecimal>,
                 byte[],
                 Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                 () {
             @Override
-            public Tuple3<Long, BigDecimal, String>
+            public Tuple2<Long, BigDecimal>
             run(byte[] key, Tuple5<
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
-                // Address
-                byte[] shortAddress = new byte[20];
-                System.arraycopy(key, 0, shortAddress, 0, 20);
-                // ASSET KEY
                 byte[] assetKeyBytes = new byte[8];
                 System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                return new Tuple3<Long, BigDecimal, String>(
-                        Longs.fromByteArray(assetKeyBytes), value.a.b.negate(),
-                        Crypto.getInstance().getAddressFromShort(shortAddress)
+                return new Tuple2<Long, BigDecimal>(
+                        Longs.fromByteArray(assetKeyBytes), value.a.b.negate()
                     );
             }
         });
@@ -159,16 +141,14 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
                 //.valuesOutsideNodesEnable()
                 .makeOrGet();
 
-        Bind.secondaryKey(hashMap, this.addressKeyMap, new Fun.Function2<Tuple3<String,
-                Long,
-                BigDecimal>,
+        Bind.secondaryKey(hashMap, this.addressKeyMap, new Fun.Function2<Tuple2<String, Long>,
                 byte[],
                 Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                 () {
             @Override
-            public Tuple3<String, Long, BigDecimal>
+            public Tuple2<String, Long>
             run(byte[] key, Tuple5<
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
@@ -180,10 +160,9 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
                 byte[] assetKeyBytes = new byte[8];
                 System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                return new Tuple3<String, Long, BigDecimal>(
+                return new Tuple2<String, Long>(
                         Crypto.getInstance().getAddressFromShort(shortAddress),
-                        Longs.fromByteArray(assetKeyBytes),
-                        value.a.b.negate()
+                        Longs.fromByteArray(assetKeyBytes)
                 );
             }
         });
@@ -313,8 +292,8 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
 
         //FILTER ALL KEYS
         Collection<byte[]> keys = this.assetKeyMap.subMap(
-                Fun.t3(key, null, null),
-                Fun.t3(key, Fun.HI(), Fun.HI())).values();
+                Fun.t2(key, null),
+                Fun.t2(key, Fun.HI())).values();
 
         int tt = keys.size();
         //RETURN
@@ -333,8 +312,8 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
 
         //FILTER ALL KEYS
         Collection<byte[]> keys = this.addressKeyMap.subMap(
-                Fun.t3(account.getAddress(), null, null),
-                Fun.t3(account.getAddress(), Fun.HI(), Fun.HI())).values();
+                Fun.t2(account.getAddress(), null),
+                Fun.t2(account.getAddress(), Fun.HI())).values();
 
         int tt = keys.size();
         //RETURN
