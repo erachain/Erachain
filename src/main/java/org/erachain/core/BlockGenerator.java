@@ -1032,6 +1032,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     // победные блоки не спеша
                                     Thread.sleep(1000);
                                 } catch (InterruptedException e) {
+                                    local_status = -1;
                                     return;
                                 }
                             }
