@@ -88,7 +88,7 @@ public class BlockChain {
     static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
-    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? -5000: -5000;
+    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? -5000: -5000; // GENERATING_MIN_BLOCK_TIME_MS>>1
     public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = 1; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
