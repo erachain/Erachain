@@ -10,6 +10,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
@@ -95,14 +96,14 @@ public class AddressesResource {
         // GET ACCOUNT
         Account account = new Account(address);
 
-        Long lastTimestamp = account.getLastTimestamp();
+        long[] lastTimestamp = account.getLastTimestamp();
 
         // RETURN
 
         if (lastTimestamp == null) {
             return "false";
         } else {
-            return "" + lastTimestamp;
+            return "" + lastTimestamp[0];
         }
     }
 
@@ -124,43 +125,25 @@ public class AddressesResource {
 
         Controller cntrl = Controller.getInstance();
 
-        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 10, true);
-
         DCSet db = DCSet.getInstance();
-        Long lastTimestamp = account.getLastTimestamp(db);
-        byte[] signature;
-        if (!(lastTimestamp == null)) {
-            signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
-            transactions.add(cntrl.getTransaction(signature));
+        long[] lastTimestamp = account.getLastTimestamp(db);
+        if (lastTimestamp != null) {
+            return "" + lastTimestamp[0];
         }
 
-        for (Transaction tx : transactions) {
-            if (tx.getCreator().equals(account)) {
-                for (Transaction tx2 : transactions) {
-                    if (tx.getTimestamp() > tx2.getTimestamp()
-                            & tx.getCreator().getAddress().equals(tx2.getCreator().getAddress())) {
-                        // if same address and parent timestamp
-                        isSomeoneReference.add(tx.getSignature());
-                        break;
-                    }
-                }
-            }
-        }
+        byte[] signature;
 
         if (isSomeoneReference.isEmpty()) {
             return getLastReference(address);
         }
 
-        for (Transaction tx : cntrl.getUnconfirmedTransactions(0, 10, true)) {
-            if (tx.getCreator().equals(account)) {
-                if (!isSomeoneReference.contains(tx.getSignature())) {
-                    //return Base58.encode(tx.getSignature());
-                    return "" + tx.getTimestamp();
-                }
-            }
-        }
+        // TODO: тут надо скан взять сразу для заданного адреса и последний
+        // а вообще для чего нафиг это нужно?
+        List<Transaction> items = DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address);
+        if (items.isEmpty())
+            return "false";
 
-        return "false";
+        return "" + items.get(items.size()).getTimestamp();
     }
 
     @GET
@@ -439,7 +422,8 @@ public class AddressesResource {
 
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = DCSet.getInstance().getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
 
         return tuple5_toJson(balance).toJSONString();
     }
@@ -476,7 +460,8 @@ public class AddressesResource {
 
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = DCSet.getInstance().getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
 
         return balance.a.b.toPlainString();
     }
@@ -513,7 +498,8 @@ public class AddressesResource {
 
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = DCSet.getInstance().getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
 
         return balance.a.a.toPlainString();
     }
@@ -530,13 +516,14 @@ public class AddressesResource {
 
         }
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(new Account(address));
 
         JSONObject assetsBalancesJSON = new JSONObject();
 
-        for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
-            assetsBalancesJSON.put(assetsBalance.getA().b, tuple5_toJson(assetsBalance.getB()));
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+            assetsBalancesJSON.put(map.getAssetKeyFromKey(assetsBalance.getA()), tuple5_toJson(assetsBalance.getB()));
         }
 
         return assetsBalancesJSON.toJSONString();

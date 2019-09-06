@@ -65,7 +65,7 @@ public class TestRecStatus {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         statusMap = db.getItemStatusMap();
@@ -90,14 +90,14 @@ public class TestRecStatus {
         Status status = new Status(maker, "test", icon, image, "strontje", true);
 
         //CREATE ISSUE STATUS TRANSACTION
-        Transaction issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        Transaction issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueStatusTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE STATUS TRANSACTION IS VALID
         assertEquals(true, issueStatusTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
+        issueStatusTransaction = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE STATUS IS INVALID
         assertEquals(false, issueStatusTransaction.isSignatureValid(db));
@@ -115,7 +115,7 @@ public class TestRecStatus {
         assertEquals(raw.length, status.getDataLength(false));
 
         //CREATE ISSUE STATUS TRANSACTION
-        IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueStatusRecord.sign(maker, Transaction.FOR_NETWORK);
         issueStatusRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueStatusRecord.process(gb, Transaction.FOR_NETWORK);
@@ -172,7 +172,7 @@ public class TestRecStatus {
         Status status = new Status(maker, "test", icon, image, "strontje", true);
 
         //CREATE ISSUE STATUS TRANSACTION
-        IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        IssueStatusRecord issueStatusRecord = new IssueStatusRecord(maker, status, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueStatusRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issueStatusRecord.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -186,7 +186,7 @@ public class TestRecStatus {
         assertEquals(true, db.getItemStatusMap().contains(key));
 
         StatusCls status_2 = new Status(maker, "test132_2", icon, image, "2_12345678910strontje", true);
-        IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db));
+        IssueStatusRecord issueStatusTransaction_2 = new IssueStatusRecord(maker, status_2, FEE_POWER, timestamp + 10, maker.getLastTimestamp(db)[0]);
         issueStatusTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         issueStatusTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issueStatusTransaction_2.process(gb, Transaction.FOR_NETWORK);

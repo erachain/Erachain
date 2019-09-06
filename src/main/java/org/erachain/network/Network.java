@@ -28,7 +28,7 @@ public class Network extends Observable {
     private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = 1024 << (3 + Controller.HARD_WORK);
     private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = 1024 << (1 + Controller.HARD_WORK >> 1);
     private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = 128 >> (Controller.HARD_WORK >> 1);
-    private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Network.class.getSimpleName());
 
     private Controller controller;
     private static InetAddress myselfAddress;

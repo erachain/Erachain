@@ -5,6 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.gui.Gui;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -47,17 +48,21 @@ public class AssetsFavorites implements Observer {
     public void reload() {
         List<Long> favoritesUpadate = new ArrayList<Long>();
 
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         for (Account account : Controller.getInstance().getAccounts()) {
-            SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(account);
+            SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList
+                    = map.getBalancesSortableList(account);
+            if (balancesList == null)
+                return;
 
-            for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance : balancesList) {
+            for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance : balancesList) {
                 if (balance.getB().a.b.compareTo(BigDecimal.ZERO) != 0
                         || balance.getB().b.b.compareTo(BigDecimal.ZERO) != 0
                         || balance.getB().c.b.compareTo(BigDecimal.ZERO) != 0
                         || balance.getB().d.b.compareTo(BigDecimal.ZERO) != 0
                         || balance.getB().e.b.compareTo(BigDecimal.ZERO) != 0) {
-                    if (!favoritesUpadate.contains(balance.getA().b)) {
-                        favoritesUpadate.add(balance.getA().b);
+                    if (!favoritesUpadate.contains(map.getAssetKeyFromKey(balance.getA()))) {
+                        favoritesUpadate.add(map.getAssetKeyFromKey(balance.getA()));
                     }
                 }
             }

@@ -113,14 +113,14 @@ public class TestRecPoll {
         //GenesisCertifyPollRecord genesis_certify = new GenesisCertifyPollRecord(certifier, 0L);
         //genesis_certify.process(db, false);
 
-        certifier.setLastTimestamp(gb.getTimestamp(), db);
+        certifier.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         certifier.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
         certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         poll = new Poll(certifier, "РСФСР", icon, image, "Россия", options);
 
         //CREATE ISSUE POLL TRANSACTION
-        issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db));
+        issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);
         issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
 
@@ -153,7 +153,7 @@ public class TestRecPoll {
         assertEquals(true, issuePollTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db), new byte[64]);
+        issuePollTransaction = new IssuePollRecord(certifier, poll, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0], new byte[64]);
         //CHECK IF ISSUE POLL IS INVALID
         assertEquals(false, issuePollTransaction.isSignatureValid(db));
 

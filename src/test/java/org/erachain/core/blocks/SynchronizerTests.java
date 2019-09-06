@@ -135,7 +135,7 @@ public class SynchronizerTests {
         }
 
         //SYNCHRONIZE DB FROM ACCOUNT 1 WITH NEXT 5 BLOCKS OF ACCOUNT 2
-        Synchronizer synchronizer = new Synchronizer();
+        Synchronizer synchronizer = new Synchronizer(Controller.getInstance(), blockChain);
 
         try {
             synchronizer.synchronize_blocks(databaseSet, null, 1, newBlocks, null);
@@ -282,7 +282,7 @@ public class SynchronizerTests {
         }
 
         //SYNCHRONIZE DB FROM ACCOUNT 1 WITH NEXT 5 BLOCKS OF ACCOUNT 2
-        Synchronizer synchronizer = new Synchronizer();
+        Synchronizer synchronizer = new Synchronizer(Controller.getInstance(), blockChain);
 
         try {
             synchronizer.synchronize_blocks(databaseSet1, gb1, 1, newBlocks, null);

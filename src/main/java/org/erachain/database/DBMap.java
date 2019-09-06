@@ -22,7 +22,7 @@ public abstract class DBMap<T, U> extends Observable {
     public int DESCENDING_SHIFT_INDEX = 10000;
 
     public static int DEFAULT_INDEX = 0;
-    private static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(DBMap.class.getSimpleName());
     protected IDB databaseSet;
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
@@ -87,10 +87,11 @@ public abstract class DBMap<T, U> extends Observable {
     @SuppressWarnings("unchecked")
     protected <V> void createIndex(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V, T, U> function) {
         assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
-        Bind.secondaryKey((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
+
+        Bind.secondaryKey((Bind.MapWithModificationListener<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
         this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
 
-        Bind.secondaryKey((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
+        Bind.secondaryKey((Bind.MapWithModificationListener<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
@@ -292,12 +293,17 @@ public abstract class DBMap<T, U> extends Observable {
                     if (this.size() < 1000) {
                         list = new SortableList<T, U>(this);
                     } else {
-                        // обрезаем полный список в базе до 1000
-                        Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
                         List<T> keys = new ArrayList<T>();
-                        int i = 0;
-                        while (iterator.hasNext() && ++i < 1000) {
-                            keys.add((T) iterator.next());
+                        // тут может быть ошибка если основной индекс не TreeMap
+                        try {
+                            // обрезаем полный список в базе до 1000
+                            Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
+                            int i = 0;
+                            while (iterator.hasNext() && ++i < 1000) {
+                                keys.add((T) iterator.next());
+                            }
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
                         }
 
                         list = new SortableList<T, U>(this, keys);

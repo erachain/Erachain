@@ -58,7 +58,7 @@ public class TestRecVouch {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
@@ -73,14 +73,14 @@ public class TestRecVouch {
         init();
 
         //CREATE VOUCH RECORD
-        Transaction vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
+        Transaction vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db)[0]);
         vouchRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF TRANSACTION IS VALID
         assertEquals(true, vouchRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db), new byte[64]);
+        vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF VOUCH IS INVALID
         assertEquals(false, vouchRecord.isSignatureValid(db));
@@ -94,20 +94,20 @@ public class TestRecVouch {
         init();
 
         //CREATE VOUCH RECORD
-        Transaction vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
+        Transaction vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db)[0]);
         assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
 
-        vouchRecord = new RVouch(maker, FEE_POWER, -1, seq, timestamp, maker.getLastTimestamp(db), new byte[64]);
+        vouchRecord = new RVouch(maker, FEE_POWER, -1, seq, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
         assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
 
         // SET <2 in isValid()
-        vouchRecord = new RVouch(maker, FEE_POWER, 1, -1, timestamp, maker.getLastTimestamp(db), new byte[64]);
+        vouchRecord = new RVouch(maker, FEE_POWER, 1, -1, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
         assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
 
-        vouchRecord = new RVouch(maker, FEE_POWER, 99, 1, timestamp, maker.getLastTimestamp(db), new byte[64]);
+        vouchRecord = new RVouch(maker, FEE_POWER, 99, 1, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
         assertEquals(Transaction.INVALID_BLOCK_HEIGHT, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
 
-        vouchRecord = new RVouch(maker, FEE_POWER, 1, 88, timestamp, maker.getLastTimestamp(db), new byte[64]);
+        vouchRecord = new RVouch(maker, FEE_POWER, 1, 88, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
         assertEquals(Transaction.INVALID_BLOCK_TRANS_SEQ_ERROR, vouchRecord.isValid(Transaction.FOR_NETWORK, flags));
     }
 
@@ -118,7 +118,7 @@ public class TestRecVouch {
         init();
 
         //CREATE ISSUE ASSET TRANSACTION
-        RVouch vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
+        RVouch vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db)[0]);
         vouchRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -178,7 +178,7 @@ public class TestRecVouch {
 
         init();
 
-        RVouch vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db));
+        RVouch vouchRecord = new RVouch(maker, FEE_POWER, height, seq, timestamp, maker.getLastTimestamp(db)[0]);
         //vouchRecord.sign(maker, false);
 
         //assertEquals(Transaction.VALIDATE_OK, vouchRecord.isValid(db, releaserReference));

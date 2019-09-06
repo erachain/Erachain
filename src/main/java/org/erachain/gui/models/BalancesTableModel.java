@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -29,7 +30,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
     private int scale;
     private String[] columnNames = Lang.getInstance().translate(new String[] { "Account", "In own", "In debt", "In use", "On hand" });
     private Boolean[] column_AutuHeight = new Boolean[] { true, false };
-    private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
     
     public BalancesTableModel(AssetCls asset, int balanceIndex) {
         this.asset = asset;
@@ -78,9 +79,9 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
             return null;
         }
         
-        Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances
-                .get(row);
-        Account account = new Account(aRow.getA().a);
+        Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow
+                = this.balances.get(row);
+        Account account = new Account(DCSet.getInstance().getAssetBalanceMap().getShortAccountFromKey(aRow.getA()));
         
         switch (column) {
             case COLUMN_ADDRESS:

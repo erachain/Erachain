@@ -60,13 +60,13 @@ public class Settings {
     private static final String DEFAULT_FONT_NAME = "Arial";
     //RPC
     private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
-    private static final boolean DEFAULT_RPC_ENABLED = false;
+    private static final boolean DEFAULT_RPC_ENABLED = false; //
     private static final boolean DEFAULT_BACUP_ENABLED = false;
     private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
     //WEB
-    private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
+    private static final String DEFAULT_WEB_ALLOWED = BlockChain.DEVELOP_USE? ";" : "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
     // 19 03
     //GUI
@@ -349,6 +349,36 @@ public class Settings {
     }
 
     @SuppressWarnings("unchecked")
+    /**
+     * полностью доверныые пиры от которых данные не проверяются - ни блоки ни транзакции
+     */
+    public List<String> getTrustedPeers() {
+
+        try {
+
+            File file = new File(this.userPath
+                    + (BlockChain.DEVELOP_USE ? "peers-trusted-dev.json" : "peers-trusted.json"));
+
+            //CREATE FILE IF IT DOESNT EXIST
+            if (file.exists()) {
+                //READ PEERS FILE
+                List<String> lines = Files.readLines(file, Charsets.UTF_8);
+
+                String jsonString = "";
+                for (String line : lines) {
+                    jsonString += line;
+                }
+
+                //CREATE JSON OBJECT
+                return new ArrayList<String>((JSONArray) JSONValue.parse(jsonString));
+            }
+        } catch (Exception e) {
+            LOGGER.debug(e.getMessage(), e);
+        }
+
+        return new ArrayList<>();
+    }
+
     public List<Peer> getKnownPeers() {
         try {
             boolean loadPeersFromInternet = (

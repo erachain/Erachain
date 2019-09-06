@@ -538,6 +538,7 @@ public class Controller extends Observable {
         } catch (Throwable e) {
 
             LOGGER.error("Error during startup detected trying to restore backup " + name);
+            LOGGER.trace(e.getMessage(), e);
 
             error = true;
 
@@ -550,6 +551,7 @@ public class Controller extends Observable {
             } catch (Throwable e1) {
 
                 LOGGER.error("Error during backup, tru recreate " + name);
+                LOGGER.trace(e1.getMessage(), e1);
                 backUped = true;
 
                 try {
@@ -559,6 +561,8 @@ public class Controller extends Observable {
 
                 } catch (Throwable e2) {
 
+                    LOGGER.error("Error during backup, tru recreate " + name);
+                    LOGGER.trace(e2.getMessage(), e2);
                     // не смогли пересоздать выход!
                     stopAll(-3);
                 }
@@ -643,10 +647,19 @@ public class Controller extends Observable {
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataLocale OK")));
             LOGGER.info("DataLocale OK");
         } catch (Throwable e) {
+            LOGGER.trace(e.getMessage(), e);
             // TODO Auto-generated catch block
             // e1.printStackTrace();
             reCreateDB();
             LOGGER.error("Error during startup detected trying to recreate DataLocale...");
+        }
+
+        try {
+            // удалим все в папке Temp
+            File tempDir = new File(Settings.getInstance().getDataTempDir());
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+            LOGGER.trace(e.getMessage(), e);
         }
 
         // OPENING DATABASES
@@ -661,11 +674,12 @@ public class Controller extends Observable {
         } catch (Throwable e) {
             // Error open DB
             error = 1;
-            LOGGER.error(e.getMessage(), e);
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
+            LOGGER.trace(e.getMessage(), e);
             try {
                 reCreateDC(inMemoryDC);
             } catch (Throwable e1) {
+                LOGGER.trace(e1.getMessage(), e1);
                 stopAll(5);
             }
         }
@@ -695,11 +709,12 @@ public class Controller extends Observable {
             try {
                 this.dcSet.close();
             } catch (Throwable e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.trace(e.getMessage(), e);
             }
             try {
                 reCreateDC(inMemoryDC);
             } catch (Throwable e) {
+                LOGGER.trace(e.getMessage(), e);
                 stopAll(5);
             }
         }
@@ -732,9 +747,6 @@ public class Controller extends Observable {
          * Setting_Json.put("DB_OPEN", "Open BAD - try reCreateDB"); }
          */
 
-        // CREATE SYNCHRONIZOR
-        this.synchronizer = new Synchronizer();
-
         // CREATE BLOCKCHAIN
         this.blockChain = new BlockChain(dcSet);
 
@@ -743,6 +755,9 @@ public class Controller extends Observable {
 
         // CREATE WinBlock SELECTOR
         this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
+
+        // CREATE SYNCHRONIZOR
+        this.synchronizer = new Synchronizer(this, blockChain);
 
         // CREATE Block REQUESTER
         this.blockRequester = new BlocksRequest(this, blockChain, dcSet);
@@ -1151,6 +1166,14 @@ public class Controller extends Observable {
             this.telegramStore.close();
         }
 
+        try {
+            // удалим все в папке Temp
+            File tempDir = new File(Settings.getInstance().getDataTempDir());
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+            LOGGER.trace(e.getMessage(), e);
+        }
+
         LOGGER.info("Closed.");
         // FORCE CLOSE
         if (par != -999999) {
@@ -1220,7 +1243,7 @@ public class Controller extends Observable {
             return false;
 
         TransactionMap map = this.dcSet.getTransactionMap();
-        Iterator<Long> iterator = map.getIterator(0, false);
+        Iterator<Long> iterator = map.getIterator(TransactionMap.TIMESTAMP_INDEX, false);
         long ping = 0;
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response
@@ -1820,6 +1843,13 @@ public class Controller extends Observable {
     }
 
 
+    /**
+     * вызывается только из синхронизатора в момент синхронизации цепочки.
+     *  Поэтому можно сипользовать внутренню переменную
+     *
+     * @param currentBetterPeer
+     * @throws Exception
+     */
     public synchronized void checkNewBetterPeer(Peer currentBetterPeer) throws Exception {
 
         if (!newPeerConnected)
@@ -1827,10 +1857,12 @@ public class Controller extends Observable {
 
         newPeerConnected = false;
 
-        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, true);
+        // нам не важно отличие в последнем блоке тут - главное чтобы цепочка была длиньше?
+        //blockGenerator.checkWeightPeers();
+        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false);
         if (betterPeerHW != null) {
             Tuple2<Integer, Long> currentHW = getHWeightOfPeer(currentBetterPeer);
-            if (currentHW != null && (currentHW.a > betterPeerHW.a || currentHW.b >= betterPeerHW.b
+            if (currentHW != null && (currentHW.a >= betterPeerHW.a
                     || currentBetterPeer.equals(betterPeerHW.c))) {
                 // новый пир не лучше - продолжим синхронизацию не прерываясь
                 return;
@@ -1877,8 +1909,26 @@ public class Controller extends Observable {
             // withWinBuffer = true
             // тут поиск длаем с учетом СИЛЫ
             // но если найдено с такой же высотой как у нас то игнорируем
-            Tuple3<Integer, Long, Peer> peerHW = this.getMaxPeerHWeight(shift, true);
-            if (peerHW != null && peerHW.a > myHWeight.a) {
+            Tuple3<Integer, Long, Peer> peerHW;
+            Tuple2<Integer, Long> peerHWdata = null;
+            if (blockGenerator.betterPeer == null) {
+                peerHW = this.getMaxPeerHWeight(shift, false);
+            } else {
+                // берем пир который нашли в генераторе при осмотре более сильных цепочек
+                // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
+                // так как тут не подвергаются исследованию точность, как это делается в checkWeightPeers
+                peerHWdata = this.getHWeightOfPeer(blockGenerator.betterPeer);
+                if (peerHWdata == null) {
+                    // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
+                    peerHW = this.getMaxPeerHWeight(shift, false);
+                } else {
+                    peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
+                }
+                blockGenerator.betterPeer = null;
+            }
+
+            if (peerHW != null && peerHW.a > myHWeight.a
+                    || peerHWdata != null) {
                 peer = peerHW.c;
                 if (peer != null) {
                     info = "update from MaxHeightPeer:" + peer + " WH: "
@@ -1894,10 +1944,14 @@ public class Controller extends Observable {
                             return;
                     } catch (Exception e) {
                         if (this.isOnStopping()) {
-                            // on closing this.dcSet.rollback();
+                            // on closing this.blocchain.rollback(dcSet);
                             return;
                         } else if (peer.isBanned()) {
                             ;
+                        } else if (blockGenerator.betterPeer != null) {
+                            // найден новый лучший ПИР
+                            isUpToDate = false;
+                            continue;
                         } else {
                             LOGGER.error(e.getMessage(), e);
                             peer.ban(e.getMessage());
@@ -1941,7 +1995,13 @@ public class Controller extends Observable {
 
         // NOTIFY
         this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+        try {
+            this.notifyObservers(new ObserverMessage(ObserverMessage.NETWORK_STATUS, this.status));
+        } catch (ClassCastException e) {
+            LOGGER.error(e.getMessage(), e);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
 
         this.statusInfo();
 
@@ -1986,7 +2046,7 @@ public class Controller extends Observable {
                 }
                 Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
                 if (height < whPeer.a
-                        || (useWeight && height == whPeer.a && weight < whPeer.b)) {
+                        || useWeight && weight < whPeer.b) {
                     height = whPeer.a;
                     weight = whPeer.b;
                     maxPeer = peer;
@@ -2288,10 +2348,16 @@ public class Controller extends Observable {
         return getTransaction(signature, this.dcSet);
     }
 
-    // by account addres + timestamp get signature
-    public byte[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
+    public Transaction getTransaction(Long dbREF) {
 
-        return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
+        return getTransaction(dbREF, this.dcSet);
+    }
+
+    // by account addres + timestamp get signature
+    public long[] getSignatureByAddrTime(DCSet dcSet, String address, Long timestamp) {
+
+        //return dcSet.getAddressTime_SignatureMap().get(address, timestamp);
+        return dcSet.getReferenceMap().get(Account.makeShortBytes(address));
     }
 
     public Transaction getTransaction(byte[] signature, DCSet database) {
@@ -2306,6 +2372,10 @@ public class Controller extends Observable {
             return database.getTransactionFinalMap().get(tuple_Tx);
         }
         return null;
+    }
+
+    public Transaction getTransaction(long refDB, DCSet database) {
+        return database.getTransactionFinalMap().get(refDB);
     }
 
     public List<Transaction> getLastTransactions(Account account, int limit) {
@@ -2594,19 +2664,20 @@ public class Controller extends Observable {
         return true;
     }
 
-    public List<Transaction> getUnconfirmedTransactions(int from, int count, boolean descending) {
-        return this.dcSet.getTransactionMap().getTransactions(from, count, descending);
+    public List<Transaction> getUnconfirmedTransactions(int count, boolean descending) {
+        return this.dcSet.getTransactionMap().getTransactions(count, descending);
 
     }
 
     // BALANCES
 
-    public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
+    public SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
             long key) {
         return this.dcSet.getAssetBalanceMap().getBalancesSortableList(key);
     }
 
-    public SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalances(
+    public SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+    getBalances(
             Account account) {
 
         return this.dcSet.getAssetBalanceMap().getBalancesSortableList(account);
@@ -3250,20 +3321,12 @@ public class Controller extends Observable {
             }
         }
 
-        // DCSet db = this.dcSet;
-        // get last transaction from this address
-        byte[] sign = dcSet.getAddressTime_SignatureMap().get(address);
-        if (sign == null) {
+        long[] makerLastTimestamp = dcSet.getReferenceMap().get(Account.makeShortBytes(address));
+        if (makerLastTimestamp == null) {
             return null;
         }
 
-        /*
-         * long lastReference = db.getReferenceMap().get(address); byte[] sign =
-         * getSignatureByAddrTime(db, address, lastReference); if (sign == null)
-         * return null;
-         */
-
-        Transaction transaction = cntr.getTransaction(sign);
+        Transaction transaction = cntr.getTransaction(makerLastTimestamp[1]);
         if (transaction == null) {
             return null;
         }

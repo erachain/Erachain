@@ -86,7 +86,7 @@ public class DatabaseTests {
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(maker, 0L);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
-        maker.setLastTimestamp(last_ref, dcSet);
+        maker.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
         maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
@@ -95,7 +95,7 @@ public class DatabaseTests {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
         //CREATE ISSUE PERSON TRANSACTION
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
 
     }
 
@@ -107,11 +107,11 @@ public class DatabaseTests {
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -121,18 +121,18 @@ public class DatabaseTests {
         //CREATE FORK
         DCSet fork = dcSet.fork();
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
 
         //SET BALANCE
-        dcSet.getAssetBalanceMap().set("test", 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        dcSet.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
@@ -141,13 +141,13 @@ public class DatabaseTests {
                 ));
 
         //CHECK VALUE IN DB
-        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get(seed, 1L));
 
         //CHECK VALUE IN FORK
-        assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get(seed, 1L));
 
         //SET BALANCE IN FORK
-        fork.getAssetBalanceMap().set("test", 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        fork.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
@@ -157,16 +157,16 @@ public class DatabaseTests {
                 ));
 
         //CHECK VALUE IN DB
-        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get(seed, 1L));
 
         //CHECK VALUE IN FORK
-        assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get(seed, 1L));
 
         //CREATE SECOND FORK
         DCSet fork2 = fork.fork();
 
         //SET BALANCE IN FORK2
-        fork2.getAssetBalanceMap().set("test", 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        fork2.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
@@ -176,13 +176,13 @@ public class DatabaseTests {
                 ));
 
         //CHECK VALUE IN DB
-        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get(seed, 1L));
 
         //CHECK VALUE IN FORK
-        assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get(seed, 1L));
 
         //CHECK VALUE IN FORK
-        assertEquals(BigDecimal.ZERO, fork2.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ZERO, fork2.getAssetBalanceMap().get(seed, 1L));
     }
 
     @Test
@@ -230,7 +230,7 @@ public class DatabaseTests {
         init();
 
         AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 8, 50000l);
-        Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
+        Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         //logger.info(asset.toString() + " getQuantity " + asset.getQuantity());

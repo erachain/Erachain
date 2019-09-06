@@ -32,7 +32,7 @@ public class Peer extends MonitoredThread {
     private final static boolean USE_MONITOR = false;
     private final static boolean logPings = false;
 
-    static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getSimpleName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
     private static int SOCKET_BUFFER_SIZE = 1024 << (10 + Controller.HARD_WORK);
@@ -338,7 +338,10 @@ public class Peer extends MonitoredThread {
         return this.socket != null && this.socket.isConnected() && this.runed;
     }
 
-    private long countAlarmMess = 0;
+    /**
+     * for all peers ONE
+     */
+    private static long countAlarmMess = 0;
     public void run() {
         byte[] messageMagic = null;
 
@@ -443,8 +446,8 @@ public class Peer extends MonitoredThread {
 
                 parsePoint = (System.nanoTime() - parsePoint) / 1000;
                 if (System.currentTimeMillis() - countAlarmMess > 1000 && parsePoint < 999999999l) {
-                    if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 10000
-                            || parsePoint > 1000000
+                    if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 1000
+                            || parsePoint > 1009000
                     ) {
                             LOGGER.debug(this + message.viewPref(false) + message
                                 + " PARSE: " + parsePoint + "[us]");
@@ -511,8 +514,10 @@ public class Peer extends MonitoredThread {
                     }
 
                     timeStart = System.currentTimeMillis() - timeStart;
-                    if (timeStart > 100
-                            || message.getType() == Message.WIN_BLOCK_TYPE) {
+                    if (System.currentTimeMillis() - countAlarmMess > 1000
+                            && (timeStart > 1
+                                || message.getType() == Message.WIN_BLOCK_TYPE && timeStart > 100)) {
+                        countAlarmMess = System.currentTimeMillis();
                         LOGGER.debug(this + message.viewPref(false) + message + " solved by period: " + timeStart);
                     }
                 }

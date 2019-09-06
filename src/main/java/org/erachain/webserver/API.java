@@ -849,13 +849,13 @@ public class API {
         // GET ACCOUNT
         Account account = new Account(address);
 
-        Long lastTimestamp = account.getLastTimestamp();
+        long[] lastTimestamp = account.getLastTimestamp();
 
         String out;
         if (lastTimestamp == null) {
             out = "-";
         } else {
-            out = "" + lastTimestamp;
+            out = "" + lastTimestamp[0];
         }
 
         return Response.status(200)
@@ -1006,7 +1006,8 @@ public class API {
 
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = dcSet.getAssetBalanceMap().get(address, assetAsLong);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = dcSet.getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
         JSONArray array = new JSONArray();
 
         array.add(setJSONArray(balance.a));
@@ -1033,12 +1034,13 @@ public class API {
 
         }
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(new Account(address));
 
         JSONObject out = new JSONObject();
 
-        for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
             JSONArray array = new JSONArray();
             JSONObject a = new JSONObject();
             array.add(setJSONArray(assetsBalance.getB().a));
@@ -1046,7 +1048,7 @@ public class API {
             array.add(setJSONArray(assetsBalance.getB().c));
             array.add(setJSONArray(assetsBalance.getB().d));
             array.add(setJSONArray(assetsBalance.getB().e));
-            out.put(assetsBalance.getA().b, array);
+            out.put(map.getAssetKeyFromKey(assetsBalance.getA()), array);
         }
 
         return Response.status(200)

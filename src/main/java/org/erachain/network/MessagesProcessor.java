@@ -22,7 +22,7 @@ public class MessagesProcessor extends MonitoredThread {
     private boolean runned;
 
     private Network network;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessagesProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessagesProcessor.class.getSimpleName());
 
     private static final int QUEUE_LENGTH = 128 << (Controller.HARD_WORK >> 1);
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);

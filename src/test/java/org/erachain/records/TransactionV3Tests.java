@@ -68,7 +68,7 @@ public class TransactionV3Tests {
 
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
@@ -88,7 +88,7 @@ public class TransactionV3Tests {
                 "headdd", data,
                 isText,
                 encrypted,
-                timestamp, maker.getLastTimestamp(db)
+                timestamp, maker.getLastTimestamp(db)[0]
         );
         messageTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
@@ -166,7 +166,7 @@ public class TransactionV3Tests {
                 maker, payments, 111,
                 data,
                 FEE_POWER,
-                timestamp + 100, maker.getLastTimestamp(db)
+                timestamp + 100, maker.getLastTimestamp(db)[0]
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
@@ -237,7 +237,7 @@ public class TransactionV3Tests {
                 maker, payments, 111,
                 data,
                 FEE_POWER,
-                timestamp, maker.getLastTimestamp(db)
+                timestamp, maker.getLastTimestamp(db)[0]
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 

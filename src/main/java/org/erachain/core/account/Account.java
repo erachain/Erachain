@@ -79,6 +79,10 @@ public class Account {
         this.address = Base58.encode(addressBytes);
     }
 
+    public static byte[] makeShortBytes(String address) {
+        return Arrays.copyOfRange(Base58.decode(address), 1, ADDRESS_LENGTH - 4);
+
+    }
     public static Account makeAccountFromShort(byte[] addressShort) {
 
         String address = Crypto.getInstance().getAddressFromShort(addressShort);
@@ -196,19 +200,35 @@ public class Account {
 
     }
 
-    public static Map<String, BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
-                                                                  Map<String, BigDecimal> values) {
+    public static Map<byte[], BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
+                                                                  Map<byte[], BigDecimal> values) {
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        Iterator<Tuple2<String, Long>> iterator = map.getIterator(0, true);
+
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ballance;
 
-        Tuple2<String, Long> iteratorKey;
-        while (iterator.hasNext()) {
-            iteratorKey = iterator.next();
-            if (iteratorKey.b == key) {
-                ballance = map.get(iteratorKey);
-                values.put(iteratorKey.a, ballance.a.b);
+        if (true) {
+            // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
+            for (byte[] mapKey: map.getKeys()) {
+                if (map.getAssetKeyFromKey(mapKey) == key) {
+                    ballance = map.get(mapKey);
+                    values.put(map.getShortAccountFromKey(mapKey), ballance.a.b);
+                }
             }
+
+        } else {
+
+            // здесь нужен протокольный итератор! его нету у балансов поэтому через перебор ключей
+            Iterator<byte[]> iterator = map.getIterator(0, true);
+
+            byte[] iteratorKey;
+            while (iterator.hasNext()) {
+                iteratorKey = iterator.next();
+                if (map.getAssetKeyFromKey(iteratorKey) == key) {
+                    ballance = map.get(iteratorKey);
+                    values.put(map.getShortAccountFromKey(iteratorKey), ballance.a.b);
+                }
+            }
+
         }
 
         DCSet dcParent = dcSet.getParent();
@@ -220,7 +240,7 @@ public class Account {
 
     }
 
-    public static Map<String, BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<String, BigDecimal> values) {
+    public static Map<byte[], BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<byte[], BigDecimal> values) {
 
         OrderMap map = dcSet.getOrderMap();
         Iterator<Long> iterator = map.getIterator(0, true);
@@ -228,7 +248,7 @@ public class Account {
         while (iterator.hasNext()) {
             order = map.get(iterator.next());
             if (order.getHaveAssetKey() == key) {
-                String address = order.getCreator().getAddress();
+                byte[] address = order.getCreator().getShortAddressBytes();
                 values.put(address, values.get(address).add(order.getAmountHave()));
             }
         }
@@ -243,9 +263,9 @@ public class Account {
     }
 
     // top balance + orders values
-    public static String getRichWithForks(DCSet dcSet, long key) {
+    public static byte[] getRichWithForks(DCSet dcSet, long key) {
 
-        Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
+        Map<byte[], BigDecimal> values = new TreeMap<byte[], BigDecimal>();
 
         values = getKeyBalancesWithForks(dcSet, key, values);
 
@@ -253,9 +273,9 @@ public class Account {
         values = getKeyOrdersWithForks(dcSet, key, values);
 
         // search richest address
-        String rich = null;
+        byte[] rich = null;
         BigDecimal maxValue = BigDecimal.ZERO;
-        for (Map.Entry<String, BigDecimal> entry : values.entrySet()) {
+        for (Map.Entry<byte[], BigDecimal> entry : values.entrySet()) {
             BigDecimal value = entry.getValue();
             if (value.compareTo(maxValue) > 0) {
                 maxValue = value;
@@ -422,7 +442,7 @@ public class Account {
                 .getBalance(dcSet, key);
         BigDecimal ownVol = balance.a.b;
 
-        if (!BlockChain.DEVELOP_USE && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
+        if (!BlockChain.DEVELOP_USE && !BlockChain.ERA_COMPU_ALL_UP && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
             int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
             if (item != null) {
                 if (item[0][0] < 0) {
@@ -521,8 +541,8 @@ public class Account {
             key = -key;
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), key);
-        if (BlockChain.DEVELOP_USE) {
+                .getAssetBalanceMap().get(getShortAddressBytes(), key);
+        if (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) {
             return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
                     new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key))),
                     balance.b, balance.c, balance.d, balance.e);
@@ -536,10 +556,10 @@ public class Account {
             key = -key;
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), key);
+                .getAssetBalanceMap().get(getShortAddressBytes(), key);
 
         if (actionType == TransactionAmount.ACTION_SEND) {
-            if (BlockChain.DEVELOP_USE) {
+            if (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) {
                 return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
             }
 
@@ -567,6 +587,8 @@ public class Account {
 
         int actionType = actionType(key, amount_in);
 
+        ItemAssetBalanceMap map = db.getAssetBalanceMap();
+
         BigDecimal amount = amount_in.abs();
         long absKey;
         if (key > 0) {
@@ -585,8 +607,8 @@ public class Account {
         }
         */
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), absKey);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance =
+                map.get(getShortAddressBytes(), absKey);
 
         boolean updateIncomed = !notUpdateIncomed;
 
@@ -627,17 +649,17 @@ public class Account {
                     balance.e);
         }
 
-        db.getAssetBalanceMap().set(getAddress(), absKey, balance);
+        map.set(getShortAddressBytes(), absKey, balance);
 
         ////////////// DEBUG TOTAL COMPU
         // несотыковка из-за ордеров на бирже
         if (false && absKey == 2l && this.equals("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS")) {
-            Collection<Tuple2<String, Long>> addrs = db.getAssetBalanceMap().getKeys();
+            Collection<byte[]> addrs = db.getAssetBalanceMap().getKeys();
             BigDecimal total = BigDecimal.ZERO;
-            for (Tuple2<String, Long> addr : addrs) {
-                if (addr.b == 2l) {
+            for (byte[] mapKey : addrs) {
+                if (map.getAssetKeyFromKey(mapKey) == 2l) {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
-                            db.getAssetBalanceMap().get(addr);
+                            map.get(mapKey);
 
                     total = total.add(ball.a.b);
                 }
@@ -703,29 +725,31 @@ public class Account {
         return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(own, rent, hold);
     }
 
-    public Long getLastTimestamp() {
+    public long[] getLastTimestamp() {
         return this.getLastTimestamp(DCSet.getInstance());
     }
 
-    public Long getLastTimestamp(DCSet dcSet) {
+    public long[] getLastTimestamp(DCSet dcSet) {
         return dcSet.getReferenceMap().get(shortBytes);
     }
 
-    public void setLastTimestamp(Long timestamp, DCSet dcSet) {
+    public void setLastTimestamp(long[] currentPoint, DCSet dcSet) {
 
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET CURRENT REFERENCE
-        Long reference = map.get(shortBytes);
+        long[] reference = map.get(shortBytes);
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
+        byte[] keyCurrentPoint = Bytes.concat(shortBytes, Longs.toByteArray(currentPoint[0]));
 
-        // set NEW LAST TIMESTAMP as REFERENCE
-        map.set(keyTimestamp, reference);
+        if (reference != null) {
+            // set NEW LAST TIMESTAMP as REFERENCE
+            map.set(keyCurrentPoint, reference);
+        }
 
         // SET NEW REFERENCE
-        map.set(shortBytes, timestamp);
+        map.set(shortBytes, currentPoint);
     }
 
     public void removeLastTimestamp(DCSet dcSet) {
@@ -733,22 +757,23 @@ public class Account {
         ReferenceMap map = dcSet.getReferenceMap();
 
         // GET LAST TIMESTAMP
-        Long timestamp = map.get(shortBytes);
+        long[] lastPoint = map.get(shortBytes);
 
-        if (timestamp == null)
-            timestamp = 0L;
+        if (lastPoint == null)
+            return;
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
+        byte[] keyPrevPoint = Bytes.concat(shortBytes, Longs.toByteArray(lastPoint[0]));
 
         // GET REFERENCE
         // DELETE TIMESTAMP - REFERENCE
-        Long reference = map.delete(keyTimestamp);
-        if (reference == null)
-            reference = 0L;
-
-        // SET OLD REFERENCE
-        map.set(shortBytes, reference);
+        long[] reference = map.delete(keyPrevPoint);
+        if (reference == null) {
+            map.delete(shortBytes);
+        } else {
+            // SET OLD REFERENCE
+            map.set(shortBytes, reference);
+        }
     }
 
     // TOSTRING

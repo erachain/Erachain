@@ -2,7 +2,10 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -16,7 +19,7 @@ import java.util.Observer;
 @SuppressWarnings("serial")
 public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> implements Observer {
 
-    private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
 
     public BalancesComboBoxModel(Account account) {
         Controller.getInstance().addObserver(this);
@@ -53,9 +56,16 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
         //EMPTY LIST
         this.removeAllElements();
 
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+
         //INSERT ALL ACCOUNTS
         for (int i = 0; i < this.balances.size(); i++) {
-            this.addElement(this.balances.get(i));
+            Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                    item = this.balances.get(i);
+            this.addElement(new Pair(
+                    new Tuple2(Crypto.getInstance().getAddressFromShortBytes(
+                            map.getShortAccountFromKey(item.getA())), map.getAssetKeyFromKey(item.getA())),
+                    item.getB()));
         }
 
         //RESET SELECTED ITEM

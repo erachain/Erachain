@@ -50,7 +50,10 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                 return null;
             }
             Block.BlockHead block = list.get(row);
-            Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+            if (block == null) {
+                return "--";
+            }
+
             switch (column) {
                 case COLUMN_HEIGHT:
                     return block.heightBlock + "";
@@ -61,15 +64,30 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                 case COLUMN_GENERATOR:
                     return block.creator.getPersonAsString();
                 case COLUMN_GB:
-                    if (block.target == 0) {
+                    if (block.heightBlock == 1) {
                         return "GENESIS";
                     }
+                    Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+                    if (forgingPoint == null)
+                        return "--";
                     return forgingPoint.b + " ";
                 case COLUMN_DH:
+                    if (block.heightBlock == 1) {
+                        return "GENESIS";
+                    }
+                    forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+                    if (forgingPoint == null)
+                        return "--";
                     return (block.heightBlock - forgingPoint.a) + "";
                 case COLUMN_WV:
                     return block.winValue + "";
                 case COLUMN_dtWV:
+                    if (block.heightBlock == 1) {
+                        return "GENESIS";
+                    }
+                    if (block.target == 0) {
+                        return "--";
+                    }
                     return String.format("%10.3f%%", (100f * (block.winValue - block.target) / block.target));
                 case COLUMN_TRANSACTIONS:
                     return block.transactionsCount;

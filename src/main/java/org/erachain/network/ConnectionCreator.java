@@ -24,7 +24,7 @@ public class ConnectionCreator extends MonitoredThread {
 
     // как часто запрашивать все пиры у других пиров
     private static long GET_PEERS_PERIOD = 60 * 10 * 1000;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCreator.class.getSimpleName());
     private Network network;
     private static long getPeersTimestamp;
 

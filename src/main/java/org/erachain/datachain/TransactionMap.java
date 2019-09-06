@@ -6,7 +6,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
@@ -15,10 +14,11 @@ import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.*;
-import java.util.concurrent.ConcurrentNavigableMap;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentNavigableMap;
 public class TransactionMap extends DCMap<Long, Transaction> implements Observer {
     public static final int TIMESTAMP_INDEX = 1;
 
-    //private static final Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class);
+    static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -51,6 +51,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public TransactionMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
+
+        DEFAULT_INDEX = TIMESTAMP_INDEX;
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
@@ -78,11 +80,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         NavigableSet<Tuple2<Long, Long>> heightIndex = database
                 .createTreeSet("transactions_index_timestamp")
                 .comparator(comparator)
+                .counterEnable()
                 .makeOrGet();
 
         NavigableSet<Tuple2<Long, Long>> descendingHeightIndex = database
                 .createTreeSet("transactions_index_timestamp_descending")
                 .comparator(new ReverseComparator(comparator))
+                .counterEnable()
                 .makeOrGet();
 
         createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
@@ -107,8 +111,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     protected Map<Long, Transaction> getMap(DB database) {
 
         // OPEN MAP
-        BTreeMap<Long, Transaction> map = database.createTreeMap("transactions")
-                .keySerializer(BTreeKeySerializer.BASIC)
+        HTreeMap<Long, Transaction> map = database.createHashMap("transactions")
+                .keySerializer(SerializerBase.BASIC)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
@@ -118,7 +122,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             // NOT USE SECONDARY INDEXES
             return map;
 
-        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
+
         Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
             @Override
             public Tuple2<String, Long> run(Long key, Transaction val) {
@@ -127,7 +134,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
             }
         });
 
-        this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
         Bind.secondaryKeys(map, this.recipientKey,
                 new Fun.Function2<String[], Long, Transaction>() {
                     @Override
@@ -146,7 +155,9 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                     }
                 });
 
-        this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
         Bind.secondaryKeys(map, this.typeKey,
                 new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
                     @Override
@@ -178,7 +189,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     protected Map<Long, Transaction> getMemoryMap() {
         return new TreeMap<Long, Transaction>(
                 //UnsignedBytes.lexicographicalComparator()
-                );
+        );
     }
 
     @Override
@@ -192,14 +203,20 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return iterator;
     }
 
-        /**
-         * Используется для получения транзакций для сборки блока
-         * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
-         * @param timestamp
-         * @param notSetDCSet
-         * @param cutDeadTime true is need filter by Dead Time
-         * @return
-         */
+    public Iterator<Long> getCeatorIterator() {
+
+        Iterator<Long> iterator = this.senderKey.iterator();
+        return iterator;
+    }
+
+    /**
+     * Используется для получения транзакций для сборки блока
+     * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
+     * @param timestamp
+     * @param notSetDCSet
+     * @param cutDeadTime true is need filter by Dead Time
+     * @return
+     */
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
 
         List<Transaction> values = new ArrayList<Transaction>();
@@ -223,8 +240,8 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
             bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
             if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN
-                    ///+ (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)
-                    ) {
+                ///+ (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)
+            ) {
                 break;
             }
 
@@ -238,7 +255,18 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return values;
     }
 
-    private static long MAX_DEADTIME = 1000 * 60 * 60 * 24;
+    private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
+
+    private boolean clearProcessed = false;
+    private synchronized boolean isClearProcessedAndSet() {
+
+        if (clearProcessed)
+            return true;
+
+        clearProcessed = true;
+
+        return false;
+    }
 
     /**
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
@@ -246,49 +274,96 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
      * @param timestamp
      * @param cutDeadTime
      */
-    protected long pointReset;
+    protected long pointClear;
     public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
 
-        long realTime = System.currentTimeMillis();
-        int count = 0;
+        // займем просецц или установим флаг
+        if (isClearProcessedAndSet())
+            return;
 
-        /////Iterator<Map.Entry<Long, Transaction>> iteratorMap = map.entrySet().iterator();
+        try {
+            long realTime = System.currentTimeMillis();
 
-        //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-        Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
-        Transaction transaction;
+            if (realTime - pointClear < BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) {
+                return;
+            }
 
-        timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+            int count = 0;
+            long tickerIter = realTime;
 
-        while (iterator.hasNext()) {
-            Long key = iterator.next().b;
-            transaction = this.map.get(key);
-            long deadline = transaction.getDeadline();
-            if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                    || ((Controller.HARD_WORK > 3 || cutDeadTime) && deadline < timestamp)
-                    || Controller.HARD_WORK <= 3 && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                    || this.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                this.delete(key);
-                count++;
+            timestamp -= (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 1) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS << (5 - Controller.HARD_WORK >> 1);
+
+            if (false && cutDeadTime) {
+
+                timestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+                tickerIter = System.currentTimeMillis();
+                SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
+                        timestamp, null));
+                tickerIter = System.currentTimeMillis() - tickerIter;
+                if (tickerIter > 10) {
+                    LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
+                }
+
+                for (Tuple2<?, Long> key : subSet) {
+                    if (true || this.contains(key.b))
+                        this.delete(key.b);
+                    count++;
+                }
+
             } else {
-                break;
+                /**
+                 * по несколько секунд итератор берется - при том что таблица пустая -
+                 * - дале COMPACT не помогает
+                 */
+                //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+                Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+                tickerIter = System.currentTimeMillis() - tickerIter;
+                if (tickerIter > 10) {
+                    LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
+                }
+
+                Transaction transaction;
+
+                tickerIter = System.currentTimeMillis();
+                long size = this.size();
+                tickerIter = System.currentTimeMillis() - tickerIter;
+                if (tickerIter > 10) {
+                    LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
+                }
+                while (iterator.hasNext()) {
+                    Long key = iterator.next().b;
+                    transaction = this.map.get(key);
+                    if (transaction == null) {
+                        // такая ошибка уже было
+                        break;
+                    }
+
+                    long deadline = transaction.getDeadline();
+                    if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
+                            || ((Controller.HARD_WORK > 3
+                            || cutDeadTime)
+                            && deadline < timestamp)
+                            || Controller.HARD_WORK <= 3
+                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                            || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                        this.delete(key);
+                        count++;
+                    } else {
+                        break;
+                    }
+                }
             }
-        }
 
-        long ticker = System.currentTimeMillis() - realTime;
-        if ( ticker > 1000 || count > 0 && ticker / count > 1) {
-            LOGGER.debug("CLEAR dead UTXs: " + ticker + " ms, for deleted: " + count);
-        }
-
-        if (true && System.currentTimeMillis() - pointReset > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
-            pointReset = System.currentTimeMillis();
-            this.reset();
-            ticker = System.currentTimeMillis() - pointReset;
-            if (ticker > 2999900) {
-                LOGGER.debug("reset UTXs: " + ticker + " ms");
+            long ticker = System.currentTimeMillis() - realTime;
+            if (ticker > 1000 || count > 0) {
+                LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + count);
             }
-        }
 
+        } finally {
+            // освободим процесс
+            pointClear = System.currentTimeMillis();
+            clearProcessed = false;
+        }
     }
 
     @Override
@@ -316,6 +391,26 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
     public Transaction delete(byte[] signature) {
         return this.delete(Longs.fromByteArray(signature));
+    }
+
+
+    public long totalDeleted = 0;
+
+    /**
+     * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
+     * Head Zero - data corrupted
+     * @param key
+     * @return
+     */
+    public /* synchronized */ Transaction delete(Long key) {
+        Transaction transaction = super.delete(key);
+        if (transaction != null) {
+            // DELETE only if DELETED
+            totalDeleted++;
+        }
+
+        return transaction;
+
     }
 
     public boolean contains(byte[] signature) {
@@ -426,7 +521,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,
-                                         int type, boolean desc, int offset, int limit, long timestamp) {
+                                              int type, boolean desc, int offset, int limit, long timestamp) {
 
         Iterable keys = findTransactionsKeys(address, sender, recipient,
                 type, desc, offset, limit, timestamp);
@@ -470,7 +565,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public List<Transaction> getTransactionsByAddress(String address) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(0, false);
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
         Account account = new Account(address);
 
         Transaction transaction;
@@ -505,13 +600,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         return values;
     }
 
-    public List<Transaction> getTransactions(int indexID, int count, boolean descending) {
+    public List<Transaction> getTransactions(int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
 
         //LOGGER.debug("get ITERATOR");
-        Iterator<Long> iterator = this.getIterator(indexID, descending);
-        //LOGGER.debug("get ITERATOR - DONE");
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
+        //LOGGER.debug("get ITERATOR - DONE"); / for merge
 
         Transaction transaction;
         for (int i = 0; i < count; i++) {
@@ -529,7 +624,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        Iterator<Long> iterator = this.getIterator(0, descending);
+        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
         Account account = new Account(address);
 
         int i = 0;

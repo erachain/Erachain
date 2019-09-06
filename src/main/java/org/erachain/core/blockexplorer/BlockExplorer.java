@@ -580,33 +580,10 @@ public class BlockExplorer {
 
                 address = account.getAddress();
                 // get reference to parent record for this account
-                Long timestampRef = account.getLastTimestamp();
+                long[] timestampRef = account.getLastTimestamp();
                 // get signature for account + time
-                byte[] signatureBytes = dcSet.getAddressTime_SignatureMap().get(address, timestampRef);
 
                 Controller cntr = Controller.getInstance();
-                do {
-                    // Transaction transaction =
-                    // Controller.getInstance().get(signatureBytes);
-                    Transaction transaction = cntr.getTransaction(signatureBytes);
-                    if (transaction == null) {
-                        break;
-                    }
-                    if (transaction.getCreator() == null && !transaction.getCreator().getAddress().equals(address)) {
-                        break;
-                    }
-
-                    if (transaction.getType() == Transaction.ARBITRARY_TRANSACTION
-                            && ((ArbitraryTransaction) transaction).getService() == 777) {
-                        transactions.add(transaction);
-                    }
-                    // get reference to parent record for this account
-                    // timestampRef = transaction.getReference();
-                    timestampRef = account.getLastTimestamp();
-                    // get signature for account + time
-                    signatureBytes = dcSet.getAddressTime_SignatureMap().get(address, timestampRef);
-
-                } while (true);
 
                 int count = transactions.size();
 
@@ -1829,15 +1806,16 @@ public class BlockExplorer {
 
         List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
-        Collection<Tuple2<String, Long>> addrs = dcSet.getAssetBalanceMap().getKeys();
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        Collection<byte[]> addrs = map.getKeys();
         //BigDecimal total = BigDecimal.ZERO;
         //BigDecimal totalNeg = BigDecimal.ZERO;
-        for (Tuple2<String, Long> addr : addrs) {
-            if (addr.b == key) {
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
-                        .getAssetBalanceMap().get(addr);
+        for (byte[] addrKey : addrs) {
+            if (map.getAssetKeyFromKey(addrKey) == key) {
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
+                        map.get(addrKey);
                 // all = all.add(ball.a);
-                Account account = new Account(addr.a);
+                Account account = new Account(map.getShortAccountFromKey(addrKey));
                 BigDecimal ballans = account.getBalanceUSE(key);
                 //if (ball.a.b.signum() > 0) {
                 //total = total.add(ball.a.b);
@@ -1845,7 +1823,7 @@ public class BlockExplorer {
                 //    totalNeg = totalNeg.add(ball.a.b);
                 //}
 
-                top100s.add(Fun.t3(addr.a, ballans, ball.a.b));
+                top100s.add(Fun.t3(account.getAddress(), ballans, ball.a.b));
             }
         }
 
@@ -1954,20 +1932,24 @@ public class BlockExplorer {
 
         // balance assets from
         LinkedHashMap output = new LinkedHashMap();
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(account);
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(account);
 
         ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         TreeMap balAssets = new TreeMap();
         if (balances != null && !balances.isEmpty()) {
-            Iterator<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> iterator = balances.iterator();
+            Iterator<Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> iterator = balances.iterator();
             while (iterator.hasNext()) {
-                Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
-                if (item.getA().b.equals(AssetCls.LIA_KEY)) {
+
+                Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
+
+                long assetKey = map.getAssetKeyFromKey(item.getA());
+                if (assetKey == AssetCls.LIA_KEY) {
                     continue;
                 }
 
-                AssetCls asset = assetsMap.get(item.getA().b);
+                AssetCls asset = assetsMap.get(assetKey);
                 if (asset == null)
                     continue;
 
@@ -1976,13 +1958,13 @@ public class BlockExplorer {
                         && itemBals.b.b.signum() != 0
                         && itemBals.c.b.signum() != 0) {
                     Map bal = new LinkedHashMap();
-                    bal.put("asset_key", item.getA().b);
+                    bal.put("asset_key", assetKey);
                     bal.put("asset_name", asset.viewName());
                     bal.put("balance_1", itemBals.a.b);
                     bal.put("balance_2", itemBals.b.b);
                     bal.put("balance_3", itemBals.c.b);
                     bal.put("balance_4", itemBals.d.b);
-                    balAssets.put(item.getA().b.toString(), bal);
+                    balAssets.put("" + assetKey, bal);
                 }
             }
         }
@@ -2371,16 +2353,17 @@ public class BlockExplorer {
             return output;
         }
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = dcSet.getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(new Account(address));
 
-        for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
             Map assetBalance = new LinkedHashMap();
 
-            assetBalance.put("assetName", Controller.getInstance().getAsset(assetsBalance.getA().b).getName());
+            assetBalance.put("assetName", Controller.getInstance().getAsset(map.getAssetKeyFromKey(assetsBalance.getA())).getName());
             assetBalance.put("amount", assetsBalance.getB().toString());
 
-            output.put(assetsBalance.getA().b, assetBalance);
+            output.put(map.getAssetKeyFromKey(assetsBalance.getA()), assetBalance);
         }
 
         return output;
@@ -2390,11 +2373,12 @@ public class BlockExplorer {
             String address) {
         Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> output = new LinkedHashMap();
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances = dcSet
-                .getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(new Account(address));
 
-        for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
-            output.put(assetsBalance.getA().b, assetsBalance.getB());
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+            output.put(map.getAssetKeyFromKey(assetsBalance.getA()), assetsBalance.getB());
         }
 
         return output;
@@ -3353,7 +3337,7 @@ public class BlockExplorer {
         //AssetNames assetNames = new AssetNames();
 
         List<Transaction> all = new ArrayList<>(
-                Controller.getInstance().getUnconfirmedTransactions(0, 100, true));
+                Controller.getInstance().getUnconfirmedTransactions(100, true));
 
         int size = all.size();
 
