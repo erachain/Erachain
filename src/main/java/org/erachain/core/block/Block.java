@@ -1660,15 +1660,17 @@ import java.util.*;
                         }
 
                         //CHECK TIMESTAMP AND DEADLINE
-                        if (this.heightBlock > 105999
+                        if ((!BlockChain.DEVELOP_USE && this.heightBlock > 277000 || this.heightBlock > 300000)
                                 && transaction.getTimestamp() > timestampEnd
                             //|| transaction.getDeadline() <= timestampBeg // не нужно так как при слиянии цепочек
                             // могут и должны страрые транзакции заноситься
                         ) {
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                     + ":" + transaction.viewFullTypeName()
-                                    + " timestampEnd invalid"
-                                    + " " + Base58.encode(transaction.getSignature()));
+                                    + " timestamp Overhead"
+                                    + " for diff: " + (transaction.getTimestamp() - timestampEnd)
+                                    + " " + Base58.encode(transaction.getSignature())
+                            );
                             return false;
                         }
 
