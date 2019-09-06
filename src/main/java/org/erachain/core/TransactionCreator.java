@@ -81,17 +81,30 @@ public class TransactionCreator {
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
         ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
         TransactionMap transactionMap = this.fork.getTransactionMap();
-        // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
-        Iterator<Long> iterator = transactionMap.getIterator(TransactionMap.TIMESTAMP_INDEX, false);
-        Transaction transaction;
-        List<Account> accountMap = Controller.getInstance().getAccounts();
-
         List<Transaction> accountTransactions = new ArrayList<Transaction>();
+        Transaction transaction;
 
-        while (iterator.hasNext()) {
-            transaction = transactionMap.get(iterator.next());
-            if (accountMap.contains(transaction.getCreator())) {
-                accountTransactions.add(transaction);
+        if (true) {
+            for (Account account: Controller.getInstance().getAccounts()) {
+                Iterable<Long> keys = transactionMap.findTransactionsKeys(account.getAddress(), null, null,
+                        0, false, 0, 0, 0L);
+                Iterator<Long> iterator = keys.iterator();
+                while (iterator.hasNext()) {
+                    transaction = transactionMap.get(iterator.next());
+                        accountTransactions.add(transaction);
+                }
+            }
+
+        } else {
+            // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX - в ФОРОКЕ он ПУСТОЙ!
+            Iterator<Long> iterator = transactionMap.getIterator(TransactionMap.TIMESTAMP_INDEX, false);
+            List<Account> accountMap = Controller.getInstance().getAccounts();
+
+            while (iterator.hasNext()) {
+                transaction = transactionMap.get(iterator.next());
+                if (accountMap.contains(transaction.getCreator())) {
+                    accountTransactions.add(transaction);
+                }
             }
         }
 
