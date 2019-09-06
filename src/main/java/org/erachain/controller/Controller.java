@@ -561,6 +561,7 @@ public class Controller extends Observable {
 
                 } catch (Throwable e2) {
 
+                    LOGGER.error("Error during backup, tru recreate " + name);
                     LOGGER.trace(e2.getMessage(), e2);
                     // не смогли пересоздать выход!
                     stopAll(-3);
@@ -673,8 +674,8 @@ public class Controller extends Observable {
         } catch (Throwable e) {
             // Error open DB
             error = 1;
-            LOGGER.trace(e.getMessage(), e);
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
+            LOGGER.trace(e.getMessage(), e);
             try {
                 reCreateDC(inMemoryDC);
             } catch (Throwable e1) {
