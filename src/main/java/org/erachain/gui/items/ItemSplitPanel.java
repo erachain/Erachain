@@ -20,7 +20,7 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
 
-public class ItemSplitPanel extends SplitPanel {
+public abstract class ItemSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected TimerTableModelCls tableModel;
@@ -124,9 +124,7 @@ public class ItemSplitPanel extends SplitPanel {
         favoriteMenuItems.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 favoriteSet(getItem(row));
-
             }
         });
 
@@ -182,11 +180,10 @@ public class ItemSplitPanel extends SplitPanel {
 
     }
 
-    protected Component getShow(ItemCls item) {
-        return null;
-    }
+    abstract protected Component getShow(ItemCls item);
 
-    protected ItemCls getItem(int row) {
+
+    private ItemCls getItem(int row) {
         Object item = ItemSplitPanel.this.tableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(row));
         if (item instanceof Fun.Tuple2) {
             return (ItemCls) ((Fun.Tuple2)item).b;
@@ -194,8 +191,6 @@ public class ItemSplitPanel extends SplitPanel {
             return (ItemCls)item;
         }
     }
-
-
 
     protected void tableMouse2Click(ItemCls item) {
     }
