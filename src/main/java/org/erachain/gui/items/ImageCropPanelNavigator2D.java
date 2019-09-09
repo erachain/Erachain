@@ -13,6 +13,8 @@ public class ImageCropPanelNavigator2D extends JPanel {
         setLayout(new BorderLayout());
         imageCropDisplayPanelNavigator2D = new ImageCropDisplayPanelNavigator2D(imageFile, cropWidth, cropHeight);
         add(imageCropDisplayPanelNavigator2D, BorderLayout.CENTER);
+
+
     }
 
 

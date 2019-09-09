@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
@@ -13,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private final int cropY;
@@ -21,6 +23,12 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private int cropWidth;
     private BufferedImage image;
 
+    private java.util.List<ChangeListener> zoomListeners = new ArrayList<>();
+
+    private JSlider zoomSlider;
+    private JSlider frameSlider;
+    private double zoom = 1;
+    private final int originalCropWidth;
 
     private AffineTransform currentTransform = new AffineTransform();
     private Point currentPoint = new Point();
@@ -29,8 +37,26 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private Logger logger = LoggerFactory.getLogger(ImageCropDisplayPanelNavigator2D.class);
 
     public ImageCropDisplayPanelNavigator2D(File imageFile, int cropWidth, int cropHeight) {
+
+        JPanel sliderPanel = new JPanel(new BorderLayout());
+        add(sliderPanel, BorderLayout.SOUTH);
+        zoomSlider = new JSlider(JSlider.HORIZONTAL, 0, 300, 100);
+        zoomSlider.setMajorTickSpacing(50);
+        zoomSlider.setMinorTickSpacing(10);
+        zoomSlider.setPaintTicks(true);
+        zoomSlider.addChangeListener(e -> this.setZoom(zoomSlider.getValue() / 100d));
+        this.addZoomListener(e -> zoomSlider.setValue((int) (this.getZoom() * 100)));
+        sliderPanel.add(zoomSlider, BorderLayout.NORTH);
+        frameSlider = new JSlider(JSlider.HORIZONTAL, 0, 30, 0);
+        frameSlider.setMajorTickSpacing(10);
+        frameSlider.setMinorTickSpacing(1);
+        frameSlider.setPaintTicks(true);
+        frameSlider.addChangeListener(e -> this.setFrameRate(frameSlider.getValue()));
+        sliderPanel.add(frameSlider, BorderLayout.SOUTH);
+
         setPreferredSize(new Dimension(600, 500));
         this.cropWidth = cropWidth;
+        this.originalCropWidth = cropWidth;
         this.cropHeight = cropHeight;
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
         cropY = getPreferredSize().height / 2 - cropHeight / 2;
@@ -95,6 +121,10 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 } else {
                     scale = 1d;
                 }
+
+                zoom *= scale;
+                zoomSlider.setValue((int) (zoom * 100d));
+
                 AffineTransform newTransform = new AffineTransform();
                 newTransform.concatenate(AffineTransform.getTranslateInstance(currentPoint.getX(), currentPoint.getY()));
                 newTransform.concatenate(AffineTransform.getScaleInstance(scale, scale));
@@ -231,6 +261,36 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                     snapshot.getWidth() - (int) pointZeroDst.x, snapshot.getHeight() - (int) pointZeroDst.y);
         }
 
+    }
+
+    public void setFrameRate(int value) {
+        cropWidth = originalCropWidth - originalCropWidth * value / 100;
+        cropX = getPreferredSize().width / 2 - cropWidth / 2;
+        //moveImageBy(0, 0);
+    }
+
+
+    public double getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(double new_zoom) {
+
+
+        double scale = new_zoom / this.zoom;
+        this.zoom = new_zoom;
+
+        AffineTransform newTransform = new AffineTransform();
+        newTransform.concatenate(AffineTransform.getTranslateInstance(currentPoint.getX(), currentPoint.getY()));
+        newTransform.concatenate(AffineTransform.getScaleInstance(scale, scale));
+        newTransform.concatenate(AffineTransform.getTranslateInstance(-currentPoint.getX(), -currentPoint.getY()));
+        newTransform.concatenate(currentTransform);
+        currentTransform = newTransform;
+        repaint();
+    }
+
+    public void addZoomListener(ChangeListener listener) {
+        zoomListeners.add(listener);
     }
 
 }
