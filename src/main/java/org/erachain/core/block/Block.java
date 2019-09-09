@@ -956,10 +956,8 @@ import java.util.*;
                 return BigDecimal.valueOf(60000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
                 return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
-                return BigDecimal.valueOf(40000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (false && this.heightBlock < inDay30 << 6) //  256 mounth
-                return BigDecimal.valueOf(30000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+            else if (this.heightBlock > BlockChain.VERS_30SEC)
+                return BigDecimal.valueOf(2000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else
                 return BigDecimal.valueOf(20000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
         } else {
