@@ -182,6 +182,11 @@ task CreateZip(type: Zip) {
 
     from 'build/libs/'
     include 'Erachain/'
+    exclude 'Erachain/datachain'
+    exclude 'Erachain/datalocal'
+    exclude 'Erachain/datatemp'
+    exclude 'Erachain/dataWallet'
+    exclude 'Erachain/walletKeys'
     archiveName 'Erachain' + '.zip'
     destinationDir(file('build/libs/'))
 }
