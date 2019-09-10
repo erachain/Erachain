@@ -21,7 +21,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class DBRocksDBTable<K, V> implements InnerDBTable<K, V> {
+public class DBRocksDBTable<K, V> implements org.erachain.rocksDB.integration.InnerDBTable<K, V> {
 
     private List<ColumnFamilyHandle> columnFamilyHandles;
     private ColumnFamilyHandle columnFamilyFieldSize;
