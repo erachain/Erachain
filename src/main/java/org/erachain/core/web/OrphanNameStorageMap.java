@@ -19,17 +19,17 @@ public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
     }
 
     @Override
-    protected Map<byte[], Map<String, String>> getMap(DB database) {
+    protected void getMap(DB database) {
 
-        return database.createTreeMap("OrphanNameStorageMap")
+        map = database.createTreeMap("OrphanNameStorageMap")
                 .comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
     }
 
     @Override
-    protected Map<byte[], Map<String, String>> getMemoryMap() {
-        return new HashMap<byte[], Map<String, String>>();
+    protected void getMemoryMap() {
+        map = new HashMap<byte[], Map<String, String>>();
     }
 
     @Override

@@ -26,9 +26,9 @@ public class AllTelegramsMap extends DBMap<String, Transaction> {
    
     @SuppressWarnings("unchecked")
     @Override
-    protected Map<String, Transaction> getMap(DB database) {
+    protected void getMap(DB database) {
       //OPEN MAP
-       return database.createTreeMap("telegrams")
+       map = database.createTreeMap("telegrams")
                .keySerializer(BTreeKeySerializer.BASIC)
                .valueSerializer(new TransactionSerializer())
                .counterEnable()
@@ -36,9 +36,7 @@ public class AllTelegramsMap extends DBMap<String, Transaction> {
     }
 
     @Override
-    protected Map<String, Transaction> getMemoryMap() {
-        // TODO Auto-generated method stub
-        return getMemoryMap();
+    protected void getMemoryMap() {
     }
 
     @Override

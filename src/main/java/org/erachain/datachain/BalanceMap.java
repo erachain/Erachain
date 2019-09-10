@@ -99,14 +99,11 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
                         key.a);
             }
         });
-
-        //RETURN
-        return;
     }
 
     @Override
     protected void getMemoryMap() {
-        return new TreeMap<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>,
+        map = new TreeMap<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(Fun.TUPLE2_COMPARATOR);
     }
 

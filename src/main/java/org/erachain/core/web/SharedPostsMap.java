@@ -21,17 +21,17 @@ public class SharedPostsMap extends DCMap<byte[], List<String>> {
     }
 
     @Override
-    protected Map<byte[], List<String>> getMap(DB database) {
+    protected void getMap(DB database) {
 
-        return database.createTreeMap("SharedPostsMap")
+        map = database.createTreeMap("SharedPostsMap")
                 .comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
     }
 
     @Override
-    protected Map<byte[], List<String>> getMemoryMap() {
-        return new HashMap<>();
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     public void add(byte[] postSignature, String name) {

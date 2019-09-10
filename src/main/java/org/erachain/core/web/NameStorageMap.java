@@ -20,15 +20,15 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
     }
 
     @Override
-    protected Map<String, Map<String, String>> getMap(DB database) {
+    protected void getMap(DB database) {
         // OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("NameStorageMap");
-        return createTreeMap.makeOrGet();
+        map = createTreeMap.makeOrGet();
     }
 
     @Override
-    protected Map<String, Map<String, String>> getMemoryMap() {
-        return new HashMap<String, Map<String, String>>();
+    protected void getMemoryMap() {
+        map = new HashMap<String, Map<String, String>>();
     }
 
     @Override

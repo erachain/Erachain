@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
@@ -23,11 +24,11 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
     protected List<T> deleted;
     private int shiftSize;
 
-    public DCMap(IDB databaseSet, DB database) {
+    public DCMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public DCMap(DCMap<T, U> parent, IDB dcSet) {
+    public DCMap(DCMap<T, U> parent, DBASet dcSet) {
         super(dcSet);
         this.parent = parent;
         getMemoryMap();

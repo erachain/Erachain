@@ -32,8 +32,8 @@ public abstract class IssueItemMap extends DCMap<byte[], Long> {
     }
 
     @Override
-    protected Map<byte[], Long> getMemoryMap() {
-        return new TreeMap<>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override

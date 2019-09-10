@@ -69,7 +69,7 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        map = this.getMap(database);
+        this.getMap(database);
     }
 
     @Override

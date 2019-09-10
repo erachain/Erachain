@@ -22,17 +22,16 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 
 
     @Override
-    protected Map<String, List<byte[]>> getMap(DB database) {
+    protected void getMap(DB database) {
 
-
-        return database.createTreeMap("OrphanNameStorageHelperMap")
+        map = database.createTreeMap("OrphanNameStorageHelperMap")
                 .makeOrGet();
 
     }
 
     @Override
-    protected Map<String, List<byte[]>> getMemoryMap() {
-        return new HashMap<>();
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     @Override

@@ -36,7 +36,7 @@ public class ReferenceMap extends DCMap<byte[], long[]> {
     }
 
     @Override
-    protected Map<byte[], long[]> getMemoryMap() {
+    protected void getMemoryMap() {
         map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
     }
 

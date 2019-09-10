@@ -156,8 +156,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
     }
 
     @Override
-    protected Map<Long, ItemCls> getMemoryMap() {
-        return new TreeMap<Long, ItemCls>();
+    protected void getMemoryMap() {
+        map = new TreeMap<Long, ItemCls>();
     }
 
     @Override

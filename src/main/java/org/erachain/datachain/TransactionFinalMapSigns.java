@@ -47,7 +47,7 @@ public class TransactionFinalMapSigns extends DCMap<UUID, Long> {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        map = this.getMap(database);
+        this.getMap(database);
     }
 
     @Override

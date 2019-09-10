@@ -53,6 +53,11 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
     }
 
     @Override
+    protected void getMemoryMap() {
+        map = new HashMap<Integer, byte[]>();
+    }
+
+    @Override
     public int size() {
         return this.key;
     }
@@ -66,11 +71,6 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
     }
 
     protected void createIndexes(DB database) {
-    }
-
-    @Override
-    protected Map<Integer, byte[]> getMemoryMap() {
-        return new HashMap<Integer, byte[]>();
     }
 
     @Override

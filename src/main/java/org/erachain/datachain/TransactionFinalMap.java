@@ -190,7 +190,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> implements Fil
         DB database = DBMaker.newMemoryDB().make();
 
         // OPEN MAP
-        map = this.getMap(database);
+        this.getMap(database);
     }
 
     @Override
