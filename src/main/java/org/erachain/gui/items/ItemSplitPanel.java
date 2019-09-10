@@ -132,7 +132,7 @@ public abstract class ItemSplitPanel extends SplitPanel {
                             favoriteSet(itemTableSelected);
                         }
                     }
-                }}, 100);
+                }}, 10);
             }
         });
 
