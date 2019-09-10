@@ -155,7 +155,7 @@ public class DCSet extends DBASet implements Observer {
             this.referenceMap = new ReferenceMap(this, database);
             this.addressForging = new AddressForging(this, database);
             this.credit_AddressesMap = new CreditAddressesMap(this, database);
-            this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
+            this.assetBalanceMap = new ItemAssetBalanceRocksMap(this, database);
             this.addressStatement_Refs = new AddressStatementRefs(this, database);
             this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
 

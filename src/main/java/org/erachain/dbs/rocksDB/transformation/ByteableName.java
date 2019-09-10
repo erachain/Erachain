@@ -9,7 +9,7 @@ public class ByteableName implements Byteable<Name>{
     @Override
     public Name receiveObjectFromBytes(byte[] bytes) {
         try {
-            return Name.parse(bytes);
+            return Name.Parse(bytes);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new WrongParseException(e);
