@@ -1,0 +1,16 @@
+package org.erachain.rocksDB.transformation;
+
+import java.util.concurrent.atomic.AtomicLong;
+
+public class ByteableAtomicLong implements Byteable<AtomicLong> {
+    ByteableLong byteableLong = new ByteableLong();
+    @Override
+    public AtomicLong receiveObjectFromBytes(byte[] bytes) {
+        return new AtomicLong(byteableLong.receiveObjectFromBytes(bytes));
+    }
+
+    @Override
+    public byte[] toBytesObject(AtomicLong value) {
+        return byteableLong.toBytesObject(value.longValue());
+    }
+}
