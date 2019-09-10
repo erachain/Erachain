@@ -3,6 +3,7 @@ package org.erachain.core.web;
 import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
+import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 

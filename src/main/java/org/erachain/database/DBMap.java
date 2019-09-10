@@ -23,13 +23,13 @@ public abstract class DBMap<T, U> extends Observable {
 
     public static int DEFAULT_INDEX = 0;
     private static Logger logger = LoggerFactory.getLogger(DBMap.class.getSimpleName());
-    protected IDB databaseSet;
+    protected DBASet databaseSet;
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
     protected Map<Integer, Integer> observableData;
 
-    public DBMap(IDB databaseSet) {
+    public DBMap(DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
 
@@ -41,7 +41,7 @@ public abstract class DBMap<T, U> extends Observable {
         }
     }
 
-    public DBMap(IDB databaseSet, DB database) {
+    public DBMap(DBASet databaseSet, DB database) {
         this.databaseSet = databaseSet;
 
         //OPEN MAP

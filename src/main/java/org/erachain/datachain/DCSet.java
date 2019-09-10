@@ -18,6 +18,7 @@ import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
+import org.erachain.database.DBMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
@@ -27,10 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Random;
+import java.util.*;
 
 /**
  * набор таблиц. Поидее тут нужно хранить список таблиц и ссылку на родителя при Форке базы.
@@ -454,6 +452,9 @@ public class DCSet extends DBASet implements Observer {
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
             dbFile.delete();
+            for (DBMap map: instance.externalMaps) {
+                map.reset();
+            }
             throw new Exception("error in DATACHAIN:" + instance.actions);
         }
 

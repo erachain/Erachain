@@ -12,11 +12,11 @@ public abstract class AutoKeyDBMap<T, U> extends DBMap<T, U> {
 
     protected BTreeMap AUTOKEY_INDEX;
 
-    public AutoKeyDBMap(IDB databaseSet) {
+    public AutoKeyDBMap(DBASet databaseSet) {
         super(databaseSet);
     }
 
-    public AutoKeyDBMap(IDB databaseSet, DB database) {
+    public AutoKeyDBMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
 
     }

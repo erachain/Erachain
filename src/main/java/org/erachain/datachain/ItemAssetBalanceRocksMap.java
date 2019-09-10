@@ -3,7 +3,9 @@ package org.erachain.datachain;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +21,6 @@ public class ItemAssetBalanceRocksMap extends ItemAssetBalanceMap {
 
     public ItemAssetBalanceRocksMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
-        init(databaseSet);
     }
 
     public ItemAssetBalanceRocksMap(ItemAssetBalanceRocksMap parent) {
@@ -35,13 +36,24 @@ public class ItemAssetBalanceRocksMap extends ItemAssetBalanceMap {
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>
         getMap(DB database) {
+
+
         rocksDBTable = new org.erachain.dbs.rocksDB.integration.DBRocksDBTable<>(
                 new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple2StringLong(),
                 new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal(), NAME_TABLE, indexes,
                 org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),ROCKS_DB_FOLDER);
-        return rocksDBTable.getMap();
+
+        databaseSet.addExternalMaps(this);
+
+        return null;
     }
 
+    @Override
+    public void reset() {
+        databaseSet.close();
+        File dbFile = new File(Paths.get(ROCKS_DB_FOLDER).toString(), NAME_TABLE);
+        dbFile.delete();
+    }
 }

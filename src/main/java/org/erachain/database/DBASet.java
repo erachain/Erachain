@@ -4,6 +4,8 @@ package org.erachain.database;
 import org.mapdb.DB;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 //import org.mapdb.Serializer;
 
@@ -14,6 +16,8 @@ abstract public class DBASet implements IDB {
     protected File DATA_FILE;
     protected DB database;
     protected int uses;
+
+    protected List<DBMap> externalMaps = new ArrayList<>();
 
     private boolean withObserver;// observe
     private boolean dynamicGUI;// observe
@@ -75,6 +79,14 @@ abstract public class DBASet implements IDB {
         } else {
             return false;
         }
+    }
+
+    public List getExternalMaps() {
+        return externalMaps;
+    }
+
+    public void addExternalMaps(DBMap map) {
+        externalMaps.add(map);
     }
 
     public void clearCache() {

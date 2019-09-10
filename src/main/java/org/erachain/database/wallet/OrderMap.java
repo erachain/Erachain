@@ -3,6 +3,7 @@ package org.erachain.database.wallet;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.AutoKeyDBMap;
+import org.erachain.database.DBASet;
 import org.erachain.database.DBMap;
 import org.erachain.database.IDB;
 import org.erachain.database.serializer.LongAndOrderSerializer;
@@ -37,7 +38,7 @@ Tuple3
  */
 public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Order>> {
 
-    public OrderMap(IDB databaseSet, DB database) {
+    public OrderMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {

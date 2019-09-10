@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
+import org.erachain.database.DBASet;
 import org.erachain.database.DBMap;
 import org.erachain.database.IDB;
 import org.erachain.utils.ObserverMessage;
@@ -36,11 +37,11 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
     int shiftSize;
 
 
-    public DCMap(IDB databaseSet, DB database) {
+    public DCMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public DCMap(DCMap<T, U> parent, IDB dcSet) {
+    public DCMap(DCMap<T, U> parent, DBASet dcSet) {
         super(dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
