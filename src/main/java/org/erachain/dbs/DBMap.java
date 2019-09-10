@@ -2,17 +2,11 @@ package org.erachain.dbs;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.IDB;
-import org.erachain.database.SortableList;
-import org.erachain.rocksDB.indexes.IndexDB;
-import org.erachain.rocksDB.integration.DBRocksDBTable;
-import org.erachain.rocksDB.integration.InnerDBTable;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
 import java.util.HashMap;
 import java.util.*;
-
-import static org.erachain.datachain.DBConstants.*;
 
 @Slf4j
 public abstract class DBMap<T, U> extends Observable {
@@ -72,7 +66,6 @@ public abstract class DBMap<T, U> extends Observable {
     abstract Collection<U> getValues();
 
     abstract void put(T key, U value);
-
     abstract U delete(T key);
 
     abstract boolean contains(T key);
@@ -93,8 +86,8 @@ public abstract class DBMap<T, U> extends Observable {
         super.addObserver(o);
         //NOTIFY
         if (observableData != null) {
-            if (observableData.containsKey(NOTIFY_LIST)) {
-                o.update(null, new ObserverMessage(observableData.get(NOTIFY_LIST), this));
+            if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_LIST)) {
+                o.update(null, new ObserverMessage(observableData.get(org.erachain.database.DBMap.NOTIFY_LIST), this));
             }
         }
     }
@@ -103,39 +96,19 @@ public abstract class DBMap<T, U> extends Observable {
      * @param descending true if need descending sort
      * @return
      */
-    public Iterator<T> getIndexIterator(IndexDB indexDB, boolean descending) {
-        return tableDB.getIndexIterator(descending, indexDB);
-    }
+    abstract Iterator<T> getIndexIterator(int indexDB, boolean descending);
 
-    public Iterator<T> getIterator(boolean descending) {
-        return tableDB.getIterator(descending);
-    }
-
-    //todo Gleb нужен ли этот метод?
-    public SortableList<T, U> getList() {
-        SortableList<T, U> list;
-        if (size() < 1000) {
-            list = new SortableList<>(this);
-        } else {
-            // обрезаем полный список в базе до 1000
-            list = SortableList.makeSortableList(this, false, 1000);
-        }
-        return list;
-
-    }
+    abstract Iterator<T> getIterator(boolean descending);
 
     public void reset() {
-        tableDB.clear();
         if (observableData != null) {
             //NOTIFY LIST
-            if (observableData.containsKey(NOTIFY_RESET)) {
+            if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_RESET)) {
                 setChanged();
-                notifyObservers(new ObserverMessage(observableData.get(NOTIFY_RESET), this));
+                notifyObservers(new ObserverMessage(observableData.get(org.erachain.database.DBMap.NOTIFY_RESET), this));
             }
         }
     }
 
-    public void close() {
-        tableDB.close();
-    }
+    abstract void close();
 }

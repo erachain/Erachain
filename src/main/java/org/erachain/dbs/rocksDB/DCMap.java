@@ -1,8 +1,8 @@
-package org.erachain.dbs.rocksDB.basic;
+package org.erachain.dbs.rocksDB;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.IDB;
+import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -16,7 +16,7 @@ import java.util.*;
  * @param <U>
  */
 @Slf4j
-@NoArgsConstructor
+//@NoArgsConstructor
 public abstract class DCMap<T, U> extends DBMap<T, U> {
 
     protected DCMap<T, U> parent;
@@ -30,7 +30,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
     public DCMap(DCMap<T, U> parent, IDB dcSet) {
         super(dcSet);
         this.parent = parent;
-        tableDB = getMemoryMap();
+        getMemoryMap();
     }
 
 
@@ -106,9 +106,9 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
                 // NOTIFY if not FORKED
                 if (observableData != null
                         /*&& (old == null || !old.equals(value))*/) {
-                    if (observableData.containsKey(NOTIFY_ADD) && !DCSet.isStoped()) {
+                    if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
                         setChanged();
-                        Integer observeItem = observableData.get(NOTIFY_ADD);
+                        Integer observeItem = (Integer) observableData.get(org.erachain.database.DBMap.NOTIFY_ADD);
                         if (observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
                                 || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
                                 || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
@@ -146,9 +146,9 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         } else if (parent == null) {
             // NOTIFY
             if (observableData != null) {
-                if (observableData.containsKey(NOTIFY_REMOVE)) {
+                if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_REMOVE)) {
                     setChanged();
-                    Integer observItem = this.observableData.get(NOTIFY_REMOVE);
+                    Integer observItem = (Integer) this.observableData.get(org.erachain.database.DBMap.NOTIFY_REMOVE);
                     if (observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
                             || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
                             || observItem.equals(ObserverMessage.REMOVE_AT_TX)) {

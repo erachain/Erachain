@@ -32,4 +32,7 @@ public interface InnerDBTable<K, V> {
     Iterator<K> getIterator(boolean descending);
 
     Iterator<K> getIndexIterator(boolean descending, IndexDB indexDB);
+
+    Iterator<K> getIndexIterator(boolean descending, int indexDB);
+
 }

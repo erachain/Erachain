@@ -1,28 +1,32 @@
-package org.erachain.dbs.rocksDB.basic;
+package org.erachain.dbs.rocksDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.InnerDBTable;
-import org.erachain.rocksDB.indexes.IndexDB;
-import org.erachain.rocksDB.integration.DBRocksDBTable;
-import org.erachain.rocksDB.integration.InnerDBTable;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
 import java.util.*;
 
-import static org.erachain.datachain.DBConstants.*;
 
 @Slf4j
 public abstract class DBMap<T, U> extends org.erachain.dbs.DBMap {
 
     protected InnerDBTable<T, U> tableDB;
 
+    public DBMap(IDB databaseSet, DB database) {
+        super(databaseSet, database);
+    }
 
-    protected abstract InnerDBTable<T, U> getMap(DB database);
+    public DBMap(IDB databaseSet) {
+        super(databaseSet);
+    }
 
-    protected abstract InnerDBTable<T, U> getMemoryMap();
+    protected abstract void getMap(DB database);
+
+    protected abstract void getMemoryMap();
 
     protected U getDefaultValue() {
         return null;
@@ -61,7 +65,7 @@ public abstract class DBMap<T, U> extends org.erachain.dbs.DBMap {
         if (observableData != null) {
             if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_ADD)) {
                 setChanged();
-                notifyObservers(new ObserverMessage(observableData.get(org.erachain.database.DBMap.NOTIFY_ADD), value));
+                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.database.DBMap.NOTIFY_ADD), value));
             }
         }
     }
@@ -75,7 +79,7 @@ public abstract class DBMap<T, U> extends org.erachain.dbs.DBMap {
             if (observableData != null) {
                 if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_REMOVE)) {
                     setChanged();
-                    notifyObservers(new ObserverMessage(this.observableData.get(org.erachain.database.DBMap.NOTIFY_REMOVE), value));
+                    notifyObservers(new ObserverMessage((Integer) this.observableData.get(org.erachain.database.DBMap.NOTIFY_REMOVE), value));
                 }
             }
         }
@@ -94,56 +98,13 @@ public abstract class DBMap<T, U> extends org.erachain.dbs.DBMap {
         return ((DBRocksDBTable<T, U>) tableDB).getLatestValues(limit);
     }
 
-
-    /**
-     * Соединяется прямо к списку SortableList для отображения в ГУИ
-     * Нужен только для сортировки<br>
-     *
-     * @param o
-     */
-    @Override
-    public void addObserver(Observer o) {
-        super.addObserver(o);
-        //NOTIFY
-        if (observableData != null) {
-            if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_LIST)) {
-                o.update(null, new ObserverMessage(observableData.get(org.erachain.database.DBMap.NOTIFY_LIST), this));
-            }
-        }
-    }
-
-    /**
-     * @param descending true if need descending sort
-     * @return
-     */
-    public Iterator<T> getIndexIterator(IndexDB indexDB, boolean descending) {
-        return tableDB.getIndexIterator(descending, indexDB);
-    }
-
-    public Iterator<T> getIterator(boolean descending) {
-        return tableDB.getIterator(descending);
-    }
-
-    //todo Gleb нужен ли этот метод?
-    public SortableList<T, U> getList() {
-        SortableList<T, U> list;
-        if (size() < 1000) {
-            list = new SortableList<>(this);
-        } else {
-            // обрезаем полный список в базе до 1000
-            list = SortableList.makeSortableList(this, false, 1000);
-        }
-        return list;
-
-    }
-
     public void reset() {
         tableDB.clear();
         if (observableData != null) {
             //NOTIFY LIST
             if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_RESET)) {
                 setChanged();
-                notifyObservers(new ObserverMessage(observableData.get(org.erachain.database.DBMap.NOTIFY_RESET), this));
+                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.database.DBMap.NOTIFY_RESET), this));
             }
         }
     }

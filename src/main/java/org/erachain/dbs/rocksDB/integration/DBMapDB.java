@@ -82,4 +82,9 @@ public class DBMapDB<K, V> implements InnerDBTable<K, V> {
         return null;
     }
 
+    @Override
+    public Iterator<K> getIndexIterator(boolean descending, int indexDB) {
+        return null;
+    }
+
 }
