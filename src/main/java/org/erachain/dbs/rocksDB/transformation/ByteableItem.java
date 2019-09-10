@@ -1,9 +1,9 @@
-package org.erachain.rocksDB.transformation;
+package org.erachain.dbs.rocksDB.transformation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.ItemFactory;
-import org.erachain.rocksDB.exceptions.WrongParseException;
+import org.erachain.dbs.rocksDB.exceptions.WrongParseException;
 
 @Slf4j
 public class ByteableItem implements Byteable<ItemCls> {

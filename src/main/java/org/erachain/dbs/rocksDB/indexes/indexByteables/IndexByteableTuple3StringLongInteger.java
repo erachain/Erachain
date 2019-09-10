@@ -1,10 +1,10 @@
-package org.erachain.rocksDB.indexes.indexByteables;
+package org.erachain.dbs.rocksDB.indexes.indexByteables;
 
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.erachain.rocksDB.indexes.IndexByteable;
-import org.erachain.rocksDB.transformation.ByteableInteger;
-import org.erachain.rocksDB.transformation.ByteableLong;
-import org.erachain.rocksDB.transformation.ByteableString;
+import org.erachain.dbs.rocksDB.indexes.IndexByteable;
+import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
+import org.erachain.dbs.rocksDB.transformation.ByteableLong;
+import org.erachain.dbs.rocksDB.transformation.ByteableString;
 
 public class IndexByteableTuple3StringLongInteger implements IndexByteable<Tuple3<String, Long, Integer>, Long> {
     @Override

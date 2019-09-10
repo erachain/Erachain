@@ -1,6 +1,6 @@
-package org.erachain.rocksDB.transformation.tuples;
+package org.erachain.dbs.rocksDB.transformation.tuples;
 
-import org.erachain.rocksDB.transformation.*;
+import org.erachain.dbs.rocksDB.transformation.*;
 
 public class ByteableTuple3LongIntegerBigInteger extends ByteableTuple3<String, Long, String> {
 

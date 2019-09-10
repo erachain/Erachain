@@ -1,8 +1,8 @@
-package org.erachain.rocksDB.transformation;
+package org.erachain.dbs.rocksDB.transformation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.naming.Name;
-import org.erachain.rocksDB.exceptions.WrongParseException;
+import org.erachain.dbs.rocksDB.exceptions.WrongParseException;
 
 @Slf4j
 public class ByteableName implements Byteable<Name>{

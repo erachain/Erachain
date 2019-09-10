@@ -1,4 +1,4 @@
-package org.erachain.rocksDB.indexes;
+package org.erachain.dbs.rocksDB.indexes;
 
 import lombok.Getter;
 import lombok.Setter;

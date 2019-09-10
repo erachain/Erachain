@@ -1,13 +1,13 @@
-package org.erachain.rocksDB.integration;
+package org.erachain.dbs.rocksDB.integration;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.erachain.rocksDB.common.DB;
-import org.erachain.rocksDB.exceptions.UnsupportedRocksDBOperationException;
-import org.erachain.rocksDB.indexes.IndexDB;
-import org.erachain.rocksDB.indexes.SimpleIndexDB;
-import org.erachain.rocksDB.transformation.Byteable;
-import org.erachain.rocksDB.transformation.ByteableTransaction;
+import org.erachain.dbs.rocksDB.common.DB;
+import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.transformation.Byteable;
+import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 
 import java.util.*;
 

@@ -1,8 +1,8 @@
-package org.erachain.rocksDB.transformation.tuples;
+package org.erachain.dbs.rocksDB.transformation.tuples;
 
 import lombok.Setter;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.erachain.rocksDB.transformation.Byteable;
+import org.erachain.dbs.rocksDB.transformation.Byteable;
 
 import java.util.Arrays;
 

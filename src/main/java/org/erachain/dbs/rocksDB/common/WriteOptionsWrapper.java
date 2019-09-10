@@ -1,4 +1,4 @@
-package org.erachain.rocksDB.common;
+package org.erachain.dbs.rocksDB.common;
 
 import lombok.Getter;
 import org.rocksdb.WriteOptions;

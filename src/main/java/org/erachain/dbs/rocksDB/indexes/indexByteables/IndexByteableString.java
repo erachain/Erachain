@@ -1,6 +1,6 @@
-package org.erachain.rocksDB.indexes.indexByteables;
+package org.erachain.dbs.rocksDB.indexes.indexByteables;
 
-import org.erachain.rocksDB.indexes.IndexByteable;
+import org.erachain.dbs.rocksDB.indexes.IndexByteable;
 
 import java.nio.charset.StandardCharsets;
 

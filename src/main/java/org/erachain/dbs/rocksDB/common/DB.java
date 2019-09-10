@@ -1,6 +1,6 @@
-package org.erachain.rocksDB.common;
+package org.erachain.dbs.rocksDB.common;
 
-import org.erachain.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
 
 import java.util.Set;
 

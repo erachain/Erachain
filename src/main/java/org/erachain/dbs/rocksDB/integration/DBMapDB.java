@@ -1,6 +1,6 @@
-package org.erachain.rocksDB.integration;
+package org.erachain.dbs.rocksDB.integration;
 
-import org.erachain.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
 
 import java.util.Collection;
 import java.util.Iterator;

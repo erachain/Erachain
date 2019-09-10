@@ -1,7 +1,7 @@
-package org.erachain.rocksDB.integration;
+package org.erachain.dbs.rocksDB.integration;
 
-import org.erachain.rocksDB.common.RocksDbSettings;
-import org.erachain.rocksDB.transformation.ByteableTrivial;
+import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 
 import java.util.Set;
 

@@ -1,9 +1,9 @@
-package org.erachain.rocksDB.transformation.differentLength;
+package org.erachain.dbs.rocksDB.transformation.differentLength;
 
 import org.apache.flink.api.java.tuple.Tuple5;
-import org.erachain.rocksDB.transformation.Byteable;
-import org.erachain.rocksDB.transformation.ByteableInteger;
-import org.erachain.rocksDB.transformation.ByteableLong;
+import org.erachain.dbs.rocksDB.transformation.Byteable;
+import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
+import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 
 import java.util.ArrayList;
 import java.util.Arrays;

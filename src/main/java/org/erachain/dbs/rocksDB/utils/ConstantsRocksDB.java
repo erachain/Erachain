@@ -1,4 +1,4 @@
-package org.erachain.rocksDB.utils;
+package org.erachain.dbs.rocksDB.utils;
 
 public class ConstantsRocksDB {
     public static String ROCKS_DB_FOLDER = "./RocksDB";

@@ -1,9 +1,9 @@
-package org.erachain.rocksDB.transformation;
+package org.erachain.dbs.rocksDB.transformation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.BlockFactory;
-import org.erachain.rocksDB.exceptions.WrongParseException;
+import org.erachain.dbs.rocksDB.exceptions.WrongParseException;
 
 @Slf4j
 public class ByteableBlock implements Byteable<Block>{

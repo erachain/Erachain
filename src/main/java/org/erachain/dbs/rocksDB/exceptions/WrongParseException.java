@@ -1,4 +1,4 @@
-package org.erachain.rocksDB.exceptions;
+package org.erachain.dbs.rocksDB.exceptions;
 
 public class WrongParseException extends RuntimeException {
 

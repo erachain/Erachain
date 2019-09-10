@@ -1,19 +1,19 @@
-package org.erachain.rocksDB.integration;
+package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
-import org.erachain.rocksDB.common.DBIterator;
-import org.erachain.rocksDB.common.RocksDB;
-import org.erachain.rocksDB.common.RocksDbSettings;
-import org.erachain.rocksDB.exceptions.UnsupportedRocksDBOperationException;
-import org.erachain.rocksDB.exceptions.UnsupportedTypeIndexException;
-import org.erachain.rocksDB.indexes.ArrayIndexDB;
-import org.erachain.rocksDB.indexes.IndexDB;
-import org.erachain.rocksDB.indexes.ListIndexDB;
-import org.erachain.rocksDB.indexes.SimpleIndexDB;
-import org.erachain.rocksDB.transformation.Byteable;
-import org.erachain.rocksDB.transformation.ByteableInteger;
-import org.erachain.rocksDB.utils.FileUtil;
+import org.erachain.dbs.rocksDB.common.DBIterator;
+import org.erachain.dbs.rocksDB.common.RocksDB;
+import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
+import org.erachain.dbs.rocksDB.exceptions.UnsupportedTypeIndexException;
+import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
+import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.transformation.Byteable;
+import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
+import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.*;
@@ -21,7 +21,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class DBRocksDBTable<K, V> implements org.erachain.rocksDB.integration.InnerDBTable<K, V> {
+public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integration.InnerDBTable<K, V> {
 
     private List<ColumnFamilyHandle> columnFamilyHandles;
     private ColumnFamilyHandle columnFamilyFieldSize;

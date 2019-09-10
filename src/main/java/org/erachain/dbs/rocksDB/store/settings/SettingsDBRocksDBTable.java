@@ -1,12 +1,12 @@
-package org.erachain.rocksDB.store.settings;
+package org.erachain.dbs.rocksDB.store.settings;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.erachain.rocksDB.common.RocksDB;
-import org.erachain.rocksDB.transformation.Byteable;
-import org.erachain.rocksDB.transformation.ByteableAtomicLong;
-import org.erachain.rocksDB.transformation.ByteableInteger;
-import org.erachain.rocksDB.transformation.ByteableString;
+import org.erachain.dbs.rocksDB.common.RocksDB;
+import org.erachain.dbs.rocksDB.transformation.Byteable;
+import org.erachain.dbs.rocksDB.transformation.ByteableAtomicLong;
+import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
+import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.mapdb.Atomic;
 
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package org.erachain.rocksDB.common;
+package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksIterator;

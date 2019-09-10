@@ -1,7 +1,7 @@
-package org.erachain.rocksDB.transformation.tuples;
+package org.erachain.dbs.rocksDB.transformation.tuples;
 
-import org.erachain.rocksDB.transformation.Byteable;
-import org.erachain.rocksDB.transformation.ByteableLong;
+import org.erachain.dbs.rocksDB.transformation.Byteable;
+import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 
 public class ByteableTuple2LongLong extends ByteableTuple2<Long,Long>{
 

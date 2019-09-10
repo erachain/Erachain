@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the ethereumJ library. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.erachain.rocksDB.common;
+package org.erachain.dbs.rocksDB.common;
 
-import org.erachain.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.List;

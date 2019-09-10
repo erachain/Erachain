@@ -1,13 +1,13 @@
-package org.erachain.rocksDB.common;
+package org.erachain.dbs.rocksDB.common;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.rocksDB.indexes.IndexDB;
-import org.erachain.rocksDB.utils.ByteUtil;
-import org.erachain.rocksDB.utils.FileUtil;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.utils.ByteUtil;
+import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.rocksdb.RocksDB;
 import org.rocksdb.*;
 

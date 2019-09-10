@@ -1,4 +1,4 @@
-package org.erachain.rocksDB.common;
+package org.erachain.dbs.rocksDB.common;
 
 import java.util.Map;
 
