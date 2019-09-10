@@ -48,9 +48,9 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
     }
 
     @Override
-    protected Map<Integer, Block.BlockHead> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap(NAME)
+        map = database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockHeadSerializer())
                 .counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
@@ -71,8 +71,8 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
     }
 
     @Override
-    protected Map<Integer, Block.BlockHead> getMemoryMap() {
-        return new HashMap<Integer, Block.BlockHead>();
+    protected void getMemoryMap() {
+        map = new HashMap<Integer, Block.BlockHead>();
     }
 
     @Override

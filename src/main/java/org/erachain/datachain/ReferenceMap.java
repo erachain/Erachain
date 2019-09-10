@@ -26,9 +26,9 @@ public class ReferenceMap extends DCMap<byte[], long[]> {
     }
 
     @Override
-    protected Map<byte[], long[]> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createHashMap("references")
+        map = database.createHashMap("references")
                 .keySerializer(SerializerBase.BASIC)
                 .hasher(Hasher.BASIC)
                 .counterEnable()
@@ -37,7 +37,7 @@ public class ReferenceMap extends DCMap<byte[], long[]> {
 
     @Override
     protected Map<byte[], long[]> getMemoryMap() {
-        return new TreeMap<>(UnsignedBytes.lexicographicalComparator());
+        map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
     }
 
     protected void createIndexes(DB database) {

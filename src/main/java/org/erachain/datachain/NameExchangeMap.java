@@ -60,16 +60,16 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
     }
 
     @Override
-    protected Map<String, BigDecimal> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("namesales")
+        map = database.createTreeMap("namesales")
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<String, BigDecimal> getMemoryMap() {
-        return new HashMap<String, BigDecimal>();
+    protected void getMemoryMap() {
+        map = new HashMap<String, BigDecimal>();
     }
 
     @Override

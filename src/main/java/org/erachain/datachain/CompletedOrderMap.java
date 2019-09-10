@@ -39,17 +39,17 @@ public class CompletedOrderMap extends DCMap<Long, Order> {
     }
 
     @Override
-    protected Map<Long, Order> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<Long, Order> getMemoryMap() {
+    protected void getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     private Map<Long, Order> openMap(DB database) {

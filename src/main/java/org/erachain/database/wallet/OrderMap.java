@@ -54,17 +54,17 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
     }
 
     @Override
-    protected Map<Tuple2<String, Long>, Tuple2<Long, Order>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<String, Long>, Tuple2<Long, Order>> getMemoryMap() {
+    protected void getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     private Map<Tuple2<String, Long>, Tuple2<Long, Order>> openMap(DB database) {

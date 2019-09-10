@@ -69,9 +69,9 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Name> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("names")
+        map = database.createTreeMap("names")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new NameSerializer())
                 .counterEnable()
@@ -79,8 +79,8 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Name> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, Name>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<String, String>, Name>(Fun.TUPLE2_COMPARATOR);
     }
 
     @Override

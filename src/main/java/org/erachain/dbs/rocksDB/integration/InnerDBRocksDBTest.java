@@ -67,7 +67,6 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
 
     @Override
     public void close() {
-        
     }
 
     @Override
@@ -77,6 +76,11 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
 
     @Override
     public Iterator<K> getIndexIterator(boolean descending, IndexDB indexDB) {
+        return null;
+    }
+
+    @Override
+    public Iterator<K> getIndexIterator(boolean descending, int indexDB) {
         return null;
     }
 

@@ -24,17 +24,17 @@ public class VoteOnPollMap extends DCMap<byte[], Integer> {
     }
 
     @Override
-    protected Map<byte[], Integer> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("voteOnPollOrphanData")
+        map = database.createTreeMap("voteOnPollOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], Integer> getMemoryMap() {
-        return new TreeMap<byte[], Integer>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Integer>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override

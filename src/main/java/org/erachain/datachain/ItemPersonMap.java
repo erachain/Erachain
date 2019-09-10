@@ -35,9 +35,9 @@ public class ItemPersonMap extends ItemMap {
 
     // type+name not initialized yet! - it call as Super in New
     @SuppressWarnings("unchecked")
-    protected Map<Long, ItemCls> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap(NAME)
+        map = database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))
                 .makeOrGet();
 

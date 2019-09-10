@@ -33,17 +33,17 @@ public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
     }
 
     @Override
-    protected Map<byte[], BigDecimal> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("cancelNameOrphanData")
+        map = database.createTreeMap("cancelNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], BigDecimal> getMemoryMap() {
-        return new TreeMap<byte[], BigDecimal>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], BigDecimal>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override

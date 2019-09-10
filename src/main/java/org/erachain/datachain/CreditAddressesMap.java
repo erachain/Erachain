@@ -35,9 +35,9 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
     }
 
     @Override
-    protected Map<Tuple3<String, Long, String>, BigDecimal> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("credit_debt")
+        map = database.createTreeMap("credit_debt")
                 .keySerializer(BTreeKeySerializer.TUPLE3)
                 //.comparator(UnsignedBytes.lexicographicalComparator())
                 //.comparator(Fun.COMPARATOR)
@@ -47,8 +47,8 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
     }
 
     @Override
-    protected Map<Tuple3<String, Long, String>, BigDecimal> getMemoryMap() {
-        return new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
     }
 
     @Override

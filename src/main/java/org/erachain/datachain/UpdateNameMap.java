@@ -26,9 +26,9 @@ public class UpdateNameMap extends DCMap<byte[], Name> {
     }
 
     @Override
-    protected Map<byte[], Name> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("updateNameOrphanData")
+        map = database.createTreeMap("updateNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .valueSerializer(new NameSerializer())
@@ -36,8 +36,8 @@ public class UpdateNameMap extends DCMap<byte[], Name> {
     }
 
     @Override
-    protected Map<byte[], Name> getMemoryMap() {
-        return new TreeMap<byte[], Name>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Name>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override

@@ -42,7 +42,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         this.name = name;
 
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
-        map = getMap(database);
+        getMap(database);
 
         makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
 
@@ -61,12 +61,12 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
         if (this.name == null)
-            return null;
+            return;
 
-        return database.createTreeMap(this.name)
+        map = database.createTreeMap(this.name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new LongItemSerializer(this.type))
                 .counterEnable()
@@ -74,8 +74,8 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> getMemoryMap() {
-        return new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
     }
 
     @Override

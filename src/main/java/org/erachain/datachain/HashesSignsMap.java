@@ -42,17 +42,17 @@ public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
     }
 
     @Override
-    protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("hashes_signs")
+        map = database.createTreeMap("hashes_signs")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMemoryMap() {
-        return new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override

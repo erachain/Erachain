@@ -52,17 +52,17 @@ public class ATMap extends DCMap<String, AT> {
     }
 
     @Override
-    protected Map<String, AT> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<String, AT> getMemoryMap() {
+    protected void getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     @SuppressWarnings("unchecked")

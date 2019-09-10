@@ -45,17 +45,17 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
     }
 
     @Override
-    protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("vote_item_poll")
+        map = database.createTreeMap("vote_item_poll")
                 .keySerializer(BTreeKeySerializer.TUPLE3)
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMemoryMap() {
-        return new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
     }
 
     @Override

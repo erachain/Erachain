@@ -146,9 +146,9 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Block.BlockHead> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("blocks")
+        map = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.TUPLE2) /// ТУТ тоже переделать на стандартный серилиазотор
                 .valueSerializer(new BlockHeadSerializer())
                 .valuesOutsideNodesEnable()
@@ -157,8 +157,8 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Block.BlockHead> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, Block.BlockHead>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<String, String>, Block.BlockHead>(Fun.TUPLE2_COMPARATOR);
     }
 
     @Override

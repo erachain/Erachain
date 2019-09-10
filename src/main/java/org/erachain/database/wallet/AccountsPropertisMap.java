@@ -33,9 +33,9 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
     }
 
     @Override
-    protected Map<String, Tuple2<String, String>> getMap(DB database) {
+    protected void getMap(DB database) {
         // OPEN MAP
-        return database.createTreeMap("accounts_propertis_map")
+        map = database.createTreeMap("accounts_propertis_map")
                 //.keySerializer(BTreeKeySerializer.STRING)
                 //.valueSerializer(new NameSerializer())
                 .counterEnable()
@@ -44,8 +44,8 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Map<String, Tuple2<String, String>> getMemoryMap() {
-        return new TreeMap<String, Tuple2<String, String>>(Fun.COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<String, Tuple2<String, String>>(Fun.COMPARATOR);
     }
 
     @Override

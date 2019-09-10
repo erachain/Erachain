@@ -1,16 +1,18 @@
-package org.erachain.datachain;
+package org.erachain.dbs.MapDB;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
-import org.erachain.database.DBMap;
-import org.erachain.database.IDB;
+import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Observer;
+import java.util.Set;
 
 /**
  * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork()

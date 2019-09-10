@@ -51,17 +51,17 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Trade> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Trade> getMemoryMap() {
+    protected void getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     @SuppressWarnings("unchecked")

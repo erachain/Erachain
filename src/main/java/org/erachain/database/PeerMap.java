@@ -30,17 +30,17 @@ public class PeerMap extends DBMap<byte[], byte[]> {
     }
 
     @Override
-    protected Map<byte[], byte[]> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("peers")
+        map = database.createTreeMap("peers")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], byte[]> getMemoryMap() {
-        return new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override

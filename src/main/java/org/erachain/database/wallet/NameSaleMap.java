@@ -88,17 +88,17 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
     }
 
     @Override
-    protected Map<Tuple2<String, String>, BigDecimal> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("namesales")
+        map = database.createTreeMap("namesales")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<Tuple2<String, String>, BigDecimal> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, BigDecimal>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<String, String>, BigDecimal>(Fun.TUPLE2_COMPARATOR);
     }
 
     @Override

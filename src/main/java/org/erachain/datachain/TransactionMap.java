@@ -108,10 +108,10 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
     }
 
     @Override
-    protected Map<Long, Transaction> getMap(DB database) {
+    protected void getMap(DB database) {
 
         // OPEN MAP
-        HTreeMap<Long, Transaction> map = database.createHashMap("transactions")
+        map = database.createHashMap("transactions")
                 .keySerializer(SerializerBase.BASIC)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
@@ -120,13 +120,13 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
-            return map;
+            return;
 
         this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
 
-        Bind.secondaryKey(map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
+        Bind.secondaryKey((BTreeMap)map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
             @Override
             public Tuple2<String, Long> run(Long key, Transaction val) {
                 Account account = val.getCreator();
@@ -137,7 +137,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
-        Bind.secondaryKeys(map, this.recipientKey,
+        Bind.secondaryKeys((BTreeMap)map, this.recipientKey,
                 new Fun.Function2<String[], Long, Transaction>() {
                     @Override
                     public String[] run(Long key, Transaction val) {
@@ -158,7 +158,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
         this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
-        Bind.secondaryKeys(map, this.typeKey,
+        Bind.secondaryKeys((BTreeMap)map, this.typeKey,
                 new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
                     @Override
                     public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
@@ -182,12 +182,11 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
                     }
                 });
 
-        return map;
     }
 
     @Override
-    protected Map<Long, Transaction> getMemoryMap() {
-        return new TreeMap<Long, Transaction>(
+    protected void getMemoryMap() {
+        map = new TreeMap<Long, Transaction>(
                 //UnsignedBytes.lexicographicalComparator()
         );
     }

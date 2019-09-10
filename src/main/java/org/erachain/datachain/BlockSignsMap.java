@@ -32,10 +32,10 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
     }
 
     @Override
-    protected Map<Long, Integer> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN HASH MAP
         //
-        return database.createHashMap("height")
+        map = database.createHashMap("height")
                 .keySerializer(SerializerBase.LONG)
                 .valueSerializer(SerializerBase.INTEGER)
 
@@ -49,7 +49,7 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
     @Override
     protected Map<Long, Integer> getMemoryMap() {
         //return new TreeMap<long[], Integer>(UnsignedBytes.lexicographicalComparator()); // for byte[] KEYS
-        return new TreeMap<Long, Integer>();
+        map = new TreeMap<Long, Integer>();
     }
 
     @Override

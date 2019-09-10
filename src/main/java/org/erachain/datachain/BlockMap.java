@@ -74,9 +74,9 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     @Override
-    protected Map<Integer, Block> getMap(DB database) {
+    protected void getMap(DB database) {
         // OPEN MAP
-        return database.createTreeMap("blocks")
+        map = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockSerializer())
                 .valuesOutsideNodesEnable()
@@ -85,8 +85,8 @@ public class BlockMap extends DCMap<Integer, Block> {
     }
 
     @Override
-    protected Map<Integer, Block> getMemoryMap() {
-        return new TreeMap<>();
+    protected void getMemoryMap() {
+        map = new TreeMap<>();
     }
 
     @Override

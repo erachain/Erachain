@@ -25,9 +25,9 @@ public class TelegramsMap extends DBMap<String, Transaction> {
     }
    
     @Override
-    protected Map<String, Transaction> getMap(DB database) {
+    protected void getMap(DB database) {
       //OPEN MAP
-        return database.createTreeMap("telegrams1")
+        map = database.createTreeMap("telegrams1")
                 .keySerializer(BTreeKeySerializer.STRING)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
@@ -35,9 +35,9 @@ public class TelegramsMap extends DBMap<String, Transaction> {
     }
 
     @Override
-    protected Map<String, Transaction> getMemoryMap() {
+    protected void getMemoryMap() {
         // TODO Auto-generated method stub
-        return getMemoryMap();
+        map = null;
     }
 
     @Override

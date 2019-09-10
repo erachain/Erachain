@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -12,15 +13,15 @@ import java.util.*;
 
 
 @Slf4j
-public abstract class DBMap<T, U> extends org.erachain.dbs.DBMap {
+public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
 
     protected InnerDBTable<T, U> tableDB;
 
-    public DBMap(IDB databaseSet, DB database) {
+    public DBMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public DBMap(IDB databaseSet) {
+    public DBMap(DBASet databaseSet) {
         super(databaseSet);
     }
 

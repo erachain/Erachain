@@ -58,21 +58,19 @@ public class KKKMap extends DCMap<
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        BTreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> map = database.createTreeMap(name)
+        map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .counterEnable()
                 .makeOrGet();
 
-        //RETURN
-        return map;
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMemoryMap() {
+    protected void getMemoryMap() {
         // HashMap ?
-        return new TreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>>();
+        map = new TreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>>();
     }
 
     @Override

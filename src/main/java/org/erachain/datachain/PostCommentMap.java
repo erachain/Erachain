@@ -25,13 +25,19 @@ public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
     }
 
     @Override
-    protected Map<byte[], List<byte[]>> getMap(DB database) {
+    protected void getMap(DB database) {
 
-        return database.createTreeMap("CommentPostMap")
+        map = database.createTreeMap("CommentPostMap")
                 .comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
     }
+
+    @Override
+    protected void getMemoryMap() {
+        map = new HashMap<>();
+    }
+
 
     public void add(byte[] signatureOfPostToComment, byte[] signatureOfComment) {
         List<byte[]> list;
@@ -68,12 +74,6 @@ public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
         }
 
 
-    }
-
-
-    @Override
-    protected Map<byte[], List<byte[]>> getMemoryMap() {
-        return new HashMap<>();
     }
 
     @Override

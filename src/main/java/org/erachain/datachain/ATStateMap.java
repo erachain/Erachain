@@ -26,14 +26,14 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
     }
 
     @Override
-    protected Map<Tuple2<Integer, String>, byte[]> getMap(DB database) {
-        return this.openMap(database);
+    protected void getMap(DB database) {
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<Integer, String>, byte[]> getMemoryMap() {
+    protected void getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
 

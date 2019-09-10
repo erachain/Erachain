@@ -7,6 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.MapDB.DCMap;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
@@ -63,9 +64,7 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
 
     @SuppressWarnings({"unchecked"})
     @Override
-    protected Map<byte[], Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
         BTreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
@@ -73,10 +72,6 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
         HTreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> hashMap;
-
-        Map<byte[], Tuple5<
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> map;
 
         if (true) {
             hashMap = database.createHashMap("balances")
@@ -104,7 +99,7 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
-            return map;
+            return;
 
 
         //BIND ASSET KEY
@@ -167,15 +162,11 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
             }
         });
 
-        //RETURN
-        return map;
     }
 
     @Override
-    protected Map<byte[], Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getMemoryMap() {
-        return new TreeMap<byte[], Tuple5<
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(Fun.BYTE_ARRAY_COMPARATOR);
     }

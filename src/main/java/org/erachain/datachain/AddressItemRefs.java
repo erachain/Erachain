@@ -45,9 +45,9 @@ public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     }
 
     @Override
-    protected Map<Tuple2<byte[], Long>, byte[]> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("address_" + this.name + "_refs")
+        map = database.createTreeMap("address_" + this.name + "_refs")
                 //.keySerializer(BTreeKeySerializer.TUPLE2)
                 //.comparator(UnsignedBytes.lexicographicalComparator())
                 .comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.COMPARATOR)) // - for Tuple2<byte[]m byte[]>
@@ -56,9 +56,9 @@ public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
     }
 
     @Override
-    protected Map<Tuple2<byte[], Long>, byte[]> getMemoryMap() {
+    protected void getMemoryMap() {
         //return new TreeMap<Tuple2<byte[], Long>, byte[]>(UnsignedBytes.lexicographicalComparator());
-        return new TreeMap<Tuple2<byte[], Long>, byte[]>();
+        map = new TreeMap<Tuple2<byte[], Long>, byte[]>();
     }
 
     @Override

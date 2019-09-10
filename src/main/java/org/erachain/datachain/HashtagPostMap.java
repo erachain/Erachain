@@ -21,15 +21,15 @@ public class HashtagPostMap extends DCMap<String, List<byte[]>> {
 
 
     @Override
-    protected Map<String, List<byte[]>> getMap(DB database) {
+    protected void getMap(DB database) {
         // / OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("HashtagPostMap");
-        return createTreeMap.makeOrGet();
+        map = createTreeMap.makeOrGet();
     }
 
     @Override
-    protected Map<String, List<byte[]>> getMemoryMap() {
-        return new HashMap<>();
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     @Override

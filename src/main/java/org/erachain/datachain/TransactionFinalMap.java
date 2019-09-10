@@ -180,17 +180,17 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> implements Fil
     }
 
     @Override
-    protected Map<Long, Transaction> getMap(DB database) {
+    protected void getMap(DB database) {
         // OPEN MAP
-        return openMap(database);
+        map = openMap(database);
     }
 
     @Override
-    protected Map<Long, Transaction> getMemoryMap() {
+    protected void getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         // OPEN MAP
-        return this.getMap(database);
+        map = this.getMap(database);
     }
 
     @Override

@@ -23,16 +23,16 @@ public class NameMap extends DCMap<String, Name> {
     }
 
     @Override
-    protected Map<String, Name> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("names")
+        map = database.createTreeMap("names")
                 .valueSerializer(new NameSerializer())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<String, Name> getMemoryMap() {
-        return new HashMap<String, Name>();
+    protected void getMemoryMap() {
+        map = new HashMap<String, Name>();
     }
 
     @Override

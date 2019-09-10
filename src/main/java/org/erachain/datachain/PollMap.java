@@ -62,17 +62,17 @@ public class PollMap extends DCMap<String, Poll> {
     }
 
     @Override
-    protected Map<String, Poll> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("polls")
+        map = database.createTreeMap("polls")
                 .valueSerializer(new PollSerializer())
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<String, Poll> getMemoryMap() {
-        return new HashMap<String, Poll>();
+    protected void getMemoryMap() {
+        map = new HashMap<String, Poll>();
     }
 
     @Override

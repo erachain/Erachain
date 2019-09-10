@@ -69,9 +69,9 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Poll> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("polls")
+        map = database.createTreeMap("polls")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new PollSerializer())
                 .counterEnable()
@@ -79,8 +79,8 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Poll> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, Poll>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<String, String>, Poll>(Fun.TUPLE2_COMPARATOR);
     }
 
     @Override

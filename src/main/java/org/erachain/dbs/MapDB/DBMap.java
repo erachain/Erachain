@@ -1,5 +1,9 @@
-package org.erachain.database;
+package org.erachain.dbs.MapDB;
 
+import org.erachain.database.DBASet;
+import org.erachain.database.IDB;
+import org.erachain.database.IndexIterator;
+import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -11,9 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public abstract class DBMap<T, U> extends Observable {
-
-    protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
 
     public static final int NOTIFY_RESET = 1;
     public static final int NOTIFY_ADD = 2;
@@ -24,6 +26,7 @@ public abstract class DBMap<T, U> extends Observable {
     public int DESCENDING_SHIFT_INDEX = 10000;
 
     public static int DEFAULT_INDEX = 0;
+    private static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
     protected DBASet databaseSet;
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
@@ -31,47 +34,13 @@ public abstract class DBMap<T, U> extends Observable {
     protected Map<Integer, Integer> observableData;
 
     public DBMap(DBASet databaseSet) {
-
-        this.databaseSet = databaseSet;
-
-        //CREATE INDEXES
-        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
-
-        if (databaseSet != null && databaseSet.isWithObserver()) {
-            observableData = new HashMap<Integer, Integer>(8, 1);
-        }
+        super(databaseSet);
     }
 
     public DBMap(DBASet databaseSet, DB database) {
-        this.databaseSet = databaseSet;
-
-        //OPEN MAP
-        getMap(database);
-
-        //CREATE INDEXES
-        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
-
-        if (this.map !=  null) {
-            this.createIndexes(database);
-        }
-
-        if (databaseSet.isWithObserver()) {
-            observableData = new HashMap<Integer, Integer>(8, 1);
-        }
-
+        super(databaseSet, database);
     }
 
-    public IDB getDBSet() {
-        return this.databaseSet;
-    }
-
-    protected abstract void getMap(DB database);
-
-    protected abstract void getMemoryMap();
-
-    protected abstract U getDefaultValue();
-
-    protected abstract void createIndexes(DB database);
 
     /**
      * Make SECODATY INDEX
@@ -302,7 +271,7 @@ public abstract class DBMap<T, U> extends Observable {
                                 keys.add((T) iterator.next());
                             }
                         } catch (Exception e) {
-                            LOGGER.error(e.getMessage(), e);
+                            logger.error(e.getMessage(), e);
                         }
 
                         list = new SortableList<T, U>(this, keys);

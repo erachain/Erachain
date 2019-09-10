@@ -22,9 +22,9 @@ public class CommentPostMap extends DCMap<byte[], byte[]> {
     }
 
     @Override
-    protected Map<byte[], byte[]> getMap(DB database) {
+    protected void getMap(DB database) {
 
-        return database.createTreeMap("CommentPostMapTree")
+        map = database.createTreeMap("CommentPostMapTree")
                 .comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
@@ -39,8 +39,8 @@ public class CommentPostMap extends DCMap<byte[], byte[]> {
     }
 
     @Override
-    protected Map<byte[], byte[]> getMemoryMap() {
-        return new HashMap<>();
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     @Override

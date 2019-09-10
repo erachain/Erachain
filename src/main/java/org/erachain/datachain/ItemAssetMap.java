@@ -37,10 +37,10 @@ public class ItemAssetMap extends ItemMap {
     }
 
     // type+name not initialized yet! - it call as Super in New
-    protected Map<Long, ItemCls> getMap(DB database) {
+    protected void getMap(DB database) {
 
         // OPEN MAP
-        return database.createTreeMap(NAME).valueSerializer(new ItemSerializer(TYPE))
+        map = database.createTreeMap(NAME).valueSerializer(new ItemSerializer(TYPE))
                 // .valueSerializer(new AssetSerializer())
                 // key instead size - .counterEnable()
                 .makeOrGet();

@@ -56,17 +56,17 @@ public class PersonAddressMap extends DCMap<
     }
 
     @Override
-    protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("person_address")
+        map = database.createTreeMap("person_address")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>> getMemoryMap() {
-        return new TreeMap<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>>();
+    protected void getMemoryMap() {
+        map = new TreeMap<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>>();
     }
 
     @Override

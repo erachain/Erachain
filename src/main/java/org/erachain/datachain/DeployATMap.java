@@ -23,17 +23,17 @@ public class DeployATMap extends DCMap<byte[], Long> {
     }
 
     @Override
-    protected Map<byte[], Long> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.createTreeMap("DeployATOrphanData")
+        map = database.createTreeMap("DeployATOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], Long> getMemoryMap() {
-        return new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override

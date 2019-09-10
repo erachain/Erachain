@@ -23,15 +23,15 @@ public class LocalDataMap extends DCMap<String, String> {
 
 
     @Override
-    protected Map<String, String> getMap(DB database) {
+    protected void getMap(DB database) {
         /// OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("LocalDataMap");
-        return createTreeMap.makeOrGet();
+        map = createTreeMap.makeOrGet();
     }
 
     @Override
-    protected Map<String, String> getMemoryMap() {
-        return new HashMap<String, String>();
+    protected void getMemoryMap() {
+        map = new HashMap<String, String>();
     }
 
 

@@ -52,14 +52,14 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
 
     @Override
 
-    protected Map<Tuple2<String, Integer>, Tuple2<Integer, Integer>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return database.getHashMap("address_forging");
+        map = database.getHashMap("address_forging");
     }
 
     @Override
-    protected Map<Tuple2<String, Integer>, Tuple2<Integer, Integer>> getMemoryMap() {
-        return new HashMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>>();
+    protected void getMemoryMap() {
+        map = new HashMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>>();
     }
 
     @Override

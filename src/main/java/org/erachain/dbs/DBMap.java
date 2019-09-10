@@ -1,6 +1,7 @@
 package org.erachain.dbs;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
@@ -10,20 +11,20 @@ import java.util.*;
 
 @Slf4j
 public abstract class DBMap<T, U> extends Observable {
-    protected IDB databaseSet;
+    protected DBASet databaseSet;
     protected Map<Integer, Integer> observableData;
 
     public DBMap() {
     }
 
-    public DBMap(IDB databaseSet) {
+    public DBMap(DBASet databaseSet) {
         this.databaseSet = databaseSet;
         if (databaseSet != null && databaseSet.isWithObserver()) {
             observableData = new HashMap<>();
         }
     }
 
-    public void init(IDB databaseSet) {
+    public void init(DBASet databaseSet) {
         this.databaseSet = databaseSet;
         getMap(null);
         createIndexes();
@@ -32,7 +33,7 @@ public abstract class DBMap<T, U> extends Observable {
         }
     }
 
-    public DBMap(IDB databaseSet, DB database) {
+    public DBMap(DBASet databaseSet, DB database) {
         this.databaseSet = databaseSet;
         getMap(database);
         createIndexes();

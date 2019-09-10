@@ -106,7 +106,7 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
         BTreeMap map = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
@@ -116,12 +116,12 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
 
         makeAutoKey(database, map, "dw_transactions");
 
-        return map;
+        map = map;
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> getMemoryMap() {
-        return new TreeMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>>(Fun.TUPLE2_COMPARATOR);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

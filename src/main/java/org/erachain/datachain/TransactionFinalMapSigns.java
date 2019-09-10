@@ -37,17 +37,17 @@ public class TransactionFinalMapSigns extends DCMap<UUID, Long> {
     }
 
     @Override
-    protected Map<UUID, Long> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        return openMap(database);
+        map = openMap(database);
     }
 
     @Override
-    protected Map<UUID, Long> getMemoryMap() {
+    protected void getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        return this.getMap(database);
+        map = this.getMap(database);
     }
 
     @Override

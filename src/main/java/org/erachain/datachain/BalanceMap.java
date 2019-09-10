@@ -56,12 +56,9 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
 
     @SuppressWarnings({"unchecked"})
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getMap(DB database) {
+    protected void getMap(DB database) {
         //OPEN MAP
-        BTreeMap<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                map = database.createTreeMap("assets_balances_" + this.name)
+        map = database.createTreeMap("assets_balances_" + this.name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .counterEnable()
                 .makeOrGet();
@@ -74,7 +71,7 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
-            return map;
+            return;
 
         //BIND ASSET KEY
 		/*
@@ -84,7 +81,7 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
 				return new Tuple3<Long, BigDecimal, String>(key.b, value.negate(), key.a);
 			}
 		});*/
-        Bind.secondaryKey(map, this.assetKeyMap, new Fun.Function2<Tuple3<Long, Tuple4<Tuple2<BigDecimal, BigDecimal>,
+        Bind.secondaryKey((BTreeMap)map, this.assetKeyMap, new Fun.Function2<Tuple3<Long, Tuple4<Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>, Long>,
                 Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>() {
@@ -104,12 +101,11 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
         });
 
         //RETURN
-        return map;
+        return;
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getMemoryMap() {
+    protected void getMemoryMap() {
         return new TreeMap<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(Fun.TUPLE2_COMPARATOR);
     }

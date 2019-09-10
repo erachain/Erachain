@@ -45,19 +45,19 @@ public class AccountMap extends DBMap <String, Integer> {
     }
 
     @Override
-    protected Map<String, Integer> getMap(DB database) {
+    protected void getMap(DB database) {
         this.publickKeys = database.createTreeSet(ADDRESSES)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .serializer(BTreeKeySerializer.BASIC)
                 .makeOrGet();
 
         this.assetsBalanceMap = database.getTreeMap(ADDRESS_ASSETS);
-        return database.getTreeMap(ADDRESSES_NO);
+        map = database.getTreeMap(ADDRESSES_NO);
     }
 
     @Override
-    protected Map<String, Integer> getMemoryMap() {
-        return new TreeMap<String, Integer>();
+    protected void getMemoryMap() {
+        map = new TreeMap<String, Integer>();
     }
 
     @Override
