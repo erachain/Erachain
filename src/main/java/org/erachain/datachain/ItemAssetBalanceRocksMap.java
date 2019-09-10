@@ -42,8 +42,8 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
         super(databaseSet, database);
     }
 
-    public ItemAssetBalanceRocksMap(ItemAssetBalanceRocksMap parent) {
-        super(parent, null);
+    public ItemAssetBalanceRocksMap(ItemAssetBalanceRocksMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
 
     @Override
     protected void getMemoryMap() {
-        rocksDBTable = new DBMapDB<>(new HashMap<>());
+        //rocksDBTable = new DBMapDB<>(new HashMap<>());
     }
 
     /*
