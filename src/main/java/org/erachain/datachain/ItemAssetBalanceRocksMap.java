@@ -19,7 +19,7 @@ public class ItemAssetBalanceRocksMap extends ItemAssetBalanceMap {
 
     public ItemAssetBalanceRocksMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
-        //init(databaseSet);
+        init(databaseSet);
     }
 
     public ItemAssetBalanceRocksMap(ItemAssetBalanceRocksMap parent) {
