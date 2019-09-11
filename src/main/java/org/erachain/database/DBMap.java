@@ -197,13 +197,12 @@ public abstract class DBMap<T, U> extends Observable {
             }
 
         //    this.outUses();
-        //    return old != null;
         //} catch (Exception e) {
         //    logger.error(e.getMessage(), e);
         //}
 
         this.outUses();
-        return false;
+        return old != null;
     }
 
     /**

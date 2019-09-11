@@ -1,8 +1,8 @@
 package org.erachain.dbs.rocksDB.transformation.differentLength;
 
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class ByteableTuple5Tuples2BigDecimal implements Byteable<
             copy = Arrays.copyOfRange(copy, byteableTuple2BigDecimal.getSummurySize(), copy.length);
             list.add(tuple2);
         }
-        return Tuple5.of(list.get(0), list.get(1), list.get(2), list.get(3), list.get(4));
+        return new Tuple5(list.get(0), list.get(1), list.get(2), list.get(3), list.get(4));
 
     }
 
@@ -36,11 +36,11 @@ public class ByteableTuple5Tuples2BigDecimal implements Byteable<
     public byte[] toBytesObject(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
         return org.bouncycastle.util.Arrays.concatenate(
                 org.bouncycastle.util.Arrays.concatenate(
-                        byteableTuple2BigDecimal.toBytesObject(value.f0),
-                        byteableTuple2BigDecimal.toBytesObject(value.f1),
-                        byteableTuple2BigDecimal.toBytesObject(value.f2)),
+                        byteableTuple2BigDecimal.toBytesObject(value.a),
+                        byteableTuple2BigDecimal.toBytesObject(value.b),
+                        byteableTuple2BigDecimal.toBytesObject(value.c)),
                 org.bouncycastle.util.Arrays.concatenate(
-                        byteableTuple2BigDecimal.toBytesObject(value.f3),
-                        byteableTuple2BigDecimal.toBytesObject(value.f4)));
+                        byteableTuple2BigDecimal.toBytesObject(value.d),
+                        byteableTuple2BigDecimal.toBytesObject(value.e)));
     }
 }

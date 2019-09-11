@@ -1,7 +1,7 @@
 package org.erachain.dbs.rocksDB.transformation.differentLength;
 
 import lombok.Getter;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.mapdb.Fun.Tuple2;
 import org.erachain.core.BlockChain;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
@@ -27,12 +27,12 @@ public class ByteableTuple2BigDecimal implements Byteable<Tuple2<BigDecimal, Big
         Integer size2 = byteableInteger.receiveObjectFromBytes(sizeArray2);
         summurySize = newZero + Integer.BYTES + size2;
         byte[] f1 = Arrays.copyOfRange(bytes, newZero + Integer.BYTES, summurySize);
-        return Tuple2.of(new BigDecimal(new BigInteger(f0)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN),
+        return new Tuple2(new BigDecimal(new BigInteger(f0)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN),
                 new BigDecimal(new BigInteger(f1)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN));
     }
 
     @Override
     public byte[] toBytesObject(Tuple2<BigDecimal, BigDecimal> value) {
-        return org.bouncycastle.util.Arrays.concatenate(byteableBigDecimal.toBytesObject(value.f0), byteableBigDecimal.toBytesObject(value.f1));
+        return org.bouncycastle.util.Arrays.concatenate(byteableBigDecimal.toBytesObject(value.a), byteableBigDecimal.toBytesObject(value.b));
     }
 }

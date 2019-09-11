@@ -1,5 +1,6 @@
 package org.erachain.dbs.rocksDB;
 
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
@@ -38,10 +39,12 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
     protected void createIndexes() {
     }
 
+    @Override
     public int size() {
         return tableDB.size();
     }
 
+    @Override
     public U get(T key) {
         try {
             if (tableDB.containsKey(key)) {
@@ -54,12 +57,28 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         }
     }
 
+    @Override
     public Set<T> getKeys() {
         return tableDB.keySet();
     }
 
+    @Override
     public Collection<U> getValues() {
         return tableDB.values();
+    }
+
+    @Override
+    public boolean set(T key, U value) {
+        U old = get(key);
+        tableDB.put(key, value);
+        //NOTIFY
+        if (observableData != null) {
+            if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_ADD)) {
+                setChanged();
+                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.database.DBMap.NOTIFY_ADD), value));
+            }
+        }
+        return old != null;
     }
 
     public void put(T key, U value) {
@@ -73,6 +92,7 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         }
     }
 
+    @Override
     public U delete(T key) {
         U value = null;
         if (tableDB.containsKey(key)) {
@@ -89,18 +109,22 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         return value;
     }
 
+    @Override
     public boolean contains(T key) {
         return tableDB.containsKey(key);
     }
 
+    @Override
     public Map<Integer, Integer> getObservableData() {
         return observableData;
     }
 
+    //@Override
     public List<U> getLastValues(int limit) {
         return ((DBRocksDBTable<T, U>) tableDB).getLatestValues(limit);
     }
 
+    @Override
     public void reset() {
         tableDB.clear();
         if (observableData != null) {
@@ -112,6 +136,7 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         }
     }
 
+    //@Override
     public void close() {
         tableDB.close();
     }

@@ -90,6 +90,47 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
     }
 
     @Override
+    public boolean set(T key, U value) {
+        if (DCSet.isStoped()) {
+            return false;
+        }
+
+        try {
+            U old = tableDB.get(key);
+            tableDB.put(key, value);
+            if (parent != null) {
+                if (deleted != null) {
+                    if (deleted.remove(key)) {
+                        shiftSize++;
+                    }
+                }
+            } else {
+                // NOTIFY if not FORKED
+                if (observableData != null
+                        && (old == null || !old.equals(value))) {
+                    if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
+                        setChanged();
+                        Integer observeItem = (Integer) observableData.get(org.erachain.database.DBMap.NOTIFY_ADD);
+                        if (observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
+                                || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                                || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
+                                || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)) {
+                            notifyObservers(new ObserverMessage(observeItem, new Pair<>(key, value)));
+                        } else {
+                            notifyObservers(new ObserverMessage(observeItem, value));
+                        }
+                    }
+                }
+            }
+            return old != null;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    @Override
     public void put(T key, U value) {
         if (DCSet.isStoped()) {
             return;
