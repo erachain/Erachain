@@ -905,7 +905,7 @@ public class Controller extends Observable {
         } else {
             File dataChain = new File(Settings.getInstance().getDataDir());
             File dataChainBackUp = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+                    + Settings.getInstance().getDataDir() + File.separator);
             // del datachain
             if (dataChain.exists()) {
                 try {
@@ -960,7 +960,7 @@ public class Controller extends Observable {
             File dataDir = new File(Settings.getInstance().getDataDir());
 
             File dataBakDC = new File(Settings.getInstance().getBackUpDir() + File.separator
-                    + Settings.getInstance().DEFAULT_DATA_DIR + File.separator);
+                    + Settings.getInstance().getDataDir() + File.separator);
             // copy Data dir to Back
             if (dataDir.exists()) {
                 if (dataBakDC.exists()) {
