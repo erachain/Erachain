@@ -172,7 +172,7 @@ public class DCSet extends DBASet implements Observer {
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
             this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
-            this.transactionMap = new TransactionMap(this, database);
+            this.transactionMap = new TransactionMapMapDB(this, database);
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
@@ -280,7 +280,7 @@ public class DCSet extends DBASet implements Observer {
         this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns, this);
-        this.transactionMap = new TransactionMap(parent.transactionMap, this);
+        this.transactionMap = new TransactionMapMapDB(parent.transactionMap, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
