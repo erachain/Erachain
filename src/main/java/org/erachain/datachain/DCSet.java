@@ -155,7 +155,7 @@ public class DCSet extends DBASet implements Observer {
             this.credit_AddressesMap = new CreditAddressesMap(this, database);
             this.assetBalanceMap = new ItemAssetBalanceRocksMap(this, database);
             this.addressStatement_Refs = new AddressStatementRefs(this, database);
-            this.assetBalanceAccountingMap = new ItemAssetBalanceRocksMap(this, database);
+            //this.assetBalanceAccountingMap = new ItemAssetBalanceRocksMap(this, database);
 
             this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
             this.kKPersonStatusMap = new KKPersonStatusMap(this, database);
@@ -265,7 +265,7 @@ public class DCSet extends DBASet implements Observer {
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
         this.assetBalanceMap = new ItemAssetBalanceRocksMap((ItemAssetBalanceRocksMap)parent.assetBalanceMap, this);
         this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs, this);
-        this.assetBalanceAccountingMap = new ItemAssetBalanceRocksMap((ItemAssetBalanceRocksMap)parent.assetBalanceAccountingMap, this);
+        //this.assetBalanceAccountingMap = new ItemAssetBalanceRocksMap((ItemAssetBalanceRocksMap)parent.assetBalanceAccountingMap, this);
         this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap, this);
         this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap, this);
         this.kKUnionStatusMap = new KKUnionStatusMap(parent.kKUnionStatusMap, this);
