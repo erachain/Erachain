@@ -114,15 +114,15 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     @Override
     protected void getMap(DB database) {
         //OPEN MAP
-        BTreeMap map = database.createTreeMap("transactions")
+        BTreeMap mapTree = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new LongAndTransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
 
-        makeAutoKey(database, map, "dw_transactions");
+        makeAutoKey(database, mapTree, "dw_transactions");
 
-        map = map;
+        this.map = mapTree;
     }
 
     @Override
