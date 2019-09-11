@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integration.InnerDBTable
         <K, V> {
 
+    private boolean logON = false;
+
     private List<ColumnFamilyHandle> columnFamilyHandles;
     private ColumnFamilyHandle columnFamilyFieldSize;
     //  интерфейс доступа к БД
@@ -96,63 +98,63 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
 
     @Override
     public void put(K key, V value) {
-        logger.info("put invoked");
+        if (logON) logger.info("put invoked");
         counterFlush++;
         final byte[] keyBytes = byteableKey.toBytesObject(key);
-        logger.info("keyBytes.length = " + keyBytes.length);
+        if (logON) logger.info("keyBytes.length = " + keyBytes.length);
         byte[] old = db.get(keyBytes);
         if (old == null || old.length == 0) {
             byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
             Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
             size++;
-            logger.info("put size = " + size);
+            if (logON) logger.info("put size = " + size);
             db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
         }
         byte[] bytesValue = byteableValue.toBytesObject(value);
         db.put(columnFamilyHandles.get(0), keyBytes, bytesValue);
-        logger.info("valueBytes.length = " + bytesValue.length);
+        if (logON) logger.info("valueBytes.length = " + bytesValue.length);
         for (int i = 1; i < indexes.size(); i++) {
             IndexDB indexDB = indexes.get(i);
             if (indexDB instanceof SimpleIndexDB) {
-                logger.info("SimpleIndex");
+                if (logON) logger.info("SimpleIndex");
                 SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
                 Object apply = simpleIndexDB.getBiFunction().apply(key, value);
                 byte[] bytes = indexDB.getIndexByteable().toBytes(apply, key);
                 if (bytes == null) {
                     continue;
                 }
-                logger.info("SimpleIndex.bytes.length = " + bytes.length);
+                if (logON) logger.info("SimpleIndex.bytes.length = " + bytes.length);
                 byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
                 db.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
             } else if (indexDB instanceof ArrayIndexDB) {
-                logger.info("ArrayIndex");
+                if (logON) logger.info("ArrayIndex");
                 ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
                 BiFunction biFunction = arrayIndexDB.getBiFunction();
                 Object[] apply = (Object[]) biFunction.apply(key, value);
-                logger.info("ArrayIndex.count.elements = " + apply.length);
+                if (logON) logger.info("ArrayIndex.count.elements = " + apply.length);
                 for (Object valueIndex : apply) {
                     byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
                     if (bytes == null) {
                         continue;
                     }
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    logger.info("ArrayIndex.bytes.length = " + bytes.length);
+                    if (logON) logger.info("ArrayIndex.bytes.length = " + bytes.length);
                     db.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
                 }
 
             } else if (indexDB instanceof ListIndexDB) {
-                logger.info("ListIndex");
+                if (logON) logger.info("ListIndex");
                 ListIndexDB listIndexDB = (ListIndexDB) indexDB;
                 BiFunction biFunction = listIndexDB.getBiFunction();
                 List<Object> apply = (List<Object>) biFunction.apply(key, value);
-                logger.info("ListIndex.count.elements = " + apply.size());
+                if (logON) logger.info("ListIndex.count.elements = " + apply.size());
                 for (Object valueIndex : apply) {
                     byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
                     if (bytes == null) {
                         continue;
                     }
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    logger.info("ListIndex.bytes.length = " + bytes.length);
+                    if (logON) logger.info("ListIndex.bytes.length = " + bytes.length);
                     db.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
                 }
 

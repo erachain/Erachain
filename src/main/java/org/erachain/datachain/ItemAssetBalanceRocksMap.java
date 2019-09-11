@@ -7,15 +7,24 @@ import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.rocksDB.DCMap;
+import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
+import org.erachain.dbs.rocksDB.transformation.ByteableLong;
+import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
+import org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple5;
 
 import java.io.File;
 import java.math.BigDecimal; // org.erachain.dbs.rocksDB.DBMap
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
@@ -85,6 +94,7 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
     }
     */
 
+    /*
     @Override
     protected void createIndexes(DB database) {
 
@@ -149,6 +159,60 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
         });
 
     }
+    */
+
+    @Override
+    protected void createIndexes(DB database) {
+        indexes = new ArrayList<>();
+
+        SimpleIndexDB<
+                byte[],
+                Tuple5<
+                        Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>>,
+                Fun.Tuple2<Long, BigDecimal>> indexDBf1f0 = new SimpleIndexDB<>(balanceKeyAssetNameIndex,
+                (key, value) -> {
+                    byte[] assetKeyBytes = new byte[8];
+                    System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                    return new Fun.Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate());
+                }
+                ,
+                (result, key) -> org.bouncycastle.util.Arrays.concatenate(
+                        new ByteableLong().toBytesObject(result.a),
+                        new ByteableBigDecimal().toBytesObject(result.b)
+                ));
+        indexes.add(indexDBf1f0);
+
+        SimpleIndexDB<
+                byte[],
+                Tuple5<
+                        Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>,
+                        Tuple2<BigDecimal, BigDecimal>>,
+                Fun.Tuple2<String, Long>> indexDBf0f1 = new SimpleIndexDB<>(balanceAssetKeyNameIndex,
+                (key, value) -> {
+                    // Address
+                    byte[] shortAddress = new byte[20];
+                    System.arraycopy(key, 0, shortAddress, 0, 20);
+                    // ASSET KEY
+                    byte[] assetKeyBytes = new byte[8];
+                    System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+
+                    return new Fun.Tuple2<String, Long>(
+                            Crypto.getInstance().getAddressFromShort(shortAddress),
+                            Longs.fromByteArray(assetKeyBytes));
+                },
+                (result, key) -> org.bouncycastle.util.Arrays.concatenate(
+                        new ByteableString().toBytesObject(result.a),
+                        new ByteableLong().toBytesObject(result.b)
+        ));
+        indexes.add(indexDBf0f1);
+    }
 
     @Override
     protected Fun.Tuple5<
@@ -196,6 +260,7 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
     }
 
     private Account testAcc = new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe");
+
     public boolean set(byte[] key, Fun.Tuple5<
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> value) {
