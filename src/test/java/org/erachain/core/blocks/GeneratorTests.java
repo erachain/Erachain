@@ -588,6 +588,9 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
+
+        int height = 2;
+
         // get timestamp for block
         long timestamp = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
 
@@ -658,6 +661,7 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
+        int height = 2;
         // get timestamp for block
         long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
         long timestamp = timestampStart;
@@ -741,6 +745,7 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
+        int height = 2;
         // get timestamp for block
         long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
         long timestamp = timestampStart;
@@ -772,7 +777,7 @@ public class GeneratorTests {
             e.printStackTrace();
         }
 
-        int height = newBlock.getHeight();
+        height = newBlock.getHeight();
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
         Tuple2<Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
         assertEquals((int) forgingData.a, 2);
