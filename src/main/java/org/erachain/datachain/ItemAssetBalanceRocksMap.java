@@ -6,7 +6,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.rocksDB.DCMap;
-import org.erachain.dbs.rocksDB.integration.DBMapDB;
+import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -15,9 +15,6 @@ import java.io.File;
 import java.math.BigDecimal; // org.erachain.dbs.rocksDB.DBMap
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
@@ -58,11 +55,11 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
                 Fun.Tuple2<BigDecimal, BigDecimal>, // it DO
                 Fun.Tuple2<BigDecimal, BigDecimal>  // on HOLD
                 >>(
-                new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple2BytesLong(),
+                new ByteableTrivial(),
                 new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal(), NAME_TABLE, indexes,
                 org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
-                        1, 256, 32, false),ROCKS_DB_FOLDER);
+                        1, 256, 32, false), ROCKS_DB_FOLDER);
 
         databaseSet.addExternalMaps(this);
 
