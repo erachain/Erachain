@@ -81,90 +81,6 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
         tableDB = new DBMapDB<>(new HashMap<>());
     }
 
-    /*
-    public Fun.Tuple5<
-            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> get(byte[] address, long key) {
-        if (key < 0)
-            key = -key;
-
-
-        Fun.Tuple5<
-                Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> value = this.get(
-                Bytes.concat(address, Longs.toByteArray(key)));
-
-        return value;
-    }
-    */
-
-    /*
-    @Override
-    protected void createIndexes(DB database) {
-
-        //BIND ASSET KEY
-        /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
-        // - иначе она не сработает так как тут дерево с поиском
-        this.assetKeyMap = database.createTreeMap("balances_key_asset_bal_address")
-                .comparator(Fun.COMPARATOR)
-                //.valuesOutsideNodesEnable()
-                .makeOrGet();
-
-        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Fun.Tuple2<Long, BigDecimal>,
-                byte[],
-                Fun.Tuple5<
-                        Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                        Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>
-                () {
-            @Override
-            public Fun.Tuple2<Long, BigDecimal>
-            run(byte[] key, Fun.Tuple5<
-                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> value) {
-
-                byte[] assetKeyBytes = new byte[8];
-                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-
-                return new Fun.Tuple2<Long, BigDecimal>(
-                        Longs.fromByteArray(assetKeyBytes), value.a.b.negate()
-                );
-            }
-        });
-
-        this.addressKeyMap = database.createTreeMap("balances_address_asset_bal")
-                .comparator(Fun.COMPARATOR)
-                //.valuesOutsideNodesEnable()
-                .makeOrGet();
-
-        Bind.secondaryKey(hashMap, this.addressKeyMap, new Fun.Function2<Fun.Tuple2<String, Long>,
-                byte[],
-                Fun.Tuple5<
-                        Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                        Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>
-                () {
-            @Override
-            public Fun.Tuple2<String, Long>
-            run(byte[] key, Fun.Tuple5<
-                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> value) {
-
-                // Address
-                byte[] shortAddress = new byte[20];
-                System.arraycopy(key, 0, shortAddress, 0, 20);
-                // ASSET KEY
-                byte[] assetKeyBytes = new byte[8];
-                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-
-                return new Fun.Tuple2<String, Long>(
-                        Crypto.getInstance().getAddressFromShort(shortAddress),
-                        Longs.fromByteArray(assetKeyBytes)
-                );
-            }
-        });
-
-    }
-    */
-
     @Override
     protected void createIndexes(DB database) {
         indexes = new ArrayList<>();
@@ -284,13 +200,6 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
 
     }
 
-	/*
-	public BigDecimal get(byte[] address)
-	{
-		return this.get(address, FEE_KEY);
-	}
-	 */
-
     public Fun.Tuple5<
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> get(byte[] address, long key) {
@@ -302,18 +211,6 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
                 Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
                 Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> value = this.get(
                 Bytes.concat(address, Longs.toByteArray(key)));
-
-		/*
-		// TODO for TEST
-		// FOR TEST NET
-		if (key == Transaction.FEE_KEY &&
-				value.a.compareTo(BigDecimal.ONE) < 0) {
-
-			return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(
-					BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO);
-
-		}
-		 */
 
         return value;
     }
