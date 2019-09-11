@@ -4,10 +4,12 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.rocksDB.DCMap;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
@@ -39,10 +41,6 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
 
     public ItemAssetBalanceRocksMap(ItemAssetBalanceRocksMap parent, DCSet dcSet) {
         super(parent, dcSet);
-    }
-
-    @Override
-    protected void createIndexes(DB database) {
     }
 
     @Override
@@ -87,6 +85,70 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
     }
     */
 
+    @Override
+    protected void createIndexes(DB database) {
+
+        //BIND ASSET KEY
+        /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
+        // - иначе она не сработает так как тут дерево с поиском
+        this.assetKeyMap = database.createTreeMap("balances_key_asset_bal_address")
+                .comparator(Fun.COMPARATOR)
+                //.valuesOutsideNodesEnable()
+                .makeOrGet();
+
+        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Fun.Tuple2<Long, BigDecimal>,
+                byte[],
+                Fun.Tuple5<
+                        Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+                        Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>
+                () {
+            @Override
+            public Fun.Tuple2<Long, BigDecimal>
+            run(byte[] key, Fun.Tuple5<
+                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> value) {
+
+                byte[] assetKeyBytes = new byte[8];
+                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+
+                return new Fun.Tuple2<Long, BigDecimal>(
+                        Longs.fromByteArray(assetKeyBytes), value.a.b.negate()
+                );
+            }
+        });
+
+        this.addressKeyMap = database.createTreeMap("balances_address_asset_bal")
+                .comparator(Fun.COMPARATOR)
+                //.valuesOutsideNodesEnable()
+                .makeOrGet();
+
+        Bind.secondaryKey(hashMap, this.addressKeyMap, new Fun.Function2<Fun.Tuple2<String, Long>,
+                byte[],
+                Fun.Tuple5<
+                        Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+                        Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>
+                () {
+            @Override
+            public Fun.Tuple2<String, Long>
+            run(byte[] key, Fun.Tuple5<
+                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> value) {
+
+                // Address
+                byte[] shortAddress = new byte[20];
+                System.arraycopy(key, 0, shortAddress, 0, 20);
+                // ASSET KEY
+                byte[] assetKeyBytes = new byte[8];
+                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+
+                return new Fun.Tuple2<String, Long>(
+                        Crypto.getInstance().getAddressFromShort(shortAddress),
+                        Longs.fromByteArray(assetKeyBytes)
+                );
+            }
+        });
+
+    }
 
     @Override
     protected Fun.Tuple5<
