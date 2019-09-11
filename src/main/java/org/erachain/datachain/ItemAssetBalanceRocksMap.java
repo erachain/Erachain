@@ -8,6 +8,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.rocksDB.DCMap;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.integration.DBMapDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
@@ -27,6 +28,7 @@ import java.math.BigDecimal; // org.erachain.dbs.rocksDB.DBMap
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Set;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
@@ -76,7 +78,7 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
 
     @Override
     protected void getMemoryMap() {
-        //rocksDBTable = new DBMapDB<>(new HashMap<>());
+        tableDB = new DBMapDB<>(new HashMap<>());
     }
 
     /*

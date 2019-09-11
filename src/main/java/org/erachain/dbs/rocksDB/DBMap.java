@@ -10,6 +10,7 @@ import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
 import java.util.*;
 
@@ -21,7 +22,20 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
     protected List<IndexDB> indexes;
 
     public DBMap(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+
+        //super(databaseSet, database);
+        this.databaseSet = databaseSet;
+
+        // create INDEXES before
+        this.createIndexes(database);
+
+        //OPEN MAP
+        getMap(database);
+
+        if (databaseSet.isWithObserver()) {
+            observableData = new HashMap<Integer, Integer>(8, 1);
+        }
+
     }
 
     public DBMap(DBASet databaseSet) {

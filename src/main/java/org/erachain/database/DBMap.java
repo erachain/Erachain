@@ -30,6 +30,9 @@ public abstract class DBMap<T, U> extends Observable {
 
     protected Map<Integer, Integer> observableData;
 
+    public DBMap() {
+    }
+
     public DBMap(DBASet databaseSet) {
 
         this.databaseSet = databaseSet;

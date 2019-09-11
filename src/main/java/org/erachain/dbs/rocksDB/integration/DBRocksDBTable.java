@@ -113,8 +113,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         byte[] bytesValue = byteableValue.toBytesObject(value);
         db.put(columnFamilyHandles.get(0), keyBytes, bytesValue);
         if (logON) logger.info("valueBytes.length = " + bytesValue.length);
-        for (int i = 1; i < indexes.size(); i++) {
-            IndexDB indexDB = indexes.get(i);
+        for (IndexDB indexDB : indexes) {
             if (indexDB instanceof SimpleIndexDB) {
                 if (logON) logger.info("SimpleIndex");
                 SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
@@ -180,8 +179,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
             db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
         }
         db.remove(columnFamilyHandles.get(0), keyBytes);
-        for (int i = 1; i < indexes.size(); i++) {
-            IndexDB indexDB = indexes.get(i);
+        for (IndexDB indexDB : indexes) {
             if (indexDB instanceof SimpleIndexDB) {
                 SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
                 byte[] valueByte = db.get(keyBytes);
