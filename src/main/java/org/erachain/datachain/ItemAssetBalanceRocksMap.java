@@ -26,6 +26,7 @@ import java.math.BigDecimal; // org.erachain.dbs.rocksDB.DBMap
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
@@ -325,16 +326,22 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
         if (key < 0)
             key = -key;
 
-        //FILTER ALL KEYS
-        Collection<byte[]> keys = this.assetKeyMap.subMap(
-                Fun.t2(key, null),
-                Fun.t2(key, Fun.HI())).values();
+        if (false) {
+            //FILTER ALL KEYS
+            Collection<byte[]> keys = this.assetKeyMap.subMap(
+                    Fun.t2(key, null),
+                    Fun.t2(key, Fun.HI())).values();
 
-        int tt = keys.size();
-        //RETURN
-        return new SortableList<byte[], Fun.Tuple5<
-                Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+            int tt = keys.size();
+            //RETURN
+            return new SortableList<byte[], Fun.Tuple5<
+                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+        } else {
+            Set<Tuple2<String, Long>> keys = rocksDBTable.filterAppropriateValuesAsKeys(new ByteableLong().toBytesObject(key),
+                    rocksDBTable.receiveIndexByName(balanceKeyAssetNameIndex));
+            return new SortableList<>(this, keys);
+        }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -345,15 +352,21 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
 
-        //FILTER ALL KEYS
-        Collection<byte[]> keys = this.addressKeyMap.subMap(
-                Fun.t2(account.getAddress(), null),
-                Fun.t2(account.getAddress(), Fun.HI())).values();
+        if (false) {
+            //FILTER ALL KEYS
+            Collection<byte[]> keys = this.addressKeyMap.subMap(
+                    Fun.t2(account.getAddress(), null),
+                    Fun.t2(account.getAddress(), Fun.HI())).values();
 
-        int tt = keys.size();
-        //RETURN
-        return new SortableList<byte[], Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
-                Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+            int tt = keys.size();
+            //RETURN
+            return new SortableList<byte[], Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+                    Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+        } else {
+            Set<Tuple2<String, Long>> keys = rocksDBTable.filterAppropriateValuesAsKeys(new ByteableString().toBytesObject(account.getAddress()),
+                    rocksDBTable.receiveIndexByName(balanceAssetKeyNameIndex));
+            return new SortableList<>(this, keys);
+        }
     }
 
     @Override
@@ -362,4 +375,5 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
         File dbFile = new File(Paths.get(ROCKS_DB_FOLDER).toString(), NAME_TABLE);
         dbFile.delete();
     }
+
 }
