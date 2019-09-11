@@ -8,6 +8,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.rocksDB.DCMap;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
@@ -338,8 +339,8 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
                     Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
                     Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>(this, keys);
         } else {
-            Set<Tuple2<String, Long>> keys = rocksDBTable.filterAppropriateValuesAsKeys(new ByteableLong().toBytesObject(key),
-                    rocksDBTable.receiveIndexByName(balanceKeyAssetNameIndex));
+            Collection<byte[]> keys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(new ByteableLong().toBytesObject(key),
+                    ((DBRocksDBTable)tableDB).receiveIndexByName(balanceKeyAssetNameIndex));
             return new SortableList<>(this, keys);
         }
     }
@@ -357,14 +358,12 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
             Collection<byte[]> keys = this.addressKeyMap.subMap(
                     Fun.t2(account.getAddress(), null),
                     Fun.t2(account.getAddress(), Fun.HI())).values();
-
-            int tt = keys.size();
             //RETURN
             return new SortableList<byte[], Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
                     Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>>(this, keys);
         } else {
-            Set<Tuple2<String, Long>> keys = rocksDBTable.filterAppropriateValuesAsKeys(new ByteableString().toBytesObject(account.getAddress()),
-                    rocksDBTable.receiveIndexByName(balanceAssetKeyNameIndex));
+            Collection<byte[]> keys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(new ByteableString().toBytesObject(account.getAddress()),
+                    ((DBRocksDBTable)tableDB).receiveIndexByName(balanceAssetKeyNameIndex));
             return new SortableList<>(this, keys);
         }
     }

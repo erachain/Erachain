@@ -28,7 +28,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
     @Getter
     private RocksDbDataSourceImpl db;
 
-    private List<IndexDB> indexes;
+    //private List<IndexDB> indexes;
 
     @Getter
     private List<ColumnFamilyHandle> columnFamilyHandles;
@@ -46,7 +46,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
         db = new RocksDbDataSourceImpl(
                 Paths.get(root).toString(), name);
         optionsWrapper = WriteOptionsWrapper.getInstance().sync(dbSync);
-        this.indexes = indexes;
+        //this.indexes = indexes;
         columnFamilyHandles = db.initDB(settings, indexes);
         db.initSizeField();
         columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
@@ -149,7 +149,8 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
 
     @Override
     public IndexDB recieveIndexByName(String name) {
-        return indexes.stream().filter(indexDB -> indexDB.getNameIndex().equals(name)).findFirst().get();
+        return indexes.stream().filter(indexDB ->
+                indexDB.getNameIndex().equals(name)).findFirst().get();
     }
 
     public Set<byte[]> getLatestValues(long limit) {
