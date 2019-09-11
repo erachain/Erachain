@@ -1653,10 +1653,10 @@ import java.util.*;
                         }
 
                         //CHECK TIMESTAMP AND DEADLINE
-                        if (BlockChain.VERS_30SEC > heightBlock
+                        if (heightBlock > BlockChain.VERS_30SEC
                                 && transaction.getTimestamp() > timestampEnd
-                            //|| transaction.getDeadline() <= timestampBeg // не нужно так как при слиянии цепочек
-                            // могут и должны страрые транзакции заноситься
+                            || heightBlock > 278989 // TODO убрать после перехода на 30 сек
+                                && transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                         ) {
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                     + ":" + transaction.viewFullTypeName()
