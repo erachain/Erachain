@@ -449,7 +449,7 @@ public class Settings {
 
             if (this.cacheInternetPeers.isEmpty() || NTP.getTime() - this.timeLoadInternetPeers > 24 * 60 * 60 * 1000) {
                 this.timeLoadInternetPeers = NTP.getTime();
-                URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase_public/master/peers.json");
+                URL u = new URL("https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json");
                 InputStream in = u.openStream();
                 String stringInternetSettings = IOUtils.toString(in);
                 JSONObject internetSettingsJSON = (JSONObject) JSONValue.parse(stringInternetSettings);

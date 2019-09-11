@@ -1653,7 +1653,7 @@ import java.util.*;
                         }
 
                         //CHECK TIMESTAMP AND DEADLINE
-                        if (BlockChain.VERS_30SEC > heightBlock
+                        if (BlockChain.VERS_30SEC < heightBlock
                                 && transaction.getTimestamp() > timestampEnd
                             //|| transaction.getDeadline() <= timestampBeg // не нужно так как при слиянии цепочек
                             // могут и должны страрые транзакции заноситься
