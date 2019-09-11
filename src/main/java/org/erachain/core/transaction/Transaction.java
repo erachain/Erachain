@@ -602,8 +602,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public long getDeadline() {
-        // 0,5 HOUR DEADLINE TO INCLUDE TRANSACTION IN BLOCK
-        return this.timestamp + BlockChain.UNCONFIRMED_DEADTIME_MS;
+        return this.timestamp + BlockChain.UNCONFIRMED_DEADTIME_MS(this.timestamp);
     }
 
     /// tyutuy jhg jhg jg j

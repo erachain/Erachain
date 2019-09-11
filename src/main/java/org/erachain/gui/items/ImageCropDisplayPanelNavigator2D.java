@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
@@ -13,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private final int cropY;
@@ -21,6 +23,10 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     private int cropWidth;
     private BufferedImage image;
 
+    private java.util.List<ChangeListener> zoomListeners = new ArrayList<>();
+
+    private double zoom = 1;
+    private final int originalCropWidth;
 
     private AffineTransform currentTransform = new AffineTransform();
     private Point currentPoint = new Point();
@@ -28,9 +34,11 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
     private Logger logger = LoggerFactory.getLogger(ImageCropDisplayPanelNavigator2D.class);
 
-    public ImageCropDisplayPanelNavigator2D(File imageFile, int cropWidth, int cropHeight) {
+    public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, File imageFile, int cropWidth, int cropHeight) {
+
         setPreferredSize(new Dimension(600, 500));
         this.cropWidth = cropWidth;
+        this.originalCropWidth = cropWidth;
         this.cropHeight = cropHeight;
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
         cropY = getPreferredSize().height / 2 - cropHeight / 2;
@@ -95,6 +103,11 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 } else {
                     scale = 1d;
                 }
+
+                zoom *= scale;
+                parent.zoomSlider.setValue((int) (zoom * 100d));
+
+                // тут смещаем из центра - мышка это центр
                 AffineTransform newTransform = new AffineTransform();
                 newTransform.concatenate(AffineTransform.getTranslateInstance(currentPoint.getX(), currentPoint.getY()));
                 newTransform.concatenate(AffineTransform.getScaleInstance(scale, scale));
@@ -231,6 +244,37 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                     snapshot.getWidth() - (int) pointZeroDst.x, snapshot.getHeight() - (int) pointZeroDst.y);
         }
 
+    }
+
+    public void setFrameRate(int value) {
+        cropWidth = originalCropWidth - originalCropWidth * value / 100;
+        cropX = getPreferredSize().width / 2 - cropWidth / 2;
+        //moveImageBy(0, 0);
+    }
+
+
+    public double getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(double new_zoom) {
+
+
+        double scale = new_zoom / this.zoom;
+        this.zoom = new_zoom;
+
+        // тут не смещаем из центра
+        AffineTransform newTransform = new AffineTransform();
+        newTransform.concatenate(AffineTransform.getTranslateInstance(getPreferredSize().width /2 , getPreferredSize().height / 2));
+        newTransform.concatenate(AffineTransform.getScaleInstance(scale, scale));
+        newTransform.concatenate(AffineTransform.getTranslateInstance(-getPreferredSize().width /2, -getPreferredSize().height / 2));
+        newTransform.concatenate(currentTransform);
+        currentTransform = newTransform;
+        repaint();
+    }
+
+    public void addZoomListener(ChangeListener listener) {
+        zoomListeners.add(listener);
     }
 
 }

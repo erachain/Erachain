@@ -32,7 +32,7 @@ import java.util.TreeMap;
  */
 public class Synchronizer extends Thread {
 
-    public static final int GET_BLOCK_TIMEOUT = 20000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> (6 - (Controller.HARD_WORK >> 1)));
+    public static final int GET_BLOCK_TIMEOUT = 20000 + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> (6 - (Controller.HARD_WORK >> 1)));
     public static final int GET_HEADERS_TIMEOUT = GET_BLOCK_TIMEOUT;
     private static final int BYTES_MAX_GET = BlockChain.MAX_BLOCK_SIZE_BYTES << 1;
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class.getSimpleName());
@@ -544,7 +544,8 @@ public class Synchronizer extends Thread {
                     LOGGER.debug("BLOCK Signature is Valid");
 
                     if (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
-                        errorMess = "invalid Timestamp from FUTURE";
+                        errorMess = "invalid Timestamp from FUTURE: "
+                                + (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) - NTP.getTime());
                         break;
                     }
 
@@ -1131,8 +1132,8 @@ public class Synchronizer extends Thread {
         long timePoint = 0;
         BlockGenerator blockGenerator;
 
-        long shiftPoint = BlockChain.GENERATING_MIN_BLOCK_TIME_MS
-                + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2);
+        long shiftPoint = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1)
+                + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> 1) - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> 2);
         // INIT wait START
         do {
             try {

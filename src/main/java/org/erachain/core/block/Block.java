@@ -944,7 +944,7 @@ import java.util.*;
             return BigDecimal.ZERO;
         }
 
-        int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;
+        int inDay30 = BlockChain.BLOCKS_PER_DAY(heightBlock) * 30;
 
         BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
 
@@ -956,10 +956,8 @@ import java.util.*;
                 return BigDecimal.valueOf(60000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
                 return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
-                return BigDecimal.valueOf(40000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (false && this.heightBlock < inDay30 << 6) //  256 mounth
-                return BigDecimal.valueOf(30000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+            else if (this.heightBlock > BlockChain.VERS_30SEC)
+                return BigDecimal.valueOf(2000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else
                 return BigDecimal.valueOf(20000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
         } else {
@@ -1534,11 +1532,6 @@ import java.util.*;
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
-        if (heightBlock > 11482) {
-            // rro
-            Long test = null;
-        }
-
         // TRY CHECK HEAD
         if (!this.isValidHead(dcSet))
             return false;
@@ -1584,7 +1577,7 @@ import java.util.*;
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
-            long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS;
+            long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
 
             DCSet validatingDC;
 
@@ -1660,7 +1653,7 @@ import java.util.*;
                         }
 
                         //CHECK TIMESTAMP AND DEADLINE
-                        if ((!BlockChain.DEVELOP_USE && this.heightBlock > 277000 || this.heightBlock > 300000)
+                        if (BlockChain.VERS_30SEC > heightBlock
                                 && transaction.getTimestamp() > timestampEnd
                             //|| transaction.getDeadline() <= timestampBeg // не нужно так как при слиянии цепочек
                             // могут и должны страрые транзакции заноситься
