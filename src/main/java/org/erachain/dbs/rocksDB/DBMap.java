@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.erachain.utils.ObserverMessage;
@@ -16,6 +17,7 @@ import java.util.*;
 public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
 
     protected InnerDBTable<T, U> tableDB;
+    protected List<IndexDB> indexes;
 
     public DBMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);

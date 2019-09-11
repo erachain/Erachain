@@ -8,16 +8,16 @@ import org.mapdb.Fun;
 
 import java.util.Arrays;
 
-public class ByteableTuple2StringLong implements Byteable<Fun.Tuple2<String, Long>> {
+public class ByteableTuple2BytesLong implements Byteable<Fun.Tuple2<byte[], Long>> {
     @Override
-    public Fun.Tuple2<String, Long> receiveObjectFromBytes(byte[] bytes) {
+    public Fun.Tuple2<byte[], Long> receiveObjectFromBytes(byte[] bytes) {
         byte[] bytesF1 = Arrays.copyOfRange(bytes, 0, bytes.length-Long.BYTES);
         byte[] bytesF2 = Arrays.copyOfRange(bytes, bytes.length - Long.BYTES, bytes.length);
-        return new Fun.Tuple2(new ByteableString().receiveObjectFromBytes(bytesF1), new ByteableLong().receiveObjectFromBytes(bytesF2));
+        return new Fun.Tuple2(bytesF1, new ByteableLong().receiveObjectFromBytes(bytesF2));
     }
 
     @Override
-    public byte[] toBytesObject(Fun.Tuple2<String, Long> value) {
-        return org.bouncycastle.util.Arrays.concatenate(new ByteableString().toBytesObject(value.a),new ByteableLong().toBytesObject(value.b));
+    public byte[] toBytesObject(Fun.Tuple2<byte[], Long> value) {
+        return org.bouncycastle.util.Arrays.concatenate(value.a, new ByteableLong().toBytesObject(value.b));
     }
 }

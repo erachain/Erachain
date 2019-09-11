@@ -31,8 +31,6 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
     private final String NAME_TABLE = "ITEM_ASSET_BALANCE_TABLE";
     private final String balanceKeyAssetNameIndex = "balances_key_asset";
     private final String balanceAssetKeyNameIndex = "balances_asset_key";
-    private List<org.erachain.dbs.rocksDB.indexes.IndexDB> indexes;
-    private org.erachain.dbs.rocksDB.integration.DBRocksDBTable rocksDBTable;
 
     @SuppressWarnings("rawtypes")
     private BTreeMap assetKeyMap;
@@ -53,8 +51,14 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
     @Override
     protected void getMap(DB database) {
 
-        rocksDBTable = new org.erachain.dbs.rocksDB.integration.DBRocksDBTable<>(
-                new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple2StringLong(),
+        tableDB = new org.erachain.dbs.rocksDB.integration.DBRocksDBTable<byte[], Fun.Tuple5<
+                Fun.Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
+                Fun.Tuple2<BigDecimal, BigDecimal>, // in DEBT
+                Fun.Tuple2<BigDecimal, BigDecimal>, // in STOCK
+                Fun.Tuple2<BigDecimal, BigDecimal>, // it DO
+                Fun.Tuple2<BigDecimal, BigDecimal>  // on HOLD
+                >>(
+                new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple2BytesLong(),
                 new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal(), NAME_TABLE, indexes,
                 org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
