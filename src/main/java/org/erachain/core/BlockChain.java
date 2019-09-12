@@ -40,6 +40,10 @@ public class BlockChain {
     static final public boolean TEST_DB_TXS_OFF = false;
 
     /**
+     * Используем для DCSet такую базу данных
+     */
+    static final public int DC_DBS_TYPE = 1; // 0 MapDB, 1 - RocksDB
+    /**
      * set uo all balances ERA to 10000 and COMPU to 100
      */
     public static final boolean ERA_COMPU_ALL_UP = false;

@@ -14,13 +14,10 @@ import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
-import org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal;
 import org.mapdb.BTreeMap;
-import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 
 import java.io.File;
@@ -29,11 +26,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Set;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
-public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
+public class ItemAssetBalanceRocksDBMap extends DCMap<byte[], Fun.Tuple5<
         Fun.Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Fun.Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Fun.Tuple2<BigDecimal, BigDecimal>, // in STOCK
@@ -48,11 +44,11 @@ public class ItemAssetBalanceRocksMap extends DCMap<byte[], Fun.Tuple5<
     private BTreeMap assetKeyMap;
     private BTreeMap addressKeyMap;
 
-    public ItemAssetBalanceRocksMap(DCSet databaseSet, DB database) {
+    public ItemAssetBalanceRocksDBMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public ItemAssetBalanceRocksMap(ItemAssetBalanceRocksMap parent, DCSet dcSet) {
+    public ItemAssetBalanceRocksDBMap(ItemAssetBalanceRocksDBMap parent, DCSet dcSet) {
         super(parent, dcSet);
     }
 

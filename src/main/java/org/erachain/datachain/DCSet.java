@@ -144,6 +144,17 @@ public class DCSet extends DBASet implements Observer {
         this.inMemory = inMemory;
 
         try {
+            switch (BlockChain.DC_DBS_TYPE) {
+                case 1:
+                    this.transactionMap = new TransactionRocksDBMap(this, database);
+                    this.assetBalanceMap = new ItemAssetBalanceRocksDBMap(this, database);
+                    break;
+                default:
+                    this.assetBalanceMap = new ItemAssetBalanceMapDBMap(this, database);
+                    this.transactionMap = new TransactionMapDBMap(this, database);
+
+            }
+
             this.actions = 0L;
 
             this.blockMap = new BlockMap(this, database);
@@ -153,7 +164,6 @@ public class DCSet extends DBASet implements Observer {
             this.referenceMap = new ReferenceMap(this, database);
             this.addressForging = new AddressForging(this, database);
             this.credit_AddressesMap = new CreditAddressesMap(this, database);
-            this.assetBalanceMap = new ItemAssetBalanceRocksMap(this, database);
             this.addressStatement_Refs = new AddressStatementRefs(this, database);
             //this.assetBalanceAccountingMap = new ItemAssetBalanceRocksMap(this, database);
 
@@ -172,7 +182,6 @@ public class DCSet extends DBASet implements Observer {
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
             this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
-            this.transactionMap = new TransactionMapDBMap(this, database);
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
@@ -261,9 +270,19 @@ public class DCSet extends DBASet implements Observer {
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
 
+        switch (BlockChain.DC_DBS_TYPE) {
+            case 1:
+                this.transactionMap = new TransactionRocksDBMap((TransactionRocksDBMap)parent.transactionMap, this);
+                this.assetBalanceMap = new ItemAssetBalanceRocksDBMap((ItemAssetBalanceRocksDBMap)parent.assetBalanceMap, this);
+                break;
+            default:
+                this.assetBalanceMap = new ItemAssetBalanceMapDBMap((ItemAssetBalanceMapDBMap)parent.assetBalanceMap, this);
+                this.transactionMap = new TransactionMapDBMap((TransactionMapDBMap)parent.transactionMap, this);
+
+        }
+
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
-        this.assetBalanceMap = new ItemAssetBalanceRocksMap((ItemAssetBalanceRocksMap)parent.assetBalanceMap, this);
         this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs, this);
         //this.assetBalanceAccountingMap = new ItemAssetBalanceRocksMap((ItemAssetBalanceRocksMap)parent.assetBalanceAccountingMap, this);
         this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap, this);
@@ -280,7 +299,6 @@ public class DCSet extends DBASet implements Observer {
         this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns, this);
-        this.transactionMap = new TransactionMapDBMap(parent.transactionMap, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);

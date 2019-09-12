@@ -2,10 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Observable;
+import java.util.*;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -24,7 +21,7 @@ import java.util.Observable;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-interface TransactionMap {
+public interface TransactionMap {
 
     int TIMESTAMP_INDEX = 1;
 
@@ -42,21 +39,21 @@ interface TransactionMap {
 
     void update(Observable o, Object arg);
 
+    boolean set(Long key, Transaction transaction);
     boolean set(byte[] signature, Transaction transaction);
 
     boolean add(Transaction transaction);
 
     void delete(Transaction transaction);
-
     Transaction delete(byte[] signature);
-
-    /* synchronized */ Transaction delete(Long key);
+    Transaction delete(Long key);
 
     boolean contains(byte[] signature);
-
+    boolean contains(Long key);
     boolean contains(Transaction transaction);
 
     Transaction get(byte[] signature);
+    Transaction get(Long key);
 
     Collection<Long> getFromToKeys(long fromKey, long toKey);
 
@@ -78,5 +75,11 @@ interface TransactionMap {
     List<Transaction> getTransactions(int count, boolean descending);
 
     List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending);
+
+    public int totalDeleted = 0;
+    int size();
+    Iterator<Long> getIterator(int index, boolean descending);
+    Set<Transaction> getValues();
+    void reset();
 
 }
