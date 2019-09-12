@@ -112,7 +112,7 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
 
         // OPEN MAP
         HTreeMap<Long, Transaction> map = database.createHashMap("transactions")
-                .keySerializer(SerializerBase.BASIC)
+                .keySerializer(SerializerBase.LONG)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
