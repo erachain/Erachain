@@ -750,6 +750,7 @@ public class Account {
 
         // SET NEW REFERENCE
         map.set(shortBytes, currentPoint);
+
     }
 
     public void removeLastTimestamp(DCSet dcSet) {

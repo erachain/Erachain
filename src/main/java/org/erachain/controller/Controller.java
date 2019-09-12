@@ -3309,6 +3309,40 @@ public class Controller extends Observable {
         return getBlockByHeight(this.dcSet, parseInt);
     }
 
+    public byte[] getPublicKey(Account account) {
+
+        // CHECK ACCOUNT IN OWN WALLET
+        if (isMyAccountByAddress(account.getAddress())) {
+            if (isWalletUnlocked()) {
+                return getPrivateKeyAccountByAddress(account.getAddress()).getPublicKey();
+            }
+        }
+
+        long[] makerLastTimestamp = account.getLastTimestamp(dcSet);
+        if (makerLastTimestamp == null) {
+            return null;
+        }
+
+        Transaction transaction = getTransaction(makerLastTimestamp[1]);
+        if (transaction != null) {
+
+            if (transaction.getCreator().equals(account))
+                return transaction.getCreator().getPublicKey();
+            else {
+                List<PublicKeyAccount> pKeys = transaction.getPublicKeys();
+                if (pKeys != null) {
+                    for (PublicKeyAccount pKey : pKeys) {
+                        if (pKey.equals(account)) {
+                            return pKey.getPublicKey();
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public byte[] getPublicKeyByAddress(String address) {
 
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -3316,32 +3350,30 @@ public class Controller extends Observable {
         }
 
         // CHECK ACCOUNT IN OWN WALLET
-        Controller cntr = Controller.getInstance();
-        Account account = cntr.getAccountByAddress(address);
+        Account account = getAccountByAddress(address);
         if (account != null) {
-            if (cntr.isWalletUnlocked()) {
-                return cntr.getPrivateKeyAccountByAddress(address).getPublicKey();
+            if (isWalletUnlocked()) {
+                return getPrivateKeyAccountByAddress(address).getPublicKey();
             }
         }
 
         long[] makerLastTimestamp = dcSet.getReferenceMap().get(Account.makeShortBytes(address));
-        if (makerLastTimestamp == null) {
-            return null;
-        }
+        if (makerLastTimestamp != null) {
 
-        Transaction transaction = cntr.getTransaction(makerLastTimestamp[1]);
-        if (transaction == null) {
-            return null;
-        }
+            Transaction transaction = getTransaction(makerLastTimestamp[1]);
+            if (transaction == null) {
+                return null;
+            }
 
-        if (transaction.getCreator().equals(address))
-            return transaction.getCreator().getPublicKey();
-        else {
-            List<PublicKeyAccount> pKeys = transaction.getPublicKeys();
-            if (pKeys != null) {
-                for (PublicKeyAccount pKey : pKeys) {
-                    if (pKey.equals(address)) {
-                        return pKey.getPublicKey();
+            if (transaction.getCreator().equals(address))
+                return transaction.getCreator().getPublicKey();
+            else {
+                List<PublicKeyAccount> pKeys = transaction.getPublicKeys();
+                if (pKeys != null) {
+                    for (PublicKeyAccount pKey : pKeys) {
+                        if (pKey.equals(address)) {
+                            return pKey.getPublicKey();
+                        }
                     }
                 }
             }

@@ -699,7 +699,7 @@ public class MailSendPanel extends JPanel {
                 if (recipient instanceof PublicKeyAccount) {
                     publicKey = ((PublicKeyAccount) recipient).getPublicKey();
                 } else {
-                    publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                    publicKey = Controller.getInstance().getPublicKey(recipient);
                 }
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
