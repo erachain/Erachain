@@ -1655,7 +1655,7 @@ import java.util.*;
                         //CHECK TIMESTAMP AND DEADLINE
                         if (heightBlock > BlockChain.VERS_30SEC
                                 && transaction.getTimestamp() > timestampEnd
-                            || heightBlock > 278989 // TODO убрать после перехода на 30 сек
+                            || !BlockChain.DEVELOP_USE && heightBlock > 278989 // TODO убрать после перехода на 30 сек
                                 && transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                         ) {
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
