@@ -7,7 +7,9 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
@@ -37,24 +39,41 @@ import java.util.*;
  */
 public class TransactionMapMapDB extends DCMap<Long, Transaction> implements TransactionMap {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionMapMapDB.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
+
+    @SuppressWarnings("rawtypes")
+    private NavigableSet senderKey;
+    @SuppressWarnings("rawtypes")
+    private NavigableSet recipientKey;
+    @SuppressWarnings("rawtypes")
+    private NavigableSet typeKey;
 
     public TransactionMapMapDB(DCSet databaseSet, DB database) {
         super(databaseSet, database);
+
+        DEFAULT_INDEX = TIMESTAMP_INDEX;
+
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
+        }
+
     }
 
-    public TransactionMapMapDB(TransactionMap parent, DCSet dcSet) {
+    public TransactionMapMapDB(TransactionMapMapDB parent, DCSet dcSet) {
         super(parent, dcSet);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public void createIndexes(DB database) {
+    protected void createIndexes(DB database) {
 
         //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
 
         // TIMESTAMP INDEX
-        Tuple2Comparator<Long, Long> comparator = new Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
+        Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
                 //UnsignedBytes.lexicographicalComparator()
                 Fun.COMPARATOR);
         NavigableSet<Tuple2<Long, Long>> heightIndex = database
@@ -79,27 +98,34 @@ public class TransactionMapMapDB extends DCMap<Long, Transaction> implements Tra
 
     }
 
+    public Integer deleteObservableData(int index) {
+        return this.observableData.remove(index);
+    }
+
+    public Integer setObservableData(int index, Integer data) {
+        return this.observableData.put(index, data);
+    }
+
     @Override
     protected void getMap(DB database) {
 
         // OPEN MAP
-        HTreeMap<Long, Transaction> mapTree = database.createHashMap("transactions")
+        map = database.createHashMap("transactions")
                 .keySerializer(SerializerBase.BASIC)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
 
-        map = mapTree;
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
-            return ;
+            return;
 
         this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
 
-        Bind.secondaryKey(mapTree, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
+        Bind.secondaryKey((BTreeMap)map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
             @Override
             public Tuple2<String, Long> run(Long key, Transaction val) {
                 Account account = val.getCreator();
@@ -110,7 +136,7 @@ public class TransactionMapMapDB extends DCMap<Long, Transaction> implements Tra
         this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
-        Bind.secondaryKeys(mapTree, this.recipientKey,
+        Bind.secondaryKeys((BTreeMap)map, this.recipientKey,
                 new Fun.Function2<String[], Long, Transaction>() {
                     @Override
                     public String[] run(Long key, Transaction val) {
@@ -131,7 +157,7 @@ public class TransactionMapMapDB extends DCMap<Long, Transaction> implements Tra
         this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
-        Bind.secondaryKeys(mapTree, this.typeKey,
+        Bind.secondaryKeys((BTreeMap)map, this.typeKey,
                 new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
                     @Override
                     public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
@@ -225,6 +251,19 @@ public class TransactionMapMapDB extends DCMap<Long, Transaction> implements Tra
         }
 
         return values;
+    }
+
+    private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
+
+    private boolean clearProcessed = false;
+    private synchronized boolean isClearProcessedAndSet() {
+
+        if (clearProcessed)
+            return true;
+
+        clearProcessed = true;
+
+        return false;
     }
 
     /**
