@@ -1,6 +1,7 @@
 package org.erachain.core.account;
 
 import org.erachain.core.block.GenesisBlock;
+import org.erachain.core.transaction.GenesisTransferAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
@@ -15,6 +16,7 @@ public class AccountTest {
 
     DCSet db;
     GenesisBlock gb;
+    Account account;
 
     void init() {
         db = DCSet.createEmptyHardDatabaseSet();
@@ -28,6 +30,17 @@ public class AccountTest {
         }
 
     }
+
+    @Test
+    public void setLastTimestamp() {
+        init();
+
+        account = ((GenesisTransferAssetTransaction)gb.getTransactions().get(100)).getRecipient();
+        long[] time = account.getLastTimestamp(db);
+        Fun.Tuple2<Integer, Integer> point = account.getLastForgingData(db);
+        assertEquals(point != null, true);
+    }
+
     @Test
     public void getBalance() {
         init();
