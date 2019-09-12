@@ -1,4 +1,4 @@
-package org.erachain.dbs.MapDB;
+package org.erachain.dbs.mapDB;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;

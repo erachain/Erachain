@@ -37,7 +37,7 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionMapMapDB extends DCMap<Long, Transaction> implements TransactionMap {
+public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Transaction> implements TransactionMap {
 
     static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
 
@@ -48,7 +48,7 @@ public class TransactionMapMapDB extends DCMap<Long, Transaction> implements Tra
     @SuppressWarnings("rawtypes")
     private NavigableSet typeKey;
 
-    public TransactionMapMapDB(DCSet databaseSet, DB database) {
+    public TransactionMapDBMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         DEFAULT_INDEX = TIMESTAMP_INDEX;
@@ -62,7 +62,7 @@ public class TransactionMapMapDB extends DCMap<Long, Transaction> implements Tra
 
     }
 
-    public TransactionMapMapDB(TransactionMapMapDB parent, DCSet dcSet) {
+    public TransactionMapDBMap(TransactionMapDBMap parent, DCSet dcSet) {
         super(parent, dcSet);
     }
 

@@ -7,7 +7,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
-import org.erachain.dbs.MapDB.DCMap;
+import org.erachain.dbs.mapDB.DCMap;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;

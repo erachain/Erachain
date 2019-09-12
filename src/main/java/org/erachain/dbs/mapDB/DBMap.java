@@ -1,7 +1,6 @@
-package org.erachain.dbs.MapDB;
+package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
-import org.erachain.database.IDB;
 import org.erachain.database.IndexIterator;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
