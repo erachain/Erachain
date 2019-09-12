@@ -35,7 +35,7 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionMapMapDB extends TransactionMap {
+public class TransactionMapMapDB extends DCMap<Long, Transaction> implements TransactionMap {
 
     static Logger logger = LoggerFactory.getLogger(TransactionMapMapDB.class.getSimpleName());
 

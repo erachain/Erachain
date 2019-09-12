@@ -1,10 +1,11 @@
 package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DBMap;
-import org.erachain.utils.ObserverMessage;
-import org.mapdb.*;
-import java.util.*;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observable;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -23,118 +24,59 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-abstract public class TransactionMap extends DCMap<Long, Transaction> {
+interface TransactionMap {
 
-    public static int TIMESTAMP_INDEX = 1;
-    NavigableSet senderKey = null;
-    NavigableSet recipientKey = null;
-    NavigableSet typeKey = null;
+    int TIMESTAMP_INDEX = 1;
 
-    public TransactionMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+    Integer deleteObservableData(int index);
 
-        DEFAULT_INDEX = TIMESTAMP_INDEX;
+    Integer setObservableData(int index, Integer data);
 
-        if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
-        }
+    Iterator<Long> getTimestampIterator();
 
-    }
+    Iterator<Long> getCeatorIterator();
 
-    public TransactionMap(TransactionMap parent, DCSet dcSet) {
-        super(parent, dcSet);
-    }
+    List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime);
 
-    public Integer deleteObservableData(int index) {
-        return this.observableData.remove(index);
-    }
+    void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
 
-    public Integer setObservableData(int index, Integer data) {
-        return this.observableData.put(index, data);
-    }
+    void update(Observable o, Object arg);
 
-    abstract public Iterator<Long> getTimestampIterator();
+    boolean set(byte[] signature, Transaction transaction);
 
-    abstract public Iterator<Long> getCeatorIterator();
+    boolean add(Transaction transaction);
 
-    /**
-     * Используется для получения транзакций для сборки блока
-     * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
-     * @param timestamp
-     * @param notSetDCSet
-     * @param cutDeadTime true is need filter by Dead Time
-     * @return
-     */
-    abstract public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime);
+    void delete(Transaction transaction);
 
-    protected static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
+    Transaction delete(byte[] signature);
 
-    protected boolean clearProcessed = false;
-    protected synchronized boolean isClearProcessedAndSet() {
+    /* synchronized */ Transaction delete(Long key);
 
-        if (clearProcessed)
-            return true;
+    boolean contains(byte[] signature);
 
-        clearProcessed = true;
+    boolean contains(Transaction transaction);
 
-        return false;
-    }
+    Transaction get(byte[] signature);
 
-    /**
-     * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
-     * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
-     * @param timestamp
-     * @param cutDeadTime
-     */
-    long pointClear = 0;
-    abstract public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
+    Collection<Long> getFromToKeys(long fromKey, long toKey);
 
-    abstract public void update(Observable o, Object arg);
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    Iterable findTransactionsKeys(String address, String sender, String recipient,
+                                  int type, boolean desc, int offset, int limit, long timestamp);
 
-    abstract public boolean set(byte[] key, Transaction transaction);
-    abstract public boolean add(Transaction transaction);
-    abstract public Transaction get(byte[] signature);
-    abstract public boolean contains(byte[] signature);
+    List<Transaction> findTransactions(String address, String sender, String recipient,
+                                       int type, boolean desc, int offset, int limit, long timestamp);
 
-    abstract public void delete(Transaction transaction);
-    abstract public Transaction delete(byte[] signature);
+    List<Transaction> getUnconfirmedTransaction(Iterable keys);
 
-    long totalDeleted = 0;
+    // TODO выдает ошибку на шаге treeKeys.addAll(Sets.newTreeSet(senderKeys));
+    List<Transaction> getTransactionsByAddressFast100(String address);
 
-    abstract public boolean contains(Transaction transaction);
+    // slow?? without index
+    List<Transaction> getTransactionsByAddress(String address);
 
-    abstract public Collection<Long> getFromToKeys(long fromKey, long toKey);
+    List<Transaction> getTransactions(int count, boolean descending);
 
-    /**
-     * Find all unconfirmed transaction by address, sender or recipient.
-     * Need set only one parameter(address, sender,recipient)
-     *
-     * @param address   - address
-     * @param sender    - sender
-     * @param recipient - recipient
-     * @param type      - type transaction
-     * @param desc      - order by transaction
-     * @param offset    -
-     * @param limit     - count transaction
-     * @return Key transactions
-     */
-    abstract public Iterable findTransactionsKeys(String address, String sender, String recipient,
-                                         int type, boolean desc, int offset, int limit, long timestamp);
-
-    abstract public List<Transaction> findTransactions(String address, String sender, String recipient,
-                                              int type, boolean desc, int offset, int limit, long timestamp);
-
-    abstract public List<Transaction> getUnconfirmedTransaction(Iterable keys);
-
-    abstract public List<Transaction> getTransactionsByAddressFast100(String address);
-
-    abstract public List<Transaction> getTransactionsByAddress(String address);
-
-    abstract public List<Transaction> getTransactions(int count, boolean descending);
-
-    abstract public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending);
+    List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending);
 
 }
