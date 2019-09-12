@@ -26,7 +26,7 @@ import java.util.List;
  * Вообще тут реализация как СТЕК - удалить можно только если это верхний элемент.
  * Добавление вверх или обновляем существующий по AUTOKEY_INDEX
  * <hr>
- * Ключ: первых байт счета + время создания<br>
+ * Ключ: первых байт счета + время создания, причем счет Involved - то есть и входящие тоже будут<br>
  * Значение: транзакция
  */
 public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>> {
@@ -66,23 +66,29 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
             }
         });
 
-        /* - это как основной индекс можно брать
+        /*
         //ADDRESS INDEX
-        NavigableSet<Tuple2<String, Tuple2<Long, Long>>> addressIndex = database.createTreeSet("transactions_index_address")
+        NavigableSet<Tuple2<String[], Tuple2<Long, Long>>> addressIndex = database.createTreeSet("transactions_index_address")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<String, Tuple2<Long, Long>>> descendingAddressIndex = database.createTreeSet("transactions_index_address_descending")
+        NavigableSet<Tuple2<String[], Tuple2<Long, Long>>> descendingAddressIndex = database.createTreeSet("transactions_index_address_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(ADDRESS_INDEX, addressIndex, descendingAddressIndex, new Fun.Function2<String, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
+        createIndexes(ADDRESS_INDEX, addressIndex, descendingAddressIndex, new Fun.Function2<String[], Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
             @Override
-            public String run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
-                return key.b;
+            public String[] run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
+                HashSet<Account> involved = value.b.getInvolvedAccounts();
+                String[] keys = new String[involved.size()];
+                Iterator<Account> keysIterator = involved.iterator();
+                for (int i = 0; i < involved.size(); i++) {
+                    keys[i] =keysIterator.next().getAddress();
+                }
+                return keys;
             }
         });
-        */
+         */
 
         /* это вообще не информативнй индекс не нужен
         //AMOUNT INDEX
@@ -130,21 +136,20 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
 
         try {
             //GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-			/*Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
-					Fun.t2(null, Longs.fromByteArray(account.getShortAddressBytes())),
-					Fun.t2(Fun.HI(), Longs.fromByteArray(account.getShortAddressBytes())));*/
-
-            Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
+            Set<Tuple2<Long, Long>> accountTransactions = ((NavigableMap) this.map).subMap(
                     Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
-                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
+                    Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
 
             //GET ITERATOR
-            Iterator<Tuple2<Long, Transaction>> iterator = accountTransactions.values().iterator();
+            Iterator<Tuple2<Long, Long>> iterator = accountTransactions.iterator();
 
             //RETURN {LIMIT} TRANSACTIONS
             int counter = 0;
             while (iterator.hasNext() && counter < limit) {
-                transactions.add(iterator.next().b);
+                Tuple2<Long, Transaction> item = this.get((Tuple2<Long, Long>) iterator.next());
+                if (item == null)
+                    continue;
+                transactions.add(item.b);
                 counter++;
             }
         } catch (Exception e) {
@@ -158,7 +163,7 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Tuple2<Long, Long>> getAddressIterator(Account account) {
 
-        Set<Tuple2<Long, Long>> accountKeys = ((BTreeMap) this.map).subMap(
+        Set<Tuple2<Long, Long>> accountKeys = ((NavigableMap) this.map).subMap(
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
 
@@ -168,9 +173,16 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Tuple2<Long, Long>> getAddressDescendingIterator(Account account) {
 
-        Set<Tuple2<Long, Long>> accountKeys = ((BTreeMap) this.map).subMap(
+        /*
+        SortedSet<Tuple2<String, Tuple2<Long, Long>>> accountKeys = ((NavigableSet) this.indexes.get(ADDRESS_INDEX)).subSet(
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
+         */
+
+        Set<Tuple2<Long, Long>> accountKeys = ((NavigableMap) this.map).subMap(
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
+
 
         return ((NavigableSet<Tuple2<Long, Long>>) accountKeys).descendingIterator();
     }
@@ -199,12 +211,19 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Account account) {
         //GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> accountTransactions = ((BTreeMap) this.map).subMap(
+        /*
+        SortedSet<Tuple2<Long, Long>> accountTransactions = ((NavigableSet) this.indexes.get(ADDRESS_INDEX)).subSet(
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
+         */
+
+        Set<Tuple2<Long, Long>> accountTransactions = ((NavigableMap) this.map).subMap(
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
+
         //DELETE TRANSACTIONS
-        for (Tuple2<Long, Long> key : accountTransactions.keySet()) {
+        for (Tuple2<Long, Long> key: accountTransactions) {
             this.delete(key);
         }
     }
