@@ -2,17 +2,15 @@ package org.erachain.datachain;
 
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
-import org.erachain.dbs.mapDB.DCMap;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Observer;
 import java.util.Set;
 
-public interface ItemAssetBalanceMap extends DCMap {
+public interface ItemAssetBalanceMap {
 
 	long getAssetKeyFromKey(byte[] key);
 
