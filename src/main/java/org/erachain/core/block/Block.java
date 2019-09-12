@@ -1657,6 +1657,8 @@ import java.util.*;
                                 && transaction.getTimestamp() > timestampEnd
                             || !BlockChain.DEVELOP_USE && heightBlock > 278989 // TODO убрать после перехода на 30 сек
                                 && transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
+                            || BlockChain.DEVELOP_USE && heightBlock > 491555 // TODO убрать после перехода на 30 сек
+                                && transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                         ) {
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                     + ":" + transaction.viewFullTypeName()
