@@ -65,7 +65,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
 
             return getDefaultValue();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            //logger.error(e.getMessage(), e);
             return getDefaultValue();
         }
     }
@@ -123,7 +123,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
             }
             return old != null;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            //logger.error(e.getMessage(), e);
         }
 
         return false;
@@ -162,7 +162,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            //logger.error(e.getMessage(), e);
         }
     }
 

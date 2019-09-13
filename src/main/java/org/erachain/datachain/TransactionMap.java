@@ -54,7 +54,6 @@ public interface TransactionMap extends DBMap {
     boolean contains(Transaction transaction);
 
     Transaction get(byte[] signature);
-    Transaction get(Long key);
 
     Collection<Long> getFromToKeys(long fromKey, long toKey);
 

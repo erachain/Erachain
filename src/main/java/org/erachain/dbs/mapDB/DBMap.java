@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
+public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachain.dbs.DBMap<T, U> {
 
     public static final int NOTIFY_RESET = 1;
     public static final int NOTIFY_ADD = 2;
@@ -102,6 +102,8 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
         return u;
     }
 
+    /*
+    @Override
     public U get(T key) {
 
         this.addUses();
@@ -127,6 +129,8 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
         }
     }
 
+     */
+
     public Set<T> getKeys() {
         this.addUses();
         Set<T> u = this.map.keySet();
@@ -141,12 +145,8 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
         return u;
     }
 
-    /**
-     * уведомляет только счетчик если он разрешен, иначе Добавить
-     * @param key
-     * @param value
-     * @return
-     */
+    /*
+    @Override
     public boolean set(T key, U value) {
         this.addUses();
         //try {
@@ -175,11 +175,9 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
         return false;
     }
 
-    /**
-     * уведомляет только счетчик если он разрешен, иначе Удалить
-     * @param key
-     * @return
      */
+
+    /*
     public U delete(T key) {
 
         this.addUses();
@@ -212,6 +210,10 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
         return value;
     }
 
+     */
+
+    /*
+    @Override
     public boolean contains(T key) {
 
         this.addUses();
@@ -224,6 +226,8 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
         this.outUses();
         return false;
     }
+
+     */
 
     public Map<Integer, Integer> getObservableData() {
         return observableData;

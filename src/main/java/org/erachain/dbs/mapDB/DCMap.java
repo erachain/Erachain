@@ -23,7 +23,7 @@ import java.util.Set;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DCMap<T, U> extends DBMap<T, U> // implements org.erachain.dbs.DBMap
+public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.dbs.DBMap<T, U>
         {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());

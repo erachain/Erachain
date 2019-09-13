@@ -15,7 +15,7 @@ abstract public class DBASet implements IDB {
     private static final String VERSION = "version";
 
     protected File DATA_FILE;
-    protected DB database;
+    public DB database;
     protected int uses;
 
     protected List<DBMap> externalMaps = new ArrayList<>();

@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.DBMap;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -10,7 +11,7 @@ import java.util.Iterator;
 import java.util.Observer;
 import java.util.Set;
 
-public interface ItemAssetBalanceMap {
+public interface ItemAssetBalanceMap extends DBMap {
 
 	long getAssetKeyFromKey(byte[] key);
 
