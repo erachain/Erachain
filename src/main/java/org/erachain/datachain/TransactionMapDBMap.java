@@ -398,8 +398,6 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
     }
 
 
-    public long totalDeleted = 0;
-
     /**
      * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
      * Head Zero - data corrupted

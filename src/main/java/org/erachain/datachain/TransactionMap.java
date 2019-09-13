@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
+import org.erachain.dbs.DBMap;
 
 import java.util.*;
 
@@ -81,9 +82,11 @@ public interface TransactionMap {
 
     int size();
     Iterator<Long> getIterator(int index, boolean descending);
-    Set<Transaction> getValues();
+
+    Collection<Transaction> getValues();
 
     void addObserver(Observer o);
+    void deleteObserver(Observer o);
 
     void reset();
 
