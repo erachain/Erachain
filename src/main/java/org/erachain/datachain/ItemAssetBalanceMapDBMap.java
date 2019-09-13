@@ -55,7 +55,7 @@ public class ItemAssetBalanceMapDBMap extends DCMap<byte[], Tuple5<
         }
     }
 
-    public ItemAssetBalanceMapDBMap(ItemAssetBalanceMapDBMap parent, DCSet dcSet) {
+    public ItemAssetBalanceMapDBMap(ItemAssetBalanceMap parent, DCSet dcSet) {
         super(parent, dcSet);
     }
 

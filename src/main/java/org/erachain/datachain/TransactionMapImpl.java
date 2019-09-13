@@ -38,10 +38,12 @@ import java.util.*;
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 public class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transaction>
-        implements TransactionMap<Long, TransactionMap>
+        //implements TransactionMap<Long, TransactionMap>
 {
 
     static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
+
+    int TIMESTAMP_INDEX = 1;
 
     public int totalDeleted = 0;
 
@@ -356,11 +358,6 @@ public class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transac
             pointClear = System.currentTimeMillis();
             clearProcessed = false;
         }
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-
     }
 
     public boolean set(byte[] signature, Transaction transaction) {

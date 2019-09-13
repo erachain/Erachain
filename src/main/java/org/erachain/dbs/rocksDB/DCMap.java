@@ -19,7 +19,7 @@ import java.util.*;
 //@NoArgsConstructor
 public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.dbs.DCMap<T, U> {
 
-    protected DCMap<T, U> parent;
+    protected org.erachain.dbs.DBMap<T, U> parent;
     protected List<T> deleted;
     private int shiftSize;
 
@@ -27,7 +27,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
         super(databaseSet, database);
     }
 
-    public DCMap(DCMap<T, U> parent, DBASet dcSet) {
+    public DCMap(org.erachain.dbs.DBMap parent, DBASet dcSet) {
         super(dcSet);
         this.parent = parent;
         getMemoryMap();

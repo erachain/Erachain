@@ -44,7 +44,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
         super(databaseSet, database);
     }
 
-    public DCMap(org.erachain.dbs.DBMap<T, U> parent, DBASet dcSet) {
+    public DCMap(org.erachain.dbs.DBMap parent, DBASet dcSet) {
         super(dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {

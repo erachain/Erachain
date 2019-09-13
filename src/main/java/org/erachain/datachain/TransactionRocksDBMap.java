@@ -46,7 +46,10 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, Transaction> implements TransactionMap {
+public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, Transaction>
+    implements // org.erachain.dbs.DCMap<Long, Transaction>
+        TransactionMap
+{
 
     static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
 
@@ -493,11 +496,6 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
             pointClear = System.currentTimeMillis();
             clearProcessed = false;
         }
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-
     }
 
     public boolean set(byte[] signature, Transaction transaction) {
