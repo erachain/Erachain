@@ -144,15 +144,20 @@ public class DCSet extends DBASet implements Observer {
         this.inMemory = inMemory;
 
         try {
-            switch (BlockChain.DC_DBS_TYPE) {
-                case 1:
-                    this.transactionMap = new TransactionRocksDBMap(this, database);
-                    this.assetBalanceMap = new ItemAssetBalanceRocksDBMap(this, database);
-                    break;
-                default:
-                    this.assetBalanceMap = new ItemAssetBalanceMapDBMap(this, database);
-                    this.transactionMap = new TransactionMapDBMap(this, database);
+            if (isFork()) {
+                this.assetBalanceMap = new ItemAssetBalanceMapDBMap(this, database);
+                this.transactionMap = new TransactionMapDBMap(this, database);
+            } else {
+                switch (BlockChain.DC_DBS_TYPE) {
+                    case 1:
+                        this.transactionMap = new TransactionRocksDBMap(this, database);
+                        this.assetBalanceMap = new ItemAssetBalanceRocksDBMap(this, database);
+                        break;
+                    default:
+                        this.assetBalanceMap = new ItemAssetBalanceMapDBMap(this, database);
+                        this.transactionMap = new TransactionMapDBMap(this, database);
 
+                }
             }
 
             this.actions = 0L;
@@ -270,14 +275,19 @@ public class DCSet extends DBASet implements Observer {
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
 
+        if (isFork()) {
+            this.assetBalanceMap = new ItemAssetBalanceMapDBMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
+            this.transactionMap = new TransactionMapDBMap((TransactionMapDBMap) parent.transactionMap, this);
+        } else {
         switch (BlockChain.DC_DBS_TYPE) {
             case 1:
-                this.transactionMap = new TransactionRocksDBMap((TransactionRocksDBMap)parent.transactionMap, this);
-                this.assetBalanceMap = new ItemAssetBalanceRocksDBMap((ItemAssetBalanceRocksDBMap)parent.assetBalanceMap, this);
+                this.transactionMap = new TransactionRocksDBMap((TransactionRocksDBMap) parent.transactionMap, this);
+                this.assetBalanceMap = new ItemAssetBalanceRocksDBMap((ItemAssetBalanceRocksDBMap) parent.assetBalanceMap, this);
                 break;
             default:
-                this.assetBalanceMap = new ItemAssetBalanceMapDBMap((ItemAssetBalanceMapDBMap)parent.assetBalanceMap, this);
-                this.transactionMap = new TransactionMapDBMap((TransactionMapDBMap)parent.transactionMap, this);
+                this.assetBalanceMap = new ItemAssetBalanceMapDBMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
+                this.transactionMap = new TransactionMapDBMap((TransactionMapDBMap) parent.transactionMap, this);
+        }
 
         }
 
