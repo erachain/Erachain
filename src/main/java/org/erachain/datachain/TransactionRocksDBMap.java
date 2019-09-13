@@ -192,11 +192,12 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     private Iterable receiveIndexKeys(String recipient, int type, long timestamp, Iterable recipientKeys, String recipientUnconfirmedTransactionIndexName) {
         if (recipient != null) {
             if (type > 0) {
-                recipientKeys = tableDB.filterAppropriateValuesAsKeys(
+                recipientKeys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(
                         indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
-                        tableDB.receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
+                        ((DBRocksDBTable)tableDB).receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
             } else {
-                recipientKeys = tableDB.filterAppropriateValuesAsKeys(recipient.getBytes(), tableDB.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+                recipientKeys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(recipient.getBytes(),
+                        ((DBRocksDBTable)tableDB).receiveIndexByName(recipientUnconfirmedTransactionIndexName));
             }
         }
         return recipientKeys;
@@ -227,9 +228,11 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
     public List<Transaction> getTransactionsByAddressFast100(String address, int limitSize) {
         HashSet<Long> treeKeys = new HashSet<>();
-        Set<Long> senderKeys = tableDB.filterAppropriateValuesAsKeys(address.getBytes(), tableDB.receiveIndexByName(senderUnconfirmedTransactionIndexName));
+        Set<Long> senderKeys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(address.getBytes(),
+                ((DBRocksDBTable)tableDB).receiveIndexByName(senderUnconfirmedTransactionIndexName));
         List<Long> senderKeysLimit = senderKeys.stream().limit(limitSize).collect(Collectors.toList());
-        Set<Long> recipientKeys = tableDB.filterAppropriateValuesAsKeys(address.getBytes(), tableDB.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+        Set<Long> recipientKeys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(address.getBytes(),
+                ((DBRocksDBTable)tableDB).receiveIndexByName(recipientUnconfirmedTransactionIndexName));
         List<Long> recipientKeysLimit = recipientKeys.stream().limit(limitSize).collect(Collectors.toList());
         treeKeys.addAll(senderKeysLimit);
         treeKeys.addAll(recipientKeysLimit);
