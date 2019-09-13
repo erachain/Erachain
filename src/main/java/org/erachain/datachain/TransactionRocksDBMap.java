@@ -134,10 +134,6 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         return getIndexIterator(senderUnconfirmedTransactionIndex, false);
     }
 
-    Iterable receiveIndexKeys(sender, type, timestamp, senderKeys, senderUnconfirmedTransactionIndexName);
-    recipientKeys = receiveIndexKeys(recipient, type, timestamp, recipientKeys, recipientUnconfirmedTransactionIndexName);
-
-
     /**
      * Find all unconfirmed transaction by address, sender or recipient.
      * Need set only one parameter(address, sender,recipient)
@@ -196,11 +192,11 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     private Iterable receiveIndexKeys(String recipient, int type, long timestamp, Iterable recipientKeys, String recipientUnconfirmedTransactionIndexName) {
         if (recipient != null) {
             if (type > 0) {
-                recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(
-                        indexByteableTuple3StringLongInteger.toBytes(new Tuple3<>(recipient, timestamp, type), null),
-                        rocksDBTable.receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
+                recipientKeys = tableDB.filterAppropriateValuesAsKeys(
+                        indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
+                        tableDB.receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
             } else {
-                recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(recipient.getBytes(), rocksDBTable.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+                recipientKeys = tableDB.filterAppropriateValuesAsKeys(recipient.getBytes(), tableDB.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
             }
         }
         return recipientKeys;
@@ -223,7 +219,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         Long key;
         while (iter.hasNext()) {
             key = (Long) iter.next();
-            item = this.rocksDBTable.get(key);
+            item = tableDB.get(key);
             transactions.add(item);
         }
         return transactions;
@@ -231,9 +227,9 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
     public List<Transaction> getTransactionsByAddressFast100(String address, int limitSize) {
         HashSet<Long> treeKeys = new HashSet<>();
-        Set<Long> senderKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.receiveIndexByName(senderUnconfirmedTransactionIndexName));
+        Set<Long> senderKeys = tableDB.filterAppropriateValuesAsKeys(address.getBytes(), tableDB.receiveIndexByName(senderUnconfirmedTransactionIndexName));
         List<Long> senderKeysLimit = senderKeys.stream().limit(limitSize).collect(Collectors.toList());
-        Set<Long> recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+        Set<Long> recipientKeys = tableDB.filterAppropriateValuesAsKeys(address.getBytes(), tableDB.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
         List<Long> recipientKeysLimit = recipientKeys.stream().limit(limitSize).collect(Collectors.toList());
         treeKeys.addAll(senderKeysLimit);
         treeKeys.addAll(recipientKeysLimit);
@@ -253,7 +249,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         int i = 0;
         int n = 100;
         while (iterator.hasNext()) {
-            transaction = rocksDBTable.get(iterator.next());
+            transaction = tableDB.get(iterator.next());
             ok = transaction.getCreator().getAddress().equals(address);
             if (!ok) {
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
@@ -291,7 +287,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         int i = 0;
         Transaction transaction;
         while (iterator.hasNext()) {
-            transaction = rocksDBTable.get(iterator.next());
+            transaction = tableDB.get(iterator.next());
             if (type != 0 && type != transaction.getType()) {
                 continue;
             }
