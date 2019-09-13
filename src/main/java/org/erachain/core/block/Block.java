@@ -2125,14 +2125,17 @@ import java.util.*;
                 transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                 //PROCESS
-                if (!transaction.isWiped()) {
+                if (transaction.isWiped()
+                        || BlockChain.DEVELOP_USE && heightBlock > 473600 && heightBlock < 493700
+                                && transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION
+                        ) {
+                    //UPDATE REFERENCE OF SENDER
+                    transaction.getCreator().setLastTimestamp(
+                            new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
+                } else {
                     timerStart = System.currentTimeMillis();
                     transaction.process(this, Transaction.FOR_NETWORK);
                     timerProcess += System.currentTimeMillis() - timerStart;
-                } else {
-                    //UPDATE REFERENCE OF SENDER
-                        transaction.getCreator().setLastTimestamp(
-                                new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
                 }
 
                 transactionSignature = transaction.getSignature();
