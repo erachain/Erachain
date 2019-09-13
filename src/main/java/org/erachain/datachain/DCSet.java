@@ -1510,10 +1510,10 @@ public class DCSet extends DBASet implements Observer {
                 // очень долго делает - лучше ключем при старте
                 try {
                     this.database.compact();
-                    transactionMap.totalDeleted = 0;
+                    transactionMap.setTotalDeleted(0);
                     LOGGER.debug("COMPACTED");
                 } catch (Exception e) {
-                    transactionMap.totalDeleted >>= 1;
+                    transactionMap.setTotalDeleted(transactionMap.getTotalDeleted() >> 1);
                     LOGGER.error(e.getMessage(), e);
                 }
             }

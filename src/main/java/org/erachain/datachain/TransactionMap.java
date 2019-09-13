@@ -76,10 +76,15 @@ public interface TransactionMap {
 
     List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending);
 
-    public int totalDeleted = 0;
+    public void setTotalDeleted(int value);
+    public int getTotalDeleted();
+
     int size();
     Iterator<Long> getIterator(int index, boolean descending);
     Set<Transaction> getValues();
+
+    void addObserver(Observer o);
+
     void reset();
 
 }

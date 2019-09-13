@@ -61,7 +61,7 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     }
 
     @Override
-    public Collection<V> values() {
+    public Set<V> values() {
         return receiveValues();
     }
 
@@ -88,7 +88,7 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
         return (Set<K>) db.keySet();
     }
 
-    private Collection<V> receiveValues() {
+    private Set<V> receiveValues() {
         return (Set<V>) db.values();
     }
 }

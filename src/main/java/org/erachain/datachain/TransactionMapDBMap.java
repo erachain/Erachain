@@ -41,6 +41,8 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
 
     static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
 
+    public int totalDeleted = 0;
+
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")
@@ -252,6 +254,9 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
 
         return values;
     }
+
+    public void setTotalDeleted(int value) { totalDeleted = value; }
+    public int getTotalDeleted() { return totalDeleted; }
 
     private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
 

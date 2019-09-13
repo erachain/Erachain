@@ -41,6 +41,8 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
     static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
 
+    public int totalDeleted = 0;
+
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
     @SuppressWarnings("rawtypes")
@@ -253,6 +255,9 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         return values;
     }
 
+    public void setTotalDeleted(int value) { totalDeleted = value; }
+    public int getTotalDeleted() { return totalDeleted; }
+
     private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
 
     private boolean clearProcessed = false;
@@ -296,7 +301,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
                 timestamp -= keepTime;
                 tickerIter = System.currentTimeMillis();
-                SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
+                SortedSet<Tuple2<?, Long>> subSet = ((NavigableSet)this.indexes.get(TIMESTAMP_INDEX)).headSet(new Tuple2<Long, Long>(
                         timestamp, null));
                 tickerIter = System.currentTimeMillis() - tickerIter;
                 if (tickerIter > 10) {
@@ -315,7 +320,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
                  * - дале COMPACT не помогает
                  */
                 //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-                Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+                Iterator<Tuple2<?, Long>> iterator = ((NavigableSet)this.indexes.get(TIMESTAMP_INDEX)).iterator();
                 tickerIter = System.currentTimeMillis() - tickerIter;
                 if (tickerIter > 10) {
                     LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
@@ -393,8 +398,6 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     }
 
 
-    public long totalDeleted = 0;
-
     /**
      * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
      * Head Zero - data corrupted
@@ -433,7 +436,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
 
         // DESCENDING + 1000
-        Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
+        Iterable iterable = (NavigableSet)this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
         Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
 
         Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
