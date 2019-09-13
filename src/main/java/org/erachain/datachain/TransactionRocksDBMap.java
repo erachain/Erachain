@@ -3,22 +3,34 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DBMap;
-import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.database.DBASet;
+import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
+import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableTuple3StringLongInteger;
+import org.erachain.dbs.rocksDB.integration.DBMapDB;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.rocksDB.transformation.ByteableLong;
+import org.erachain.dbs.rocksDB.transformation.ByteableString;
+import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
-import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -43,25 +55,26 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
     public int totalDeleted = 0;
 
-    @SuppressWarnings("rawtypes")
-    private NavigableSet senderKey;
-    @SuppressWarnings("rawtypes")
-    private NavigableSet recipientKey;
-    @SuppressWarnings("rawtypes")
-    private NavigableSet typeKey;
+    public static final int TIMESTAMP_INDEX = 1;
+
+    private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE";
+    private final String senderUnconfirmedTransactionIndexName = "sender_unc_txs";
+    private final String recipientUnconfirmedTransactionIndexName = "recipient_unc_txs";
+    private final String addressTypeUnconfirmedTransactionIndexName = "address_type_unc_txs";
+
+    //private List<IndexDB> indexes;
+    private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
+    private SimpleIndexDB<Long, Transaction, Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
+
 
     public TransactionRocksDBMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
-
-        DEFAULT_INDEX = TIMESTAMP_INDEX;
-
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
+            observableData.put(NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
+            observableData.put(NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
+            observableData.put(NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
+            observableData.put(NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
         }
-
     }
 
     public TransactionRocksDBMap(TransactionRocksDBMap parent, DCSet dcSet) {
@@ -69,384 +82,61 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
+        senderUnconfirmedTransactionIndex = new SimpleIndexDB<>(senderUnconfirmedTransactionIndexName, new BiFunction<Long, Transaction, org.apache.flink.api.java.tuple.Tuple2<String, Long>>() {
+            @Override
+            public org.apache.flink.api.java.tuple.Tuple2<String, Long> apply(Long aLong, Transaction transaction) {
+                Account account = transaction.getCreator();
+                return new Tuple2<>(account == null ? "genesis" : account.getAddress(), transaction.getTimestamp());
+            }
+        }, (result, key) -> org.bouncycastle.util.Arrays.concatenate(
+                new ByteableString().toBytesObject(result.f0),
+                new ByteableLong().toBytesObject(result.f1)));
 
-        //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
 
-        // TIMESTAMP INDEX
-        Tuple2Comparator<Long, Long> comparator = new Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
-                //UnsignedBytes.lexicographicalComparator()
-                Fun.COMPARATOR);
-        NavigableSet<Tuple2<Long, Long>> heightIndex = database
-                .createTreeSet("transactions_index_timestamp")
-                .comparator(comparator)
-                .counterEnable()
-                .makeOrGet();
-
-        NavigableSet<Tuple2<Long, Long>> descendingHeightIndex = database
-                .createTreeSet("transactions_index_timestamp_descending")
-                .comparator(new ReverseComparator(comparator))
-                .counterEnable()
-                .makeOrGet();
-
-        createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
-                new Fun.Function2<Long, Long, Transaction>() {
-                    @Override
-                    public Long run(Long key, Transaction value) {
-                        return value.getTimestamp();
-                    }
-                });
-
+        ArrayIndexDB<Long, Transaction, String> recipientsUnconfirmedTransactionIndex = new ArrayIndexDB<>(recipientUnconfirmedTransactionIndexName,
+                (aLong, transaction) -> transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new),
+                (result, key) -> new ByteableString().toBytesObject(result));
+        indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
+        ListIndexDB<Long, Transaction, Fun.Tuple3<String, Long, Integer>> addressTypeUnconfirmedTransactionIndex
+                = new ListIndexDB<>(addressTypeUnconfirmedTransactionIndexName,
+                (aLong, transaction) -> {
+                    Integer type = transaction.getType();
+                    return transaction.getInvolvedAccounts().stream().map(
+                            (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());
+                }, indexByteableTuple3StringLongInteger);
+        indexes = new ArrayList<>();
+        indexes.add(senderUnconfirmedTransactionIndex);
+        indexes.add(recipientsUnconfirmedTransactionIndex);
+        indexes.add(addressTypeUnconfirmedTransactionIndex);
     }
 
-    public Integer deleteObservableData(int index) {
-        return this.observableData.remove(index);
-    }
-
-    public Integer setObservableData(int index, Integer data) {
-        return this.observableData.put(index, data);
+    public void setObservableData(int index, Integer data) {
+        this.observableData.put(index, data);
     }
 
     @Override
     protected void getMap(DB database) {
-
-        // OPEN MAP
-        map = database.createHashMap("transactions")
-                .keySerializer(SerializerBase.BASIC)
-                .valueSerializer(new TransactionSerializer())
-                .counterEnable()
-                .makeOrGet();
-
-
-        if (Controller.getInstance().onlyProtocolIndexing)
-            // NOT USE SECONDARY INDEXES
-            return;
-
-        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-
-        Bind.secondaryKey((BTreeMap)map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
-            @Override
-            public Tuple2<String, Long> run(Long key, Transaction val) {
-                Account account = val.getCreator();
-                return new Tuple2<String, Long>(account == null ? "genesis" : account.getAddress(), val.getTimestamp());
-            }
-        });
-
-        this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-        Bind.secondaryKeys((BTreeMap)map, this.recipientKey,
-                new Fun.Function2<String[], Long, Transaction>() {
-                    @Override
-                    public String[] run(Long key, Transaction val) {
-                        List<String> recps = new ArrayList<String>();
-
-                        val.setDC((DCSet)databaseSet);
-
-                        for (Account acc : val.getRecipientAccounts()) {
-                            // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
-                            recps.add(acc.getAddress());
-                        }
-                        String[] ret = new String[recps.size()];
-                        ret = recps.toArray(ret);
-                        return ret;
-                    }
-                });
-
-        this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-        Bind.secondaryKeys((BTreeMap)map, this.typeKey,
-                new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
-                    @Override
-                    public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
-                        List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
-                        Integer type = val.getType();
-
-                        val.setDC((DCSet)databaseSet);
-
-                        for (Account acc : val.getInvolvedAccounts()) {
-                            recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
-
-                        }
-                        // Tuple2<Integer, String>[] ret = (Tuple2<Integer,
-                        // String>[]) new Object[ recps.size() ];
-                        Fun.Tuple3<String, Long, Integer>[] ret = (Fun.Tuple3<String, Long, Integer>[])
-                                Array.newInstance(Fun.Tuple3.class, recps.size());
-
-                        ret = recps.toArray(ret);
-
-                        return ret;
-                    }
-                });
-
+        tableDB = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
+                RocksDbSettings.initCustomSettings(7,64,32,
+                        256,10,
+                        1,256,32,false),
+                ROCKS_DB_FOLDER);
     }
 
     @Override
     protected void getMemoryMap() {
-        map = new TreeMap<Long, Transaction>(
-                //UnsignedBytes.lexicographicalComparator()
-        );
+        tableDB = new DBMapDB<>(new HashMap<>());
     }
 
-    @Override
-    protected Transaction getDefaultValue() {
-        return null;
-    }
 
     public Iterator<Long> getTimestampIterator() {
-
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-        return iterator;
+        return getIndexIterator(senderUnconfirmedTransactionIndex, false);
     }
 
-    public Iterator<Long> getCeatorIterator() {
+    Iterable receiveIndexKeys(sender, type, timestamp, senderKeys, senderUnconfirmedTransactionIndexName);
+    recipientKeys = receiveIndexKeys(recipient, type, timestamp, recipientKeys, recipientUnconfirmedTransactionIndexName);
 
-        Iterator<Long> iterator = this.senderKey.iterator();
-        return iterator;
-    }
-
-    /**
-     * Используется для получения транзакций для сборки блока
-     * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
-     * @param timestamp
-     * @param notSetDCSet
-     * @param cutDeadTime true is need filter by Dead Time
-     * @return
-     */
-    public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
-
-        List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-        Transaction transaction;
-        int count = 0;
-        int bytesTotal = 0;
-        Long key;
-        while (iterator.hasNext()) {
-            key = iterator.next();
-            transaction = this.map.get(key);
-
-            if (cutDeadTime && transaction.getDeadline() < timestamp)
-                continue;
-            if (transaction.getTimestamp() > timestamp)
-                // мы используем отсортированный индекс, поэтому можно обрывать
-                break;
-
-            if (++count > BlockChain.MAX_BLOCK_SIZE_GEN)
-                break;
-
-            bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN
-                ///+ (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)
-            ) {
-                break;
-            }
-
-            if (!notSetDCSet)
-                transaction.setDC((DCSet)databaseSet);
-
-            values.add(transaction);
-
-        }
-
-        return values;
-    }
-
-    public void setTotalDeleted(int value) { totalDeleted = value; }
-    public int getTotalDeleted() { return totalDeleted; }
-
-    private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
-
-    private boolean clearProcessed = false;
-    private synchronized boolean isClearProcessedAndSet() {
-
-        if (clearProcessed)
-            return true;
-
-        clearProcessed = true;
-
-        return false;
-    }
-
-    /**
-     * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
-     * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
-     * @param timestamp
-     * @param cutDeadTime
-     */
-    protected long pointClear;
-    public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
-
-        // займем просецц или установим флаг
-        if (isClearProcessedAndSet())
-            return;
-
-        long keepTime = BlockChain.VERS_30SEC_TIME < timestamp? 600000 : 240000;
-        try {
-            long realTime = System.currentTimeMillis();
-
-            if (realTime - pointClear < keepTime) {
-                return;
-            }
-
-            int count = 0;
-            long tickerIter = realTime;
-
-            timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
-
-            if (false && cutDeadTime) {
-
-                timestamp -= keepTime;
-                tickerIter = System.currentTimeMillis();
-                SortedSet<Tuple2<?, Long>> subSet = ((NavigableSet)this.indexes.get(TIMESTAMP_INDEX)).headSet(new Tuple2<Long, Long>(
-                        timestamp, null));
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
-                }
-
-                for (Tuple2<?, Long> key : subSet) {
-                    if (true || this.contains(key.b))
-                        this.delete(key.b);
-                    count++;
-                }
-
-            } else {
-                /**
-                 * по несколько секунд итератор берется - при том что таблица пустая -
-                 * - дале COMPACT не помогает
-                 */
-                //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-                Iterator<Tuple2<?, Long>> iterator = ((NavigableSet)this.indexes.get(TIMESTAMP_INDEX)).iterator();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-                }
-
-                Transaction transaction;
-
-                tickerIter = System.currentTimeMillis();
-                long size = this.size();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
-                }
-                while (iterator.hasNext()) {
-                    Long key = iterator.next().b;
-                    transaction = this.map.get(key);
-                    if (transaction == null) {
-                        // такая ошибка уже было
-                        break;
-                    }
-
-                    long deadline = transaction.getDeadline();
-                    if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                            || ((Controller.HARD_WORK > 3
-                            || cutDeadTime)
-                            && deadline < timestamp)
-                            || Controller.HARD_WORK <= 3
-                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                            || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                        this.delete(key);
-                        count++;
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            long ticker = System.currentTimeMillis() - realTime;
-            if (ticker > 1000 || count > 0) {
-                LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + count);
-            }
-
-        } finally {
-            // освободим процесс
-            pointClear = System.currentTimeMillis();
-            clearProcessed = false;
-        }
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-
-    }
-
-    public boolean set(byte[] signature, Transaction transaction) {
-
-        Long key = Longs.fromByteArray(signature);
-
-        return this.set(key, transaction);
-
-    }
-
-    public boolean add(Transaction transaction) {
-
-        return this.set(transaction.getSignature(), transaction);
-
-    }
-
-    public void delete(Transaction transaction) {
-        this.delete(transaction.getSignature());
-    }
-
-    public Transaction delete(byte[] signature) {
-        return this.delete(Longs.fromByteArray(signature));
-    }
-
-
-    /**
-     * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
-     * Head Zero - data corrupted
-     * @param key
-     * @return
-     */
-    public /* synchronized */ Transaction delete(Long key) {
-        Transaction transaction = super.delete(key);
-        if (transaction != null) {
-            // DELETE only if DELETED
-            totalDeleted++;
-        }
-
-        return transaction;
-
-    }
-
-    public boolean contains(byte[] signature) {
-        return this.contains(Longs.fromByteArray(signature));
-    }
-
-    public boolean contains(Transaction transaction) {
-        return this.contains(transaction.getSignature());
-    }
-
-    public Transaction get(byte[] signature) {
-        return this.get(Longs.fromByteArray(signature));
-    }
-
-    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-
-        List<Long> treeKeys = new ArrayList<Long>();
-
-        //NavigableMap set = new NavigableMap<Long, Transaction>();
-        // NodeIterator
-
-
-        // DESCENDING + 1000
-        Iterable iterable = (NavigableSet)this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
-        Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
-
-        Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
-        while (iterator.hasNext()) {
-            treeKeys.add(iterator.next().b);
-        }
-
-        return treeKeys;
-
-    }
 
     /**
      * Find all unconfirmed transaction by address, sender or recipient.
@@ -478,20 +168,8 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
             return treeKeys;
         }
         //  timestamp = null;
-        if (sender != null) {
-            if (type > 0)
-                senderKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
-            else
-                senderKeys = Fun.filter(this.senderKey, sender);
-        }
-
-        if (recipient != null) {
-            if (type > 0)
-                recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
-            else
-                recipientKeys = Fun.filter(this.recipientKey, recipient);
-        }
-
+        senderKeys = receiveIndexKeys(sender, type, timestamp, senderKeys, senderUnconfirmedTransactionIndexName);
+        recipientKeys = receiveIndexKeys(recipient, type, timestamp, recipientKeys, recipientUnconfirmedTransactionIndexName);
         if (address != null) {
             treeKeys.addAll(Sets.newTreeSet(senderKeys));
             treeKeys.addAll(Sets.newTreeSet(recipientKeys));
@@ -500,7 +178,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
             treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
         } else if (sender != null) {
             treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        } else if (recipient != null) {
+        } else {
             treeKeys.addAll(Sets.newTreeSet(recipientKeys));
         }
 
@@ -510,16 +188,22 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         } else {
             keys = treeKeys;
         }
+        limit = (limit == 0) ? Iterables.size(keys) : limit;
+        return Iterables.limit(Iterables.skip(keys, offset), limit);
 
-        if (offset > 0) {
-            keys = Iterables.skip(keys, offset);
+    }
+
+    private Iterable receiveIndexKeys(String recipient, int type, long timestamp, Iterable recipientKeys, String recipientUnconfirmedTransactionIndexName) {
+        if (recipient != null) {
+            if (type > 0) {
+                recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(
+                        indexByteableTuple3StringLongInteger.toBytes(new Tuple3<>(recipient, timestamp, type), null),
+                        rocksDBTable.receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
+            } else {
+                recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(recipient.getBytes(), rocksDBTable.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+            }
         }
-
-        if (limit > 0) {
-            keys = Iterables.limit(keys, limit);
-        }
-
-        return  keys;
+        return recipientKeys;
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,
@@ -537,117 +221,92 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         List<Transaction> transactions = new ArrayList<>();
         Transaction item;
         Long key;
-
         while (iter.hasNext()) {
             key = (Long) iter.next();
-            item = this.map.get(key);
+            item = this.rocksDBTable.get(key);
             transactions.add(item);
         }
         return transactions;
     }
 
-    // TODO выдает ошибку на шаге treeKeys.addAll(Sets.newTreeSet(senderKeys));
-    public List<Transaction> getTransactionsByAddressFast100(String address) {
-
-        Iterable senderKeys = null;
-        Iterable recipientKeys = null;
-        TreeSet<Object> treeKeys = new TreeSet<>();
-
-        senderKeys = Iterables.limit(Fun.filter(this.senderKey, address), 100);
-        recipientKeys = Iterables.limit(Fun.filter(this.recipientKey, address), 100);
-
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-
-        return getUnconfirmedTransaction(Iterables.limit(treeKeys, 100));
+    public List<Transaction> getTransactionsByAddressFast100(String address, int limitSize) {
+        HashSet<Long> treeKeys = new HashSet<>();
+        Set<Long> senderKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.receiveIndexByName(senderUnconfirmedTransactionIndexName));
+        List<Long> senderKeysLimit = senderKeys.stream().limit(limitSize).collect(Collectors.toList());
+        Set<Long> recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+        List<Long> recipientKeysLimit = recipientKeys.stream().limit(limitSize).collect(Collectors.toList());
+        treeKeys.addAll(senderKeysLimit);
+        treeKeys.addAll(recipientKeysLimit);
+        return getUnconfirmedTransaction(Iterables.limit(treeKeys, limitSize));
 
     }
 
     // slow?? without index
     public List<Transaction> getTransactionsByAddress(String address) {
-
-        ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        ArrayList<Transaction> result = new ArrayList<Transaction>();
+        Iterator<Long> iterator = getIterator(false);
         Account account = new Account(address);
 
         Transaction transaction;
-        boolean ok = false;
+        boolean ok;
 
         int i = 0;
+        int n = 100;
         while (iterator.hasNext()) {
-
-            transaction = map.get(iterator.next());
-            if (transaction.getCreator().equals(address))
-                ok = true;
-            else
-                ok = false;
-
+            transaction = rocksDBTable.get(iterator.next());
+            ok = transaction.getCreator().getAddress().equals(address);
             if (!ok) {
-                transaction.setDC((DCSet)databaseSet);
                 HashSet<Account> recipients = transaction.getRecipientAccounts();
-
                 if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
                     continue;
                 }
-
             }
-
             // SET LIMIT
-            if (++i > 100)
+            if (++i > n) {
                 break;
-
-            values.add(transaction);
-
+            }
+            result.add(transaction);
         }
-        return values;
+        return result;
     }
 
-    public List<Transaction> getTransactions(int count, boolean descending) {
-
-        ArrayList<Transaction> values = new ArrayList<Transaction>();
-
-        //LOGGER.debug("get ITERATOR");
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
-        //LOGGER.debug("get ITERATOR - DONE"); / for merge
+    public List<Transaction> getTransactions(boolean descending) {
+        ArrayList<Transaction> result = new ArrayList<Transaction>();
+        logger.debug("get ITERATOR");
+        Iterator<Long> iterator = getIterator(descending);
+        logger.debug("get ITERATOR - DONE");
 
         Transaction transaction;
-        for (int i = 0; i < count; i++) {
-            if (!iterator.hasNext())
-                break;
-
-            transaction = this.get(iterator.next());
-            transaction.setDC((DCSet)databaseSet);
-            values.add(transaction);
+        while (iterator.hasNext()) {
+            transaction = get(iterator.next());
+            result.add(transaction);
         }
-        iterator = null;
-        return values;
+        return result;
     }
 
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
-
-        ArrayList<Transaction> values = new ArrayList<>();
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
+        ArrayList<Transaction> result = new ArrayList<>();
+        Iterator<Long> iterator = getIterator(descending);
         Account account = new Account(address);
-
         int i = 0;
         Transaction transaction;
         while (iterator.hasNext()) {
-            transaction = map.get(iterator.next());
-            if (type != 0 && type != transaction.getType())
+            transaction = rocksDBTable.get(iterator.next());
+            if (type != 0 && type != transaction.getType()) {
                 continue;
-
-            transaction.setDC((DCSet)databaseSet);
+            }
             HashSet<Account> recipients = transaction.getRecipientAccounts();
-            if (recipients == null || recipients.isEmpty())
+            if (recipients == null || recipients.isEmpty()) {
                 continue;
+            }
             if (recipients.contains(account) && transaction.getTimestamp() >= timestamp) {
-                values.add(transaction);
+                result.add(transaction);
                 i++;
-                if (count > 0 && i > count)
+                if (count > 0 && i > count) {
                     break;
+                }
             }
         }
-        return values;
+        return result;
     }
-
 }
