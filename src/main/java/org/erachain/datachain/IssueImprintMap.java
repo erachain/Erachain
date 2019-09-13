@@ -4,8 +4,6 @@ import com.google.common.primitives.UnsignedBytes;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.Map;
-
 /**
  * see datachain.IssueItemMap
  */
@@ -21,7 +19,7 @@ public class IssueImprintMap extends IssueItemMap {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("imprint_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

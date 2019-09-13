@@ -2,12 +2,10 @@ package org.erachain.datachain;
 
 import org.erachain.core.crypto.Base58;
 import org.erachain.database.DBMap;
-import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -41,11 +39,11 @@ public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("address_" + this.name + "_refs")
                 //.keySerializer(BTreeKeySerializer.TUPLE2)

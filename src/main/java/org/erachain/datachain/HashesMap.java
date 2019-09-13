@@ -4,7 +4,6 @@ import com.google.common.primitives.UnsignedBytes;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 // found by hash -> record signature
@@ -19,11 +18,11 @@ public class HashesMap extends DCMap<byte[], byte[]> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("hashes_keys")
                 .keySerializer(BTreeKeySerializer.BASIC)

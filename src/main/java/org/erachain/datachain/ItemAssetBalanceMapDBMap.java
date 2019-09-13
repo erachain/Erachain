@@ -60,12 +60,12 @@ public class ItemAssetBalanceMapDBMap extends DCMap<byte[], Tuple5<
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @SuppressWarnings({"unchecked"})
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         BTreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,

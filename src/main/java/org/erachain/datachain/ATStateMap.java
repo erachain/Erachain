@@ -22,11 +22,11 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         map = this.openMap(database);
     }
 

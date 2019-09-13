@@ -26,11 +26,11 @@ public class PeerMap extends DBMap<byte[], byte[]> {
         super(databaseSet, database);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("peers")
                 .keySerializer(BTreeKeySerializer.BASIC)

@@ -5,8 +5,6 @@ import org.erachain.core.block.Block;
 import org.mapdb.DB;
 import org.mapdb.SerializerBase;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -28,11 +26,11 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN HASH MAP
         //
         map = database.createHashMap("height")

@@ -36,7 +36,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
@@ -60,7 +60,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("namesales")
                 .counterEnable()

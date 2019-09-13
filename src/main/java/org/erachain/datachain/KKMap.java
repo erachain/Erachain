@@ -2,11 +2,9 @@ package org.erachain.datachain;
 
 import org.erachain.database.DBMap;
 import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple5;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -61,11 +59,11 @@ public class KKMap extends DCMap<
     }
 
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.BASIC)

@@ -37,7 +37,7 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         //NAME INDEX
         NavigableSet<Tuple2<String, Tuple2<String, String>>> nameIndex = database.createTreeSet("namesales_index_name")
                 .comparator(Fun.COMPARATOR)
@@ -88,7 +88,7 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("namesales")
                 .keySerializer(BTreeKeySerializer.TUPLE2)

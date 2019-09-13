@@ -70,7 +70,7 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
 
         //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
 
@@ -109,7 +109,7 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
 
         // OPEN MAP
         map = database.createHashMap("transactions")

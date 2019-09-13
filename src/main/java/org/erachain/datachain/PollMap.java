@@ -7,7 +7,6 @@ import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Deprecated
 public class PollMap extends DCMap<String, Poll> {
@@ -27,7 +26,7 @@ public class PollMap extends DCMap<String, Poll> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         //VOTES INDEX
 		/*final NavigableSet<Tuple2<BigDecimal, String>> namesIndex = database.createTreeSet("polls_index_votes")
 				.comparator(Fun.COMPARATOR)
@@ -62,7 +61,7 @@ public class PollMap extends DCMap<String, Poll> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("polls")
                 .valueSerializer(new PollSerializer())

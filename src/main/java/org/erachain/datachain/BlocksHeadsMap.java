@@ -11,7 +11,6 @@ import org.mapdb.DB;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  *  Block Height -> Block.BlockHead:
@@ -48,7 +47,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
@@ -67,7 +66,7 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
 	 */
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

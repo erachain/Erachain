@@ -4,7 +4,6 @@ import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.transaction.Transaction;
 import org.mapdb.DB;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -28,7 +27,7 @@ public abstract class IssueItemMap extends DCMap<byte[], Long> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

@@ -34,7 +34,7 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         //NAME INDEX
         NavigableSet<Tuple2<String, Tuple2<String, String>>> nameIndex = database.createTreeSet("names_index_name")
                 .comparator(Fun.COMPARATOR)
@@ -69,7 +69,7 @@ public class NameMap extends DBMap<Tuple2<String, String>, Name> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("names")
                 .keySerializer(BTreeKeySerializer.TUPLE2)

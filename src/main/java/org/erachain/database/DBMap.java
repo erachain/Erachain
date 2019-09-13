@@ -25,6 +25,7 @@ public abstract class DBMap<T, U> extends Observable {
 
     public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
+    protected DB database;
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
@@ -47,15 +48,16 @@ public abstract class DBMap<T, U> extends Observable {
 
     public DBMap(DBASet databaseSet, DB database) {
         this.databaseSet = databaseSet;
+        this.database = database;
 
         //OPEN MAP
-        getMap(database);
+        getMap();
 
         //CREATE INDEXES
         this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
 
         if (this.map !=  null) {
-            this.createIndexes(database);
+            this.createIndexes();
         }
 
         if (databaseSet.isWithObserver()) {
@@ -68,13 +70,13 @@ public abstract class DBMap<T, U> extends Observable {
         return this.databaseSet;
     }
 
-    protected abstract void getMap(DB database);
+    protected abstract void getMap();
 
     protected abstract void getMemoryMap();
 
     protected abstract U getDefaultValue();
 
-    protected abstract void createIndexes(DB database);
+    protected abstract void createIndexes();
 
     /**
      * Make SECODATY INDEX

@@ -6,7 +6,6 @@ import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -52,11 +51,11 @@ public class PersonAddressMap extends DCMap<
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("person_address")
                 .keySerializer(BTreeKeySerializer.BASIC)

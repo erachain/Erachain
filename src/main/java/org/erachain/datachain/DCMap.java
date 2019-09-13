@@ -3,7 +3,6 @@ package org.erachain.datachain;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.database.DBMap;
-import org.erachain.database.IDB;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -60,7 +59,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         if (dcSet == null || dcSet.getDatabase() == null) {
             this.getMemoryMap();
         } else {
-            this.getMap(dcSet.getDatabase());
+            this.getMap();
         }
     }
 

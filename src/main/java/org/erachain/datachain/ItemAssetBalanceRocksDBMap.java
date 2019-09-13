@@ -53,7 +53,7 @@ public class ItemAssetBalanceRocksDBMap extends DCMap<byte[], Fun.Tuple5<
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
 
         tableDB = new org.erachain.dbs.rocksDB.integration.DBRocksDBTable<byte[], Fun.Tuple5<
                 Fun.Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
@@ -78,7 +78,7 @@ public class ItemAssetBalanceRocksDBMap extends DCMap<byte[], Fun.Tuple5<
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         indexes = new ArrayList<>();
 
         SimpleIndexDB<

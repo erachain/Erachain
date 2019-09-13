@@ -7,7 +7,6 @@ import org.erachain.utils.ByteArrayUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Get all comments for a blogpost!
@@ -25,7 +24,7 @@ public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
 
         map = database.createTreeMap("CommentPostMap")
                 .comparator(SignedBytes.lexicographicalComparator())
@@ -82,7 +81,7 @@ public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
 }

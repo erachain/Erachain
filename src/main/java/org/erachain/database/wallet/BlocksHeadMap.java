@@ -60,7 +60,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
 
         //TIMESTAMP INDEX
         NavigableSet<Tuple2<Long, Tuple2<String, String>>> timestampIndex = database.createTreeSet("blocks_index_timestamp")
@@ -146,7 +146,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.TUPLE2) /// ТУТ тоже переделать на стандартный серилиазотор

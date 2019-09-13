@@ -5,7 +5,6 @@ import org.erachain.database.serializer.NameSerializer;
 import org.mapdb.DB;
 
 import java.util.HashMap;
-import java.util.Map;
 
 //import org.erachain.database.DLSet;
 
@@ -19,11 +18,11 @@ public class NameMap extends DCMap<String, Name> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("names")
                 .valueSerializer(new NameSerializer())

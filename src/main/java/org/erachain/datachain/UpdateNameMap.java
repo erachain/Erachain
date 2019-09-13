@@ -7,8 +7,6 @@ import org.erachain.database.serializer.NameSerializer;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 @Deprecated
@@ -22,11 +20,11 @@ public class UpdateNameMap extends DCMap<byte[], Name> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("updateNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

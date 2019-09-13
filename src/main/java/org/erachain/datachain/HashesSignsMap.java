@@ -5,7 +5,6 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -38,11 +37,11 @@ public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("hashes_signs")
                 .keySerializer(BTreeKeySerializer.BASIC)

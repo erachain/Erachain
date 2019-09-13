@@ -8,7 +8,6 @@ import org.mapdb.DB;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SharedPostsMap extends DCMap<byte[], List<String>> {
 
@@ -21,7 +20,7 @@ public class SharedPostsMap extends DCMap<byte[], List<String>> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
 
         map = database.createTreeMap("SharedPostsMap")
                 .comparator(SignedBytes.lexicographicalComparator())
@@ -64,7 +63,7 @@ public class SharedPostsMap extends DCMap<byte[], List<String>> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

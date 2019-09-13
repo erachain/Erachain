@@ -5,8 +5,6 @@ import org.erachain.core.transaction.Transaction;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 @Deprecated
@@ -20,11 +18,11 @@ public class VoteOnPollMap extends DCMap<byte[], Integer> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("voteOnPollOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

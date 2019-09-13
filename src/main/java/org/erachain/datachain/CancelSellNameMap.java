@@ -8,8 +8,6 @@ import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
@@ -29,11 +27,11 @@ public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("cancelNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

@@ -47,11 +47,11 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
 
     }
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = this.openMap(database);
     }

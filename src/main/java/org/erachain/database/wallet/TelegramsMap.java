@@ -8,9 +8,6 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class TelegramsMap extends DBMap<String, Transaction> {
 
     public TelegramsMap(DWSet dWSet, DB database) {
@@ -25,7 +22,7 @@ public class TelegramsMap extends DBMap<String, Transaction> {
     }
    
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
       //OPEN MAP
         map = database.createTreeMap("telegrams1")
                 .keySerializer(BTreeKeySerializer.STRING)
@@ -47,7 +44,7 @@ public class TelegramsMap extends DBMap<String, Transaction> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         // TODO Auto-generated method stub
         
     }

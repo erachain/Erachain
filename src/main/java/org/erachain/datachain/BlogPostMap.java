@@ -7,7 +7,6 @@ import org.erachain.utils.ByteArrayUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class BlogPostMap extends DCMap<String, List<byte[]>> {
 
@@ -22,7 +21,7 @@ public class BlogPostMap extends DCMap<String, List<byte[]>> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         // / OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("BlogPostMap");
         map = createTreeMap.makeOrGet();
@@ -34,7 +33,7 @@ public class BlogPostMap extends DCMap<String, List<byte[]>> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

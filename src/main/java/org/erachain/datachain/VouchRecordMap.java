@@ -42,7 +42,7 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     //@SuppressWarnings("unchecked")
@@ -59,7 +59,7 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
 
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = openMap(database);
     }
@@ -69,7 +69,7 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        this.getMap(database);
+        this.getMap();
     }
 
     @Override

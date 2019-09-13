@@ -63,7 +63,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @SuppressWarnings("unchecked")
@@ -139,7 +139,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         // OPEN MAP
         openMap(database);
     }
@@ -149,7 +149,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
         DB database = DBMaker.newMemoryDB().make();
 
         // OPEN MAP
-        this.getMap(database);
+        this.getMap();
     }
 
     @Override

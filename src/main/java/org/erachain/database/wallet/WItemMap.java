@@ -42,11 +42,11 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         this.name = name;
 
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
-        getMap(database);
+        getMap();
 
         makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
 
-        this.createIndexes(database);
+        this.createIndexes();
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
@@ -57,11 +57,11 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
     }
 
     //@SuppressWarnings({ "unchecked", "rawtypes" })
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         if (this.name == null)
             return;

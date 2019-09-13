@@ -132,7 +132,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
 
 
     @SuppressWarnings("unchecked")
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         if (Controller.getInstance().onlyProtocolIndexing){
             // NOT USE SECONDARY INDEXES
             return;

@@ -35,11 +35,11 @@ public class CompletedOrderMap extends DCMap<Long, Order> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = this.openMap(database);
     }

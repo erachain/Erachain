@@ -1,16 +1,12 @@
 package org.erachain.dbs.rocksDB;
 
-import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
-import org.erachain.database.IDB;
-import org.erachain.database.SortableList;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 
 import java.util.*;
 
@@ -27,10 +23,10 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         this.databaseSet = databaseSet;
 
         // create INDEXES before
-        this.createIndexes(database);
+        this.createIndexes();
 
         //OPEN MAP
-        getMap(database);
+        getMap();
 
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
@@ -42,7 +38,7 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         super(databaseSet);
     }
 
-    protected abstract void getMap(DB database);
+    protected abstract void getMap();
 
     protected abstract void getMemoryMap();
 

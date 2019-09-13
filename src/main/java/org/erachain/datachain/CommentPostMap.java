@@ -4,7 +4,6 @@ import com.google.common.primitives.SignedBytes;
 import org.mapdb.DB;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Get the parent post for a comment (the blogpost that was commented)
@@ -22,7 +21,7 @@ public class CommentPostMap extends DCMap<byte[], byte[]> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
 
         map = database.createTreeMap("CommentPostMapTree")
                 .comparator(SignedBytes.lexicographicalComparator())
@@ -49,7 +48,7 @@ public class CommentPostMap extends DCMap<byte[], byte[]> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 }
 

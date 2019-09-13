@@ -4,7 +4,6 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple4;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -37,11 +36,11 @@ public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("address_person")
                 .keySerializer(BTreeKeySerializer.STRING)

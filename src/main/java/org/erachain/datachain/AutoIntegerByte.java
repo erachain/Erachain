@@ -8,7 +8,6 @@ import org.mapdb.Atomic;
 import org.mapdb.DB;
 
 import java.util.HashMap;
-import java.util.Map;
 
 // Block Height -> creator
 
@@ -70,7 +69,7 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
         this.key = size;
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

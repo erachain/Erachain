@@ -19,7 +19,7 @@ public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
 
         map = database.createTreeMap("OrphanNameStorageMap")
                 .comparator(SignedBytes.lexicographicalComparator())
@@ -38,7 +38,7 @@ public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     public void add(byte[] txAndName, String key, String value) {

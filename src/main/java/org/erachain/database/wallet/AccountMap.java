@@ -4,7 +4,6 @@ import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.block.Block;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.DBMap;
 import org.erachain.utils.ObserverMessage;
@@ -41,11 +40,11 @@ public class AccountMap extends DBMap <String, Integer> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         this.publickKeys = database.createTreeSet(ADDRESSES)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .serializer(BTreeKeySerializer.BASIC)

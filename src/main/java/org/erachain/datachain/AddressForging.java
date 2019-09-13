@@ -6,9 +6,7 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 
 //import java.util.List;
 //import java.util.TreeMap;
@@ -47,12 +45,12 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
 
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.getHashMap("address_forging");
     }

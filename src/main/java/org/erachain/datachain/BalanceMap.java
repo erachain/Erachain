@@ -10,7 +10,6 @@ import org.mapdb.Fun.Tuple4;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -51,12 +50,12 @@ public class BalanceMap extends DCMap<Tuple2<Long, Long>,
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @SuppressWarnings({"unchecked"})
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("assets_balances_" + this.name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)

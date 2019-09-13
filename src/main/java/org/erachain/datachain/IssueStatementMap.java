@@ -1,7 +1,5 @@
 package org.erachain.datachain;
 
-import java.util.Map;
-
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
@@ -22,7 +20,7 @@ public class IssueStatementMap extends IssueItemMap {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("statement_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

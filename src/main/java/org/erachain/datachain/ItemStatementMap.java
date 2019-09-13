@@ -5,8 +5,6 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
 
-import java.util.Map;
-
 /**
  * Хранение активов.<br>
  * Ключ: номер (автоинкремент)<br>
@@ -32,7 +30,7 @@ public class ItemStatementMap extends ItemMap {
     }
 
     // type+name not initialized yet! - it call as Super in New
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))

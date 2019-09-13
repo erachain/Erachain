@@ -5,8 +5,6 @@ import org.erachain.core.transaction.Transaction;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 public class DeployATMap extends DCMap<byte[], Long> {
@@ -19,11 +17,11 @@ public class DeployATMap extends DCMap<byte[], Long> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("DeployATOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

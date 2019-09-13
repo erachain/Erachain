@@ -17,7 +17,6 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 ;
@@ -69,12 +68,12 @@ public class BlockMap extends DCMap<Integer, Block> {
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         generatorMap = database.createTreeMap("generators_index").makeOrGet();
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         // OPEN MAP
         map = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.BASIC)

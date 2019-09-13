@@ -8,7 +8,6 @@ import org.erachain.utils.ByteArrayUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 
@@ -22,7 +21,7 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
 
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
 
         map = database.createTreeMap("OrphanNameStorageHelperMap")
                 .makeOrGet();
@@ -35,7 +34,7 @@ public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     public void add(String name, byte[] signatureOfTx) {

@@ -5,7 +5,6 @@ import org.mapdb.DB;
 import org.mapdb.Hasher;
 import org.mapdb.SerializerBase;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 
@@ -26,7 +25,7 @@ public class ReferenceMap extends DCMap<byte[], long[]> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createHashMap("references")
                 .keySerializer(SerializerBase.BASIC)
@@ -40,7 +39,7 @@ public class ReferenceMap extends DCMap<byte[], long[]> {
         map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

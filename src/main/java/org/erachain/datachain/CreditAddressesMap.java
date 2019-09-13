@@ -31,11 +31,11 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("credit_debt")
                 .keySerializer(BTreeKeySerializer.TUPLE3)

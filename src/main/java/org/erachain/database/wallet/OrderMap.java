@@ -5,7 +5,6 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.DBASet;
 import org.erachain.database.DBMap;
-import org.erachain.database.IDB;
 import org.erachain.database.serializer.LongAndOrderSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
@@ -50,11 +49,11 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         //OPEN MAP
         map = this.openMap(database);
     }

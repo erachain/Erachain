@@ -3,7 +3,6 @@ package org.erachain.core.web;
 import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
-import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 
@@ -20,7 +19,7 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         // OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("NameStorageMap");
         map = createTreeMap.makeOrGet();
@@ -36,7 +35,7 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
         return null;
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     public void add(String name, String key, String value) {

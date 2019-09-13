@@ -2,15 +2,10 @@ package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Longs;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DBASet;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
-import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableTuple3StringLongInteger;
@@ -21,11 +16,9 @@ import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
-import org.mapdb.Fun.Tuple2Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -64,7 +57,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
     //private List<IndexDB> indexes;
     private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
-    private SimpleIndexDB<Long, Transaction, Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
+    private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
 
 
     public TransactionRocksDBMap(DCSet databaseSet, DB database) {
@@ -83,20 +76,22 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
     @Override
     protected void createIndexes() {
-        senderUnconfirmedTransactionIndex = new SimpleIndexDB<>(senderUnconfirmedTransactionIndexName, new BiFunction<Long, Transaction, org.apache.flink.api.java.tuple.Tuple2<String, Long>>() {
+        senderUnconfirmedTransactionIndex = new SimpleIndexDB<>(senderUnconfirmedTransactionIndexName,
+                new BiFunction<Long, Transaction, Fun.Tuple2<String, Long>>() {
             @Override
-            public org.apache.flink.api.java.tuple.Tuple2<String, Long> apply(Long aLong, Transaction transaction) {
+            public Fun.Tuple2<String, Long> apply(Long aLong, Transaction transaction) {
                 Account account = transaction.getCreator();
-                return new Tuple2<>(account == null ? "genesis" : account.getAddress(), transaction.getTimestamp());
+                return new Fun.Tuple2<>(account == null ? "genesis" : account.getAddress(), transaction.getTimestamp());
             }
         }, (result, key) -> org.bouncycastle.util.Arrays.concatenate(
-                new ByteableString().toBytesObject(result.f0),
-                new ByteableLong().toBytesObject(result.f1)));
+                new ByteableString().toBytesObject(result.a),
+                new ByteableLong().toBytesObject(result.b)));
 
 
         ArrayIndexDB<Long, Transaction, String> recipientsUnconfirmedTransactionIndex = new ArrayIndexDB<>(recipientUnconfirmedTransactionIndexName,
                 (aLong, transaction) -> transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new),
                 (result, key) -> new ByteableString().toBytesObject(result));
+
         indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
         ListIndexDB<Long, Transaction, Fun.Tuple3<String, Long, Integer>> addressTypeUnconfirmedTransactionIndex
                 = new ListIndexDB<>(addressTypeUnconfirmedTransactionIndexName,
@@ -105,6 +100,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
                     return transaction.getInvolvedAccounts().stream().map(
                             (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());
                 }, indexByteableTuple3StringLongInteger);
+
         indexes = new ArrayList<>();
         indexes.add(senderUnconfirmedTransactionIndex);
         indexes.add(recipientsUnconfirmedTransactionIndex);
@@ -116,7 +112,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         tableDB = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7,64,32,
                         256,10,

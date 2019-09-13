@@ -2,7 +2,6 @@ package org.erachain.database.wallet;
 
 import org.erachain.database.DBMap;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -10,9 +9,6 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.TreeMap;
 
 // <Account, Tuple2<Title,JSON_String>>
@@ -33,7 +29,7 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
     }
 
     @Override
-    protected void getMap(DB database) {
+    protected void getMap() {
         // OPEN MAP
         map = database.createTreeMap("accounts_propertis_map")
                 //.keySerializer(BTreeKeySerializer.STRING)
@@ -54,7 +50,7 @@ public class AccountsPropertisMap extends DBMap<String, Tuple2<String, String>> 
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         // TODO Auto-generated method stub
 
     }
