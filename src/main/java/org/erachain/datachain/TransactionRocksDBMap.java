@@ -82,12 +82,12 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     protected void createIndexes() {
         senderUnconfirmedTransactionIndex = new SimpleIndexDB<>(senderUnconfirmedTransactionIndexName,
                 new BiFunction<Long, Transaction, Fun.Tuple2<String, Long>>() {
-            @Override
-            public Fun.Tuple2<String, Long> apply(Long aLong, Transaction transaction) {
-                Account account = transaction.getCreator();
-                return new Fun.Tuple2<>(account == null ? "genesis" : account.getAddress(), transaction.getTimestamp());
-            }
-        }, (result, key) -> org.bouncycastle.util.Arrays.concatenate(
+                    @Override
+                    public Fun.Tuple2<String, Long> apply(Long aLong, Transaction transaction) {
+                        Account account = transaction.getCreator();
+                        return new Fun.Tuple2<>(account == null ? "genesis" : account.getAddress(), transaction.getTimestamp());
+                    }
+                }, (result, key) -> org.bouncycastle.util.Arrays.concatenate(
                 new ByteableString().toBytesObject(result.a),
                 new ByteableLong().toBytesObject(result.b)));
 
@@ -101,9 +101,8 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
                 = new ListIndexDB<>(addressTypeUnconfirmedTransactionIndexName,
                 (aLong, transaction) -> {
                     Integer type = transaction.getType();
-                    List<Fun.Tuple3<String, Long, Integer>> collect = transaction.getInvolvedAccounts().stream().map(
+                    return transaction.getInvolvedAccounts().stream().map(
                             (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());
-                    return collect;
                 }, indexByteableTuple3StringLongInteger);
 
         indexes = new ArrayList<>();
@@ -123,9 +122,9 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     @Override
     protected void getMap() {
         tableDB = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
-                RocksDbSettings.initCustomSettings(7,64,32,
-                        256,10,
-                        1,256,32,false),
+                RocksDbSettings.initCustomSettings(7, 64, 32,
+                        256, 10,
+                        1, 256, 32, false),
                 ROCKS_DB_FOLDER);
     }
 
@@ -144,6 +143,11 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
     public Iterator<Long> getIterator(boolean descending) {
         return tableDB.getIterator(descending);
+    }
+
+    @Override
+    public Iterator<Long> getIterator(int index, boolean descending) {
+        return tableDB.getIndexIterator(descending, index);
     }
 
     public Iterator<Long> getTimestampIterator() {
@@ -213,12 +217,12 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     private Iterable receiveIndexKeys(String recipient, int type, long timestamp, Iterable recipientKeys, String recipientUnconfirmedTransactionIndexName) {
         if (recipient != null) {
             if (type > 0) {
-                recipientKeys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(
+                recipientKeys = ((DBRocksDBTable) tableDB).filterAppropriateValuesAsKeys(
                         indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
-                        ((DBRocksDBTable)tableDB).receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
+                        ((DBRocksDBTable) tableDB).receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
             } else {
-                recipientKeys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(recipient.getBytes(),
-                        ((DBRocksDBTable)tableDB).receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+                recipientKeys = ((DBRocksDBTable) tableDB).filterAppropriateValuesAsKeys(recipient.getBytes(),
+                        ((DBRocksDBTable) tableDB).receiveIndexByName(recipientUnconfirmedTransactionIndexName));
             }
         }
         return recipientKeys;
@@ -249,11 +253,11 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
     public List<Transaction> getTransactionsByAddressFast100(String address, int limitSize) {
         HashSet<Long> treeKeys = new HashSet<>();
-        Set<Long> senderKeys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(address.getBytes(),
-                ((DBRocksDBTable)tableDB).receiveIndexByName(senderUnconfirmedTransactionIndexName));
+        Set<Long> senderKeys = ((DBRocksDBTable) tableDB).filterAppropriateValuesAsKeys(address.getBytes(),
+                ((DBRocksDBTable) tableDB).receiveIndexByName(senderUnconfirmedTransactionIndexName));
         List<Long> senderKeysLimit = senderKeys.stream().limit(limitSize).collect(Collectors.toList());
-        Set<Long> recipientKeys = ((DBRocksDBTable)tableDB).filterAppropriateValuesAsKeys(address.getBytes(),
-                ((DBRocksDBTable)tableDB).receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+        Set<Long> recipientKeys = ((DBRocksDBTable) tableDB).filterAppropriateValuesAsKeys(address.getBytes(),
+                ((DBRocksDBTable) tableDB).receiveIndexByName(recipientUnconfirmedTransactionIndexName));
         List<Long> recipientKeysLimit = recipientKeys.stream().limit(limitSize).collect(Collectors.toList());
         treeKeys.addAll(senderKeysLimit);
         treeKeys.addAll(recipientKeysLimit);
@@ -331,10 +335,10 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     }
 
 
-
     /**
      * Используется для получения транзакций для сборки блока
      * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
+     *
      * @param timestamp
      * @param notSetDCSet
      * @param cutDeadTime true is need filter by Dead Time
@@ -343,7 +347,9 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
 
         List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+
+        Iterator<Long> iterator = getTimestampIterator();
+
         Transaction transaction;
         int count = 0;
         int bytesTotal = 0;
@@ -369,7 +375,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
             }
 
             if (!notSetDCSet)
-                transaction.setDC((DCSet)databaseSet);
+                transaction.setDC((DCSet) databaseSet);
 
             values.add(transaction);
 
@@ -378,12 +384,18 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         return values;
     }
 
-    public void setTotalDeleted(int value) { totalDeleted = value; }
-    public int getTotalDeleted() { return totalDeleted; }
+    public void setTotalDeleted(int value) {
+        totalDeleted = value;
+    }
+
+    public int getTotalDeleted() {
+        return totalDeleted;
+    }
 
     private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
 
     private boolean clearProcessed = false;
+
     private synchronized boolean isClearProcessedAndSet() {
 
         if (clearProcessed)
@@ -397,17 +409,19 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     /**
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
      * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
+     *
      * @param timestamp
      * @param cutDeadTime
      */
     protected long pointClear;
+
     public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
 
         // займем просецц или установим флаг
         if (isClearProcessedAndSet())
             return;
 
-        long keepTime = BlockChain.VERS_30SEC_TIME < timestamp? 600000 : 240000;
+        long keepTime = BlockChain.VERS_30SEC_TIME < timestamp ? 600000 : 240000;
         try {
             long realTime = System.currentTimeMillis();
 
@@ -420,64 +434,44 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
             timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
 
-            if (false && cutDeadTime) {
+            /**
+             * по несколько секунд итератор берется - при том что таблица пустая -
+             * - дале COMPACT не помогает
+             */
+            Iterator<Long> iterator = getIterator(false); // getTimestampIterator();
+            tickerIter = System.currentTimeMillis() - tickerIter;
+            if (tickerIter > 10) {
+                LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
+            }
 
-                timestamp -= keepTime;
-                tickerIter = System.currentTimeMillis();
-                SortedSet<Fun.Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Fun.Tuple2<Long, Long>(
-                        timestamp, null));
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
+            Transaction transaction;
+
+            tickerIter = System.currentTimeMillis();
+            long size = this.size();
+            tickerIter = System.currentTimeMillis() - tickerIter;
+            if (tickerIter > 10) {
+                LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
+            }
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                transaction = this.map.get(key);
+                if (transaction == null) {
+                    // такая ошибка уже было
+                    break;
                 }
 
-                for (Fun.Tuple2<?, Long> key : subSet) {
-                    if (true || this.contains(key.b))
-                        this.delete(key.b);
+                long deadline = transaction.getDeadline();
+                if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
+                        || ((Controller.HARD_WORK > 3
+                        || cutDeadTime)
+                        && deadline < timestamp)
+                        || Controller.HARD_WORK <= 3
+                        && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                        || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                    this.delete(key);
                     count++;
-                }
-
-            } else {
-                /**
-                 * по несколько секунд итератор берется - при том что таблица пустая -
-                 * - дале COMPACT не помогает
-                 */
-                //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-                Iterator<Fun.Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-                }
-
-                Transaction transaction;
-
-                tickerIter = System.currentTimeMillis();
-                long size = this.size();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
-                }
-                while (iterator.hasNext()) {
-                    Long key = iterator.next().b;
-                    transaction = this.map.get(key);
-                    if (transaction == null) {
-                        // такая ошибка уже было
-                        break;
-                    }
-
-                    long deadline = transaction.getDeadline();
-                    if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                            || ((Controller.HARD_WORK > 3
-                            || cutDeadTime)
-                            && deadline < timestamp)
-                            || Controller.HARD_WORK <= 3
-                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                            || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                        this.delete(key);
-                        count++;
-                    } else {
-                        break;
-                    }
+                } else {
+                    break;
                 }
             }
 
@@ -524,6 +518,7 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     /**
      * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
      * Head Zero - data corrupted
+     *
      * @param key
      * @return
      */
@@ -557,14 +552,9 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
         //NavigableMap set = new NavigableMap<Long, Transaction>();
         // NodeIterator
 
-
-        // DESCENDING + 1000
-        Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX).;
-        Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
-
-        Iterator<Fun.Tuple2<Long, Long>> iterator = iterableLimit.iterator();
+        Iterator<Long> iterator = getIterator(false); //getTimestampIterator();
         while (iterator.hasNext()) {
-            treeKeys.add(iterator.next().b);
+            treeKeys.add(iterator.next());
         }
 
         return treeKeys;
@@ -582,9 +572,9 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
 
-        //LOGGER.debug("get ITERATOR");
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
-        //LOGGER.debug("get ITERATOR - DONE"); / for merge
+        LOGGER.debug("get ITERATOR");
+        Iterator<Long> iterator = getIterator(false); // getTimestampIterator();
+        LOGGER.debug("get ITERATOR - DONE"); // for merge
 
         Transaction transaction;
         for (int i = 0; i < count; i++) {
@@ -595,7 +585,6 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
             transaction.setDC((DCSet)databaseSet);
             values.add(transaction);
         }
-        iterator = null;
         return values;
     }
 
