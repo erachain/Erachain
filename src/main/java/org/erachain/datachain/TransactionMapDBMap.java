@@ -37,13 +37,12 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Transaction>
-        implements TransactionMap
+//public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Transaction>
+//        implements TransactionMap
+public class TransactionMapDBMap extends TransactionMapImpl
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
-
-    public int totalDeleted = 0;
+    static Logger logger = LoggerFactory.getLogger(TransactionMapDBMap.class.getSimpleName());
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -100,14 +99,6 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
                     }
                 });
 
-    }
-
-    public Integer deleteObservableData(int index) {
-        return this.observableData.remove(index);
-    }
-
-    public Integer setObservableData(int index, Integer data) {
-        return this.observableData.put(index, data);
     }
 
     @Override
@@ -194,10 +185,6 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
         );
     }
 
-    @Override
-    protected Transaction getDefaultValue() {
-        return null;
-    }
 
     public Iterator<Long> getTimestampIterator() {
 
@@ -211,219 +198,7 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
         return iterator;
     }
 
-    /**
-     * Используется для получения транзакций для сборки блока
-     * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
-     * @param timestamp
-     * @param notSetDCSet
-     * @param cutDeadTime true is need filter by Dead Time
-     * @return
-     */
-    public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
-
-        List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-        Transaction transaction;
-        int count = 0;
-        int bytesTotal = 0;
-        Long key;
-        while (iterator.hasNext()) {
-            key = iterator.next();
-            transaction = this.map.get(key);
-
-            if (cutDeadTime && transaction.getDeadline() < timestamp)
-                continue;
-            if (transaction.getTimestamp() > timestamp)
-                // мы используем отсортированный индекс, поэтому можно обрывать
-                break;
-
-            if (++count > BlockChain.MAX_BLOCK_SIZE_GEN)
-                break;
-
-            bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN
-                ///+ (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)
-            ) {
-                break;
-            }
-
-            if (!notSetDCSet)
-                transaction.setDC((DCSet)databaseSet);
-
-            values.add(transaction);
-
-        }
-
-        return values;
-    }
-
-    public void setTotalDeleted(int value) { totalDeleted = value; }
-    public int getTotalDeleted() { return totalDeleted; }
-
-    private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
-
-    private boolean clearProcessed = false;
-    private synchronized boolean isClearProcessedAndSet() {
-
-        if (clearProcessed)
-            return true;
-
-        clearProcessed = true;
-
-        return false;
-    }
-
-    /**
-     * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
-     * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
-     * @param timestamp
-     * @param cutDeadTime
-     */
-    protected long pointClear;
-    public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
-
-        // займем просецц или установим флаг
-        if (isClearProcessedAndSet())
-            return;
-
-        long keepTime = BlockChain.VERS_30SEC_TIME < timestamp? 600000 : 240000;
-        try {
-            long realTime = System.currentTimeMillis();
-
-            if (realTime - pointClear < keepTime) {
-                return;
-            }
-
-            int count = 0;
-            long tickerIter = realTime;
-
-            timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
-
-            if (false && cutDeadTime) {
-
-                timestamp -= keepTime;
-                tickerIter = System.currentTimeMillis();
-                SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
-                        timestamp, null));
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
-                }
-
-                for (Tuple2<?, Long> key : subSet) {
-                    if (true || this.contains(key.b))
-                        this.delete(key.b);
-                    count++;
-                }
-
-            } else {
-                /**
-                 * по несколько секунд итератор берется - при том что таблица пустая -
-                 * - дале COMPACT не помогает
-                 */
-                //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-                Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-                }
-
-                Transaction transaction;
-
-                tickerIter = System.currentTimeMillis();
-                long size = this.size();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
-                }
-                while (iterator.hasNext()) {
-                    Long key = iterator.next().b;
-                    transaction = this.map.get(key);
-                    if (transaction == null) {
-                        // такая ошибка уже было
-                        break;
-                    }
-
-                    long deadline = transaction.getDeadline();
-                    if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                            || ((Controller.HARD_WORK > 3
-                            || cutDeadTime)
-                            && deadline < timestamp)
-                            || Controller.HARD_WORK <= 3
-                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                            || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                        this.delete(key);
-                        count++;
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            long ticker = System.currentTimeMillis() - realTime;
-            if (ticker > 1000 || count > 0) {
-                LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + count);
-            }
-
-        } finally {
-            // освободим процесс
-            pointClear = System.currentTimeMillis();
-            clearProcessed = false;
-        }
-    }
-
-    public boolean set(byte[] signature, Transaction transaction) {
-
-        Long key = Longs.fromByteArray(signature);
-
-        return this.set(key, transaction);
-
-    }
-
-    public boolean add(Transaction transaction) {
-
-        return this.set(transaction.getSignature(), transaction);
-
-    }
-
-    public void delete(Transaction transaction) {
-        this.delete(transaction.getSignature());
-    }
-
-    public Transaction delete(byte[] signature) {
-        return this.delete(Longs.fromByteArray(signature));
-    }
-
-
-    /**
-     * synchronized - потому что почемуто вызывало ошибку в unconfirmedMap.delete(transactionSignature) в процессе блока.
-     * Head Zero - data corrupted
-     * @param key
-     * @return
-     */
-    public /* synchronized */ Transaction delete(Long key) {
-        Transaction transaction = super.delete(key);
-        if (transaction != null) {
-            // DELETE only if DELETED
-            totalDeleted++;
-        }
-
-        return transaction;
-
-    }
-
-    public boolean contains(byte[] signature) {
-        return this.contains(Longs.fromByteArray(signature));
-    }
-
-    public boolean contains(Transaction transaction) {
-        return this.contains(transaction.getSignature());
-    }
-
-    public Transaction get(byte[] signature) {
-        return this.get(Longs.fromByteArray(signature));
-    }
-
+    @Override
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
 
         List<Long> treeKeys = new ArrayList<Long>();

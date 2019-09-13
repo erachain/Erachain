@@ -37,22 +37,29 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transaction>
-        //implements TransactionMap<Long, TransactionMap>
+abstract class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transaction>
+        implements TransactionMap
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionMapImpl.class.getName());
 
     int TIMESTAMP_INDEX = 1;
 
     public int totalDeleted = 0;
 
-    @SuppressWarnings("rawtypes")
-    private NavigableSet senderKey;
-    @SuppressWarnings("rawtypes")
-    private NavigableSet recipientKey;
-    @SuppressWarnings("rawtypes")
-    private NavigableSet typeKey;
+    public TransactionMapImpl(DCSet databaseSet, DB database) {
+        super(databaseSet, database);
+
+        DEFAULT_INDEX = TIMESTAMP_INDEX;
+
+        if (databaseSet.isWithObserver()) {
+            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
+            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
+        }
+
+    }
 
     public TransactionMapImpl(TransactionMap parent, DCSet dcSet) {
         super(parent, dcSet);
@@ -98,106 +105,12 @@ public class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transac
         return this.observableData.put(index, data);
     }
 
-    @Override
-    protected void getMap() {
-
-        // OPEN MAP
-        map = database.createHashMap("transactions")
-                .keySerializer(SerializerBase.BASIC)
-                .valueSerializer(new TransactionSerializer())
-                .counterEnable()
-                .makeOrGet();
-
-
-        if (Controller.getInstance().onlyProtocolIndexing)
-            // NOT USE SECONDARY INDEXES
-            return;
-
-        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-
-        Bind.secondaryKey((BTreeMap)map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
-            @Override
-            public Tuple2<String, Long> run(Long key, Transaction val) {
-                Account account = val.getCreator();
-                return new Tuple2<String, Long>(account == null ? "genesis" : account.getAddress(), val.getTimestamp());
-            }
-        });
-
-        this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-        Bind.secondaryKeys((BTreeMap)map, this.recipientKey,
-                new Fun.Function2<String[], Long, Transaction>() {
-                    @Override
-                    public String[] run(Long key, Transaction val) {
-                        List<String> recps = new ArrayList<String>();
-
-                        val.setDC((DCSet)databaseSet);
-
-                        for (Account acc : val.getRecipientAccounts()) {
-                            // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
-                            recps.add(acc.getAddress());
-                        }
-                        String[] ret = new String[recps.size()];
-                        ret = recps.toArray(ret);
-                        return ret;
-                    }
-                });
-
-        this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-        Bind.secondaryKeys((BTreeMap)map, this.typeKey,
-                new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
-                    @Override
-                    public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
-                        List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
-                        Integer type = val.getType();
-
-                        val.setDC((DCSet)databaseSet);
-
-                        for (Account acc : val.getInvolvedAccounts()) {
-                            recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
-
-                        }
-                        // Tuple2<Integer, String>[] ret = (Tuple2<Integer,
-                        // String>[]) new Object[ recps.size() ];
-                        Fun.Tuple3<String, Long, Integer>[] ret = (Fun.Tuple3<String, Long, Integer>[])
-                                Array.newInstance(Fun.Tuple3.class, recps.size());
-
-                        ret = recps.toArray(ret);
-
-                        return ret;
-                    }
-                });
-
-    }
-
-    @Override
-    protected void getMemoryMap() {
-        map = new TreeMap<Long, Transaction>(
-                //UnsignedBytes.lexicographicalComparator()
-        );
-    }
 
     @Override
     protected Transaction getDefaultValue() {
         return null;
     }
 
-    public Iterator<Long> getTimestampIterator() {
-
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-        return iterator;
-    }
-
-    public Iterator<Long> getCeatorIterator() {
-
-        Iterator<Long> iterator = this.senderKey.iterator();
-        return iterator;
-    }
 
     /**
      * Используется для получения транзакций для сборки блока
@@ -464,17 +377,19 @@ public class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transac
         }
         //  timestamp = null;
         if (sender != null) {
-            if (type > 0)
-                senderKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
-            else
-                senderKeys = Fun.filter(this.senderKey, sender);
+            if (type > 0) {
+                //senderKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
+            } else {
+                //senderKeys = Fun.filter(this.senderKey, sender);
+            }
         }
 
         if (recipient != null) {
-            if (type > 0)
-                recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
-            else
-                recipientKeys = Fun.filter(this.recipientKey, recipient);
+            if (type > 0) {
+                //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
+            } else {
+                //recipientKeys = Fun.filter(this.recipientKey, recipient);
+            }
         }
 
         if (address != null) {
@@ -538,8 +453,8 @@ public class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transac
         Iterable recipientKeys = null;
         TreeSet<Object> treeKeys = new TreeSet<>();
 
-        senderKeys = Iterables.limit(Fun.filter(this.senderKey, address), 100);
-        recipientKeys = Iterables.limit(Fun.filter(this.recipientKey, address), 100);
+        //senderKeys = Iterables.limit(Fun.filter(this.senderKey, address), 100);
+        //recipientKeys = Iterables.limit(Fun.filter(this.recipientKey, address), 100);
 
         treeKeys.addAll(Sets.newTreeSet(senderKeys));
         treeKeys.addAll(Sets.newTreeSet(recipientKeys));

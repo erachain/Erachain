@@ -15,6 +15,7 @@ import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableTuple3StringLongInteger;
 import org.erachain.dbs.rocksDB.integration.DBMapDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
@@ -46,23 +47,20 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, Transaction>
-    implements // org.erachain.dbs.DCMap<Long, Transaction>
-        TransactionMap
+//public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, Transaction>
+//    implements TransactionMap
+public class TransactionRocksDBMap extends TransactionMapImpl
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
-
-    public int totalDeleted = 0;
-
-    public static final int TIMESTAMP_INDEX = 1;
+    static Logger logger = LoggerFactory.getLogger(TransactionRocksDBMap.class.getSimpleName());
 
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE";
     private final String senderUnconfirmedTransactionIndexName = "sender_unc_txs";
     private final String recipientUnconfirmedTransactionIndexName = "recipient_unc_txs";
     private final String addressTypeUnconfirmedTransactionIndexName = "address_type_unc_txs";
 
-    //private List<IndexDB> indexes;
+    private InnerDBTable<Long, Transaction> tableDB;
+    private List<IndexDB> indexes;
     private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
     private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
 
