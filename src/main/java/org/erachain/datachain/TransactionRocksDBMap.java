@@ -217,12 +217,20 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
     private Iterable receiveIndexKeys(String recipient, int type, long timestamp, Iterable recipientKeys, String recipientUnconfirmedTransactionIndexName) {
         if (recipient != null) {
             if (type > 0) {
-                recipientKeys = ((DBRocksDBTable) tableDB).filterAppropriateValuesAsKeys(
-                        indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
-                        ((DBRocksDBTable) tableDB).receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
+                if (tableDB instanceof DBRocksDBTable) {
+                    recipientKeys = ((DBRocksDBTable) tableDB).filterAppropriateValuesAsKeys(
+                            indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
+                            ((DBRocksDBTable) tableDB).receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
+                } else {
+                    recipientKeys = (Iterable)((DBMapDB) tableDB).getIterator(false);
+                }
             } else {
-                recipientKeys = ((DBRocksDBTable) tableDB).filterAppropriateValuesAsKeys(recipient.getBytes(),
-                        ((DBRocksDBTable) tableDB).receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+                if (tableDB instanceof DBRocksDBTable) {
+                    recipientKeys = ((DBRocksDBTable) tableDB).filterAppropriateValuesAsKeys(recipient.getBytes(),
+                            ((DBRocksDBTable) tableDB).receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+                } else {
+                    recipientKeys = (Iterable)((DBMapDB) tableDB).getIterator(false);
+                }
             }
         }
         return recipientKeys;
