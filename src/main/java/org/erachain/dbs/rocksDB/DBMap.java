@@ -138,6 +138,18 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         return ((DBRocksDBTable<T, U>) tableDB).getLatestValues(limit);
     }
 
+    /**
+     * @param descending true if need descending sort
+     * @return
+     */
+    public Iterator<T> getIndexIterator(IndexDB indexDB, boolean descending) {
+        return tableDB.getIndexIterator(descending, indexDB);
+    }
+
+    public Iterator<T> getIterator(boolean descending) {
+        return tableDB.getIterator(descending);
+    }
+
     @Override
     public void reset() {
         tableDB.clear();
