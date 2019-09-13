@@ -4,7 +4,9 @@ import org.erachain.core.account.Account;
 import org.junit.Test;
 import org.mapdb.Fun;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
@@ -35,12 +37,19 @@ public class ItemAssetBalanceMapTest {
     @Test
     public void set() {
 
+        init();
+
         Account account = new Account("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS");
         map.set(account.getShortAddressBytes(), 2L, balance);
 
         balance2 = map.get(account.getShortAddressBytes(), 2L);
 
+        assertEquals(Arrays.equals(account.getShortAddressBytes(), map.getShortAccountFromKey(account.getShortAddressBytes())), true);
+
         Account account2 = new Account(map.getShortAccountFromKey(account.getShortAddressBytes()));
+
+        assertEquals(Arrays.equals(account.getAddressBytes(), account2.getAddressBytes()), true);
+        assertEquals(Arrays.equals(account.getShortAddressBytes(), account2.getShortAddressBytes()), true);
         assertEquals(account.getAddress(), account2.getAddress());
 
     }
