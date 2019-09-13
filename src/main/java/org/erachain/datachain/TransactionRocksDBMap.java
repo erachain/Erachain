@@ -101,8 +101,9 @@ public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, 
                 = new ListIndexDB<>(addressTypeUnconfirmedTransactionIndexName,
                 (aLong, transaction) -> {
                     Integer type = transaction.getType();
-                    return transaction.getInvolvedAccounts().stream().map(
+                    List<Fun.Tuple3<String, Long, Integer>> collect = transaction.getInvolvedAccounts().stream().map(
                             (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());
+                    return collect;
                 }, indexByteableTuple3StringLongInteger);
 
         indexes = new ArrayList<>();
