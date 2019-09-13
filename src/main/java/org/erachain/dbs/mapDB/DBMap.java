@@ -102,7 +102,6 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         return u;
     }
 
-    /*
     @Override
     public U get(T key) {
 
@@ -129,8 +128,6 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         }
     }
 
-     */
-
     public Set<T> getKeys() {
         this.addUses();
         Set<T> u = this.map.keySet();
@@ -145,7 +142,6 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         return u;
     }
 
-    /*
     @Override
     public boolean set(T key, U value) {
         this.addUses();
@@ -175,9 +171,6 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         return false;
     }
 
-     */
-
-    /*
     public U delete(T key) {
 
         this.addUses();
@@ -210,9 +203,6 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         return value;
     }
 
-     */
-
-    /*
     @Override
     public boolean contains(T key) {
 
@@ -226,8 +216,6 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         this.outUses();
         return false;
     }
-
-     */
 
     public Map<Integer, Integer> getObservableData() {
         return observableData;

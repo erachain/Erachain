@@ -1,4 +1,4 @@
-package org.erachain.dbs.mapDB;
+package org.erachain.dbs;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
@@ -14,20 +14,11 @@ import java.util.HashMap;
 import java.util.Observer;
 import java.util.Set;
 
-/**
- * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork()
- * @param <T>
- * @param <U>
-<br><br>
-ВНИМАНИЕ !!! Вторичные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
-Поэтому нужно добавлять униальность
-
- */
-public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.dbs.DCMap<T, U>
-        {
+public abstract class DCMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
-    protected org.erachain.dbs.DBMap<T, U> parent;
+
+    protected DCMap<T, U> parent;
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
@@ -40,11 +31,11 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
     int shiftSize;
 
 
-    public DCMap(DBASet databaseSet, DB database) {
+    public DCMapImpl(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public DCMap(org.erachain.dbs.DBMap<T, U> parent, DBASet dcSet) {
+    public DCMapImpl(DCMap<T, U> parent, DBASet dcSet) {
         super(dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {

@@ -142,6 +142,31 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
         return u;
     }
 
+    public U get(T key) {
+
+        this.addUses();
+
+        try {
+            if (this.map.containsKey(key)) {
+                U u = this.map.get(key);
+                this.outUses();
+                return u;
+            }
+
+            U u = this.getDefaultValue();
+            this.outUses();
+            return u;
+        } catch (Exception e)
+        //else
+        {
+            //logger.error(e.getMessage(), e);
+
+            U u = this.getDefaultValue();
+            this.outUses();
+            return u;
+        }
+    }
+
     @Override
     public Set<T> getKeys() {
         this.addUses();
@@ -164,7 +189,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
      * @param value
      * @return
      */
-    @Override
     public boolean set(T key, U value) {
         this.addUses();
         //try {
@@ -190,6 +214,56 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
 
         this.outUses();
         return old != null;
+    }
+
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Удалить
+     * @param key
+     * @return
+     */
+    public U delete(T key) {
+
+        this.addUses();
+
+        U value;
+
+        //try {
+            //REMOVE
+            if (this.map.containsKey(key)) {
+                value = this.map.remove(key);
+
+                //NOTIFY
+                if (this.observableData != null) {
+                    if (this.observableData.containsKey(NOTIFY_REMOVE)) {
+                        this.setChanged();
+                        this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
+                    }
+                }
+
+            } else
+                value = null;
+
+        //} catch (Exception e) {
+        //    value = null;
+        //    logger.error(e.getMessage(), e);
+        //}
+
+        this.outUses();
+
+        return value;
+    }
+
+    public boolean contains(T key) {
+
+        this.addUses();
+
+        if (this.map.containsKey(key)) {
+            this.outUses();
+            return true;
+        }
+
+        this.outUses();
+        return false;
     }
 
     @Override

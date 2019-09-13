@@ -17,7 +17,7 @@ import java.util.*;
  */
 @Slf4j
 //@NoArgsConstructor
-public abstract class DCMap<T, U> extends DBMap<T, U> {
+public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.dbs.DCMap<T, U> {
 
     protected DCMap<T, U> parent;
     protected List<T> deleted;

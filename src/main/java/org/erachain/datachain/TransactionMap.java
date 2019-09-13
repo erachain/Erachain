@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DCMap;
 
 import java.util.*;
 
@@ -22,7 +22,7 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public interface TransactionMap extends DBMap {
+public interface TransactionMap extends DCMap {
 
     int TIMESTAMP_INDEX = 1;
 

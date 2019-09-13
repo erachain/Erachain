@@ -7,8 +7,8 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.dbs.DBMap;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
@@ -37,8 +37,8 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Transaction>
-        //implements TransactionMap<Long, TransactionMap>
+public class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transaction>
+        implements TransactionMap<Long, TransactionMap>
 {
 
     static Logger logger = LoggerFactory.getLogger(TransactionMap.class.getSimpleName());
@@ -52,21 +52,7 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
     @SuppressWarnings("rawtypes")
     private NavigableSet typeKey;
 
-    public TransactionMapDBMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
-
-        DEFAULT_INDEX = TIMESTAMP_INDEX;
-
-        if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_UNC_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
-        }
-
-    }
-
-    public TransactionMapDBMap(TransactionMap parent, DCSet dcSet) {
+    public TransactionMapImpl(TransactionMap parent, DCSet dcSet) {
         super(parent, dcSet);
     }
 
@@ -77,7 +63,7 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
         //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
 
         // TIMESTAMP INDEX
-        Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
+        Tuple2Comparator<Long, Long> comparator = new Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
                 //UnsignedBytes.lexicographicalComparator()
                 Fun.COMPARATOR);
         NavigableSet<Tuple2<Long, Long>> heightIndex = database
