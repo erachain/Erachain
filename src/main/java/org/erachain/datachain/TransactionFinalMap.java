@@ -11,7 +11,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.utils.ObserverMessage;

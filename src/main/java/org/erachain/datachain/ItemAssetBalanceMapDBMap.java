@@ -5,7 +5,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.mapDB.DCMap;
 import org.erachain.utils.ObserverMessage;
@@ -218,6 +218,7 @@ public class ItemAssetBalanceMapDBMap extends DCMap<byte[], Tuple5<
     }
 
     private Account testAcc = new Account("76ACGgH8c63VrrgEw1wQA4Dno1JuPLTsWe");
+
     public boolean set(byte[] key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {

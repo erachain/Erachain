@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.crypto.Base58;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;

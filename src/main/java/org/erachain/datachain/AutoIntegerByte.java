@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.Atomic;

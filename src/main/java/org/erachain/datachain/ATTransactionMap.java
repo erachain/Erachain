@@ -2,7 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.serializer.ATTransactionSerializer;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;

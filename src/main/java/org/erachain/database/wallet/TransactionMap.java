@@ -5,7 +5,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.serializer.LongAndTransactionSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;

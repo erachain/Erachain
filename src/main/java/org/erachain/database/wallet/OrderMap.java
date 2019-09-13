@@ -4,7 +4,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.AutoKeyDBMap;
 import org.erachain.database.DBASet;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.serializer.LongAndOrderSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;

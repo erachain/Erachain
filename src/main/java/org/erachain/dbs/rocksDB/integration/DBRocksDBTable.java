@@ -2,7 +2,6 @@ package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
-import org.erachain.database.DBMap;
 import org.erachain.dbs.rocksDB.common.DBIterator;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;

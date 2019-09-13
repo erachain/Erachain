@@ -2,7 +2,8 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.naming.NameSale;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
+public class NameSaleMap extends DBMapImpl<Tuple2<String, String>, BigDecimal> {
     public static final int NAME_INDEX = 1;
     public static final int SELLER_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;

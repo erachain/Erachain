@@ -7,7 +7,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.ReverseComparator;
@@ -64,7 +64,7 @@ public class TransactionMapDBMap extends org.erachain.dbs.mapDB.DCMap<Long, Tran
 
     }
 
-    public TransactionMapDBMap(TransactionMapDBMap parent, DCSet dcSet) {
+    public TransactionMapDBMap(TransactionMap parent, DCSet dcSet) {
         super(parent, dcSet);
     }
 

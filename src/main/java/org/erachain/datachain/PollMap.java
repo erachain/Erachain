@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.voting.Poll;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.serializer.PollSerializer;
 import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;

@@ -2,7 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.naming.NameSale;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.ReverseComparator;
 import org.mapdb.DB;

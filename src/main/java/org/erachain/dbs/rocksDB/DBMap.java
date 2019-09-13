@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
+import org.erachain.dbs.DBMapImpl;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.InnerDBTable;
@@ -12,7 +13,7 @@ import java.util.*;
 
 
 @Slf4j
-public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
+public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
 
     protected InnerDBTable<T, U> tableDB;
     protected List<IndexDB> indexes;
@@ -62,7 +63,7 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
             }
             return getDefaultValue();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            //logger.error(e.getMessage(), e);
             return getDefaultValue();
         }
     }
@@ -83,9 +84,9 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         tableDB.put(key, value);
         //NOTIFY
         if (observableData != null) {
-            if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_ADD)) {
+            if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_ADD)) {
                 setChanged();
-                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.database.DBMap.NOTIFY_ADD), value));
+                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.dbs.DBMap.NOTIFY_ADD), value));
             }
         }
         return old != null;
@@ -95,9 +96,9 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         tableDB.put(key, value);
         //NOTIFY
         if (observableData != null) {
-            if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_ADD)) {
+            if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_ADD)) {
                 setChanged();
-                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.database.DBMap.NOTIFY_ADD), value));
+                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.dbs.DBMap.NOTIFY_ADD), value));
             }
         }
     }
@@ -110,9 +111,9 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
             tableDB.remove(key);
             //NOTIFY
             if (observableData != null) {
-                if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_REMOVE)) {
+                if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_REMOVE)) {
                     setChanged();
-                    notifyObservers(new ObserverMessage((Integer) this.observableData.get(org.erachain.database.DBMap.NOTIFY_REMOVE), value));
+                    notifyObservers(new ObserverMessage((Integer) this.observableData.get(org.erachain.dbs.DBMap.NOTIFY_REMOVE), value));
                 }
             }
         }
@@ -151,9 +152,9 @@ public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
         tableDB.clear();
         if (observableData != null) {
             //NOTIFY LIST
-            if (observableData.containsKey(org.erachain.database.DBMap.NOTIFY_RESET)) {
+            if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_RESET)) {
                 setChanged();
-                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.database.DBMap.NOTIFY_RESET), this));
+                notifyObservers(new ObserverMessage((Integer) observableData.get(org.erachain.dbs.DBMap.NOTIFY_RESET), this));
             }
         }
     }

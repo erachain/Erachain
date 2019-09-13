@@ -2,7 +2,7 @@ package org.erachain.datachain;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.transaction.CancelSellNameTransaction;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;

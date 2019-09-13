@@ -1,5 +1,6 @@
 package org.erachain.database;
 
+import org.erachain.dbs.DBMapImpl;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -8,7 +9,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Collection;
 
-public abstract class AutoKeyDBMap<T, U> extends DBMap<T, U> {
+public abstract class AutoKeyDBMap<T, U> extends DBMapImpl<T, U> {
 
     protected BTreeMap AUTOKEY_INDEX;
 

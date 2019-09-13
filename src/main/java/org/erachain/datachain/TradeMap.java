@@ -6,7 +6,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.utils.ObserverMessage;

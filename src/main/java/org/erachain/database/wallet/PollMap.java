@@ -2,7 +2,8 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.voting.Poll;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBMapImpl;
 import org.erachain.database.serializer.PollSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
+public class PollMap extends DBMapImpl<Tuple2<String, String>, Poll> {
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(PollMap.class.getName());

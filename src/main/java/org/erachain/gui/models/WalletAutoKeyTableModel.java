@@ -2,10 +2,9 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;

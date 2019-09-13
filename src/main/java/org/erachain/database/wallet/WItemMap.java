@@ -4,7 +4,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.serializer.LongItemSerializer;
 import org.erachain.utils.Pair;
 import org.mapdb.*;

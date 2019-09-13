@@ -3,7 +3,7 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.utils.Pair;
 import org.mapdb.*;

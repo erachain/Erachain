@@ -1,7 +1,8 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBMapImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected int step = 50;
     protected long size = 0;
 
-    protected DBMap map;
+    protected DBMapImpl map;
     protected Logger logger;
 
     public TimerTableModelCls(String[] columnNames, boolean descending) {
@@ -46,7 +47,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, boolean descending) {
+    public TimerTableModelCls(DBMapImpl map, String[] columnNames, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -60,7 +61,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+    public TimerTableModelCls(DBMapImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -68,7 +69,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
+    public TimerTableModelCls(DBMapImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;

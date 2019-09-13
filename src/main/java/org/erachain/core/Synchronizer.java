@@ -1,11 +1,10 @@
 package org.erachain.core;
 
-import javafx.scene.control.Control;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;

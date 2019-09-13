@@ -18,7 +18,7 @@ import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
@@ -277,7 +277,7 @@ public class DCSet extends DBASet implements Observer {
 
         if (isFork()) {
             this.assetBalanceMap = new ItemAssetBalanceMapDBMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
-            this.transactionMap = new TransactionMapDBMap((TransactionMapDBMap) parent.transactionMap, this);
+            this.transactionMap = new TransactionMapDBMap((TransactionMap) parent.transactionMap, this);
         } else {
         switch (BlockChain.DC_DBS_TYPE) {
             case 1:

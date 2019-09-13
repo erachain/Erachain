@@ -23,10 +23,11 @@ import java.util.Set;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DCMap<T, U> extends DBMap<T, U> {
+public abstract class DCMap<T, U> extends DBMap<T, U> // implements org.erachain.dbs.DBMap
+        {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
-    protected DCMap<T, U> parent;
+    protected org.erachain.dbs.DBMap<T, U> parent;
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
@@ -43,7 +44,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         super(databaseSet, database);
     }
 
-    public DCMap(DCMap<T, U> parent, DBASet dcSet) {
+    public DCMap(org.erachain.dbs.DBMap<T, U> parent, DBASet dcSet) {
         super(dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {

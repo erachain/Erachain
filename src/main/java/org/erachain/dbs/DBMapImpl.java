@@ -1,5 +1,6 @@
-package org.erachain.database;
+package org.erachain.dbs;
 
+import org.erachain.database.*;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -11,14 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public abstract class DBMap<T, U> extends Observable {
+public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
-    public static final int NOTIFY_RESET = 1;
-    public static final int NOTIFY_ADD = 2;
-    public static final int NOTIFY_REMOVE = 3;
-    public static final int NOTIFY_LIST = 4;
     //public static final int NOTIFY_COUNT = 5;
 
     public int DESCENDING_SHIFT_INDEX = 10000;
@@ -31,10 +28,10 @@ public abstract class DBMap<T, U> extends Observable {
 
     protected Map<Integer, Integer> observableData;
 
-    public DBMap() {
+    public DBMapImpl() {
     }
 
-    public DBMap(DBASet databaseSet) {
+    public DBMapImpl(DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
 
@@ -49,7 +46,7 @@ public abstract class DBMap<T, U> extends Observable {
         }
     }
 
-    public DBMap(DBASet databaseSet, DB database) {
+    public DBMapImpl(DBASet databaseSet, DB database) {
         this.databaseSet = databaseSet;
         this.database = database;
 
@@ -69,6 +66,7 @@ public abstract class DBMap<T, U> extends Observable {
 
     }
 
+    @Override
     public IDB getDBSet() {
         return this.databaseSet;
     }
@@ -122,18 +120,21 @@ public abstract class DBMap<T, U> extends Observable {
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
+    @Override
     public void addUses() {
         if (this.databaseSet != null) {
             this.databaseSet.addUses();
         }
     }
 
+    @Override
     public void outUses() {
         if (this.databaseSet != null) {
             this.databaseSet.outUses();
         }
     }
 
+    @Override
     public int size() {
         this.addUses();
         int u = this.map.size();
@@ -141,6 +142,7 @@ public abstract class DBMap<T, U> extends Observable {
         return u;
     }
 
+    @Override
     public U get(T key) {
 
         this.addUses();
@@ -166,6 +168,7 @@ public abstract class DBMap<T, U> extends Observable {
         }
     }
 
+    @Override
     public Set<T> getKeys() {
         this.addUses();
         Set<T> u = this.map.keySet();
@@ -173,6 +176,7 @@ public abstract class DBMap<T, U> extends Observable {
         return u;
     }
 
+    @Override
     public Collection<U> getValues() {
         this.addUses();
         Collection<U> u = this.map.values();
@@ -186,6 +190,7 @@ public abstract class DBMap<T, U> extends Observable {
      * @param value
      * @return
      */
+    @Override
     public boolean set(T key, U value) {
         this.addUses();
         //try {
@@ -218,6 +223,7 @@ public abstract class DBMap<T, U> extends Observable {
      * @param key
      * @return
      */
+    @Override
     public U delete(T key) {
 
         this.addUses();
@@ -250,6 +256,7 @@ public abstract class DBMap<T, U> extends Observable {
         return value;
     }
 
+    @Override
     public boolean contains(T key) {
 
         this.addUses();
@@ -263,10 +270,12 @@ public abstract class DBMap<T, U> extends Observable {
         return false;
     }
 
+    @Override
     public Map<Integer, Integer> getObservableData() {
         return observableData;
     }
 
+    @Override
     public boolean checkObserverMessageType(int messageType, int thisMessageType) {
         if (observableData == null || observableData.isEmpty() || !observableData.containsKey(thisMessageType))
             return false;
@@ -335,6 +344,7 @@ public abstract class DBMap<T, U> extends Observable {
      * @param descending true if need descending sort
      * @return
      */
+    @Override
     public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();
 
@@ -364,6 +374,7 @@ public abstract class DBMap<T, U> extends Observable {
         }
     }
 
+    @Override
     public SortableList<T, U> getList() {
         addUses();
         SortableList<T, U> list;
@@ -381,6 +392,7 @@ public abstract class DBMap<T, U> extends Observable {
     /**
      * уведомляет только счетчик если он разрешен, иначе Сбросить
      */
+    @Override
     public void reset() {
         this.addUses();
 

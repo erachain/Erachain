@@ -4,7 +4,7 @@ import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.*;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.utils.ObserverMessage;

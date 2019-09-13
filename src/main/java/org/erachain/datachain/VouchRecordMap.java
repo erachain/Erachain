@@ -3,7 +3,7 @@ package org.erachain.datachain;
 
 //import java.lang.reflect.Array;
 
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;

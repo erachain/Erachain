@@ -6,7 +6,7 @@ import org.erachain.at.AT;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.ATSerializer;
 import org.erachain.utils.ObserverMessage;
@@ -14,7 +14,7 @@ import org.mapdb.*;
 
 import java.util.*;
 
-//import org.erachain.database.DBMap;
+//import org.erachain.dbs.DBMap;
 //import database.SortableList;
 
 @SuppressWarnings("rawtypes")

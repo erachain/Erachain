@@ -2,7 +2,8 @@ package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -20,7 +21,7 @@ import java.util.*;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DCMap<T, U> extends DBMap<T, U> {
+public abstract class DCMap<T, U> extends DBMapImpl<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
     protected DCMap<T, U> parent;

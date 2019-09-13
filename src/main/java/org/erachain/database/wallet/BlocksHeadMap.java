@@ -2,7 +2,8 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBMapImpl;
 import org.erachain.database.serializer.BlockHeadSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -27,7 +28,7 @@ import java.util.*;
  * maker
  */
 
-public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead> {
+public class BlocksHeadMap extends DBMapImpl<Tuple2<String, String>, Block.BlockHead> {
     // нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int GENERATOR_INDEX = 2;

@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.item.assets.Order;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.serializer.OrderSerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;

@@ -1,6 +1,7 @@
 package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
+import org.erachain.dbs.DBMapImpl;
 import org.erachain.database.IndexIterator;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
@@ -14,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public abstract class DBMap<T, U> extends org.erachain.database.DBMap<T, U> {
+public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
 
     public static final int NOTIFY_RESET = 1;
     public static final int NOTIFY_ADD = 2;

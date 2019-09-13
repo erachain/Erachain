@@ -1,6 +1,7 @@
 package org.erachain.database;
 // 30/03 ++
 
+import org.erachain.dbs.DBMap;
 import org.mapdb.DB;
 
 import java.io.File;

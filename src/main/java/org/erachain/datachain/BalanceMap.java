@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
