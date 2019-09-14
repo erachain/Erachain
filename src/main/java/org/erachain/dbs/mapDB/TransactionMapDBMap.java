@@ -36,7 +36,6 @@ public class TransactionMapDBMap extends DBMapSuit<Long, Transaction>
 
     public TransactionMapDBMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
-
     }
 
     @Override

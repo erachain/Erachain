@@ -16,10 +16,6 @@ public interface DBMap<T, U> {
 
     IDB getDBSet();
 
-    void addUses();
-
-    void outUses();
-
     int size();
 
     U get(T key);

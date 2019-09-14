@@ -17,17 +17,17 @@ import java.util.*;
  */
 @Slf4j
 //@NoArgsConstructor
-public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.dbs.DCMap<T, U> {
+public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.erachain.dbs.DCMap<T, U> {
 
     protected org.erachain.dbs.DBMap<T, U> parent;
     protected List<T> deleted;
     private int shiftSize;
 
-    public DCMap(DBASet databaseSet, DB database) {
+    public DCMapSuit(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public DCMap(org.erachain.dbs.DBMap parent, DBASet dcSet) {
+    public DCMapSuit(org.erachain.dbs.DBMap parent, DBASet dcSet) {
         super(dcSet);
         this.parent = parent;
         getMap();

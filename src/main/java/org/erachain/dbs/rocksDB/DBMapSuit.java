@@ -13,12 +13,12 @@ import java.util.*;
 
 
 @Slf4j
-public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
+public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
 
     protected InnerDBTable<T, U> tableDB;
     protected List<IndexDB> indexes;
 
-    public DBMap(DBASet databaseSet, DB database) {
+    public DBMapSuit(DBASet databaseSet, DB database) {
 
         //super(databaseSet, database);
         this.databaseSet = databaseSet;
@@ -35,7 +35,7 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> {
 
     }
 
-    public DBMap(DBASet databaseSet) {
+    public DBMapSuit(DBASet databaseSet) {
         super(databaseSet);
     }
 

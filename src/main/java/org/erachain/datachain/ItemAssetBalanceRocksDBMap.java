@@ -6,7 +6,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.SortableList;
-import org.erachain.dbs.rocksDB.DCMap;
+import org.erachain.dbs.rocksDB.DCMapSuit;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBMapDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -29,12 +29,12 @@ import java.util.HashMap;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
-public class ItemAssetBalanceRocksDBMap extends DCMap<byte[], Fun.Tuple5<
-        Fun.Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
-        Fun.Tuple2<BigDecimal, BigDecimal>, // in DEBT
-        Fun.Tuple2<BigDecimal, BigDecimal>, // in STOCK
-        Fun.Tuple2<BigDecimal, BigDecimal>, // it DO
-        Fun.Tuple2<BigDecimal, BigDecimal>  // on HOLD
+public class ItemAssetBalanceRocksDBMap extends DCMapSuit<byte[], Tuple5<
+        Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
+        Tuple2<BigDecimal, BigDecimal>, // in DEBT
+        Tuple2<BigDecimal, BigDecimal>, // in STOCK
+        Tuple2<BigDecimal, BigDecimal>, // it DO
+        Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> implements ItemAssetBalanceMap {
     private final String NAME_TABLE = "ITEM_ASSET_BALANCE_TABLE";
     private final String balanceKeyAssetNameIndex = "balances_key_asset";

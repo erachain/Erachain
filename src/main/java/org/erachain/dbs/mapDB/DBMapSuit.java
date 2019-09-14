@@ -100,7 +100,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         return u;
     }
 
-    //@Override
+    @Override
     public U get(T key) {
 
         this.addUses();

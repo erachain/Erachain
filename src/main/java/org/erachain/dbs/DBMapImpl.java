@@ -12,6 +12,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * К Обработке данных добалены события. Это Суперкласс для таблиц проекта.
+ * Однако в каждой таблице есть еще обертка для каждой СУБД отдельно - DBMapSuit
+ * @param <T>
+ * @param <U>
+ */
 public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
@@ -75,174 +81,68 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
 
     protected abstract void createIndexes();
 
-    /**
-     * Make SECODATY INDEX
-     * INDEX ID = 0 - its is PRIMARY - not use it here
-     *
-     * @param index index ID. Must be 1...9999
-     * @param indexSet
-     * @param descendingIndexSet
-     * @param function
-     * @param <V>
-     */
-    @SuppressWarnings("unchecked")
-    protected <V> void createIndex(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V, T, U> function) {
-        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
-
-        Bind.secondaryKey((Bind.MapWithModificationListener<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
-        this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
-
-        Bind.secondaryKey((Bind.MapWithModificationListener<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
-        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
-    }
-
-    /**
-     * Make SECODATY INDEX
-     * INDEX ID = 0 - its is PRIMARY - not use it here
-     *
-     * @param index index ID. Must be 1...9999
-     * @param indexSet
-     * @param descendingIndexSet
-     * @param function
-     * @param <V>
-     */
-    @SuppressWarnings("unchecked")
-    protected <V> void createIndexes(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Function2<V[], T, U> function) {
-        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
-        Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) indexSet, function);
-        this.indexes.put(index, (NavigableSet<Tuple2<?, T>>) indexSet);
-
-        Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
-        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
-    }
-
-    @Override
-    public void addUses() {
-        if (this.databaseSet != null) {
-            this.databaseSet.addUses();
-        }
-    }
-
-    @Override
-    public void outUses() {
-        if (this.databaseSet != null) {
-            this.databaseSet.outUses();
-        }
-    }
 
     @Override
     public int size() {
-        this.addUses();
-        int u = this.map.size();
-        this.outUses();
-        return u;
+        return this.map.size();
     }
 
     @Override
     public Set<T> getKeys() {
-        this.addUses();
-        Set<T> u = this.map.keySet();
-        this.outUses();
-        return u;
+        return this.map.keySet();
     }
 
     @Override
     public Collection<U> getValues() {
-        this.addUses();
-        Collection<U> u = this.map.values();
-        this.outUses();
-        return u;
+        return this.map.values();
     }
 
-    /**
-     * уведомляет только счетчик если он разрешен, иначе Добавить
-     * @param key
-     * @param value
-     * @return
-     */
+    @Override
+    public U get(T key) {
+        return this.map.get(key);
+    }
+
     @Override
     public boolean set(T key, U value) {
-        this.addUses();
-        //try {
-
-            U old = this.map.set(key, value);
-
-            //COMMIT and NOTIFY if not FORKED
-            // TODO - удалить тут этот ак как у нас везде управляемый внешний коммит
-            if (false) this.databaseSet.commit();
-
-            //NOTIFY
-            if (this.observableData != null && (old == null || !old.equals(value))) {
-                if (this.observableData.containsKey(NOTIFY_ADD)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
-                }
-            }
-
-        //    this.outUses();
-        //} catch (Exception e) {
-        //    logger.error(e.getMessage(), e);
-        //}
-
-        this.outUses();
-        return old != null;
+        return this.map.set(key, value) != null;
     }
 
-    /**
-     * уведомляет только счетчик если он разрешен, иначе Удалить
-     * @param key
-     * @return
-     */
     @Override
     public U delete(T key) {
 
-        this.addUses();
+        U value = this.map.remove(key);
 
-        U value;
-
-        //try {
-            //REMOVE
-            if (this.map.contains(key)) {
-                value = this.map.remove(key);
-
-                //NOTIFY
-                if (this.observableData != null) {
-                    if (this.observableData.containsKey(NOTIFY_REMOVE)) {
-                        this.setChanged();
-                        this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
-                    }
+        if (value != null) {
+            //NOTIFY
+            if (this.observableData != null) {
+                if (this.observableData.containsKey(NOTIFY_REMOVE)) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
                 }
-
-            } else
-                value = null;
-
-        //} catch (Exception e) {
-        //    value = null;
-        //    logger.error(e.getMessage(), e);
-        //}
-
-        this.outUses();
+            }
+        }
 
         return value;
     }
 
     @Override
     public boolean contains(T key) {
-
-        this.addUses();
-
-        if (this.map.contains(key)) {
-            this.outUses();
-            return true;
-        }
-
-        this.outUses();
-        return false;
+        return map.contains(key);
     }
 
     @Override
     public Map<Integer, Integer> getObservableData() {
         return observableData;
+    }
+
+    @Override
+    public Integer deleteObservableData(int index) {
+        return this.observableData.remove(index);
+    }
+
+    @Override
+    public Integer setObservableData(int index, Integer data) {
+        return this.observableData.put(index, data);
     }
 
     @Override
@@ -263,8 +163,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
      */
     @Override
     public void addObserver(Observer o) {
-
-        this.addUses();
 
         //ADD OBSERVER
         super.addObserver(o);
@@ -304,8 +202,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
                 }
             }
         }
-
-        this.outUses();
     }
 
     /**
@@ -316,7 +212,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
      */
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
-        this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes
         if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
@@ -327,18 +222,15 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
             }
 
             IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
-            this.outUses();
             return u;
 
         } else {
             if (descending) {
                 Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
-                this.outUses();
                 return u;
             }
 
             Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
-            this.outUses();
             return u;
 
         }
@@ -346,7 +238,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
 
     @Override
     public SortableList<T, U> getList() {
-        addUses();
         SortableList<T, U> list;
         if (this.size() < 1000) {
             list = new SortableList<T, U>(this);
@@ -355,7 +246,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
             list = SortableList.makeSortableList(this, false, 1000);
         }
 
-        outUses();
         return list;
     }
 
@@ -364,15 +254,8 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
      */
     @Override
     public void reset() {
-        this.addUses();
-
         //RESET MAP
         this.map.reset();
-
-        //RESET INDEXES
-        for (Set<Tuple2<?, T>> set : this.indexes.values()) {
-            set.clear();
-        }
 
         // NOTYFIES
         if (this.observableData != null) {
@@ -383,18 +266,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
             }
 
         }
-
-        this.outUses();
-    }
-
-    @Override
-    public Integer deleteObservableData(int index) {
-        return this.observableData.remove(index);
-    }
-
-    @Override
-    public Integer setObservableData(int index, Integer data) {
-        return this.observableData.put(index, data);
     }
 
 }

@@ -32,8 +32,12 @@ public class TransactionMapDBMap extends TransactionMapImpl
     }
 
     @Override
-    protected Transaction getDefaultValue() {
-        return null;
+    protected void getMap() {
+        map = new org.erachain.dbs.mapDB.TransactionMapDBMap(databaseSet, database);
+    }
+
+    @Override
+    protected void createIndexes() {
     }
 
     @Override
@@ -47,17 +51,6 @@ public class TransactionMapDBMap extends TransactionMapImpl
     @Override
     public Iterable recipientKeys(String recipient) {
         return Fun.filter(((org.erachain.dbs.mapDB.TransactionMapDBMap)map).recipientKey, recipient);
-    }
-
-    @Override
-    protected void getMap() {
-
-        map = new org.erachain.dbs.mapDB.TransactionMapDBMap(databaseSet, database);
-
-    }
-
-    @Override
-    protected void createIndexes() {
     }
 
     @Override
