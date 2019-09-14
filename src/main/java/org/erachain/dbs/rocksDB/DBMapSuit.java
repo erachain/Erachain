@@ -9,7 +9,11 @@ import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.*;
+
+import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 
 @Slf4j
@@ -165,4 +169,5 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
     public void close() {
         ((DBRocksDBTable<T, U>) map).close();
     }
+
 }

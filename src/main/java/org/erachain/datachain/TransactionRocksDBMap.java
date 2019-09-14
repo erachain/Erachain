@@ -39,6 +39,7 @@ public class TransactionRocksDBMap extends TransactionMapImpl
         super(databaseSet, database);
     }
 
+
     @Override
     protected void getMap() {
         map = new org.erachain.dbs.rocksDB.TransactionRocksDBMap(databaseSet, database);
@@ -48,35 +49,44 @@ public class TransactionRocksDBMap extends TransactionMapImpl
     protected void createIndexes() {
     }
 
-    public Iterator<Long> getTimestampIterator() {
-        return getIndexIterator(senderUnconfirmedTransactionIndex, false);
-    }
+    @Override
+    Iterable typeKeys(String address, Long timestamp, Integer type) {
+        /*
+        IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
+        return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(
+                indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(address, timestamp, type), null),
+                ((DBRocksDBTable) map).list);
 
-    public Iterator<Long> getCeatorIterator() {
+         */
         return null;
     }
 
-    //senderKeys = receiveIndexKeys(sender, type, timestamp, senderKeys, senderUnconfirmedTransactionIndexName);
-    //recipientKeys = receiveIndexKeys(recipient, type, timestamp, recipientKeys, recipientUnconfirmedTransactionIndexName);
-
-    Iterable recipientKeys(String recipient, long timestamp, int type) {
+    @Override
+    Iterable senderKeys(String sender) {
+        IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
         return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(
-                indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
-                ((DBRocksDBTable) map).list);
-    }
-    Iterable senderKeys(String recipient, long timestamp, int type) {
-        return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(
-                indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
+                indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(sender, null, null, null),
                 ((org.erachain.dbs.rocksDB.TransactionRocksDBMap)map).getSenderIndex());
     }
+
     Iterable sendKeys(byte[] recipient) {
         return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(recipient,
                 ((org.erachain.dbs.rocksDB.TransactionRocksDBMap)map).getRecientIndex());
     }
 
+    @Override
     Iterable recipientKeys(String recipient) {
         return (Iterable) ((DBMapDB) map).getIterator(false);
     }
 
 
+    @Override
+    public Iterator<Long> getTimestampIterator() {
+        return null;
+    }
+
+    @Override
+    public Iterator<Long> getCeatorIterator() {
+        return null;
+    }
 }
