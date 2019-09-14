@@ -41,6 +41,9 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         this.type = type;
         this.name = name;
 
+        // Теперь задаем БАЗУ
+        this.database = database;
+
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
         getMap();
 
@@ -49,6 +52,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         this.createIndexes();
 
         if (databaseSet.isWithObserver()) {
+            observableData = new HashMap<Integer, Integer>(8, 1);
             this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
             this.observableData.put(DBMap.NOTIFY_LIST, observeList);
             this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
