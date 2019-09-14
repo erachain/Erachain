@@ -11,7 +11,7 @@ public class TransactionNativeMemMap extends TransactionMapImpl
 
     static Logger logger = LoggerFactory.getLogger(TransactionNativeMemMap.class.getSimpleName());
 
-    public TransactionNativeMemMap(TransactionNativeMemMap parent, DCSet databaseSet) {
+    public TransactionNativeMemMap(TransactionMapImpl parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 

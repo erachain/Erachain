@@ -276,7 +276,7 @@ public class DCSet extends DBASet implements Observer {
         this.bchain = parent.bchain;
 
         this.assetBalanceMap = new ItemAssetBalanceNativeMemMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
-        this.transactionMap = new TransactionMapDBMap((TransactionMapDBMap) parent.transactionMap, this);
+        this.transactionMap = new TransactionNativeMemMap((TransactionMapDBMap) parent.transactionMap, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);

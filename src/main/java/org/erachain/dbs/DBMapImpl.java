@@ -38,22 +38,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
     public DBMapImpl() {
     }
 
-    public DBMapImpl(DBMap parent, DBASet databaseSet) {
-
-        this.databaseSet = databaseSet;
-        this.parent = parent;
-
-        //CREATE INDEXES
-        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
-
-        if (databaseSet != null) {
-            this.database = databaseSet.database;
-            if (databaseSet.isWithObserver()) {
-                observableData = new HashMap<Integer, Integer>(8, 1);
-            }
-        }
-    }
-
     public DBMapImpl(DBASet databaseSet, DB database) {
         this.databaseSet = databaseSet;
         this.database = database;
@@ -71,6 +55,18 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
         }
+
+    }
+
+    /**
+     * Это лоя форкеутой таблицы вызов - запомнить Родителя и все - индексы тут не нужны и обсерверы
+     * @param parent
+     * @param databaseSet
+     */
+    public DBMapImpl(DBMap parent, DBASet databaseSet) {
+
+        this.databaseSet = databaseSet;
+        this.parent = parent;
 
     }
 
