@@ -275,24 +275,8 @@ public class DCSet extends DBASet implements Observer {
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
 
-        if (isFork()) {
-            this.assetBalanceMap = new org.erachain.dbs.nativeMemMap
-                    .nativeMapTreeMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
-
-            this.assetBalanceMap = new ItemAssetBalanceMapDBMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
-            this.transactionMap = new TransactionMapDBMap((TransactionMap) parent.transactionMap, this);
-        } else {
-        switch (BlockChain.DC_DBS_TYPE) {
-            case 1:
-                this.transactionMap = new TransactionRocksDBMap((TransactionRocksDBMap) parent.transactionMap, this);
-                this.assetBalanceMap = new ItemAssetBalanceRocksDBMap((ItemAssetBalanceRocksDBMap) parent.assetBalanceMap, this);
-                break;
-            default:
-                this.assetBalanceMap = new ItemAssetBalanceMapDBMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
-                this.transactionMap = new TransactionMapDBMap((TransactionMapDBMap) parent.transactionMap, this);
-        }
-
-        }
+        this.assetBalanceMap = new ItemAssetBalanceNativeMemMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
+        this.transactionMap = new TransactionMapDBMap((TransactionMapDBMap) parent.transactionMap, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);

@@ -7,17 +7,13 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.dbs.DBMap;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.ReverseComparator;
-import org.mapdb.*;
+import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple2Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -59,6 +55,10 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
             this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE);
         }
 
+    }
+
+    public TransactionMapImpl(TransactionMapImpl parent, DCSet databaseSet) {
+        super(parent, databaseSet);
     }
 
     protected Transaction getDefaultValue() {

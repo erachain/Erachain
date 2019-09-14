@@ -8,7 +8,7 @@ import java.util.Collection;
 
 public class ItemAssetBalanceNativeMemMap extends ItemAssetBalanceMapImpl {
 
-    public ItemAssetBalanceNativeMemMap(org.erachain.dbs.DBMap parent, DCSet databaseSet) {
+    public ItemAssetBalanceNativeMemMap(ItemAssetBalanceMapImpl parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 
