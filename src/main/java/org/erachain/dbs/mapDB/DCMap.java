@@ -141,16 +141,16 @@ public abstract class DCMap<T, U> extends DBMap<T, U>
     }
 
     @Override
-    public boolean set(T key, U value) {
+    public void put(T key, U value) {
         if (DCSet.isStoped()) {
-            return false;
+            return;
         }
 
         this.addUses();
 
         try {
 
-            U old = this.map.put(key, value);
+            this.map.put(key, value);
 
             if (this.parent != null) {
                 //if (old != null)
@@ -164,17 +164,49 @@ public abstract class DCMap<T, U> extends DBMap<T, U>
             }
 
             this.outUses();
-            return old != null;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
 
         this.outUses();
-        return false;
     }
 
     @Override
-    public U delete(T key) {
+    public U set(T key, U value) {
+        if (DCSet.isStoped()) {
+            return null;
+        }
+
+        this.addUses();
+
+        try {
+
+            U old = this.map.set(key, value);
+
+            if (this.parent != null) {
+                //if (old != null)
+                //	++this.shiftSize;
+                if (this.deleted != null) {
+                    if (this.deleted.remove(key) != null)
+                        ++this.shiftSize;
+                }
+            } else {
+
+            }
+
+            this.outUses();
+            return old;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        this.outUses();
+        return null;
+    }
+
+
+    @Override
+    public U remove(T key) {
 
         if (DCSet.isStoped()) {
             return null;
@@ -225,7 +257,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U>
 
         this.addUses();
 
-        if (this.map.containsKey(key)) {
+        if (this.map.contains(key)) {
             this.outUses();
             return true;
         } else {

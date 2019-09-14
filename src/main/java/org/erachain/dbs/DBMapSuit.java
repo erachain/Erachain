@@ -14,9 +14,9 @@ public interface DBMapSuit<T, U> {
 
     Collection<U> getValues();
 
-    void set(T key, U value);
+    void put(T key, U value);
 
-    U put(T key, U value);
+    U set(T key, U value);
 
     U remove(T key);
 

@@ -22,7 +22,7 @@ public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
     protected DBASet databaseSet;
     protected DB database;
 
-    protected Map<T, U> map;
+    protected DBMapSuit<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
     public DBMap() {
@@ -107,7 +107,7 @@ public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
         this.addUses();
 
         try {
-            if (this.map.containsKey(key)) {
+            if (this.map.contains(key)) {
                 U u = this.map.get(key);
                 this.outUses();
                 return u;
@@ -150,13 +150,22 @@ public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
      * @return
      */
     @Override
-    public boolean set(T key, U value) {
+    public U set(T key, U value) {
         this.addUses();
 
-        U old = this.map.put(key, value);
+        U old = this.map.set(key, value);
 
         this.outUses();
-        return old != null;
+        return old;
+    }
+
+    @Override
+    public void put(T key, U value) {
+        this.addUses();
+
+        this.map.set(key, value);
+
+        this.outUses();
     }
 
     /**
@@ -165,7 +174,7 @@ public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
      * @return
      */
     @Override
-    public U delete(T key) {
+    public U remove(T key) {
 
         this.addUses();
 
@@ -173,7 +182,7 @@ public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
 
         //try {
         //REMOVE
-        if (this.map.containsKey(key)) {
+        if (this.map.contains(key)) {
             value = this.map.remove(key);
 
 
@@ -190,12 +199,27 @@ public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
         return value;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Удалить
+     * @param key
+     * @return
+     */
+    @Override
+    public void delete(T key) {
+
+        this.addUses();
+        this.map.delete(key);
+
+        this.outUses();
+    }
+
+
     @Override
     public boolean contains(T key) {
 
         this.addUses();
 
-        if (this.map.containsKey(key)) {
+        if (this.map.contains(key)) {
             this.outUses();
             return true;
         }
@@ -248,7 +272,7 @@ public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
         this.addUses();
 
         //RESET MAP
-        this.map.clear();
+        this.map.reset();
 
         //RESET INDEXES
         for (Set<Tuple2<?, T>> set : this.indexes.values()) {
