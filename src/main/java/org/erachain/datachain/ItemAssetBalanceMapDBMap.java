@@ -1,6 +1,5 @@
 package org.erachain.datachain;
 
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
@@ -9,10 +8,6 @@ import java.util.Collection;
 // TODO SOFT HARD TRUE
 
 public class ItemAssetBalanceMapDBMap extends ItemAssetBalanceMapImpl {
-
-    @SuppressWarnings("rawtypes")
-    private BTreeMap assetKeyMap;
-    private BTreeMap addressKeyMap;
 
     public ItemAssetBalanceMapDBMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -30,13 +25,13 @@ public class ItemAssetBalanceMapDBMap extends ItemAssetBalanceMapImpl {
     }
 
     public Collection<byte[]> assetKeySubMap(long key) {
-        return this.assetKeyMap.subMap(
+        return ((org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap)map).assetKeyMap.subMap(
                 Fun.t2(key, null),
                 Fun.t2(key, Fun.HI())).values();
     }
 
     public Collection<byte[]> addressKeySubMap(String address) {
-        return this.addressKeyMap.subMap(
+        return ((org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap)map).addressKeyMap.subMap(
                 Fun.t2(address, null),
                 Fun.t2(address, Fun.HI())).values();
     }

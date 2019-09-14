@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 
 // TODO SOFT HARD TRUE
 
@@ -23,8 +22,8 @@ public class ItemAssetBalanceMapDBMap extends DBMapSuit<byte[], Tuple5<
     static Logger logger = LoggerFactory.getLogger(TransactionMapDBMap.class.getSimpleName());
 
     @SuppressWarnings("rawtypes")
-    private BTreeMap assetKeyMap;
-    private BTreeMap addressKeyMap;
+    public BTreeMap assetKeyMap;
+    public BTreeMap addressKeyMap;
 
     public ItemAssetBalanceMapDBMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
@@ -149,18 +148,6 @@ public class ItemAssetBalanceMapDBMap extends DBMapSuit<byte[], Tuple5<
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
-    }
-
-    public Collection<byte[]> assetKeySubMap(long key) {
-        return this.assetKeyMap.subMap(
-                Fun.t2(key, null),
-                Fun.t2(key, Fun.HI())).values();
-    }
-
-    public Collection<byte[]> addressKeySubMap(String address) {
-        return this.addressKeyMap.subMap(
-                Fun.t2(address, null),
-                Fun.t2(address, Fun.HI())).values();
     }
 
 }
