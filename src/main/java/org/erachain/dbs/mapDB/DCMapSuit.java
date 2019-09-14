@@ -20,7 +20,7 @@ import java.util.Set;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DCMap<T, U> extends DBMap<T, U>
+public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
@@ -37,7 +37,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U>
     Boolean EXIST = true;
     int shiftSize;
 
-    public DCMap(org.erachain.dbs.DBMap parent, DBASet dcSet) {
+    public DCMapSuit(org.erachain.dbs.DBMap parent, DBASet dcSet) {
         this.databaseSet = dcSet;
         this.database = dcSet.database;
 

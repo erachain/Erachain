@@ -2,7 +2,6 @@ package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.database.IndexIterator;
-import org.erachain.dbs.DBMapSuit;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -13,22 +12,22 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
+public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
 
     public int DESCENDING_SHIFT_INDEX = 10000;
 
-    private static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(DBMapSuit.class.getName());
 
     protected DBASet databaseSet;
     protected DB database;
 
-    protected DBMapSuit<T, U> map;
+    protected org.erachain.dbs.DBMapSuit map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
-    public DBMap() {
+    public DBMapSuit() {
     }
 
-    public DBMap(DBASet databaseSet, DB database) {
+    public DBMapSuit(DBASet databaseSet, DB database) {
         this.databaseSet = databaseSet;
         this.database = database;
         getMap();

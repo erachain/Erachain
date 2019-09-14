@@ -7,7 +7,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
-import org.erachain.dbs.mapDB.DCMap;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
@@ -32,7 +31,7 @@ import java.util.TreeMap;
  */
 // TODO SOFT HARD TRUE
 
-public class ItemAssetBalanceMapDBMap extends DCMap<byte[], Tuple5<
+public class ItemAssetBalanceMapDBMap extends DBMap<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK

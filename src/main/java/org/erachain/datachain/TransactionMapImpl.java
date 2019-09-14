@@ -37,7 +37,7 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-abstract class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Transaction>
+abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
         implements TransactionMap
 {
 
@@ -60,51 +60,6 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Trans
         }
 
     }
-
-    public TransactionMapImpl(TransactionMap parent, DCSet dcSet) {
-        super(parent, dcSet);
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes() {
-
-        //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
-
-        // TIMESTAMP INDEX
-        Tuple2Comparator<Long, Long> comparator = new Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
-                //UnsignedBytes.lexicographicalComparator()
-                Fun.COMPARATOR);
-        NavigableSet<Tuple2<Long, Long>> heightIndex = database
-                .createTreeSet("transactions_index_timestamp")
-                .comparator(comparator)
-                .counterEnable()
-                .makeOrGet();
-
-        NavigableSet<Tuple2<Long, Long>> descendingHeightIndex = database
-                .createTreeSet("transactions_index_timestamp_descending")
-                .comparator(new ReverseComparator(comparator))
-                .counterEnable()
-                .makeOrGet();
-
-        createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
-                new Fun.Function2<Long, Long, Transaction>() {
-                    @Override
-                    public Long run(Long key, Transaction value) {
-                        return value.getTimestamp();
-                    }
-                });
-
-    }
-
-    public Integer deleteObservableData(int index) {
-        return this.observableData.remove(index);
-    }
-
-    public Integer setObservableData(int index, Integer data) {
-        return this.observableData.put(index, data);
-    }
-
 
     @Override
     protected Transaction getDefaultValue() {
@@ -346,6 +301,11 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Trans
 
     }
 
+    abstract Iterable typeKeys(String sender, Long timestamp, Integer type);
+    abstract Iterable senderKeys(String sender);
+    abstract Iterable recipientKeys(String recipient);
+
+
     /**
      * Find all unconfirmed transaction by address, sender or recipient.
      * Need set only one parameter(address, sender,recipient)
@@ -378,17 +338,17 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DCMapImpl<Long, Trans
         //  timestamp = null;
         if (sender != null) {
             if (type > 0) {
-                //senderKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
+                senderKeys = typeKeys(sender, timestamp, type);
             } else {
-                //senderKeys = Fun.filter(this.senderKey, sender);
+                senderKeys = senderKeys(sender);
             }
         }
 
         if (recipient != null) {
             if (type > 0) {
-                //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
+                recipientKeys = typeKeys(recipient, timestamp, type);
             } else {
-                //recipientKeys = Fun.filter(this.recipientKey, recipient);
+                recipientKeys = recipientKeys(recipient);
             }
         }
 
