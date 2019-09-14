@@ -23,7 +23,7 @@ import java.util.*;
  * TODO: передлать короткий Счет на байты
  * TODO: передаьт Тупле 2 на Лонг - на ссылку сразу как ключ для поиска транзакции
  */
-public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
+public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
 
     public VoteOnItemPollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

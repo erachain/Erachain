@@ -24,7 +24,7 @@ import java.util.*;
 Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @SuppressWarnings("rawtypes")
-public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
+public class TradeMap extends DCUMap<Tuple2<Long, Long>, Trade> {
 
     private BTreeMap pairKeyMap;
     private BTreeMap wantKeyMap;

@@ -12,7 +12,7 @@ import java.util.UUID;
  * Поиск по подписи ссылки на транзакцию
  * signature (as UUID bytes16) -> <BlockHeoght, Record No> (as Long)
  */
-public class TransactionFinalMapSigns extends DCMap<UUID, Long> {
+public class TransactionFinalMapSigns extends DCUMap<UUID, Long> {
 
     public TransactionFinalMapSigns(DCSet databaseSet, DB database) {
         super(databaseSet, database);

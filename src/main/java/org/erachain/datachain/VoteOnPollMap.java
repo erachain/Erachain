@@ -8,7 +8,7 @@ import org.mapdb.DB;
 import java.util.TreeMap;
 
 @Deprecated
-public class VoteOnPollMap extends DCMap<byte[], Integer> {
+public class VoteOnPollMap extends DCUMap<byte[], Integer> {
 
     public VoteOnPollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

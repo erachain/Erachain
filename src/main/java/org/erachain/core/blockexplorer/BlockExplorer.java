@@ -96,7 +96,7 @@ public class BlockExplorer {
     public void makePage(Class type, int start, int pageSize,
                          Map output, JSONObject langObj) {
 
-        DCMap map = dcSet.getMap(type);
+        DCUMap map = dcSet.getMap(type);
         ExplorerJsonLine element;
         int size = map.size();
 
@@ -125,7 +125,7 @@ public class BlockExplorer {
     public void makePage(Class type, long start, int pageSize,
                          Map output, JSONObject langObj) {
 
-        DCMap map = dcSet.getMap(type);
+        DCUMap map = dcSet.getMap(type);
         ExplorerJsonLine element;
         long size = map.size();
 
@@ -166,7 +166,7 @@ public class BlockExplorer {
         JSONArray array = new JSONArray();
 
         if (size > 0) {
-            DCMap map = dcSet.getMap(type);
+            DCUMap map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
             while (index > start - pageSize && index > 0) {
@@ -205,7 +205,7 @@ public class BlockExplorer {
         //В зависимости от выбранного языка(ru,en)
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
 
-        DCMap map = dcSet.getMap(type);
+        DCUMap map = dcSet.getMap(type);
 
         try {
             //Если в строке ввели число

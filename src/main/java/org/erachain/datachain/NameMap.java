@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 //import org.erachain.database.DLSet;
 
-public class NameMap extends DCMap<String, Name> {
+public class NameMap extends DCUMap<String, Name> {
 
     public NameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

@@ -19,7 +19,7 @@ import java.util.Iterator;
  *  + Forging Data - Forging Value, Win Value, Target Value
  *
  */
-public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
+public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     static final String NAME = "blocks_heads";
     static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadsMap.class.getName());

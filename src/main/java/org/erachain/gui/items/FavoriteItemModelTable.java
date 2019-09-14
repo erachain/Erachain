@@ -1,20 +1,14 @@
 package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
-import org.erachain.datachain.DCMap;
-import org.erachain.datachain.ItemMap;
+import org.erachain.datachain.DCUMap;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.SortedListTableModelCls;
-import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
 import java.util.*;
 
 @SuppressWarnings("serial")
@@ -27,7 +21,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
 
     protected FavoriteItemMap favoriteMap;
 
-    public FavoriteItemModelTable(DCMap map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
+    public FavoriteItemModelTable(DCUMap map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
         super(columnNames, columnAutoHeight, false);
 

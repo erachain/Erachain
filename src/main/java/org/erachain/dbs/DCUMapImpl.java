@@ -9,15 +9,19 @@ import org.mapdb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Observer;
-import java.util.Set;
+import java.util.*;
 
-public abstract class DCMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<T, U> {
+/**
+ * Тут старый вариант от MapDB - и как форкнутая и нет может быть.
+ * Форкнутая - по getForkedMap()
+ * @param <T>
+ * @param <U>
+ */
+public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
+    protected Map<T, U> map;
     protected DCMap<T, U> parent;
 
     /**
@@ -26,17 +30,18 @@ public abstract class DCMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<T
     boolean OLD_USED_NOW = false;
 
     //ConcurrentHashMap deleted;
-    HashMap deleted;
-    Boolean EXIST = true;
-    int shiftSize;
+    protected HashMap deleted;
+    protected Boolean EXIST = true;
+    protected int shiftSize;
 
+    int uses = 0;
 
-    public DCMapImpl(DBASet databaseSet, DB database) {
+    public DCUMapImpl(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public DCMapImpl(DCMap<T, U> parent, DBASet dcSet) {
-        super(dcSet);
+    public DCUMapImpl(DCMap<T, U> parent, DBASet dcSet) {
+        super(parent, dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
@@ -58,6 +63,8 @@ public abstract class DCMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<T
         }
     }
 
+    protected abstract void getMemoryMap();
+    protected abstract U getDefaultValue();
 
     // ERROR if key is not unique for each value:
     // After removing the key from the fork, which is in the parent, an incorrect post occurs
@@ -285,6 +292,18 @@ public abstract class DCMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<T
             return;
 
         super.addObserver(o);
+    }
+
+    public void addUses() {
+        if (database != null) {
+            uses++;
+        }
+    }
+
+    public void outUses() {
+        if (database != null) {
+            uses--;
+        }
     }
 
     @Override

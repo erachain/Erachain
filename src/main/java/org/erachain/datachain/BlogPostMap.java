@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class BlogPostMap extends DCMap<String, List<byte[]>> {
+public class BlogPostMap extends DCUMap<String, List<byte[]>> {
 
     public final static String MAINBLOG = "Erachain.org";
 
@@ -16,7 +16,7 @@ public class BlogPostMap extends DCMap<String, List<byte[]>> {
         super(databaseSet, database);
     }
 
-    public BlogPostMap(DCMap<String, List<byte[]>> parent) {
+    public BlogPostMap(DCUMap<String, List<byte[]>> parent) {
         super(parent, null);
     }
 

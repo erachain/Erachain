@@ -34,7 +34,7 @@ import java.util.*;
  * ++ recipient_txs
  * ++ address_type_txs
  */
-public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer, Long>, Calculated> {
+public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Integer, Long>, Calculated> {
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -356,7 +356,7 @@ public class TransactionFinalCalculatedMap extends DCMap<Tuple3<Integer, Integer
         return null;
     }
 
-    public DCMap<Tuple3<Integer, Integer, Long>, Calculated> getParentMap() {
+    public DCUMap<Tuple3<Integer, Integer, Long>, Calculated> getParentMap() {
         return this.parent;
     }
 

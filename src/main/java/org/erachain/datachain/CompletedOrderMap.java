@@ -17,7 +17,7 @@ import java.util.Map;
  * Ключ: ссылка на запись создания заказа<br>
  * Значение: заказ<br>
  */
-public class CompletedOrderMap extends DCMap<Long, Order> {
+public class CompletedOrderMap extends DCUMap<Long, Order> {
 
     public CompletedOrderMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

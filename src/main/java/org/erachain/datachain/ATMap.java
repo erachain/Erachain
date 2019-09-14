@@ -18,7 +18,7 @@ import java.util.*;
 //import database.SortableList;
 
 @SuppressWarnings("rawtypes")
-public class ATMap extends DCMap<String, AT> {
+public class ATMap extends DCUMap<String, AT> {
 
     private NavigableSet typeATs;
     private NavigableSet creatorATs;
@@ -284,7 +284,7 @@ public class ATMap extends DCMap<String, AT> {
         return Fun.filter(this.orderedATs, null, true, height, true).iterator();
     }
 
-    public DCMap<String, AT> getParent() {
+    public DCUMap<String, AT> getParent() {
         return this.parent;
     }
 

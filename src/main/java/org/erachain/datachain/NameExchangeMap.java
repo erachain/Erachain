@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 /**
  * для Имен - не используется в трнзакциях сейчас
  */
-public class NameExchangeMap extends DCMap<String, BigDecimal> {
+public class NameExchangeMap extends DCUMap<String, BigDecimal> {
     public static final int AMOUNT_INDEX = 1;
 
     public NameExchangeMap(DCSet databaseSet, DB database) {

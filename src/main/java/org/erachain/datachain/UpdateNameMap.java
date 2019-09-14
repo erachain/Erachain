@@ -10,7 +10,7 @@ import org.mapdb.DB;
 import java.util.TreeMap;
 
 @Deprecated
-public class UpdateNameMap extends DCMap<byte[], Name> {
+public class UpdateNameMap extends DCUMap<byte[], Name> {
 
     public UpdateNameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

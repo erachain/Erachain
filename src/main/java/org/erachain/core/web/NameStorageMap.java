@@ -1,6 +1,6 @@
 package org.erachain.core.web;
 
-import org.erachain.datachain.DCMap;
+import org.erachain.datachain.DCUMap;
 import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
 import org.mapdb.DB;
@@ -8,13 +8,13 @@ import org.mapdb.DB.BTreeMapMaker;
 
 import java.util.*;
 
-public class NameStorageMap extends DCMap<String, Map<String, String>> {
+public class NameStorageMap extends DCUMap<String, Map<String, String>> {
 
     public NameStorageMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
 
-    public NameStorageMap(DCMap<String, Map<String, String>> parent) {
+    public NameStorageMap(DCUMap<String, Map<String, String>> parent) {
         super(parent, null);
     }
 

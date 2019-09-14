@@ -10,13 +10,13 @@ import java.util.HashMap;
  *
  * @author Skerberus
  */
-public class CommentPostMap extends DCMap<byte[], byte[]> {
+public class CommentPostMap extends DCUMap<byte[], byte[]> {
 
     public CommentPostMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public CommentPostMap(DCMap<byte[], byte[]> parent) {
+    public CommentPostMap(DCUMap<byte[], byte[]> parent) {
         super(parent, null);
     }
 

@@ -1,6 +1,6 @@
 package org.erachain.core.web;
 
-import org.erachain.datachain.DCMap;
+import org.erachain.datachain.DCUMap;
 import org.erachain.datachain.DCSet;
 import org.mapdb.DB;
 import org.erachain.utils.ByteArrayUtils;
@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
+public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
 
     public OrphanNameStorageHelperMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
 
-    public OrphanNameStorageHelperMap(DCMap<String, List<byte[]>> parent) {
+    public OrphanNameStorageHelperMap(DCUMap<String, List<byte[]>> parent) {
         super(parent, null);
     }
 

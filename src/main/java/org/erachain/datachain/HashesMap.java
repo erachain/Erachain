@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 // found by hash -> record signature
 // TODO: переделать ссылку на транзакцию на Long
-public class HashesMap extends DCMap<byte[], byte[]> {
+public class HashesMap extends DCUMap<byte[], byte[]> {
 
     public HashesMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

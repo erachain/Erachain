@@ -10,7 +10,7 @@ import org.erachain.utils.ObserverMessage;
 import java.math.BigDecimal;
 import java.util.TreeMap;
 
-public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
+public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
 
     public CancelSellNameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

@@ -16,7 +16,7 @@ import java.util.*;
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredByStringArray<Long> {
+public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<Long> {
 
     //private static Logger logger;
 

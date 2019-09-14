@@ -66,9 +66,10 @@ public class TransactionRocksDBMap extends TransactionMapImpl
         IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
         return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(
                 indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(sender, null, null, null),
-                ((org.erachain.dbs.rocksDB.TransactionRocksDBMap)map).getSenderIndex());
+                ((org.erachain.dbs.rocksDB.TransactionRocksDBMap)map).getSenderIndex()));
     }
 
+    //@Override
     Iterable sendKeys(byte[] recipient) {
         return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(recipient,
                 ((org.erachain.dbs.rocksDB.TransactionRocksDBMap)map).getRecientIndex());

@@ -23,7 +23,7 @@ import java.util.*;
  Поэтому нужно добавлять униальность
  * @return
  */
-public class OrderMap extends DCMap<Long, Order> {
+public class OrderMap extends DCUMap<Long, Order> {
 
     private static boolean  useWantHaveKeys = true;
     @SuppressWarnings("rawtypes")

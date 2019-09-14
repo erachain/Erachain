@@ -7,7 +7,7 @@ import org.mapdb.DB;
 
 import java.util.TreeMap;
 
-public class DeployATMap extends DCMap<byte[], Long> {
+public class DeployATMap extends DCUMap<byte[], Long> {
 
     public DeployATMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

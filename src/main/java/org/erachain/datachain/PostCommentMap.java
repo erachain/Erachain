@@ -13,13 +13,13 @@ import java.util.List;
  *
  * @author Skerberus
  */
-public class PostCommentMap extends DCMap<byte[], List<byte[]>> {
+public class PostCommentMap extends DCUMap<byte[], List<byte[]>> {
 
     public PostCommentMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public PostCommentMap(DCMap<byte[], List<byte[]>> parent) {
+    public PostCommentMap(DCUMap<byte[], List<byte[]>> parent) {
         super(parent, null);
     }
 

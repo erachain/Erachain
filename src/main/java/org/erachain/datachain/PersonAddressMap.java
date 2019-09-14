@@ -27,7 +27,7 @@ import java.util.TreeMap;
  ))
  */
 // TODO: ссылку на ЛОНГ
-public class PersonAddressMap extends DCMap<
+public class PersonAddressMap extends DCUMap<
         Long, // personKey
         TreeMap<
                 String, // address

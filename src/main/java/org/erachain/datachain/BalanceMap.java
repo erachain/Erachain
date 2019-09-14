@@ -21,7 +21,7 @@ import java.util.TreeMap;
  *   b - balance
  *   outcome = b - a
  */
-public class BalanceMap extends DCMap<Tuple2<Long, Long>,
+public class BalanceMap extends DCUMap<Tuple2<Long, Long>,
         Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> {
 

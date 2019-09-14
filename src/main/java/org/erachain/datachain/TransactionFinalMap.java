@@ -43,7 +43,7 @@ import java.util.*;
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionFinalMap extends DCMap<Long, Transaction> implements FilteredByStringArray {
+public class TransactionFinalMap extends DCUMap<Long, Transaction> implements FilteredByStringArray {
 
     private static int CUT_NAME_INDEX = 12;
 
@@ -619,7 +619,7 @@ public class TransactionFinalMap extends DCMap<Long, Transaction> implements Fil
         return null;
     }
 
-    public DCMap<Long, Transaction> getParentMap() {
+    public DCUMap<Long, Transaction> getParentMap() {
         return this.parent;
     }
 

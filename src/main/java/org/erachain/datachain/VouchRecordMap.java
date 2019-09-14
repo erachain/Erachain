@@ -25,7 +25,7 @@ import java.util.Map;
  * @return dcMap
  */
 
-public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> {
+public class VouchRecordMap extends DCUMap<Long, Tuple2<BigDecimal, List<Long>>> {
 
     public VouchRecordMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

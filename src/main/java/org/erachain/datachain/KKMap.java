@@ -22,7 +22,7 @@ import java.util.TreeMap;
  * TODO: переделать ссылку на запись на Лонг
  *
  */
-public class KKMap extends DCMap<
+public class KKMap extends DCUMap<
         Long, // item1 Key
         TreeMap<Long, // item2 Key
                 Stack<Tuple5<

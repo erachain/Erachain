@@ -18,7 +18,7 @@ import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBMapSuit;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
@@ -467,7 +467,7 @@ public class DCSet extends DBASet implements Observer {
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
         if (instance.actions < 0) {
             dbFile.delete();
-            for (DBMap map: instance.externalMaps) {
+            for (DBMapSuit map: instance.externalMaps) {
                 map.reset();
             }
             throw new Exception("error in DATACHAIN:" + instance.actions);
@@ -1295,7 +1295,7 @@ public class DCSet extends DBASet implements Observer {
         return null;
     }
 
-    public DCMap getMap(Class type) {
+    public DCUMap getMap(Class type) {
 
         if(type == Transaction.class) {
             return this.getTransactionFinalMap();

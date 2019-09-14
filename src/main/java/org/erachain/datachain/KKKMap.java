@@ -19,7 +19,7 @@ import java.util.TreeMap;
  *
  * TODO: передлать подпись на Long
  */
-public class KKKMap extends DCMap<
+public class KKKMap extends DCUMap<
         Tuple2<Long, Long>, // item1 Key + item2 Key
         TreeMap<Long, // item3 Key
                 Stack<Tuple3<

@@ -20,7 +20,7 @@ import java.util.*;
  *
  */
 
-public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigDecimal> {
+public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, BigDecimal> {
 
 
     public CreditAddressesMap(DCSet databaseSet, DB database) {

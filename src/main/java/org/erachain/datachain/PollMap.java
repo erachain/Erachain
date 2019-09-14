@@ -9,7 +9,7 @@ import org.erachain.utils.ObserverMessage;
 import java.util.HashMap;
 
 @Deprecated
-public class PollMap extends DCMap<String, Poll> {
+public class PollMap extends DCUMap<String, Poll> {
 
     public PollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

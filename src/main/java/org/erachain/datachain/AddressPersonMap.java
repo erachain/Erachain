@@ -22,7 +22,7 @@ import java.util.TreeMap;
  ))
  */
 // TODO укротить до 20 байт адрес и ссылку на Long
-public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
+public class AddressPersonMap extends DCUMap<String, Stack<Tuple4<
         Long, // person key
         Integer, // end_date day
         Integer, // block height

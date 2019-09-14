@@ -1,7 +1,7 @@
 package org.erachain.core.web;
 
 import com.google.common.primitives.SignedBytes;
-import org.erachain.datachain.DCMap;
+import org.erachain.datachain.DCUMap;
 import org.erachain.datachain.DCSet;
 import org.mapdb.DB;
 
@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class SharedPostsMap extends DCMap<byte[], List<String>> {
+public class SharedPostsMap extends DCUMap<byte[], List<String>> {
 
     public SharedPostsMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
 
-    public SharedPostsMap(DCMap<byte[], List<String>> parent) {
+    public SharedPostsMap(DCUMap<byte[], List<String>> parent) {
         super(parent, null);
     }
 

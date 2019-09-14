@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class HashtagPostMap extends DCMap<String, List<byte[]>> {
+public class HashtagPostMap extends DCUMap<String, List<byte[]>> {
 
     public HashtagPostMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public HashtagPostMap(DCMap<String, List<byte[]>> parent) {
+    public HashtagPostMap(DCUMap<String, List<byte[]>> parent) {
         super(parent, null);
     }
 

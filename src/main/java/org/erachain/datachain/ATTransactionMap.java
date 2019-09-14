@@ -12,7 +12,7 @@ import org.mapdb.Fun.Tuple2;
 import java.util.*;
 
 
-public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransaction> {
+public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransaction> {
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -103,7 +103,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransact
         return this.set(new Tuple2<Integer, Integer>(blockHeight, seq), atTx);
     }
 
-    public DCMap<Tuple2<Integer, Integer>, ATTransaction> getParent() {
+    public DCUMap<Tuple2<Integer, Integer>, ATTransaction> getParent() {
         return this.parent;
     }
 

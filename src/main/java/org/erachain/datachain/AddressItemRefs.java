@@ -16,7 +16,7 @@ import java.util.TreeMap;
  * Значение  - массив байтов
  * Используется как супер класс для AddressStatementRefs (которая сейчас не используется?) - видимо для быстрого поиска записей данного вида для данного счета
  */
-public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
+public class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[]> {
     protected String name;
 
     public AddressItemRefs(DCSet databaseSet, DB database, String name,

@@ -17,7 +17,7 @@ import java.util.TreeMap;
  * https://lab.erachain.org/erachain/Erachain/issues/465
  *
  */
-public abstract class IssueItemMap extends DCMap<byte[], Long> {
+public abstract class IssueItemMap extends DCUMap<byte[], Long> {
 
     public IssueItemMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

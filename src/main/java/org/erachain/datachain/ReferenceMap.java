@@ -14,7 +14,7 @@ import java.util.TreeMap;
  * account.address + TX.timestamp -> PARENT[TX.timestamp + TX.dbRef]
  *
  */
-public class ReferenceMap extends DCMap<byte[], long[]> {
+public class ReferenceMap extends DCUMap<byte[], long[]> {
 
     public ReferenceMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

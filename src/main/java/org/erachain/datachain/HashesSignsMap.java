@@ -23,7 +23,7 @@ import java.util.TreeMap;
 
  */
 
-public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
+public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
         Long, // person key
         Integer, // block height
         Integer>>> // transaction index

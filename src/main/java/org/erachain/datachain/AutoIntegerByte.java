@@ -14,7 +14,7 @@ import java.util.HashMap;
 /**
  * Главный класс для инкриментов - не используется
  */
-public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
+public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
     static Logger LOGGER = LoggerFactory.getLogger(AutoIntegerByte.class.getName());
 
     // protected int type;

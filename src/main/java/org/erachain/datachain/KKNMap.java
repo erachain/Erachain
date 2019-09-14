@@ -16,7 +16,7 @@ import java.util.TreeMap;
  * TODO: ссылку на блок и трнзакцию сменить на Лонг
  * Значение: крта по строке - нигде не используется - лучше по байтам
  */
-public class KKNMap extends DCMap<
+public class KKNMap extends DCUMap<
         Long, // item1 Key
         TreeMap<String, // item2 Key
                 Stack<Tuple3<

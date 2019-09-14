@@ -14,7 +14,7 @@ import java.util.TreeMap;
  * ключ: подпись блока<br>
  * занчение: номер блока (высота, height)<br>
  */
-public class BlockSignsMap extends DCMap<Long, Integer> {
+public class BlockSignsMap extends DCUMap<Long, Integer> {
 
     public BlockSignsMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);

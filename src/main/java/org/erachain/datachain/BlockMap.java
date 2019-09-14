@@ -34,7 +34,7 @@ import java.util.TreeMap;
  *
  * @return
  */
-public class BlockMap extends DCMap<Integer, Block> {
+public class BlockMap extends DCUMap<Integer, Block> {
 
     static Logger logger = LoggerFactory.getLogger(BlockMap.class.getSimpleName());
 

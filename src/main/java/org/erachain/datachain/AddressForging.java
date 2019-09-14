@@ -33,7 +33,7 @@ import java.util.HashMap;
  */
 
 // TODO укротить до 20 байт адрес
-public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>> {
+public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>> {
 
 
     public AddressForging(DCSet databaseSet, DB database) {

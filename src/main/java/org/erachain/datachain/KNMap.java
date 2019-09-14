@@ -17,7 +17,7 @@ import java.util.TreeMap;
  // key to Name_Stack End_Date Map
  // in days
  */
-public class KNMap extends DCMap<
+public class KNMap extends DCUMap<
         Long, // item1 Key
         TreeMap<String, // item2 Key
                 Stack<Tuple3<
