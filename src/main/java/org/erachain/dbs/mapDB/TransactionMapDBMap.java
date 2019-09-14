@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.NavigableSet;
 
 public class TransactionMapDBMap extends DBMapSuit<Long, Transaction>
@@ -26,7 +25,6 @@ public class TransactionMapDBMap extends DBMapSuit<Long, Transaction>
 
     int TIMESTAMP_INDEX = 1;
 
-    protected Map<Long, Transaction> map;
     @SuppressWarnings("rawtypes")
     public NavigableSet senderKey;
     @SuppressWarnings("rawtypes")

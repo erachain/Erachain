@@ -15,7 +15,7 @@ import java.util.*;
 @Slf4j
 public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
 
-    protected InnerDBTable<T, U> tableDB;
+    protected InnerDBTable<T, U> map;
     protected List<IndexDB> indexes;
 
     public DBMapSuit(DBASet databaseSet, DB database) {
@@ -41,8 +41,6 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
 
     protected abstract void getMap();
 
-    protected abstract void getMemoryMap();
-
     protected U getDefaultValue() {
         return null;
     }
@@ -52,14 +50,14 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
 
     @Override
     public int size() {
-        return tableDB.size();
+        return map.size();
     }
 
     @Override
     public U get(T key) {
         try {
-            if (tableDB.containsKey(key)) {
-                return tableDB.get(key);
+            if (map.containsKey(key)) {
+                return map.get(key);
             }
             return getDefaultValue();
         } catch (Exception e) {
@@ -70,18 +68,18 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
 
     @Override
     public Set<T> getKeys() {
-        return tableDB.keySet();
+        return map.keySet();
     }
 
     @Override
     public Collection<U> getValues() {
-        return tableDB.values();
+        return map.values();
     }
 
     @Override
     public boolean set(T key, U value) {
         U old = get(key);
-        tableDB.put(key, value);
+        map.put(key, value);
         //NOTIFY
         if (observableData != null) {
             if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_ADD)) {
@@ -93,7 +91,7 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
     }
 
     public void put(T key, U value) {
-        tableDB.put(key, value);
+        map.put(key, value);
         //NOTIFY
         if (observableData != null) {
             if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_ADD)) {
@@ -106,9 +104,9 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
     @Override
     public U delete(T key) {
         U value = null;
-        if (tableDB.containsKey(key)) {
-            value = tableDB.get(key);
-            tableDB.remove(key);
+        if (map.containsKey(key)) {
+            value = map.get(key);
+            map.remove(key);
             //NOTIFY
             if (observableData != null) {
                 if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_REMOVE)) {
@@ -122,7 +120,7 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
 
     @Override
     public boolean contains(T key) {
-        return tableDB.containsKey(key);
+        return map.containsKey(key);
     }
 
     @Override
@@ -132,7 +130,7 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
 
     //@Override
     public List<U> getLastValues(int limit) {
-        return ((DBRocksDBTable<T, U>) tableDB).getLatestValues(limit);
+        return ((DBRocksDBTable<T, U>) map).getLatestValues(limit);
     }
 
     /**
@@ -140,16 +138,20 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
      * @return
      */
     public Iterator<T> getIndexIterator(IndexDB indexDB, boolean descending) {
-        return tableDB.getIndexIterator(descending, indexDB);
+        return ((DBRocksDBTable<T, U>) map).getIndexIterator(descending, indexDB);
     }
 
+    /*
+    @Override
     public Iterator<T> getIterator(boolean descending) {
-        return tableDB.getIterator(descending);
+        return map.getIterator(descending);
     }
+
+     */
 
     @Override
     public void reset() {
-        tableDB.clear();
+        map.clear();
         if (observableData != null) {
             //NOTIFY LIST
             if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_RESET)) {
@@ -161,6 +163,6 @@ public abstract class DBMapSuit<T, U> extends DBMapImpl<T, U> {
 
     //@Override
     public void close() {
-        tableDB.close();
+        ((DBRocksDBTable<T, U>) map).close();
     }
 }

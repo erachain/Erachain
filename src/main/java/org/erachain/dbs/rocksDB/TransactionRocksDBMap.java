@@ -3,7 +3,6 @@ package org.erachain.dbs.rocksDB;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
-import org.erachain.dbs.mapDB.DBMapSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
@@ -37,8 +36,6 @@ public class TransactionRocksDBMap extends DBMapSuit<Long, Transaction>
     private final String recipientUnconfirmedTransactionIndexName = "recipient_unc_txs";
     private final String addressTypeUnconfirmedTransactionIndexName = "address_type_unc_txs";
 
-    private InnerDBTable<Long, Transaction> map;
-    private List<IndexDB> indexes;
     private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
     private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
 

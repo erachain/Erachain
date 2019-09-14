@@ -36,7 +36,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
 
     @Override
     public int size() {
-        int u = tableDB.size();
+        int u = map.size();
         if (parent != null) {
             if (deleted != null) {
                 u -= deleted.size();
@@ -53,8 +53,8 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
             return null;
         }
         try {
-            if (tableDB.containsKey(key)) {
-                return tableDB.get(key);
+            if (map.containsKey(key)) {
+                return map.get(key);
             } else {
                 if (deleted == null || !deleted.contains(key)) {
                     if (parent != null) {
@@ -72,7 +72,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
 
     @Override
     public Set<T> getKeys() {
-        Set<T> u = tableDB.keySet();
+        Set<T> u = map.keySet();
         if (parent != null) {
             u.addAll(parent.getKeys());
         }
@@ -81,7 +81,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
 
     @Override
     public Collection<U> getValues() {
-        Collection<U> u = tableDB.values();
+        Collection<U> u = map.values();
         if (parent != null) {
             u.addAll(parent.getValues());
         }
@@ -95,8 +95,8 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
         }
 
         try {
-            U old = tableDB.get(key);
-            tableDB.put(key, value);
+            U old = map.get(key);
+            map.put(key, value);
             if (parent != null) {
                 if (deleted != null) {
                     if (deleted.remove(key)) {
@@ -136,7 +136,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
         }
         try {
 //            U old = tableDB.get(key);
-            tableDB.put(key, value);
+            map.put(key, value);
             if (parent != null) {
                 if (deleted != null) {
                     if (deleted.remove(key)) {
@@ -171,8 +171,8 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
         if (DCSet.isStoped()) {
             return null;
         }
-        U value = tableDB.get(key);
-        tableDB.remove(key);
+        U value = map.get(key);
+        map.remove(key);
         if (value == null) {
             if (parent != null) {
                 if (deleted == null) {
@@ -209,7 +209,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
         if (DCSet.isStoped()) {
             return false;
         }
-        if (tableDB.containsKey(key)) {
+        if (map.containsKey(key)) {
             return true;
         } else {
             if (deleted == null || !deleted.contains(key)) {
