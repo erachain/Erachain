@@ -6,7 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.dbs.DBMap;
-import org.erachain.dbs.DBMapImpl;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 // UNCONFIRMED balances for accounts in owner wallet only
-public class AccountMap extends DBMapImpl<String, Integer> {
+public class AccountMap extends DCUMapImpl<String, Integer> {
 
     private static final String ADDRESS_ASSETS = "address_assets";
     private static final String ADDRESSES = "addresses";

@@ -3,7 +3,7 @@ package org.erachain.database;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
-import org.erachain.dbs.DBMapImpl;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.util.*;
 
-public class PeerMap extends DBMapImpl<byte[], byte[]> {
+public class PeerMap extends DCUMapImpl<byte[], byte[]> {
     private static final byte[] BYTE_WHITELISTED = new byte[]{0, 0};
     //private static final byte[] BYTE_BLACKLISTED = new byte[]{1, 1};
     private static final byte[] BYTE_NOTFOUND = new byte[]{2, 2};

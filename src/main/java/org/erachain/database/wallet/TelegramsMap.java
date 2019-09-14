@@ -2,14 +2,14 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBMap;
-import org.erachain.dbs.DBMapImpl;
 import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-public class TelegramsMap extends DBMapImpl<String, Transaction> {
+public class TelegramsMap extends DCUMapImpl<String, Transaction> {
 
     public TelegramsMap(DWSet dWSet, DB database) {
         super(dWSet, database);

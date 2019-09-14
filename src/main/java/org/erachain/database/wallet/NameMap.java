@@ -2,9 +2,9 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.naming.Name;
-import org.erachain.dbs.DBMap;
-import org.erachain.dbs.DBMapImpl;
 import org.erachain.database.serializer.NameSerializer;
+import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class NameMap extends DBMapImpl<Tuple2<String, String>, Name> {
+public class NameMap extends DCUMapImpl<Tuple2<String, String>, Name> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(NameMap.class.getName());

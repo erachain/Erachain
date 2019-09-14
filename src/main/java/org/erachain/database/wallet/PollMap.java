@@ -2,9 +2,9 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.voting.Poll;
-import org.erachain.dbs.DBMap;
-import org.erachain.dbs.DBMapImpl;
 import org.erachain.database.serializer.PollSerializer;
+import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class PollMap extends DBMapImpl<Tuple2<String, String>, Poll> {
+public class PollMap extends DCUMapImpl<Tuple2<String, String>, Poll> {
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(PollMap.class.getName());

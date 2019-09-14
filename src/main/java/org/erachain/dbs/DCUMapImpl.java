@@ -36,6 +36,10 @@ public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<
 
     int uses = 0;
 
+    public DCUMapImpl(DBASet databaseSet) {
+        this.databaseSet = databaseSet;
+    }
+
     public DCUMapImpl(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }

@@ -1,7 +1,7 @@
 package org.erachain.database.wallet;
 
 import org.erachain.dbs.DBMap;
-import org.erachain.dbs.DBMapImpl;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.TreeMap;
 
 // <Account, Tuple2<Title,JSON_String>>
-public class AccountsPropertisMap extends DBMapImpl<String, Tuple2<String, String>> {
+public class AccountsPropertisMap extends DCUMapImpl<String, Tuple2<String, String>> {
     public static final int NAME_INDEX = 1;
     public static final int OWNER_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(AccountsPropertisMap.class.getName());
