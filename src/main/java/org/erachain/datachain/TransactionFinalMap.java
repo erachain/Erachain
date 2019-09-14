@@ -619,7 +619,7 @@ public class TransactionFinalMap extends DCUMap<Long, Transaction> implements Fi
         return null;
     }
 
-    public DCUMap<Long, Transaction> getParentMap() {
+    public DBMap<Long, Transaction> getParentMap() {
         return this.parent;
     }
 

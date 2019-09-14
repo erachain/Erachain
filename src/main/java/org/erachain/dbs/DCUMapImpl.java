@@ -5,7 +5,10 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +25,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
     protected Map<T, U> map;
-    protected DCMap<T, U> parent;
+    protected DBMap<T, U> parent;
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
@@ -69,6 +72,47 @@ public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<
 
     protected abstract void getMemoryMap();
     protected abstract U getDefaultValue();
+
+    /**
+     * Make SECODATY INDEX
+     * INDEX ID = 0 - its is PRIMARY - not use it here
+     *
+     * @param index index ID. Must be 1...9999
+     * @param indexSet
+     * @param descendingIndexSet
+     * @param function
+     * @param <V>
+     */
+    @SuppressWarnings("unchecked")
+    protected <V> void createIndex(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Fun.Function2<V, T, U> function) {
+        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
+
+        Bind.secondaryKey((Bind.MapWithModificationListener<T, U>) this.map, (NavigableSet<Fun.Tuple2<V, T>>) indexSet, function);
+        this.indexes.put(index, (NavigableSet<Fun.Tuple2<?, T>>) indexSet);
+
+        Bind.secondaryKey((Bind.MapWithModificationListener<T, U>) this.map, (NavigableSet<Fun.Tuple2<V, T>>) descendingIndexSet, function);
+        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Fun.Tuple2<?, T>>) descendingIndexSet);
+    }
+
+    /**
+     * Make SECODATY INDEX
+     * INDEX ID = 0 - its is PRIMARY - not use it here
+     *
+     * @param index index ID. Must be 1...9999
+     * @param indexSet
+     * @param descendingIndexSet
+     * @param function
+     * @param <V>
+     */
+    @SuppressWarnings("unchecked")
+    protected <V> void createIndexes(int index, NavigableSet<?> indexSet, NavigableSet<?> descendingIndexSet, Fun.Function2<V[], T, U> function) {
+        assert(index > 0 && index < DESCENDING_SHIFT_INDEX);
+        Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Fun.Tuple2<V, T>>) indexSet, function);
+        this.indexes.put(index, (NavigableSet<Fun.Tuple2<?, T>>) indexSet);
+
+        Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Fun.Tuple2<V, T>>) descendingIndexSet, function);
+        this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Fun.Tuple2<?, T>>) descendingIndexSet);
+    }
 
     // ERROR if key is not unique for each value:
     // After removing the key from the fork, which is in the parent, an incorrect post occurs

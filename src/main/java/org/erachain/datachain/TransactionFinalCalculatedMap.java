@@ -356,7 +356,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         return null;
     }
 
-    public DCUMap<Tuple3<Integer, Integer, Long>, Calculated> getParentMap() {
+    public DBMap<Tuple3<Integer, Integer, Long>, Calculated> getParentMap() {
         return this.parent;
     }
 

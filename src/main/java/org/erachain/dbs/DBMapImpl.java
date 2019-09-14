@@ -38,6 +38,18 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
     public DBMapImpl() {
     }
 
+    public DBMapImpl(DBASet databaseSet) {
+
+        this.databaseSet = databaseSet;
+
+        //CREATE INDEXES
+        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
+
+        if (databaseSet != null && databaseSet.isWithObserver()) {
+            observableData = new HashMap<Integer, Integer>(8, 1);
+        }
+    }
+
     public DBMapImpl(DBASet databaseSet, DB database) {
         this.databaseSet = databaseSet;
         this.database = database;

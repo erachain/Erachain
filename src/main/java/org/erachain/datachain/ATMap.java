@@ -9,6 +9,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.ATSerializer;
+import org.erachain.dbs.DCMap;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
 
@@ -18,7 +20,7 @@ import java.util.*;
 //import database.SortableList;
 
 @SuppressWarnings("rawtypes")
-public class ATMap extends DCUMap<String, AT> {
+public class ATMap extends DCUMapImpl<String, AT> {
 
     private NavigableSet typeATs;
     private NavigableSet creatorATs;
@@ -284,7 +286,7 @@ public class ATMap extends DCUMap<String, AT> {
         return Fun.filter(this.orderedATs, null, true, height, true).iterator();
     }
 
-    public DCUMap<String, AT> getParent() {
+    public DBMap<String, AT> getParent() {
         return this.parent;
     }
 
