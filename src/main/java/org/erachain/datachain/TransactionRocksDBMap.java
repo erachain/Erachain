@@ -88,5 +88,52 @@ public class TransactionRocksDBMap extends TransactionMapImpl
         return null;
     }
 
+    /**
+     * @param descending true if need descending sort
+     * @return
+     */
+    public Iterator<Long> getIndexIterator(IndexDB indexDB, boolean descending) {
+        return ((DBRocksDBTable) map).getIndexIterator(descending, indexDB);
+    }
+
+    public Iterator<Long> getIterator(boolean descending) {
+        return map.getIterator(descending);
+    }
+
+    @Override
+    public Iterator<Long> getIterator(int index, boolean descending) {
+        return ((DBRocksDBTable) map).getIndexIterator(descending, index);
+    }
+
+    public Iterator<Long> getTimestampIterator() {
+        return getIndexIterator(senderUnconfirmedTransactionIndex, false);
+    }
+
+    public Iterator<Long> getCeatorIterator() {
+        return null;
+    }
+
+    //senderKeys = receiveIndexKeys(sender, type, timestamp, senderKeys, senderUnconfirmedTransactionIndexName);
+    //recipientKeys = receiveIndexKeys(recipient, type, timestamp, recipientKeys, recipientUnconfirmedTransactionIndexName);
+
+    Iterable recipientKeys(String recipient, long timestamp, int type) {
+        return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(
+                indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
+                ((DBRocksDBTable) map).list);
+    }
+    Iterable senderKeys(String recipient, long timestamp, int type) {
+        return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(
+                indexByteableTuple3StringLongInteger.toBytes(new Fun.Tuple3<>(recipient, timestamp, type), null),
+                ((org.erachain.dbs.rocksDB.TransactionRocksDBMap)map).getSenderIndex());
+    }
+    Iterable sendKeys(byte[] recipient) {
+        return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(recipient,
+                ((org.erachain.dbs.rocksDB.TransactionRocksDBMap)map).getRecientIndex());
+    }
+
+    Iterable recipientKeys(String recipient) {
+        return (Iterable) ((DBMapDB) map).getIterator(false);
+    }
+
 
 }
