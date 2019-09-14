@@ -1,8 +1,6 @@
 package org.erachain.dbs.rocksDB.indexes;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.function.BiFunction;
 
@@ -14,5 +12,5 @@ public class SimpleIndexDB<K, V, R> extends IndexDB {
         this.biFunction = biFunction;
     }
 
-    private BiFunction<K, V, R> biFunction;
+    public BiFunction<K, V, R> biFunction;
 }

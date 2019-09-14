@@ -9,8 +9,8 @@ import java.util.function.BiFunction;
 public class IndexDB {
 
     public IndexDB(String nameIndex, IndexByteable indexByteable) {
-        this.nameIndex = nameIndex;
-        this.indexByteable = indexByteable;
+        public this.nameIndex = nameIndex;
+        public this.indexByteable = indexByteable;
     }
 
     private String nameIndex;
