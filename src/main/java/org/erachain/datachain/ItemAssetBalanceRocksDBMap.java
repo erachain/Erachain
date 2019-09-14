@@ -93,8 +93,6 @@ public class ItemAssetBalanceRocksDBMap extends ItemAssetBalanceMapImpl {
         ///map = new org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap(databaseSet, database);
         map = new org.erachain.dbs.rocksDB.ItemAssetBalanceRocksDBMap(databaseSet, database);
 
-        databaseSet.addExternalMaps(this);
-
     }
 
     @Override

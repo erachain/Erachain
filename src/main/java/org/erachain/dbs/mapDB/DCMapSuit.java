@@ -41,13 +41,15 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         this.databaseSet = dcSet;
         this.database = dcSet.database;
 
-        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-            // System.out.println("########################### Free Memory:"
-            // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
-                System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
-                    Controller.getInstance().stopAll(97);
+        if (false) {
+            if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+                // System.out.println("########################### Free Memory:"
+                // + Runtime.getRuntime().freeMemory());
+                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                    System.gc();
+                    if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
+                        Controller.getInstance().stopAll(97);
+                }
             }
         }
 
