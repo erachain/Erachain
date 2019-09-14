@@ -1,18 +1,17 @@
 package org.erachain.dbs.mapDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Observer;
 import java.util.Set;
 
 /**
- * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork()
+ * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork())
+ * Тут всегда должен быть задан Родитель
  * @param <T>
  * @param <U>
 <br><br>
@@ -20,10 +19,9 @@ import java.util.Set;
 Поэтому нужно добавлять униальность
 
  */
+@Slf4j
 public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         {
-
-    protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
     protected org.erachain.dbs.DBMap<T, U> parent;
 
@@ -38,6 +36,8 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     int shiftSize;
 
     public DCMapSuit(org.erachain.dbs.DBMap parent, DBASet dcSet) {
+        assert (parent != null);
+
         this.databaseSet = dcSet;
         this.database = dcSet.database;
 
@@ -165,7 +165,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
             this.outUses();
             return old;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         this.outUses();
@@ -180,39 +180,24 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     @Override
     public U remove(T key) {
 
-        if (DCSet.isStoped()) {
-            return null;
+        this.addUses();
+
+        U value = this.map.remove(key);
+
+        if (this.deleted == null) {
+            this.deleted = new HashMap(1024 , 0.75f);
         }
 
-        this.addUses();
-        U value = null;
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
 
-        value = this.map.remove(key);
-
-        if (this.parent != null) {
-            // это форкнутая таблица
-
-            if (this.deleted == null) {
-                this.deleted = new HashMap(1024 , 0.75f);
-            }
-
-            // добавляем в любом случае, так как
-            // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
-            // и это есть в основной базе, то в воркнутую будет помещена так же запись.
-            // Получаем что запись есть и в Родителе и в Форкнутой таблице!
-            // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
-            this.deleted.put(key, EXIST);
-
-            if (value == null) {
-                // если тут нету то создадим пометку что удалили
-                value = this.parent.get(key);
-            }
-
-            this.outUses();
-            return value;
-
-        } else {
-
+        if (value == null) {
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
         }
 
         this.outUses();
@@ -252,14 +237,8 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         return false;
     }
 
-    public void addObserver(Observer o) {
-    }
-
     @Override
     public String toString() {
-        if (parent == null)  {
-            return getClass().getName();
-        }
         return getClass().getName() + ".FORK";
     }
 }

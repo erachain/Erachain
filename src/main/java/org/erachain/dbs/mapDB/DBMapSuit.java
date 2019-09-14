@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.database.IndexIterator;
 import org.mapdb.BTreeMap;
@@ -7,16 +8,13 @@ import org.mapdb.Bind;
 import org.mapdb.DB;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+@Slf4j
 public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U> {
 
     public int DESCENDING_SHIFT_INDEX = 10000;
-
-    private static Logger logger = LoggerFactory.getLogger(DBMapSuit.class.getName());
 
     protected DBASet databaseSet;
     protected DB database;
@@ -24,6 +22,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
+    // for DCMapSuit
     public DBMapSuit() {
     }
 

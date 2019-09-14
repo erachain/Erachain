@@ -1,36 +1,55 @@
 package org.erachain.dbs.rocksDB;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.mapdb.DB;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork()
- *
+ * Тут всегда должен быть задан Родитель
  * @param <T>
  * @param <U>
  */
 @Slf4j
-//@NoArgsConstructor
-public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.erachain.dbs.DCMap<T, U> {
+public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> {
 
     protected org.erachain.dbs.DBMap<T, U> parent;
-    protected List<T> deleted;
-    private int shiftSize;
 
-    public DCMapSuit(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
-    }
+    /**
+     * пометка какие индексы не используются - отключим для ускорения
+     */
+    boolean OLD_USED_NOW = false;
+
+    //ConcurrentHashMap deleted;
+    HashMap deleted;
+    Boolean EXIST = true;
+    int shiftSize;
 
     public DCMapSuit(org.erachain.dbs.DBMap parent, DBASet dcSet) {
-        super(dcSet);
+        assert (parent != null);
+
+        this.databaseSet = dcSet;
+        this.database = dcSet.database;
+
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                System.gc();
+                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
+                    Controller.getInstance().stopAll(97);
+            }
+        }
+
         this.parent = parent;
-        getMap();
+
+        this.getMap();
+
     }
 
 
@@ -56,7 +75,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
             if (map.containsKey(key)) {
                 return map.get(key);
             } else {
-                if (deleted == null || !deleted.contains(key)) {
+                if (deleted == null || !deleted.containsKey(key)) {
                     if (parent != null) {
                         return parent.get(key);
                     }
@@ -71,62 +90,36 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
     }
 
     @Override
-    public Set<T> getKeys() {
+    public Set<T> keySet() {
         Set<T> u = map.keySet();
-        if (parent != null) {
-            u.addAll(parent.getKeys());
-        }
+        u.addAll(parent.getKeys());
         return u;
     }
 
     @Override
-    public Collection<U> getValues() {
+    public Collection<U> values() {
         Collection<U> u = map.values();
-        if (parent != null) {
-            u.addAll(parent.getValues());
-        }
+        u.addAll(parent.getValues());
         return u;
     }
 
     @Override
-    public boolean set(T key, U value) {
-        if (DCSet.isStoped()) {
-            return false;
-        }
+    public U set(T key, U value) {
 
         try {
             U old = map.get(key);
             map.put(key, value);
-            if (parent != null) {
-                if (deleted != null) {
-                    if (deleted.remove(key)) {
-                        shiftSize++;
-                    }
-                }
-            } else {
-                // NOTIFY if not FORKED
-                if (observableData != null
-                        && (old == null || !old.equals(value))) {
-                    if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
-                        setChanged();
-                        Integer observeItem = (Integer) observableData.get(org.erachain.dbs.DBMap.NOTIFY_ADD);
-                        if (observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
-                                || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
-                                || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
-                                || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)) {
-                            notifyObservers(new ObserverMessage(observeItem, new Pair<>(key, value)));
-                        } else {
-                            notifyObservers(new ObserverMessage(observeItem, value));
-                        }
-                    }
+            if (deleted != null) {
+                if (deleted.remove(key) != null) {
+                    shiftSize++;
                 }
             }
-            return old != null;
+            return old;
         } catch (Exception e) {
-            //logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
-        return false;
+        return null;
     }
 
     @Override
@@ -135,104 +128,75 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> implements org.era
             return;
         }
         try {
-//            U old = tableDB.get(key);
             map.put(key, value);
-            if (parent != null) {
-                if (deleted != null) {
-                    if (deleted.remove(key)) {
-                        shiftSize++;
-                    }
-                }
-            } else {
-                // NOTIFY if not FORKED
-                if (observableData != null
-                        /*&& (old == null || !old.equals(value))*/) {
-                    if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
-                        setChanged();
-                        Integer observeItem = (Integer) observableData.get(org.erachain.dbs.DBMap.NOTIFY_ADD);
-                        if (observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
-                                || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
-                                || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
-                                || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)) {
-                            notifyObservers(new ObserverMessage(observeItem, new Pair<>(key, value)));
-                        } else {
-                            notifyObservers(new ObserverMessage(observeItem, value));
-                        }
-                    }
+            if (deleted != null) {
+                if (deleted.remove(key) != null) {
+                    shiftSize++;
                 }
             }
         } catch (Exception e) {
-            //logger.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
     }
 
     @Override
-    public U delete(T key) {
-        if (DCSet.isStoped()) {
-            return null;
+    public U remove(T key) {
+
+        U value = this.map.get(key);
+        this.map.remove(key);
+
+        if (this.deleted == null) {
+            this.deleted = new HashMap(1024 , 0.75f);
         }
-        U value = map.get(key);
-        map.remove(key);
+
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
+
         if (value == null) {
-            if (parent != null) {
-                if (deleted == null) {
-                    deleted = new ArrayList<T>();
-                }
-                if (parent.contains(key)) {
-                    deleted.add(key);
-                    value = parent.get(key);
-                }
-            }
-            return value;
-        } else if (parent == null) {
-            // NOTIFY
-            if (observableData != null) {
-                if (observableData.containsKey(org.erachain.dbs.DBMap.NOTIFY_REMOVE)) {
-                    setChanged();
-                    Integer observItem = (Integer) this.observableData.get(org.erachain.dbs.DBMap.NOTIFY_REMOVE);
-                    if (observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
-                            || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
-                            || observItem.equals(ObserverMessage.REMOVE_AT_TX)) {
-                        notifyObservers(new ObserverMessage(observItem, new Pair<>(key, value)));
-                    } else {
-                        notifyObservers(new ObserverMessage(observItem, value));
-                    }
-                }
-            }
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
         }
+
         return value;
 
     }
 
     @Override
-    public boolean contains(T key) {
-        if (DCSet.isStoped()) {
-            return false;
+    public void delete(T key) {
+
+        this.map.remove(key);
+
+        if (this.deleted == null) {
+            this.deleted = new HashMap(1024 , 0.75f);
         }
+
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
+
+    }
+
+    @Override
+    public boolean contains(T key) {
         if (map.containsKey(key)) {
             return true;
         } else {
-            if (deleted == null || !deleted.contains(key)) {
-                if (parent != null) {
-                    return parent.contains(key);
-                }
+            if (deleted == null || !deleted.containsKey(key)) {
+                return parent.contains(key);
             }
         }
         return false;
     }
 
-    public void addObserver(Observer o) {
-        if (parent != null)  {
-            return;
-        }
-        super.addObserver(o);
-    }
-
     @Override
     public String toString() {
-        if (parent == null) {
-            return getClass().getName();
-        }
-        return parent.getClass().getName() + ".parent";
+        return getClass().getName() + ".FORK";
     }
 }

@@ -282,7 +282,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     }
 
     public IndexDB receiveIndex(int index) {
-        return db.recieveIndexByName(name);
+        return indexes.get(index);
     }
 
     public void addIndex(IndexDB indexes) {

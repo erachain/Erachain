@@ -1,14 +1,9 @@
 package org.erachain.dbs.rocksDB;
 
-import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
-import org.erachain.database.SortableList;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
-import org.erachain.dbs.rocksDB.integration.DBMapDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
@@ -22,8 +17,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
@@ -61,10 +54,6 @@ public class ItemAssetBalanceRocksDBMap extends DBMapSuit<byte[], Tuple5<
 
         databaseSet.addExternalMaps(this);
 
-    }
-
-    protected void getMemoryMap() {
-        map = new DBMapDB<>(new HashMap<>());
     }
 
     @Override
@@ -132,93 +121,6 @@ public class ItemAssetBalanceRocksDBMap extends DBMapSuit<byte[], Tuple5<
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
-    }
-
-	/*
-	public void set(byte[] address, BigDecimal value)
-	{
-		this.set(address, FEE_KEY, value);
-	}
-	 */
-
-    public long getAssetKeyFromKey(byte[] key) {
-        // ASSET KEY
-        byte[] assetKeyBytes = new byte[8];
-        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-        return Longs.fromByteArray(assetKeyBytes);
-    }
-
-    public byte[] getShortAccountFromKey(byte[] key) {
-        // ASSET KEY
-        byte[] shortAddressBytes = new byte[20];
-        System.arraycopy(key, 0, shortAddressBytes, 0, 20);
-        return shortAddressBytes;
-
-    }
-
-    public void set(byte[] address, long key, Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
-        if (key < 0)
-            key = -key;
-
-        this.set(Bytes.concat(address, Longs.toByteArray(key)), value);
-    }
-
-    public boolean set(byte[] key, Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
-
-        boolean result = super.set(key, value);
-
-        return result;
-
-    }
-
-    public Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> get(byte[] address, long key) {
-        if (key < 0)
-            key = -key;
-
-
-        Tuple5<
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value = this.get(
-                Bytes.concat(address, Longs.toByteArray(key)));
-
-        return value;
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<byte[], Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long key) {
-
-        if (Controller.getInstance().onlyProtocolIndexing)
-            return null;
-
-        if (key < 0)
-            key = -key;
-
-        Collection<byte[]> keys = ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(new ByteableLong().toBytesObject(key),
-                ((DBRocksDBTable)map).receiveIndexByName(balanceKeyAssetNameIndex));
-
-            return new SortableList<>(this, keys);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<byte[], Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(Account account) {
-
-        if (Controller.getInstance().onlyProtocolIndexing)
-            return null;
-
-        Collection<byte[]> keys = ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(new ByteableString().toBytesObject(account.getAddress()),
-                ((DBRocksDBTable)map).receiveIndexByName(balanceAssetKeyNameIndex));
-
-        return new SortableList<>(this, keys);
     }
 
     @Override

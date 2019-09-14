@@ -7,7 +7,6 @@ import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
-import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -15,9 +14,8 @@ import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
-import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 public class ItemAssetBalanceRocksDBMap extends ItemAssetBalanceMapImpl {
 
@@ -29,6 +27,15 @@ public class ItemAssetBalanceRocksDBMap extends ItemAssetBalanceMapImpl {
         super(databaseSet, database);
     }
 
+    @Override
+    Collection<byte[]> assetKeySubMap(long key) {
+        return null;
+    }
+
+    @Override
+    Collection<byte[]> addressKeySubMap(String address) {
+        return null;
+    }
 
     @Override
     protected void getMap() {
@@ -83,22 +90,8 @@ public class ItemAssetBalanceRocksDBMap extends ItemAssetBalanceMapImpl {
                 ));
         indexes.add(indexDBf0f1);
 
+        ///map = new org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap(databaseSet, database);
         map = new org.erachain.dbs.rocksDB.ItemAssetBalanceRocksDBMap(databaseSet, database);
-        /*
-        <byte[], Fun.Tuple5<
-                Fun.Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
-                Fun.Tuple2<BigDecimal, BigDecimal>, // in DEBT
-                Fun.Tuple2<BigDecimal, BigDecimal>, // in STOCK
-                Fun.Tuple2<BigDecimal, BigDecimal>, // it DO
-                Fun.Tuple2<BigDecimal, BigDecimal>  // on HOLD
-                >>(
-                new ByteableTrivial(),
-                new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal(), NAME_TABLE, indexes,
-                org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
-                        256, 10,
-                        1, 256, 32, false), ROCKS_DB_FOLDER);
-
-         */
 
         databaseSet.addExternalMaps(this);
 
