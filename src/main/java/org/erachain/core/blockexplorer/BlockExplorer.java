@@ -2277,11 +2277,12 @@ public class BlockExplorer {
             Block block = (Block) unit;
 
             transactionDataJSON = new LinkedHashMap();
-            transactionDataJSON.put("timestamp", block.getTimestamp());
 
             int height = block.getHeight();
             transactionDataJSON.put("confirmations", getHeight() - height + 1);
             transactionDataJSON.put("height", height);
+            // height
+            transactionDataJSON.put("timestamp", block.getTimestamp(height));
 
             transactionDataJSON.put("generator", block.getCreator().getAddress());
             transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
@@ -3285,11 +3286,10 @@ public class BlockExplorer {
             Map transactionJSON = new LinkedHashMap();
             Map transactionDataJSON = new LinkedHashMap();
 
-            transactionDataJSON.put("timestamp", block.getTimestamp());
-
             int height = block.getHeight();
             transactionDataJSON.put("confirmations", getHeight() - height + 1);
             transactionDataJSON.put("height", height);
+            transactionDataJSON.put("timestamp", block.getTimestamp(height));
 
             transactionDataJSON.put("generator", block.getCreator().getAddress());
             transactionDataJSON.put("signature", Base58.encode(block.getSignature()));

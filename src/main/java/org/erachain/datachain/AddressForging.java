@@ -52,6 +52,7 @@ public class AddressForging extends DCMap<Tuple2<String, Integer>, Tuple2<Intege
 
     protected void getMap() {
         //OPEN MAP
+        ////return database.createHashMap("address_forging").makeOrGet();
         map = database.getHashMap("address_forging");
     }
 

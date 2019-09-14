@@ -26,7 +26,7 @@ import java.util.List;
  * Вообще тут реализация как СТЕК - удалить можно только если это верхний элемент.
  * Добавление вверх или обновляем существующий по AUTOKEY_INDEX
  * <hr>
- * Ключ: первых байт счета + время создания<br>
+ * Ключ: первых байт счета + время создания, причем счет Involved - то есть и входящие тоже будут<br>
  * Значение: транзакция
  */
 public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>> {

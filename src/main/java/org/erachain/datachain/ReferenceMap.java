@@ -27,9 +27,11 @@ public class ReferenceMap extends DCMap<byte[], long[]> {
     @Override
     protected void getMap() {
         //OPEN MAP
-        map = database.createHashMap("references")
-                .keySerializer(SerializerBase.BASIC)
-                .hasher(Hasher.BASIC)
+        return database.createHashMap("references")
+                .keySerializer(SerializerBase.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
+                // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
+                .hasher(Hasher.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
+                // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
                 .counterEnable()
                 .makeOrGet();
     }

@@ -31,6 +31,7 @@ public class TransactionFinalMapSigns extends DCMap<UUID, Long> {
         // HASH map is so QUICK
         return database.createHashMap("signature_final_tx")
                 .keySerializer(SerializerBase.UUID)
+                //.hasher(Hasher.UUID)
                 .valueSerializer(SerializerBase.LONG)
                 .makeOrGet();
 
