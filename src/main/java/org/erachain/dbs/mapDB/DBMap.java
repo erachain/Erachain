@@ -1,10 +1,8 @@
 package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapImpl;
 import org.erachain.database.IndexIterator;
-import org.erachain.database.SortableList;
-import org.erachain.utils.ObserverMessage;
+import org.erachain.dbs.DBMapSuit;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -15,32 +13,31 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachain.dbs.DBMap<T, U> {
-
-    public static final int NOTIFY_RESET = 1;
-    public static final int NOTIFY_ADD = 2;
-    public static final int NOTIFY_REMOVE = 3;
-    public static final int NOTIFY_LIST = 4;
-    //public static final int NOTIFY_COUNT = 5;
+public abstract class DBMap<T, U> implements DBMapSuit<T, U> {
 
     public int DESCENDING_SHIFT_INDEX = 10000;
 
-    public static int DEFAULT_INDEX = 0;
     private static Logger logger = LoggerFactory.getLogger(DBMap.class.getName());
+
     protected DBASet databaseSet;
+    protected DB database;
+
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
-    protected Map<Integer, Integer> observableData;
-
-    public DBMap(DBASet databaseSet) {
-        super(databaseSet);
+    public DBMap() {
     }
 
     public DBMap(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        this.databaseSet = databaseSet;
+        this.database = database;
+        getMap();
+        createIndexes();
     }
 
+    protected abstract void getMap();
+
+    protected abstract void createIndexes();
 
     /**
      * Make SECODATY INDEX
@@ -82,6 +79,8 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Tuple2<V, T>>) descendingIndexSet, function);
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
+
+    protected abstract U getDefaultValue();
 
     public void addUses() {
         if (this.databaseSet != null) {
@@ -128,6 +127,7 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         }
     }
 
+    @Override
     public Set<T> getKeys() {
         this.addUses();
         Set<T> u = this.map.keySet();
@@ -135,6 +135,7 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         return u;
     }
 
+    @Override
     public Collection<U> getValues() {
         this.addUses();
         Collection<U> u = this.map.values();
@@ -142,35 +143,28 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         return u;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Добавить
+     * @param key
+     * @param value
+     * @return
+     */
     @Override
     public boolean set(T key, U value) {
         this.addUses();
-        //try {
 
-            U old = this.map.put(key, value);
-
-            //COMMIT and NOTIFY if not FORKED
-            // TODO - удалить тут этот ак как у нас везде управляемый внешний коммит
-            if (false) this.databaseSet.commit();
-
-            //NOTIFY
-            if (this.observableData != null && (old == null || !old.equals(value))) {
-                if (this.observableData.containsKey(NOTIFY_ADD)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
-                }
-            }
-
-        //    this.outUses();
-        //    return old != null;
-        //} catch (Exception e) {
-        //    logger.error(e.getMessage(), e);
-        //}
+        U old = this.map.put(key, value);
 
         this.outUses();
-        return false;
+        return old != null;
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Удалить
+     * @param key
+     * @return
+     */
+    @Override
     public U delete(T key) {
 
         this.addUses();
@@ -178,20 +172,13 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         U value;
 
         //try {
-            //REMOVE
-            if (this.map.containsKey(key)) {
-                value = this.map.remove(key);
+        //REMOVE
+        if (this.map.containsKey(key)) {
+            value = this.map.remove(key);
 
-                //NOTIFY
-                if (this.observableData != null) {
-                    if (this.observableData.containsKey(NOTIFY_REMOVE)) {
-                        this.setChanged();
-                        this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
-                    }
-                }
 
-            } else
-                value = null;
+        } else
+            value = null;
 
         //} catch (Exception e) {
         //    value = null;
@@ -217,78 +204,13 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         return false;
     }
 
-    public Map<Integer, Integer> getObservableData() {
-        return observableData;
-    }
-
-    public boolean checkObserverMessageType(int messageType, int thisMessageType) {
-        if (observableData == null || observableData.isEmpty() || !observableData.containsKey(thisMessageType))
-            return false;
-
-
-        return observableData.get(messageType) == thisMessageType;
-    }
-
-    /**
-     * Соединяется прямо к списку SortableList для отображения в ГУИ
-     * Нужен только для сортировки<br>
-     * TODO надо его убрать отсюла нафиг чтобы не тормозило и только
-     * по месту работало окнкретно как надо
-     * @param o
-     */
-    @Override
-    public void addObserver(Observer o) {
-
-        this.addUses();
-
-        //ADD OBSERVER
-        super.addObserver(o);
-
-        //NOTIFY
-        if (this.observableData != null) {
-            if (this.observableData.containsKey(NOTIFY_LIST)) {
-                if (false) {
-                    //CREATE LIST
-                    SortableList<T, U> list;
-                    if (this.size() < 1000) {
-                        list = new SortableList<T, U>(this);
-                    } else {
-                        List<T> keys = new ArrayList<T>();
-                        // тут может быть ошибка если основной индекс не TreeMap
-                        try {
-                            // обрезаем полный список в базе до 1000
-                            Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
-                            int i = 0;
-                            while (iterator.hasNext() && ++i < 1000) {
-                                keys.add((T) iterator.next());
-                            }
-                        } catch (Exception e) {
-                            logger.error(e.getMessage(), e);
-                        }
-
-                        list = new SortableList<T, U>(this, keys);
-                    }
-
-                    //UPDATE
-                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
-                } else {
-
-                    //UPDATE
-                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
-
-                }
-            }
-        }
-
-        this.outUses();
-    }
-
     /**
      *
      * @param index <b>primary Index = 0</b>, secondary index = 1...10000
      * @param descending true if need descending sort
      * @return
      */
+    @Override
     public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();
 
@@ -318,23 +240,10 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         }
     }
 
-    public SortableList<T, U> getList() {
-        addUses();
-        SortableList<T, U> list;
-        if (this.size() < 1000) {
-            list = new SortableList<T, U>(this);
-        } else {
-            // обрезаем полный список в базе до 1000
-            list = SortableList.makeSortableList(this, false, 1000);
-        }
-
-        outUses();
-        return list;
-    }
-
     /**
      * уведомляет только счетчик если он разрешен, иначе Сбросить
      */
+    @Override
     public void reset() {
         this.addUses();
 
@@ -344,16 +253,6 @@ public abstract class DBMap<T, U> extends DBMapImpl<T, U> implements org.erachai
         //RESET INDEXES
         for (Set<Tuple2<?, T>> set : this.indexes.values()) {
             set.clear();
-        }
-
-        // NOTYFIES
-        if (this.observableData != null) {
-            //NOTIFY LIST
-            if (this.observableData.containsKey(NOTIFY_RESET)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
-            }
-
         }
 
         this.outUses();

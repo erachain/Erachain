@@ -23,7 +23,7 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
     public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
     protected DB database;
-    protected Map<T, U> map;
+    protected DBMapSuit<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
     protected Map<Integer, Integer> observableData;
@@ -142,12 +142,13 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
         return u;
     }
 
+    @Override
     public U get(T key) {
 
         this.addUses();
 
         try {
-            if (this.map.containsKey(key)) {
+            if (this.map.contains(key)) {
                 U u = this.map.get(key);
                 this.outUses();
                 return u;
@@ -189,6 +190,7 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
      * @param value
      * @return
      */
+    @Override
     public boolean set(T key, U value) {
         this.addUses();
         //try {
@@ -221,6 +223,7 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
      * @param key
      * @return
      */
+    @Override
     public U delete(T key) {
 
         this.addUses();
@@ -229,7 +232,7 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
 
         //try {
             //REMOVE
-            if (this.map.containsKey(key)) {
+            if (this.map.contains(key)) {
                 value = this.map.remove(key);
 
                 //NOTIFY
@@ -253,11 +256,12 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
         return value;
     }
 
+    @Override
     public boolean contains(T key) {
 
         this.addUses();
 
-        if (this.map.containsKey(key)) {
+        if (this.map.contains(key)) {
             this.outUses();
             return true;
         }
@@ -393,7 +397,7 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
         this.addUses();
 
         //RESET MAP
-        this.map.clear();
+        this.map.reset();
 
         //RESET INDEXES
         for (Set<Tuple2<?, T>> set : this.indexes.values()) {

@@ -3,9 +3,6 @@ package org.erachain.dbs.mapDB;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.mapdb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +20,11 @@ import java.util.Set;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.dbs.DCMap<T, U>
+public abstract class DCMap<T, U> extends DBMap<T, U>
         {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+
     protected org.erachain.dbs.DBMap<T, U> parent;
 
     /**
@@ -39,13 +37,9 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
     Boolean EXIST = true;
     int shiftSize;
 
-
-    public DCMap(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
-    }
-
     public DCMap(org.erachain.dbs.DBMap parent, DBASet dcSet) {
-        super(dcSet);
+        this.databaseSet = dcSet;
+        this.database = dcSet.database;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
@@ -59,12 +53,8 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
 
         this.parent = parent;
 
-        // OPEN MAP
-        if (dcSet == null || dcSet.getDatabase() == null) {
-            this.getMemoryMap();
-        } else {
-            this.getMap();
-        }
+        this.getMap();
+
     }
 
 
@@ -171,24 +161,6 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
                 }
             } else {
 
-                // NOTIFY if not FORKED
-                if (this.observableData != null && (old == null || !old.equals(value))) {
-                    if (this.observableData.containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
-                        this.setChanged();
-                        Integer observeItem = this.observableData.get(DBMap.NOTIFY_ADD);
-                        if (
-                                observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
-                                        || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
-                                        || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
-                                        || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
-                        ) {
-                            this.notifyObservers(new ObserverMessage(observeItem, new Pair<T, U>(key, value)));
-                        } else {
-                            this.notifyObservers(
-                                    new ObserverMessage(observeItem, value));
-                        }
-                    }
-                }
             }
 
             this.outUses();
@@ -237,22 +209,6 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
 
         } else {
 
-            // NOTIFY
-            if (this.observableData != null) {
-                if (this.observableData.containsKey(DBMap.NOTIFY_REMOVE)) {
-                    this.setChanged();
-                    Integer observItem = this.observableData.get(DBMap.NOTIFY_REMOVE);
-                    if (
-                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
-                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
-                                    || observItem.equals(ObserverMessage.REMOVE_AT_TX)
-                    ) {
-                        this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, value)));
-                    } else {
-                        this.notifyObservers(new ObserverMessage(observItem, value));
-                    }
-                }
-            }
         }
 
         this.outUses();
@@ -288,12 +244,6 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
     }
 
     public void addObserver(Observer o) {
-
-        // NOT for FORK
-        if (this.parent != null)
-            return;
-
-        super.addObserver(o);
     }
 
     @Override
