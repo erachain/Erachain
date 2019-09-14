@@ -116,8 +116,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     }
 
     @Override
-    public Set<T> getKeys() {
-
+    public Set<T> keySet() {
         this.addUses();
         Set<T> u = this.map.keySet();
 
@@ -129,7 +128,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     }
 
     @Override
-    public Collection<U> getValues() {
+    public Collection<U> values() {
         this.addUses();
         Collection<U> u = this.map.values();
 
@@ -138,37 +137,6 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
 
         this.outUses();
         return u;
-    }
-
-    @Override
-    public void put(T key, U value) {
-        if (DCSet.isStoped()) {
-            return;
-        }
-
-        this.addUses();
-
-        try {
-
-            this.map.put(key, value);
-
-            if (this.parent != null) {
-                //if (old != null)
-                //	++this.shiftSize;
-                if (this.deleted != null) {
-                    if (this.deleted.remove(key) != null)
-                        ++this.shiftSize;
-                }
-            } else {
-
-            }
-
-            this.outUses();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-
-        this.outUses();
     }
 
     @Override
@@ -181,7 +149,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
 
         try {
 
-            U old = this.map.set(key, value);
+            U old = this.map.put(key, value);
 
             if (this.parent != null) {
                 //if (old != null)
@@ -204,6 +172,10 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         return null;
     }
 
+    @Override
+    public void put(T key, U value) {
+        set(key, value);
+    }
 
     @Override
     public U remove(T key) {
@@ -249,6 +221,11 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     }
 
     @Override
+    public void delete(T key) {
+        remove(key);
+    }
+
+    @Override
     public boolean contains(T key) {
 
         if (DCSet.isStoped()) {
@@ -257,7 +234,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
 
         this.addUses();
 
-        if (this.map.contains(key)) {
+        if (this.map.containsKey(key)) {
             this.outUses();
             return true;
         } else {

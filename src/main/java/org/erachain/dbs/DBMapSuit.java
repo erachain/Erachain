@@ -10,10 +10,6 @@ public interface DBMapSuit<T, U> {
 
     U get(T key);
 
-    Set<T> getKeys();
-
-    Collection<U> getValues();
-
     void put(T key, U value);
 
     U set(T key, U value);
@@ -28,14 +24,13 @@ public interface DBMapSuit<T, U> {
 
     Collection<U> values();
 
-
     Iterator<T> getIterator(int index, boolean descending);
 
-    Collection<T> getSubKeys(T from, T to);
+    //Collection<T> getSubKeys(T from, T to);
 
-    Collection<T> getSubHeadKeys(T to);
+    //Collection<T> getSubHeadKeys(T to);
 
-    Collection<T> getSubTailKeys(T from);
+    //Collection<T> getSubTailKeys(T from);
 
     void reset();
 

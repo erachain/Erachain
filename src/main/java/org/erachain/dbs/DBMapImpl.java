@@ -73,10 +73,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
 
     protected abstract void getMap();
 
-    protected abstract void getMemoryMap();
-
-    protected abstract U getDefaultValue();
-
     protected abstract void createIndexes();
 
     /**
@@ -143,32 +139,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
     }
 
     @Override
-    public U get(T key) {
-
-        this.addUses();
-
-        try {
-            if (this.map.contains(key)) {
-                U u = this.map.get(key);
-                this.outUses();
-                return u;
-            }
-
-            U u = this.getDefaultValue();
-            this.outUses();
-            return u;
-        } catch (Exception e)
-        //else
-        {
-            //logger.error(e.getMessage(), e);
-
-            U u = this.getDefaultValue();
-            this.outUses();
-            return u;
-        }
-    }
-
-    @Override
     public Set<T> getKeys() {
         this.addUses();
         Set<T> u = this.map.keySet();
@@ -195,7 +165,7 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
         this.addUses();
         //try {
 
-            U old = this.map.put(key, value);
+            U old = this.map.set(key, value);
 
             //COMMIT and NOTIFY if not FORKED
             // TODO - удалить тут этот ак как у нас везде управляемый внешний коммит
@@ -416,4 +386,15 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
 
         this.outUses();
     }
+
+    @Override
+    public Integer deleteObservableData(int index) {
+        return this.observableData.remove(index);
+    }
+
+    @Override
+    public Integer setObservableData(int index, Integer data) {
+        return this.observableData.put(index, data);
+    }
+
 }

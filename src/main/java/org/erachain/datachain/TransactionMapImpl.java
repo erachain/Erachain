@@ -61,7 +61,6 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
     }
 
-    @Override
     protected Transaction getDefaultValue() {
         return null;
     }
@@ -280,6 +279,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
         return this.get(Longs.fromByteArray(signature));
     }
 
+
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
 
         List<Long> treeKeys = new ArrayList<Long>();
@@ -301,10 +301,11 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
     }
 
+    //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
     abstract Iterable typeKeys(String sender, Long timestamp, Integer type);
+    //recipientKeys = Fun.filter(this.recipientKey, recipient);
     abstract Iterable senderKeys(String sender);
     abstract Iterable recipientKeys(String recipient);
-
 
     /**
      * Find all unconfirmed transaction by address, sender or recipient.
@@ -346,8 +347,10 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
         if (recipient != null) {
             if (type > 0) {
+                //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
                 recipientKeys = typeKeys(recipient, timestamp, type);
             } else {
+                //recipientKeys = Fun.filter(this.recipientKey, recipient);
                 recipientKeys = recipientKeys(recipient);
             }
         }

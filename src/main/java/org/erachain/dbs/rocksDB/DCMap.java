@@ -30,7 +30,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> implements org.erachain.db
     public DCMap(org.erachain.dbs.DBMap parent, DBASet dcSet) {
         super(dcSet);
         this.parent = parent;
-        getMemoryMap();
+        getMap();
     }
 
 

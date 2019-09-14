@@ -36,6 +36,10 @@ public interface DBMap<T, U> {
 
     Map<Integer, Integer> getObservableData();
 
+    Integer deleteObservableData(int index);
+
+    Integer setObservableData(int index, Integer data);
+
     boolean checkObserverMessageType(int messageType, int thisMessageType);
 
     Iterator<T> getIterator(int index, boolean descending);

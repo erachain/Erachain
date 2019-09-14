@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
+public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U> {
 
     public int DESCENDING_SHIFT_INDEX = 10000;
 
@@ -21,7 +21,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
     protected DBASet databaseSet;
     protected DB database;
 
-    protected org.erachain.dbs.DBMapSuit map;
+    protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
     public DBMapSuit() {
@@ -100,13 +100,13 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
         return u;
     }
 
-    @Override
+    //@Override
     public U get(T key) {
 
         this.addUses();
 
         try {
-            if (this.map.contains(key)) {
+            if (this.map.containsKey(key)) {
                 U u = this.map.get(key);
                 this.outUses();
                 return u;
@@ -127,7 +127,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
     }
 
     @Override
-    public Set<T> getKeys() {
+    public Set<T> keySet() {
         this.addUses();
         Set<T> u = this.map.keySet();
         this.outUses();
@@ -135,7 +135,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
     }
 
     @Override
-    public Collection<U> getValues() {
+    public Collection<U> values() {
         this.addUses();
         Collection<U> u = this.map.values();
         this.outUses();
@@ -152,7 +152,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
     public U set(T key, U value) {
         this.addUses();
 
-        U old = this.map.set(key, value);
+        U old = this.map.put(key, value);
 
         this.outUses();
         return old;
@@ -160,11 +160,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
 
     @Override
     public void put(T key, U value) {
-        this.addUses();
-
-        this.map.set(key, value);
-
-        this.outUses();
+        set(key, value);
     }
 
     /**
@@ -181,17 +177,13 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
 
         //try {
         //REMOVE
-        if (this.map.contains(key)) {
+        if (this.map.containsKey(key)) {
             value = this.map.remove(key);
 
 
-        } else
+        } else {
             value = null;
-
-        //} catch (Exception e) {
-        //    value = null;
-        //    logger.error(e.getMessage(), e);
-        //}
+        }
 
         this.outUses();
 
@@ -207,8 +199,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
     public void delete(T key) {
 
         this.addUses();
-        this.map.delete(key);
-
+        this.map.remove(key);
         this.outUses();
     }
 
@@ -218,7 +209,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
 
         this.addUses();
 
-        if (this.map.contains(key)) {
+        if (this.map.containsKey(key)) {
             this.outUses();
             return true;
         }
@@ -271,7 +262,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit {
         this.addUses();
 
         //RESET MAP
-        this.map.reset();
+        this.map.clear();
 
         //RESET INDEXES
         for (Set<Tuple2<?, T>> set : this.indexes.values()) {
