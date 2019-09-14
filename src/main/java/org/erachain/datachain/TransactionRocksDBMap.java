@@ -30,25 +30,6 @@ import java.util.stream.Collectors;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
-/**
- * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
- * Signature (as Long) -> Transaction
- * <hr>
- * Здесь вторичные индексы создаются по несколько для одной записи путем создания массива ключей,
- * см. typeKey и recipientKey. Они используются для API RPC block explorer.
- * Нужно огрничивать размер выдаваемого списка чтобы не перегружать ноду.
- * <br>
- * Так же вторичный индекс по времени, который используется в ГУИ TIMESTAMP_INDEX = 0 (default)
- * - он оргнизыется внутри DCMap в списке индексов для сортировок в ГУИ
- *
- * Также хранит инфо каким пирам мы уже разослали транзакцию неподтвержденную так что бы при подключении делать автоматически broadcast
- *
- *  <hr>
- *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
- *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
- */
-//public class TransactionRocksDBMap extends org.erachain.dbs.rocksDB.DCMap<Long, Transaction>
-//    implements TransactionMap
 public class TransactionRocksDBMap extends TransactionMapImpl
 {
 
@@ -65,44 +46,6 @@ public class TransactionRocksDBMap extends TransactionMapImpl
 
     @Override
     protected void createIndexes() {
-    }
-
-    public Iterator<Long> getIndexIterator(IndexDB indexDB, boolean descending) {
-        return tableDB.getIndexIterator(descending, indexDB);
-    }
-
-    public Iterator<Long> getIterator(boolean descending) {
-        return tableDB.getIterator(descending);
-    }
-
-    @Override
-    public Iterator<Long> getIterator(int index, boolean descending) {
-        return tableDB.getIndexIterator(descending, index);
-    }
-
-    public Iterator<Long> getTimestampIterator() {
-        return getIndexIterator(senderUnconfirmedTransactionIndex, false);
-    }
-
-    public Iterator<Long> getCeatorIterator() {
-        return null;
-    }
-
-    /**
-     * @param descending true if need descending sort
-     * @return
-     */
-    public Iterator<Long> getIndexIterator(IndexDB indexDB, boolean descending) {
-        return ((DBRocksDBTable) map).getIndexIterator(descending, indexDB);
-    }
-
-    public Iterator<Long> getIterator(boolean descending) {
-        return map.getIterator(descending);
-    }
-
-    @Override
-    public Iterator<Long> getIterator(int index, boolean descending) {
-        return ((DBRocksDBTable) map).getIndexIterator(descending, index);
     }
 
     public Iterator<Long> getTimestampIterator() {

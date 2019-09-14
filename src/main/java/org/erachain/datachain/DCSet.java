@@ -276,6 +276,9 @@ public class DCSet extends DBASet implements Observer {
         this.bchain = parent.bchain;
 
         if (isFork()) {
+            this.assetBalanceMap = new org.erachain.dbs.nativeMemMap
+                    .nativeMapTreeMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
+
             this.assetBalanceMap = new ItemAssetBalanceMapDBMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
             this.transactionMap = new TransactionMapDBMap((TransactionMap) parent.transactionMap, this);
         } else {

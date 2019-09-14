@@ -1,11 +1,11 @@
 package org.erachain.dbs;
 
-import org.erachain.database.*;
+import org.erachain.database.DBASet;
+import org.erachain.database.IDB;
+import org.erachain.database.IndexIterator;
+import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.BTreeMap;
-import org.mapdb.Bind;
 import org.mapdb.DB;
-import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +30,7 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
     protected DBASet databaseSet;
     protected DB database;
     protected DBMapSuit<T, U> map;
+    protected DBMap<T, U> parent;
     protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
     protected Map<Integer, Integer> observableData;
@@ -37,9 +38,10 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
     public DBMapImpl() {
     }
 
-    public DBMapImpl(DBASet databaseSet) {
+    public DBMapImpl(DBMap parent, DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
+        this.parent = parent;
 
         //CREATE INDEXES
         this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
