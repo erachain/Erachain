@@ -10,7 +10,6 @@ import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableTuple3StringLongInteger;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
-import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
@@ -20,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -32,10 +30,12 @@ public class TransactionRocksDBMap extends DBMapSuit<Long, Transaction>
     static Logger logger = LoggerFactory.getLogger(TransactionRocksDBMap.class.getSimpleName());
 
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE";
+    private final String timestampUnconfirmedTransactionIndexName = "timestamp_unc_txs";
     private final String senderUnconfirmedTransactionIndexName = "sender_unc_txs";
     private final String recipientUnconfirmedTransactionIndexName = "recipient_unc_txs";
     private final String addressTypeUnconfirmedTransactionIndexName = "address_type_unc_txs";
 
+    private SimpleIndexDB<Long, Transaction, Long> timestampUnconfirmedTransactionIndex;
     private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
     private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
 
@@ -55,6 +55,15 @@ public class TransactionRocksDBMap extends DBMapSuit<Long, Transaction>
 
     @Override
     protected void createIndexes() {
+
+        timestampUnconfirmedTransactionIndex = new SimpleIndexDB<>(timestampUnconfirmedTransactionIndexName,
+                new BiFunction<Long, Transaction, Long>() {
+                    @Override
+                    public Long apply(Long aLong, Transaction transaction) {
+                        return transaction.getTimestamp();
+                    }
+                }, (result, key) ->new ByteableLong().toBytesObject(result));
+
         senderUnconfirmedTransactionIndex = new SimpleIndexDB<>(senderUnconfirmedTransactionIndexName,
                 new BiFunction<Long, Transaction, Fun.Tuple2<String, Long>>() {
                     @Override
@@ -65,7 +74,6 @@ public class TransactionRocksDBMap extends DBMapSuit<Long, Transaction>
                 }, (result, key) -> org.bouncycastle.util.Arrays.concatenate(
                 new ByteableString().toBytesObject(result.a),
                 new ByteableLong().toBytesObject(result.b)));
-
 
         ArrayIndexDB<Long, Transaction, String> recipientsUnconfirmedTransactionIndex = new ArrayIndexDB<>(recipientUnconfirmedTransactionIndexName,
                 (aLong, transaction) -> transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new),
@@ -81,19 +89,23 @@ public class TransactionRocksDBMap extends DBMapSuit<Long, Transaction>
                 }, indexByteableTuple3StringLongInteger);
 
         indexes = new ArrayList<>();
+        indexes.add(timestampUnconfirmedTransactionIndex);
         indexes.add(senderUnconfirmedTransactionIndex);
         indexes.add(recipientsUnconfirmedTransactionIndex);
         indexes.add(addressTypeUnconfirmedTransactionIndex);
     }
 
-    public IndexDB getSenderIndex() {
+    public IndexDB getTimestampIndex() {
         return indexes.get(0);
     }
-    public IndexDB getRecientIndex() {
+    public IndexDB getSenderIndex() {
         return indexes.get(1);
     }
-    public IndexDB getAddresTypeIndex() {
+    public IndexDB getRecientIndex() {
         return indexes.get(2);
+    }
+    public IndexDB getAddresTypeIndex() {
+        return indexes.get(3);
     }
 
     protected Transaction getDefaultValue() {

@@ -107,6 +107,11 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
         return db.indexIterator(descending, columnFamilyHandle);
     }
 
+    public DBIterator indexIterator(boolean descending, int index) {
+        return db.indexIterator(descending, columnFamilyHandles.get(index));
+    }
+
+
 
     @Override
     public void flush(Map<byte[], byte[]> rows) {

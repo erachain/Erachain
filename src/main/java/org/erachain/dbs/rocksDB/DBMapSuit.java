@@ -111,9 +111,9 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         return ((DBRocksDBTable<T, U>) map).getLatestValues(limit);
     }
 
+    @Override
     public Iterator<T> getIterator(int index, boolean descending) {
-        //return indexes.get(index);
-        return null;
+        return map.getIndexIterator(descending, index);
     }
 
     @Override

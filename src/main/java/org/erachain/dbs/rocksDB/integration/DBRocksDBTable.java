@@ -339,8 +339,8 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         };
     }
 
-    public Iterator<K> getIndexIterator(boolean descending, int indexDB) {
-        return getIndexIterator(descending, indexes.get(indexDB));
+    public Iterator<K> getIndexIterator(boolean descending, int index) {
+        return getIndexIterator(descending, indexes.get(index));
     }
 
     public Collection<K> keys(byte[] fromKey, long limit, String indexDBName) {

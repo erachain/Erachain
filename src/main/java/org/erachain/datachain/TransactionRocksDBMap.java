@@ -13,6 +13,8 @@ public class TransactionRocksDBMap extends TransactionMapImpl
 
     static Logger logger = LoggerFactory.getLogger(TransactionRocksDBMap.class.getSimpleName());
 
+    int TIMESTAMP_INDEX = 0; // in Family List
+
     public TransactionRocksDBMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
@@ -73,7 +75,8 @@ public class TransactionRocksDBMap extends TransactionMapImpl
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return null;
+        return  ((org.erachain.dbs.rocksDB.TransactionRocksDBMap) map).getIterator(0, false);
+        ///IndexDB timestampIndex = ((org.erachain.dbs.rocksDB.TransactionRocksDBMap) map).getTimestampIndex();
     }
 
     @Override
