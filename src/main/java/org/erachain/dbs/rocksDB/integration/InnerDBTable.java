@@ -1,11 +1,9 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.mapdb.Fun;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface InnerDBTable<K, V> {
 
@@ -32,10 +30,12 @@ public interface InnerDBTable<K, V> {
 
     void close();
 
+    NavigableSet<Fun.Tuple2<?, K>> getIndex(int index, boolean descending);
+
     Iterator<K> getIterator(boolean descending);
 
-    Iterator<K> getIndexIterator(boolean descending, IndexDB indexDB);
+    Iterator<K> getIndexIterator(IndexDB indexDB, boolean descending);
 
-    Iterator<K> getIndexIterator(boolean descending, int indexDB);
+    Iterator<K> getIndexIterator(int indexDB, boolean descending);
 
 }

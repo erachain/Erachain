@@ -75,12 +75,12 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     }
 
     @Override
-    public Iterator<K> getIndexIterator(boolean descending, IndexDB indexDB) {
+    public Iterator<K> getIndexIterator(IndexDB indexDB, boolean descending) {
         return null;
     }
 
     @Override
-    public Iterator<K> getIndexIterator(boolean descending, int indexDB) {
+    public Iterator<K> getIndexIterator(int indexDB, boolean descending) {
         return null;
     }
 

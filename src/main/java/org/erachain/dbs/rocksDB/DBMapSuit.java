@@ -129,7 +129,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
 
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
-        return map.getIndexIterator(descending, index);
+        return map.getIndexIterator(index, descending);
     }
 
     @Override

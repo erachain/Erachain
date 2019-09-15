@@ -1,11 +1,9 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.mapdb.Fun;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DBMapDB<K, V> implements InnerDBTable<K, V> {
     public DBMapDB() {
@@ -73,17 +71,22 @@ public class DBMapDB<K, V> implements InnerDBTable<K, V> {
     }
 
     @Override
+    public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
+        return map.getIndex(index, descending);
+    }
+
+    @Override
     public Iterator<K> getIterator(boolean descending) {
         return null;
     }
 
     @Override
-    public Iterator<K> getIndexIterator(boolean descending, IndexDB indexDB) {
+    public Iterator<K> getIndexIterator(IndexDB indexDB, boolean descending) {
         return null;
     }
 
     @Override
-    public Iterator<K> getIndexIterator(boolean descending, int indexDB) {
+    public Iterator<K> getIndexIterator(int indexDB, boolean descending) {
         return null;
     }
 

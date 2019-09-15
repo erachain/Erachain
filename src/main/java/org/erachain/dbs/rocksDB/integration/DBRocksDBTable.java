@@ -324,7 +324,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         };
     }
 
-    public Iterator<K> getIndexIterator(boolean descending, IndexDB indexDB) {
+    public Iterator<K> getIndexIterator(IndexDB indexDB, boolean descending) {
         DBIterator iterator = db.indexIterator(descending, indexDB.getColumnFamilyHandle());
         return new Iterator<K>() {
             @Override
@@ -339,8 +339,8 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         };
     }
 
-    public Iterator<K> getIndexIterator(boolean descending, int index) {
-        return getIndexIterator(descending, indexes.get(index));
+    public Iterator<K> getIndexIterator(int index, boolean descending) {
+        return getIndexIterator(indexes.get(index), descending);
     }
 
     public Collection<K> keys(byte[] fromKey, long limit, String indexDBName) {
