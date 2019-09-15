@@ -142,9 +142,9 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     }
 
     @Override
-    public U set(T key, U value) {
+    public boolean set(T key, U value) {
         if (DCSet.isStoped()) {
-            return null;
+            return false;
         }
 
         this.addUses();
@@ -165,13 +165,14 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
             }
 
             this.outUses();
-            return old;
+            return old != null;
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
 
         this.outUses();
-        return null;
+        return false;
     }
 
     @Override
@@ -206,9 +207,18 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         return value;
 
     }
+    @Override
+    public U removeValue(T key) {
+        return remove(key);
+    }
 
     @Override
     public void delete(T key) {
+        remove(key);
+    }
+
+    @Override
+    public void deleteValue(T key) {
         remove(key);
     }
 

@@ -148,13 +148,13 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
      * @return
      */
     @Override
-    public U set(T key, U value) {
+    public boolean set(T key, U value) {
         this.addUses();
 
         U old = this.map.put(key, value);
 
         this.outUses();
-        return old;
+        return old != null;
     }
 
     @Override
@@ -189,6 +189,11 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         return value;
     }
 
+    @Override
+    public U removeValue(T key) {
+        return remove(key);
+    }
+
     /**
      * уведомляет только счетчик если он разрешен, иначе Удалить
      * @param key
@@ -200,6 +205,11 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         this.addUses();
         this.map.remove(key);
         this.outUses();
+    }
+
+    @Override
+    public void deleteValue(T key) {
+        delete(key);
     }
 
 
