@@ -19,6 +19,7 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuit;
+import org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMapForked;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
@@ -28,7 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Collection;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Random;
 
 /**
  * набор таблиц. Поидее тут нужно хранить список таблиц и ссылку на родителя при Форке базы.
@@ -145,17 +149,17 @@ public class DCSet extends DBASet implements Observer {
 
         try {
             if (isFork()) {
-                this.assetBalanceMap = new ItemAssetBalanceMapDBMap(this, database);
-                this.transactionMap = new TransactionMapDBMap(this, database);
+                this.assetBalanceMap = new ItemAssetBalanceSuitMapDB(this, database);
+                this.transactionMap = new TransactionSuitMapDB(this, database);
             } else {
                 switch (BlockChain.DC_DBS_TYPE) {
                     case 1:
-                        this.transactionMap = new TransactionRocksDBMap(this, database);
-                        this.assetBalanceMap = new ItemAssetBalanceRocksDBMap(this, database);
+                        this.transactionMap = new TransactionSuitRocksDB(this, database);
+                        this.assetBalanceMap = new ItemAssetBalanceSuitRocksDB(this, database);
                         break;
                     default:
-                        this.assetBalanceMap = new ItemAssetBalanceMapDBMap(this, database);
-                        this.transactionMap = new TransactionMapDBMap(this, database);
+                        this.assetBalanceMap = new ItemAssetBalanceSuitMapDB(this, database);
+                        this.transactionMap = new TransactionSuitMapDB(this, database);
 
                 }
             }
@@ -275,8 +279,15 @@ public class DCSet extends DBASet implements Observer {
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
 
-        this.assetBalanceMap = new ItemAssetBalanceNativeMemMap((ItemAssetBalanceMapDBMap) parent.assetBalanceMap, this);
-        this.transactionMap = new TransactionNativeMemMap((TransactionMapDBMap) parent.transactionMap, this);
+        switch (BlockChain.DCFORK_DBS_TYPE) {
+            case 1:
+                this.assetBalanceMap = new ItemAssetBalanceSuitMapDBForked(parent.assetBalanceMap,this);
+                this.transactionMap = new TransactionSuitNativeMem(parent.transactionMap, this);
+                break;
+            default:
+                this.assetBalanceMap = new ItemAssetBalanceSuitNativeMem(parent.assetBalanceMap, this);
+                this.transactionMap = new TransactionSuitNativeMem(parent.transactionMap, this);
+        }
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);

@@ -1,31 +1,17 @@
 package org.erachain.datachain;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
-import org.erachain.core.account.Account;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBMap;
-import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.*;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple2Comparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
-public class TransactionMapDBMap extends TransactionMapImpl
+public class TransactionSuitMapDB extends TransactionMapImpl
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionMapDBMap.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
 
-    public TransactionMapDBMap(DCSet databaseSet, DB database) {
+    public TransactionSuitMapDB(DCSet databaseSet, DB database) {
         super(databaseSet, database);
         TIMESTAMP_INDEX = 1;
 

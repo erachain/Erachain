@@ -22,8 +22,7 @@ import java.util.Set;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
-        {
+public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -136,9 +135,9 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     }
 
     @Override
-    public U set(T key, U value) {
+    public boolean set(T key, U value) {
         if (DCSet.isStoped()) {
-            return null;
+            return false;
         }
 
         this.addUses();
@@ -153,13 +152,13 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
             }
 
             this.outUses();
-            return old;
+            return old != null;
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
         }
 
         this.outUses();
-        return null;
+        return false;
     }
 
     @Override
@@ -203,7 +202,17 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     }
 
     @Override
+    public U removeValue(T key) {
+        return remove(key);
+    }
+
+    @Override
     public void delete(T key) {
+        remove(key);
+    }
+
+    @Override
+    public void deleteValue(T key) {
         remove(key);
     }
 

@@ -19,7 +19,7 @@ import java.util.Random;
 
 import static org.junit.Assert.*;
 
-public class TransactionRocksDBMapSuitTest {
+public class TransactionSuitRocksDBSuitTest {
 
     DCSet db;
     String address = "7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF";

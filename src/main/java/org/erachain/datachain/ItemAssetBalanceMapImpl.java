@@ -48,7 +48,7 @@ abstract public class ItemAssetBalanceMapImpl extends org.erachain.dbs.DBMapImpl
         }
     }
 
-    public ItemAssetBalanceMapImpl(ItemAssetBalanceMapImpl parent, DCSet databaseSet) {
+    public ItemAssetBalanceMapImpl(ItemAssetBalanceMap parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 

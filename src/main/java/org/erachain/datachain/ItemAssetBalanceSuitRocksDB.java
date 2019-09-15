@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ItemAssetBalanceRocksDBMap extends ItemAssetBalanceMapImpl {
+public class ItemAssetBalanceSuitRocksDB extends ItemAssetBalanceMapImpl {
 
     private final String NAME_TABLE = "ITEM_ASSET_BALANCE_TABLE";
     private final String balanceKeyAssetNameIndex = "balances_key_asset";
     private final String balanceAssetKeyNameIndex = "balances_asset_key";
 
-    public ItemAssetBalanceRocksDBMap(DCSet databaseSet, DB database) {
+    public ItemAssetBalanceSuitRocksDB(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 

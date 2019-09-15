@@ -44,6 +44,11 @@ public class BlockChain {
      */
     static final public int DC_DBS_TYPE = 1; // 0 MapDB, 1 - RocksDB
     /**
+     * Какую базу используем для форкеутого набора таблиц (DCSet.fork())
+     */
+    static final public int DCFORK_DBS_TYPE = 1; // 0 - NativeMemoryMap, 1- MapDB, 2 - RocksDB
+
+    /**
      * set uo all balances ERA to 10000 and COMPU to 100
      */
     public static final boolean ERA_COMPU_ALL_UP = false;

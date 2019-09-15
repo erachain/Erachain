@@ -8,14 +8,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
-public class TransactionRocksDBMap extends TransactionMapImpl
+public class TransactionSuitRocksDB extends TransactionMapImpl
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionRocksDBMap.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionSuitRocksDB.class.getSimpleName());
 
     int TIMESTAMP_INDEX = 0; // in Family List
 
-    public TransactionRocksDBMap(DCSet databaseSet, DB database) {
+    public TransactionSuitRocksDB(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 

@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
-public class TransactionNativeMemMap extends TransactionMapImpl
+public class TransactionSuitNativeMem extends TransactionMapImpl
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionNativeMemMap.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionSuitNativeMem.class.getSimpleName());
 
-    public TransactionNativeMemMap(TransactionMapImpl parent, DCSet databaseSet) {
+    public TransactionSuitNativeMem(TransactionMap parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 

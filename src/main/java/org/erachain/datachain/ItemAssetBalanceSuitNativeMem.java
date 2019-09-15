@@ -1,17 +1,15 @@
 package org.erachain.datachain;
 
-import org.mapdb.DB;
 import org.mapdb.Fun;
 
 import java.util.Collection;
 
 // TODO SOFT HARD TRUE
 
-public class ItemAssetBalanceMapDBMap extends ItemAssetBalanceMapImpl {
+public class ItemAssetBalanceSuitNativeMem extends ItemAssetBalanceMapImpl {
 
-    public ItemAssetBalanceMapDBMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
-
+    public ItemAssetBalanceSuitNativeMem(ItemAssetBalanceMap parent, DCSet databaseSet) {
+        super(parent, databaseSet);
     }
 
     @Override
@@ -21,7 +19,7 @@ public class ItemAssetBalanceMapDBMap extends ItemAssetBalanceMapImpl {
     @SuppressWarnings({"unchecked"})
     @Override
     protected void getMap() {
-        map = new org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap(databaseSet, database);
+        map = new org.erachain.dbs.nativeMemMap.nativeMapTreeMap(parent, databaseSet);
     }
 
     public Collection<byte[]> assetKeySubMap(long key) {

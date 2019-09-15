@@ -57,7 +57,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
     }
 
-    public TransactionMapImpl(TransactionMapImpl parent, DCSet databaseSet) {
+    public TransactionMapImpl(TransactionMap parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 
