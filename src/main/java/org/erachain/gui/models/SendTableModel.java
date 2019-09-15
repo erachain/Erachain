@@ -586,7 +586,7 @@ public class SendTableModel extends JTable implements Observer {
 
         public int getConfirmations() {
 
-            if (DCSet.getInstance().getTransactionMap().contains(this.signature)) {
+            if (DCSet.getInstance().getTransactionTab().contains(this.signature)) {
                 return 0;
             } else {
                 Transaction tx = Controller.getInstance().getTransaction(this.signature);

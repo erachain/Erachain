@@ -310,7 +310,7 @@ public class BlockExplorerTest {
 
 
         // CHECK IF IN TRANSACTION DATABASE
-        return DCSet.getInstance().getTransactionMap().get(signature);
+        return DCSet.getInstance().getTransactionTab().get(signature);
     }
 
     public class BalancesBlocksComparator implements Comparator<Pair<Block, BigDecimal>> {

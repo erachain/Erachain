@@ -4,7 +4,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
-import org.erachain.datachain.ItemAssetBalanceMap;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -15,19 +14,20 @@ import java.math.BigDecimal;
 
 // TODO SOFT HARD TRUE
 
-public class ItemAssetBalanceMapDBMapForked extends DCMapSuit<byte[], Tuple5<
+public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> {
 
 
-    static Logger logger = LoggerFactory.getLogger(ItemAssetBalanceMapDBMapForked.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
 
     @SuppressWarnings("rawtypes")
     public BTreeMap assetKeyMap;
     public BTreeMap addressKeyMap;
 
-    public ItemAssetBalanceMapDBMapForked(ItemAssetBalanceMap parent, DBASet databaseSet) {
-        super(parent, databaseSet);
+    public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database) {
+        super(databaseSet, database);
+
     }
 
     @SuppressWarnings({"unchecked"})

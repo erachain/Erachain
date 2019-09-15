@@ -436,7 +436,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             // soft or hard confirmations
             key = db.getTransactionFinalMapSigns().get(dbRef);
             if (key == null) {
-                return db.getTransactionMap().get(dbRef);
+                return db.getTransactionTab().get(dbRef);
             }
         } else {
             int heightBlock = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));

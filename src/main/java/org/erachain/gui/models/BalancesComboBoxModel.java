@@ -5,7 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -56,7 +56,7 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
         //EMPTY LIST
         this.removeAllElements();
 
-        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
 
         //INSERT ALL ACCOUNTS
         for (int i = 0; i < this.balances.size(); i++) {

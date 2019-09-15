@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.Observer;
 import java.util.Set;
 
-public interface ItemAssetBalanceMap extends org.erachain.dbs.DBMap<byte[], Tuple5<
+public interface ItemAssetBalanceTab extends org.erachain.dbs.DBMap<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK

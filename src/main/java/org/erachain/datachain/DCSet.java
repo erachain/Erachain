@@ -68,9 +68,9 @@ public class DCSet extends DBASet implements Observer {
 
     private AddressForging addressForging;
     private CreditAddressesMap credit_AddressesMap;
-    private ItemAssetBalanceMap assetBalanceMap;
+    private ItemAssetBalanceTab assetBalanceMap;
     private AddressStatementRefs addressStatement_Refs;
-    private ItemAssetBalanceMap assetBalanceAccountingMap;
+    private ItemAssetBalanceTab assetBalanceAccountingMap;
     private KKAssetStatusMap kKAssetStatusMap;
     private KKPersonStatusMap kKPersonStatusMap;
     //private KKPollStatusMap kKPollStatusMap;
@@ -132,7 +132,7 @@ public class DCSet extends DBASet implements Observer {
     private TransactionFinalMap transactionFinalMap;
     private TransactionFinalCalculatedMap transactionFinalCalculatedMap;
     private TransactionFinalMapSigns transactionFinalMapSigns;
-    private TransactionMap transactionMap;
+    private TransactionTab transactionTab;
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
@@ -148,17 +148,17 @@ public class DCSet extends DBASet implements Observer {
 
         try {
             if (isFork()) {
-                this.assetBalanceMap = new ItemAssetBalanceSuitMapDB(this, database);
-                this.transactionMap = new TransactionSuitMapDB(this, database);
+                this.assetBalanceMap = new ItemAssetBalanceTabMapDB(this, database);
+                this.transactionTab = new TransactionTabMapDB(this, database);
             } else {
                 switch (BlockChain.DC_DBS_TYPE) {
                     case 1:
-                        this.transactionMap = new TransactionSuitRocksDB(this, database);
-                        this.assetBalanceMap = new ItemAssetBalanceSuitRocksDB(this, database);
+                        this.transactionTab = new TransactionTabRocksDB(this, database);
+                        this.assetBalanceMap = new ItemAssetBalanceTabRocksDB(this, database);
                         break;
                     default:
-                        this.assetBalanceMap = new ItemAssetBalanceSuitMapDB(this, database);
-                        this.transactionMap = new TransactionSuitMapDB(this, database);
+                        this.assetBalanceMap = new ItemAssetBalanceTabMapDB(this, database);
+                        this.transactionTab = new TransactionTabMapDB(this, database);
 
                 }
             }
@@ -280,12 +280,12 @@ public class DCSet extends DBASet implements Observer {
 
         switch (BlockChain.DCFORK_DBS_TYPE) {
             case 1:
-                this.assetBalanceMap = new ItemAssetBalanceSuitMapDBForked(parent.assetBalanceMap,this);
-                this.transactionMap = new TransactionSuitNativeMem(parent.transactionMap, this);
+                this.assetBalanceMap = new ItemAssetBalanceTabMapDBForked(parent.assetBalanceMap,this);
+                this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
                 break;
             default:
-                this.assetBalanceMap = new ItemAssetBalanceSuitNativeMemForked(parent.assetBalanceMap, this);
-                this.transactionMap = new TransactionSuitNativeMem(parent.transactionMap, this);
+                this.assetBalanceMap = new ItemAssetBalanceTabNativeMemForked(parent.assetBalanceMap, this);
+                this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
         }
 
         this.addressForging = new AddressForging(parent.addressForging, this);
@@ -485,7 +485,7 @@ public class DCSet extends DBASet implements Observer {
 
         // очистим полностью перед компактом
         if (Controller.getInstance().compactDConStart) {
-            instance.getTransactionMap().reset();
+            instance.getTransactionTab().reset();
             instance.database.commit();
             LOGGER.debug("try COMPACT");
             database.compact();
@@ -592,7 +592,7 @@ public class DCSet extends DBASet implements Observer {
         this.transactionFinalMap.reset();
         this.transactionFinalCalculatedMap.reset();        
         this.transactionFinalMapSigns.reset();
-        this.transactionMap.reset();
+        this.transactionTab.reset();
         this.nameMap.reset();
         this.nameStorageMap.reset();
         this.orphanNameStorageMap.reset();
@@ -708,7 +708,7 @@ public class DCSet extends DBASet implements Observer {
      *
      */
 // TODO SOFT HARD TRUE
-    public ItemAssetBalanceMap getAssetBalanceMap() {
+    public ItemAssetBalanceTab getAssetBalanceMap() {
         return this.assetBalanceMap;
     }
 
@@ -731,7 +731,7 @@ public class DCSet extends DBASet implements Observer {
      *
      */
     // TODO SOFT HARD TRUE
-    public ItemAssetBalanceMap getAssetBalanceAccountingMap() {
+    public ItemAssetBalanceTab getAssetBalanceAccountingMap() {
         return this.assetBalanceAccountingMap;
     }
 
@@ -1010,8 +1010,8 @@ public class DCSet extends DBASet implements Observer {
      *
      * ++ seek by TIMESTAMP
      */
-    public TransactionMap getTransactionMap() {
-        return this.transactionMap;
+    public TransactionTab getTransactionTab() {
+        return this.transactionTab;
     }
 
     public NameMap getNameMap() {
@@ -1474,13 +1474,13 @@ public class DCSet extends DBASet implements Observer {
         // try repopulate table
         if (System.currentTimeMillis() - poinClear > 6000000) {
             poinClear = System.currentTimeMillis();
-            TransactionMap utxMap = getTransactionMap();
+            TransactionTab utxMap = getTransactionTab();
             LOGGER.debug("try CLEAR UTXs");
             int sizeUTX = utxMap.size();
             LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
             this.actions += sizeUTX;
             Collection<Transaction> items = utxMap.getValues();
-            instance.getTransactionMap().reset();
+            instance.getTransactionTab().reset();
             for (Transaction item: items) {
                 utxMap.add(item);
             }
@@ -1517,10 +1517,10 @@ public class DCSet extends DBASet implements Observer {
                 // очень долго делает - лучше ключем при старте
                 try {
                     this.database.compact();
-                    transactionMap.setTotalDeleted(0);
+                    transactionTab.setTotalDeleted(0);
                     LOGGER.debug("COMPACTED");
                 } catch (Exception e) {
-                    transactionMap.setTotalDeleted(transactionMap.getTotalDeleted() >> 1);
+                    transactionTab.setTotalDeleted(transactionTab.getTotalDeleted() >> 1);
                     LOGGER.error(e.getMessage(), e);
                 }
             }

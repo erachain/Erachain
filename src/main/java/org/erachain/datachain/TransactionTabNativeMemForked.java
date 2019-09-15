@@ -1,17 +1,18 @@
 package org.erachain.datachain;
 
+import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
-public class TransactionSuitNativeMem extends TransactionMapImpl
+public class TransactionTabNativeMemForked extends TransactionTabImpl
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionSuitNativeMem.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionTabNativeMemForked.class.getSimpleName());
 
-    public TransactionSuitNativeMem(TransactionMap parent, DCSet databaseSet) {
+    public TransactionTabNativeMemForked(TransactionTab parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 
@@ -26,15 +27,15 @@ public class TransactionSuitNativeMem extends TransactionMapImpl
 
     @Override
     Iterable typeKeys(String sender, Long timestamp, Integer type) {
-        return Fun.filter(((org.erachain.dbs.mapDB.TransactionMapDBMap)map).typeKey, new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
+        return Fun.filter(((TransactionSuitMapDB)map).typeKey, new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
     }
     @Override
     public Iterable senderKeys(String sender) {
-        return Fun.filter(((org.erachain.dbs.mapDB.TransactionMapDBMap)map).senderKey, sender);
+        return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender);
     }
     @Override
     public Iterable recipientKeys(String recipient) {
-        return Fun.filter(((org.erachain.dbs.mapDB.TransactionMapDBMap)map).recipientKey, recipient);
+        return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient);
     }
 
     @Override

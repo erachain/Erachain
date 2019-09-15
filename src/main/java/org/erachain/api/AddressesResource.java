@@ -10,7 +10,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
@@ -139,7 +139,7 @@ public class AddressesResource {
 
         // TODO: тут надо скан взять сразу для заданного адреса и последний
         // а вообще для чего нафиг это нужно?
-        List<Transaction> items = DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address);
+        List<Transaction> items = DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address);
         if (items.isEmpty())
             return "false";
 
@@ -516,7 +516,7 @@ public class AddressesResource {
 
         }
 
-        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
         SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
                 = map.getBalancesSortableList(new Account(address));
 

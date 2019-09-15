@@ -29,15 +29,15 @@ import java.util.Collection;
  */
 // TODO SOFT HARD TRUE
 
-abstract public class ItemAssetBalanceMapImpl extends org.erachain.dbs.DBMapImpl<byte[], Tuple5<
+abstract public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK
         Tuple2<BigDecimal, BigDecimal>, // it DO
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
-        >> implements ItemAssetBalanceMap {
+        >> implements ItemAssetBalanceTab {
 
-    public ItemAssetBalanceMapImpl(DCSet databaseSet, DB database) {
+    public ItemAssetBalanceTabImpl(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
@@ -48,7 +48,7 @@ abstract public class ItemAssetBalanceMapImpl extends org.erachain.dbs.DBMapImpl
         }
     }
 
-    public ItemAssetBalanceMapImpl(ItemAssetBalanceMap parent, DCSet databaseSet) {
+    public ItemAssetBalanceTabImpl(ItemAssetBalanceTab parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 

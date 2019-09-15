@@ -5,7 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.gui.Gui;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -48,7 +48,7 @@ public class AssetsFavorites implements Observer {
     public void reload() {
         List<Long> favoritesUpadate = new ArrayList<Long>();
 
-        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
         for (Account account : Controller.getInstance().getAccounts()) {
             SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList
                     = map.getBalancesSortableList(account);

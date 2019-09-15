@@ -7,7 +7,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBMap;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
 import org.erachain.network.message.Message;
@@ -401,7 +401,7 @@ public class Synchronizer extends Thread {
         }
 
         // CLEAR for DEADs
-        TransactionMap map = dcSet.getTransactionMap();
+        TransactionTab map = dcSet.getTransactionTab();
         List<Transaction> orphanedTransactionsList = new ArrayList<Transaction>();
         for (Transaction transaction : orphanedTransactions.values()) {
             if (cnt.isOnStopping())
@@ -638,7 +638,7 @@ public class Synchronizer extends Thread {
             }
 
             // SEND ORPHANED TRANSACTIONS TO PEER
-            TransactionMap map = dcSet.getTransactionMap();
+            TransactionTab map = dcSet.getTransactionTab();
             for (Transaction transaction : orphanedTransactions) {
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stopping");
@@ -909,7 +909,7 @@ public class Synchronizer extends Thread {
                     return;
 
                 // образать список только по максимальному размеру
-                dcSet.getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), false);
+                dcSet.getTransactionTab().clearByDeadTimeAndLimit(block.getTimestamp(), false);
 
                 if (cnt.isOnStopping())
                     return;
@@ -984,7 +984,7 @@ public class Synchronizer extends Thread {
 
                     if (countObserv_ADD != null) {
                         try {
-                            dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
+                            dcSet.getTransactionTab().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1012,7 +1012,7 @@ public class Synchronizer extends Thread {
                 dcSet.flush(blockSize, false);
 
                 // образать список и по времени протухания
-                dcSet.getTransactionMap().clearByDeadTimeAndLimit(block.getTimestamp(), true);
+                dcSet.getTransactionTab().clearByDeadTimeAndLimit(block.getTimestamp(), true);
 
                 if (cnt.isOnStopping())
                     return;
@@ -1093,7 +1093,7 @@ public class Synchronizer extends Thread {
 
                     if (countObserv_REMOVE != null) {
                         try {
-                            dcSet.getTransactionMap().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
+                            dcSet.getTransactionTab().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }

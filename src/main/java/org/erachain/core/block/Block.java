@@ -1608,7 +1608,7 @@ import java.util.*;
             long processTimingLocalDiff;
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
-            TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
+            TransactionTab unconfirmedMap = validatingDC.getTransactionTab();
             TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSigns = validatingDC.getTransactionFinalMapSigns();
 
@@ -1929,7 +1929,7 @@ import java.util.*;
         Collection<byte[]> keys = dcSet.getAssetBalanceMap().getKeys();
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalNeg = BigDecimal.ZERO;
-        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
         for (byte[] key : keys) {
             if (map.getAssetKeyFromKey(key) == 2l) {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
@@ -1949,7 +1949,7 @@ import java.util.*;
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
             BigDecimal ballParent;
             Collection<byte[]> keys = dcSet.getAssetBalanceMap().getKeys();
-            ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+            ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
             boolean error = false;
             for (byte[] key : keys) {
                 if (map.getAssetKeyFromKey(key) == 2l) {
@@ -2098,7 +2098,7 @@ import java.util.*;
             }
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
-            TransactionMap unconfirmedMap = dcSet.getTransactionMap();
+            TransactionTab unconfirmedMap = dcSet.getTransactionTab();
             TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
@@ -2286,7 +2286,7 @@ import java.util.*;
 
         boolean notFork = !dcSet.isFork();
 
-        TransactionMap unconfirmedMap = dcSet.getTransactionMap();
+        TransactionTab unconfirmedMap = dcSet.getTransactionTab();
         TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 

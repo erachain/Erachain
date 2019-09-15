@@ -1232,7 +1232,7 @@ public class BlockChain {
     // CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
     public void clearUnconfirmedRecords(DCSet dcSet, boolean cutDeadTime) {
 
-        dcSet.getTransactionMap().clearByDeadTimeAndLimit(this.getTimestamp(dcSet), cutDeadTime);
+        dcSet.getTransactionTab().clearByDeadTimeAndLimit(this.getTimestamp(dcSet), cutDeadTime);
 
     }
 }

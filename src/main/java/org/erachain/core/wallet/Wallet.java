@@ -82,7 +82,7 @@ public class Wallet extends Observable implements Observer {
 			if (withObserver) {
 				// ADD OBSERVER
 				// Controller.getInstance().addObserver(this);
-				DCSet.getInstance().getTransactionMap().addObserver(this);
+				DCSet.getInstance().getTransactionTab().addObserver(this);
 				DCSet.getInstance().getBlockMap().addObserver(this);
 				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 			}

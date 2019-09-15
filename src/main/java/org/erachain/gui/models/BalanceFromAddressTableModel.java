@@ -5,7 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -46,7 +46,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
         tableBalance1 = new ArrayList<>();
         HashSet<Long> assetKeys = new HashSet();
 
-        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
         for (Account account1 : accounts) {
             account = account1;
             balances = Controller.getInstance().getBalances(account);

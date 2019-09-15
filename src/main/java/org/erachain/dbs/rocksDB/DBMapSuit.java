@@ -6,11 +6,9 @@ import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Slf4j
@@ -122,6 +120,11 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
     //@Override
     public List<U> getLastValues(int limit) {
         return ((DBRocksDBTable<T, U>) map).getLatestValues(limit);
+    }
+
+    @Override
+    public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
+        return map.getIndex(index, descending);
     }
 
     @Override

@@ -3,7 +3,7 @@ package org.erachain.core;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.TransactionMessage;
 import org.erachain.ntp.NTP;
@@ -28,13 +28,13 @@ public class TransactionsPool extends MonitoredThread {
     private Controller controller;
     private BlockChain blockChain;
     private DCSet dcSet;
-    private TransactionMap txMap;
+    private TransactionTab txMap;
 
     public TransactionsPool(Controller controller, BlockChain blockChain, DCSet dcSet) {
         this.controller = controller;
         this.blockChain = blockChain;
         this.dcSet = dcSet;
-        this.txMap = dcSet.getTransactionMap();
+        this.txMap = dcSet.getTransactionTab();
 
         this.setName("Transactions Pool[" + this.getId() + "]");
 

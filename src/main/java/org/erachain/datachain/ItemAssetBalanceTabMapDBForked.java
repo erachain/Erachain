@@ -1,16 +1,17 @@
 package org.erachain.datachain;
 
-import org.mapdb.DB;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDBForked;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
 import org.mapdb.Fun;
 
 import java.util.Collection;
 
 // TODO SOFT HARD TRUE
 
-public class ItemAssetBalanceSuitMapDB extends ItemAssetBalanceMapImpl {
+public class ItemAssetBalanceTabMapDBForked extends ItemAssetBalanceTabImpl {
 
-    public ItemAssetBalanceSuitMapDB(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+    public ItemAssetBalanceTabMapDBForked(ItemAssetBalanceTab parent, DCSet databaseSet) {
+        super(parent, databaseSet);
 
     }
 
@@ -21,17 +22,17 @@ public class ItemAssetBalanceSuitMapDB extends ItemAssetBalanceMapImpl {
     @SuppressWarnings({"unchecked"})
     @Override
     protected void getMap() {
-        map = new org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap(databaseSet, database);
+        map = new ItemAssetBalanceSuitMapDBForked((ItemAssetBalanceTab)parent, databaseSet);
     }
 
     public Collection<byte[]> assetKeySubMap(long key) {
-        return ((org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap)map).assetKeyMap.subMap(
+        return ((ItemAssetBalanceSuitMapDB)map).assetKeyMap.subMap(
                 Fun.t2(key, null),
                 Fun.t2(key, Fun.HI())).values();
     }
 
     public Collection<byte[]> addressKeySubMap(String address) {
-        return ((org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap)map).addressKeyMap.subMap(
+        return ((ItemAssetBalanceSuitMapDB)map).addressKeyMap.subMap(
                 Fun.t2(address, null),
                 Fun.t2(address, Fun.HI())).values();
     }

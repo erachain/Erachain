@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
-public class ItemAssetBalanceRocksDBMap extends DBMapSuit<byte[], Tuple5<
+public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK
@@ -32,7 +32,7 @@ public class ItemAssetBalanceRocksDBMap extends DBMapSuit<byte[], Tuple5<
     private final String balanceKeyAssetNameIndex = "balances_key_asset";
     private final String balanceAssetKeyNameIndex = "balances_asset_key";
 
-    public ItemAssetBalanceRocksDBMap(DBASet databaseSet, DB database) {
+    public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 

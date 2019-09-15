@@ -28,7 +28,7 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
@@ -80,28 +80,28 @@ public class TransactionCreator {
 
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
         ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
-        TransactionMap transactionMap = this.fork.getTransactionMap();
+        TransactionTab transactionTab = this.fork.getTransactionTab();
         List<Transaction> accountTransactions = new ArrayList<Transaction>();
         Transaction transaction;
 
         if (true) {
             for (Account account: Controller.getInstance().getAccounts()) {
-                Iterable<Long> keys = transactionMap.findTransactionsKeys(account.getAddress(), null, null,
+                Iterable<Long> keys = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
                         0, false, 0, 0, 0L);
                 Iterator<Long> iterator = keys.iterator();
                 while (iterator.hasNext()) {
-                    transaction = transactionMap.get(iterator.next());
+                    transaction = transactionTab.get(iterator.next());
                         accountTransactions.add(transaction);
                 }
             }
 
         } else {
             // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX - в ФОРОКЕ он ПУСТОЙ!
-            Iterator<Long> iterator = transactionMap.getIterator(TransactionMap.TIMESTAMP_INDEX, false);
+            Iterator<Long> iterator = transactionTab.getIterator(TransactionTab.TIMESTAMP_INDEX, false);
             List<Account> accountMap = Controller.getInstance().getAccounts();
 
             while (iterator.hasNext()) {
-                transaction = transactionMap.get(iterator.next());
+                transaction = transactionTab.get(iterator.next());
                 if (accountMap.contains(transaction.getCreator())) {
                     accountTransactions.add(transaction);
                 }
@@ -117,13 +117,13 @@ public class TransactionCreator {
             transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
             if (!transactionAccount.isSignatureValid(this.fork)) {
                 //THE TRANSACTION BECAME INVALID LET
-                this.fork.getTransactionMap().delete(transactionAccount);
+                this.fork.getTransactionTab().delete(transactionAccount);
             } else {
                 if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0l) == Transaction.VALIDATE_OK) {
                     transactionAccount.process(null, Transaction.FOR_NETWORK);
                 } else {
                     //THE TRANSACTION BECAME INVALID LET
-                    this.fork.getTransactionMap().delete(transactionAccount);
+                    this.fork.getTransactionTab().delete(transactionAccount);
                 }
                 // CLEAR for HEAP
                 transactionAccount.setDC(null);
@@ -424,7 +424,7 @@ public class TransactionCreator {
         if (forIssue) {
 
             // IF has not DUPLICATE in UNCONFIRMED RECORDS
-            TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
+            TransactionTab unconfirmedMap = DCSet.getInstance().getTransactionTab();
             for (Transaction record : unconfirmedMap.getValues()) {
                 if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
                     if (record instanceof IssuePersonRecord) {
@@ -479,7 +479,7 @@ public class TransactionCreator {
         this.checkUpdate();
 
         // IF has not DUPLICATE in UNCONFIRMED RECORDS
-        TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
+        TransactionTab unconfirmedMap = DCSet.getInstance().getTransactionTab();
         for (Transaction record : unconfirmedMap.getValues()) {
             if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
                 if (record instanceof IssuePersonRecord) {
@@ -944,7 +944,7 @@ public class TransactionCreator {
     public Integer afterCreate(Transaction transaction, int asDeal) {
         //CHECK IF PAYMENT VALID
 
-        if (this.fork.getTransactionMap().contains(transaction.getSignature())) {
+        if (this.fork.getTransactionTab().contains(transaction.getSignature())) {
             // если случилась коллизия по подписи усеченной
             // в базе неподтвержденных транзакций -то выдадим ошибку
             return Transaction.KEY_COLLISION;

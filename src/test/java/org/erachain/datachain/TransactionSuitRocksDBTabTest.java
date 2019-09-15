@@ -12,14 +12,10 @@ import org.junit.Test;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.security.PublicKey;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
-
-public class TransactionSuitRocksDBSuitTest {
+public class TransactionSuitRocksDBTabTest {
 
     DCSet db;
     String address = "7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF";
@@ -64,19 +60,19 @@ public class TransactionSuitRocksDBSuitTest {
         transaction.sign(creator, Transaction.FOR_NETWORK);
         transaction.setDC(db, Transaction.FOR_NETWORK, blockHeight, seqNo++);
 
-        db.getTransactionMap().add(transaction);
+        db.getTransactionTab().add(transaction);
 
         transaction = new RSend(creator, feePow, recipient, 01, new BigDecimal("0.00000001"), timestamp++, 0L);
 
         transaction.sign(creator, Transaction.FOR_NETWORK);
         transaction.setDC(db, Transaction.FOR_NETWORK, blockHeight, seqNo++);
 
-        db.getTransactionMap().add(transaction);
+        db.getTransactionTab().add(transaction);
 
-        db.getTransactionMap().clearByDeadTimeAndLimit(++timestamp, false);
+        db.getTransactionTab().clearByDeadTimeAndLimit(++timestamp, false);
 
-        List<Transaction> txs1 = db.getTransactionMap().getTransactions(1000, false);
-        List<Transaction> txs2 = db.getTransactionMap().getTransactions(1000, false);
+        List<Transaction> txs1 = db.getTransactionTab().getTransactions(1000, false);
+        List<Transaction> txs2 = db.getTransactionTab().getTransactions(1000, false);
 
         int size = txs1.size();
     }

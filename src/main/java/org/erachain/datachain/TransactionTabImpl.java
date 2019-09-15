@@ -10,7 +10,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBMap;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,17 +33,17 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
-        implements TransactionMap
+abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
+        implements TransactionTab
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionMapImpl.class.getName());
+    static Logger logger = LoggerFactory.getLogger(TransactionTabImpl.class.getName());
 
     int TIMESTAMP_INDEX = 1;
 
     public int totalDeleted = 0;
 
-    public TransactionMapImpl(DCSet databaseSet, DB database) {
+    public TransactionTabImpl(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         DEFAULT_INDEX = TIMESTAMP_INDEX;
@@ -58,7 +57,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
     }
 
-    public TransactionMapImpl(TransactionMap parent, DCSet databaseSet) {
+    public TransactionTabImpl(TransactionTab parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 
@@ -159,7 +158,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
                 timestamp -= keepTime;
                 tickerIter = System.currentTimeMillis();
-                SortedSet<Tuple2<?, Long>> subSet = this.getIndex(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
+                SortedSet<Tuple2<?, Long>> subSet = this.getIndex(TIMESTAMP_INDEX, false).headSet(new Tuple2<Long, Long>(
                         timestamp, null));
                 tickerIter = System.currentTimeMillis() - tickerIter;
                 if (tickerIter > 10) {

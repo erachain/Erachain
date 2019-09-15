@@ -3,7 +3,7 @@ package org.erachain.gui;
 import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlockMap;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.BlocksTableModel;
 import org.erachain.gui.models.UnconfirmedTransactionsTableModel;
@@ -53,7 +53,7 @@ public class DebugTabPane extends JTabbedPane {
 
         //TRANSACTIONS SORTER
         Map<Integer, Integer> indexes = new TreeMap<Integer, Integer>();
-        indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionMap.TIMESTAMP_INDEX);
+        indexes.put(SearchTransactionsTableModel.COLUMN_TIMESTAMP, TransactionTab.TIMESTAMP_INDEX);
         //CoreRowSorter sorter = new CoreRowSorter(transactionsTableModel, indexes);
         //transactionsTable.setRowSorter(sorter);
 

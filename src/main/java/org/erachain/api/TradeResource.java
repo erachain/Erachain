@@ -28,10 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
 import java.util.*;
 
 @Path("trade")
@@ -151,7 +149,7 @@ public class TradeResource {
             throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
         }
 
-        if (DCSet.getInstance().getTransactionMap().contains(signature)) {
+        if (DCSet.getInstance().getTransactionTab().contains(signature)) {
             JSONObject out = new JSONObject();
             out.put("unconfirmed", true);
             return out.toJSONString();
@@ -217,7 +215,7 @@ public class TradeResource {
 
         Controller cntr = Controller.getInstance();
 
-        if (!DCSet.getInstance().getTransactionMap().contains(signature)) {
+        if (!DCSet.getInstance().getTransactionTab().contains(signature)) {
             // ЕСЛИ нет его в неподтвержденных то пытаемся найти в действующих
             Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
             if (key == null) {

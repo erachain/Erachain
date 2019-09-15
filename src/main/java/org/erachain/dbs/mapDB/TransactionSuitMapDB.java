@@ -18,10 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NavigableSet;
 
-public class TransactionMapDBMap extends DBMapSuit<Long, Transaction>
+public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionMapDBMap.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
 
     int TIMESTAMP_INDEX = 1;
 
@@ -32,7 +32,7 @@ public class TransactionMapDBMap extends DBMapSuit<Long, Transaction>
     @SuppressWarnings("rawtypes")
     public NavigableSet typeKey;
 
-    public TransactionMapDBMap(DBASet databaseSet, DB database) {
+    public TransactionSuitMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 

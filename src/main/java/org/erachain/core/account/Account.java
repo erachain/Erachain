@@ -15,7 +15,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.ReferenceMap;
 import org.erachain.lang.Lang;
@@ -202,7 +202,7 @@ public class Account {
 
     public static Map<byte[], BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
                                                                   Map<byte[], BigDecimal> values) {
-        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ballance;
 
@@ -587,7 +587,7 @@ public class Account {
 
         int actionType = actionType(key, amount_in);
 
-        ItemAssetBalanceMap map = db.getAssetBalanceMap();
+        ItemAssetBalanceTab map = db.getAssetBalanceMap();
 
         BigDecimal amount = amount_in.abs();
         long absKey;

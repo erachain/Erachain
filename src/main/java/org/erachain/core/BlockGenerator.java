@@ -6,8 +6,8 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.lang.Lang;
-import org.erachain.datachain.TransactionMap;
 import org.erachain.network.Peer;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.SignaturesMessage;
@@ -234,7 +234,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long totalBytes = 0;
         int counter = 0;
 
-        TransactionMap map = dcSet.getTransactionMap();
+        TransactionTab map = dcSet.getTransactionTab();
         Iterator<Long> iterator = map.getTimestampIterator();
 
         needRemoveInvalids = new ArrayList<byte[]>();
@@ -340,7 +340,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private void clearInvalids() {
         if (needRemoveInvalids != null && !needRemoveInvalids.isEmpty()) {
             long start = System.currentTimeMillis();
-            TransactionMap transactionsMap = dcSet.getTransactionMap();
+            TransactionTab transactionsMap = dcSet.getTransactionTab();
             for (byte[] signature : needRemoveInvalids) {
                 if (ctrl.isOnStopping()) {
                     return;
@@ -368,7 +368,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         long start = System.currentTimeMillis();
 
-        TransactionMap map = dcSet.getTransactionMap();
+        TransactionTab map = dcSet.getTransactionTab();
         Iterator<Long> iterator = map.getTimestampIterator();
         LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 

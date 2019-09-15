@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.dbs.rocksDB.integration.DBMapDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.mapdb.DB;
@@ -8,21 +9,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 
-public class TransactionSuitRocksDB extends TransactionMapImpl
+public class TransactionTabRocksDB extends TransactionTabImpl
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionSuitRocksDB.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionTabRocksDB.class.getSimpleName());
 
     int TIMESTAMP_INDEX = 0; // in Family List
 
-    public TransactionSuitRocksDB(DCSet databaseSet, DB database) {
+    public TransactionTabRocksDB(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
 
     @Override
     protected void getMap() {
-        map = new org.erachain.dbs.rocksDB.TransactionRocksDBMap(databaseSet, database);
+        map = new TransactionSuitRocksDB(databaseSet, database);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class TransactionSuitRocksDB extends TransactionMapImpl
     //@Override
     Iterable sendKeys(byte[] recipient) {
         return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(recipient,
-                ((org.erachain.dbs.rocksDB.TransactionRocksDBMap)map).getRecientIndex());
+                ((TransactionSuitRocksDB)map).getRecientIndex());
     }
 
     @Override
@@ -75,7 +76,7 @@ public class TransactionSuitRocksDB extends TransactionMapImpl
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return  ((org.erachain.dbs.rocksDB.TransactionRocksDBMap) map).getIterator(0, false);
+        return  ((TransactionSuitRocksDB) map).getIterator(0, false);
         ///IndexDB timestampIndex = ((org.erachain.dbs.rocksDB.TransactionRocksDBMap) map).getTimestampIndex();
     }
 

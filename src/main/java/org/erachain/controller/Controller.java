@@ -41,7 +41,7 @@ import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemMap;
 import org.erachain.datachain.LocalDataMap;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.GuiTimer;
@@ -1243,8 +1243,8 @@ public class Controller extends Observable {
         if (this.isStopping)
             return false;
 
-        TransactionMap map = this.dcSet.getTransactionMap();
-        Iterator<Long> iterator = map.getIterator(TransactionMap.TIMESTAMP_INDEX, false);
+        TransactionTab map = this.dcSet.getTransactionTab();
+        Iterator<Long> iterator = map.getIterator(TransactionTab.TIMESTAMP_INDEX, false);
         long ping = 0;
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response
@@ -2366,8 +2366,8 @@ public class Controller extends Observable {
     public Transaction getTransaction(byte[] signature, DCSet database) {
 
         // CHECK IF IN TRANSACTION DATABASE
-        if (database.getTransactionMap().contains(signature)) {
-            return database.getTransactionMap().get(signature);
+        if (database.getTransactionTab().contains(signature)) {
+            return database.getTransactionTab().get(signature);
         }
         // CHECK IF IN BLOCK
         Long tuple_Tx = database.getTransactionFinalMapSigns().get(signature);
@@ -2668,7 +2668,7 @@ public class Controller extends Observable {
     }
 
     public List<Transaction> getUnconfirmedTransactions(int count, boolean descending) {
-        return this.dcSet.getTransactionMap().getTransactions(count, descending);
+        return this.dcSet.getTransactionTab().getTransactions(count, descending);
 
     }
 
@@ -2688,7 +2688,7 @@ public class Controller extends Observable {
     }
 
     public List<Transaction> getUnconfirmedTransactionsByAddressFast100(String address) {
-        return this.dcSet.getTransactionMap().getTransactionsByAddressFast100(address);
+        return this.dcSet.getTransactionTab().getTransactionsByAddressFast100(address);
     }
 
     // NAMES
@@ -2819,7 +2819,7 @@ public class Controller extends Observable {
 
     public void onTransactionCreate(Transaction transaction) {
         // ADD TO UNCONFIRMED TRANSACTIONS
-        this.dcSet.getTransactionMap().add(transaction);
+        this.dcSet.getTransactionTab().add(transaction);
 
         // BROADCAST
         this.broadcastTransaction(transaction);
@@ -3387,7 +3387,7 @@ public class Controller extends Observable {
     public void addObserver(Observer o) {
 
         this.dcSet.getBlockMap().addObserver(o);
-        this.dcSet.getTransactionMap().addObserver(o);
+        this.dcSet.getTransactionTab().addObserver(o);
         // this.dcSet.getTransactionFinalMap().addObserver(o);
 
         if (this.dcSetWithObserver) {

@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
-public class TransactionRocksDBMap extends DBMapSuit<Long, Transaction>
+public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction>
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionRocksDBMap.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionSuitRocksDB.class.getSimpleName());
 
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE";
     private final String timestampUnconfirmedTransactionIndexName = "timestamp_unc_txs";
@@ -40,7 +40,7 @@ public class TransactionRocksDBMap extends DBMapSuit<Long, Transaction>
     private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
 
 
-    public TransactionRocksDBMap(DBASet databaseSet, DB database) {
+    public TransactionSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 

@@ -178,7 +178,7 @@ public class TransactionsResource {
     public String getNetworkTransactions(@PathParam("address") String address) {
         // TODO ошибку выдает
         //List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactionsByAddressFast100(address);
-        List<Transaction> transactions = DCSet.getInstance().getTransactionMap().getTransactionsByAddress(address);
+        List<Transaction> transactions = DCSet.getInstance().getTransactionTab().getTransactionsByAddress(address);
 
         JSONArray array = new JSONArray();
 
@@ -201,7 +201,7 @@ public class TransactionsResource {
 
         DCSet dcSet = DCSet.getInstance();
 
-        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, type, from, count, descending)) {
+        for (Transaction record : dcSet.getTransactionTab().getIncomedTransactions(address, type, from, count, descending)) {
             record.setDC(dcSet);
             array.add(record.toJson());
         }

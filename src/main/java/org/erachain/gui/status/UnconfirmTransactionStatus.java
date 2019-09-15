@@ -3,7 +3,7 @@ package org.erachain.gui.status;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.gui.items.records.UnconfirmedTransactionsPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
@@ -22,7 +22,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnconfirmTransactionStatus.class);
 
-    private TransactionMap map;
+    private TransactionTab map;
     private int counter;
     private boolean needUpdate;
 
@@ -30,7 +30,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
     public UnconfirmTransactionStatus() {
         super("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 0/usec");
 
-        map = DCSet.getInstance().getTransactionMap();
+        map = DCSet.getInstance().getTransactionTab();
         counter = map.size();
 
         map.addObserver(this);

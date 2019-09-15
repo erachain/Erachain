@@ -5,7 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -49,7 +49,7 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
         //	 table_balance = new List();
         table_balance = new ArrayList<>();//Pair();
 
-        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
         for (int ia = 0; accounts.size() > ia; ia++) {
             account = accounts.get(ia);
             balances = Controller.getInstance().getBalances(account); //.getBalances(key);

@@ -134,7 +134,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
     public void removeObservers() {
 
         if (Controller.getInstance().doesWalletDatabaseExists())
-            DCSet.getInstance().getTransactionMap().deleteObserver(this);
+            DCSet.getInstance().getTransactionTab().deleteObserver(this);
     }
 
     public void filter(ObserverMessage message) {

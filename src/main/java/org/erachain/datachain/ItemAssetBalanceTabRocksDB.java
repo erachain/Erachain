@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import com.google.common.primitives.Longs;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
@@ -17,13 +18,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ItemAssetBalanceSuitRocksDB extends ItemAssetBalanceMapImpl {
+public class ItemAssetBalanceTabRocksDB extends ItemAssetBalanceTabImpl {
 
     private final String NAME_TABLE = "ITEM_ASSET_BALANCE_TABLE";
     private final String balanceKeyAssetNameIndex = "balances_key_asset";
     private final String balanceAssetKeyNameIndex = "balances_asset_key";
 
-    public ItemAssetBalanceSuitRocksDB(DCSet databaseSet, DB database) {
+    public ItemAssetBalanceTabRocksDB(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
@@ -91,7 +92,7 @@ public class ItemAssetBalanceSuitRocksDB extends ItemAssetBalanceMapImpl {
         indexes.add(indexDBf0f1);
 
         ///map = new org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMap(databaseSet, database);
-        map = new org.erachain.dbs.rocksDB.ItemAssetBalanceRocksDBMap(databaseSet, database);
+        map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
 
     }
 
