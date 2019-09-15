@@ -2,7 +2,7 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.dbs.DBMap;
-import org.erachain.dbs.DBMapImpl;
+import org.erachain.dbs.DBMapCommonImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-import java.util.*;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public abstract class TimerTableModelCls<U> extends AbstractTableModel implements Observer {
@@ -38,7 +40,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected int step = 50;
     protected long size = 0;
 
-    protected DBMapImpl map;
+    protected DBMapCommonImpl map;
     protected Logger logger;
 
     public TimerTableModelCls(String[] columnNames, boolean descending) {
@@ -47,7 +49,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMapImpl map, String[] columnNames, boolean descending) {
+    public TimerTableModelCls(DBMapCommonImpl map, String[] columnNames, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -61,7 +63,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMapImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+    public TimerTableModelCls(DBMapCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -69,7 +71,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMapImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
+    public TimerTableModelCls(DBMapCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -157,7 +159,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         if (map == null)
             return 0;
 
-        return map.DEFAULT_INDEX;
+        return map.getDefaultIndex();
     }
 
     public long getMapSize() {

@@ -20,7 +20,7 @@ public class ItemAssetBalanceSuitMapDBForked extends ItemAssetBalanceMapImpl {
     @SuppressWarnings({"unchecked"})
     @Override
     protected void getMap() {
-        map = new org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMapForked(parent, databaseSet);
+        map = new org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMapForked((ItemAssetBalanceMap)parent, databaseSet);
     }
 
     public Collection<byte[]> assetKeySubMap(long key) {

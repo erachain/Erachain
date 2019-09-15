@@ -75,8 +75,8 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
     }
 
     @Override
-    public U set(T key, U value) {
-        U old = get(key);
+    public boolean set(T key, U value) {
+        boolean old = contains(key);
         map.put(key, value);
         return old;
     }
@@ -87,11 +87,6 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
     }
 
     @Override
-    public void delete(T key) {
-        map.remove(key);
-    }
-
-    @Override
     public U remove(T key) {
         U value = null;
         if (map.containsKey(key)) {
@@ -99,6 +94,24 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
             map.remove(key);
         }
         return value;
+    }
+
+    // TODO сделать это у РоксДБ есть
+    @Override
+    public U removeValue(T key) {
+        return remove(key);
+    }
+
+    @Override
+    public void delete(T key) {
+        map.remove(key);
+    }
+
+
+    // TODO сделать это у РоксДБ есть
+    @Override
+    public void deleteValue(T key) {
+        map.remove(key);
     }
 
     @Override

@@ -1,18 +1,20 @@
 package org.erachain.gui.items;
 
 import org.erachain.core.item.ItemCls;
-import org.erachain.dbs.DBMapImpl;
 import org.erachain.datachain.ItemMap;
+import org.erachain.dbs.DBMapCommonImpl;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Observable;
 
 @SuppressWarnings("serial")
 public abstract class SearchItemsTableModel extends TimerTableModelCls<ItemCls> {
 
-    public SearchItemsTableModel(DBMapImpl itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
+    public SearchItemsTableModel(DBMapCommonImpl itemsMap, String[] columnNames, Boolean[] column_AutoHeight, int favorite) {
         super(itemsMap, columnNames, column_AutoHeight, favorite,false);
     }
 

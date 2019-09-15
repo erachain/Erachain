@@ -6,9 +6,9 @@ import java.util.Collection;
 
 // TODO SOFT HARD TRUE
 
-public class ItemAssetBalanceSuitNativeMem extends ItemAssetBalanceMapImpl {
+public class ItemAssetBalanceSuitNativeMemForked extends ItemAssetBalanceMapImpl {
 
-    public ItemAssetBalanceSuitNativeMem(ItemAssetBalanceMap parent, DCSet databaseSet) {
+    public ItemAssetBalanceSuitNativeMemForked(ItemAssetBalanceMap parent, DCSet databaseSet) {
         super(parent, databaseSet);
     }
 

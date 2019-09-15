@@ -21,6 +21,9 @@ public interface InnerDBTable<K, V> {
 
     void remove(Object key);
 
+    // TODO: нужно сделать это - у РоксДБ естьт акое
+    //void removeValue(Object key);
+
     void clear();
 
     Set<K> keySet();

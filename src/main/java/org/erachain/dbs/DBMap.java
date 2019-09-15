@@ -80,6 +80,8 @@ public interface DBMap<T, U> {
 
     Iterator<T> getIterator(int index, boolean descending);
 
+    int getDefaultIndex();
+
     SortableList<T, U> getList();
 
     void reset();

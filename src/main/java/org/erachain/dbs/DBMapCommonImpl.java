@@ -196,6 +196,9 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
 
         }
     }
+    public int getDefaultIndex() {
+        return DEFAULT_INDEX;
+    }
 
     @Override
     public SortableList<T, U> getList() {

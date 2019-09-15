@@ -19,7 +19,6 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuit;
-import org.erachain.dbs.mapDB.ItemAssetBalanceMapDBMapForked;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
@@ -285,7 +284,7 @@ public class DCSet extends DBASet implements Observer {
                 this.transactionMap = new TransactionSuitNativeMem(parent.transactionMap, this);
                 break;
             default:
-                this.assetBalanceMap = new ItemAssetBalanceSuitNativeMem(parent.assetBalanceMap, this);
+                this.assetBalanceMap = new ItemAssetBalanceSuitNativeMemForked(parent.assetBalanceMap, this);
                 this.transactionMap = new TransactionSuitNativeMem(parent.transactionMap, this);
         }
 

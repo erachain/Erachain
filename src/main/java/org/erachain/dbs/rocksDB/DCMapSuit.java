@@ -106,10 +106,10 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> {
     }
 
     @Override
-    public U set(T key, U value) {
+    public boolean set(T key, U value) {
 
         try {
-            U old = map.get(key);
+            boolean old = map.containsKey(key);
             map.put(key, value);
             if (deleted != null) {
                 if (deleted.remove(key) != null) {
@@ -121,7 +121,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> {
             logger.error(e.getMessage(), e);
         }
 
-        return null;
+        return false;
     }
 
     @Override
