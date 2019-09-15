@@ -10,13 +10,49 @@ public interface DBMapSuit<T, U> {
 
     U get(T key);
 
+    /**
+     *
+     * @param key
+     * @param value
+     * @return If has old value = true
+     */
+    boolean set(T key, U value);
+
+    /**
+     * not check old value
+     * @param key
+     * @param value
+     */
     void put(T key, U value);
 
-    U set(T key, U value);
-
+    /**
+     *
+     * @param key
+     * @return old value
+     */
     U remove(T key);
 
+    /**
+     * not check old value
+     * @param key
+     * @return
+     */
     void delete(T key);
+
+    /**
+     * Remove only Value - not Key.
+     * @param key
+     * @return old value
+     */
+    U removeValue(T key);
+
+    /**
+     * Delete only Value - not Key.
+     * not check old value
+     * @param key
+     * @return
+     */
+    void deleteValue(T key);
 
     boolean contains(T key);
 

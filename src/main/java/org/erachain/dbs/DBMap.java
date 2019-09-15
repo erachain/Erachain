@@ -53,6 +53,21 @@ public interface DBMap<T, U> {
      */
     void delete(T key);
 
+    /**
+     * Remove only Value - not Key.
+     * @param key
+     * @return old value
+     */
+    U removeValue(T key);
+
+    /**
+     * Delete only Value - not Key.
+     * not check old value
+     * @param key
+     * @return
+     */
+    void deleteValue(T key);
+
     boolean contains(T key);
 
     Map<Integer, Integer> getObservableData();

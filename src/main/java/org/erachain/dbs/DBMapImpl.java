@@ -89,6 +89,18 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl implements DBMap<T
         return value;
     }
 
+    @Override U removeValue(T key) {
+        return remove(key);
+    }
+
+    @Override void delete(T key) {
+        remove(key);
+    }
+
+    @Override void deleteValue(T key) {
+        remove(key);
+    }
+
     @Override
     public boolean contains(T key) {
         return map.contains(key);

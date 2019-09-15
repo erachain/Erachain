@@ -319,7 +319,17 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
     }
 
     @Override
+    public U removeValue(T key) {
+        remove(key);
+    }
+
+    @Override
     public void delete(T key) {
+        remove(key);
+    }
+
+    @Override
+    public void deleteValue(T key) {
         remove(key);
     }
 
