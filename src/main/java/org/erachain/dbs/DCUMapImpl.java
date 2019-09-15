@@ -20,7 +20,7 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements DCMap<T, U> {
+public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements DBMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -47,7 +47,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         super(databaseSet, database);
     }
 
-    public DCUMapImpl(DCMap<T, U> parent, DBASet dcSet) {
+    public DCUMapImpl(DBMap<T, U> parent, DBASet dcSet) {
         super(parent, dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
@@ -320,7 +320,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
 
     @Override
     public U removeValue(T key) {
-        remove(key);
+        return remove(key);
     }
 
     @Override

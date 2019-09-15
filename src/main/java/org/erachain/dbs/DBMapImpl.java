@@ -16,7 +16,7 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DBMapImpl<T, U> extends DBMapCommonImpl implements DBMap<T, U> {
+public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements DBMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -63,7 +63,7 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl implements DBMap<T
 
     @Override
     public boolean set(T key, U value) {
-        return this.map.set(key, value) != null;
+        return this.map.set(key, value);
     }
 
     @Override
@@ -89,15 +89,18 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl implements DBMap<T
         return value;
     }
 
-    @Override U removeValue(T key) {
+    @Override
+    public U removeValue(T key) {
         return remove(key);
     }
 
-    @Override void delete(T key) {
+    @Override
+    public void delete(T key) {
         remove(key);
     }
 
-    @Override void deleteValue(T key) {
+    @Override
+    public void deleteValue(T key) {
         remove(key);
     }
 
@@ -170,6 +173,4 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl implements DBMap<T
         }
     }
 
-    public void getMap() {}
-    public void createIndexes() {}
 }
