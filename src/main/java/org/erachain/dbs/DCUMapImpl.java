@@ -20,7 +20,7 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<T, U> {
+public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements DCMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -40,7 +40,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<
     int uses = 0;
 
     public DCUMapImpl(DBASet databaseSet) {
-        this.databaseSet = databaseSet;
+        super(databaseSet);
     }
 
     public DCUMapImpl(DBASet databaseSet, DB database) {
@@ -120,7 +120,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<
     // the deleted ones are smaller and the size is increased by 1
     @Override
     public int size() {
-        //this.addUses();
+        this.addUses();
 
         int u = this.map.size();
 
@@ -132,7 +132,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<
             u += this.parent.size();
         }
 
-        //this.outUses();
+        this.outUses();
         return u;
     }
 
@@ -206,7 +206,14 @@ public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<
 
         try {
 
-            U old = this.map.put(key, value);
+            U old;
+            if (this.parent != null) {
+                // найдем и в Родительских тоже
+                old = get(key);
+                this.map.put(key, value);
+            } else {
+                old = this.map.put(key, value);
+            }
 
             if (this.parent != null) {
                 //if (old != null)
@@ -248,7 +255,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapImpl<T, U> implements DCMap<
     }
 
     @Override
-    public U delete(T key) {
+    public U remove(T key) {
 
         if (DCSet.isStoped()) {
             return null;

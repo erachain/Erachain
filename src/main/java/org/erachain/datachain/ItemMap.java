@@ -193,7 +193,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     }
 
     public void remove(long key) {
-        super.delete(key);
+        super.remove(key);
 
         if (this.key != key) {
             // it is not top of STACK (for UNIQUE items with short NUM)

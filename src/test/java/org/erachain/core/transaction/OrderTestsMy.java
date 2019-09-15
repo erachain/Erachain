@@ -176,8 +176,8 @@ public class OrderTestsMy {
 
     private void removeOrder(Long orderId) {
 
-        db.getCompletedOrderMap().delete(orderId);
-        db.getOrderMap().delete(orderId);
+        db.getCompletedOrderMap().remove(orderId);
+        db.getOrderMap().remove(orderId);
 
     }
 
@@ -3629,7 +3629,7 @@ public class OrderTestsMy {
         order_AB_2_ID = order_AB_2.getId();
 
         ///////// DELETE in FORK
-        fork.getOrderMap().delete(deletedID);
+        fork.getOrderMap().remove(deletedID);
         
         int compare;
         int index = 0;

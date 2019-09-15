@@ -159,7 +159,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
             if (this.fullWeightVar != null) {
                 this.fullWeightVar.set(fullWeight);
             }
-            return super.delete(key);
+            return super.remove(key);
         }
 
         return null;

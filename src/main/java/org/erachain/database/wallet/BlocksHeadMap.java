@@ -233,12 +233,12 @@ public class BlocksHeadMap extends DCUMapImpl<Tuple2<String, String>, Block.Bloc
 
         //DELETE TRANSACTIONS
         for (Tuple2<String, String> key : accountBlocks.keySet()) {
-            delete(key);
+            remove(key);
         }
     }
 
     public void delete(Block.BlockHead block) {
-        delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
+        remove(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
     }
 
     public void deleteAll(List<Account> accounts) {

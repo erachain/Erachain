@@ -209,13 +209,13 @@ public class TransactionFinalMap extends DCUMap<Long, Transaction> implements Fi
         // DELETE TRANSACTIONS
         for (Long key : keys) {
             if (this.contains(key))
-                this.delete(key);
+                this.remove(key);
         }
         keys = null;
     }
 
     public void delete(Integer height, Integer seq) {
-        this.delete(Transaction.makeDBRef(height, seq));
+        this.remove(Transaction.makeDBRef(height, seq));
     }
 
     public boolean add(Integer height, Integer seq, Transaction transaction) {

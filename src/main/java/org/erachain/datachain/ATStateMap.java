@@ -122,7 +122,7 @@ public class ATStateMap extends DCUMap<Tuple2<Integer, String>, byte[]> {
 
         //DELETE
         for (Tuple2 key : keys) {
-            this.delete(key);
+            this.remove(key);
         }
 
         // in .deleted

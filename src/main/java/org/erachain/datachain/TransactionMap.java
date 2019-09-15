@@ -46,7 +46,7 @@ public interface TransactionMap extends org.erachain.dbs.DBMap<Long, Transaction
 
     void delete(Transaction transaction);
     Transaction delete(byte[] signature);
-    Transaction delete(Long key);
+    Transaction remove(Long key);
 
     boolean contains(byte[] signature);
     boolean contains(Long key);

@@ -73,6 +73,6 @@ public class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[]> {
     }
 
     public void delete(String address, Long key) {
-        this.delete(new Tuple2<byte[], Long>(Base58.decode(address), key));
+        this.remove(new Tuple2<byte[], Long>(Base58.decode(address), key));
     }
 }

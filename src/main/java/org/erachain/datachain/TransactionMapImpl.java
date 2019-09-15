@@ -167,7 +167,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
                 for (Tuple2<?, Long> key : subSet) {
                     if (true || this.contains(key.b))
-                        this.delete(key.b);
+                        this.remove(key.b);
                     count++;
                 }
 
@@ -207,7 +207,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
                             || Controller.HARD_WORK <= 3
                             && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                             || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                        this.delete(key);
+                        this.remove(key);
                         count++;
                     } else {
                         break;
@@ -246,7 +246,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
     }
 
     public Transaction delete(byte[] signature) {
-        return this.delete(Longs.fromByteArray(signature));
+        return this.remove(Longs.fromByteArray(signature));
     }
 
 
@@ -256,8 +256,8 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
      * @param key
      * @return
      */
-    public /* synchronized */ Transaction delete(Long key) {
-        Transaction transaction = super.delete(key);
+    public /* synchronized */ Transaction remove(Long key) {
+        Transaction transaction = super.remove(key);
         if (transaction != null) {
             // DELETE only if DELETED
             totalDeleted++;

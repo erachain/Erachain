@@ -50,7 +50,7 @@ public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
     }
 
     public void delete(CancelSellNameTransaction transaction) {
-        this.delete(transaction.getSignature());
+        this.remove(transaction.getSignature());
     }
 
     public BigDecimal get(CancelSellNameTransaction transaction) {

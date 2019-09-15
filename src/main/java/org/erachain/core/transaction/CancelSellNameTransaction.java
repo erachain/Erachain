@@ -217,7 +217,7 @@ public class CancelSellNameTransaction extends Transaction {
         this.dcSet.getCancelSellNameMap().set(this, nameSale.getAmount());
 
         //DELETE FROM DATABASE
-        this.dcSet.getNameExchangeMap().delete(this.name);
+        this.dcSet.getNameExchangeMap().remove(this.name);
 
     }
 

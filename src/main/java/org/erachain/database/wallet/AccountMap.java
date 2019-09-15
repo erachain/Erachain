@@ -263,7 +263,7 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
             this.publickKeys.remove(account.getPublicKey());
 
             // USE NOTIFY
-            super.delete(account.getAddress());
+            super.remove(account.getAddress());
 
         }
     }

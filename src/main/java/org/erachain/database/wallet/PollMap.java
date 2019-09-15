@@ -142,7 +142,7 @@ public class PollMap extends DCUMapImpl<Tuple2<String, String>, Poll> {
 
         //DELETE NAMES
         for (Tuple2<String, String> key : accountPolls.keySet()) {
-            this.delete(key);
+            this.remove(key);
         }
     }
 
@@ -151,7 +151,7 @@ public class PollMap extends DCUMapImpl<Tuple2<String, String>, Poll> {
     }
 
     public void delete(Account account, Poll poll) {
-        this.delete(new Tuple2<String, String>(account.getAddress(), poll.getName()));
+        this.remove(new Tuple2<String, String>(account.getAddress(), poll.getName()));
     }
 
     public void deleteAll(List<Account> accounts) {

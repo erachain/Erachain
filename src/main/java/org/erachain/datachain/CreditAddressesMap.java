@@ -98,6 +98,6 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     }
 
     public void delete(String creditorAddress, long key, String debtorAddress) {
-        this.delete(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
+        this.remove(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
     }
 }

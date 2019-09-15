@@ -67,7 +67,7 @@ public class PostCommentMap extends DCUMap<byte[], List<byte[]>> {
         }
 
         if (list.isEmpty()) {
-            delete(signatureOfPost);
+            remove(signatureOfPost);
         } else {
             set(signatureOfPost, list);
         }

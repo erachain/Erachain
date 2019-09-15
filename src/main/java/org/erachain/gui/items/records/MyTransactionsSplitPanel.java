@@ -165,7 +165,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
 
                 // code delete
                 Controller.getInstance().getWallet().database.getTransactionMap()
-                        .delete(selectedTransactionKey);
+                        .remove(selectedTransactionKey);
 
             }
         });

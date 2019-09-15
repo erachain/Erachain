@@ -495,6 +495,6 @@ public class TradeMap extends DCUMap<Tuple2<Long, Long>, Trade> {
     }
 
     public void delete(Trade trade) {
-        this.delete(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()));
+        this.remove(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()));
     }
 }

@@ -119,7 +119,7 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
 
         //DELETE
         for (Tuple2 key : keys) {
-            this.delete(key);
+            this.remove(key);
         }
 
         if (this.parent != null)
@@ -138,7 +138,7 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
 
         //DELETE
         for (Tuple2 key : keys) {
-            this.delete(key);
+            this.remove(key);
         }
 
         if (this.parent != null)

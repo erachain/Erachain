@@ -428,14 +428,14 @@ public class OrderMap extends DCUMap<Long, Order> {
         return super.set(id, order);
     }
 
-    public Order delete(Long id) {
+    public Order remove(Long id) {
         if (BlockChain.CHECK_BUGS > 1) {
             if (((DCSet)this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 assert("".equals("already in Completed"));
             }
         }
-        return super.delete(id);
+        return super.remove(id);
     }
 
     public void add(Order order) {
@@ -445,6 +445,6 @@ public class OrderMap extends DCUMap<Long, Order> {
 
     public void delete(Order order) {
 
-        this.delete(order.getId());
+        this.remove(order.getId());
     }
 }

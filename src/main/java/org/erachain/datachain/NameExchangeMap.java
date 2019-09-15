@@ -113,6 +113,6 @@ public class NameExchangeMap extends DCUMap<String, BigDecimal> {
     }
 
     public void delete(NameSale nameSale) {
-        this.delete(nameSale.getKey());
+        this.remove(nameSale.getKey());
     }
 }

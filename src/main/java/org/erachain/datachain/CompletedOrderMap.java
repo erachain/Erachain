@@ -88,6 +88,6 @@ public class CompletedOrderMap extends DCUMap<Long, Order> {
 
     public void delete(Order order) {
 
-        this.delete(order.getId());
+        this.remove(order.getId());
     }
 }

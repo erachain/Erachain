@@ -167,13 +167,13 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         // DELETE CalculatedS
         for (Tuple3<Integer, Integer, Long> key : keys) {
             if (this.contains(key))
-                this.delete(key);
+                this.remove(key);
         }
         keys = null;
     }
 
     public void delete(Integer blockNo, Integer transNo, Long seq) {
-        this.delete(new Tuple3<Integer, Integer, Long>(blockNo, transNo, seq));
+        this.remove(new Tuple3<Integer, Integer, Long>(blockNo, transNo, seq));
     }
 
     public boolean add(Integer blockNo, Integer transNo, Long seq, Calculated calculated) {

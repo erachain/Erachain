@@ -140,7 +140,7 @@ public class AddressForgingTest {
 
         // TRY DELETE
         Tuple2<String, Integer> key3 = new Tuple2<>(address, lastPoint3.a);
-        point = forgingMap.delete(key3);
+        point = forgingMap.remove(key3);
 
         Tuple2<Integer, Integer> lastPoint4 = forgingMap.getLast(address);
         Tuple2<Integer, Integer> prevPoint4 = forgingMap.get(address, lastPoint4.b);
@@ -150,7 +150,7 @@ public class AddressForgingTest {
 
         // TRY DELETE TWICE
         Tuple2<String, Integer> key4 = new Tuple2<>(address, lastPoint3.a);
-        point = forgingMap.delete(key4);
+        point = forgingMap.remove(key4);
 
         Tuple2<Integer, Integer> lastPoint5 = forgingMap.getLast(address);
         Tuple2<Integer, Integer> prevPoint5 = forgingMap.get(address, lastPoint5.b);
@@ -190,7 +190,7 @@ public class AddressForgingTest {
 
         // TRY DELETE
         Tuple2<String, Integer> key3 = new Tuple2<>(address, height - 100);
-        point = forgingMap.delete(key3);
+        point = forgingMap.remove(key3);
 
     }
 

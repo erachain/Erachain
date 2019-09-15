@@ -26,7 +26,7 @@ public interface DCMap<T, U> extends DBMap<T, U> {
 
     boolean set(T key, U value);
 
-    U delete(T key);
+    U remove(T key);
 
     boolean contains(T key);
 

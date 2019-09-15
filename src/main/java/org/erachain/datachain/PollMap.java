@@ -88,6 +88,6 @@ public class PollMap extends DCUMap<String, Poll> {
     }
 
     public void delete(Poll poll) {
-        this.delete(poll.getName());
+        this.remove(poll.getName());
     }
 }

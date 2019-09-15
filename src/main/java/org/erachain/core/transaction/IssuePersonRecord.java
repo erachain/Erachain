@@ -307,7 +307,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();
         byte[] makerBytes = maker.getPublicKey();
-        this.dcSet.getIssuePersonMap().delete(makerBytes);
+        this.dcSet.getIssuePersonMap().remove(makerBytes);
 
     }
 

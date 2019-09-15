@@ -24,9 +24,34 @@ public interface DBMap<T, U> {
 
     Collection<U> getValues();
 
+    /**
+     *
+     * @param key
+     * @param value
+     * @return If has old value = true
+     */
     boolean set(T key, U value);
 
-    U delete(T key);
+    /**
+     * not check old value
+     * @param key
+     * @param value
+     */
+    void put(T key, U value);
+
+    /**
+     *
+     * @param key
+     * @return old value
+     */
+    U remove(T key);
+
+    /**
+     * not check old value
+     * @param key
+     * @return
+     */
+    void delete(T key);
 
     boolean contains(T key);
 

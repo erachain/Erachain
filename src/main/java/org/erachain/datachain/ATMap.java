@@ -9,7 +9,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.dbs.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.ATSerializer;
-import org.erachain.dbs.DCMap;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
@@ -234,7 +233,7 @@ public class ATMap extends DCUMapImpl<String, AT> {
 
     public void delete(AT at) {
         // USE parents
-        this.delete(Base58.encode(at.getId()));
+        this.remove(Base58.encode(at.getId()));
 
     }
 
@@ -265,7 +264,7 @@ public class ATMap extends DCUMapImpl<String, AT> {
         Iterable<String> ids = Fun.filter(this.creationHeightATs, blockHeight + 1, true, Integer.MAX_VALUE, true);
         Iterator<String> iter = ids.iterator();
         while (iter.hasNext()) {
-            delete(iter.next());
+            remove(iter.next());
         }
     }
 

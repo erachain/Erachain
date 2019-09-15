@@ -591,12 +591,12 @@ public abstract class ItemCls implements ExplorerJsonLine {
         if (thisKey > startKey) {
             this.getDBMap(db).remove(thisKey);
         } else {
-            this.getDBMap(db).delete(thisKey);
+            this.getDBMap(db).remove(thisKey);
         }
 
         //DELETE ORPHAN DATA
         //logger.debug("<<<<< core.item.ItemCls.removeFromMap 2");
-        this.getDBIssueMap(db).delete(this.reference);
+        this.getDBIssueMap(db).remove(this.reference);
 
         //logger.debug("<<<<< core.item.ItemCls.removeFromMap 3");
 

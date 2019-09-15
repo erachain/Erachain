@@ -234,7 +234,7 @@ public class BlockMap extends DCUMap<Integer, Block> {
         }
 
         // use SUPER.class only!
-        return super.delete(height);
+        return super.remove(height);
 
     }
 

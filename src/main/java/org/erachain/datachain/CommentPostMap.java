@@ -34,7 +34,7 @@ public class CommentPostMap extends DCUMap<byte[], byte[]> {
     }
 
     public void remove(byte[] signatureOfComment) {
-        delete(signatureOfComment);
+        this.remove(signatureOfComment);
     }
 
     @Override

@@ -37,7 +37,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+
 //import org.erachain.core.item.assets.AssetCls;
 
 public class GenesisBlock extends Block {
@@ -758,7 +758,7 @@ public class GenesisBlock extends Block {
     public void orphan(DCSet dcSet) throws Exception {
 
         if (false)
-            dcSet.getItemAssetMap().delete(AssetCls.LIA_KEY);
+            dcSet.getItemAssetMap().remove(AssetCls.LIA_KEY);
 
         super.orphan(dcSet);
 

@@ -85,7 +85,7 @@ public class TransactionFinalMapSigns extends DCUMap<UUID, Long> {
                 (byte)0, (byte)0, (byte)0, (byte)0);
 
         UUID key = new UUID(key1, key2);
-        this.delete(key);
+        this.remove(key);
     }
 
     public boolean set(byte[] signature, Long refernce) {

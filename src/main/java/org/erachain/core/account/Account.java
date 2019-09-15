@@ -768,9 +768,9 @@ public class Account {
 
         // GET REFERENCE
         // DELETE TIMESTAMP - REFERENCE
-        long[] reference = map.delete(keyPrevPoint);
+        long[] reference = map.remove(keyPrevPoint);
         if (reference == null) {
-            map.delete(shortBytes);
+            map.remove(shortBytes);
         } else {
             // SET OLD REFERENCE
             map.set(shortBytes, reference);

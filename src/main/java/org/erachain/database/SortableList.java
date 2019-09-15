@@ -1,10 +1,10 @@
 package org.erachain.database;
 
 import org.erachain.dbs.DBMap;
-import org.erachain.dbs.DBMapImpl;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.dbs.DBMapCommonImpl;
 import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -27,7 +27,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
     private List<String> additionalFilterFields;
 
 
-    public SortableList(DBMapImpl<T, U> db) {
+    public SortableList(DBMapCommonImpl<T, U> db) {
         this.db = db;
 
         //LOAD DEFAULT ITERATOR
@@ -39,7 +39,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
         additionalFilterFields = new ArrayList<String>();
     }
 
-    public SortableList(DBMapImpl<T, U> db, Collection<T> keys) {
+    public SortableList(DBMapCommonImpl<T, U> db, Collection<T> keys) {
         this.db = db;
         this.keys = keys;
 
@@ -52,7 +52,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
         additionalFilterFields = new ArrayList<String>();
     }
 
-    public static SortableList makeSortableList(DBMapImpl map, boolean descending, int limit) {
+    public static SortableList makeSortableList(DBMapCommonImpl map, boolean descending, int limit) {
 
         // обрезаем полный список в базе до 1000
         Iterator iterator = map.getIterator(map.DEFAULT_INDEX, descending);

@@ -49,6 +49,6 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
     }
 
     public void delete(Transaction transaction) {
-        delete(transaction.getSignature());
+        remove(transaction.getSignature());
     }
 }

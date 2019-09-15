@@ -138,7 +138,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * @param key
      * @return
      */
-    public Tuple2<Integer, Integer> delete(Tuple2<String, Integer> key) {
+    public Tuple2<Integer, Integer> remove(Tuple2<String, Integer> key) {
 
         if (key.b < 3) {
             // not delete GENESIS forging data for all accounts
@@ -151,11 +151,11 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         if (lastPoint == null) {
             // обычно такого не должно случаться!!!
             LOGGER.error("ERROR LAST forging POINTS = null for KEY: " + key);
-            return super.delete(key);
+            return super.remove(key);
         } else {
             LOGGER.debug("last POINT: " + lastPoint);
             if (lastPoint.a.equals(key.b)) {
-                Tuple2<Integer, Integer> previous = super.delete(key);
+                Tuple2<Integer, Integer> previous = super.remove(key);
                 this.setLast(key.a, previous);
                 LOGGER.debug("delete and set prev POINT as last: " + (previous == null? "null" : previous) + " for " + key);
                 return previous;
@@ -174,7 +174,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
     }
 
     public void delete(String address, int height) {
-        this.delete(new Tuple2<String, Integer>(address, height));
+        this.remove(new Tuple2<String, Integer>(address, height));
     }
 
     /**
@@ -189,7 +189,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
     private void setLast(String address, Tuple2<Integer, Integer> point) {
         if (point == null) {
             // вызываем супер-класс
-            super.delete(new Tuple2<String, Integer>(address, 0));
+            super.remove(new Tuple2<String, Integer>(address, 0));
         } else {
             // вызываем супер-класс
             super.set(new Tuple2<String, Integer>(address, 0), point);

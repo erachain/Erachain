@@ -1,12 +1,10 @@
 package org.erachain.dbs;
 
 import org.erachain.database.DBASet;
-import org.erachain.database.IDB;
 import org.erachain.database.IndexIterator;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,56 +16,20 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> {
+public abstract class DBMapImpl<T, U> extends DBMapCommonImpl implements DBMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
-
-    //public static final int NOTIFY_COUNT = 5;
-
-    public int DESCENDING_SHIFT_INDEX = 10000;
-
-    public static int DEFAULT_INDEX = 0;
-    protected DBASet databaseSet;
-    protected DB database;
-    protected DBMapSuit<T, U> map;
-    protected DBMap<T, U> parent;
-    protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
-
-    protected Map<Integer, Integer> observableData;
 
     public DBMapImpl() {
     }
 
     public DBMapImpl(DBASet databaseSet) {
+        super(databaseSet);
 
-        this.databaseSet = databaseSet;
-
-        //CREATE INDEXES
-        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
-
-        if (databaseSet != null && databaseSet.isWithObserver()) {
-            observableData = new HashMap<Integer, Integer>(8, 1);
-        }
     }
 
     public DBMapImpl(DBASet databaseSet, DB database) {
-        this.databaseSet = databaseSet;
-        this.database = database;
-
-        //OPEN MAP
-        getMap();
-
-        //CREATE INDEXES
-        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
-
-        if (this.map !=  null) {
-            this.createIndexes();
-        }
-
-        if (databaseSet.isWithObserver()) {
-            observableData = new HashMap<Integer, Integer>(8, 1);
-        }
-
+        super(databaseSet, database);
     }
 
     /**
@@ -76,21 +38,8 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
      * @param databaseSet
      */
     public DBMapImpl(DBMap parent, DBASet databaseSet) {
-
-        this.databaseSet = databaseSet;
-        this.parent = parent;
-
+        super(parent, databaseSet);
     }
-
-    @Override
-    public IDB getDBSet() {
-        return this.databaseSet;
-    }
-
-    protected abstract void getMap();
-
-    protected abstract void createIndexes();
-
 
     @Override
     public int size() {
@@ -118,7 +67,12 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
     }
 
     @Override
-    public U delete(T key) {
+    public void put(T key, U value) {
+        this.map.put(key, value);
+    }
+
+    @Override
+    public U remove(T key) {
 
         U value = this.map.remove(key);
 
@@ -138,80 +92,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
     @Override
     public boolean contains(T key) {
         return map.contains(key);
-    }
-
-    @Override
-    public Map<Integer, Integer> getObservableData() {
-        return observableData;
-    }
-
-    @Override
-    public Integer deleteObservableData(int index) {
-        return this.observableData.remove(index);
-    }
-
-    @Override
-    public Integer setObservableData(int index, Integer data) {
-        return this.observableData.put(index, data);
-    }
-
-    @Override
-    public boolean checkObserverMessageType(int messageType, int thisMessageType) {
-        if (observableData == null || observableData.isEmpty() || !observableData.containsKey(thisMessageType))
-            return false;
-
-
-        return observableData.get(messageType) == thisMessageType;
-    }
-
-    /**
-     * Соединяется прямо к списку SortableList для отображения в ГУИ
-     * Нужен только для сортировки<br>
-     * TODO надо его убрать отсюла нафиг чтобы не тормозило и только
-     * по месту работало окнкретно как надо
-     * @param o
-     */
-    @Override
-    public void addObserver(Observer o) {
-
-        //ADD OBSERVER
-        super.addObserver(o);
-
-        //NOTIFY
-        if (this.observableData != null) {
-            if (this.observableData.containsKey(NOTIFY_LIST)) {
-                if (false) {
-                    //CREATE LIST
-                    SortableList<T, U> list;
-                    if (this.size() < 1000) {
-                        list = new SortableList<T, U>(this);
-                    } else {
-                        List<T> keys = new ArrayList<T>();
-                        // тут может быть ошибка если основной индекс не TreeMap
-                        try {
-                            // обрезаем полный список в базе до 1000
-                            Iterator iterator = this.getIterator(DEFAULT_INDEX, false);
-                            int i = 0;
-                            while (iterator.hasNext() && ++i < 1000) {
-                                keys.add((T) iterator.next());
-                            }
-                        } catch (Exception e) {
-                            LOGGER.error(e.getMessage(), e);
-                        }
-
-                        list = new SortableList<T, U>(this, keys);
-                    }
-
-                    //UPDATE
-                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), list));
-                } else {
-
-                    //UPDATE
-                    o.update(null, new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
-
-                }
-            }
-        }
     }
 
     /**
@@ -278,4 +158,6 @@ public abstract class DBMapImpl<T, U> extends Observable implements DBMap<T, U> 
         }
     }
 
+    public void getMap() {}
+    public void createIndexes() {}
 }

@@ -48,6 +48,6 @@ public class NameMap extends DCUMap<String, Name> {
     }
 
     public void delete(Name name) {
-        this.delete(name.getName());
+        this.remove(name.getName());
     }
 }

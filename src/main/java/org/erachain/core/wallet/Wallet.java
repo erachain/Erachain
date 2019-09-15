@@ -1665,7 +1665,7 @@ public class Wallet extends Observable implements Observer {
 			// DELETE ORDER
 			if (false) {
 				// order STATUS is ORPHANED
-				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
+				this.database.getOrderMap().remove(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
 						Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
 			}
 		}
@@ -1684,7 +1684,7 @@ public class Wallet extends Observable implements Observer {
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			if (false) {
 				// DELETE ORDER
-				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
+				this.database.getOrderMap().remove(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
 						Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
 			}
 		}
