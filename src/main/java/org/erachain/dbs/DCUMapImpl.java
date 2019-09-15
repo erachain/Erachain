@@ -255,6 +255,11 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
     }
 
     @Override
+    public void put(T key, U value) {
+        set(key, value);
+    }
+
+    @Override
     public U remove(T key) {
 
         if (DCSet.isStoped()) {
@@ -311,6 +316,11 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         this.outUses();
         return value;
 
+    }
+
+    @Override
+    public void delete(T key) {
+        remove(key);
     }
 
     @Override
