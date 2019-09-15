@@ -14,7 +14,6 @@ public class TransactionTabMapDB extends TransactionTabImpl
 
     public TransactionTabMapDB(DCSet databaseSet, DB database) {
         super(databaseSet, database);
-        TIMESTAMP_INDEX = 1;
 
     }
 

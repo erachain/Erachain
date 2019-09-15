@@ -151,15 +151,20 @@ public class DCSet extends DBASet implements Observer {
                 this.assetBalanceMap = new ItemAssetBalanceTabMapDB(this, database);
                 this.transactionTab = new TransactionTabMapDB(this, database);
             } else {
-                switch (BlockChain.DC_DBS_TYPE) {
-                    case 1:
-                        this.transactionTab = new TransactionTabRocksDB(this, database);
-                        this.assetBalanceMap = new ItemAssetBalanceTabRocksDB(this, database);
-                        break;
-                    default:
-                        this.assetBalanceMap = new ItemAssetBalanceTabMapDB(this, database);
-                        this.transactionTab = new TransactionTabMapDB(this, database);
+                if (true) {
+                    this.assetBalanceMap = new ItemAssetBalanceTabRocksDB(this, database);
+                    this.transactionTab = new TransactionTabMapDB(this, database);
+                } else {
+                    switch (BlockChain.DC_DBS_TYPE) {
+                        case 1:
+                            this.transactionTab = new TransactionTabRocksDB(this, database);
+                            this.assetBalanceMap = new ItemAssetBalanceTabRocksDB(this, database);
+                            break;
+                        default:
+                            this.assetBalanceMap = new ItemAssetBalanceTabMapDB(this, database);
+                            this.transactionTab = new TransactionTabMapDB(this, database);
 
+                    }
                 }
             }
 
@@ -244,7 +249,7 @@ public class DCSet extends DBASet implements Observer {
             this.atTransactionMap = new ATTransactionMap(this, database);
 
         } catch (Throwable e) {
-            LOGGER.trace(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
             this.close();
             throw e;
         }
@@ -278,14 +283,19 @@ public class DCSet extends DBASet implements Observer {
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
 
-        switch (BlockChain.DCFORK_DBS_TYPE) {
-            case 1:
-                this.assetBalanceMap = new ItemAssetBalanceTabMapDBForked(parent.assetBalanceMap,this);
-                this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
-                break;
-            default:
-                this.assetBalanceMap = new ItemAssetBalanceTabNativeMemForked(parent.assetBalanceMap, this);
-                this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
+        if (true) {
+            this.assetBalanceMap = new ItemAssetBalanceTabNativeMemForked(parent.assetBalanceMap, this);
+            this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
+        } else {
+            switch (BlockChain.DCFORK_DBS_TYPE) {
+                case 1:
+                    this.assetBalanceMap = new ItemAssetBalanceTabMapDBForked(parent.assetBalanceMap, this);
+                    this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
+                    break;
+                default:
+                    this.assetBalanceMap = new ItemAssetBalanceTabNativeMemForked(parent.assetBalanceMap, this);
+                    this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
+            }
         }
 
         this.addressForging = new AddressForging(parent.addressForging, this);
@@ -469,9 +479,7 @@ public class DCSet extends DBASet implements Observer {
             databaseStruc.cacheDisable();
         }
 
-
         DB database = databaseStruc.make();
-
 
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
@@ -1530,7 +1538,7 @@ public class DCSet extends DBASet implements Observer {
                 File tempDir = new File(Settings.getInstance().getDataTempDir());
                 Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
             } catch (Throwable e) {
-                LOGGER.trace(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " +getEngineSize() + "   %%%%%%  commit time: "

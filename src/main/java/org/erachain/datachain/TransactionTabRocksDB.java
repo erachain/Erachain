@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
-import org.erachain.dbs.rocksDB.integration.DBMapDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.mapdb.DB;
 import org.slf4j.Logger;
@@ -70,13 +69,13 @@ public class TransactionTabRocksDB extends TransactionTabImpl
 
     @Override
     Iterable recipientKeys(String recipient) {
-        return (Iterable) ((DBMapDB) map).getIterator(false);
+        return (Iterable) ((TransactionSuitRocksDB) map).getIterator(TIMESTAMP_INDEX, false);
     }
 
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return  ((TransactionSuitRocksDB) map).getIterator(0, false);
+        return  ((TransactionSuitRocksDB) map).getIterator(TIMESTAMP_INDEX, false);
         ///IndexDB timestampIndex = ((org.erachain.dbs.rocksDB.TransactionRocksDBMap) map).getTimestampIndex();
     }
 

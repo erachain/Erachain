@@ -538,7 +538,7 @@ public class Controller extends Observable {
         } catch (Throwable e) {
 
             LOGGER.error("Error during startup detected trying to restore backup " + name);
-            LOGGER.trace(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
 
             error = true;
 
@@ -551,7 +551,7 @@ public class Controller extends Observable {
             } catch (Throwable e1) {
 
                 LOGGER.error("Error during backup, tru recreate " + name);
-                LOGGER.trace(e1.getMessage(), e1);
+                LOGGER.error(e1.getMessage(), e1);
                 backUped = true;
 
                 try {
@@ -562,7 +562,7 @@ public class Controller extends Observable {
                 } catch (Throwable e2) {
 
                     LOGGER.error("Error during backup, tru recreate " + name);
-                    LOGGER.trace(e2.getMessage(), e2);
+                    LOGGER.error(e2.getMessage(), e2);
                     // не смогли пересоздать выход!
                     stopAll(-3);
                 }
@@ -647,9 +647,13 @@ public class Controller extends Observable {
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("DataLocale OK")));
             LOGGER.info("DataLocale OK");
         } catch (Throwable e) {
-            LOGGER.trace(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
             // TODO Auto-generated catch block
-            // e1.printStackTrace();
+            try {
+                this.dlSet.close();
+            } catch (Exception e2) {
+                
+            }
             reCreateDB();
             LOGGER.error("Error during startup detected trying to recreate DataLocale...");
         }
@@ -659,7 +663,7 @@ public class Controller extends Observable {
             File tempDir = new File(Settings.getInstance().getDataTempDir());
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {
-            LOGGER.trace(e.getMessage(), e);
+            ////LOGGER.error(e.getMessage(), e);
         }
 
         // OPENING DATABASES
@@ -675,12 +679,12 @@ public class Controller extends Observable {
             // Error open DB
             error = 1;
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
-            LOGGER.trace(e.getMessage(), e);
+            //LOGGER.trace(e.getMessage(), e);
             LOGGER.error(e.getMessage(), e);
             try {
                 reCreateDC(inMemoryDC);
             } catch (Throwable e1) {
-                LOGGER.trace(e1.getMessage(), e1);
+                LOGGER.error(e1.getMessage(), e1);
                 stopAll(5);
             }
         }
@@ -710,12 +714,12 @@ public class Controller extends Observable {
             try {
                 this.dcSet.close();
             } catch (Throwable e) {
-                LOGGER.trace(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
             }
             try {
                 reCreateDC(inMemoryDC);
             } catch (Throwable e) {
-                LOGGER.trace(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
                 stopAll(5);
             }
         }
@@ -945,7 +949,7 @@ public class Controller extends Observable {
             try {
                 Files.walkFileTree(dataLocal.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
             } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
+                //LOGGER.error(e.getMessage(), e);
             }
         }
 
@@ -1172,7 +1176,7 @@ public class Controller extends Observable {
             File tempDir = new File(Settings.getInstance().getDataTempDir());
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {
-            LOGGER.trace(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         LOGGER.info("Closed.");

@@ -5,7 +5,6 @@ import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     protected DB database;
     protected DBMapSuit<T, U> map;
     protected DBMap<T, U> parent;
-    protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>(32, 1);
 
     protected Map<Integer, Integer> observableData;
 
@@ -71,6 +69,7 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     public DBMapCommonImpl(DBMap parent, DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
+        this.database = databaseSet.database;
         this.parent = parent;
 
     }

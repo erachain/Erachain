@@ -10,7 +10,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBMap;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,7 @@ abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
     static Logger logger = LoggerFactory.getLogger(TransactionTabImpl.class.getName());
 
-    int TIMESTAMP_INDEX = 1;
+    //public int TIMESTAMP_INDEX = 1;
 
     public int totalDeleted = 0;
 
@@ -159,7 +158,8 @@ abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
              * - дале COMPACT не помогает
              */
             //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-            Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+            //Iterator<Tuple2<?, Long>> iterator = map.getIterator(TIMESTAMP_INDEX, false);
+            Iterator<Long> iterator = map.getIterator(TIMESTAMP_INDEX, false);
             tickerIter = System.currentTimeMillis() - tickerIter;
             if (tickerIter > 10) {
                 LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
@@ -174,7 +174,7 @@ abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
                 LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
             }
             while (iterator.hasNext()) {
-                Long key = iterator.next().b;
+                Long key = iterator.next();
                 transaction = this.map.get(key);
                 if (transaction == null) {
                     // такая ошибка уже было
@@ -270,12 +270,13 @@ abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
 
         // DESCENDING + 1000
-        Iterable iterable = this.indexes.get(TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
-        Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
+        Iterator<Long> iterator = this.map.getIterator(TIMESTAMP_INDEX, true);
+        Iterable iterableLimit = Iterables.limit(Iterables.skip((Iterable)iterator, (int) fromKey), (int) (toKey - fromKey));
 
-        Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
+        //Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
+        iterator = iterableLimit.iterator();
         while (iterator.hasNext()) {
-            treeKeys.add(iterator.next().b);
+            treeKeys.add(iterator.next());
         }
 
         return treeKeys;

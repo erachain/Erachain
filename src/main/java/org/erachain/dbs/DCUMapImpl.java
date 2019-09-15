@@ -26,7 +26,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
 
     protected Map<T, U> map;
     protected DBMap<T, U> parent;
-    //protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
+    protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
@@ -64,7 +64,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         this.parent = parent;
 
         // OPEN MAP
-        if (dcSet == null || dcSet.getDatabase() == null) {
+        if (database == null) {
             this.getMemoryMap();
         } else {
             this.getMap();

@@ -6,10 +6,14 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.utils.ReverseComparator;
-import org.mapdb.*;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
+import org.mapdb.SerializerBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +26,6 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
 {
 
     static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
-
-    int TIMESTAMP_INDEX = 1;
 
     @SuppressWarnings("rawtypes")
     public NavigableSet senderKey;
@@ -55,7 +57,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
                 .counterEnable()
                 .makeOrGet();
 
-        Bind.secondaryKey((BTreeMap)map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
+        Bind.secondaryKey((Bind.MapWithModificationListener)map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
             @Override
             public Tuple2<String, Long> run(Long key, Transaction val) {
                 Account account = val.getCreator();
@@ -66,7 +68,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
         this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
-        Bind.secondaryKeys((BTreeMap)map, this.recipientKey,
+        Bind.secondaryKeys((Bind.MapWithModificationListener)map, this.recipientKey,
                 new Fun.Function2<String[], Long, Transaction>() {
                     @Override
                     public String[] run(Long key, Transaction val) {
@@ -87,7 +89,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
         this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
-        Bind.secondaryKeys((BTreeMap)map, this.typeKey,
+        Bind.secondaryKeys((Bind.MapWithModificationListener)map, this.typeKey,
                 new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
                     @Override
                     public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
@@ -135,7 +137,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
                 .counterEnable()
                 .makeOrGet();
 
-        createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
+        createIndex(TransactionTab.TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
                 new Fun.Function2<Long, Long, Transaction>() {
                     @Override
                     public Long run(Long key, Transaction value) {
