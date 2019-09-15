@@ -275,6 +275,18 @@ public class DCSet extends DBASet implements Observer {
      */
     protected DCSet(DCSet parent, DB idDatabase) {
 
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                System.gc();
+                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1) {
+                    Controller.getInstance().stopAll(91);
+                    return;
+                }
+            }
+        }
+
         this.addUses();
 
         this.database = idDatabase;

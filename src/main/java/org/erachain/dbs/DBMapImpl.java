@@ -39,6 +39,9 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
      */
     public DBMapImpl(DBMap parent, DBASet databaseSet) {
         super(parent, databaseSet);
+
+        // OPEN MAP
+        this.getMap();
     }
 
     @Override

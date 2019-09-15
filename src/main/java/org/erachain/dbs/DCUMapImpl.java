@@ -51,7 +51,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
     public DCUMapImpl(DBMap<T, U> parent, DBASet dcSet) {
         super(parent, dcSet);
 
-        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+        if (false && Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {

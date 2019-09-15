@@ -18,7 +18,19 @@ public interface ItemAssetBalanceTab extends org.erachain.dbs.DBMap<byte[], Tupl
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> {
 
-	long getAssetKeyFromKey(byte[] key);
+    Tuple5<
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> DEFAULT_VALUE
+        = new Tuple5<
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                (new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                        new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
+
+    long getAssetKeyFromKey(byte[] key);
 
     byte[] getShortAccountFromKey(byte[] key);
 
@@ -49,5 +61,7 @@ public interface ItemAssetBalanceTab extends org.erachain.dbs.DBMap<byte[], Tupl
     void reset();
 
     void addObserver(Observer o);
+
+
 
     }

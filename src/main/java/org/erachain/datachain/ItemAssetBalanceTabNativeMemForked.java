@@ -20,7 +20,8 @@ public class ItemAssetBalanceTabNativeMemForked extends ItemAssetBalanceTabImpl 
     @SuppressWarnings({"unchecked"})
     @Override
     protected void getMap() {
-        map = new org.erachain.dbs.nativeMemMap.nativeMapTreeMap(parent, databaseSet);
+        map = new org.erachain.dbs.nativeMemMap.nativeMapTreeMap(parent, databaseSet,
+                ItemAssetBalanceTab.DEFAULT_VALUE);
     }
 
     public Collection<byte[]> assetKeySubMap(long key) {

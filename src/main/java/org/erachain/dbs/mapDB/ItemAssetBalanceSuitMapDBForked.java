@@ -132,7 +132,8 @@ public class ItemAssetBalanceSuitMapDBForked extends DCMapSuit<byte[], Tuple5<
 
     }
 
-    protected Tuple5<
+    @Override
+    public Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getDefaultValue() {
         return new Tuple5<

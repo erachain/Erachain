@@ -10,6 +10,8 @@ public interface DBMapSuit<T, U> {
 
     U get(T key);
 
+    U getDefaultValue();
+
     /**
      *
      * @param key

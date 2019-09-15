@@ -128,9 +128,6 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         }
     }
 
-
-    protected abstract U getDefaultValue();
-
     public void addUses() {
         if (this.databaseSet != null) {
             this.databaseSet.addUses();

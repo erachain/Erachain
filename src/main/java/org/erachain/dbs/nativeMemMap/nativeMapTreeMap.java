@@ -12,8 +12,10 @@ public class nativeMapTreeMap<T, U> extends DCMapSuit<T, U>
 
     static Logger logger = LoggerFactory.getLogger(nativeMapTreeMap.class.getSimpleName());
 
-    public nativeMapTreeMap(DBMap parent, DBASet databaseSet) {
+    private U DEFAULT_VALUE;
+    public nativeMapTreeMap(DBMap parent, DBASet databaseSet, U defaultValue) {
         super(parent, databaseSet);
+        DEFAULT_VALUE = defaultValue;
     }
 
     @Override
@@ -27,11 +29,10 @@ public class nativeMapTreeMap<T, U> extends DCMapSuit<T, U>
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
-
     }
 
-    protected U getDefaultValue() {
-        return null;
+    public U getDefaultValue() {
+        return DEFAULT_VALUE;
     }
 
 }

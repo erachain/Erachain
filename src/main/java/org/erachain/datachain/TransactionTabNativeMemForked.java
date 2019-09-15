@@ -18,7 +18,7 @@ public class TransactionTabNativeMemForked extends TransactionTabImpl
 
     @Override
     protected void getMap() {
-        map = new org.erachain.dbs.nativeMemMap.nativeMapTreeMap(parent, databaseSet);
+        map = new org.erachain.dbs.nativeMemMap.nativeMapTreeMap(parent, databaseSet, null);
     }
 
     @Override

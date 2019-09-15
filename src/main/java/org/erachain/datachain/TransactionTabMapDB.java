@@ -41,12 +41,12 @@ public class TransactionTabMapDB extends TransactionTabImpl
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return null;
+        return map.getIterator(TIMESTAMP_INDEX, false);
     }
 
     @Override
     public Iterator<Long> getCeatorIterator() {
-        return null;
+        return ((TransactionSuitMapDB)map).senderKey.iterator();
     }
 
 }
