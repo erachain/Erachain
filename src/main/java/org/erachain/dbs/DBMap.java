@@ -3,10 +3,7 @@ package org.erachain.dbs;
 import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface DBMap<T, U> {
     int NOTIFY_RESET = 1;
@@ -79,6 +76,7 @@ public interface DBMap<T, U> {
     boolean checkObserverMessageType(int messageType, int thisMessageType);
 
     Iterator<T> getIterator(int index, boolean descending);
+    NavigableMap<?, T> getIndex(int index, boolean descending);
 
     int getDefaultIndex();
 

@@ -1,14 +1,14 @@
 package org.erachain.dbs;
 
 import org.erachain.database.DBASet;
-import org.erachain.database.IndexIterator;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * К Обработке данных добалены события. Это Суперкласс для таблиц проекта.
@@ -107,38 +107,6 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
     @Override
     public boolean contains(T key) {
         return map.contains(key);
-    }
-
-    /**
-     *
-     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
-     * @param descending true if need descending sort
-     * @return
-     */
-    @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
-
-        // 0 - это главный индекс - он не в списке indexes
-        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
-            // IT IS INDEX ID in this.indexes
-
-            if (descending) {
-                index += DESCENDING_SHIFT_INDEX;
-            }
-
-            IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
-            return u;
-
-        } else {
-            if (descending) {
-                Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
-                return u;
-            }
-
-            Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
-            return u;
-
-        }
     }
 
     @Override

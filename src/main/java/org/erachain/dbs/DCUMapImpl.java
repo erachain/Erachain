@@ -26,6 +26,9 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
 
     protected Map<T, U> map;
     protected DBMap<T, U> parent;
+    protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes
+            = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
+
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
@@ -112,6 +115,16 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
 
         Bind.secondaryKeys((BTreeMap<T, U>) this.map, (NavigableSet<Fun.Tuple2<V, T>>) descendingIndexSet, function);
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Fun.Tuple2<?, T>>) descendingIndexSet);
+    }
+
+    @Override
+    public NavigableMap<?, T> getIndex(int index, boolean descending) {
+        return (NavigableMap)this.indexes.get(index);
+    }
+
+    @Override
+    public Iterator<T> getIterator(int index, boolean descending) {
+        return this.indexes.get(index).iterator();
     }
 
     // ERROR if key is not unique for each value:

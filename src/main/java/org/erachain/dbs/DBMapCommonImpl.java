@@ -2,11 +2,9 @@ package org.erachain.dbs;
 
 import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
-import org.erachain.database.IndexIterator;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +29,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     protected DB database;
     protected DBMapSuit<T, U> map;
     protected DBMap<T, U> parent;
-    protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
 
     protected Map<Integer, Integer> observableData;
 
@@ -41,9 +38,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     public DBMapCommonImpl(DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
-
-        //CREATE INDEXES
-        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
 
         if (databaseSet != null && databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
@@ -56,9 +50,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
 
         //OPEN MAP
         getMap();
-
-        //CREATE INDEXES
-        this.indexes = new HashMap<Integer, NavigableSet<Tuple2<?, T>>>();
 
         if (this.map !=  null) {
             this.createIndexes();
@@ -173,29 +164,14 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
      */
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
-
-        // 0 - это главный индекс - он не в списке indexes
-        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
-            // IT IS INDEX ID in this.indexes
-
-            if (descending) {
-                index += DESCENDING_SHIFT_INDEX;
-            }
-
-            IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
-            return u;
-
-        } else {
-            if (descending) {
-                Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
-                return u;
-            }
-
-            Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
-            return u;
-
-        }
+        return map.getIterator(index, descending);
     }
+
+    @Override
+    public Iterator<T> getIndex(int index, boolean descending) {
+        return map.getIndex(index, descending);
+    }
+
     public int getDefaultIndex() {
         return DEFAULT_INDEX;
     }
