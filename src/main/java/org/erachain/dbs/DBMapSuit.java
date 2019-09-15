@@ -1,8 +1,10 @@
 package org.erachain.dbs;
 
+import org.mapdb.Fun;
+
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.Set;
 
 public interface DBMapSuit<T, U> {
@@ -61,9 +63,9 @@ public interface DBMapSuit<T, U> {
 
     Collection<U> values();
 
-    Iterator<T> getIterator(int index, boolean descending);
+    NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending);
 
-    NavigableMap<?, T> getIndex(int index, boolean descending);
+    Iterator<T> getIterator(int index, boolean descending);
 
     //Collection<T> getSubKeys(T from, T to);
 

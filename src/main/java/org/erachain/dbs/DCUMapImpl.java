@@ -3,7 +3,6 @@ package org.erachain.dbs;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.IndexIterator;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.BTreeMap;
@@ -27,9 +26,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
 
     protected Map<T, U> map;
     protected DBMap<T, U> parent;
-    protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes
-            = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
-
+    //protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
@@ -118,6 +115,24 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Fun.Tuple2<?, T>>) descendingIndexSet);
     }
 
+    @Override
+    public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
+
+        // 0 - это главный индекс - он не в списке indexes
+        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
+            // IT IS INDEX ID in this.indexes
+
+            if (descending) {
+                index += DESCENDING_SHIFT_INDEX;
+            }
+
+            return this.indexes.get(index);
+
+        }
+
+        return null;
+    }
+
     /**
      *
      * @param index <b>primary Index = 0</b>, secondary index = 1...10000
@@ -129,14 +144,10 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes
-        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
-            // IT IS INDEX ID in this.indexes
+        NavigableSet<Fun.Tuple2<?, T>> indexSet = getIndex(index, descending);
+        if (indexSet != null) {
 
-            if (descending) {
-                index += DESCENDING_SHIFT_INDEX;
-            }
-
-            IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
+            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(this.indexes.get(index));
             this.outUses();
             return u;
 
@@ -148,37 +159,6 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
             }
 
             Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
-            this.outUses();
-            return u;
-
-        }
-    }
-
-    @Override
-    public NavigableMap<?, T> getIndex(int index, boolean descending) {
-        this.addUses();
-
-        // 0 - это главный индекс - он не в списке indexes
-        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
-            // IT IS INDEX ID in this.indexes
-
-            if (descending) {
-                index += DESCENDING_SHIFT_INDEX;
-            }
-
-            NavigableMap<?, T> u = (NavigableMap) this.indexes.get(index);
-            this.outUses();
-            return u;
-
-        } else {
-            NavigableSet<T> u;
-            if (descending) {
-                u = ((NavigableMap<T, U>) this.map).descendingKeySet();
-                this.outUses();
-                return u;
-            }
-
-            u = this.map.keySet();
             this.outUses();
             return u;
 

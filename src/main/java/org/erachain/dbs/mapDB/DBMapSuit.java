@@ -2,10 +2,10 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
-import org.erachain.database.IndexIterator;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 
@@ -20,7 +20,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
     protected DB database;
 
     protected Map<T, U> map;
-    protected Map<Integer, NavigableSet<Tuple2<?, T>>> indexes;
+    protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<>();
 
     // for DCMapSuit
     public DBMapSuit() {
@@ -79,9 +79,55 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
     }
 
     @Override
-    Iterator <T> getIterator() {
-        return  indexes.
+    public NavigableSet<Tuple2<?, T>> getIndex(int index, boolean descending) {
+
+        // 0 - это главный индекс - он не в списке indexes
+        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
+            // IT IS INDEX ID in this.indexes
+
+            if (descending) {
+                index += DESCENDING_SHIFT_INDEX;
+            }
+
+            return this.indexes.get(index);
+
+        }
+
+        return null;
     }
+
+    /**
+     *
+     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param descending true if need descending sort
+     * @return
+     */
+    @Override
+    public Iterator<T> getIterator(int index, boolean descending) {
+        this.addUses();
+
+        // 0 - это главный индекс - он не в списке indexes
+        NavigableSet<Tuple2<?, T>> indexSet = getIndex(index, descending);
+        if (indexSet != null) {
+
+            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(this.indexes.get(index));
+            this.outUses();
+            return u;
+
+        } else {
+            if (descending) {
+                Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                this.outUses();
+                return u;
+            }
+
+            Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
+            this.outUses();
+            return u;
+
+        }
+    }
+
 
     protected abstract U getDefaultValue();
 
@@ -230,42 +276,6 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
 
         this.outUses();
         return false;
-    }
-
-    /**
-     *
-     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
-     * @param descending true if need descending sort
-     * @return
-     */
-    @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
-        this.addUses();
-
-        // 0 - это главный индекс - он не в списке indexes
-        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
-            // IT IS INDEX ID in this.indexes
-
-            if (descending) {
-                index += DESCENDING_SHIFT_INDEX;
-            }
-
-            IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
-            this.outUses();
-            return u;
-
-        } else {
-            if (descending) {
-                Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
-                this.outUses();
-                return u;
-            }
-
-            Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
-            this.outUses();
-            return u;
-
-        }
     }
 
     /**

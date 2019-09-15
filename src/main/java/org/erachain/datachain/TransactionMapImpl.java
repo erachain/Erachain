@@ -158,7 +158,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
                 timestamp -= keepTime;
                 tickerIter = System.currentTimeMillis();
-                SortedSet<Tuple2<?, Long>> subSet = this.indexes.get(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
+                ubSet = this.getIndex(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
                         timestamp, null));
                 tickerIter = System.currentTimeMillis() - tickerIter;
                 if (tickerIter > 10) {

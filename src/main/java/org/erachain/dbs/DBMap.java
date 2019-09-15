@@ -2,6 +2,7 @@ package org.erachain.dbs;
 
 import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
+import org.mapdb.Fun;
 
 import java.util.*;
 
@@ -75,8 +76,9 @@ public interface DBMap<T, U> {
 
     boolean checkObserverMessageType(int messageType, int thisMessageType);
 
+    NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending);
+
     Iterator<T> getIterator(int index, boolean descending);
-    NavigableMap<?, T> getIndex(int index, boolean descending);
 
     int getDefaultIndex();
 
