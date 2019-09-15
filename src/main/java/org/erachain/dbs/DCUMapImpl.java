@@ -3,6 +3,7 @@ package org.erachain.dbs;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.IndexIterator;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.BTreeMap;
@@ -117,14 +118,71 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Fun.Tuple2<?, T>>) descendingIndexSet);
     }
 
+    /**
+     *
+     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param descending true if need descending sort
+     * @return
+     */
     @Override
-    public NavigableMap<?, T> getIndex(int index, boolean descending) {
-        return (NavigableMap)this.indexes.get(index);
+    public Iterator<T> getIterator(int index, boolean descending) {
+        this.addUses();
+
+        // 0 - это главный индекс - он не в списке indexes
+        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
+            // IT IS INDEX ID in this.indexes
+
+            if (descending) {
+                index += DESCENDING_SHIFT_INDEX;
+            }
+
+            IndexIterator<T> u = new IndexIterator<T>(this.indexes.get(index));
+            this.outUses();
+            return u;
+
+        } else {
+            if (descending) {
+                Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                this.outUses();
+                return u;
+            }
+
+            Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
+            this.outUses();
+            return u;
+
+        }
     }
 
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
-        return this.indexes.get(index).iterator();
+    public NavigableMap<?, T> getIndex(int index, boolean descending) {
+        this.addUses();
+
+        // 0 - это главный индекс - он не в списке indexes
+        if (index > 0 && this.indexes != null && this.indexes.containsKey(index)) {
+            // IT IS INDEX ID in this.indexes
+
+            if (descending) {
+                index += DESCENDING_SHIFT_INDEX;
+            }
+
+            NavigableMap<?, T> u = (NavigableMap) this.indexes.get(index);
+            this.outUses();
+            return u;
+
+        } else {
+            NavigableSet<T> u;
+            if (descending) {
+                u = ((NavigableMap<T, U>) this.map).descendingKeySet();
+                this.outUses();
+                return u;
+            }
+
+            u = this.map.keySet();
+            this.outUses();
+            return u;
+
+        }
     }
 
     // ERROR if key is not unique for each value:
