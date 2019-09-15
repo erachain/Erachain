@@ -147,7 +147,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
 
     }
 
-    protected Transaction getDefaultValue() {
+    public Transaction getDefaultValue() {
         return null;
     }
 

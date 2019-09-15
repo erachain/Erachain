@@ -108,7 +108,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction>
         return indexes.get(3);
     }
 
-    protected Transaction getDefaultValue() {
+    public Transaction getDefaultValue() {
         return null;
     }
 
