@@ -10,6 +10,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBMap;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -158,7 +159,7 @@ abstract class TransactionMapImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
                 timestamp -= keepTime;
                 tickerIter = System.currentTimeMillis();
-                ubSet = this.getIndex(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
+                SortedSet<Tuple2<?, Long>> subSet = this.getIndex(TIMESTAMP_INDEX).headSet(new Tuple2<Long, Long>(
                         timestamp, null));
                 tickerIter = System.currentTimeMillis() - tickerIter;
                 if (tickerIter > 10) {
