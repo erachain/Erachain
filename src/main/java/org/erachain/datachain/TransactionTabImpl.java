@@ -154,64 +154,45 @@ abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
             timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
 
-            if (false && cutDeadTime) {
+            /**
+             * по несколько секунд итератор берется - при том что таблица пустая -
+             * - дале COMPACT не помогает
+             */
+            //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+            Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
+            tickerIter = System.currentTimeMillis() - tickerIter;
+            if (tickerIter > 10) {
+                LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
+            }
 
-                timestamp -= keepTime;
-                tickerIter = System.currentTimeMillis();
-                SortedSet<Tuple2<?, Long>> subSet = this.getIndex(TIMESTAMP_INDEX, false).headSet(new Tuple2<Long, Long>(
-                        timestamp, null));
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE headSet: " + tickerIter + " ms subSet.size: " + subSet.size());
+            Transaction transaction;
+
+            tickerIter = System.currentTimeMillis();
+            long size = this.size();
+            tickerIter = System.currentTimeMillis() - tickerIter;
+            if (tickerIter > 10) {
+                LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
+            }
+            while (iterator.hasNext()) {
+                Long key = iterator.next().b;
+                transaction = this.map.get(key);
+                if (transaction == null) {
+                    // такая ошибка уже было
+                    break;
                 }
 
-                for (Tuple2<?, Long> key : subSet) {
-                    if (true || this.contains(key.b))
-                        this.remove(key.b);
+                long deadline = transaction.getDeadline();
+                if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
+                        || ((Controller.HARD_WORK > 3
+                        || cutDeadTime)
+                        && deadline < timestamp)
+                        || Controller.HARD_WORK <= 3
+                        && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                        || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                    this.remove(key);
                     count++;
-                }
-
-            } else {
-                /**
-                 * по несколько секунд итератор берется - при том что таблица пустая -
-                 * - дале COMPACT не помогает
-                 */
-                //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-                Iterator<Tuple2<?, Long>> iterator = this.indexes.get(TIMESTAMP_INDEX).iterator();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-                }
-
-                Transaction transaction;
-
-                tickerIter = System.currentTimeMillis();
-                long size = this.size();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
-                }
-                while (iterator.hasNext()) {
-                    Long key = iterator.next().b;
-                    transaction = this.map.get(key);
-                    if (transaction == null) {
-                        // такая ошибка уже было
-                        break;
-                    }
-
-                    long deadline = transaction.getDeadline();
-                    if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                            || ((Controller.HARD_WORK > 3
-                            || cutDeadTime)
-                            && deadline < timestamp)
-                            || Controller.HARD_WORK <= 3
-                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                            || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                        this.remove(key);
-                        count++;
-                    } else {
-                        break;
-                    }
+                } else {
+                    break;
                 }
             }
 

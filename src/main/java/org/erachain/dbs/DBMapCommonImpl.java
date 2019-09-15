@@ -157,10 +157,10 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
         }
     }
 
-    @Override
-    public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
-        return map.getIndex(index, descending);
-    }
+    //@Override
+    //public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
+    //    return map.getIndex(index, descending);
+    //}
 
     /**
      *

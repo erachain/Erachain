@@ -78,7 +78,7 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
-    @Override
+    //@Override
     public NavigableSet<Tuple2<?, T>> getIndex(int index, boolean descending) {
 
         // 0 - это главный индекс - он не в списке indexes

@@ -115,7 +115,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Fun.Tuple2<?, T>>) descendingIndexSet);
     }
 
-    @Override
+    //@Override
     public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
 
         // 0 - это главный индекс - он не в списке indexes

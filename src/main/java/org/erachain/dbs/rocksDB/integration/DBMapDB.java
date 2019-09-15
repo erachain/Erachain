@@ -70,10 +70,10 @@ public class DBMapDB<K, V> implements InnerDBTable<K, V> {
 
     }
 
-    @Override
-    public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
-        return map.getIndex(index, descending);
-    }
+    //@Override
+    //public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
+    //    return map.getIndex(index, descending);
+    //}
 
     @Override
     public Iterator<K> getIterator(boolean descending) {
