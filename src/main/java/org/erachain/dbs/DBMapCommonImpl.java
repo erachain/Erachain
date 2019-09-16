@@ -158,4 +158,17 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
         return this.observableData.put(index, data);
     }
 
+    @Override
+    public Map<Integer, Integer> getObservableData() {
+        return observableData;
+    }
+
+    @Override
+    public boolean checkObserverMessageType(int messageType, int thisMessageType) {
+        if (observableData == null || observableData.isEmpty() || !observableData.containsKey(thisMessageType))
+            return false;
+
+        return observableData.get(messageType) == thisMessageType;
+    }
+
 }

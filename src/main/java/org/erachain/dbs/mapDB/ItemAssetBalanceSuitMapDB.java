@@ -148,11 +148,6 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes() {
-    }
-
-    @Override
     public Iterator<byte[]> assetIterator(Long key) {
         return ((ItemAssetBalanceSuitMapDB)map).assetKeyMap.subMap(
                 Fun.t2(key, null),

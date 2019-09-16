@@ -202,13 +202,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
         this.outUses();
 
-        if (this.observableData != null) {
-            if (this.observableData.containsKey(NOTIFY_ADD)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
-            }
-        }
-
         return old != null;
     }
 
@@ -235,14 +228,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
             value = this.map.remove(key);
             this.outUses();
 
-            //NOTIFY
-            if (this.observableData != null) {
-                if (this.observableData.containsKey(NOTIFY_REMOVE)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
-                }
-            }
-
         } else {
             value = null;
             this.outUses();
@@ -267,14 +252,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         this.addUses();
         this.map.remove(key);
         this.outUses();
-
-        //NOTIFY
-        if (this.observableData != null) {
-            if (this.observableData.containsKey(NOTIFY_DELETE)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_DELETE), key));
-            }
-        }
 
     }
 
@@ -315,15 +292,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
         this.outUses();
 
-        // NOTYFIES
-        if (this.observableData != null) {
-            //NOTIFY LIST
-            if (this.observableData.containsKey(NOTIFY_RESET)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
-            }
-
-        }
-
     }
+
 }

@@ -12,9 +12,18 @@ import org.mapdb.Fun.Tuple2;
 import java.util.*;
 
 @Slf4j
-public abstract class DBMapSuitImpl<T, U> extends Observable
+public abstract class DBMapSuitImpl<T, U>
         implements DBMapSuit<T, U> {
 
-    protected Map<Integer, Integer> observableData;
+
+    protected abstract void getMap();
+
+    @Override
+    public int getDefaultIndex() {
+        return 0;
+    }
+
+    protected void createIndexes() {
+    }
 
 }

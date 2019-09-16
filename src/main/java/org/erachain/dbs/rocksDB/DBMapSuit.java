@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
+import org.erachain.dbs.DBMapSuitImpl;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.InnerDBTable;
@@ -14,7 +15,7 @@ import java.util.Set;
 
 
 @Slf4j
-public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U> {
+public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     protected DBASet databaseSet;
     protected DB database;
