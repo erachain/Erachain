@@ -23,10 +23,6 @@ public class TransactionTabMapDB extends TransactionTabImpl
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     Iterable typeKeys(String sender, Long timestamp, Integer type) {
         return Fun.filter(((TransactionSuitMapDB)map).typeKey, new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
     }

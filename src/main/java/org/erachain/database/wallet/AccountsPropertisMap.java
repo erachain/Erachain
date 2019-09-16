@@ -50,11 +50,4 @@ public class AccountsPropertisMap extends DCUMapImpl<String, Tuple2<String, Stri
         return null;
     }
 
-    @Override
-    protected void createIndexes() {
-        // TODO Auto-generated method stub
-
-    }
-
-
 }

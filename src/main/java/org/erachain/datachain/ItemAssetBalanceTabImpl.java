@@ -35,7 +35,7 @@ import java.util.Iterator;
  */
 // TODO SOFT HARD TRUE
 
-abstract public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl<byte[], Tuple5<
+public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK

@@ -148,20 +148,20 @@ public class DCSet extends DBASet implements Observer {
 
         try {
             if (isFork()) {
-                this.assetBalanceMap = new ItemAssetBalanceTabMapDB(this, database);
+                this.assetBalanceMap = new ItemAssetBalanceTabImpl(this, database);
                 this.transactionTab = new TransactionTabMapDB(this, database);
             } else {
                 if (true) {
-                    this.assetBalanceMap = new ItemAssetBalanceTabRocksDB(this, database);
+                    this.assetBalanceMap = new ItemAssetBalanceTabImpl(this, database);
                     this.transactionTab = new TransactionTabMapDB(this, database);
                 } else {
                     switch (BlockChain.DC_DBS_TYPE) {
                         case 1:
+                            this.assetBalanceMap = new ItemAssetBalanceTabImpl(this, database);
                             this.transactionTab = new TransactionTabRocksDB(this, database);
-                            this.assetBalanceMap = new ItemAssetBalanceTabRocksDB(this, database);
                             break;
                         default:
-                            this.assetBalanceMap = new ItemAssetBalanceTabMapDB(this, database);
+                            this.assetBalanceMap = new ItemAssetBalanceTabImpl(this, database);
                             this.transactionTab = new TransactionTabMapDB(this, database);
 
                     }
@@ -296,16 +296,16 @@ public class DCSet extends DBASet implements Observer {
         this.bchain = parent.bchain;
 
         if (true) {
-            this.assetBalanceMap = new ItemAssetBalanceTabNativeMemForked(parent.assetBalanceMap, this);
+            this.assetBalanceMap = new ItemAssetBalanceTabImpl(parent.assetBalanceMap, this);
             this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
         } else {
             switch (BlockChain.DCFORK_DBS_TYPE) {
                 case 1:
-                    this.assetBalanceMap = new ItemAssetBalanceTabMapDBForked(parent.assetBalanceMap, this);
+                    this.assetBalanceMap = new ItemAssetBalanceTabImpl(parent.assetBalanceMap, this);
                     this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
                     break;
                 default:
-                    this.assetBalanceMap = new ItemAssetBalanceTabNativeMemForked(parent.assetBalanceMap, this);
+                    this.assetBalanceMap = new ItemAssetBalanceTabImpl(parent.assetBalanceMap, this);
                     this.transactionTab = new TransactionTabNativeMemForked(parent.transactionTab, this);
             }
         }

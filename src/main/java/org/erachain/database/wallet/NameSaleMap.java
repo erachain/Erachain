@@ -36,7 +36,6 @@ public class NameSaleMap extends DCUMapImpl<Tuple2<String, String>, BigDecimal> 
         }
     }
 
-    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
         //NAME INDEX

@@ -49,10 +49,6 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     protected void getMap() {
         //OPEN MAP
         map = this.openMap(database);

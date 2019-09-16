@@ -50,11 +50,7 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
 
         //OPEN MAP
         getMap();
-
-        if (this.map !=  null) {
-            this.createIndexes();
-        }
-
+        
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
         }
@@ -80,8 +76,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     }
 
     protected abstract void getMap();
-
-    protected abstract void createIndexes();
 
     @Override
     public Map<Integer, Integer> getObservableData() {

@@ -74,6 +74,9 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
     protected abstract void getMemoryMap();
     protected abstract U getDefaultValue();
 
+    protected void createIndexes() {
+    }
+
     /**
      * Make SECODATY INDEX
      * INDEX ID = 0 - its is PRIMARY - not use it here

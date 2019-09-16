@@ -26,10 +26,6 @@ public class TransactionTabRocksDB extends TransactionTabImpl
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     Iterable typeKeys(String address, Long timestamp, Integer type) {
         /*
         IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
