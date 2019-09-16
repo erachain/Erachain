@@ -1447,7 +1447,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         // CLEAR all FOOTPRINTS and empty data
-        this.dcSet.getVouchRecordMap().remove(dbRef);
+        this.dcSet.getVouchRecordMap().delete(dbRef);
 
     }
 

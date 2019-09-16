@@ -770,10 +770,10 @@ public class Account {
         // DELETE TIMESTAMP - REFERENCE
         long[] reference = map.remove(keyPrevPoint);
         if (reference == null) {
-            map.remove(shortBytes);
+            map.delete(shortBytes);
         } else {
-            // SET OLD REFERENCE
-            map.set(shortBytes, reference);
+            // PUT OLD REFERENCE
+            map.put(shortBytes, reference);
         }
     }
 
