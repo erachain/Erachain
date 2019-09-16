@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Описатель Таблиц (Tab), в которых есть Обернутые карты - (Suit)
+ * Общий Описатель Таблиц (Tab) и Обернутых карт - (Suit)
  * @param <T>
  * @param <U>
  */
-public interface DBMap<T, U> {
+public interface DBTabSuitCommon<T, U> {
     int NOTIFY_RESET = 1;
     int NOTIFY_ADD = 2;
     int NOTIFY_REMOVE = 3;

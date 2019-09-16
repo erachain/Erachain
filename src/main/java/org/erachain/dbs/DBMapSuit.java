@@ -6,6 +6,10 @@ import java.util.Set;
 
 public interface DBMapSuit<T, U> {
 
+    void getMap();
+    void createIndexes();
+
+
     int size();
 
     U get(T key);

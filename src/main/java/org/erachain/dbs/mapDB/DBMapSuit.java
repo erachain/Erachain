@@ -2,6 +2,9 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
+import org.erachain.dbs.DBMapCommonImpl;
+import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -12,7 +15,7 @@ import org.mapdb.Fun.Tuple2;
 import java.util.*;
 
 @Slf4j
-public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U> {
+public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     public int DESCENDING_SHIFT_INDEX = 10000;
 
@@ -32,10 +35,6 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         getMap();
         createIndexes();
     }
-
-    protected abstract void getMap();
-
-    protected abstract void createIndexes();
 
     /**
      * Make SECODATY INDEX
@@ -202,6 +201,14 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         U old = this.map.put(key, value);
 
         this.outUses();
+
+        if (this.observableData != null) {
+            if (this.observableData.containsKey(NOTIFY_ADD)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
+            }
+        }
+
         return old != null;
     }
 
@@ -226,13 +233,20 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         //REMOVE
         if (this.map.containsKey(key)) {
             value = this.map.remove(key);
+            this.outUses();
 
+            //NOTIFY
+            if (this.observableData != null) {
+                if (this.observableData.containsKey(NOTIFY_REMOVE)) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
+                }
+            }
 
         } else {
             value = null;
+            this.outUses();
         }
-
-        this.outUses();
 
         return value;
     }
@@ -253,6 +267,15 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         this.addUses();
         this.map.remove(key);
         this.outUses();
+
+        //NOTIFY
+        if (this.observableData != null) {
+            if (this.observableData.containsKey(NOTIFY_DELETE)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_DELETE), key));
+            }
+        }
+
     }
 
     @Override
@@ -291,5 +314,16 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
         }
 
         this.outUses();
+
+        // NOTYFIES
+        if (this.observableData != null) {
+            //NOTIFY LIST
+            if (this.observableData.containsKey(NOTIFY_RESET)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
+            }
+
+        }
+
     }
 }

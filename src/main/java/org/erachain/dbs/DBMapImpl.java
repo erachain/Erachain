@@ -24,13 +24,13 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
     // Эта Карта не должна путаться вверху с DCU картой - иначе НУЛ при заходе в DBMapCommonImpl
     protected DBMapSuit<T, U> map;
 
-    public DBMapImpl() {
-    }
+    //public DBMapImpl() {
+    //}
 
-    public DBMapImpl(DBASet databaseSet) {
-        super(databaseSet);
-
-    }
+    //public DBMapImpl(DBASet databaseSet) {
+    //    super(databaseSet);
+    //
+    //}
 
     public DBMapImpl(DBASet databaseSet, DB database) {
         super(databaseSet, database);
@@ -70,12 +70,31 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
 
     @Override
     public boolean set(T key, U value) {
-        return this.map.set(key, value);
+
+        boolean result = this.map.set(key, value);
+
+        if (this.observableData != null) {
+            if (this.observableData.containsKey(NOTIFY_ADD)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
+            }
+        }
+
+        return result;
+
     }
 
     @Override
     public void put(T key, U value) {
+
         this.map.put(key, value);
+
+        if (this.observableData != null) {
+            if (this.observableData.containsKey(NOTIFY_ADD)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_ADD), value));
+            }
+        }
     }
 
     @Override
@@ -103,7 +122,16 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
 
     @Override
     public void delete(T key) {
-        remove(key);
+        this.map.delete(key);
+
+        //NOTIFY
+        if (this.observableData != null) {
+            if (this.observableData.containsKey(NOTIFY_DELETE)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_DELETE), key));
+            }
+        }
+
     }
 
     @Override

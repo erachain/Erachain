@@ -49,7 +49,8 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
 
         //OPEN MAP
         getMap();
-        
+        getMap();
+
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
         }
