@@ -511,7 +511,9 @@ public class RSend extends TransactionAmount {
         if ((flags & Transaction.NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0
                 && this.hasPublicText() && !isPerson) {
             if (BlockChain.DEVELOP_USE) {
-                if (height > BlockChain.ALL_BALANCES_OK_TO) { // TODO: delete for new CHAIN
+                if (height < 495000) { // TODO: delete for new CHAIN
+                    ;
+                } else if (height > BlockChain.ALL_BALANCES_OK_TO) { // TODO: delete for new CHAIN
                     boolean good = false;
                     for (String admin : BlockChain.GENESIS_ADMINS) {
                         if (this.creator.equals(admin)) {

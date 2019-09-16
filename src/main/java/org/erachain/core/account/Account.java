@@ -76,7 +76,7 @@ public class Account {
             assert(addressBytes.length == 25);
         }
 
-        this.address = Base58.encode(addressBytes);
+        this.address = Base58.encode(bytes);
     }
 
     public static byte[] makeShortBytes(String address) {
