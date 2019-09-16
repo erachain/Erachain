@@ -136,7 +136,7 @@ public class BlockChain {
 
     public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
-    public static final int VERS_30SEC = DEVELOP_USE ? 471000 : 278975 + 1500;
+    public static final int VERS_30SEC = DEVELOP_USE ? 471000 : 280785; //	2019-09-17 12:01:13
     public static final long VERS_30SEC_TIME = DEFAULT_MAINNET_STAMP + (long)VERS_30SEC * (DEVELOP_USE? 120L :288L);
 
     public static final int DEVELOP_FORGING_START = 100;

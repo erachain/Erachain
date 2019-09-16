@@ -1653,10 +1653,13 @@ import java.util.*;
                         }
 
                         //CHECK TIMESTAMP AND DEADLINE
-                        if (heightBlock > BlockChain.VERS_30SEC
+                        if (BlockChain.DEVELOP_USE && heightBlock > 494000
                                 && transaction.getTimestamp() > timestampEnd
-                            || !BlockChain.DEVELOP_USE && heightBlock > 278989 // TODO убрать после перехода на 30 сек
-                                && transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
+                            || !BlockChain.DEVELOP_USE
+                                && (heightBlock > BlockChain.VERS_30SEC && transaction.getTimestamp() > timestampEnd)
+                                    || heightBlock > 278989
+                                            && transaction.getTimestamp()
+                                                > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                         ) {
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                     + ":" + transaction.viewFullTypeName()
@@ -2122,14 +2125,17 @@ import java.util.*;
                 transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                 //PROCESS
-                if (!transaction.isWiped()) {
+                if (transaction.isWiped()
+                        || BlockChain.DEVELOP_USE && heightBlock > 473600 && heightBlock < 493700
+                                && transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION
+                        ) {
+                    //UPDATE REFERENCE OF SENDER
+                    transaction.getCreator().setLastTimestamp(
+                            new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
+                } else {
                     timerStart = System.currentTimeMillis();
                     transaction.process(this, Transaction.FOR_NETWORK);
                     timerProcess += System.currentTimeMillis() - timerStart;
-                } else {
-                    //UPDATE REFERENCE OF SENDER
-                        transaction.getCreator().setLastTimestamp(
-                                new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
                 }
 
                 transactionSignature = transaction.getSignature();
