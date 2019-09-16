@@ -3,6 +3,7 @@ package org.erachain.dbs.rocksDB;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
@@ -19,12 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
-public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction>
+public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
 {
 
     static Logger logger = LoggerFactory.getLogger(TransactionSuitRocksDB.class.getSimpleName());
@@ -46,15 +49,6 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction>
 
     @Override
     protected void getMap() {
-        map = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
-                RocksDbSettings.initCustomSettings(7, 64, 32,
-                        256, 10,
-                        1, 256, 32, false),
-                ROCKS_DB_FOLDER);
-    }
-
-    @Override
-    protected void createIndexes() {
 
         timestampUnconfirmedTransactionIndex = new SimpleIndexDB<>(timestampUnconfirmedTransactionIndexName,
                 new BiFunction<Long, Transaction, Long>() {
@@ -88,28 +82,46 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction>
                             (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());
                 }, indexByteableTuple3StringLongInteger);
 
-        indexes = new ArrayList<>();
+        List indexes = new ArrayList<>();
         indexes.add(timestampUnconfirmedTransactionIndex);
+        indexes.add(addressTypeUnconfirmedTransactionIndex);
         indexes.add(senderUnconfirmedTransactionIndex);
         indexes.add(recipientsUnconfirmedTransactionIndex);
-        indexes.add(addressTypeUnconfirmedTransactionIndex);
+
+        map = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
+                RocksDbSettings.initCustomSettings(7, 64, 32,
+                        256, 10,
+                        1, 256, 32, false),
+                ROCKS_DB_FOLDER);
     }
 
-    public IndexDB getTimestampIndex() {
-        return indexes.get(0);
-    }
-    public IndexDB getSenderIndex() {
-        return indexes.get(1);
-    }
-    public IndexDB getRecientIndex() {
-        return indexes.get(2);
-    }
-    public IndexDB getAddresTypeIndex() {
-        return indexes.get(3);
-    }
-
+    @Override
     public Transaction getDefaultValue() {
+        return DEFAULT_VALUE;
+    }
+
+    @Override
+    public Iterable typeKeys(String sender, Long timestamp, Integer type) {
+        return (Iterable) map.getIndexIterator(4, false);
+    }
+
+    @Override
+    public Iterable senderKeys(String sender) {
+        return (Iterable) map.getIndexIterator(4, false);
+    }
+
+    @Override
+    public Iterable recipientKeys(String recipient) {
+        return (Iterable) map.getIndexIterator(2, false);
+    }
+
+    @Override
+    public Iterator<Long> getTimestampIterator() {
         return null;
     }
 
+    @Override
+    public Iterator<Long> getCeatorIterator() {
+        return null;
+    }
 }

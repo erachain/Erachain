@@ -6,6 +6,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionSuit;
 import org.erachain.datachain.TransactionTab;
 import org.erachain.utils.ReverseComparator;
 import org.mapdb.Bind;
@@ -19,10 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 
-public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
+public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
 {
 
     static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
@@ -147,8 +149,33 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction>
 
     }
 
+    @Override
     public Transaction getDefaultValue() {
+        return DEFAULT_VALUE;
+    }
+
+    @Override
+    public Iterable typeKeys(String sender, Long timestamp, Integer type) {
         return null;
     }
 
+    @Override
+    public Iterable senderKeys(String sender) {
+        return null;
+    }
+
+    @Override
+    public Iterable recipientKeys(String recipient) {
+        return null;
+    }
+
+    @Override
+    public Iterator<Long> getTimestampIterator() {
+        return null;
+    }
+
+    @Override
+    public Iterator<Long> getCeatorIterator() {
+        return null;
+    }
 }

@@ -1176,7 +1176,7 @@ public class Controller extends Observable {
             File tempDir = new File(Settings.getInstance().getDataTempDir());
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {
-            LOGGER.error(e.getMessage(), e);
+            //LOGGER.error(e.getMessage(), e);
         }
 
         LOGGER.info("Closed.");

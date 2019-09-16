@@ -84,7 +84,8 @@ public class TransactionCreator {
         List<Transaction> accountTransactions = new ArrayList<Transaction>();
         Transaction transaction;
 
-        if (true) {
+        if (false) {
+            // У форка нет вторичных индексов поэтому этот вариант не покатит
             for (Account account: Controller.getInstance().getAccounts()) {
                 Iterable<Long> keys = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
                         0, false, 0, 0, 0L);
