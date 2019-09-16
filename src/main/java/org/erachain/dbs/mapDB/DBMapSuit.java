@@ -12,6 +12,12 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
 
+/**
+ * Оболочка для Карты от конкретной СУБД чтобы эту оболочку вставлять в Таблицу, которая запускает события для ГУИ.
+ * Для каждой СУБД свой порядок обработки команд
+ * @param <T>
+ * @param <U>
+ */
 @Slf4j
 public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
