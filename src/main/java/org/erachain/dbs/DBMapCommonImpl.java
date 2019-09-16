@@ -148,4 +148,14 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
         return list;
     }
 
+    @Override
+    public Integer deleteObservableData(int index) {
+        return this.observableData.remove(index);
+    }
+
+    @Override
+    public Integer setObservableData(int index, Integer data) {
+        return this.observableData.put(index, data);
+    }
+
 }
