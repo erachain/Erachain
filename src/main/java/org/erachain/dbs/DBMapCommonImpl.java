@@ -27,7 +27,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
     protected DB database;
-    protected DBMapSuit<T, U> map;
     protected DBMap<T, U> parent;
 
     protected Map<Integer, Integer> observableData;
@@ -155,17 +154,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     //    return map.getIndex(index, descending);
     //}
 
-    /**
-     *
-     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
-     * @param descending true if need descending sort
-     * @return
-     */
-    @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
-        return map.getIterator(index, descending);
-    }
-
     public int getDefaultIndex() {
         return DEFAULT_INDEX;
     }
@@ -181,25 +169,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
         }
 
         return list;
-    }
-
-    /**
-     * уведомляет только счетчик если он разрешен, иначе Сбросить
-     */
-    @Override
-    public void reset() {
-        //RESET MAP
-        this.map.reset();
-
-        // NOTYFIES
-        if (this.observableData != null) {
-            //NOTIFY LIST
-            if (this.observableData.containsKey(NOTIFY_RESET)) {
-                this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
-            }
-
-        }
     }
 
 }

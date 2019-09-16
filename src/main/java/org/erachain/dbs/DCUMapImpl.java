@@ -2,6 +2,7 @@ package org.erachain.dbs;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -166,6 +167,19 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
             return u;
 
         }
+    }
+
+    @Override
+    public SortableList<T, U> getList() {
+        SortableList<T, U> list;
+        if (this.size() < 1000) {
+            list = new SortableList<T, U>(this);
+        } else {
+            // обрезаем полный список в базе до 1000
+            list = SortableList.makeSortableList(this, false, 1000);
+        }
+
+        return list;
     }
 
     // ERROR if key is not unique for each value:
@@ -432,6 +446,25 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
     public void outUses() {
         if (database != null) {
             uses--;
+        }
+    }
+
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Сбросить
+     */
+    @Override
+    public void reset() {
+        //RESET MAP
+        this.map.clear();
+
+        // NOTYFIES
+        if (this.observableData != null) {
+            //NOTIFY LIST
+            if (this.observableData.containsKey(NOTIFY_RESET)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
+            }
+
         }
     }
 

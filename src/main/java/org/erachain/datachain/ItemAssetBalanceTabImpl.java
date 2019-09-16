@@ -66,7 +66,7 @@ public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl<byte[], 
     protected void getMap()
     {
         if (parent == null) {
-            String dbs = "MapDB";
+            String dbs = "RocksDB";
             if (dbs.equals("MapDB"))
                 map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
             else if (dbs.equals("RocksDB"))

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -19,6 +20,9 @@ import java.util.Set;
 public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements DBMap<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+
+    // Эта Карта не должна путаться вверху с DCU картой - иначе НУЛ при заходе в DBMapCommonImpl
+    protected DBMapSuit<T, U> map;
 
     public DBMapImpl() {
     }
@@ -110,6 +114,17 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
     @Override
     public boolean contains(T key) {
         return map.contains(key);
+    }
+
+    /**
+     *
+     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param descending true if need descending sort
+     * @return
+     */
+    @Override
+    public Iterator<T> getIterator(int index, boolean descending) {
+        return map.getIterator(index, descending);
     }
 
     @Override
