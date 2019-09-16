@@ -93,8 +93,6 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
         }
     }
 
-
-
     /**
      * Используется для получения транзакций для сборки блока
      * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
@@ -313,25 +311,9 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
 
     }
 
-    Iterable typeKeys(String sender, Long timestamp, Integer type) {
-        return Fun.filter(((TransactionSuitMapDB)map).typeKey,
-                new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
-    }
-    public Iterable senderKeys(String sender) {
-        return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender);
-    }
-    public Iterable recipientKeys(String recipient) {
-        return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient);
-    }
-
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return map.getIterator(TIMESTAMP_INDEX, false);
-    }
-
-    @Override
-    public Iterator<Long> getCeatorIterator() {
-        return ((TransactionSuitMapDB)map).senderKey.iterator();
+        return ((TransactionSuit)map).getTimestampIterator();
     }
 
     /**
@@ -366,19 +348,19 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
         //  timestamp = null;
         if (sender != null) {
             if (type > 0) {
-                senderKeys = typeKeys(sender, timestamp, type);
+                senderKeys = ((TransactionSuit)map).typeKeys(sender, timestamp, type);
             } else {
-                senderKeys = senderKeys(sender);
+                senderKeys = ((TransactionSuit)map).senderKeys(sender);
             }
         }
 
         if (recipient != null) {
             if (type > 0) {
                 //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
-                recipientKeys = typeKeys(recipient, timestamp, type);
+                recipientKeys = ((TransactionSuit)map).typeKeys(recipient, timestamp, type);
             } else {
                 //recipientKeys = Fun.filter(this.recipientKey, recipient);
-                recipientKeys = recipientKeys(recipient);
+                recipientKeys = ((TransactionSuit)map).recipientKeys(recipient);
             }
         }
 
@@ -443,8 +425,8 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
         Iterable recipientKeys = null;
         TreeSet<Object> treeKeys = new TreeSet<>();
 
-        //senderKeys = Iterables.limit(Fun.filter(this.senderKey, address), 100);
-        //recipientKeys = Iterables.limit(Fun.filter(this.recipientKey, address), 100);
+        senderKeys = Iterables.limit(((TransactionSuit)map).senderKeys(address), 100);
+        recipientKeys = Iterables.limit(((TransactionSuit)map).recipientKeys(address), 100);
 
         treeKeys.addAll(Sets.newTreeSet(senderKeys));
         treeKeys.addAll(Sets.newTreeSet(recipientKeys));
@@ -509,7 +491,6 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
             transaction.setDC((DCSet)databaseSet);
             values.add(transaction);
         }
-        iterator = null;
         return values;
     }
 

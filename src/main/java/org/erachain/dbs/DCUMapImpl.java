@@ -64,7 +64,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         this.parent = parent;
 
         // OPEN MAP
-        if (database == null) {
+        if (parent != null || database == null) {
             this.getMemoryMap();
         } else {
             this.getMap();

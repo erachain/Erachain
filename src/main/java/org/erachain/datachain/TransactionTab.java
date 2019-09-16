@@ -31,7 +31,7 @@ public interface TransactionTab extends org.erachain.dbs.DBMap<Long, Transaction
 
     Iterator<Long> getTimestampIterator();
 
-    Iterator<Long> getCeatorIterator();
+    //Iterator<Long> getCeatorIterator();
 
     List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime);
 

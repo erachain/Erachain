@@ -16,6 +16,6 @@ public interface TransactionSuit {
 
     Iterator<Long> getTimestampIterator();
 
-    Iterator<Long> getCeatorIterator();
+    //Iterator<Long> getCeatorIterator();
 
 }

@@ -120,8 +120,8 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
         return null;
     }
 
-    @Override
-    public Iterator<Long> getCeatorIterator() {
-        return null;
-    }
+    //@Override
+    //public Iterator<Long> getCeatorIterator() {
+    //    return null;
+    //}
 }

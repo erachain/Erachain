@@ -19,10 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NavigableSet;
+import java.util.*;
 
 public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
 {
@@ -154,28 +151,25 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         return DEFAULT_VALUE;
     }
 
-    @Override
     public Iterable typeKeys(String sender, Long timestamp, Integer type) {
-        return null;
+        return Fun.filter(((TransactionSuitMapDB)map).typeKey,
+                new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
     }
-
-    @Override
     public Iterable senderKeys(String sender) {
-        return null;
+        return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender);
     }
-
-    @Override
     public Iterable recipientKeys(String recipient) {
-        return null;
+        return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient);
     }
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return null;
+        return getIterator(TransactionTab.TIMESTAMP_INDEX, false);
     }
 
-    @Override
-    public Iterator<Long> getCeatorIterator() {
-        return null;
-    }
+    //@Override
+    //public Iterator<Long> getCeatorIterator() {
+    //    return ((TransactionSuitMapDB)map).senderKey.iterator();
+    //}
+
 }
