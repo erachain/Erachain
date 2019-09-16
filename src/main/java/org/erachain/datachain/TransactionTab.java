@@ -79,7 +79,7 @@ public interface TransactionTab extends org.erachain.dbs.DBMap<Long, Transaction
     int size();
     Iterator<Long> getIterator(int index, boolean descending);
 
-    Collection<Transaction> getValues();
+    Collection<Transaction> values();
 
     void addObserver(Observer o);
     void deleteObserver(Observer o);

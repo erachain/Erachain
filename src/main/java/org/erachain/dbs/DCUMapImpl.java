@@ -72,6 +72,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         }
     }
 
+    protected abstract void getMap();
     protected abstract void getMemoryMap();
     protected abstract U getDefaultValue();
 
@@ -240,25 +241,25 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
     }
 
     @Override
-    public Set<T> getKeys() {
+    public Set<T> keySet() {
 
         this.addUses();
         Set<T> u = this.map.keySet();
 
         if (this.parent != null)
-            u.addAll(this.parent.getKeys());
+            u.addAll(this.parent.keySet());
 
         this.outUses();
         return u;
     }
 
     @Override
-    public Collection<U> getValues() {
+    public Collection<U> values() {
         this.addUses();
         Collection<U> u = this.map.values();
 
         if (this.parent != null)
-            u.addAll(this.parent.getValues());
+            u.addAll(this.parent.values());
 
         this.outUses();
         return u;

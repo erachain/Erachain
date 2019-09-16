@@ -62,7 +62,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     }
 
     @Override
-    protected void createIndexes() {
+    public void createIndexes() {
         indexes = new ArrayList<>();
 
         SimpleIndexDB<

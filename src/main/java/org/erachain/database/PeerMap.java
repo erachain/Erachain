@@ -52,7 +52,7 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
     public List<Peer> getAllPeers(int amount) {
         try {
             //GET ITERATOR
-            Iterator<byte[]> iterator = this.getKeys().iterator();
+            Iterator<byte[]> iterator = this.keySet().iterator();
 
             //PEERS
             List<Peer> peers = new ArrayList<Peer>();
@@ -104,7 +104,7 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
             //////// GET first all WHITE PEERS
             try {
                 //GET ITERATOR
-                Iterator<byte[]> iterator = this.getKeys().iterator();
+                Iterator<byte[]> iterator = this.keySet().iterator();
 
                 //ITERATE AS LONG AS:
 
@@ -206,7 +206,7 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
 
             cnt = peers.size();
             //GET ITERATOR
-            Iterator<byte[]> iterator = this.getKeys().iterator();
+            Iterator<byte[]> iterator = this.keySet().iterator();
 
             //ITERATE AS LONG AS:
 
@@ -259,7 +259,7 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
     public List<String> getAllPeersAddresses(int amount) {
         try {
             List<String> addresses = new ArrayList<String>();
-            Iterator<byte[]> iterator = this.getKeys().iterator();
+            Iterator<byte[]> iterator = this.keySet().iterator();
             while (iterator.hasNext() && (amount == -1 || addresses.size() < amount)) {
                 byte[] addressBI = iterator.next();
                 addresses.add(InetAddress.getByAddress(addressBI).getHostAddress());
@@ -275,7 +275,7 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
     public List<PeerInfo> getAllInfoPeers(int amount) {
         try {
             //GET ITERATOR
-            Iterator<byte[]> iterator = this.getKeys().iterator();
+            Iterator<byte[]> iterator = this.keySet().iterator();
 
             //PEERS
             List<PeerInfo> peers = new ArrayList<PeerInfo>();

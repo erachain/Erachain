@@ -54,12 +54,12 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
     }
 
     @Override
-    public Set<T> getKeys() {
+    public Set<T> keySet() {
         return this.map.keySet();
     }
 
     @Override
-    public Collection<U> getValues() {
+    public Collection<U> values() {
         return this.map.values();
     }
 

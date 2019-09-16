@@ -1471,7 +1471,7 @@ public class DCSet extends DBASet implements Observer {
             int sizeUTX = utxMap.size();
             LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
             this.actions += sizeUTX;
-            Collection<Transaction> items = utxMap.getValues();
+            Collection<Transaction> items = utxMap.values();
             instance.getTransactionTab().reset();
             for (Transaction item: items) {
                 utxMap.add(item);

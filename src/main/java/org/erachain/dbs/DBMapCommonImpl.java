@@ -49,7 +49,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
 
         //OPEN MAP
         getMap();
-        getMap();
 
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
@@ -76,29 +75,6 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     }
 
     protected abstract void getMap();
-
-    @Override
-    public Map<Integer, Integer> getObservableData() {
-        return observableData;
-    }
-
-    @Override
-    public Integer deleteObservableData(int index) {
-        return this.observableData.remove(index);
-    }
-
-    @Override
-    public Integer setObservableData(int index, Integer data) {
-        return this.observableData.put(index, data);
-    }
-
-    @Override
-    public boolean checkObserverMessageType(int messageType, int thisMessageType) {
-        if (observableData == null || observableData.isEmpty() || !observableData.containsKey(thisMessageType))
-            return false;
-
-        return observableData.get(messageType) == thisMessageType;
-    }
 
     /**
      * Соединяется прямо к списку SortableList для отображения в ГУИ

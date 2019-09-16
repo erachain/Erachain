@@ -2532,15 +2532,15 @@ public class Controller extends Observable {
 
 
     public Collection<org.erachain.core.voting.Poll> getAllPolls() {
-        return this.dcSet.getPollMap().getValues();
+        return this.dcSet.getPollMap().values();
     }
 
     public Collection<ItemCls> getAllItems(int type) {
-        return getItemMap(type).getValues();
+        return getItemMap(type).values();
     }
 
     public Collection<ItemCls> getAllItems(int type, Account account) {
-        return getItemMap(type).getValues();
+        return getItemMap(type).values();
     }
 
     public BlockGenerator getBlockGenerator() {

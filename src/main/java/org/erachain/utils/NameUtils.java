@@ -60,7 +60,7 @@ public class NameUtils {
 
 
         NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
-        Set<String> keys = nameStorageMap.getKeys();
+        Set<String> keys = nameStorageMap.keySet();
 
         for (String key : keys) {
             String value = nameStorageMap.getOpt(key, Corekeys.WEBSITE.getKeyname());

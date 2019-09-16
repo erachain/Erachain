@@ -123,7 +123,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         Set<T> u = this.map.keySet();
 
         if (this.parent != null)
-            u.addAll(this.parent.getKeys());
+            u.addAll(this.parent.keySet());
 
         this.outUses();
         return u;
@@ -135,7 +135,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         Collection<U> u = this.map.values();
 
         if (this.parent != null)
-            u.addAll(this.parent.getValues());
+            u.addAll(this.parent.values());
 
         this.outUses();
         return u;

@@ -116,7 +116,7 @@ public class DatabaseTests {
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
 
-        //assertEquals(dcSet.getItemPersonMap().getKeys().toString(), "");
+        //assertEquals(dcSet.getItemPersonMap().keySet().toString(), "");
         //assertEquals(dcSet.getItemPersonMap().getValuesAll().toString(), "");
         //CREATE FORK
         DCSet fork = dcSet.fork();
@@ -129,7 +129,7 @@ public class DatabaseTests {
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
+        //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).keySet().toString(), "");
 
         //SET BALANCE
         dcSet.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
@@ -204,7 +204,7 @@ public class DatabaseTests {
         }
 
         ItemAssetMap dbMap = dcSet.getItemAssetMap();
-        Collection<ItemCls> assets = dbMap.getValues();
+        Collection<ItemCls> assets = dbMap.values();
         for (ItemCls asset : assets) {
             //Asset asset = DLSet.getInstance().getAssetMap().get(key);
             AssetCls aa = (AssetCls) asset;
@@ -216,7 +216,7 @@ public class DatabaseTests {
         }
 
         dbMap.add(dbMap.get(1l));
-        LOGGER.info("keys " + dbMap.getKeys());
+        LOGGER.info("keys " + dbMap.keySet());
 
         //Collection<Asset> issues = DLSet.getInstance().getIssueAssetMap.getValuesAll();
 
@@ -238,7 +238,7 @@ public class DatabaseTests {
         long key = asset.getKey(dcSet);
 
         ItemAssetMap assetDB = dcSet.getItemAssetMap();
-        Collection<ItemCls> assets = assetDB.getValues();
+        Collection<ItemCls> assets = assetDB.values();
         for (ItemCls asset_2 : assets) {
             AssetCls aa = (AssetCls) asset_2;
             LOGGER.info(aa.toString() + " getQuantity " + aa.getQuantity());

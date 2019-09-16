@@ -1807,7 +1807,7 @@ public class BlockExplorer {
         List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
         ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
-        Collection<byte[]> addrs = map.getKeys();
+        Collection<byte[]> addrs = map.keySet();
         //BigDecimal total = BigDecimal.ZERO;
         //BigDecimal totalNeg = BigDecimal.ZERO;
         for (byte[] addrKey : addrs) {
@@ -1829,7 +1829,7 @@ public class BlockExplorer {
 
         //totalNeg = total.add(totalNeg);
 
-        Collection<Order> orders = dcSet.getOrderMap().getValues();
+        Collection<Order> orders = dcSet.getOrderMap().values();
 
         for (Order order : orders) {
             if (order.getHaveAssetKey() == key) {

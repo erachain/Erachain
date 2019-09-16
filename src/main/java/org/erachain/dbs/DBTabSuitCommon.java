@@ -20,15 +20,13 @@ public interface DBTabSuitCommon<T, U> {
     int NOTIFY_LIST = 4;
     int NOTIFY_DELETE = 5; // in event args - KEY
 
-    IDB getDBSet();
-
     int size();
 
     U get(T key);
 
-    Set<T> getKeys();
+    Set<T> keySet();
 
-    Collection<U> getValues();
+    Collection<U> values();
 
     /**
      *
@@ -76,21 +74,10 @@ public interface DBTabSuitCommon<T, U> {
 
     boolean contains(T key);
 
-    Map<Integer, Integer> getObservableData();
-
-    Integer deleteObservableData(int index);
-
-    Integer setObservableData(int index, Integer data);
-
-    boolean checkObserverMessageType(int messageType, int thisMessageType);
-
-    //NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending);
-
     Iterator<T> getIterator(int index, boolean descending);
 
     int getDefaultIndex();
 
-    SortableList<T, U> getList();
-
     void reset();
+
 }

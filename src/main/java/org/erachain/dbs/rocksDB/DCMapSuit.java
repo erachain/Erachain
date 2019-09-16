@@ -94,14 +94,14 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> {
     @Override
     public Set<T> keySet() {
         Set<T> u = map.keySet();
-        u.addAll(parent.getKeys());
+        u.addAll(parent.keySet());
         return u;
     }
 
     @Override
     public Collection<U> values() {
         Collection<U> u = map.values();
-        u.addAll(parent.getValues());
+        u.addAll(parent.values());
         return u;
     }
 

@@ -39,11 +39,6 @@ public abstract class DBMapSuit<T, U> implements org.erachain.dbs.DBMapSuit<T, U
 
     }
 
-    protected abstract void getMap();
-
-    protected void createIndexes() {
-    }
-
     @Override
     public int size() {
         return map.size();

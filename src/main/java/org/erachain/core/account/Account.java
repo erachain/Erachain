@@ -208,7 +208,7 @@ public class Account {
 
         if (true) {
             // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
-            for (byte[] mapKey: map.getKeys()) {
+            for (byte[] mapKey: map.keySet()) {
                 if (map.getAssetKeyFromKey(mapKey) == key) {
                     ballance = map.get(mapKey);
                     values.put(map.getShortAccountFromKey(mapKey), ballance.a.b);
@@ -654,7 +654,7 @@ public class Account {
         ////////////// DEBUG TOTAL COMPU
         // несотыковка из-за ордеров на бирже
         if (false && absKey == 2l && this.equals("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS")) {
-            Collection<byte[]> addrs = db.getAssetBalanceMap().getKeys();
+            Collection<byte[]> addrs = db.getAssetBalanceMap().keySet();
             BigDecimal total = BigDecimal.ZERO;
             for (byte[] mapKey : addrs) {
                 if (map.getAssetKeyFromKey(mapKey) == 2l) {

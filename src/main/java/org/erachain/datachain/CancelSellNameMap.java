@@ -30,7 +30,6 @@ public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
     protected void createIndexes() {
     }
 
-    @Override
     protected void getMap() {
         //OPEN MAP
         map = database.createTreeMap("cancelNameOrphanData")

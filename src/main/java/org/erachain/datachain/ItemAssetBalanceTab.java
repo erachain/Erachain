@@ -42,7 +42,7 @@ public interface ItemAssetBalanceTab extends org.erachain.dbs.DBMap<byte[], Tupl
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(Account account);
 
-    Set<byte[]> getKeys();
+    Set<byte[]> keySet();
 
     Iterator<byte[]> getIterator(int index, boolean descending);
 

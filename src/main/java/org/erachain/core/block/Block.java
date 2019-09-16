@@ -1926,7 +1926,7 @@ import java.util.*;
 
         // TEST COMPU ORPHANs
         HashMap bals = new HashMap();
-        Collection<byte[]> keys = dcSet.getAssetBalanceMap().getKeys();
+        Collection<byte[]> keys = dcSet.getAssetBalanceMap().keySet();
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalNeg = BigDecimal.ZERO;
         ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
@@ -1948,7 +1948,7 @@ import java.util.*;
         if (parentBalanses != null) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
             BigDecimal ballParent;
-            Collection<byte[]> keys = dcSet.getAssetBalanceMap().getKeys();
+            Collection<byte[]> keys = dcSet.getAssetBalanceMap().keySet();
             ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
             boolean error = false;
             for (byte[] key : keys) {
