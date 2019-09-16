@@ -3,7 +3,7 @@ package org.erachain.database.wallet;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
@@ -15,10 +15,10 @@ public class TelegramsMap extends DCUMapImpl<String, Transaction> {
         super(dWSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TELEGRAM_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TELEGRAM_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TELEGRAM_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TELEGRAM_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TELEGRAM_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TELEGRAM_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TELEGRAM_TYPE);
         }
     }
    

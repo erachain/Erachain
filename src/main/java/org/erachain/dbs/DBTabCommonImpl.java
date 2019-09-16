@@ -16,7 +16,7 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<T, U> {
+public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -27,14 +27,14 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
     public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
     protected DB database;
-    protected DBMap<T, U> parent;
+    protected DBTab<T, U> parent;
 
     protected Map<Integer, Integer> observableData;
 
-    public DBMapCommonImpl() {
+    public DBTabCommonImpl() {
     }
 
-    public DBMapCommonImpl(DBASet databaseSet) {
+    public DBTabCommonImpl(DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
 
@@ -43,7 +43,7 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
         }
     }
 
-    public DBMapCommonImpl(DBASet databaseSet, DB database) {
+    public DBTabCommonImpl(DBASet databaseSet, DB database) {
         this.databaseSet = databaseSet;
         this.database = database;
 
@@ -61,7 +61,7 @@ public abstract class DBMapCommonImpl<T, U> extends Observable implements DBMap<
      * @param parent
      * @param databaseSet
      */
-    public DBMapCommonImpl(DBMap parent, DBASet databaseSet) {
+    public DBTabCommonImpl(DBTab parent, DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;

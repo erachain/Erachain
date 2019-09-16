@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.crypto.Base58;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -26,10 +26,10 @@ public class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[]> {
         this.name = name;
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
-            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
-            this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+            this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
+            this.observableData.put(DBTab.NOTIFY_LIST, observeList);
+            this.observableData.put(DBTab.NOTIFY_ADD, observeAdd);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
         }
 
     }

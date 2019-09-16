@@ -2,7 +2,7 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 
@@ -27,10 +27,10 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
 
         super(map, columnNames, column_AutoHeight, descending);
 
-        RESET_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_RESET);
-        LIST_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_LIST);
-        ADD_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_ADD);
-        REMOVE_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+        RESET_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_RESET);
+        LIST_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_LIST);
+        ADD_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_ADD);
+        REMOVE_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_REMOVE);
 
         addObservers();
 

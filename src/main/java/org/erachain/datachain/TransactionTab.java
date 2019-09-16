@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
+import org.erachain.dbs.DBTab;
 
 import java.util.*;
 
@@ -21,7 +22,7 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public interface TransactionTab extends org.erachain.dbs.DBMap<Long, Transaction> {
+public interface TransactionTab extends DBTab<Long, Transaction> {
 
     Integer deleteObservableData(int index);
 

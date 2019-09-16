@@ -1,17 +1,21 @@
-package org.erachain.dbs.mapDB;
+package org.erachain.dbs.nativeMemMap;
 
-import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.mapDB.DBMapSuit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Observer;
 import java.util.Set;
 
 /**
- * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork())
- * Тут всегда должен быть задан Родитель
+ * Это только форкнутые таблицы
+ * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork()
  * @param <T>
  * @param <U>
 <br><br>
@@ -19,11 +23,11 @@ import java.util.Set;
 Поэтому нужно добавлять униальность
 
  */
-@Slf4j
-public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
-        {
+public abstract class DBMapSuitFotk<T, U> extends DBMapSuit<T, U> {
 
-    protected org.erachain.dbs.DBMap<T, U> parent;
+    protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+
+    protected DBTab<T, U> parent;
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
@@ -35,21 +39,17 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     Boolean EXIST = true;
     int shiftSize;
 
-    public DCMapSuit(org.erachain.dbs.DBMap parent, DBASet dcSet) {
-        assert (parent != null);
-
+    public DBMapSuitFotk(DBTab parent, DBASet dcSet) {
         this.databaseSet = dcSet;
         this.database = dcSet.database;
 
-        if (false) {
-            if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-                // System.out.println("########################### Free Memory:"
-                // + Runtime.getRuntime().freeMemory());
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
-                    System.gc();
-                    if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
-                        Controller.getInstance().stopAll(97);
-                }
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                System.gc();
+                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
+                    Controller.getInstance().stopAll(97);
             }
         }
 
@@ -70,13 +70,11 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
 
         int u = this.map.size();
 
-        if (this.parent != null) {
-            if (this.deleted != null)
-                u -= this.deleted.size();
+        if (this.deleted != null)
+            u -= this.deleted.size();
 
-            u -= this.shiftSize;
-            u += this.parent.size();
-        }
+        u -= this.shiftSize;
+        u += this.parent.size();
 
         //this.outUses();
         return u;
@@ -98,12 +96,10 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
                 return u;
             }
 
-            if (parent != null) {
-                if (this.deleted == null || !this.deleted.containsKey(key)) {
-                    u = this.parent.get(key);
-                    this.outUses();
-                    return u;
-                }
+            if (this.deleted == null || !this.deleted.containsKey(key)) {
+                u = this.parent.get(key);
+                this.outUses();
+                return u;
             }
 
             u = this.getDefaultValue();
@@ -122,8 +118,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         this.addUses();
         Set<T> u = this.map.keySet();
 
-        if (this.parent != null)
-            u.addAll(this.parent.keySet());
+        u.addAll(this.parent.keySet());
 
         this.outUses();
         return u;
@@ -134,8 +129,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         this.addUses();
         Collection<U> u = this.map.values();
 
-        if (this.parent != null)
-            u.addAll(this.parent.values());
+        u.addAll(this.parent.values());
 
         this.outUses();
         return u;
@@ -153,22 +147,15 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
 
             U old = this.map.put(key, value);
 
-            if (this.parent != null) {
-                //if (old != null)
-                //	++this.shiftSize;
-                if (this.deleted != null) {
-                    if (this.deleted.remove(key) != null)
-                        ++this.shiftSize;
-                }
-            } else {
-
+            if (this.deleted != null) {
+                if (this.deleted.remove(key) != null)
+                    ++this.shiftSize;
             }
 
             this.outUses();
             return old != null;
-
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            LOGGER.error(e.getMessage(), e);
         }
 
         this.outUses();
@@ -183,9 +170,16 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
     @Override
     public U remove(T key) {
 
-        this.addUses();
+        if (DCSet.isStoped()) {
+            return null;
+        }
 
-        U value = this.map.remove(key);
+        this.addUses();
+        U value = null;
+
+        value = this.map.remove(key);
+
+        // это форкнутая таблица
 
         if (this.deleted == null) {
             this.deleted = new HashMap(1024 , 0.75f);
@@ -199,7 +193,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         this.deleted.put(key, EXIST);
 
         if (value == null) {
-            // если тут нету то попобуем в Родителе найти
+            // если тут нету то создадим пометку что удалили
             value = this.parent.get(key);
         }
 
@@ -207,6 +201,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         return value;
 
     }
+
     @Override
     public U removeValue(T key) {
         return remove(key);
@@ -234,19 +229,20 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U>
         if (this.map.containsKey(key)) {
             this.outUses();
             return true;
-        } else {
-            if (this.deleted == null || !this.deleted.containsKey(key)) {
-                if (this.parent != null) {
-                    boolean u = this.parent.contains(key);
+        }
 
-                    this.outUses();
-                    return u;
-                }
-            }
+        if (this.deleted == null || !this.deleted.containsKey(key)) {
+            boolean u = this.parent.contains(key);
+
+            this.outUses();
+            return u;
         }
 
         this.outUses();
         return false;
+    }
+
+    public void addObserver(Observer o) {
     }
 
     @Override

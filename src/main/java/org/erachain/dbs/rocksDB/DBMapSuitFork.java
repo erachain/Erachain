@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.DBTab;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,9 +17,9 @@ import java.util.Set;
  * @param <U>
  */
 @Slf4j
-public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> {
+public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
 
-    protected org.erachain.dbs.DBMap<T, U> parent;
+    protected DBTab<T, U> parent;
 
     /**
      * пометка какие индексы не используются - отключим для ускорения
@@ -30,7 +31,7 @@ public abstract class DCMapSuit<T, U> extends DBMapSuit<T, U> {
     Boolean EXIST = true;
     int shiftSize;
 
-    public DCMapSuit(org.erachain.dbs.DBMap parent, DBASet dcSet) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet) {
         assert (parent != null);
 
         this.databaseSet = dcSet;

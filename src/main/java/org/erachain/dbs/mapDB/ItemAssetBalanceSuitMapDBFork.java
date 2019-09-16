@@ -1,8 +1,5 @@
 package org.erachain.dbs.mapDB;
 
-import com.google.common.primitives.Longs;
-import org.erachain.controller.Controller;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.datachain.ItemAssetBalanceTab;
@@ -17,14 +14,14 @@ import java.util.Iterator;
 
 // TODO SOFT HARD TRUE
 
-public class ItemAssetBalanceSuitMapDBForked extends DCMapSuit<byte[], Tuple5<
+public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
             implements ItemAssetBalanceSuit {
 
-    static Logger logger = LoggerFactory.getLogger(ItemAssetBalanceSuitMapDBForked.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(ItemAssetBalanceSuitMapDBFork.class.getSimpleName());
 
-    public ItemAssetBalanceSuitMapDBForked(ItemAssetBalanceTab parent, DBASet databaseSet) {
+    public ItemAssetBalanceSuitMapDBFork(ItemAssetBalanceTab parent, DBASet databaseSet) {
         super(parent, databaseSet);
     }
 

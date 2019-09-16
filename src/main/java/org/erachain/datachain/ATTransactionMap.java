@@ -2,7 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.ATTransactionSerializer;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
@@ -23,10 +23,10 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_AT_TX_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_AT_TXS);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TX_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TX);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_AT_TX_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_AT_TXS);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_AT_TX_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TX);
         }
     }
 
@@ -103,7 +103,7 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
         return this.set(new Tuple2<Integer, Integer>(blockHeight, seq), atTx);
     }
 
-    public DBMap<Tuple2<Integer, Integer>, ATTransaction> getParent() {
+    public DBTab<Tuple2<Integer, Integer>, ATTransaction> getParent() {
         return this.parent;
     }
 

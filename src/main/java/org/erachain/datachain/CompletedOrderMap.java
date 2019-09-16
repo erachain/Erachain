@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.item.assets.Order;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.OrderSerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -23,10 +23,10 @@ public class CompletedOrderMap extends DCUMap<Long, Order> {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_COMPL_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_COMPL_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_COMPL_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_COMPL_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_COMPL_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_COMPL_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_COMPL_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_COMPL_ORDER_TYPE);
         }
     }
 

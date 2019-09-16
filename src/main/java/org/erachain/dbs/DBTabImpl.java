@@ -17,7 +17,7 @@ import java.util.Set;
  * @param <T>
  * @param <U>
  */
-public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements DBMap<T, U> {
+public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements DBTab<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -32,7 +32,7 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
     //
     //}
 
-    public DBMapImpl(DBASet databaseSet, DB database) {
+    public DBTabImpl(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
@@ -41,7 +41,7 @@ public abstract class DBMapImpl<T, U> extends DBMapCommonImpl<T, U> implements D
      * @param parent
      * @param databaseSet
      */
-    public DBMapImpl(DBMap parent, DBASet databaseSet) {
+    public DBTabImpl(DBTab parent, DBASet databaseSet) {
         super(parent, databaseSet);
 
         // OPEN MAP

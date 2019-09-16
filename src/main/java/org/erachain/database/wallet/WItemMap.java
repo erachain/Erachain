@@ -4,7 +4,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.LongItemSerializer;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
@@ -53,10 +53,10 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
 
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
-            this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
-            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
-            this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+            this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
+            this.observableData.put(DBTab.NOTIFY_LIST, observeList);
+            this.observableData.put(DBTab.NOTIFY_ADD, observeAdd);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
         }
     }
 

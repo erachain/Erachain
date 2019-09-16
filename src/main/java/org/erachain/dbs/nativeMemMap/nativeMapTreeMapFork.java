@@ -1,19 +1,19 @@
 package org.erachain.dbs.nativeMemMap;
 
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.TreeMap;
 
-public class nativeMapTreeMap<T, U> extends DCMapSuit<T, U>
+public class nativeMapTreeMapFork<T, U> extends DBMapSuitFotk<T, U>
 {
 
-    static Logger logger = LoggerFactory.getLogger(nativeMapTreeMap.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(nativeMapTreeMapFork.class.getSimpleName());
 
     private U DEFAULT_VALUE;
-    public nativeMapTreeMap(DBMap parent, DBASet databaseSet, U defaultValue) {
+    public nativeMapTreeMapFork(DBTab parent, DBASet databaseSet, U defaultValue) {
         super(parent, databaseSet);
         DEFAULT_VALUE = defaultValue;
     }

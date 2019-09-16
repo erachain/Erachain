@@ -1,7 +1,7 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.dbs.DBMapCommonImpl;
+import org.erachain.dbs.DBTabCommonImpl;
 import org.erachain.lang.Lang;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +32,12 @@ public abstract class SearchTableModelCls<U> extends AbstractTableModel {
     protected int step = 500;
     protected long size = 0;
 
-    protected DBMapCommonImpl map;
+    protected DBTabCommonImpl map;
     protected Logger logger;
 
     protected Controller cnt;
 
-    public SearchTableModelCls(DBMapCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight,
+    public SearchTableModelCls(DBTabCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight,
                                boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;

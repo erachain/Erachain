@@ -12,9 +12,7 @@ import org.mapdb.Fun.Tuple2;
 import java.util.*;
 
 @Slf4j
-public abstract class DBMapSuitImpl<T, U>
-        implements DBMapSuit<T, U> {
-
+public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
 
     protected abstract void getMap();
 

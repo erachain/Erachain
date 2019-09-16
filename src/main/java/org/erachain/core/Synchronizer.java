@@ -4,7 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionTab;
@@ -984,7 +984,7 @@ public class Synchronizer extends Thread {
 
                     if (countObserv_ADD != null) {
                         try {
-                            dcSet.getTransactionTab().setObservableData(DBMap.NOTIFY_ADD, countObserv_ADD);
+                            dcSet.getTransactionTab().setObservableData(DBTab.NOTIFY_ADD, countObserv_ADD);
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1093,7 +1093,7 @@ public class Synchronizer extends Thread {
 
                     if (countObserv_REMOVE != null) {
                         try {
-                            dcSet.getTransactionTab().setObservableData(DBMap.NOTIFY_REMOVE, countObserv_REMOVE);
+                            dcSet.getTransactionTab().setObservableData(DBTab.NOTIFY_REMOVE, countObserv_REMOVE);
                         } catch (Exception e) {
                             LOGGER.error(e.getMessage(), e);
                         }

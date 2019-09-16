@@ -3,7 +3,7 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
@@ -51,14 +51,14 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         this(databaseSet, database, name);
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
-                this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+                this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
             if (observeList > 0)
-                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+                this.observableData.put(DBTab.NOTIFY_LIST, observeList);
             if (observeAdd > 0) {
-                observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                observableData.put(DBTab.NOTIFY_ADD, observeAdd);
             }
             if (observeRemove > 0) {
-                observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+                observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
             }
         }
     }

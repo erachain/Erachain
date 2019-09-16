@@ -21,12 +21,12 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements DBMap<T, U> {
+public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements DBTab<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
     protected Map<T, U> map;
-    protected DBMap<T, U> parent;
+    protected DBTab<T, U> parent;
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
     /**
@@ -49,7 +49,7 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
         super(databaseSet, database);
     }
 
-    public DCUMapImpl(DBMap<T, U> parent, DBASet dcSet) {
+    public DCUMapImpl(DBTab<T, U> parent, DBASet dcSet) {
         super(parent, dcSet);
 
         if (false && Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
@@ -295,9 +295,9 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
 
                 // NOTIFY if not FORKED
                 if (this.observableData != null && (old == null || !old.equals(value))) {
-                    if (this.observableData.containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
+                    if (this.observableData.containsKey(DBTab.NOTIFY_ADD) && !DCSet.isStoped()) {
                         this.setChanged();
-                        Integer observeItem = this.observableData.get(DBMap.NOTIFY_ADD);
+                        Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
                         if (
                                 observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
                                         || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
@@ -366,9 +366,9 @@ public abstract class DCUMapImpl<T, U> extends DBMapCommonImpl<T, U> implements 
 
             // NOTIFY
             if (this.observableData != null) {
-                if (this.observableData.containsKey(DBMap.NOTIFY_REMOVE)) {
+                if (this.observableData.containsKey(DBTab.NOTIFY_REMOVE)) {
                     this.setChanged();
-                    Integer observItem = this.observableData.get(DBMap.NOTIFY_REMOVE);
+                    Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
                     if (
                             observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
                                     || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)

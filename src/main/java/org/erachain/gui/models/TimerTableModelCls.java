@@ -1,8 +1,8 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.dbs.DBMap;
-import org.erachain.dbs.DBMapCommonImpl;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DBTabCommonImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected int step = 50;
     protected long size = 0;
 
-    protected DBMapCommonImpl map;
+    protected DBTabCommonImpl map;
     protected Logger logger;
 
     public TimerTableModelCls(String[] columnNames, boolean descending) {
@@ -49,7 +49,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMapCommonImpl map, String[] columnNames, boolean descending) {
+    public TimerTableModelCls(DBTabCommonImpl map, String[] columnNames, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -63,7 +63,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMapCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+    public TimerTableModelCls(DBTabCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -71,7 +71,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMapCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
+    public TimerTableModelCls(DBTabCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -196,10 +196,10 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
         if (map != null) {
 
-            RESET_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_RESET);
-            LIST_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_LIST);
-            ADD_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_ADD);
-            DELETE_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+            RESET_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_RESET);
+            LIST_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_LIST);
+            ADD_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_ADD);
+            DELETE_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_REMOVE);
 
             map.addObserver(this);
         }

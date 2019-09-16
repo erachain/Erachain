@@ -6,7 +6,7 @@ import org.erachain.at.AT;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.ATSerializer;
 import org.erachain.dbs.DCUMapImpl;
@@ -36,10 +36,10 @@ public class ATMap extends DCUMapImpl<String, AT> {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_AT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ATS);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_AT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_ATS);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_AT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TYPE);
         }
     }
 
@@ -285,7 +285,7 @@ public class ATMap extends DCUMapImpl<String, AT> {
         return Fun.filter(this.orderedATs, null, true, height, true).iterator();
     }
 
-    public DBMap<String, AT> getParent() {
+    public DBTab<String, AT> getParent() {
         return this.parent;
     }
 

@@ -6,7 +6,7 @@ import com.google.common.collect.Sets;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transCalculated.Calculated;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.CalculatedSerializer;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
@@ -52,10 +52,10 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_CLACULATED_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_CLACULATED_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_CLACULATED_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_CLACULATED_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_CLACULATED_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_CLACULATED_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_CLACULATED_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_CLACULATED_TYPE);
         }
     }
 
@@ -356,7 +356,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         return null;
     }
 
-    public DBMap<Tuple3<Integer, Integer, Long>, Calculated> getParentMap() {
+    public DBTab<Tuple3<Integer, Integer, Long>, Calculated> getParentMap() {
         return this.parent;
     }
 

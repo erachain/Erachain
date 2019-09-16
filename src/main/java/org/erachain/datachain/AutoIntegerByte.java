@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.Atomic;
@@ -35,13 +35,13 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
 
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
-                this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+                this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
             if (observeList > 0)
-                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+                this.observableData.put(DBTab.NOTIFY_LIST, observeList);
             if (observeAdd > 0)
-                this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                this.observableData.put(DBTab.NOTIFY_ADD, observeAdd);
             if (observeRemove > 0)
-                this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+                this.observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
         }
     }
 

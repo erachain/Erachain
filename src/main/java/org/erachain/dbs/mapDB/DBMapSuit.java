@@ -2,9 +2,7 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapCommonImpl;
 import org.erachain.dbs.DBMapSuitImpl;
-import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;

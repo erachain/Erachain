@@ -3,7 +3,7 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.TransactionTab;
-import org.erachain.dbs.DBMapImpl;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
@@ -26,7 +26,7 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
 
     public UnconfirmedTransactionsTableModel()
     {
-        super((DBMapImpl) DCSet.getInstance().getTransactionTab(),
+        super((DBTabImpl) DCSet.getInstance().getTransactionTab(),
                 new String[]{"Timestamp", "Type", "Name", "Creator", "Fee"},
                 new Boolean[]{true, false, true, true, false}, false);
 

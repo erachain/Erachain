@@ -13,7 +13,7 @@ import java.util.Set;
  * @param <T>
  * @param <U>
  */
-public interface DBMap<T, U> extends DBTabSuitCommon<T, U> {
+public interface DBTab<T, U> extends DBTabSuitCommon<T, U> {
 
     IDB getDBSet();
 

@@ -2,7 +2,7 @@ package org.erachain.datachain;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.transaction.CancelSellNameTransaction;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
@@ -16,10 +16,10 @@ public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
         }
     }
 

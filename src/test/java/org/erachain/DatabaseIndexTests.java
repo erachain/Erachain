@@ -2,7 +2,7 @@ package org.erachain;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.naming.Name;
-import org.erachain.dbs.DBMapImpl;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.datachain.NameMap;
 import org.erachain.database.SortableList;
 import org.junit.Assert;
@@ -42,7 +42,7 @@ public class DatabaseIndexTests {
         Assert.assertEquals(list.get(0).getA(), "a");
 
         //GET VALUES BY OWNER INDEX
-        list.sort(DBMapImpl.DEFAULT_INDEX);
+        list.sort(DBTabImpl.DEFAULT_INDEX);
         Assert.assertEquals(list.get(0).getA(), "b");
         Assert.assertEquals(list.get(1).getA(), "a");
         Assert.assertEquals(list.get(0).getA(), "b");

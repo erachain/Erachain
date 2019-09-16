@@ -5,10 +5,11 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
-import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDBForked;
-import org.erachain.dbs.nativeMemMap.nativeMapTreeMap;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDBFork;
+import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
@@ -35,7 +36,7 @@ import java.util.Iterator;
  */
 // TODO SOFT HARD TRUE
 
-public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl<byte[], Tuple5<
+public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK
@@ -50,10 +51,10 @@ public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl<byte[], 
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_BALANCE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_BALANCE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_BALANCE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_BALANCE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_BALANCE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_BALANCE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_BALANCE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_BALANCE_TYPE);
         }
     }
 
@@ -76,11 +77,11 @@ public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl<byte[], 
         } else {
             String dbs = "MapDB";
             if (dbs.equals("MapDB"))
-                map = new ItemAssetBalanceSuitMapDBForked((ItemAssetBalanceTab)parent, databaseSet);
+                map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab)parent, databaseSet);
             else if (dbs.equals("RocksDB"))
                 map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
             else
-                map = new nativeMapTreeMap(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
+                map = new nativeMapTreeMapFork(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
 
         }
     }

@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
-import org.erachain.dbs.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.database.SortableList;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
@@ -38,10 +38,10 @@ public class BalanceMap extends DCUMap<Tuple2<Long, Long>,
         this.name = name;
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, reset_BALANCE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, list_BALANCE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, add_BALANCE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, remove_BALANCE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, reset_BALANCE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, list_BALANCE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, add_BALANCE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, remove_BALANCE_TYPE);
         }
     }
 
