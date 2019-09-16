@@ -3,6 +3,8 @@ package org.erachain.dbs.rocksDB;
 import com.google.common.primitives.Longs;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.ItemAssetBalanceSuit;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
@@ -10,6 +12,7 @@ import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -17,6 +20,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
@@ -26,7 +30,8 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in STOCK
         Tuple2<BigDecimal, BigDecimal>, // it DO
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
-        >> {
+        >>
+            implements ItemAssetBalanceSuit {
 
     private final String NAME_TABLE = "ITEM_ASSET_BALANCE_TABLE";
     private final String balanceKeyAssetNameIndex = "balances_key_asset";
@@ -105,7 +110,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 (result, key) -> org.bouncycastle.util.Arrays.concatenate(
                         new ByteableString().toBytesObject(result.a),
                         new ByteableLong().toBytesObject(result.b)
-        ));
+                ));
         indexes.add(indexDBf0f1);
     }
 
@@ -130,4 +135,18 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         dbFile.delete();
     }
 
+    // TODO - replace
+    public Iterator<byte[]> assetIterator(Long key) {
+        return ((ItemAssetBalanceSuitMapDB) map).assetKeyMap.subMap(
+                Fun.t2(key, null),
+                Fun.t2(key, Fun.HI())).values().iterator();
+    }
+
+    // TODO - replace
+    public Iterator<byte[]> addressIterator(String address) {
+        return ((ItemAssetBalanceSuitMapDB) map).addressKeyMap.subMap(
+                Fun.t2(address, null),
+                Fun.t2(address, Fun.HI())).values().iterator();
+
+    }
 }

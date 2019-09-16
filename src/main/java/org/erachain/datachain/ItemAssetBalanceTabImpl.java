@@ -6,13 +6,19 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.DBMap;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDBForked;
+import org.erachain.dbs.nativeMemMap.nativeMapTreeMap;
+import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Hasher работает неверно! и вообще там 32 битное число 0 INTEGER - чего нифига не хватает!
@@ -37,6 +43,9 @@ abstract public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> implements ItemAssetBalanceTab {
 
+    int ASSET_AMOUNT_INDEX = 1;
+    int ADDRESS_ASSET_INDEX = 2;
+
     public ItemAssetBalanceTabImpl(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
@@ -52,7 +61,31 @@ abstract public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl
         super(parent, databaseSet);
     }
 
-	public long getAssetKeyFromKey(byte[] key) {
+    // TODO вставить настройки выбора СУБД
+    @Override
+    protected void getMap()
+    {
+        if (parent == null) {
+            String dbs = "MapDB";
+            if (dbs.equals("MapDB"))
+                map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
+            else if (dbs.equals("RocksDB"))
+                map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
+            else
+                map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
+        } else {
+            String dbs = "MapDB";
+            if (dbs.equals("MapDB"))
+                map = new ItemAssetBalanceSuitMapDBForked((ItemAssetBalanceTab)parent, databaseSet);
+            else if (dbs.equals("RocksDB"))
+                map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
+            else
+                map = new nativeMapTreeMap(parent, databaseSet, ItemAssetBalanceTab.DEFAULT_VALUE);
+
+        }
+    }
+
+    public long getAssetKeyFromKey(byte[] key) {
         // ASSET KEY
         byte[] assetKeyBytes = new byte[8];
         System.arraycopy(key, 20, assetKeyBytes, 0, 8);
@@ -101,8 +134,6 @@ abstract public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl
         return value;
     }
 
-    abstract Collection<byte[]> assetKeySubMap(long key);
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public SortableList<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
@@ -115,17 +146,17 @@ abstract public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl
             key = -key;
 
         //FILTER ALL KEYS
-
-        //Collection<byte[]> keys = this.assetKeyMap.subMap(Fun.t2(key, null), Fun.t2(key, Fun.HI())).values();
-        Collection<byte[]> keys = assetKeySubMap(key);
+        Collection<byte[]> keys = new ArrayList<>();
+        Iterator<byte[]> iterator = ((ItemAssetBalanceSuit)map).assetIterator(key);
+        while(iterator.hasNext()) {
+            keys.add(iterator.next());
+        }
 
         //RETURN
         return new SortableList<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
     }
-
-    abstract Collection<byte[]> addressKeySubMap(String address);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public SortableList<byte[], Tuple5<
@@ -136,12 +167,12 @@ abstract public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl
             return null;
 
         //FILTER ALL KEYS
-        //Collection<byte[]> keys = this.addressKeyMap.subMap(
-        //        Fun.t2(account.getAddress(), null),
-        //        Fun.t2(account.getAddress(), Fun.HI())).values();
-        Collection<byte[]> keys = addressKeySubMap(account.getAddress());
+        Collection<byte[]> keys = new ArrayList<>();
+        Iterator<byte[]> iterator = ((ItemAssetBalanceSuit)map).addressIterator(account.getAddress());
+        while(iterator.hasNext()) {
+            keys.add(iterator.next());
+        }
 
-        int tt = keys.size();
         //RETURN
         return new SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);

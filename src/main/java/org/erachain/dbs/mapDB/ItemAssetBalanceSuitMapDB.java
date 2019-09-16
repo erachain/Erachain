@@ -4,6 +4,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -11,13 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 // TODO SOFT HARD TRUE
 
 public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> {
-
+        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+            implements ItemAssetBalanceSuit {
 
     static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
 
@@ -148,6 +150,18 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
+    }
+
+    public Iterator<byte[]> assetIterator(Long key) {
+        return ((ItemAssetBalanceSuitMapDB)map).assetKeyMap.subMap(
+                Fun.t2(key, null),
+                Fun.t2(key, Fun.HI())).values().iterator();
+    }
+
+    public Iterator<byte[]> addressIterator(String address) {
+        return ((ItemAssetBalanceSuitMapDB)map).addressKeyMap.subMap(
+                Fun.t2(address, null),
+                Fun.t2(address, Fun.HI())).values().iterator();
     }
 
 }
