@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -117,6 +118,11 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     @Override
     public Iterator<Long> getTimestampIterator() {
+        return null;
+    }
+
+    @Override
+    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
         return null;
     }
 

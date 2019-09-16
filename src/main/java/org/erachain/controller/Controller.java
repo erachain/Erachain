@@ -38,10 +38,7 @@ import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DLSet;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemMap;
-import org.erachain.datachain.LocalDataMap;
-import org.erachain.datachain.TransactionTab;
+import org.erachain.datachain.*;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.GuiTimer;
@@ -1248,7 +1245,7 @@ public class Controller extends Observable {
             return false;
 
         TransactionTab map = this.dcSet.getTransactionTab();
-        Iterator<Long> iterator = map.getIterator(TransactionTab.TIMESTAMP_INDEX, false);
+        Iterator<Long> iterator = map.getIterator(TransactionSuit.TIMESTAMP_INDEX, false);
         long ping = 0;
         int counter = 0;
         ///////// big maxCounter freeze network and make bans on response

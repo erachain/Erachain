@@ -3,6 +3,7 @@ package org.erachain.datachain;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Iterator;
 
 public interface ItemAssetBalanceSuit {

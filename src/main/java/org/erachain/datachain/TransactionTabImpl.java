@@ -52,7 +52,7 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
     public TransactionTabImpl(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
-        DEFAULT_INDEX = TIMESTAMP_INDEX;
+        DEFAULT_INDEX = TransactionSuit.TIMESTAMP_INDEX;
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_UNC_TRANSACTION_TYPE);
@@ -104,7 +104,7 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
 
         List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        Iterator<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, false);
         Transaction transaction;
         int count = 0;
         int bytesTotal = 0;
@@ -187,7 +187,7 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
              */
             //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
             //Iterator<Tuple2<?, Long>> iterator = map.getIterator(TIMESTAMP_INDEX, false);
-            Iterator<Long> iterator = map.getIterator(TIMESTAMP_INDEX, false);
+            Iterator<Long> iterator = ((TransactionSuit)map).getTimestampIterator();
             tickerIter = System.currentTimeMillis() - tickerIter;
             if (tickerIter > 10) {
                 LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
@@ -291,23 +291,7 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
 
-        List<Long> treeKeys = new ArrayList<Long>();
-
-        //NavigableMap set = new NavigableMap<Long, Transaction>();
-        // NodeIterator
-
-
-        // DESCENDING + 1000
-        Iterator<Long> iterator = this.map.getIterator(TIMESTAMP_INDEX, true);
-        Iterable iterableLimit = Iterables.limit(Iterables.skip((Iterable)iterator, (int) fromKey), (int) (toKey - fromKey));
-
-        //Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
-        iterator = iterableLimit.iterator();
-        while (iterator.hasNext()) {
-            treeKeys.add(iterator.next());
-        }
-
-        return treeKeys;
+        return ((TransactionSuit)map).getFromToKeys(fromKey, toKey);
 
     }
 
@@ -439,7 +423,7 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
     public List<Transaction> getTransactionsByAddress(String address) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+        Iterator<Long> iterator = ((TransactionSuit)map).getTimestampIterator();
         Account account = new Account(address);
 
         Transaction transaction;
@@ -479,7 +463,7 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
         ArrayList<Transaction> values = new ArrayList<Transaction>();
 
         //LOGGER.debug("get ITERATOR");
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
+        Iterator<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending);
         //LOGGER.debug("get ITERATOR - DONE"); / for merge
 
         Transaction transaction;
@@ -497,7 +481,7 @@ class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, descending);
+        Iterator<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending);
         Account account = new Account(address);
 
         int i = 0;

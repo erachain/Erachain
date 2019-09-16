@@ -28,6 +28,7 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionSuit;
 import org.erachain.datachain.TransactionTab;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
@@ -98,7 +99,7 @@ public class TransactionCreator {
 
         } else {
             // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX - в ФОРОКЕ он ПУСТОЙ!
-            Iterator<Long> iterator = transactionTab.getIterator(TransactionTab.TIMESTAMP_INDEX, false);
+            Iterator<Long> iterator = transactionTab.getIterator(TransactionSuit.TIMESTAMP_INDEX, false);
             List<Account> accountMap = Controller.getInstance().getAccounts();
 
             while (iterator.hasNext()) {

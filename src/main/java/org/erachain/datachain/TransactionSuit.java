@@ -2,9 +2,12 @@ package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 public interface TransactionSuit {
+
+    int TIMESTAMP_INDEX = 1;
 
     Transaction DEFAULT_VALUE = null;
 
@@ -17,5 +20,7 @@ public interface TransactionSuit {
     Iterator<Long> getTimestampIterator();
 
     //Iterator<Long> getCeatorIterator();
+
+    Collection<Long> getFromToKeys(long fromKey, long toKey);
 
 }

@@ -23,8 +23,6 @@ import java.util.*;
  */
 public interface TransactionTab extends org.erachain.dbs.DBMap<Long, Transaction> {
 
-    int TIMESTAMP_INDEX = 1;
-
     Integer deleteObservableData(int index);
 
     Integer setObservableData(int index, Integer data);

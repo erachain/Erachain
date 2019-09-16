@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
@@ -136,7 +137,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
                 .counterEnable()
                 .makeOrGet();
 
-        createIndex(TransactionTab.TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
+        createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
                 new Fun.Function2<Long, Long, Transaction>() {
                     @Override
                     public Long run(Long key, Transaction value) {
@@ -164,7 +165,29 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return getIterator(TransactionTab.TIMESTAMP_INDEX, false);
+        return getIterator(TIMESTAMP_INDEX, false);
+    }
+
+    @Override
+    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
+
+        List<Long> treeKeys = new ArrayList<Long>();
+
+        //NavigableMap set = new NavigableMap<Long, Transaction>();
+        // NodeIterator
+
+
+        // DESCENDING + 1000
+        Iterable iterable = this.indexes.get(TransactionSuit.TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
+        Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
+
+        Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
+        while (iterator.hasNext()) {
+            treeKeys.add(iterator.next().b);
+        }
+
+        return treeKeys;
+
     }
 
     //@Override
