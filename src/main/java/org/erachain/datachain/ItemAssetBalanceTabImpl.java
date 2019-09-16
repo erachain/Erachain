@@ -80,7 +80,7 @@ public class ItemAssetBalanceTabImpl extends org.erachain.dbs.DBMapImpl<byte[], 
             else if (dbs.equals("RocksDB"))
                 map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
             else
-                map = new nativeMapTreeMap(parent, databaseSet, ItemAssetBalanceTab.DEFAULT_VALUE);
+                map = new nativeMapTreeMap(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
 
         }
     }

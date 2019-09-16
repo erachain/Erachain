@@ -22,12 +22,7 @@ public class ItemAssetBalanceSuitMapDBForked extends DCMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
             implements ItemAssetBalanceSuit {
 
-
     static Logger logger = LoggerFactory.getLogger(ItemAssetBalanceSuitMapDBForked.class.getSimpleName());
-
-    @SuppressWarnings("rawtypes")
-    public BTreeMap assetKeyMap;
-    public BTreeMap addressKeyMap;
 
     public ItemAssetBalanceSuitMapDBForked(ItemAssetBalanceTab parent, DBASet databaseSet) {
         super(parent, databaseSet);
@@ -68,71 +63,6 @@ public class ItemAssetBalanceSuitMapDBForked extends DCMapSuit<byte[], Tuple5<
             map = treeMap;
         }
 
-        if (Controller.getInstance().onlyProtocolIndexing)
-            // NOT USE SECONDARY INDEXES
-            return;
-
-
-        //BIND ASSET KEY
-        /// так как основной Индекс не сравниваемы - byte[] то во Вторичном индексе делаем Строку
-        // - иначе она не сработает так как тут дерево с поиском
-        this.assetKeyMap = database.createTreeMap("balances_key_asset_bal_address")
-                .comparator(Fun.COMPARATOR)
-                //.valuesOutsideNodesEnable()
-                .makeOrGet();
-
-        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple2<Long, BigDecimal>,
-                byte[],
-                Tuple5<
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                () {
-            @Override
-            public Tuple2<Long, BigDecimal>
-            run(byte[] key, Tuple5<
-                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
-
-                byte[] assetKeyBytes = new byte[8];
-                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-
-                return new Tuple2<Long, BigDecimal>(
-                        Longs.fromByteArray(assetKeyBytes), value.a.b.negate()
-                    );
-            }
-        });
-
-        this.addressKeyMap = database.createTreeMap("balances_address_asset_bal")
-                .comparator(Fun.COMPARATOR)
-                //.valuesOutsideNodesEnable()
-                .makeOrGet();
-
-        Bind.secondaryKey(hashMap, this.addressKeyMap, new Fun.Function2<Tuple2<String, Long>,
-                byte[],
-                Tuple5<
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                () {
-            @Override
-            public Tuple2<String, Long>
-            run(byte[] key, Tuple5<
-                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                    Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
-
-                // Address
-                byte[] shortAddress = new byte[20];
-                System.arraycopy(key, 0, shortAddress, 0, 20);
-                // ASSET KEY
-                byte[] assetKeyBytes = new byte[8];
-                System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-
-                return new Tuple2<String, Long>(
-                        Crypto.getInstance().getAddressFromShort(shortAddress),
-                        Longs.fromByteArray(assetKeyBytes)
-                );
-            }
-        });
-
     }
 
     @Override
@@ -147,16 +77,14 @@ public class ItemAssetBalanceSuitMapDBForked extends DCMapSuit<byte[], Tuple5<
     protected void createIndexes() {
     }
 
+    // NOT used in FORK
     public Iterator<byte[]> assetIterator(Long key) {
-        return ((ItemAssetBalanceSuitMapDB)map).assetKeyMap.subMap(
-                Fun.t2(key, null),
-                Fun.t2(key, Fun.HI())).values().iterator();
+        return null;
     }
 
+    // NOT used in FORK
     public Iterator<byte[]> addressIterator(String address) {
-        return ((ItemAssetBalanceSuitMapDB)map).addressKeyMap.subMap(
-                Fun.t2(address, null),
-                Fun.t2(address, Fun.HI())).values().iterator();
+        return null;
     }
 
 }

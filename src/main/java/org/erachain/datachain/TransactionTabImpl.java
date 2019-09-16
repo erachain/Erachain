@@ -8,8 +8,15 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBMap;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDBForked;
+import org.erachain.dbs.mapDB.TransactionSuitMapDB;
+import org.erachain.dbs.nativeMemMap.nativeMapTreeMap;
+import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
+import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +39,7 @@ import java.util.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
+class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Transaction>
         implements TransactionTab
 {
 
@@ -60,9 +67,32 @@ abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
         super(parent, databaseSet);
     }
 
-    protected Transaction getDefaultValue() {
-        return null;
+    // TODO вставить настройки выбора СУБД
+    @Override
+    protected void getMap()
+    {
+        if (parent == null) {
+            String dbs = "MapDB";
+            if (dbs.equals("MapDB")) {
+                map = new TransactionSuitMapDB(databaseSet, database);
+            } else if (dbs.equals("RocksDB")) {
+                map = new TransactionSuitRocksDB(databaseSet, database);
+            } else {
+                map = new TransactionSuitMapDB(databaseSet, database);
+            }
+        } else {
+            String dbs = "mem";
+            if (dbs.equals("MapDB")) {
+                ; //map = new TransactionSuitMapDB((TransactionTab)parent, databaseSet);
+            } else if (dbs.equals("RocksDB")) {
+                ; //map = new TransactionSuitRocksDB(databaseSet, database);
+            } else {
+                map = new nativeMapTreeMap(parent, databaseSet, TransactionSuit.DEFAULT_VALUE);
+            }
+
+        }
     }
+
 
 
     /**
@@ -283,11 +313,26 @@ abstract class TransactionTabImpl extends org.erachain.dbs.DBMapImpl<Long, Trans
 
     }
 
-    //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
-    abstract Iterable typeKeys(String sender, Long timestamp, Integer type);
-    //recipientKeys = Fun.filter(this.recipientKey, recipient);
-    abstract Iterable senderKeys(String sender);
-    abstract Iterable recipientKeys(String recipient);
+    Iterable typeKeys(String sender, Long timestamp, Integer type) {
+        return Fun.filter(((TransactionSuitMapDB)map).typeKey,
+                new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
+    }
+    public Iterable senderKeys(String sender) {
+        return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender);
+    }
+    public Iterable recipientKeys(String recipient) {
+        return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient);
+    }
+
+    @Override
+    public Iterator<Long> getTimestampIterator() {
+        return map.getIterator(TIMESTAMP_INDEX, false);
+    }
+
+    @Override
+    public Iterator<Long> getCeatorIterator() {
+        return ((TransactionSuitMapDB)map).senderKey.iterator();
+    }
 
     /**
      * Find all unconfirmed transaction by address, sender or recipient.
