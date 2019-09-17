@@ -1935,7 +1935,7 @@ public class BlockExplorer {
         SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(account);
 
         ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
-        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        //ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         TreeMap balAssets = new TreeMap();
         if (balances != null && !balances.isEmpty()) {
@@ -1944,7 +1944,7 @@ public class BlockExplorer {
 
                 Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
 
-                long assetKey = map.getAssetKeyFromKey(item.getA());
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.getA());
                 if (assetKey == AssetCls.LIA_KEY) {
                     continue;
                 }
@@ -1954,18 +1954,20 @@ public class BlockExplorer {
                     continue;
 
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> itemBals = item.getB();
-                if (true || itemBals.a.b.signum() != 0
-                        && itemBals.b.b.signum() != 0
-                        && itemBals.c.b.signum() != 0) {
-                    Map bal = new LinkedHashMap();
-                    bal.put("asset_key", assetKey);
-                    bal.put("asset_name", asset.viewName());
+                Map bal = new LinkedHashMap();
+                bal.put("asset_key", assetKey);
+                bal.put("asset_name", asset.viewName());
+
+                if (BlockChain.ERA_COMPU_ALL_UP) {
+                    bal.put("balance_1", itemBals.a.b.add(account.addDEVAmount(assetKey)));
+                } else {
                     bal.put("balance_1", itemBals.a.b);
-                    bal.put("balance_2", itemBals.b.b);
-                    bal.put("balance_3", itemBals.c.b);
-                    bal.put("balance_4", itemBals.d.b);
-                    balAssets.put("" + assetKey, bal);
                 }
+
+                bal.put("balance_2", itemBals.b.b);
+                bal.put("balance_3", itemBals.c.b);
+                bal.put("balance_4", itemBals.d.b);
+                balAssets.put("" + assetKey, bal);
             }
         }
 
@@ -2346,6 +2348,7 @@ public class BlockExplorer {
         }
     }
 
+    /*
     public Map jsonQueryBalance(String address) {
         Map output = new LinkedHashMap();
 
@@ -2370,8 +2373,8 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetBalance(
-            String address) {
+    public Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+    assetBalance(String address) {
         Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> output = new LinkedHashMap();
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
@@ -2384,6 +2387,8 @@ public class BlockExplorer {
 
         return output;
     }
+
+     */
 
     @SuppressWarnings({"serial", "static-access"})
     public void jsonQueryExchange(String filterStr, int start) {
