@@ -42,6 +42,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     private SimpleIndexDB<Long, Transaction, Long> timestampUnconfirmedTransactionIndex;
     private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
     private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
+    private ArrayIndexDB<Long, Transaction, String> recipientsUnconfirmedTransactionIndex;
 
 
     public TransactionSuitRocksDB(DBASet databaseSet, DB database) {
@@ -70,7 +71,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 new ByteableString().toBytesObject(result.a),
                 new ByteableLong().toBytesObject(result.b)));
 
-        ArrayIndexDB<Long, Transaction, String> recipientsUnconfirmedTransactionIndex = new ArrayIndexDB<>(recipientUnconfirmedTransactionIndexName,
+        recipientsUnconfirmedTransactionIndex = new ArrayIndexDB<>(recipientUnconfirmedTransactionIndexName,
                 (aLong, transaction) -> transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new),
                 (result, key) -> new ByteableString().toBytesObject(result));
 
