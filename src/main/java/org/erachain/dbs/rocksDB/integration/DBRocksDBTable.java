@@ -115,6 +115,8 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         for (IndexDB indexDB : indexes) {
             if (indexDB instanceof SimpleIndexDB) {
                 if (logON) logger.info("SimpleIndex");
+                ////// тут получаем ответы от двух функций Индекса - формирования ключа и преобразования его в байты
+                //// причем у Глеба тут опять передается ключ первичный - даже для серилиазации результат из вервого вызова
                 SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
                 Object apply = simpleIndexDB.getBiFunction().apply(key, value);
                 byte[] bytes = indexDB.getIndexByteable().toBytes(apply, key);

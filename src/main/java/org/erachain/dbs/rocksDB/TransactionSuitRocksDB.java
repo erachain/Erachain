@@ -9,6 +9,7 @@ import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableLong;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableTuple3StringLongInteger;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
@@ -40,10 +41,10 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     private final String addressTypeUnconfirmedTransactionIndexName = "address_type_unc_txs";
 
     private SimpleIndexDB<Long, Transaction, Long> timestampUnconfirmedTransactionIndex;
-    private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
+    //private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
     private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
     private ArrayIndexDB<Long, Transaction, String> recipientsUnconfirmedTransactionIndex;
-
+    ListIndexDB<Long, Transaction, Fun.Tuple3<String, Long, Integer>> addressTypeUnconfirmedTransactionIndex;
 
     public TransactionSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database);
@@ -58,7 +59,8 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                     public Long apply(Long aLong, Transaction transaction) {
                         return transaction.getTimestamp();
                     }
-                }, (result, key) ->new ByteableLong().toBytesObject(result));
+                //}, (result, key) ->new ByteableLong().toBytesObject(result));
+                }, new IndexByteableLong());
 
         senderUnconfirmedTransactionIndex = new SimpleIndexDB<>(senderUnconfirmedTransactionIndexName,
                 new BiFunction<Long, Transaction, Fun.Tuple2<String, Long>>() {
@@ -75,14 +77,14 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 (aLong, transaction) -> transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new),
                 (result, key) -> new ByteableString().toBytesObject(result));
 
-        indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
-        ListIndexDB<Long, Transaction, Fun.Tuple3<String, Long, Integer>> addressTypeUnconfirmedTransactionIndex
+        //indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
+        addressTypeUnconfirmedTransactionIndex
                 = new ListIndexDB<>(addressTypeUnconfirmedTransactionIndexName,
                 (aLong, transaction) -> {
                     Integer type = transaction.getType();
                     return transaction.getInvolvedAccounts().stream().map(
                             (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());
-                }, indexByteableTuple3StringLongInteger);
+                }, new IndexByteableTuple3StringLongInteger());
 
         List indexes = new ArrayList<>();
         indexes.add(timestampUnconfirmedTransactionIndex);
