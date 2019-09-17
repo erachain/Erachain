@@ -944,7 +944,8 @@ import java.util.*;
             return BigDecimal.ZERO;
         }
 
-        int inDay30 = BlockChain.BLOCKS_PER_DAY(heightBlock) * 30;
+        // in OLD protocol it USED - and heightBlock get AS 1
+        int inDay30 = BlockChain.BLOCKS_PER_DAY(1) * 30;
 
         BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
 
