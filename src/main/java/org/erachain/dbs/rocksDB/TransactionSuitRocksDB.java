@@ -119,7 +119,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return map.getIndexIterator(senderUnconfirmedTransactionIndex, false);
+        return map.getIndexIterator(timestampUnconfirmedTransactionIndex, false);
     }
 
     @Override
