@@ -13,6 +13,7 @@ public class IndexByteableLong implements IndexByteable<Long, Long> {
 
     /**
      * result - то что прилетело из уровня создания вторичного ключа - в simpleIndexDB.getBiFunction().apply(key, value);
+     * смотри org.erachain.dbs.rocksDB.integration.DBRocksDBTable#put(java.lang.Object, java.lang.Object)
      * key - первичный ключ
      */
     public byte[] toBytes(Long result, Long key) {

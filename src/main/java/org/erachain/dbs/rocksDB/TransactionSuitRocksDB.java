@@ -59,8 +59,8 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                     public Long apply(Long aLong, Transaction transaction) {
                         return transaction.getTimestamp();
                     }
-                //}, (result, key) ->new ByteableLong().toBytesObject(result));
-                }, new IndexByteableLong());
+                //}, (result, key) ->new ByteableLong().toBytesObject(result)); // создает Класс на лету и переопределяет его метод
+                }, new IndexByteableLong()); // а тут мы уже создали заранее Класс
 
         senderUnconfirmedTransactionIndex = new SimpleIndexDB<>(senderUnconfirmedTransactionIndexName,
                 new BiFunction<Long, Transaction, Fun.Tuple2<String, Long>>() {
@@ -106,17 +106,17 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     @Override
     public Iterable typeKeys(String sender, Long timestamp, Integer type) {
-        return (Iterable) map.getIndexIterator(4, false);
+        return (Iterable) map.getIndexIterator(addressTypeUnconfirmedTransactionIndex, false);
     }
 
     @Override
     public Iterable senderKeys(String sender) {
-        return (Iterable) map.getIndexIterator(4, false);
+        return (Iterable) map.getIndexIterator(senderUnconfirmedTransactionIndex, false);
     }
 
     @Override
     public Iterable recipientKeys(String recipient) {
-        return (Iterable) map.getIndexIterator(2, false);
+        return (Iterable) map.getIndexIterator(recipientsUnconfirmedTransactionIndex, false);
     }
 
     @Override
