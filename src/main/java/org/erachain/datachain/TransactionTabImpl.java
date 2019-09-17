@@ -101,7 +101,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
 
         List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, false);
+        Iterator<Long> iterator = this.getTimestampIterator();
         Transaction transaction;
         int count = 0;
         int bytesTotal = 0;

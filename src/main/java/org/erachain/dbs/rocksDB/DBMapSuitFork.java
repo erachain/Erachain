@@ -9,6 +9,7 @@ import org.erachain.dbs.DBTab;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Оболочка для Карты от конкретной СУБД чтобы эту оболочку вставлять в Таблицу, которая форкнута (см. fork()).
@@ -21,13 +22,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
 
     protected DBTab<T, U> parent;
 
-    /**
-     * пометка какие индексы не используются - отключим для ускорения
-     */
-    boolean OLD_USED_NOW = false;
-
     //ConcurrentHashMap deleted;
-    HashMap deleted;
+    ///////// - если ключи набор байт или других примитивов - то неверный поиск в этом виде таблиц HashMap deleted;
+    /// поэтому берем медленный но правильный TreeMap
+    TreeMap<T, Boolean> deleted;
     Boolean EXIST = true;
     int shiftSize;
 
@@ -59,13 +57,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
     @Override
     public int size() {
         int u = map.size();
-        if (parent != null) {
-            if (deleted != null) {
-                u -= deleted.size();
-            }
-            u -= shiftSize;
-            u += parent.size();
+
+        if (deleted != null) {
+            u -= deleted.size();
         }
+
+        u -= shiftSize;
+        u += parent.size();
         return u;
     }
 
@@ -79,9 +77,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
                 return map.get(key);
             } else {
                 if (deleted == null || !deleted.containsKey(key)) {
-                    if (parent != null) {
-                        return parent.get(key);
-                    }
+                    return parent.get(key);
                 }
             }
 
@@ -127,9 +123,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
 
     @Override
     public void put(T key, U value) {
-        if (DCSet.isStoped()) {
-            return;
-        }
         try {
             map.put(key, value);
             if (deleted != null) {
@@ -149,7 +142,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
         this.map.remove(key);
 
         if (this.deleted == null) {
-            this.deleted = new HashMap(1024 , 0.75f);
+            //this.deleted = new HashMap<T, U>(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
         }
 
         // добавляем в любом случае, так как
@@ -174,7 +168,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
         this.map.remove(key);
 
         if (this.deleted == null) {
-            this.deleted = new HashMap(1024 , 0.75f);
+            //this.deleted = new HashMap(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
         }
 
         // добавляем в любом случае, так как

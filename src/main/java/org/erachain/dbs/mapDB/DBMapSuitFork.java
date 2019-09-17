@@ -9,6 +9,7 @@ import org.erachain.dbs.DBTab;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Оболочка для Карты от конкретной СУБД чтобы эту оболочку вставлять в Таблицу, которая форкнута (см. fork()).
@@ -26,14 +27,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
 
     protected DBTab<T, U> parent;
 
-    /**
-     * пометка какие индексы не используются - отключим для ускорения
-     */
-    boolean OLD_USED_NOW = false;
-
     //ConcurrentHashMap deleted;
-    HashMap deleted;
-    Boolean EXIST = true;
+    ///////// - если ключи набор байт или других примитивов - то неверный поиск в этом виде таблиц HashMap deleted;
+    /// поэтому берем медленный но правильный TreeMap
+    TreeMap<T, Boolean> deleted;
     int shiftSize;
 
     public DBMapSuitFork(DBTab parent, DBASet dcSet) {
@@ -67,112 +64,77 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
     // the deleted ones are smaller and the size is increased by 1
     @Override
     public int size() {
-        //this.addUses();
 
         int u = this.map.size();
 
-        if (this.parent != null) {
-            if (this.deleted != null)
-                u -= this.deleted.size();
+        if (this.deleted != null)
+            u -= this.deleted.size();
 
-            u -= this.shiftSize;
-            u += this.parent.size();
-        }
+        u -= this.shiftSize;
+        u += this.parent.size();
 
-        //this.outUses();
         return u;
     }
 
     @Override
     public U get(T key) {
 
-        if (DCSet.isStoped()) {
-            return null;
-        }
-
-        this.addUses();
-
         try {
             U u = this.map.get(key);
             if (u != null) {
-                this.outUses();
                 return u;
             }
 
-            if (parent != null) {
-                if (this.deleted == null || !this.deleted.containsKey(key)) {
-                    u = this.parent.get(key);
-                    this.outUses();
-                    return u;
-                }
+            if (this.deleted == null || !this.deleted.containsKey(key)) {
+                u = this.parent.get(key);
+                return u;
             }
 
             u = this.getDefaultValue();
-            this.outUses();
             return u;
         } catch (Exception e) {
 
             U u = this.getDefaultValue();
-            this.outUses();
             return u;
         }
     }
 
     @Override
     public Set<T> keySet() {
-        this.addUses();
         Set<T> u = this.map.keySet();
 
-        if (this.parent != null)
-            u.addAll(this.parent.keySet());
+        u.addAll(this.parent.keySet());
 
-        this.outUses();
         return u;
     }
 
     @Override
     public Collection<U> values() {
-        this.addUses();
         Collection<U> u = this.map.values();
 
-        if (this.parent != null)
-            u.addAll(this.parent.values());
+        u.addAll(this.parent.values());
 
-        this.outUses();
         return u;
     }
 
     @Override
     public boolean set(T key, U value) {
-        if (DCSet.isStoped()) {
-            return false;
-        }
-
-        this.addUses();
 
         try {
 
             U old = this.map.put(key, value);
 
-            if (this.parent != null) {
-                //if (old != null)
-                //	++this.shiftSize;
-                if (this.deleted != null) {
-                    if (this.deleted.remove(key) != null)
-                        ++this.shiftSize;
-                }
-            } else {
-
+            if (this.deleted != null) {
+                if (this.deleted.remove(key) != null)
+                    ++this.shiftSize;
             }
 
-            this.outUses();
             return old != null;
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
 
-        this.outUses();
         return false;
     }
 
@@ -184,12 +146,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
     @Override
     public U remove(T key) {
 
-        this.addUses();
-
         U value = this.map.remove(key);
 
         if (this.deleted == null) {
-            this.deleted = new HashMap(1024 , 0.75f);
+            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
         }
 
         // добавляем в любом случае, так как
@@ -204,10 +165,10 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
             value = this.parent.get(key);
         }
 
-        this.outUses();
         return value;
 
     }
+
     @Override
     public U removeValue(T key) {
         return remove(key);
@@ -226,27 +187,16 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
     @Override
     public boolean contains(T key) {
 
-        if (DCSet.isStoped()) {
-            return false;
-        }
-
-        this.addUses();
-
         if (this.map.containsKey(key)) {
-            this.outUses();
             return true;
         } else {
             if (this.deleted == null || !this.deleted.containsKey(key)) {
-                if (this.parent != null) {
-                    boolean u = this.parent.contains(key);
+                boolean u = this.parent.contains(key);
 
-                    this.outUses();
-                    return u;
-                }
+                return u;
             }
         }
 
-        this.outUses();
         return false;
     }
 

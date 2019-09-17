@@ -162,17 +162,13 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
                 return u;
             }
 
-            U u = this.getDefaultValue();
             this.outUses();
-            return u;
-        } catch (Exception e)
-        //else
-        {
-            //logger.error(e.getMessage(), e);
+            return this.getDefaultValue();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
 
-            U u = this.getDefaultValue();
             this.outUses();
-            return u;
+            return this.getDefaultValue();
         }
     }
 
@@ -192,12 +188,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         return u;
     }
 
-    /**
-     * уведомляет только счетчик если он разрешен, иначе Добавить
-     * @param key
-     * @param value
-     * @return
-     */
     @Override
     public boolean set(T key, U value) {
         this.addUses();
@@ -211,33 +201,28 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void put(T key, U value) {
-        set(key, value);
+        this.addUses();
+
+        this.map.put(key, value);
+
+        this.outUses();
     }
 
-    /**
-     * уведомляет только счетчик если он разрешен, иначе Удалить
-     * @param key
-     * @return
-     */
     @Override
     public U remove(T key) {
 
         this.addUses();
 
-        U value;
-
-        //try {
         //REMOVE
         if (this.map.containsKey(key)) {
-            value = this.map.remove(key);
+            U value = this.map.remove(key);
             this.outUses();
-
-        } else {
-            value = null;
-            this.outUses();
+            return value;
         }
 
-        return value;
+        this.outUses();
+        return null;
+
     }
 
     @Override
@@ -261,7 +246,9 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void deleteValue(T key) {
-        delete(key);
+        this.addUses();
+        this.map.remove(key);
+        this.outUses();
     }
 
 

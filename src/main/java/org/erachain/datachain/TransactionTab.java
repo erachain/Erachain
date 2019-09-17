@@ -32,7 +32,7 @@ public interface TransactionTab extends DBTab<Long, Transaction> {
 
     //Iterator<Long> getCeatorIterator();
 
-    List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime);
+    //List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime);
 
     void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
 

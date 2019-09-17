@@ -68,6 +68,12 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
         return this.map.get(key);
     }
 
+    /**
+     * уведомляет только счетчик если он разрешен, иначе Добавить
+     * @param key
+     * @param value
+     * @return
+     */
     @Override
     public boolean set(T key, U value) {
 

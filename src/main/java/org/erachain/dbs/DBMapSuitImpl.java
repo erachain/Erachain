@@ -14,14 +14,15 @@ import java.util.*;
 @Slf4j
 public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
 
-    protected abstract void getMap();
-
     @Override
     public int getDefaultIndex() {
         return 0;
     }
 
+    protected abstract void getMap();
+
     protected void createIndexes() {
     }
 
+    protected U getDefaultValue() { return null; }
 }

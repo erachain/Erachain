@@ -20,6 +20,8 @@ public interface DBTabSuitCommon<T, U> {
     int NOTIFY_LIST = 4;
     int NOTIFY_DELETE = 5; // in event args - KEY
 
+    Boolean EXIST = true;
+
     int size();
 
     U get(T key);

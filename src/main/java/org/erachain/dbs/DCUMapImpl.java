@@ -29,11 +29,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     protected DBTab<T, U> parent;
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
-    /**
-     * пометка какие индексы не используются - отключим для ускорения
-     */
-    boolean OLD_USED_NOW = false;
-
     //ConcurrentHashMap deleted;
     protected HashMap deleted;
     protected Boolean EXIST = true;
