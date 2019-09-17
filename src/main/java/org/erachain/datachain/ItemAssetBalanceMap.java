@@ -201,14 +201,14 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
 	}
 	 */
 
-	public long getAssetKeyFromKey(byte[] key) {
+	public static long getAssetKeyFromKey(byte[] key) {
         // ASSET KEY
         byte[] assetKeyBytes = new byte[8];
         System.arraycopy(key, 20, assetKeyBytes, 0, 8);
         return Longs.fromByteArray(assetKeyBytes);
     }
 
-    public byte[] getShortAccountFromKey(byte[] key) {
+    public static byte[] getShortAccountFromKey(byte[] key) {
         // ASSET KEY
         byte[] shortAddressBytes = new byte[20];
         System.arraycopy(key, 0, shortAddressBytes, 0, 20);
