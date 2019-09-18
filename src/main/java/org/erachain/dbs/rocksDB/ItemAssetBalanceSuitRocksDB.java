@@ -2,19 +2,14 @@ package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
-import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
+import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
-import org.erachain.dbs.rocksDB.transformation.ByteableLong;
-import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -24,6 +19,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Set;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
@@ -37,8 +33,27 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
             implements ItemAssetBalanceSuit {
 
     private final String NAME_TABLE = "ITEM_ASSET_BALANCE_TABLE";
-    private final String balanceKeyAssetNameIndex = "balances_key_asset";
-    private final String balanceAssetKeyNameIndex = "balances_asset_key";
+    private final String balanceKeyAssetIndexName = "balances_by_asset";
+    private final String balanceAddressIndexName = "balances_by_address";
+    private SimpleIndexDB<
+            byte[],
+            Tuple5<
+                    Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>>,
+            byte[]> balanceKeyAssetIndex;
+
+    private SimpleIndexDB<
+            byte[],
+            Tuple5<
+                    Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>,
+                    Tuple2<BigDecimal, BigDecimal>>,
+            byte[]> balanceAddressIndex;
 
     public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database);
@@ -68,15 +83,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     public void createIndexes() {
         indexes = new ArrayList<>();
 
-        SimpleIndexDB<
-                byte[],
-                Tuple5<
-                        Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>>,
-                byte[]> indexDBf1f0 = new SimpleIndexDB<>(balanceKeyAssetNameIndex,
+        balanceKeyAssetIndex = new SimpleIndexDB<>(balanceKeyAssetIndexName,
                 (key, value) -> {
                     // Address
                     byte[] shortAddress = new byte[20];
@@ -91,17 +98,9 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                             shortAddress);
                 },
                 (result, key) -> result);
-        indexes.add(indexDBf1f0);
+        indexes.add(balanceKeyAssetIndex);
 
-        SimpleIndexDB<
-                byte[],
-                Tuple5<
-                        Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>,
-                        Tuple2<BigDecimal, BigDecimal>>,
-                byte[] indexDBf0f1 = new SimpleIndexDB<>(balanceAssetKeyNameIndex,
+        balanceAddressIndex = new SimpleIndexDB<>(balanceAddressIndexName,
                 (key, value) -> {
                     // Address
                     byte[] shortAddress = new byte[20];
@@ -115,7 +114,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                             assetKeyBytes);
                 },
                 (result, key) -> result); // ByteableTrivial
-        indexes.add(indexDBf0f1);
+        indexes.add(balanceAddressIndex);
     }
 
     @Override
@@ -135,14 +134,10 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     // TODO - release it
 
-    public Collection<byte[]> assetKeys(long assetKey) {
-        Collection<byte[]> keys = new ArrayList<>();
-        //FILTER ALL KEYS
-        Iterator<byte[]> iterator = assetIterator(assetKey);
-        while (iterator.hasNext()) {
-            keys.add(iterator.next());
-        }
-        return keys;
+    public Set<byte[]> assetKeys(long assetKey) {
+        return ((RocksDB)map).filterAppropriateValuesAsKeys(
+                Longs.toByteArray(assetKey),
+                balanceAddressIndex);
     }
 
     @Override
@@ -150,19 +145,15 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         return assetKeys(assetKey).iterator();
     }
 
-    public Collection<byte[]> accountKeys(Account account) {
-        Collection<byte[]> keys = new ArrayList<>();
-        //FILTER ALL KEYS
-        Iterator<byte[]> iterator = accountIterator(account);
-        while (iterator.hasNext()) {
-            keys.add(iterator.next());
-        }
-        return keys;
+    public Set<byte[]> accountKeys(Account account) {
+        return ((RocksDB)map).filterAppropriateValuesAsKeys(
+                account.getShortAddressBytes(),
+                balanceAddressIndex);
     }
 
     @Override
     public Iterator<byte[]> accountIterator(Account account) {
-        //return accountKeys(account).iterator();
+        return accountKeys(account).iterator();
     }
 
 }
