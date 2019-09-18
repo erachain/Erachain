@@ -137,7 +137,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     public Set<byte[]> assetKeys(long assetKey) {
         return ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
                 Longs.toByteArray(assetKey),
-                balanceAddressIndex);
+                balanceKeyAssetIndex);
     }
 
     @Override

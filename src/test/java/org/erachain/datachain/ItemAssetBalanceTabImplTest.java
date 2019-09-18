@@ -6,16 +6,13 @@ import org.erachain.core.account.Account;
 import org.junit.Test;
 import org.mapdb.Fun;
 
-import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.Random;
 
 import static org.junit.Assert.*;
 
-public class ItemAssetBalanceMapTest {
+public class ItemAssetBalanceTabImplTest {
 
     DCSet dcSet;
     Account account1 = new Account("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
@@ -29,7 +26,6 @@ public class ItemAssetBalanceMapTest {
     Fun.Tuple2<BigDecimal, BigDecimal> balAA = new Fun.Tuple2<>(balA, balA);
     Fun.Tuple2<BigDecimal, BigDecimal> balBB = new Fun.Tuple2<>(balB, balB);
 
-    ItemAssetBalanceMap map;
     ItemAssetBalanceTab map;
 
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance1;
@@ -40,7 +36,7 @@ public class ItemAssetBalanceMapTest {
     private void init() {
 
         dcSet = DCSet.createEmptyDatabaseSet();
-        map = new ItemAssetBalanceMap(dcSet, dcSet.getDatabase());
+        map = new ItemAssetBalanceTabImpl(dcSet, dcSet.getDatabase());
 
         balance1 = new Fun.Tuple5<>(balAB, balAB, balAB, balAB, balAB);
         balance2 = new Fun.Tuple5<>(balBA, balBA, balBA, balBA, balBA);
@@ -58,9 +54,9 @@ public class ItemAssetBalanceMapTest {
 
         balance2 = map.get(account1.getShortAddressBytes(), 2L);
 
-        assertEquals(Arrays.equals(account1.getShortAddressBytes(), map.getShortAccountFromKey(account1.getShortAddressBytes())), true);
+        assertEquals(Arrays.equals(account1.getShortAddressBytes(), ItemAssetBalanceTab.getShortAccountFromKey(account1.getShortAddressBytes())), true);
 
-        Account account = new Account(map.getShortAccountFromKey(account1.getShortAddressBytes()));
+        Account account = new Account(ItemAssetBalanceTab.getShortAccountFromKey(account1.getShortAddressBytes()));
 
         assertEquals(Arrays.equals(account.getAddressBytes(), account1.getAddressBytes()), true);
         assertEquals(Arrays.equals(account.getShortAddressBytes(), account1.getShortAddressBytes()), true);
@@ -79,11 +75,11 @@ public class ItemAssetBalanceMapTest {
         int iteratorSize = 0;
 
         int iteratorSize1 = 0;
-        Iterator<byte[]> assetKeys = map.assetKeys(assetKey1).iterator();
+        Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey1).iterator();
         while (assetKeys.hasNext()) {
             iteratorSize1++;
             byte[] key = assetKeys.next();
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
             assertEquals(assetKey, assetKey2);
 
         }
@@ -95,7 +91,7 @@ public class ItemAssetBalanceMapTest {
         map.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey2)), balance1);
 
         iteratorSize = 0;
-        assetKeys = map.assetKeys(assetKey1).iterator();
+        assetKeys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey1).iterator();
         while (assetKeys.hasNext()) {
             iteratorSize++;
             assetKeys.next();
@@ -103,7 +99,7 @@ public class ItemAssetBalanceMapTest {
         assertEquals(1, iteratorSize);
 
         iteratorSize = 0;
-        assetKeys = map.assetKeys(assetKey2).iterator();
+        assetKeys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey2).iterator();
         while (assetKeys.hasNext()) {
             iteratorSize++;
             assetKeys.next();
@@ -119,7 +115,7 @@ public class ItemAssetBalanceMapTest {
         assertEquals(map.size(), size + 4);
 
         //////////////////
-        assetKeys = map.assetKeys(assetKey1).iterator();
+        assetKeys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey1).iterator();
 
         int found1 = 0;
         int found2 = 0;
@@ -129,9 +125,9 @@ public class ItemAssetBalanceMapTest {
             iteratorSize++;
 
             byte[] key = assetKeys.next();
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
             assertEquals(assetKey, assetKey1);
-            byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
+            byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
 
             if (account1.equals(shortAddress)) {
                 found1++;
@@ -148,7 +144,7 @@ public class ItemAssetBalanceMapTest {
 
 
         //////////////////
-        assetKeys = map.assetKeys(assetKey2).iterator();
+        assetKeys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey2).iterator();
         iteratorSize = 0;
         found1 = 0;
         found2 = 0;
@@ -157,14 +153,14 @@ public class ItemAssetBalanceMapTest {
             iteratorSize++;
 
             byte[] key = assetKeys.next();
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
             assertEquals(assetKey, assetKey2);
 
-            if (account1.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
+            if (account1.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
                 found1++;
-            } else if (account2.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
+            } else if (account2.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
                 found2++;
-            } else if (account3.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
+            } else if (account3.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
                 found3++;
             }
         }
@@ -177,7 +173,7 @@ public class ItemAssetBalanceMapTest {
         ///////////// тот же КЛЮЧ
         map.set(Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance3);
 
-        assetKeys = map.assetKeys(assetKey1).iterator();
+        assetKeys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey1).iterator();
         iteratorSize = 0;
         found1 = 0;
         found2 = 0;
@@ -186,14 +182,14 @@ public class ItemAssetBalanceMapTest {
             iteratorSize++;
 
             byte[] key = assetKeys.next();
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
             assertEquals(assetKey, assetKey1);
 
-            if (account1.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
+            if (account1.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
                 found1++;
-            } else if (account2.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
+            } else if (account2.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
                 found2++;
-            } else if (account3.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
+            } else if (account3.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
                 found3++;
             }
         }
@@ -214,17 +210,17 @@ public class ItemAssetBalanceMapTest {
         long assetKey2 = 2L;
         int iteratorSize;
 
-        Iterator<byte[]> addressKeys;
+        Iterator<byte[]> accountKeys;
 
         // проверить не затирают ли ключи друг друга
         map.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance1);
         map.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey2)), balance1);
 
         iteratorSize = 0;
-        addressKeys = map.addressKeys(account1).iterator();
-        while (addressKeys.hasNext()) {
+        accountKeys = ((ItemAssetBalanceSuit)map).accountKeys(account1).iterator();
+        while (accountKeys.hasNext()) {
             iteratorSize++;
-            addressKeys.next();
+            accountKeys.next();
         }
         assertEquals(2, iteratorSize);
         assertEquals(map.size(), iteratorSize);
@@ -236,18 +232,18 @@ public class ItemAssetBalanceMapTest {
         assertEquals(map.size(), size + 4);
 
         //////////////////
-        addressKeys = map.addressKeys(account1).iterator();
+        accountKeys = ((ItemAssetBalanceSuit)map).accountKeys(account1).iterator();
 
         int found1 = 0;
         int found2 = 0;
         int found3 = 0;
         iteratorSize = 0;
-        while (addressKeys.hasNext()) {
+        while (accountKeys.hasNext()) {
             iteratorSize++;
 
-            byte[] key = addressKeys.next();
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
-            byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
+            byte[] key = accountKeys.next();
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
 
             assertEquals(true, account1.equals(shortAddress));
 
@@ -263,16 +259,16 @@ public class ItemAssetBalanceMapTest {
 
 
         //////////////////
-        addressKeys = map.addressKeys(account2).iterator();
+        accountKeys = ((ItemAssetBalanceSuit)map).accountKeys(account2).iterator();
         iteratorSize = 0;
         found1 = 0;
         found2 = 0;
-        while (addressKeys.hasNext()) {
+        while (accountKeys.hasNext()) {
             iteratorSize++;
 
-            byte[] key = addressKeys.next();
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
-            byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
+            byte[] key = accountKeys.next();
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
 
             assertEquals(true, account2.equals(shortAddress));
 
@@ -290,16 +286,16 @@ public class ItemAssetBalanceMapTest {
         ///////////// тот же КЛЮЧ
         map.set(Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance3);
 
-        addressKeys = map.addressKeys(account3).iterator();
+        accountKeys = ((ItemAssetBalanceSuit)map).accountKeys(account3).iterator();
         iteratorSize = 0;
         found1 = 0;
         found2 = 0;
-        while (addressKeys.hasNext()) {
+        while (accountKeys.hasNext()) {
             iteratorSize++;
 
-            byte[] key = addressKeys.next();
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
-            byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
+            byte[] key = accountKeys.next();
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
 
             assertEquals(true, account3.equals(shortAddress));
 
