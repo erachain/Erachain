@@ -86,23 +86,28 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
                 //.valuesOutsideNodesEnable()
                 .makeOrGet();
 
-        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple2<Long, BigDecimal>,
+        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple2<Tuple2<Long, BigDecimal>, String>,
                 byte[],
                 Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                 () {
             @Override
-            public Tuple2<Long, BigDecimal>
+            public Tuple2<Tuple2<Long, BigDecimal>, String>
             run(byte[] key, Tuple5<
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
+                // Address
+                byte[] shortAddress = new byte[20];
+                System.arraycopy(key, 0, shortAddress, 0, 20);
+                // ASSET KEY
                 byte[] assetKeyBytes = new byte[8];
                 System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                return new Tuple2<Long, BigDecimal>(
-                        Longs.fromByteArray(assetKeyBytes), value.a.b.negate()
+                return new Tuple2<Tuple2<Long, BigDecimal>, String>(
+                        new Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate()),
+                        Crypto.getInstance().getAddressFromShort(shortAddress)
                     );
             }
         });

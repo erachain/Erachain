@@ -47,6 +47,9 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
     int ASSET_AMOUNT_INDEX = 1;
     int ADDRESS_ASSET_INDEX = 2;
 
+    String dbSuitMain = "RocksDB";
+    String dbSuitFork = "mem";
+
     public ItemAssetBalanceTabImpl(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
@@ -67,18 +70,16 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
     protected void getMap()
     {
         if (parent == null) {
-            String dbs = "RocksDB";
-            if (dbs.equals("MapDB"))
+            if (dbSuitMain.equals("MapDB"))
                 map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
-            else if (dbs.equals("RocksDB"))
+            else if (dbSuitMain.equals("RocksDB"))
                 map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
             else
                 map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
         } else {
-            String dbs = "MapDB";
-            if (dbs.equals("MapDB"))
+            if (dbSuitFork.equals("MapDB"))
                 map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab)parent, databaseSet);
-            else if (dbs.equals("RocksDB"))
+            else if (dbSuitFork.equals("RocksDB"))
                 map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
             else
                 map = new nativeMapTreeMapFork(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
@@ -152,11 +153,16 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
 
-        //FILTER ALL KEYS
-        Collection<byte[]> keys = new ArrayList<>();
-        Iterator<byte[]> iterator = ((ItemAssetBalanceSuit)map).addressIterator(account.getAddress());
-        while(iterator.hasNext()) {
-            keys.add(iterator.next());
+        Collection<byte[]> keys;
+        if (map instanceof ItemAssetBalanceSuitRocksDB) {
+            //FILTER ALL KEYS
+            keys = new ArrayList<>();
+            Iterator<byte[]> iterator = ((ItemAssetBalanceSuitRocksDB) map).addressIterator(account.getAddress());
+            while (iterator.hasNext()) {
+                keys.add(iterator.next());
+            }
+        } else {
+            keys = ((ItemAssetBalanceSuitMapDB)map).addressIterator(account);
         }
 
         //RETURN
