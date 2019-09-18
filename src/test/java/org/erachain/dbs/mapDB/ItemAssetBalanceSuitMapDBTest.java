@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.junit.Test;
 import org.mapdb.Fun;
 
@@ -23,7 +24,7 @@ public class ItemAssetBalanceSuitMapDBTest {
     BigDecimal balA = new BigDecimal("0.1");
     BigDecimal balB = new BigDecimal("0.2");
     Fun.Tuple2<BigDecimal, BigDecimal> balAB = new Fun.Tuple2<>(balA, balB);
-    ItemAssetBalanceSuitMapDB map;
+    ItemAssetBalanceSuitRocksDB map;
 
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance;
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance2;
@@ -31,7 +32,7 @@ public class ItemAssetBalanceSuitMapDBTest {
     private void init() {
 
         dcSet = DCSet.createEmptyDatabaseSet();
-        map = new ItemAssetBalanceSuitMapDB(dcSet, dcSet.database);
+        map = (ItemAssetBalanceSuitRocksDB)dcSet.getAssetBalanceMap().getMapSuit();
 
         balance = new Fun.Tuple5<>(balAB, balAB, balAB, balAB, balAB);
 

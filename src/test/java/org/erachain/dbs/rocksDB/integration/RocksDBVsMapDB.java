@@ -23,7 +23,7 @@ public class RocksDBVsMapDB {
 
     private Map<byte[], byte[]> data = new HashMap<>();
 
-    private long countData = 1000000;
+    private long countData = 10000;
 
     private Set<Map.Entry<byte[], byte[]>> entrySet;
 

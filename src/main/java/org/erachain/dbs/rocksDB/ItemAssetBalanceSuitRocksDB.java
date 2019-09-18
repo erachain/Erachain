@@ -71,9 +71,10 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 >>(
                 new ByteableTrivial(),
                 new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal(), NAME_TABLE, indexes,
-                org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
-                        256, 10,
-                        1, 256, 32, false), ROCKS_DB_FOLDER);
+                //org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
+                //        256, 10,
+                //        1, 256, 32, false),
+                ROCKS_DB_FOLDER);
 
         databaseSet.addExternalMaps(this);
 

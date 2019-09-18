@@ -88,6 +88,10 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         }
     }
 
+    public ItemAssetBalanceSuit getMapSuit() {
+        return (ItemAssetBalanceSuit)map;
+    }
+
     public void set(byte[] address, long key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {

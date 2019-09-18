@@ -3,7 +3,9 @@ package org.erachain.datachain;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.DBMapSuit;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -63,6 +65,6 @@ public interface ItemAssetBalanceTab extends DBTab<byte[], Tuple5<
 
     void addObserver(Observer o);
 
-
+    ItemAssetBalanceSuit getMapSuit();
 
     }

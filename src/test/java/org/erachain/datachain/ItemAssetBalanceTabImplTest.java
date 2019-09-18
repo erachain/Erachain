@@ -36,7 +36,7 @@ public class ItemAssetBalanceTabImplTest {
     private void init() {
 
         dcSet = DCSet.createEmptyDatabaseSet();
-        map = new ItemAssetBalanceTabImpl(dcSet, dcSet.getDatabase());
+        map = dcSet.getAssetBalanceMap();
 
         balance1 = new Fun.Tuple5<>(balAB, balAB, balAB, balAB, balAB);
         balance2 = new Fun.Tuple5<>(balBA, balBA, balBA, balBA, balBA);
