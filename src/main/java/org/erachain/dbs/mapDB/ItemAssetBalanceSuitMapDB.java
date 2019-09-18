@@ -3,6 +3,7 @@ package org.erachain.dbs.mapDB;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
@@ -30,8 +31,8 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
 
     @SuppressWarnings("rawtypes")
-    public BTreeMap assetKeyMap;
-    public BTreeMap addressKeyMap;
+    protected BTreeMap assetKeyMap;
+    protected BTreeMap addressKeyMap;
 
     public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database);
@@ -152,18 +153,32 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         return DEFAULT_VALUE;
     }
 
+
     @Override
-    public Iterator<byte[]> assetIterator(Long key) {
-        return assetKeyMap.subMap(
-                Fun.t2(key, null),
-                Fun.t2(key, Fun.HI())).values().iterator();
+    public Collection<byte[]> assetKeys(long assetKey) {
+        //FILTER ALL KEYS
+        return this.assetKeyMap.subMap(
+                Fun.t2(Fun.t2(assetKey, null), null),
+                Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI())).values();
     }
 
     @Override
-    public Iterator<byte[]> addressIterator(String address) {
-        return addressKeyMap.subMap(
-                Fun.t2(address, null),
-                Fun.t2(address, Fun.HI())).values().iterator();
+    public Iterator<byte[]> assetIterator(long assetKey) {
+        return assetKeys(assetKey).iterator();
     }
+
+    @Override
+    public Collection<byte[]> accountKeys(Account account) {
+        //FILTER ALL KEYS
+        return this.addressKeyMap.subMap(
+                Fun.t2(account.getAddress(), null),
+                Fun.t2(account.getAddress(), Fun.HI())).values();
+    }
+
+    @Override
+    public Iterator<byte[]> accountIterator(Account account) {
+        return accountKeys(account).iterator();
+    }
+
 
 }

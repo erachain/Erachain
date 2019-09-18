@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.core.account.Account;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -20,8 +21,10 @@ public interface ItemAssetBalanceSuit {
                     new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                     new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
 
-    Iterator<byte[]> assetIterator(Long asset);
+    Iterator<byte[]> assetIterator(long assetKey);
+    Collection<byte[]> assetKeys(long assetKey);
 
-    Iterator<byte[]> addressIterator(String address);
+    Iterator<byte[]> accountIterator(Account account);
+    Collection<byte[]> accountKeys(Account account);
 
 }

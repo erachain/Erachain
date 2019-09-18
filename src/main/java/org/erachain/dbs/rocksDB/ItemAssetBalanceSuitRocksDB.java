@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
+import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
@@ -11,6 +12,7 @@ import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
+import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -20,6 +22,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
@@ -73,17 +76,21 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                         Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>>,
-                Tuple2<Long, BigDecimal>> indexDBf1f0 = new SimpleIndexDB<>(balanceKeyAssetNameIndex,
+                byte[]> indexDBf1f0 = new SimpleIndexDB<>(balanceKeyAssetNameIndex,
                 (key, value) -> {
+                    // Address
+                    byte[] shortAddress = new byte[20];
+                    System.arraycopy(key, 0, shortAddress, 0, 20);
+                    // ASSET KEY
                     byte[] assetKeyBytes = new byte[8];
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-                    return new Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate());
-                }
-                ,
-                (result, key) -> org.bouncycastle.util.Arrays.concatenate(
-                        new ByteableLong().toBytesObject(result.a),
-                        new ByteableBigDecimal().toBytesObject(result.b)
-                ));
+
+                    return org.bouncycastle.util.Arrays.concatenate(
+                            assetKeyBytes,
+                            new ByteableBigDecimal().toBytesObject(value.a.b.negate()),
+                            shortAddress);
+                },
+                (result, key) -> result);
         indexes.add(indexDBf1f0);
 
         SimpleIndexDB<
@@ -94,7 +101,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                         Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>>,
-                Tuple2<String, Long>> indexDBf0f1 = new SimpleIndexDB<>(balanceAssetKeyNameIndex,
+                byte[] indexDBf0f1 = new SimpleIndexDB<>(balanceAssetKeyNameIndex,
                 (key, value) -> {
                     // Address
                     byte[] shortAddress = new byte[20];
@@ -103,14 +110,11 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     byte[] assetKeyBytes = new byte[8];
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                    return new Tuple2<String, Long>(
-                            Crypto.getInstance().getAddressFromShort(shortAddress),
-                            Longs.fromByteArray(assetKeyBytes));
+                    return org.bouncycastle.util.Arrays.concatenate(
+                            shortAddress,
+                            assetKeyBytes);
                 },
-                (result, key) -> org.bouncycastle.util.Arrays.concatenate(
-                        new ByteableString().toBytesObject(result.a),
-                        new ByteableLong().toBytesObject(result.b)
-                ));
+                (result, key) -> result); // ByteableTrivial
         indexes.add(indexDBf0f1);
     }
 
@@ -128,18 +132,37 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         dbFile.delete();
     }
 
-    // TODO - replace
-    public Iterator<byte[]> assetIterator(Long key) {
-        return ((ItemAssetBalanceSuitMapDB) map).assetKeyMap.subMap(
-                Fun.t2(key, null),
-                Fun.t2(key, Fun.HI())).values().iterator();
+
+    // TODO - release it
+
+    public Collection<byte[]> assetKeys(long assetKey) {
+        Collection<byte[]> keys = new ArrayList<>();
+        //FILTER ALL KEYS
+        Iterator<byte[]> iterator = assetIterator(assetKey);
+        while (iterator.hasNext()) {
+            keys.add(iterator.next());
+        }
+        return keys;
     }
 
-    // TODO - replace
-    public Iterator<byte[]> addressIterator(String address) {
-        return ((ItemAssetBalanceSuitMapDB) map).addressKeyMap.subMap(
-                Fun.t2(address, null),
-                Fun.t2(address, Fun.HI())).values().iterator();
-
+    @Override
+    public Iterator<byte[]> assetIterator(long assetKey) {
+        return assetKeys(assetKey).iterator();
     }
+
+    public Collection<byte[]> accountKeys(Account account) {
+        Collection<byte[]> keys = new ArrayList<>();
+        //FILTER ALL KEYS
+        Iterator<byte[]> iterator = accountIterator(account);
+        while (iterator.hasNext()) {
+            keys.add(iterator.next());
+        }
+        return keys;
+    }
+
+    @Override
+    public Iterator<byte[]> accountIterator(Account account) {
+        //return accountKeys(account).iterator();
+    }
+
 }

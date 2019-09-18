@@ -124,19 +124,24 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
     @SuppressWarnings({"unchecked", "rawtypes"})
     public SortableList<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long key) {
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long assetKey) {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
 
-        if (key < 0)
-            key = -key;
+        if (assetKey < 0)
+            assetKey = -assetKey;
 
-        //FILTER ALL KEYS
-        Collection<byte[]> keys = new ArrayList<>();
-        Iterator<byte[]> iterator = ((ItemAssetBalanceSuit)map).assetIterator(key);
-        while(iterator.hasNext()) {
-            keys.add(iterator.next());
+        Collection<byte[]> keys;
+        if (map instanceof ItemAssetBalanceSuitRocksDB) {
+            //FILTER ALL KEYS
+            keys = new ArrayList<>();
+            Iterator<byte[]> iterator = ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
+            while (iterator.hasNext()) {
+                keys.add(iterator.next());
+            }
+        } else {
+            keys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey);
         }
 
         //RETURN
@@ -157,12 +162,12 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         if (map instanceof ItemAssetBalanceSuitRocksDB) {
             //FILTER ALL KEYS
             keys = new ArrayList<>();
-            Iterator<byte[]> iterator = ((ItemAssetBalanceSuitRocksDB) map).addressIterator(account.getAddress());
+            Iterator<byte[]> iterator = ((ItemAssetBalanceSuit) map).accountIterator(account);
             while (iterator.hasNext()) {
                 keys.add(iterator.next());
             }
         } else {
-            keys = ((ItemAssetBalanceSuitMapDB)map).addressIterator(account);
+            keys = ((ItemAssetBalanceSuit)map).accountKeys(account);
         }
 
         //RETURN

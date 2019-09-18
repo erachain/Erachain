@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import org.erachain.core.account.Account;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.datachain.ItemAssetBalanceTab;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Iterator;
 
 // TODO SOFT HARD TRUE
@@ -74,13 +76,26 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
     protected void createIndexes() {
     }
 
+    @Override
     // NOT used in FORK
-    public Iterator<byte[]> assetIterator(Long key) {
+    public Iterator<byte[]> assetIterator(long key) {
         return null;
     }
 
+    @Override
     // NOT used in FORK
-    public Iterator<byte[]> addressIterator(String address) {
+    public Collection<byte[]> assetKeys(long key) {
+        return null;
+    }
+
+    @Override
+    // NOT used in FORK
+    public Iterator<byte[]> accountIterator(Account account) {
+        return null;
+    }
+    @Override
+    // NOT used in FORK
+    public Collection<byte[]> accountKeys(Account account) {
         return null;
     }
 
