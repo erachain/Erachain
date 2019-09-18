@@ -44,9 +44,9 @@ public class ItemAssetBalanceMapTest {
 
         balance2 = map.get(account.getShortAddressBytes(), 2L);
 
-        assertEquals(Arrays.equals(account.getShortAddressBytes(), map.getShortAccountFromKey(account.getShortAddressBytes())), true);
+        assertEquals(Arrays.equals(account.getShortAddressBytes(), ItemAssetBalanceTab.getShortAccountFromKey(account.getShortAddressBytes())), true);
 
-        Account account2 = new Account(map.getShortAccountFromKey(account.getShortAddressBytes()));
+        Account account2 = new Account(ItemAssetBalanceTab.getShortAccountFromKey(account.getShortAddressBytes()));
 
         assertEquals(Arrays.equals(account.getAddressBytes(), account2.getAddressBytes()), true);
         assertEquals(Arrays.equals(account.getShortAddressBytes(), account2.getShortAddressBytes()), true);

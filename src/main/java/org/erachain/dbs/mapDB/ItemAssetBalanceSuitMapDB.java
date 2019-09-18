@@ -149,14 +149,14 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public Iterator<byte[]> assetIterator(Long key) {
-        return ((ItemAssetBalanceSuitMapDB)map).assetKeyMap.subMap(
+        return assetKeyMap.subMap(
                 Fun.t2(key, null),
                 Fun.t2(key, Fun.HI())).values().iterator();
     }
 
     @Override
     public Iterator<byte[]> addressIterator(String address) {
-        return ((ItemAssetBalanceSuitMapDB)map).addressKeyMap.subMap(
+        return addressKeyMap.subMap(
                 Fun.t2(address, null),
                 Fun.t2(address, Fun.HI())).values().iterator();
     }
