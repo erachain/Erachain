@@ -5,6 +5,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.DBMapSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
@@ -47,8 +48,8 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
     int ASSET_AMOUNT_INDEX = 1;
     int ADDRESS_ASSET_INDEX = 2;
 
-    String dbSuitMain = "RocksDB";
-    String dbSuitFork = "mem";
+    final static String dbSuitMain = "RocksDB";
+    final static String dbSuitFork = "mem";
 
     public ItemAssetBalanceTabImpl(DCSet databaseSet, DB database) {
         super(databaseSet, database);
