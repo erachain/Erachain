@@ -7,10 +7,15 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
+import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
+import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.Iterator;
 
 import static org.junit.Assert.*;
@@ -30,6 +35,13 @@ public class ItemAssetBalanceSuitMapDBTest {
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance2;
 
     private void init() {
+
+        try {
+            // удалим все в папке Temp
+            File tempDir = new File(ConstantsRocksDB.ROCKS_DB_FOLDER);
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
 
         dcSet = DCSet.createEmptyDatabaseSet();
         map = (ItemAssetBalanceSuitRocksDB)dcSet.getAssetBalanceMap().getMapSuit();
@@ -54,7 +66,7 @@ public class ItemAssetBalanceSuitMapDBTest {
             iteratorSize1++;
             byte[] key = assetKeys.next();
             long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
-            assertEquals(assetKey, assetKey2);
+            assertEquals(assetKey, assetKey1);
 
         }
 
