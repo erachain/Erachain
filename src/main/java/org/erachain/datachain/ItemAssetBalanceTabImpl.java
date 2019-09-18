@@ -86,21 +86,6 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         }
     }
 
-    public long getAssetKeyFromKey(byte[] key) {
-        // ASSET KEY
-        byte[] assetKeyBytes = new byte[8];
-        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-        return Longs.fromByteArray(assetKeyBytes);
-    }
-
-    public byte[] getShortAccountFromKey(byte[] key) {
-        // ASSET KEY
-        byte[] shortAddressBytes = new byte[20];
-        System.arraycopy(key, 0, shortAddressBytes, 0, 20);
-        return shortAddressBytes;
-
-    }
-
     public void set(byte[] address, long key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {

@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.DBTab;
@@ -19,9 +20,20 @@ public interface ItemAssetBalanceTab extends DBTab<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> {
 
-    long getAssetKeyFromKey(byte[] key);
+    static long getAssetKeyFromKey(byte[] key) {
+        // ASSET KEY
+        byte[] assetKeyBytes = new byte[8];
+        System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+        return Longs.fromByteArray(assetKeyBytes);
+    }
 
-    byte[] getShortAccountFromKey(byte[] key);
+    static byte[] getShortAccountFromKey(byte[] key) {
+        // ASSET KEY
+        byte[] shortAddressBytes = new byte[20];
+        System.arraycopy(key, 0, shortAddressBytes, 0, 20);
+        return shortAddressBytes;
+
+    }
 
     void set(byte[] address, long key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,

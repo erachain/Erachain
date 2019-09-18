@@ -209,9 +209,9 @@ public class Account {
         if (true) {
             // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
             for (byte[] mapKey: map.keySet()) {
-                if (map.getAssetKeyFromKey(mapKey) == key) {
+                if (ItemAssetBalanceTab.getAssetKeyFromKey(mapKey) == key) {
                     ballance = map.get(mapKey);
-                    values.put(map.getShortAccountFromKey(mapKey), ballance.a.b);
+                    values.put(ItemAssetBalanceTab.getShortAccountFromKey(mapKey), ballance.a.b);
                 }
             }
 
@@ -223,9 +223,9 @@ public class Account {
             byte[] iteratorKey;
             while (iterator.hasNext()) {
                 iteratorKey = iterator.next();
-                if (map.getAssetKeyFromKey(iteratorKey) == key) {
+                if (ItemAssetBalanceTab.getAssetKeyFromKey(iteratorKey) == key) {
                     ballance = map.get(iteratorKey);
-                    values.put(map.getShortAccountFromKey(iteratorKey), ballance.a.b);
+                    values.put(ItemAssetBalanceTab.getShortAccountFromKey(iteratorKey), ballance.a.b);
                 }
             }
 
@@ -675,7 +675,7 @@ public class Account {
             Collection<byte[]> addrs = db.getAssetBalanceMap().keySet();
             BigDecimal total = BigDecimal.ZERO;
             for (byte[] mapKey : addrs) {
-                if (map.getAssetKeyFromKey(mapKey) == 2l) {
+                if (ItemAssetBalanceTab.getAssetKeyFromKey(mapKey) == 2l) {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
                             map.get(mapKey);
 

@@ -61,8 +61,8 @@ public class AssetsFavorites implements Observer {
                         || balance.getB().c.b.compareTo(BigDecimal.ZERO) != 0
                         || balance.getB().d.b.compareTo(BigDecimal.ZERO) != 0
                         || balance.getB().e.b.compareTo(BigDecimal.ZERO) != 0) {
-                    if (!favoritesUpadate.contains(map.getAssetKeyFromKey(balance.getA()))) {
-                        favoritesUpadate.add(map.getAssetKeyFromKey(balance.getA()));
+                    if (!favoritesUpadate.contains(ItemAssetBalanceTab.getAssetKeyFromKey(balance.getA()))) {
+                        favoritesUpadate.add(ItemAssetBalanceTab.getAssetKeyFromKey(balance.getA()));
                     }
                 }
             }

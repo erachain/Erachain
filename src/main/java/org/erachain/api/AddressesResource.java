@@ -523,7 +523,7 @@ public class AddressesResource {
         JSONObject assetsBalancesJSON = new JSONObject();
 
         for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
-            assetsBalancesJSON.put(map.getAssetKeyFromKey(assetsBalance.getA()), tuple5_toJson(assetsBalance.getB()));
+            assetsBalancesJSON.put(ItemAssetBalanceTab.getAssetKeyFromKey(assetsBalance.getA()), tuple5_toJson(assetsBalance.getB()));
         }
 
         return assetsBalancesJSON.toJSONString();

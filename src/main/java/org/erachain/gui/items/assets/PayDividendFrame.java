@@ -190,7 +190,7 @@ public class PayDividendFrame extends JFrame {
             List<Account> accounts = new ArrayList<Account>();
             BigDecimal total = BigDecimal.ZERO;
             for (int i = 0; i < holders && i < balances.size(); i++) {
-                Account account = new Account(map.getShortAccountFromKey(balances.get(i).getA()));
+                Account account = new Account(ItemAssetBalanceTab.getShortAccountFromKey(balances.get(i).getA()));
                 accounts.add(account);
 
                 total = total.add(balances.get(i).getB().a.b);

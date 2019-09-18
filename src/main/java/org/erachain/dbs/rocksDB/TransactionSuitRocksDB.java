@@ -107,8 +107,8 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     @Override
     public Iterable typeKeys(String sender, Long timestamp, Integer type) {
-        ((RocksDB)map).filterAppropriateValuesAsKeys(
-                toBytesStringLongInteger.toBytes(sender, timestamp, type), null),
+        return ((RocksDB)map).filterAppropriateValuesAsKeys(
+                toBytesStringLongInteger.toBytes(sender, timestamp, type),
                 addressTypeUnconfirmedTransactionIndex);
     }
 

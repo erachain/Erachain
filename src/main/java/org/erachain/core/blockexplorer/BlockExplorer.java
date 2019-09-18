@@ -1811,11 +1811,11 @@ public class BlockExplorer {
         //BigDecimal total = BigDecimal.ZERO;
         //BigDecimal totalNeg = BigDecimal.ZERO;
         for (byte[] addrKey : addrs) {
-            if (map.getAssetKeyFromKey(addrKey) == key) {
+            if (ItemAssetBalanceTab.getAssetKeyFromKey(addrKey) == key) {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
                         map.get(addrKey);
                 // all = all.add(ball.a);
-                Account account = new Account(map.getShortAccountFromKey(addrKey));
+                Account account = new Account(ItemAssetBalanceTab.getShortAccountFromKey(addrKey));
                 BigDecimal ballans = account.getBalanceUSE(key);
                 //if (ball.a.b.signum() > 0) {
                 //total = total.add(ball.a.b);
@@ -1944,7 +1944,7 @@ public class BlockExplorer {
 
                 Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
 
-                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.getA());
+                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(item.getA());
                 if (assetKey == AssetCls.LIA_KEY) {
                     continue;
                 }
