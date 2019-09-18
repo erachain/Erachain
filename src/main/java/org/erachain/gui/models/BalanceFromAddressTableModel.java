@@ -1,6 +1,7 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
@@ -29,14 +30,14 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
     public static final int COLUMN_FOR_ICON = 1;
 
     Account account;
-    Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
+    //Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
     Tuple2<Long, String> asset;
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"key Asset", "Asset", "Balance A", "Balance B", "Balance C"});
     // balances;
     private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
     private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance;
-    private ArrayList<Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance1;
+    private ArrayList<Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>>> tableBalance1;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public BalanceFromAddressTableModel() {
@@ -46,22 +47,22 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
         tableBalance1 = new ArrayList<>();
         HashSet<Long> assetKeys = new HashSet();
 
-        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
+        //ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         for (Account account1 : accounts) {
             account = account1;
             balances = Controller.getInstance().getBalances(account);
             for (Pair<byte[],
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance1 : this.balances) {
+                            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance : this.balances) {
 
-                if (Controller.getInstance().getAsset(map.getAssetKeyFromKey(balance1.getA())) == null) {
+                if (Controller.getInstance().getAsset(ItemAssetBalanceTab.getAssetKeyFromKey(balance.getA())) == null) {
                     // SKIP LIA etc.
                     continue;
                 }
 
-                balance = balance1;
-                tableBalance1.add(new Pair(account, new Pair(balance.getA(), balance.getB())));
-                assetKeys.add(map.getAssetKeyFromKey(balance.getA()));
+                Long assetKey =  ItemAssetBalanceTab.getAssetKeyFromKey(balance.getA());
+                tableBalance1.add(new Pair(account, new Pair(assetKey, balance.getB())));
+                assetKeys.add(assetKey);
             }
         }
 
@@ -76,8 +77,8 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
             BigDecimal sumCB = new BigDecimal(0);
             BigDecimal sumDB = new BigDecimal(0);
             BigDecimal sumEB = new BigDecimal(0);
-            for (Pair<Account, Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k : this.tableBalance1) {
-                if (k.getB().getA().b.equals(assetKey)) {
+            for (Pair<Account, Pair<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> k : this.tableBalance1) {
+                if (assetKey.equals(k.getB().getA())) {
 
                     sumAA = sumAA.add(k.getB().getB().a.a);
                     sumBA = sumBA.add(k.getB().getB().b.a);
@@ -86,6 +87,9 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
                     sumEA = sumEA.add(k.getB().getB().e.a);
 
                     sumAB = sumAB.add(k.getB().getB().a.b);
+                    if (BlockChain.ERA_COMPU_ALL_UP) {
+                        sumAB = sumAB.add(k.getA().addDEVAmount(assetKey));
+                    }
                     sumBB = sumBB.add(k.getB().getB().b.b);
                     sumCB = sumCB.add(k.getB().getB().c.b);
                     sumDB = sumDB.add(k.getB().getB().d.b);

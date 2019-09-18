@@ -51,7 +51,7 @@ public class BlockChain {
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
      */
-    public static final boolean ERA_COMPU_ALL_UP = false;
+    public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || false;
 
     static final public int CHECK_BUGS = 1;
 

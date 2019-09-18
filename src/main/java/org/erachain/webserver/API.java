@@ -1034,21 +1034,28 @@ public class API {
 
         }
 
+        Account account = new Account(address);
         ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
         SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = map.getBalancesSortableList(new Account(address));
+                = map.getBalancesSortableList(account);
 
         JSONObject out = new JSONObject();
 
-        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                assetsBalance : assetsBalances) {
             JSONArray array = new JSONArray();
-            JSONObject a = new JSONObject();
-            array.add(setJSONArray(assetsBalance.getB().a));
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.getA());
+
+            if (BlockChain.ERA_COMPU_ALL_UP) {
+                array.add(setJSONArray(account.balAaddDEVAmount(assetKey, assetsBalance.getB().a)));
+            } else {
+                array.add(setJSONArray(assetsBalance.getB().a));
+            }
             array.add(setJSONArray(assetsBalance.getB().b));
             array.add(setJSONArray(assetsBalance.getB().c));
             array.add(setJSONArray(assetsBalance.getB().d));
             array.add(setJSONArray(assetsBalance.getB().e));
-            out.put(map.getAssetKeyFromKey(assetsBalance.getA()), array);
+            out.put(assetKey, array);
         }
 
         return Response.status(200)

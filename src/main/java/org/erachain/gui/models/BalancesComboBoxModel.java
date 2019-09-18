@@ -1,8 +1,8 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceTab;
@@ -21,7 +21,11 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
 
     private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
 
+    Account account;
+
     public BalancesComboBoxModel(Account account) {
+        this.account = account;
+
         Controller.getInstance().addObserver(this);
         this.balances = Controller.getInstance().getBalances(account);
         ///this.balances.registerObserver();
@@ -56,16 +60,20 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
         //EMPTY LIST
         this.removeAllElements();
 
-        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
+        //ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         //INSERT ALL ACCOUNTS
         for (int i = 0; i < this.balances.size(); i++) {
             Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                     item = this.balances.get(i);
-            this.addElement(new Pair(
-                    new Tuple2(Crypto.getInstance().getAddressFromShortBytes(
-                            map.getShortAccountFromKey(item.getA())), map.getAssetKeyFromKey(item.getA())),
-                    item.getB()));
+
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(item.getA());
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = item.getB();
+            if (BlockChain.ERA_COMPU_ALL_UP) {
+                balance = account.balanceAddDEVAmount(assetKey, balance);
+            }
+
+            this.addElement(new Pair(new Tuple2(account, assetKey), balance));
         }
 
         //RESET SELECTED ITEM

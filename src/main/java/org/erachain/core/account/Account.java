@@ -523,9 +523,9 @@ public class Account {
      * }
      */
 
-    // REFERENCE
 
-    private BigDecimal addDEVAmount(long key) {
+    // Добавляем величины для тестовых режимов
+    public BigDecimal addDEVAmount(long key) {
         if (key == 1)
             return BigDecimal.valueOf(( 512000 + 500 * this.getShortAddressBytes()[10]) >> 6);
         else if (key == 2)
@@ -533,6 +533,26 @@ public class Account {
 
         return BigDecimal.ZERO;
 
+    }
+    public Tuple2<BigDecimal, BigDecimal> balAaddDEVAmount(long key, Tuple2<BigDecimal, BigDecimal> balA) {
+        BigDecimal addAmount = addDEVAmount(key);
+        if (addAmount.signum() == 0)
+            return balA;
+
+        return new Tuple2<>(balA.a, balA.b.add(addAmount));
+
+    }
+
+    public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        balanceAddDEVAmount(long key, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                            balance) {
+        BigDecimal addAmount = addDEVAmount(key);
+        if (addAmount.signum() == 0)
+            return balance;
+
+        return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addAmount)),
+                    balance.b, balance.c, balance.d, balance.e);
     }
 
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
@@ -542,10 +562,8 @@ public class Account {
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
                 .getAssetBalanceMap().get(getShortAddressBytes(), key);
-        if (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) {
-            return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                    new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key))),
-                    balance.b, balance.c, balance.d, balance.e);
+        if (BlockChain.ERA_COMPU_ALL_UP) {
+            return balanceAddDEVAmount(key, balance);
         }
         return balance;
 
@@ -559,7 +577,7 @@ public class Account {
                 .getAssetBalanceMap().get(getShortAddressBytes(), key);
 
         if (actionType == TransactionAmount.ACTION_SEND) {
-            if (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) {
+            if (BlockChain.ERA_COMPU_ALL_UP ) {
                 return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
             }
 
