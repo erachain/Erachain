@@ -279,27 +279,40 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
         return value;
     }
 
+    public Collection<byte[]> assetKeys(long assetKey) {
+        //FILTER ALL KEYS
+        return this.assetKeyMap.subMap(
+                Fun.t2(assetKey, null),
+                Fun.t2(assetKey, Fun.HI())).values();
+
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public SortableList<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long key) {
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long assetKey) {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
 
-        if (key < 0)
-            key = -key;
+        if (assetKey < 0)
+            assetKey = -assetKey;
 
         //FILTER ALL KEYS
-        Collection<byte[]> keys = this.assetKeyMap.subMap(
-                Fun.t2(key, null),
-                Fun.t2(key, Fun.HI())).values();
+        Collection<byte[]> keys = assetKeys(assetKey);
 
-        int tt = keys.size();
         //RETURN
         return new SortableList<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+    }
+
+    public Collection<byte[]> addressKeys(Account account) {
+        //FILTER ALL KEYS
+        return this.addressKeyMap.subMap(
+                Fun.t2(account.getAddress(), null),
+                Fun.t2(account.getAddress(), Fun.HI())).values();
+
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -311,11 +324,8 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
             return null;
 
         //FILTER ALL KEYS
-        Collection<byte[]> keys = this.addressKeyMap.subMap(
-                Fun.t2(account.getAddress(), null),
-                Fun.t2(account.getAddress(), Fun.HI())).values();
+        Collection<byte[]> keys = addressKeys(account);
 
-        int tt = keys.size();
         //RETURN
         return new SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
