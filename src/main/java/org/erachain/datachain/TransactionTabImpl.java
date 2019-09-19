@@ -285,6 +285,23 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         return this.get(Longs.fromByteArray(signature));
     }
 
+    /**
+     * Из-за того что для проверки валидности в core.TransactionCreator
+     * задаются номер блоки и позиция даже когда она неподтвержденная
+     * То надо сбрасывать эти значения при получении из базы - иначе в КЭШе этот объект с установленными занчениями
+     * @param key
+     * @return
+     */
+    public Transaction get(long key) {
+        Transaction transaction = this.get(key);
+        transaction.setHeightSeq(0, 0);
+        return transaction;
+    }
+    public Transaction get(Long key) {
+        Transaction transaction = this.get(key);
+        transaction.setHeightSeq(0, 0);
+        return transaction;
+    }
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
 
