@@ -115,23 +115,28 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
                 //.valuesOutsideNodesEnable()
                 .makeOrGet();
 
-        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple2<Long, BigDecimal>,
+        Bind.secondaryKey(hashMap, this.assetKeyMap, new Fun.Function2<Tuple2<Tuple2<Long, BigDecimal>, String>,
                 byte[],
                 Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                 () {
             @Override
-            public Tuple2<Long, BigDecimal>
+            public Tuple2<Tuple2<Long, BigDecimal>, String>
             run(byte[] key, Tuple5<
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                     Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
 
+                // Address
+                byte[] shortAddress = new byte[20];
+                System.arraycopy(key, 0, shortAddress, 0, 20);
+                // ASSET KEY
                 byte[] assetKeyBytes = new byte[8];
                 System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                return new Tuple2<Long, BigDecimal>(
-                        Longs.fromByteArray(assetKeyBytes), value.a.b.negate()
+                return new Tuple2<Tuple2<Long, BigDecimal>, String>(
+                        new Tuple2<>(Longs.fromByteArray(assetKeyBytes), value.a.b.negate()),
+                        Crypto.getInstance().getAddressFromShort(shortAddress)
                     );
             }
         });
@@ -279,27 +284,52 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
         return value;
     }
 
+    public Collection<byte[]> assetKeys(long assetKey) {
+        //FILTER ALL KEYS
+        return this.assetKeyMap.subMap(
+                Fun.t2(Fun.t2(assetKey, null), null),
+                Fun.t2(Fun.t2(assetKey, Fun.HI()), Fun.HI())).values();
+
+    }
+
+    public Iterator<byte[]> assetKeysIterator(long assetKey) {
+        //FILTER ALL KEYS
+        return assetKeys(assetKey).iterator();
+
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public SortableList<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long key) {
+            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(long assetKey) {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
 
-        if (key < 0)
-            key = -key;
+        if (assetKey < 0)
+            assetKey = -assetKey;
 
         //FILTER ALL KEYS
-        Collection<byte[]> keys = this.assetKeyMap.subMap(
-                Fun.t2(key, null),
-                Fun.t2(key, Fun.HI())).values();
+        Collection<byte[]> keys = assetKeys(assetKey);
 
-        int tt = keys.size();
         //RETURN
         return new SortableList<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
+    }
+
+    public Collection<byte[]> addressKeys(Account account) {
+        //FILTER ALL KEYS
+        return this.addressKeyMap.subMap(
+                Fun.t2(account.getAddress(), null),
+                Fun.t2(account.getAddress(), Fun.HI())).values();
+
+    }
+
+    public Iterator<byte[]> addressKeysIterator(Account account) {
+        //FILTER ALL KEYS
+        return addressKeys(account).iterator();
+
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -311,11 +341,8 @@ public class ItemAssetBalanceMap extends DCMap<byte[], Tuple5<
             return null;
 
         //FILTER ALL KEYS
-        Collection<byte[]> keys = this.addressKeyMap.subMap(
-                Fun.t2(account.getAddress(), null),
-                Fun.t2(account.getAddress(), Fun.HI())).values();
+        Collection<byte[]> keys = addressKeys(account);
 
-        int tt = keys.size();
         //RETURN
         return new SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
