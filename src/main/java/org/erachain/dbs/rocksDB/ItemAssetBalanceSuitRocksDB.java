@@ -102,11 +102,11 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
                     int sign = value.a.b.signum();
                     // берем абсолютное значение
-                    BigDecimal shiftForSortBG = value.a.b.abs().setScale(TransactionAmount.maxSCALE);
+                    BigDecimal shiftForSortBG = value.a.b;//.setScale(TransactionAmount.maxSCALE);
                     BigInteger shiftForSortBI = shiftForSortBG.unscaledValue();
                     //shiftForSortBI = new BigInteger("-1").subtract(shiftForSortBI);
                     byte[] shiftForSortOrig = shiftForSortBI.toByteArray();
-                    byte[] shiftForSortBuff = new byte[32];
+                    byte[] shiftForSortBuff = new byte[3];
                     System.arraycopy(shiftForSortOrig, 0, shiftForSortBuff,
                             shiftForSortBuff.length - shiftForSortOrig.length, shiftForSortOrig.length);
 
@@ -115,7 +115,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                        // shiftForSortBuff[0] = (byte)(-1 + shiftForSortBuff[0]);
                         // сковертируем
                         for (int i = 3; i < shiftForSortBuff.length; i++) {
-                            shiftForSortBuff[i-3] = shiftForSortBuff[i];
+                            //shiftForSortBuff[i-1] = shiftForSortBuff[i];
                         }
                     } else {
                         // учтем знак числа
@@ -128,8 +128,9 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
                     return org.bouncycastle.util.Arrays.concatenate(
                             assetKeyBytes,
-                            shiftForSortBuff,
-                            shortAddress);
+                            shiftForSortBuff
+                            //shortAddress - он уже есть тут
+                    );
                 },
                 (result, key) -> result);
         indexes.add(balanceKeyAssetIndex);
@@ -168,11 +169,18 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     // TODO - release it
 
-    public Set<byte[]> assetKeys(long assetKey) {
+    public Set<byte[]> assetKeys_bad(long assetKey) {
         return ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
                 Longs.toByteArray(assetKey),
                 balanceKeyAssetIndex);
     }
+
+    public Set<byte[]> assetKeys(long assetKey) {
+        return ((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
+                Longs.toByteArray(assetKey),
+                balanceKeyAssetIndex);
+    }
+
 
     @Override
     public Iterator<byte[]> assetIterator(long assetKey) {

@@ -269,6 +269,10 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         return set.stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
     }
 
+    public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, IndexDB indexDB) {
+        return db.filterAppropriateValuesAsKeys(filter, indexDB);
+    }
+
     public Set<K> filterAppropriateKeys(byte[] filter) {
         Set<byte[]> set = db.filterAppropriateValuesAsKeys(filter);
         return set.stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());

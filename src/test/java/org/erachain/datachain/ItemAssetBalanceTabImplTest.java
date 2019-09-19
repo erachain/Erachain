@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.function.DoubleFunction;
@@ -148,15 +149,36 @@ public class ItemAssetBalanceTabImplTest {
                 map.set(key, balance1);
             }
 
-            //////////////////
-            Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getMapSuit()).assetKeys(assetKey1).iterator();
             BigDecimal value;
             Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                     balance = null;
             Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                     balanceTmp;
 
+            Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getMapSuit()).assetKeys(assetKey1);
             int iteratorSize = 0;
+            for (byte[] key: assetKeysSet) {
+                iteratorSize++;
+                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+                assertEquals(assetKey, assetKey1);
+                balanceTmp = map.get(key);
+
+                // Нужно положить их с отсутпом
+                logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
+                        + balanceTmp.a.b);
+
+                if (balance != null && balanceTmp.a.b.compareTo(balance.a.b) > 0) {
+                    //logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize);
+                    // всегда идем по возрастанию
+                    //assertEquals(balanceTmp.a.b, balance.a.b);
+                }
+                balance = balanceTmp;
+            }
+
+            //////////////////
+            Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getMapSuit()).assetIterator(assetKey1);
+
+            iteratorSize = 0;
             while (assetKeys.hasNext()) {
                 iteratorSize++;
 
@@ -166,7 +188,7 @@ public class ItemAssetBalanceTabImplTest {
                 balanceTmp = map.get(key);
 
                 // Нужно положить их с отсутпом
-                logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " bal:"
+                logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " ITER bal:"
                         + balanceTmp.a.b);
 
                 if (balance != null && balanceTmp.a.b.compareTo(balance.a.b) > 0) {
