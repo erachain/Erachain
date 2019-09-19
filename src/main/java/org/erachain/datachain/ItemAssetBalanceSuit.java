@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.account.Account;
+import org.erachain.dbs.DBMapSuit;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;

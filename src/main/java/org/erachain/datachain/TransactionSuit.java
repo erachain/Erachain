@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
+import org.erachain.dbs.DBMapSuit;
 
 import java.util.Collection;
 import java.util.Iterator;

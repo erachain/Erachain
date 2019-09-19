@@ -74,6 +74,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     protected void createIndexes() {
     }
 
+    public Map getMapSuit() {
+        return map;
+    }
+
     /**
      * Make SECODATY INDEX
      * INDEX ID = 0 - its is PRIMARY - not use it here

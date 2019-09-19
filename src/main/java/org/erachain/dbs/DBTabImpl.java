@@ -32,11 +32,11 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
     //
     //}
 
-    public DBTabImpl(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database) {
+        super(dbsUsed, databaseSet, database);
     }
 
-    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database) {
+    public DBTabImpl(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
@@ -45,13 +45,6 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
      * @param parent
      * @param databaseSet
      */
-    public DBTabImpl(DBTab parent, DBASet databaseSet) {
-        super(parent, databaseSet);
-
-        // OPEN MAP
-        this.getMap();
-    }
-
     public DBTabImpl(int dbsUsed, DBTab parent, DBASet databaseSet) {
         super(dbsUsed, parent, databaseSet);
 
@@ -59,8 +52,19 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
         this.getMap();
     }
 
+    public DBTabImpl(DBTab parent, DBASet databaseSet) {
+        super(parent, databaseSet);
+
+        // OPEN MAP
+        this.getMap();
+    }
+
     // for TESTS etc.
     public void setMap(DBMapSuit map) { this.map = map; }
+
+    public DBMapSuit getMapSuit() {
+        return map;
+    }
 
     @Override
     public int size() {

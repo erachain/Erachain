@@ -65,6 +65,4 @@ public interface ItemAssetBalanceTab extends DBTab<byte[], Tuple5<
 
     void addObserver(Observer o);
 
-    ItemAssetBalanceSuit getMapSuit();
-
     }
