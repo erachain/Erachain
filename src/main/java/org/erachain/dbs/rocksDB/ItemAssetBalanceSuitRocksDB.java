@@ -2,12 +2,14 @@ package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
+import org.erachain.dbs.rocksDB.transformation.ByteableBigInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
@@ -15,6 +17,7 @@ import org.mapdb.Fun.Tuple5;
 
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,6 +62,9 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         super(databaseSet, database);
     }
 
+    //private final ByteableBigDecimal byteableBigDecimal = new ByteableBigDecimal();
+    private final ByteableBigInteger byteableBigInteger = new ByteableBigInteger();
+
     @Override
     protected void getMap() {
 
@@ -92,10 +98,11 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     // ASSET KEY
                     byte[] assetKeyBytes = new byte[8];
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
+                    BigInteger shiftForSort = value.a.b.negate().setScale(TransactionAmount.maxSCALE).unscaledValue();
 
                     return org.bouncycastle.util.Arrays.concatenate(
                             assetKeyBytes,
-                            new ByteableBigDecimal().toBytesObject(value.a.b.negate()),
+                            byteableBigInteger.toBytesObject(shiftForSort),
                             shortAddress);
                 },
                 (result, key) -> result);
