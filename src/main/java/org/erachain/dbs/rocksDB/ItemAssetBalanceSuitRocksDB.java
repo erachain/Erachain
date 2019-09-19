@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
+import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.DBASet;
@@ -78,7 +79,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 new ByteableTrivial(),
                 new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal(), NAME_TABLE, indexes,
                 org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
-                        256, 10,
+                        256, 128,
                         1, 256, 32, false),
                 ROCKS_DB_FOLDER);
 
@@ -98,11 +99,36 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     // ASSET KEY
                     byte[] assetKeyBytes = new byte[8];
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
-                    BigInteger shiftForSort = value.a.b.negate().setScale(TransactionAmount.maxSCALE).unscaledValue();
+
+                    int sign = value.a.b.signum();
+                    // берем абсолютное значение
+                    BigDecimal shiftForSortBG = value.a.b.abs().setScale(TransactionAmount.maxSCALE);
+                    BigInteger shiftForSortBI = shiftForSortBG.unscaledValue();
+                    //shiftForSortBI = new BigInteger("-1").subtract(shiftForSortBI);
+                    byte[] shiftForSortOrig = shiftForSortBI.toByteArray();
+                    byte[] shiftForSortBuff = new byte[32];
+                    System.arraycopy(shiftForSortOrig, 0, shiftForSortBuff,
+                            shiftForSortBuff.length - shiftForSortOrig.length, shiftForSortOrig.length);
+
+                    if (sign >= 0) {
+                        // учтем знак числа
+                       // shiftForSortBuff[0] = (byte)(-1 + shiftForSortBuff[0]);
+                        // сковертируем
+                        for (int i = 3; i < shiftForSortBuff.length; i++) {
+                            shiftForSortBuff[i-3] = shiftForSortBuff[i];
+                        }
+                    } else {
+                        // учтем знак числа
+                        //shiftForSortBuff[0] = (byte)(0 - shiftForSortBuff[0]);
+                        // сковертируем
+                        //for (int i = 0; i < shiftForSortBuff.length; i++) {
+                        //    //shiftForSortBuff[i] = (byte)(0 + shiftForSortBuff[i]);
+                        //}
+                    }
 
                     return org.bouncycastle.util.Arrays.concatenate(
                             assetKeyBytes,
-                            byteableBigInteger.toBytesObject(shiftForSort),
+                            shiftForSortBuff,
                             shortAddress);
                 },
                 (result, key) -> result);
