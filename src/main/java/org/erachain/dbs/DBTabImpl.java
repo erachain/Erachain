@@ -36,6 +36,10 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
         super(databaseSet, database);
     }
 
+    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database) {
+        super(databaseSet, database);
+    }
+
     /**
      * Это лоя форкеутой таблицы вызов - запомнить Родителя и все - индексы тут не нужны и обсерверы
      * @param parent
@@ -43,6 +47,13 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
      */
     public DBTabImpl(DBTab parent, DBASet databaseSet) {
         super(parent, databaseSet);
+
+        // OPEN MAP
+        this.getMap();
+    }
+
+    public DBTabImpl(int dbsUsed, DBTab parent, DBASet databaseSet) {
+        super(dbsUsed, parent, databaseSet);
 
         // OPEN MAP
         this.getMap();

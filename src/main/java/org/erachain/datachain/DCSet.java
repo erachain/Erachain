@@ -136,7 +136,7 @@ public class DCSet extends DBASet implements Observer {
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
-    public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
+    public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory, int defaultDBS) {
         super(dbFile, database, withObserver, dynamicGUI);
 
         LOGGER.info("UP SIZE BEFORE COMMIT [KB]: " + MAX_ENGINE_BEFORE_COMMIT_KB
@@ -148,7 +148,7 @@ public class DCSet extends DBASet implements Observer {
 
         try {
             // переделанные таблицы
-            this.assetBalanceMap = new ItemAssetBalanceTabImpl(this, database);
+            this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS: DBS_MAP_DB, this, database);
             this.transactionTab = new TransactionTabImpl(this, database);
 
             this.actions = 0L;
@@ -279,7 +279,7 @@ public class DCSet extends DBASet implements Observer {
         this.bchain = parent.bchain;
 
         // переделанные поновой таблицы
-        this.assetBalanceMap = new ItemAssetBalanceTabImpl(parent.assetBalanceMap, this);
+        this.assetBalanceMap = new ItemAssetBalanceTabImpl(DBS_MAP_DB, parent.assetBalanceMap, this);
         this.transactionTab = new TransactionTabImpl(parent.transactionTab, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
@@ -466,7 +466,7 @@ public class DCSet extends DBASet implements Observer {
         DB database = databaseStruc.make();
 
         //CREATE INSTANCE
-        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
+        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false, 0);
         if (instance.actions < 0) {
             dbFile.delete();
             for (DBMapSuit map: instance.externalMaps) {
@@ -492,7 +492,7 @@ public class DCSet extends DBASet implements Observer {
                 //.newMemoryDirectDB()
                 .make();
 
-        instance = new DCSet(null, database, withObserver, dynamicGUI, true);
+        instance = new DCSet(null, database, withObserver, dynamicGUI, true, 0);
 
     }
 
@@ -500,19 +500,20 @@ public class DCSet extends DBASet implements Observer {
          * make data set in memory. For tests
          *
          * @return
+         * @param defaultDBS
          */
-    public static DCSet createEmptyDatabaseSet() {
+    public static DCSet createEmptyDatabaseSet(int defaultDBS) {
         DB database = DBMaker
                 .newMemoryDB()
                 //.newMemoryDirectDB()
                 .make();
 
-        instance = new DCSet(null, database, false, false, true);
+        instance = new DCSet(null, database, false, false, true, defaultDBS);
         return instance;
     }
 
     public static DCSet createEmptyHardDatabaseSet() {
-        instance = new DCSet(null, getHardBase(), false, false, true);
+        instance = new DCSet(null, getHardBase(), false, false, true, 0);
         return instance;
     }
 

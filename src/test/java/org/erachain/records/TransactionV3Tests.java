@@ -57,7 +57,7 @@ public class TransactionV3Tests {
     // INIT ASSETS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
             gb.process(db);

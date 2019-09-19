@@ -66,7 +66,7 @@ public class TestRecTemplate {
     // INIT TEMPLATES
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         templateMap = db.getItemTemplateMap();
 
         gb = new GenesisBlock();

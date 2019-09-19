@@ -88,7 +88,7 @@ public class TestRecPoll {
             fail("You need change key 'BlockChain.TESTS_VERS' to current version");
 
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         Controller.getInstance().setDCSet(db);
         gb = new GenesisBlock();
         try {

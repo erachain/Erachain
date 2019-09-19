@@ -52,11 +52,11 @@ public class GeneratorTests {
     byte[] transactionsHash = new byte[Crypto.HASH_LENGTH];
 
     //CREATE EMPTY MEMORY DATABASE
-    DCSet dcSet = DCSet.createEmptyDatabaseSet();
+    DCSet dcSet = DCSet.createEmptyDatabaseSet(0);
 
     @Before
     public void init() {
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
     }
 
 

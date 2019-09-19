@@ -62,7 +62,7 @@ public class TestRecAsset {
     // INIT ASSETS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         cntrl = Controller.getInstance();
         cntrl.initBlockChain(db);
         bchain = cntrl.getBlockChain();

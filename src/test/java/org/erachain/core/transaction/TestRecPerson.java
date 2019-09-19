@@ -82,7 +82,7 @@ public class TestRecPerson {
     // INIT PERSONS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         dbPA = db.getPersonAddressMap();
         dbAP = db.getAddressPersonMap();
         dbPS = db.getPersonStatusMap();

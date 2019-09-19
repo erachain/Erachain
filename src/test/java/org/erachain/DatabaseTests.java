@@ -62,7 +62,7 @@ public class DatabaseTests {
     // INIT PERSONS
     private void init() {
 
-        dcSet = DCSet.createEmptyDatabaseSet();
+        dcSet = DCSet.createEmptyDatabaseSet(0);
 
         gb = new GenesisBlock();
         try {

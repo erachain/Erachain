@@ -8,7 +8,6 @@ import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
-import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -43,11 +42,10 @@ public class ItemAssetBalanceSuitMapDBTest {
         } catch (Throwable e) {
         }
 
-        dcSet = DCSet.createEmptyDatabaseSet();
+        dcSet = DCSet.createEmptyDatabaseSet(0);
         map = (ItemAssetBalanceSuitRocksDB)dcSet.getAssetBalanceMap().getMapSuit();
 
         balance = new Fun.Tuple5<>(balAB, balAB, balAB, balAB, balAB);
-
 
     }
 

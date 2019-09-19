@@ -24,6 +24,8 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
 
     public int DESCENDING_SHIFT_INDEX = 10000;
 
+    protected int dbsUsed;
+
     public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
     protected DB database;
@@ -43,7 +45,8 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         }
     }
 
-    public DBTabCommonImpl(DBASet databaseSet, DB database) {
+    public DBTabCommonImpl(int dbsUsed, DBASet databaseSet, DB database) {
+        this.dbsUsed = dbsUsed;
         this.databaseSet = databaseSet;
         this.database = database;
 
@@ -56,11 +59,23 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
 
     }
 
+    public DBTabCommonImpl(DBASet databaseSet, DB database) {
+        this(IDB.DBS_MAP_DB, databaseSet, database);
+    }
+
     /**
      * Это лоя форкеутой таблицы вызов - запомнить Родителя и все - индексы тут не нужны и обсерверы
      * @param parent
      * @param databaseSet
      */
+    public DBTabCommonImpl(int dbsUsed, DBTab parent, DBASet databaseSet) {
+
+        this.dbsUsed = dbsUsed;
+        this.databaseSet = databaseSet;
+        this.database = databaseSet.database;
+        this.parent = parent;
+
+    }
     public DBTabCommonImpl(DBTab parent, DBASet databaseSet) {
 
         this.databaseSet = databaseSet;

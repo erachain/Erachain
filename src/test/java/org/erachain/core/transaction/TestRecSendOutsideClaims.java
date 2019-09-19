@@ -73,7 +73,7 @@ public class TestRecSendOutsideClaims {
     // INIT ASSETS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         Controller.getInstance().setDCSet(db);
         gb = new GenesisBlock();
         try {

@@ -33,7 +33,7 @@ public class TransactionSuitRocksDBTabTest {
 
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         forgingMap = db.getAddressForging();
 
     }

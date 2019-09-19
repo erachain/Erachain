@@ -34,7 +34,7 @@ public class SynchronizerTests {
     byte FEE_POWER = (byte) 0;
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
-    DCSet databaseSet = DCSet.createEmptyDatabaseSet();
+    DCSet databaseSet = DCSet.createEmptyDatabaseSet(0);
     GenesisBlock genesisBlock = new GenesisBlock();
     BlockChain blockChain;
 
@@ -169,8 +169,8 @@ public class SynchronizerTests {
     public void synchronizeCommonBlock() {
 
         //GENERATE 5 BLOCKS FROM ACCOUNT 1
-        DCSet databaseSet1 = DCSet.createEmptyDatabaseSet();
-        DCSet databaseSet2 = DCSet.createEmptyDatabaseSet();
+        DCSet databaseSet1 = DCSet.createEmptyDatabaseSet(0);
+        DCSet databaseSet2 = DCSet.createEmptyDatabaseSet(0);
 
         GenesisBlock gb1;
         GenesisBlock gb2;

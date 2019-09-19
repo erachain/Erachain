@@ -4,8 +4,8 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.database.DBASet;
 import org.erachain.database.SortableList;
-import org.erachain.dbs.DBMapSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
@@ -21,6 +21,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+
+import static org.erachain.database.IDB.DBS_MAP_DB;
+import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 /**
  * Hasher работает неверно! и вообще там 32 битное число 0 INTEGER - чего нифига не хватает!
@@ -48,11 +51,8 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
     int ASSET_AMOUNT_INDEX = 1;
     int ADDRESS_ASSET_INDEX = 2;
 
-    final static String dbSuitMain = "RocksDB";
-    final static String dbSuitFork = "mem";
-
-    public ItemAssetBalanceTabImpl(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+    public ItemAssetBalanceTabImpl(int dbsUsed, DCSet databaseSet, DB database) {
+        super(dbsUsed, databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_BALANCE_TYPE);
@@ -62,28 +62,35 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         }
     }
 
-    public ItemAssetBalanceTabImpl(ItemAssetBalanceTab parent, DCSet databaseSet) {
-        super(parent, databaseSet);
+    public ItemAssetBalanceTabImpl(int dbsUsed, ItemAssetBalanceTab parent, DCSet databaseSet) {
+        super(dbsUsed, parent, databaseSet);
     }
 
     // TODO вставить настройки выбора СУБД
     @Override
     protected void getMap()
     {
+
+
         if (parent == null) {
-            if (dbSuitMain.equals("MapDB"))
-                map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
-            else if (dbSuitMain.equals("RocksDB"))
-                map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
-            else
-                map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
+            switch (dbsUsed) {
+                case DBS_ROCK_DB:
+                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
+                    break;
+                default:
+                    map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
+            }
         } else {
-            if (dbSuitFork.equals("MapDB"))
-                map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab)parent, databaseSet);
-            else if (dbSuitFork.equals("RocksDB"))
-                map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
-            else
-                map = new nativeMapTreeMapFork(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
+            switch (dbsUsed) {
+                case DBS_MAP_DB:
+                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet);
+                    break;
+                //case DBS_ROCK_DB:
+                    //map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
+                    //break;
+                default:
+                    map = new nativeMapTreeMapFork(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
+            }
 
         }
     }

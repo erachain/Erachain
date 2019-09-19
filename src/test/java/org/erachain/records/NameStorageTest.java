@@ -44,7 +44,7 @@ public class NameStorageTest {
     public void setup() {
         //Ed25519.load();
 
-        databaseSet = DCSet.createEmptyDatabaseSet();
+        databaseSet = DCSet.createEmptyDatabaseSet(0);
 
         // CREATE KNOWN ACCOUNT
         byte[] seed = Crypto.getInstance().digest("test".getBytes());

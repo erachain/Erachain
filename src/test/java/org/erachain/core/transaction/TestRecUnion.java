@@ -77,7 +77,7 @@ public class TestRecUnion {
     // INIT UNIONS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
 
         gb = new GenesisBlock();
         try {

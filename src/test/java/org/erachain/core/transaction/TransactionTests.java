@@ -70,7 +70,7 @@ public class TransactionTests {
             //PropertyConfigurator.configure(log4j.getAbsolutePath());
         }
 
-        databaseSet = db = DCSet.createEmptyDatabaseSet();
+        databaseSet = db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         block = gb;
 
