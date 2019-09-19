@@ -37,6 +37,8 @@ public interface ItemAssetBalanceTab extends DBTab<byte[], Tuple5<
 
     }
 
+    boolean contains(byte[] address, long key);
+
     void set(byte[] address, long key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value);

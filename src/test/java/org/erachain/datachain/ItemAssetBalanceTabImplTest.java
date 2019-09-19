@@ -69,9 +69,32 @@ public class ItemAssetBalanceTabImplTest {
 
             init(dbs);
 
+            boolean found = map.contains(account1.getShortAddressBytes(), 2L);
+
+            assertEquals(found, false);
+
             map.set(account1.getShortAddressBytes(), 2L, balance1);
 
-            balance2 = map.get(account1.getShortAddressBytes(), 2L);
+            // make SAME KEY as NEW OBJECT
+            found = map.contains(account1.getShortAddressBytes(), 2L);
+
+            assertEquals(found, true);
+
+            // make SAME KEY as NEW OBJECT
+            found = map.contains(account1.getShortAddressBytes(), 3L);
+
+            assertEquals(found, false);
+
+            // make SAME KEY as NEW OBJECT
+            found = map.contains(account2.getShortAddressBytes(), 2L);
+
+            assertEquals(found, false);
+
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                    balance = map.get(account1.getShortAddressBytes(), 2L);
+
+            assertEquals(balance1, balance);
+
 
             assertEquals(Arrays.equals(account1.getShortAddressBytes(), ItemAssetBalanceTab.getShortAccountFromKey(account1.getShortAddressBytes())), true);
 
@@ -129,7 +152,13 @@ public class ItemAssetBalanceTabImplTest {
 
             map.set(Bytes.concat(account2.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance2);
 
-            map.set(Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance1);
+            byte[] keyAccount3Asset1 = Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1));
+            map.set(keyAccount3Asset1, balance1);
+
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                    balance = map.get(keyAccount3Asset1);
+
+            assertEquals(balance, balance1);
 
             assertEquals(map.size(), size + 4);
 
@@ -189,8 +218,8 @@ public class ItemAssetBalanceTabImplTest {
             assertEquals(1, iteratorSize);
 
 
-            ///////////// тот же КЛЮЧ
-            map.set(Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance3);
+            ///////////// тот же КЛЮЧ но новый баланс
+            map.set(keyAccount3Asset1, balance3);
 
             assetKeys = ((ItemAssetBalanceSuit)((DBTabImpl)map).getMapSuit()).assetKeys(assetKey1).iterator();
             iteratorSize = 0;
@@ -216,6 +245,10 @@ public class ItemAssetBalanceTabImplTest {
             assertEquals(1, found2);
             assertEquals(1, found3);
             assertEquals(3, iteratorSize);
+
+           balance = map.get(keyAccount3Asset1);
+
+            assertEquals(balance, balance3);
         }
     }
 

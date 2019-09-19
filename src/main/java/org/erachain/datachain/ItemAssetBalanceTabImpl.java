@@ -95,6 +95,13 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         }
     }
 
+    public boolean contains(byte[] address, long key) {
+        if (key < 0)
+            key = -key;
+
+        return this.contains(Bytes.concat(address, Longs.toByteArray(key)));
+    }
+
     public void set(byte[] address, long key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
