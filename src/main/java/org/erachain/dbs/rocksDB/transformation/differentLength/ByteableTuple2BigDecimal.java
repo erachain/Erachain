@@ -1,38 +1,45 @@
 package org.erachain.dbs.rocksDB.transformation.differentLength;
 
-import lombok.Getter;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.core.BlockChain;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
-import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.util.Arrays;
 
 public class ByteableTuple2BigDecimal implements Byteable<Tuple2<BigDecimal, BigDecimal>> {
-    private final ByteableBigDecimal byteableBigDecimal = new ByteableBigDecimal();
-    private final ByteableInteger byteableInteger = new ByteableInteger();
-    @Getter
-    private int summurySize;
 
-    @Override
+    /**
+     * [0] - длинна первого BigDecimal, [1] - scale1, [2] - scale2
+     * @param bytes
+     * @return
+     */
     public Tuple2<BigDecimal, BigDecimal> receiveObjectFromBytes(byte[] bytes) {
-        byte[] sizeArray = Arrays.copyOfRange(bytes, 0, Integer.BYTES);
-        Integer size = byteableInteger.receiveObjectFromBytes(sizeArray);
-        byte[] f0 = Arrays.copyOfRange(bytes, Integer.BYTES,Integer.BYTES+size);
-        int newZero = Integer.BYTES + size;
-        byte[] sizeArray2 = Arrays.copyOfRange(bytes, newZero, newZero + Integer.BYTES);
-        Integer size2 = byteableInteger.receiveObjectFromBytes(sizeArray2);
-        summurySize = newZero + Integer.BYTES + size2;
-        byte[] f1 = Arrays.copyOfRange(bytes, newZero + Integer.BYTES, summurySize);
-        return new Tuple2(new BigDecimal(new BigInteger(f0)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN),
-                new BigDecimal(new BigInteger(f1)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN));
+        int length1 = bytes[0];
+        byte[] buff1 = new byte[length1];
+
+        System.arraycopy(bytes, 3, buff1, 0, length1);
+
+        int length2 = bytes.length - length1 - 3;
+        byte[] buff2 = new byte[length2];
+        System.arraycopy(bytes, 3 + length1, buff2, 0, length2);
+
+        return new Tuple2(new BigDecimal(new BigInteger(buff1), bytes[1]),  new BigDecimal(new BigInteger(buff2), bytes[2]));
     }
 
     @Override
     public byte[] toBytesObject(Tuple2<BigDecimal, BigDecimal> value) {
-        return org.bouncycastle.util.Arrays.concatenate(byteableBigDecimal.toBytesObject(value.a), byteableBigDecimal.toBytesObject(value.b));
+        byte[] buff1 = value.a.unscaledValue().toByteArray();
+        byte[] buff2 = value.b.unscaledValue().toByteArray();
+
+        byte[] buff = new byte[3 + buff1.length + buff2.length];
+        int length1 = buff1.length;
+        buff[0] = (byte)length1;
+        buff[1] = (byte)value.a.scale();
+        buff[2] = (byte)value.b.scale();
+
+        System.arraycopy(buff1, 0, buff, 3, length1);
+        System.arraycopy(buff2, 0, buff, 3 + length1, buff2.length);
+
+        return buff;
     }
 }

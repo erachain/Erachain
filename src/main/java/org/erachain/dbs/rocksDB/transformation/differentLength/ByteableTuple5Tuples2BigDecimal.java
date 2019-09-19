@@ -5,9 +5,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class ByteableTuple5Tuples2BigDecimal implements Byteable<
         Tuple5<
@@ -19,28 +16,49 @@ public class ByteableTuple5Tuples2BigDecimal implements Byteable<
     private final ByteableTuple2BigDecimal byteableTuple2BigDecimal = new ByteableTuple2BigDecimal();
 
     @Override
-    public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> receiveObjectFromBytes(byte[] bytes) {
-        List<Tuple2<BigDecimal, BigDecimal>> list = new ArrayList<>();
+    public Tuple5<
+            Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>,
+            Tuple2<BigDecimal, BigDecimal>> receiveObjectFromBytes(byte[] bytes) {
+        Tuple2<BigDecimal, BigDecimal>[] tuples = new Tuple2[5];
+
         int n = 5;
-        byte[] copy = bytes;
+        int pos = 0;
+        int length;
         for (int i = 0; i < n; i++) {
-            Tuple2<BigDecimal, BigDecimal> tuple2 = byteableTuple2BigDecimal.receiveObjectFromBytes(copy);
-            copy = Arrays.copyOfRange(copy, byteableTuple2BigDecimal.getSummurySize(), copy.length);
-            list.add(tuple2);
+            length = bytes[i];
+            byte[] buff = new byte[length];
+            System.arraycopy(bytes, pos, buff, 0, length);
+            tuples[i] = byteableTuple2BigDecimal.receiveObjectFromBytes(buff);
+
         }
-        return new Tuple5(list.get(0), list.get(1), list.get(2), list.get(3), list.get(4));
+        return new Tuple5(tuples[0], tuples[1], tuples[2], tuples[3], tuples[4]);
 
     }
 
     @Override
     public byte[] toBytesObject(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
-        return org.bouncycastle.util.Arrays.concatenate(
-                org.bouncycastle.util.Arrays.concatenate(
-                        byteableTuple2BigDecimal.toBytesObject(value.a),
-                        byteableTuple2BigDecimal.toBytesObject(value.b),
-                        byteableTuple2BigDecimal.toBytesObject(value.c)),
-                org.bouncycastle.util.Arrays.concatenate(
-                        byteableTuple2BigDecimal.toBytesObject(value.d),
-                        byteableTuple2BigDecimal.toBytesObject(value.e)));
+        byte[] buff1 = byteableTuple2BigDecimal.toBytesObject(value.a);
+        byte[] buff2 = byteableTuple2BigDecimal.toBytesObject(value.b);
+        byte[] buff3 = byteableTuple2BigDecimal.toBytesObject(value.c);
+        byte[] buff4 = byteableTuple2BigDecimal.toBytesObject(value.d);
+        byte[] buff5 = byteableTuple2BigDecimal.toBytesObject(value.e);
+        byte[] buff = new byte[5 + buff1.length+ buff2.length + buff3.length + buff4.length + buff5.length];
+
+        int pos = 0;
+        System.arraycopy(buff1, 0, buff, 5 + pos, buff1.length);
+        pos += buff1.length;
+        System.arraycopy(buff2, 0, buff, 5 + pos, buff2.length);
+        pos += buff2.length;
+        System.arraycopy(buff3, 0, buff, 5 + pos, buff3.length);
+        pos += buff3.length;
+        System.arraycopy(buff4, 0, buff, 5 + pos, buff4.length);
+        pos += buff4.length;
+        System.arraycopy(buff5, 0, buff, 5 + pos, buff5.length);
+        //pos += buff5.length;
+
+        return buff;
     }
 }
