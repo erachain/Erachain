@@ -57,10 +57,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 int button = e.getButton();
                 Point newPoint = e.getPoint();
                 currentPoint = newPoint;
-                // сброс всего в исходное положение по правой кнопке мыши
-                if (button == MouseEvent.BUTTON3) {
-                    currentTransform = new AffineTransform();
-                }
                 // сброс только масштаба по средней кнопке мыши
                 if (button == MouseEvent.BUTTON2) {
                     AffineTransform newTransform = new AffineTransform();
