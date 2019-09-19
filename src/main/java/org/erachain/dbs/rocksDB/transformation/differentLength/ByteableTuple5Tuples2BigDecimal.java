@@ -30,9 +30,9 @@ public class ByteableTuple5Tuples2BigDecimal implements Byteable<
         for (int i = 0; i < n; i++) {
             length = bytes[i];
             byte[] buff = new byte[length];
-            System.arraycopy(bytes, pos, buff, 0, length);
+            System.arraycopy(bytes, 5 + pos, buff, 0, length);
             tuples[i] = byteableTuple2BigDecimal.receiveObjectFromBytes(buff);
-
+            pos += length;
         }
         return new Tuple5(tuples[0], tuples[1], tuples[2], tuples[3], tuples[4]);
 
@@ -46,6 +46,12 @@ public class ByteableTuple5Tuples2BigDecimal implements Byteable<
         byte[] buff4 = byteableTuple2BigDecimal.toBytesObject(value.d);
         byte[] buff5 = byteableTuple2BigDecimal.toBytesObject(value.e);
         byte[] buff = new byte[5 + buff1.length+ buff2.length + buff3.length + buff4.length + buff5.length];
+
+        buff[0] = (byte)buff1.length;
+        buff[1] = (byte)buff2.length;
+        buff[2] = (byte)buff3.length;
+        buff[3] = (byte)buff4.length;
+        buff[4] = (byte)buff5.length;
 
         int pos = 0;
         System.arraycopy(buff1, 0, buff, 5 + pos, buff1.length);
