@@ -1,15 +1,12 @@
 package org.erachain.datachain;
 
 import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.database.DBASet;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -18,16 +15,14 @@ import org.mapdb.Fun;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
-import java.util.function.DoubleFunction;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class ItemAssetBalanceTabImplTest {
@@ -116,6 +111,64 @@ public class ItemAssetBalanceTabImplTest {
             assertEquals(Arrays.equals(account.getAddressBytes(), account1.getAddressBytes()), true);
             assertEquals(Arrays.equals(account.getShortAddressBytes(), account1.getShortAddressBytes()), true);
             assertEquals(account.getAddress(), account1.getAddress());
+        }
+    }
+
+    @Test
+    public void addressIteratorSort() {
+        for (int dbs : TESTED_DBS) {
+            init(dbs);
+
+            long assetKeyTMP = 0L;
+
+            Random rand = new Random();
+            for (int i = 0; i < 10; i++) {
+                long randLong = rand.nextLong();
+                if (randLong < 0)
+                    randLong = -randLong;
+
+                int randInt = rand.nextInt();
+                BigDecimal balTest = new BigDecimal(randInt + "." + randLong);
+                balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
+                balTest = balTest.setScale(TransactionAmount.maxSCALE, RoundingMode.HALF_DOWN);
+
+                balTest = new BigDecimal(i - 5);
+
+                // account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
+
+                // создаем новые ключи
+                byte[] key = Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(randLong >> 5));
+
+                balance1 = new Fun.Tuple5<>(new Fun.Tuple2(balTest, balTest), balAB, balAC, balBD, balBD);
+                //logger.info(balTest.toPlainString());
+                map.set(key, balance1);
+            }
+
+            BigDecimal value;
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                    balance = null;
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                    balanceTmp;
+
+            Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getMapSuit()).accountKeys(account1);
+            int iteratorSize = 0;
+            for (byte[] key : assetKeysSet) {
+                iteratorSize++;
+                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+                //assertEquals(assetKey, assetKey1);
+                balanceTmp = map.get(key);
+
+                // Нужно положить их с отсутпом
+                logger.error("DBS: " + dbs + "  assetKey: " + assetKey + " SET bal:"
+                        + balanceTmp.a.b);
+
+                if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
+                    //logger.error("DBS: " + dbs + "  assetKey: " + assetKey);
+                    // всегда идем по возрастанию
+                    //assertEquals(assetKeyTMP, assetKey);
+                }
+                assetKeyTMP = assetKey;
+            }
         }
     }
 
