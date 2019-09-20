@@ -2,10 +2,12 @@ package org.erachain.gui.items;
 
 import org.erachain.lang.Lang;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 
 public abstract class ImageCropDialog extends JDialog {
     public ImageCropDialog(File imageFile, int cropWidth, int cropHeight, TypeOfImage typeOfImage) {
@@ -17,7 +19,8 @@ public abstract class ImageCropDialog extends JDialog {
         c.gridx = 0;
         JButton okButton = new JButton("OK");
         okButton.addActionListener(e -> {
-            onFinish(imageCropPanel.getSnapshot(typeOfImage));
+            BufferedImage snapshot = imageCropPanel.getSnapshot(typeOfImage);
+            onFinish(snapshot);
             dispose();
         });
         buttonPanel.add(okButton, c);

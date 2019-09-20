@@ -7,7 +7,9 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -52,6 +54,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             public void mousePressed(MouseEvent e) {
                 currentPoint = e.getPoint();
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 int button = e.getButton();
@@ -79,6 +82,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 newTransform.concatenate(currentTransform);
                 currentTransform = newTransform;
             }
+
             @Override
             public void mouseMoved(MouseEvent e) {
                 try {
@@ -235,9 +239,11 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             }
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
-            logger.info("Error size of sub image");
-            return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
-                    snapshot.getWidth() - (int) pointZeroDst.x, snapshot.getHeight() - (int) pointZeroDst.y);
+            logger.error("Error size of sub image", e);
+            int shift = 2;
+            return snapshot.getSubimage((int) pointZeroDst.x + shift, (int) pointZeroDst.y + shift,
+                    snapshot.getWidth() - (int) pointZeroDst.x - shift,
+                    snapshot.getHeight() - (int) pointZeroDst.y - shift);
         }
 
     }
@@ -261,9 +267,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
         // тут не смещаем из центра
         AffineTransform newTransform = new AffineTransform();
-        newTransform.concatenate(AffineTransform.getTranslateInstance(getPreferredSize().width /2 , getPreferredSize().height / 2));
+        newTransform.concatenate(AffineTransform.getTranslateInstance(getPreferredSize().width / 2, getPreferredSize().height / 2));
         newTransform.concatenate(AffineTransform.getScaleInstance(scale, scale));
-        newTransform.concatenate(AffineTransform.getTranslateInstance(-getPreferredSize().width /2, -getPreferredSize().height / 2));
+        newTransform.concatenate(AffineTransform.getTranslateInstance(-getPreferredSize().width / 2, -getPreferredSize().height / 2));
         newTransform.concatenate(currentTransform);
         currentTransform = newTransform;
         repaint();
