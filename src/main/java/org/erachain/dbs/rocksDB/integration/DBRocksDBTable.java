@@ -25,10 +25,13 @@ import java.util.stream.Collectors;
 public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integration.InnerDBTable
         <K, V> {
 
-    private boolean logON = false;
+    private boolean logON = true;
 
+    // индексы
+    private List<IndexDB> indexes;
     private List<ColumnFamilyHandle> columnFamilyHandles;
     private ColumnFamilyHandle columnFamilyFieldSize;
+
     //  интерфейс доступа к БД
     public RocksDB db;
 
@@ -39,8 +42,6 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     private String NAME_TABLE;
     private RocksDbSettings settings;
     private String root;
-    // индексы
-    private List<IndexDB> indexes;
 
     //Для пересчета размеров таблицы
     private ByteableInteger byteableInteger = new ByteableInteger();
@@ -113,7 +114,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         byte[] bytesValue = byteableValue.toBytesObject(value);
         db.put(columnFamilyHandles.get(0), keyBytes, bytesValue);
         if (logON) logger.info("valueBytes.length = " + bytesValue.length);
-        for (IndexDB indexDB : indexes) {
+        for (IndexDB indexDB: indexes) {
             if (indexDB instanceof SimpleIndexDB) {
                 if (logON) logger.info("SimpleIndex");
                 ////// тут получаем ответы от двух функций Индекса - формирования ключа и преобразования его в байты

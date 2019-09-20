@@ -190,7 +190,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
         resetDbLock.readLock().lock();
         List<byte[]> result = new ArrayList<byte[]>();
-        try (final RocksIterator iter = database.newIterator()) {
+        try (final RocksIterator iter = database.newIterator(indexDB)) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
             }

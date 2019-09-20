@@ -87,7 +87,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public void createIndexes() {
-        indexes = new ArrayList<>();
 
         balanceKeyAssetIndex = new SimpleIndexDB<>(balanceKeyAssetIndexName,
                 (key, value) -> {
@@ -131,7 +130,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     );
                 },
                 (result, key) -> result);
-        indexes.add(balanceKeyAssetIndex);
 
         balanceAddressIndex = new SimpleIndexDB<>(balanceAddressIndexName,
                 (key, value) -> {
@@ -147,7 +145,10 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                             assetKeyBytes);
                 },
                 (result, key) -> result); // ByteableTrivial
+
+        indexes = new ArrayList<>();
         indexes.add(balanceAddressIndex);
+        indexes.add(balanceKeyAssetIndex);
     }
 
     @Override
