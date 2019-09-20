@@ -29,7 +29,7 @@ import static org.rocksdb.RocksDB.loadLibrary;
 public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     private String dataBaseName;
     @Getter
-    private RocksDB database;
+    public RocksDB database;
     private boolean alive;
     private String parentName;
 

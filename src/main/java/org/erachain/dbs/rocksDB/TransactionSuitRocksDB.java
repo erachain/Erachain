@@ -195,9 +195,9 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
             if (type > 0) {
                 recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(
                         indexByteableTuple3StringLongInteger.toBytes(new Tuple3<>(recipient, timestamp, type), null),
-                        rocksDBTable.receiveIndexByName(addressTypeUnconfirmedTransactionIndexName));
+                        rocksDBTable.getIndexByName(addressTypeUnconfirmedTransactionIndexName));
             } else {
-                recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(recipient.getBytes(), rocksDBTable.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+                recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(recipient.getBytes(), rocksDBTable.getIndexByName(recipientUnconfirmedTransactionIndexName));
             }
         }
         return recipientKeys;
@@ -228,9 +228,9 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     public List<Transaction> getTransactionsByAddressFast100(String address, int limitSize) {
         HashSet<Long> treeKeys = new HashSet<>();
-        Set<Long> senderKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.receiveIndexByName(senderUnconfirmedTransactionIndexName));
+        Set<Long> senderKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.getIndexByName(senderUnconfirmedTransactionIndexName));
         List<Long> senderKeysLimit = senderKeys.stream().limit(limitSize).collect(Collectors.toList());
-        Set<Long> recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.receiveIndexByName(recipientUnconfirmedTransactionIndexName));
+        Set<Long> recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.getIndexByName(recipientUnconfirmedTransactionIndexName));
         List<Long> recipientKeysLimit = recipientKeys.stream().limit(limitSize).collect(Collectors.toList());
         treeKeys.addAll(senderKeysLimit);
         treeKeys.addAll(recipientKeysLimit);

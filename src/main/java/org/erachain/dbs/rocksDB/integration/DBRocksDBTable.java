@@ -29,7 +29,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     private List<ColumnFamilyHandle> columnFamilyHandles;
     private ColumnFamilyHandle columnFamilyFieldSize;
     //  интерфейс доступа к БД
-    private RocksDB db;
+    public RocksDB db;
 
     //  Сериализатор ключей
     private Byteable byteableKey;
@@ -283,11 +283,11 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         return set.stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
     }
 
-    public IndexDB receiveIndexByName(String name) {
+    public IndexDB getIndexByName(String name) {
         return db.recieveIndexByName(name);
     }
 
-    public IndexDB receiveIndex(int index) {
+    public IndexDB getIndex(int index) {
         return indexes.get(index);
     }
 
@@ -350,11 +350,11 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     }
 
     public Collection<K> keys(byte[] fromKey, long limit, String indexDBName) {
-        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, receiveIndexByName(indexDBName));
+        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, getIndexByName(indexDBName));
         return keysNext.stream().map((bytes) -> (K) byteableKey.receiveObjectFromBytes(bytes)).collect(Collectors.toSet());
     }
     public Collection<V> values(byte[] fromKey, long limit, String indexDBName) {
-        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, receiveIndexByName(indexDBName));
+        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, getIndexByName(indexDBName));
         return keysNext.stream().map((bytes) -> {
             byte[] value = db.get(bytes);
             if (value != null) {

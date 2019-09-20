@@ -26,7 +26,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
     private boolean dbSync;
 
     @Getter
-    private RocksDbDataSourceImpl db;
+    public RocksDbDataSourceImpl db;
 
     private List<IndexDB> indexes;
 

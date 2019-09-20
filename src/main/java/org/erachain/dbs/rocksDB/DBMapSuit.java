@@ -26,7 +26,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     protected DBASet databaseSet;
     protected DB database;
 
-    protected InnerDBTable<T, U> map;
+    public InnerDBTable<T, U> map;
     protected List<IndexDB> indexes;
 
     // for DCMapSuit
