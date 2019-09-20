@@ -19,12 +19,15 @@ package org.erachain.dbs.rocksDB.common;
 
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.RocksIterator;
 
 import java.util.List;
 import java.util.Set;
 
 
 public interface DbSourceInter<V> extends BatchSourceInter<byte[], V> {
+
+    RocksIterator getIterator(IndexDB indexDB);
 
     String getDBName();
 
@@ -41,6 +44,8 @@ public interface DbSourceInter<V> extends BatchSourceInter<byte[], V> {
     Set<byte[]> allValues() throws RuntimeException;
 
     Set<byte[]> filterApprropriateKeys(byte[] filter) throws RuntimeException;
+
+    RocksIterator getIterator();
 
     Set<byte[]> filterApprropriateValues(byte[] filter, IndexDB IndexDB);
 

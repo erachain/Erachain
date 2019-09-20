@@ -99,6 +99,8 @@ public class DBRocksDBTableTest {
     @Test
     public void receiveIndexSorted() {
 
+        init();
+
         ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null);
 
         long assetKey1 = 1L;
@@ -136,15 +138,12 @@ public class DBRocksDBTableTest {
                 balanceTmp;
 
         IndexDB indexDB = ((DBRocksDBTable) tab.map).getIndex(1);
-        //Set<byte[]> iteratorFiltered = ((DBRocksDBTable) tab.map).db.db.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
         RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).db.db.database.newIterator(indexDB.getColumnFamilyHandle());
         iteratorFilteredNative.seek(account1.getShortAddressBytes());
 
         long assetKeyTMP = 0;
-
         int iteratorSize = 0;
         while (iteratorFilteredNative.isValid()) {
-            iteratorFilteredNative.next();
             byte[] keyIter = iteratorFilteredNative.key();
             byte[] valueIter = iteratorFilteredNative.value();
             iteratorSize++;
@@ -163,8 +162,34 @@ public class DBRocksDBTableTest {
                 assertEquals(assetKeyTMP > assetKey, false);
             }
             balance = balanceTmp;
-        }
 
+            iteratorFilteredNative.next();
+        }
+        logger.error(" NATIVE completed ");
+
+
+        Set<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).db.db.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
+
+        assetKeyTMP = 0;
+        iteratorSize = 0;
+        for (byte[] key: keysFiltered) {
+            iteratorSize++;
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            byte[] addressKey = ItemAssetBalanceTab.getShortAccountFromKey(key);
+            assertEquals(account1.equals(addressKey), true);
+
+            balanceTmp = tab.get(key);
+
+            // Нужно положить их с отсутпом
+            logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
+
+            if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
+                logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
+                // всегда идем по возрастанию
+                assertEquals(assetKeyTMP > assetKey, false);
+            }
+            balance = balanceTmp;
+        }
 
     }
 

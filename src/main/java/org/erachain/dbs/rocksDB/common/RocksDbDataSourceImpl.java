@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
+import org.mapdb.Fun;
+import org.rocksdb.Comparator;
 import org.rocksdb.RocksDB;
 import org.rocksdb.*;
 
@@ -96,7 +98,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         resetDbLock.readLock().lock();
-        Set<byte[]> result = Sets.newHashSet();
+        Set<byte[]> result = new TreeSet();
         try (final RocksIterator iter = database.newIterator()) {
             for (iter.seekToFirst(); iter.isValid(); iter.next()) {
                 result.add(iter.key());
@@ -113,7 +115,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         resetDbLock.readLock().lock();
-        Set<byte[]> result = Sets.newHashSet();
+        Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = database.newIterator()) {
             for (iter.seekToFirst(); iter.isValid(); iter.next()) {
                 result.add(iter.value());
@@ -130,7 +132,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         resetDbLock.readLock().lock();
-        Set<byte[]> result = Sets.newHashSet();
+        Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = database.newIterator(database.getDefaultColumnFamily())) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.key());
@@ -141,12 +143,21 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
+    @Override
+    public RocksIterator getIterator() {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+
+        return database.newIterator(database.getDefaultColumnFamily());
+    }
+
     public Set<byte[]> filterApprropriateValues(byte[] filter) throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
         }
         resetDbLock.readLock().lock();
-        Set<byte[]> result = Sets.newHashSet();
+        Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = database.newIterator(database.getDefaultColumnFamily())) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
@@ -163,7 +174,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         resetDbLock.readLock().lock();
-        Set<byte[]> result = Sets.newHashSet();
+        Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = database.newIterator(indexDB.getColumnFamilyHandle())) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
@@ -172,6 +183,15 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         } finally {
             resetDbLock.readLock().unlock();
         }
+    }
+
+    @Override
+    public RocksIterator getIterator(IndexDB indexDB) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+
+        return database.newIterator(indexDB.getColumnFamilyHandle());
     }
 
     @Override
@@ -552,11 +572,11 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         if (limit <= 0) {
-            return Sets.newHashSet();
+            return new TreeSet();
         }
         resetDbLock.readLock().lock();
         try (RocksIterator iter = database.newIterator()) {
-            Set<byte[]> result = Sets.newHashSet();
+            Set<byte[]> result = new TreeSet();
             long i = 0;
             for (iter.seekToLast(); iter.isValid() && i < limit; iter.prev(), i++) {
                 result.add(iter.value());
@@ -572,11 +592,11 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         if (limit <= 0) {
-            return Sets.newHashSet();
+            return new TreeSet();
         }
         resetDbLock.readLock().lock();
         try (RocksIterator iter = database.newIterator()) {
-            Set<byte[]> result = Sets.newHashSet();
+            Set<byte[]> result = new TreeSet();
             long i = 0;
             byte[] data = getData(key);
             if (Objects.nonNull(data)) {
@@ -597,11 +617,11 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         if (limit <= 0) {
-            return Sets.newHashSet();
+            return new TreeSet();
         }
         resetDbLock.readLock().lock();
         try (RocksIterator iter = database.newIterator()) {
-            Set<byte[]> result = Sets.newHashSet();
+            Set<byte[]> result = new TreeSet();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
                 result.add(iter.value());
@@ -617,11 +637,11 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         if (limit <= 0) {
-            return Sets.newHashSet();
+            return new TreeSet();
         }
         resetDbLock.readLock().lock();
         try (RocksIterator iter = database.newIterator()) {
-            Set<byte[]> result = Sets.newHashSet();
+            Set<byte[]> result = new TreeSet();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
                 result.add(iter.key());
@@ -637,11 +657,11 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         if (limit <= 0) {
-            return Sets.newHashSet();
+            return new TreeSet();
         }
         resetDbLock.readLock().lock();
         try (RocksIterator iter = database.newIterator(columnFamilyHandle)) {
-            Set<byte[]> result = Sets.newHashSet();
+            Set<byte[]> result = new TreeSet();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
                 result.add(iter.value());
