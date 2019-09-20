@@ -4,6 +4,7 @@ import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public interface DB<K, V> {
@@ -21,6 +22,8 @@ public interface DB<K, V> {
     Set<K> keySet();
 
     void reset();
+
+    List<ColumnFamilyHandle> getColumnFamilyHandles();
 
     Collection<byte[]> values() throws RuntimeException;
 

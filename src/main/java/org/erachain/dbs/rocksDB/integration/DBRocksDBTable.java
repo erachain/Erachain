@@ -67,7 +67,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         db = new RocksDB(NAME_TABLE, indexes, settings, root);
         columnFamilyHandles = db.getColumnFamilyHandles();
         for (int i = 0; i < indexes.size(); i++) {
-            indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+            indexes.get(i).setColumnFamilyHandle(db.getColumnFamilyHandles().get(i));
         }
         columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
     }
@@ -261,34 +261,27 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
 
     @Override
     public Collection<V> values() {
-        Set<byte[]> set = db.values();
-        return set.stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
+        //return db.values();
+        return db.values().stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
-    public Set<K> filterAppropriateValuesAsKeys(byte[] filter, IndexDB indexDB) {
-        Set<byte[]> set = db.filterAppropriateValuesAsKeys(filter, indexDB);
-        if (false) {
-            return set.stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
-        } else {
-            Set<K> values = new TreeSet(Fun.COMPARATOR);
-            for (byte[] key: set) {
-                values.
-            }
-        }
+    public Collection<K> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
+        return db.filterAppropriateValuesAsKeys(filter, indexDB)
+                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
     }
 
-    public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, IndexDB indexDB) {
+    public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
         return db.filterAppropriateValuesAsKeys(filter, indexDB);
     }
 
     public Set<K> filterAppropriateKeys(byte[] filter) {
-        Set<byte[]> set = db.filterAppropriateValuesAsKeys(filter);
-        return set.stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
+        return db.filterAppropriateValuesAsKeys(filter)
+                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
     }
 
     public Set<V> filterAppropriateValues(byte[] filter) {
-        Set<byte[]> set = db.filterAppropriateValues(filter);
-        return set.stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
+        return db.filterAppropriateValues(filter)
+                .stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
     }
 
     public IndexDB getIndexByName(String name) {

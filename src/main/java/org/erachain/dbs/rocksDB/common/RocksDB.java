@@ -160,4 +160,8 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
     public Set<byte[]> getKeysNext(byte[] key, long limit, IndexDB index) {
         return db.getKeysNext(key, limit, index.getColumnFamilyHandle());
     }
+
+    public List<ColumnFamilyHandle> getColumnFamilyHandles() {
+        return db.getColumnFamilyHandles();
+    }
 }
