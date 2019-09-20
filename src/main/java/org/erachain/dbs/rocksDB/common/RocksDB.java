@@ -84,7 +84,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
         return db.allKeys();
     }
 
-    public Collection<byte[]> values() throws RuntimeException {
+    public List<byte[]> values() throws RuntimeException {
         return db.allValues();
     }
 
@@ -96,6 +96,9 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
         return db.indexIterator(descending, index);
     }
 
+    public DBIterator indexIterator(boolean descending, ColumnFamilyHandle index) {
+        return db.indexIterator(descending, index);
+    }
 
 
     @Override
@@ -123,33 +126,33 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
     }
 
     @Override
-    public Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
+    public List<byte[]> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
         return db.filterApprropriateValues(filter, indexDB);
     }
 
     @Override
-    public Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB) {
+    public List<byte[]> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB) {
         return db.filterApprropriateValues(filter, indexDB);
     }
 
     @Override
-    public Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter) {
-        return db.filterApprropriateKeys(filter);
-    }
-
-    public Set<byte[]> filterAppropriateValues(byte[] filter) {
+    public List<byte[]> filterAppropriateValuesAsKeys(byte[] filter) {
         return db.filterApprropriateValues(filter);
     }
 
-    public Set<byte[]> getLatestValues(long limit) {
+    public List<byte[]> filterAppropriateValues(byte[] filter) {
+        return db.filterApprropriateValues(filter);
+    }
+
+    public List<byte[]> getLatestValues(long limit) {
         return db.getLatestValues(limit);
     }
 
-    public Set<byte[]> getValuesPrevious(byte[] key, long limit) {
+    public List<byte[]> getValuesPrevious(byte[] key, long limit) {
         return db.getValuesPrevious(key, limit);
     }
 
-    public Set<byte[]> getValuesNext(byte[] key, long limit) {
+    public List<byte[]> getValuesNext(byte[] key, long limit) {
         return db.getValuesNext(key, limit);
     }
 
@@ -164,4 +167,9 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher {
     public List<ColumnFamilyHandle> getColumnFamilyHandles() {
         return db.getColumnFamilyHandles();
     }
+
+    public ColumnFamilyHandle getColumnFamilyHandle(int index) {
+        return db.getColumnFamilyHandles().get(index);
+    }
+
 }

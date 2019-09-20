@@ -24,10 +24,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -137,8 +134,8 @@ public class DBRocksDBTableTest {
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balanceTmp;
 
-        IndexDB indexDB = ((DBRocksDBTable) tab.map).getIndex(1);
-        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).db.db.database.newIterator(indexDB.getColumnFamilyHandle());
+        ColumnFamilyHandle indexDB = ((DBRocksDBTable) tab.map).getIndex(1).getColumnFamilyHandle();
+        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).db.db.database.newIterator(indexDB);
         iteratorFilteredNative.seek(account1.getShortAddressBytes());
 
         long assetKeyTMP = 0;
@@ -167,8 +164,7 @@ public class DBRocksDBTableTest {
         }
         logger.error(" NATIVE completed ");
 
-
-        Set<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).db.db.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
+        List<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).db.db.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
 
         assetKeyTMP = 0;
         iteratorSize = 0;

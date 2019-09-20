@@ -20,10 +20,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
@@ -170,16 +167,16 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     // TODO - release it
 
-    public Set<byte[]> assetKeys_bad(long assetKey) {
-        return ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
+    public List<byte[]> assetKeys_bad(long assetKey) {
+        return (List)((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
                 Longs.toByteArray(assetKey),
-                balanceKeyAssetIndex);
+                balanceKeyAssetIndex.getColumnFamilyHandle());
     }
 
-    public Set<byte[]> assetKeys(long assetKey) {
-        return ((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
+    public List<byte[]> assetKeys(long assetKey) {
+        return (List)((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
                 Longs.toByteArray(assetKey),
-                balanceKeyAssetIndex);
+                balanceKeyAssetIndex.getColumnFamilyHandle());
     }
 
 
@@ -188,10 +185,10 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         return assetKeys(assetKey).iterator();
     }
 
-    public Set<byte[]> accountKeys(Account account) {
-        return ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
+    public List<byte[]> accountKeys(Account account) {
+        return (List)((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
                 account.getShortAddressBytes(),
-                balanceAddressIndex);
+                balanceAddressIndex.getColumnFamilyHandle());
     }
 
     @Override

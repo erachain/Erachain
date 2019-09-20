@@ -109,24 +109,24 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     public Iterable typeKeys(String sender, Long timestamp, Integer type) {
         return ((RocksDB)map).filterAppropriateValuesAsKeys(
                 toBytesStringLongInteger.toBytes(sender, timestamp, type),
-                addressTypeUnconfirmedTransactionIndex);
+                addressTypeUnconfirmedTransactionIndex.getColumnFamilyHandle());
     }
 
     @Override
     public Iterable senderKeys(String sender) {
         return ((RocksDB)map).filterAppropriateValuesAsKeys(sender.getBytes(),
-                senderUnconfirmedTransactionIndex);
+                senderUnconfirmedTransactionIndex.getColumnFamilyHandle());
     }
 
     @Override
     public Iterable recipientKeys(String recipient) {
         return ((RocksDB)map).filterAppropriateValuesAsKeys(recipient.getBytes(),
-                recipientsUnconfirmedTransactionIndex);
+                recipientsUnconfirmedTransactionIndex.getColumnFamilyHandle());
     }
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return map.getIndexIterator(timestampUnconfirmedTransactionIndex, false);
+        return map.getIndexIterator(timestampUnconfirmedTransactionIndex.getColumnFamilyHandle(), false);
     }
 
     @Override

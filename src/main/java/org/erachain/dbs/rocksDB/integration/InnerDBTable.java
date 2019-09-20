@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -36,7 +37,7 @@ public interface InnerDBTable<K, V> {
 
     Iterator<K> getIterator(boolean descending);
 
-    Iterator<K> getIndexIterator(IndexDB indexDB, boolean descending);
+    Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending);
 
     Iterator<K> getIndexIterator(int indexDB, boolean descending);
 

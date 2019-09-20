@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 // TODO SOFT HARD TRUE
 
@@ -84,7 +85,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
 
     @Override
     // NOT used in FORK
-    public Collection<byte[]> assetKeys(long key) {
+    public List<byte[]> assetKeys(long key) {
         return null;
     }
 
@@ -95,7 +96,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
     }
     @Override
     // NOT used in FORK
-    public Collection<byte[]> accountKeys(Account account) {
+    public List<byte[]> accountKeys(Account account) {
         return null;
     }
 

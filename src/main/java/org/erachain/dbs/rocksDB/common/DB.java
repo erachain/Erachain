@@ -25,12 +25,12 @@ public interface DB<K, V> {
 
     List<ColumnFamilyHandle> getColumnFamilyHandles();
 
-    Collection<byte[]> values() throws RuntimeException;
+    List<byte[]> values() throws RuntimeException;
 
-    Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB);
+    List<byte[]> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB);
 
-    Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter, int indexDB);
+    List<byte[]> filterAppropriateValuesAsKeys(byte[] filter, int indexDB);
 
-    Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter);
+    List<byte[]> filterAppropriateValuesAsKeys(byte[] filter);
 
 }

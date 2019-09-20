@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB.integration;
 
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.mapdb.Fun;
+import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.*;
 
@@ -81,7 +82,7 @@ public class DBMapDB<K, V> implements InnerDBTable<K, V> {
     }
 
     @Override
-    public Iterator<K> getIndexIterator(IndexDB indexDB, boolean descending) {
+    public Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending) {
         return null;
     }
 

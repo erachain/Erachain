@@ -67,7 +67,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         db = new RocksDB(NAME_TABLE, indexes, settings, root);
         columnFamilyHandles = db.getColumnFamilyHandles();
         for (int i = 0; i < indexes.size(); i++) {
-            indexes.get(i).setColumnFamilyHandle(db.getColumnFamilyHandles().get(i));
+            indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
         }
         columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
     }
@@ -260,17 +260,23 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     }
 
     @Override
-    public Collection<V> values() {
-        //return db.values();
+    public List<V> values() {
         return db.values().stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
-    public Collection<K> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
+    public List<K> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
         return db.filterAppropriateValuesAsKeys(filter, indexDB)
-                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
+                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
+    }
+    public List<K> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB) {
+        return db.filterAppropriateValuesAsKeys(filter, indexDB)
+                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
-    public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
+    public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, int indexDB) {
+        return db.filterAppropriateValuesAsKeys(filter, indexDB);
+    }
+    public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
         return db.filterAppropriateValuesAsKeys(filter, indexDB);
     }
 
@@ -279,36 +285,36 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
                 .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
     }
 
-    public Set<V> filterAppropriateValues(byte[] filter) {
+    public List<V> filterAppropriateValues(byte[] filter) {
         return db.filterAppropriateValues(filter)
-                .stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
+                .stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
     public IndexDB getIndexByName(String name) {
-        return db.recieveIndexByName(name);
+        return indexes.stream().filter(indexDB -> indexDB.getNameIndex().equals(name)).findFirst().get();
     }
 
     public IndexDB getIndex(int index) {
         return indexes.get(index);
     }
 
+
     public void addIndex(IndexDB indexes) {
         this.indexes.add(indexes);
     }
 
     public List<V> getLatestValues(long limit) {
-        Set<byte[]> latestValues = db.getLatestValues(limit);
-        return latestValues.stream().map((bytes) -> (V) byteableValue.receiveObjectFromBytes(bytes)).collect(Collectors.toList());
+        return db.getLatestValues(limit).stream().map((bytes) -> (V) byteableValue.receiveObjectFromBytes(bytes)).collect(Collectors.toList());
     }
 
-    public Set<V> getValuesPrevious(K key, long limit) {
-        Set<byte[]> valuesPrev = db.getValuesPrevious(byteableKey.toBytesObject(key), limit);
-        return valuesPrev.stream().map((bytes) -> (V) byteableValue.receiveObjectFromBytes(bytes)).collect(Collectors.toSet());
+    public List<V> getValuesPrevious(K key, long limit) {
+        return db.getValuesPrevious(byteableKey.toBytesObject(key), limit)
+                .stream().map((bytes) -> (V) byteableValue.receiveObjectFromBytes(bytes)).collect(Collectors.toList());
     }
 
-    public Set<V> getValuesNext(K key, long limit) {
-        Set<byte[]> valuesNext = db.getValuesNext(byteableKey.toBytesObject(key), limit);
-        return valuesNext.stream().map((bytes) -> (V) byteableValue.receiveObjectFromBytes(bytes)).collect(Collectors.toSet());
+    public List<V> getValuesNext(K key, long limit) {
+        return db.getValuesNext(byteableKey.toBytesObject(key), limit)
+                .stream().map((bytes) -> (V) byteableValue.receiveObjectFromBytes(bytes)).collect(Collectors.toList());
     }
 
     public void close() {
@@ -331,8 +337,8 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         };
     }
 
-    public Iterator<K> getIndexIterator(IndexDB indexDB, boolean descending) {
-        DBIterator iterator = db.indexIterator(descending, indexDB.getColumnFamilyHandle());
+    public Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending) {
+        DBIterator iterator = db.indexIterator(descending, indexDB);
         return new Iterator<K>() {
             @Override
             public boolean hasNext() {
@@ -347,15 +353,15 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     }
 
     public Iterator<K> getIndexIterator(int index, boolean descending) {
-        return getIndexIterator(indexes.get(index), descending);
+        return getIndexIterator(columnFamilyHandles.get(index), descending);
     }
 
-    public Collection<K> keys(byte[] fromKey, long limit, String indexDBName) {
-        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, getIndexByName(indexDBName));
+    public Set<K> keys(byte[] fromKey, long limit, int indexDB) {
+        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, indexes.get(indexDB));
         return keysNext.stream().map((bytes) -> (K) byteableKey.receiveObjectFromBytes(bytes)).collect(Collectors.toSet());
     }
-    public Collection<V> values(byte[] fromKey, long limit, String indexDBName) {
-        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, getIndexByName(indexDBName));
+    public List<V> values(byte[] fromKey, long limit, int indexDB) {
+        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, indexes.get(indexDB));
         return keysNext.stream().map((bytes) -> {
             byte[] value = db.get(bytes);
             if (value != null) {
@@ -363,7 +369,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
             } else {
                 return null;
             }
-        }).filter(Objects::nonNull).collect(Collectors.toSet());
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
 

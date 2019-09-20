@@ -8,6 +8,7 @@ import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
+import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.*;
 
@@ -75,7 +76,7 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     }
 
     @Override
-    public Iterator<K> getIndexIterator(IndexDB indexDB, boolean descending) {
+    public Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending) {
         return null;
     }
 

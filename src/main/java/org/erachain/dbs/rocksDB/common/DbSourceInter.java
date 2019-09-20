@@ -29,7 +29,7 @@ import java.util.Set;
 public interface DbSourceInter<V> extends BatchSourceInter<byte[], V> {
 
     RocksIterator getIterator();
-    RocksIterator getIterator(IndexDB indexDB);
+    RocksIterator getIterator(ColumnFamilyHandle indexDB);
 
     String getDBName();
 
