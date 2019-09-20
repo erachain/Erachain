@@ -29,4 +29,6 @@ public interface DBTab<T, U> extends DBTabSuitCommon<T, U> {
 
     SortableList<T, U> getList();
 
+    void close();
+
 }

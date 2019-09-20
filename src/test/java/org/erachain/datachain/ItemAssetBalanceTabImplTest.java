@@ -49,7 +49,7 @@ public class ItemAssetBalanceTabImplTest {
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance3;
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance4;
 
-    private void init(int dbs) {
+    private synchronized void init(int dbs) {
 
         logger.info("DBS_TEST: " + dbs);
 
@@ -114,6 +114,8 @@ public class ItemAssetBalanceTabImplTest {
             assertEquals(Arrays.equals(account.getAddressBytes(), account1.getAddressBytes()), true);
             assertEquals(Arrays.equals(account.getShortAddressBytes(), account1.getShortAddressBytes()), true);
             assertEquals(account.getAddress(), account1.getAddress());
+
+            map.close();
         }
     }
 
@@ -173,9 +175,11 @@ public class ItemAssetBalanceTabImplTest {
                 balanceTmp = map.get(key);
 
                 // Нужно положить их с отсутпом
-                logger.error("DBS: " + dbs + "  assetKey: " + assetKey
-                        + " acc: " + Crypto.getInstance().getAddressFromShort(addressKey) + " SET bal:"
-                        + balanceTmp.a.b);
+                if (false) {
+                    logger.error("DBS: " + dbs + "  assetKey: " + assetKey
+                            + " acc: " + Crypto.getInstance().getAddressFromShort(addressKey) + " SET bal:"
+                            + balanceTmp.a.b);
+                }
 
                 if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
                     logger.error("DBS: " + dbs + "  assetKey: " + assetKey);
@@ -184,6 +188,9 @@ public class ItemAssetBalanceTabImplTest {
                 }
                 assetKeyTMP = assetKey;
             }
+
+            map.close();
+
         }
     }
 
@@ -275,6 +282,8 @@ public class ItemAssetBalanceTabImplTest {
 
             }
             assertEquals(map.size(), iteratorSize);
+
+            map.close();
 
         }
     }
@@ -421,9 +430,11 @@ public class ItemAssetBalanceTabImplTest {
             assertEquals(1, found3);
             assertEquals(3, iteratorSize);
 
-           balance = map.get(keyAccount3Asset1);
+            balance = map.get(keyAccount3Asset1);
 
             assertEquals(balance, balance3);
+
+            map.close();
         }
     }
 
@@ -536,6 +547,7 @@ public class ItemAssetBalanceTabImplTest {
             assertEquals(1, found1);
             assertEquals(0, found2);
             assertEquals(1, iteratorSize);
+            map.close();
         }
     }
 }

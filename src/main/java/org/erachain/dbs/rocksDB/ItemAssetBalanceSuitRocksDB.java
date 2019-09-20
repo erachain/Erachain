@@ -253,4 +253,9 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         return accountKeys(account).iterator();
     }
 
+    @Override
+    public void close() {
+        map.close();
+    }
+
 }
