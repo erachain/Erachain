@@ -148,7 +148,9 @@ public class DCSet extends DBASet implements Observer {
 
         try {
             // переделанные таблицы
-            this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS: DBS_MAP_DB, this, database);
+            this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
+                    DBS_ROCK_DB, //DBS_MAP_DB,
+                    this, database);
             this.transactionTab = new TransactionTabImpl(this, database);
 
             this.actions = 0L;

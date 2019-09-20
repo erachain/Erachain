@@ -24,6 +24,7 @@ import java.math.BigInteger;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static org.erachain.dbs.rocksDB.RockSets.ROCK_BIG_DECIMAL_LEN;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 @Slf4j
@@ -104,11 +105,13 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     // берем абсолютное значение
                     BigDecimal shiftForSortBG = value.a.b.abs().setScale(TransactionAmount.maxSCALE);
                     BigInteger shiftForSortBI = shiftForSortBG.unscaledValue();
-                    //shiftForSortBI = new BigInteger("-1").subtract(shiftForSortBI);
                     byte[] shiftForSortOrig = shiftForSortBI.toByteArray();
-                    byte[] shiftForSortBuff = new byte[20];
+
+                    assert (ROCK_BIG_DECIMAL_LEN > shiftForSortOrig.length);
+
+                    byte[] shiftForSortBuff = new byte[ROCK_BIG_DECIMAL_LEN];
                     System.arraycopy(shiftForSortOrig, 0, shiftForSortBuff,
-                            shiftForSortBuff.length - shiftForSortOrig.length, shiftForSortOrig.length);
+                            ROCK_BIG_DECIMAL_LEN - shiftForSortOrig.length, shiftForSortOrig.length);
 
                     if (false) {
                         String logBytes = "";
@@ -120,10 +123,9 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
                     if (sign >= 0) {
                         // учтем знак числа
-                       // shiftForSortBuff[0] = (byte)(-1 + shiftForSortBuff[0]);
                         // сковертируем
                         int shiftSign = 0;
-                        for (int i = shiftForSortBuff.length - 1; i >= 0; i--) {
+                        for (int i = ROCK_BIG_DECIMAL_LEN - 1; i >= 0; i--) {
                             int temp = 128 + Byte.toUnsignedInt(shiftForSortBuff[i]) + shiftSign;
                             shiftForSortBuff[i] = (byte)(temp);
 
@@ -139,7 +141,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                         // учтем знак числа
                         // сковертируем
                         int shiftSign = 0;
-                        for (int i = shiftForSortBuff.length - 1; i >= 0; i--) {
+                        for (int i = ROCK_BIG_DECIMAL_LEN - 1; i >= 0; i--) {
                             int temp = 128 - Byte.toUnsignedInt(shiftForSortBuff[i]) - shiftSign;
                             shiftForSortBuff[i] = (byte)(temp);
 

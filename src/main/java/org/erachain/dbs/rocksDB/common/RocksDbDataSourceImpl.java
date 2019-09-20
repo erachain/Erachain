@@ -104,7 +104,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         resetDbLock.readLock().lock();
-        Set<byte[]> result = new TreeSet();
+        Set<byte[]> result = new TreeSet(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = database.newIterator()) {
             for (iter.seekToFirst(); iter.isValid(); iter.next()) {
                 result.add(iter.key());
@@ -659,11 +659,11 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         if (limit <= 0) {
-            return new TreeSet();
+            return new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         }
         resetDbLock.readLock().lock();
         try (RocksIterator iter = database.newIterator()) {
-            Set<byte[]> result = new TreeSet();
+            Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
                 result.add(iter.key());
@@ -679,11 +679,11 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             return null;
         }
         if (limit <= 0) {
-            return new TreeSet();
+            return new TreeSet(Fun.BYTE_ARRAY_COMPARATOR);
         }
         resetDbLock.readLock().lock();
         try (RocksIterator iter = database.newIterator(columnFamilyHandle)) {
-            Set<byte[]> result = new TreeSet();
+            Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
                 result.add(iter.value());
