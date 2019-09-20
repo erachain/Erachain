@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.TransactionAmount;
@@ -25,6 +26,7 @@ import java.util.*;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
+@Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
@@ -98,30 +100,64 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     byte[] assetKeyBytes = new byte[8];
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                    int sign = value.a.b.signum();
+                    int sign = -value.a.b.signum();
                     // берем абсолютное значение
-                    BigDecimal shiftForSortBG = value.a.b;//.setScale(TransactionAmount.maxSCALE);
+                    BigDecimal shiftForSortBG = value.a.b.abs().setScale(TransactionAmount.maxSCALE);
                     BigInteger shiftForSortBI = shiftForSortBG.unscaledValue();
                     //shiftForSortBI = new BigInteger("-1").subtract(shiftForSortBI);
                     byte[] shiftForSortOrig = shiftForSortBI.toByteArray();
-                    byte[] shiftForSortBuff = new byte[10];
+                    byte[] shiftForSortBuff = new byte[20];
                     System.arraycopy(shiftForSortOrig, 0, shiftForSortBuff,
                             shiftForSortBuff.length - shiftForSortOrig.length, shiftForSortOrig.length);
+
+                    if (false) {
+                        String logBytes = "";
+                        for (byte b : shiftForSortBuff) {
+                            logBytes += b + ",";
+                        }
+                        logger.info("\n before shift: " + logBytes + " -- " + value.a.b.toString() + " ->" + shiftForSortBI.toString());
+                    }
 
                     if (sign >= 0) {
                         // учтем знак числа
                        // shiftForSortBuff[0] = (byte)(-1 + shiftForSortBuff[0]);
                         // сковертируем
-                        for (int i = 3; i < shiftForSortBuff.length; i++) {
-                            //shiftForSortBuff[i-1] = shiftForSortBuff[i];
+                        int shiftSign = 0;
+                        for (int i = shiftForSortBuff.length - 1; i >= 0; i--) {
+                            int temp = 128 + Byte.toUnsignedInt(shiftForSortBuff[i]) + shiftSign;
+                            shiftForSortBuff[i] = (byte)(temp);
+
+                            // учтем перенос на следующий байт
+                            if (temp > 255) {
+                                shiftSign = 1;
+                            } else {
+                                shiftSign = 0;
+                            }
+
                         }
                     } else {
                         // учтем знак числа
-                        //shiftForSortBuff[0] = (byte)(0 - shiftForSortBuff[0]);
                         // сковертируем
-                        //for (int i = 0; i < shiftForSortBuff.length; i++) {
-                        //    //shiftForSortBuff[i] = (byte)(0 + shiftForSortBuff[i]);
-                        //}
+                        int shiftSign = 0;
+                        for (int i = shiftForSortBuff.length - 1; i >= 0; i--) {
+                            int temp = 128 - Byte.toUnsignedInt(shiftForSortBuff[i]) - shiftSign;
+                            shiftForSortBuff[i] = (byte)(temp);
+
+                            // учтем перенос на следующий байт
+                            if (temp < 0 ) {
+                                shiftSign = 1;
+                            } else {
+                                shiftSign = 0;
+                            }
+                        }
+                    }
+
+                    if (false) {
+                        String logBytes = "";
+                        for (byte b : shiftForSortBuff) {
+                            logBytes += b + ",";
+                        }
+                        logger.info("after shift: " + logBytes);
                     }
 
                     return org.bouncycastle.util.Arrays.concatenate(

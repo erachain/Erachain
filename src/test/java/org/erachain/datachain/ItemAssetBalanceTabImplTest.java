@@ -126,7 +126,7 @@ public class ItemAssetBalanceTabImplTest {
 
             Random rand = new Random();
             for (Account account: accounts) {
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 100; i++) {
                     long randLong = rand.nextLong();
                     if (randLong < 0)
                         randLong = -randLong;
@@ -188,14 +188,14 @@ public class ItemAssetBalanceTabImplTest {
     }
 
     @Test
-    public void assetIteratorSort() {
+    public void assetIteratorSortBigDecimal() {
         for (int dbs: TESTED_DBS) {
             init(dbs);
 
             long assetKey1 = 1L;
 
             Random rand = new Random();
-            for (int i=0; i < 10; i++) {
+            for (int i=0; i < 1000; i++) {
                 long randLong = rand.nextLong();
                 if (randLong < 0)
                     randLong = -randLong;
@@ -205,7 +205,7 @@ public class ItemAssetBalanceTabImplTest {
                 balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
                 balTest = balTest.setScale(TransactionAmount.maxSCALE, RoundingMode.HALF_DOWN);
 
-                balTest = new BigDecimal( i - 5);
+                //balTest = new BigDecimal( i - 5);
 
                 Account account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
 
@@ -224,6 +224,7 @@ public class ItemAssetBalanceTabImplTest {
                     balanceTmp;
 
             Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getMapSuit()).assetKeys(assetKey1);
+            balance = null;
             int iteratorSize = 0;
             for (byte[] key: assetKeysSet) {
                 iteratorSize++;
@@ -232,13 +233,16 @@ public class ItemAssetBalanceTabImplTest {
                 balanceTmp = map.get(key);
 
                 // Нужно положить их с отсутпом
-                logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
-                        + balanceTmp.a.b);
+                if (false && dbs == 2) {
+                    logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
+                            + balanceTmp.a.b);
+                }
 
                 if (balance != null && balanceTmp.a.b.compareTo(balance.a.b) > 0) {
-                    //logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize);
+                    logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
+                            + balanceTmp.a.b);
                     // всегда идем по возрастанию
-                    //assertEquals(balanceTmp.a.b, balance.a.b);
+                    assertEquals(balanceTmp.a.b, balance.a.b);
                 }
                 balance = balanceTmp;
             }
@@ -246,6 +250,7 @@ public class ItemAssetBalanceTabImplTest {
             //////////////////
             Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getMapSuit()).assetIterator(assetKey1);
 
+            balance = null;
             iteratorSize = 0;
             while (assetKeys.hasNext()) {
                 iteratorSize++;
@@ -256,13 +261,15 @@ public class ItemAssetBalanceTabImplTest {
                 balanceTmp = map.get(key);
 
                 // Нужно положить их с отсутпом
-                logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " ITER bal:"
-                        + balanceTmp.a.b);
+                if (false && dbs == 2) {
+                    logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
+                            + balanceTmp.a.b);
+                }
 
                 if (balance != null && balanceTmp.a.b.compareTo(balance.a.b) > 0) {
-                    //logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize);
+                    logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize);
                     // всегда идем по возрастанию
-                    //assertEquals(balanceTmp.a.b, balance.a.b);
+                    assertEquals(balanceTmp.a.b, balance.a.b);
                 }
                 balance = balanceTmp;
 
