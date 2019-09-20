@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ImageCropDisplayPanelNavigator2D extends JPanel {
-    private final int cropY;
+    private int cropY;
     private final int cropHeight;
     private int cropX;
     private int cropWidth;
@@ -54,7 +54,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                if (e.getButton()==MouseEvent.BUTTON3) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
                     flag = true;
                     return;
                 }
@@ -63,8 +63,8 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (e.getButton()==MouseEvent.BUTTON3) {
-                    flag  = false;
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    flag = false;
                     return;
                 }
                 int button = e.getButton();
@@ -84,7 +84,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (flag){
+                if (flag) {
                     return;
                 }
                 Point newPoint = e.getPoint();
@@ -119,7 +119,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 } else {
                     scale = 1d;
                 }
-
+                if (zoom < 0.05 && wheelRotation > 0) {
+                    return;
+                }
                 zoom *= scale;
                 parent.zoomSlider.setValue((int) (zoom * 100d));
 
@@ -192,9 +194,12 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         Point2D.Double cropPointRightBottom = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
         Point2D.Double pointCropDstRightBottom = new Point2D.Double();
         currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
-
+        int shift = 5;
         try {
-
+            cropX += shift;
+            cropY += shift;
+            pointZeroDst.x += shift;
+            pointZeroDst.y += shift;
             if (pointZeroDst.x > cropPointRightBottom.x
                     || pointZeroDst.y > cropPointRightBottom.y
                     || pointDstRightBottomImage.x < cropX
@@ -204,7 +209,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             if (pointZeroDst.x < cropX && pointZeroDst.y > cropY
                     && pointDstRightBottomImage.x > cropPointRightBottom.x
                     && pointDstRightBottomImage.y < cropPointRightBottom.y) {
-                return snapshot.getSubimage(cropX, (int) pointZeroDst.y, cropWidth, (int) (cropPointRightBottom.y - pointZeroDst.y));
+                return snapshot.getSubimage(cropX, (int) pointZeroDst.y, cropWidth, (int) (pointDstRightBottomImage.y - pointZeroDst.y));
             } else if (pointZeroDst.x < cropX && pointZeroDst.y > cropY
                     && pointDstRightBottomImage.x < cropPointRightBottom.x
                     && pointDstRightBottomImage.y < cropPointRightBottom.y) {
@@ -256,7 +261,6 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
             logger.error("Error size of sub image", e);
-            int shift = 5;
             return snapshot.getSubimage((int) pointZeroDst.x + shift, (int) pointZeroDst.y + shift,
                     snapshot.getWidth() - (int) pointZeroDst.x - shift,
                     snapshot.getHeight() - (int) pointZeroDst.y - shift);
@@ -276,7 +280,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
     }
 
     public void setZoom(double new_zoom) {
-
+        if (new_zoom < 0.05) {
+            new_zoom = 0.05;
+        }
 
         double scale = new_zoom / this.zoom;
         this.zoom = new_zoom;
