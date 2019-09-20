@@ -21,11 +21,17 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+/**
+ * тут происходит обработка настроенных вторичных индексов
+ *
+ * @param <K>
+ * @param <V>
+ */
 @Slf4j
 public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integration.InnerDBTable
         <K, V> {
 
-    private boolean logON = true;
+    private boolean logON = false;
 
     // индексы
     private List<IndexDB> indexes;

@@ -17,10 +17,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,6 +30,8 @@ public class ItemAssetBalanceTabImplTest {
     Account account1 = new Account("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
     Account account2 = new Account("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS");
     Account account3 = new Account("7Ca34FCVKEgVy7ZZqRB41Wzj3aSFvtfvDp");
+
+    HashSet<Account> accounts = new HashSet();
 
     BigDecimal balA = new BigDecimal("0.1");
     BigDecimal balB = new BigDecimal("0.2");
@@ -67,6 +66,10 @@ public class ItemAssetBalanceTabImplTest {
         balance2 = new Fun.Tuple5<>(balBA, balBA, balBA, balBA, balBA);
         balance3 = new Fun.Tuple5<>(balAC, balAC, balAC, balAC, balAC);
         balance4 = new Fun.Tuple5<>(balBD, balBD, balAB, balBD, balBD);
+
+        accounts.add(account1);
+        accounts.add(account2);
+        accounts.add(account3);
 
     }
 
@@ -122,30 +125,32 @@ public class ItemAssetBalanceTabImplTest {
             long assetKeyTMP = 0L;
 
             Random rand = new Random();
-            for (int i = 0; i < 10; i++) {
-                long randLong = rand.nextLong();
-                if (randLong < 0)
-                    randLong = -randLong;
+            for (Account account: accounts) {
+                for (int i = 0; i < 10; i++) {
+                    long randLong = rand.nextLong();
+                    if (randLong < 0)
+                        randLong = -randLong;
 
-                int assetKey = (int) randLong;
-                if (assetKey < 0)
-                    assetKey = -assetKey;
+                    int assetKey = (int) randLong;
+                    if (assetKey < 0)
+                        assetKey = -assetKey;
 
-                int randInt = rand.nextInt();
-                BigDecimal balTest = new BigDecimal(randInt + "." + randLong);
-                balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
-                balTest = balTest.setScale(TransactionAmount.maxSCALE, RoundingMode.HALF_DOWN);
+                    int randInt = rand.nextInt();
+                    BigDecimal balTest = new BigDecimal(randInt + "." + randLong);
+                    balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
+                    balTest = balTest.setScale(TransactionAmount.maxSCALE, RoundingMode.HALF_DOWN);
 
-                balTest = new BigDecimal(i - 5);
+                    balTest = new BigDecimal(i - 5);
 
-                // account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
+                    // account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
 
-                // создаем новые ключи
-                byte[] key = Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey));
+                    // создаем новые ключи
+                    byte[] key = Bytes.concat(account.getShortAddressBytes(), Longs.toByteArray(assetKey));
 
-                balance1 = new Fun.Tuple5<>(new Fun.Tuple2(balTest, balTest), balAB, balAC, balBD, balBD);
-                //logger.info(balTest.toPlainString());
-                map.set(key, balance1);
+                    balance1 = new Fun.Tuple5<>(new Fun.Tuple2(balTest, balTest), balAB, balAC, balBD, balBD);
+                    //logger.info(balTest.toPlainString());
+                    map.set(key, balance1);
+                }
             }
 
             BigDecimal value;
@@ -154,25 +159,28 @@ public class ItemAssetBalanceTabImplTest {
             Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                     balanceTmp;
 
-            Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getMapSuit()).accountKeys(account1);
+            Account testAccount = account2;
+            Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getMapSuit()).accountKeys(testAccount);
+
             int iteratorSize = 0;
             for (byte[] key : assetKeysSet) {
                 iteratorSize++;
                 long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
                 byte[] addressKey = ItemAssetBalanceTab.getShortAccountFromKey(key);
 
-                //assertEquals(account1.equals(addressKey), true);
+                assertEquals(testAccount.equals(addressKey), true);
 
                 balanceTmp = map.get(key);
 
                 // Нужно положить их с отсутпом
-                logger.error("DBS: " + dbs + "  assetKey: " + assetKey + " SET bal:"
+                logger.error("DBS: " + dbs + "  assetKey: " + assetKey
+                        + " acc: " + Crypto.getInstance().getAddressFromShort(addressKey) + " SET bal:"
                         + balanceTmp.a.b);
 
                 if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
-                    //logger.error("DBS: " + dbs + "  assetKey: " + assetKey);
+                    logger.error("DBS: " + dbs + "  assetKey: " + assetKey);
                     // всегда идем по возрастанию
-                    //assertEquals(assetKeyTMP, assetKey);
+                    assertEquals(assetKeyTMP, assetKey);
                 }
                 assetKeyTMP = assetKey;
             }

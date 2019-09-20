@@ -13,7 +13,8 @@ import java.util.*;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
-/** база данных как файл с обработкой закрыть открыть сохранить
+/** Обертка база данных как файл с обработкой закрыть открыть сохранить.
+ *
  *
  */
 @Slf4j

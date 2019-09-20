@@ -177,6 +177,31 @@ public class DBRocksDBTableTest {
             balanceTmp = tab.get(key);
 
             // Нужно положить их с отсутпом
+            logger.info(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
+
+            if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
+                logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
+                // всегда идем по возрастанию
+                assertEquals(assetKeyTMP > assetKey, false);
+            }
+            balance = balanceTmp;
+        }
+
+        logger.error(" Filter Apprropriate completed ");
+
+        keysFiltered = tab.accountKeys(account1);
+
+        assetKeyTMP = 0;
+        iteratorSize = 0;
+        for (byte[] key: keysFiltered) {
+            iteratorSize++;
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            byte[] addressKey = ItemAssetBalanceTab.getShortAccountFromKey(key);
+            assertEquals(account1.equals(addressKey), true);
+
+            balanceTmp = tab.get(key);
+
+            // Нужно положить их с отсутпом
             logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
 
             if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
@@ -186,6 +211,8 @@ public class DBRocksDBTableTest {
             }
             balance = balanceTmp;
         }
+
+        logger.error(" TAB account Keys completed ");
 
     }
 
