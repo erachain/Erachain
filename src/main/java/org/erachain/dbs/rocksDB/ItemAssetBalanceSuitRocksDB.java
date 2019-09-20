@@ -15,6 +15,7 @@ import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
+import org.rocksdb.RocksIterator;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -103,7 +104,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     BigInteger shiftForSortBI = shiftForSortBG.unscaledValue();
                     //shiftForSortBI = new BigInteger("-1").subtract(shiftForSortBI);
                     byte[] shiftForSortOrig = shiftForSortBI.toByteArray();
-                    byte[] shiftForSortBuff = new byte[3];
+                    byte[] shiftForSortBuff = new byte[10];
                     System.arraycopy(shiftForSortOrig, 0, shiftForSortBuff,
                             shiftForSortBuff.length - shiftForSortOrig.length, shiftForSortOrig.length);
 
@@ -126,7 +127,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     return org.bouncycastle.util.Arrays.concatenate(
                             assetKeyBytes,
                             shiftForSortBuff
-                            //shortAddress - он уже есть тут
+                            //shortAddress - он уже есть в главном ключе
                     );
                 },
                 (result, key) -> result);
@@ -147,8 +148,8 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 (result, key) -> result); // ByteableTrivial
 
         indexes = new ArrayList<>();
-        indexes.add(balanceAddressIndex);
         indexes.add(balanceKeyAssetIndex);
+        indexes.add(balanceAddressIndex);
     }
 
     @Override
@@ -169,13 +170,13 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     // TODO - release it
 
     public List<byte[]> assetKeys_bad(long assetKey) {
-        return (List)((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
+        return ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
                 Longs.toByteArray(assetKey),
                 balanceKeyAssetIndex.getColumnFamilyHandle());
     }
 
     public List<byte[]> assetKeys(long assetKey) {
-        return (List)((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
+        return ((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
                 Longs.toByteArray(assetKey),
                 balanceKeyAssetIndex.getColumnFamilyHandle());
     }
@@ -187,9 +188,26 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     }
 
     public List<byte[]> accountKeys(Account account) {
-        return (List)((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
-                account.getShortAddressBytes(),
-                balanceAddressIndex.getColumnFamilyHandle());
+        if (false) {
+            return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(
+                    account.getShortAddressBytes(),
+                    balanceAddressIndex.getColumnFamilyHandle());
+        } else {
+            RocksIterator iter = ((DBRocksDBTable) map).db.db.database.newIterator(
+                    balanceAddressIndex
+                    //balanceKeyAssetIndex
+                            .getColumnFamilyHandle());
+            List<byte[]> result = new ArrayList<byte[]>();
+
+            for (iter.seek(account.getShortAddressBytes()); iter.isValid() && new String(iter.key())
+                    .startsWith(new String(account.getShortAddressBytes())); iter.next()) {
+                byte[] key = iter.key();
+                byte[] value = iter.value();
+                result.add(iter.value());
+            }
+            return result;
+
+        }
     }
 
     @Override
