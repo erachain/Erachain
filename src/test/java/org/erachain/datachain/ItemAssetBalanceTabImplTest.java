@@ -127,6 +127,10 @@ public class ItemAssetBalanceTabImplTest {
                 if (randLong < 0)
                     randLong = -randLong;
 
+                int assetKey = (int) randLong;
+                if (assetKey < 0)
+                    assetKey = -assetKey;
+
                 int randInt = rand.nextInt();
                 BigDecimal balTest = new BigDecimal(randInt + "." + randLong);
                 balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
@@ -137,7 +141,7 @@ public class ItemAssetBalanceTabImplTest {
                 // account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
 
                 // создаем новые ключи
-                byte[] key = Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(randLong >> 5));
+                byte[] key = Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey));
 
                 balance1 = new Fun.Tuple5<>(new Fun.Tuple2(balTest, balTest), balAB, balAC, balBD, balBD);
                 //logger.info(balTest.toPlainString());
@@ -155,7 +159,8 @@ public class ItemAssetBalanceTabImplTest {
             for (byte[] key : assetKeysSet) {
                 iteratorSize++;
                 long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
-                //assertEquals(assetKey, assetKey1);
+                byte[] addressKey = ItemAssetBalanceTab.getShortAccountFromKey(key);
+                assertEquals(account1.equals(addressKey), true);
                 balanceTmp = map.get(key);
 
                 // Нужно положить их с отсутпом

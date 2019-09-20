@@ -14,6 +14,7 @@ import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
+import org.mapdb.Fun;
 import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.*;
@@ -266,7 +267,14 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
 
     public Set<K> filterAppropriateValuesAsKeys(byte[] filter, IndexDB indexDB) {
         Set<byte[]> set = db.filterAppropriateValuesAsKeys(filter, indexDB);
-        return set.stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
+        if (false) {
+            return set.stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
+        } else {
+            Set<K> values = new TreeSet(Fun.COMPARATOR);
+            for (byte[] key: set) {
+                values.
+            }
+        }
     }
 
     public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, IndexDB indexDB) {

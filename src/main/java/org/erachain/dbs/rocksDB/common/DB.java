@@ -1,7 +1,9 @@
 package org.erachain.dbs.rocksDB.common;
 
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.rocksdb.ColumnFamilyHandle;
 
+import java.util.Collection;
 import java.util.Set;
 
 public interface DB<K, V> {
@@ -20,12 +22,12 @@ public interface DB<K, V> {
 
     void reset();
 
-    Set<byte[]> values() throws RuntimeException;
+    Collection<byte[]> values() throws RuntimeException;
 
-    Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter, IndexDB indexDB);
+    Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB);
+
+    Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter, int indexDB);
 
     Set<byte[]> filterAppropriateValuesAsKeys(byte[] filter);
-
-    IndexDB recieveIndexByName(String name);
 
 }

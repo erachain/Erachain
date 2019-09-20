@@ -1,15 +1,14 @@
 package org.erachain.dbs.rocksDB.common;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.mapdb.Fun;
-import org.rocksdb.Comparator;
 import org.rocksdb.RocksDB;
 import org.rocksdb.*;
 
@@ -34,6 +33,13 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     public RocksDB database;
     private boolean alive;
     private String parentName;
+
+    @Getter
+    private List<ColumnFamilyHandle> columnFamilyHandles;
+
+    private ColumnFamilyHandle columnFamilyFieldSize;
+    private ByteableInteger byteableInteger = new ByteableInteger();
+
 
     private ReadWriteLock resetDbLock = new ReentrantReadWriteLock();
 
@@ -110,12 +116,12 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public Set<byte[]> allValues() throws RuntimeException {
+    public Collection<byte[]> allValues() throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
         }
         resetDbLock.readLock().lock();
-        Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+        Collection<byte[]> result = new ArrayList<byte[]>();
         try (final RocksIterator iter = database.newIterator()) {
             for (iter.seekToFirst(); iter.isValid(); iter.next()) {
                 result.add(iter.value());
@@ -169,13 +175,13 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public Set<byte[]> filterApprropriateValues(byte[] filter, IndexDB indexDB) throws RuntimeException {
+    public Set<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
         }
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
-        try (final RocksIterator iter = database.newIterator(indexDB.getColumnFamilyHandle())) {
+        try (final RocksIterator iter = database.newIterator()) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
             }
@@ -183,6 +189,10 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         } finally {
             resetDbLock.readLock().unlock();
         }
+    }
+    @Override
+    public Set<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException {
+        return filterApprropriateValues(filter, columnFamilyHandles.get(indexDB));
     }
 
     @Override
@@ -203,17 +213,17 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     public void setDBName(String name) {
     }
 
-    public List<ColumnFamilyHandle> initDB(List<IndexDB> indexes) {
-        return initDB(RocksDbSettings.getSettings(), indexes);
+    public void initDB(List<IndexDB> indexes) {
+        initDB(RocksDbSettings.getSettings(), indexes);
     }
 
 
-    public List<ColumnFamilyHandle> initDB(RocksDbSettings settings, List<IndexDB> indexes) {
+    public void initDB(RocksDbSettings settings, List<IndexDB> indexes) {
         resetDbLock.writeLock().lock();
         this.settings = settings;
         try {
             if (isAlive()) {
-                return null;
+                return;
             }
 
             Preconditions.checkNotNull(dataBaseName, "no name set to the dbStore");
@@ -278,6 +288,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                     ColumnFamilyHandle columnFamilyHandle = database.createColumnFamily(columnFamilyDescriptor);
                                     columnFamilyHandleList.add(columnFamilyHandle);
                                 }
+                                putData(columnFamilyHandleList.get(columnFamilyHandleList.size() - 1), new byte[]{0}, new byte[]{0, 0, 0, 0});
                                 create = true;
                             } catch (RocksDBException e) {
                                 dbOptions.setCreateIfMissing(true);
@@ -300,6 +311,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                 columnFamilyDescriptors.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts));
                                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
                                 database = TransactionDB.open(dbOptions, dbPath.toString(), columnFamilyDescriptors, columnFamilyHandleList);
+                                columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
                             }
 
                         } catch (RocksDBException e) {
@@ -313,7 +325,6 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                     }
 
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
-                    return columnFamilyHandleList;
                 }
             }
         } finally {
@@ -474,6 +485,9 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
 
     public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
         return new RockStoreIterator(database.newIterator(columnFamilyHandle), descending, true);
+    }
+    public RockStoreIterator indexIterator(boolean descending, int indexDB) {
+        return new RockStoreIterator(database.newIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
 
     private void updateByBatchInner(Map<byte[], byte[]> rows) throws Exception {
@@ -707,10 +721,9 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
-
-    public void initSizeField() {
-        if (create) {
-            putData(columnFamilyHandleList.get(columnFamilyHandleList.size() - 1), new byte[]{0}, new byte[]{0, 0, 0, 0});
-        }
+    public int size() {
+        byte[] sizeBytes = getData(columnFamilyFieldSize, new byte[]{0});
+        return byteableInteger.receiveObjectFromBytes(sizeBytes);
     }
+
 }
