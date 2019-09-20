@@ -219,4 +219,155 @@ public class DBRocksDBTableTest {
     @Test
     public void getIndexIterator() {
     }
+
+    @Test
+    public void assetIteratorAndReplace() {
+        init();
+
+        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null);
+
+        int size = tab.size();
+
+        long assetKey1 = 1L;
+        long assetKey2 = 2L;
+        int iteratorSize = 0;
+
+        int iteratorSize1 = 0;
+        Iterator<byte[]> assetKeys = tab.assetKeys(assetKey1).iterator();
+        while (assetKeys.hasNext()) {
+            iteratorSize1++;
+            byte[] key = assetKeys.next();
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            assertEquals(assetKey, assetKey2);
+
+        }
+        assertEquals(0, iteratorSize1);
+        assertEquals(tab.size(), iteratorSize);
+
+        // проверить не затирают ли ключи друг друга
+        tab.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance1);
+        tab.set(Bytes.concat(account1.getShortAddressBytes(), Longs.toByteArray(assetKey2)), balance1);
+
+        iteratorSize = 0;
+        assetKeys = tab.assetKeys(assetKey1).iterator();
+        while (assetKeys.hasNext()) {
+            iteratorSize++;
+            assetKeys.next();
+        }
+        assertEquals(1, iteratorSize);
+
+        iteratorSize = 0;
+        assetKeys = tab.assetKeys(assetKey2).iterator();
+        while (assetKeys.hasNext()) {
+            iteratorSize++;
+            assetKeys.next();
+        }
+        assertEquals(1, iteratorSize);
+
+
+        tab.set(Bytes.concat(account2.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance2);
+
+        byte[] keyAccount3Asset1 = Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1));
+        tab.set(keyAccount3Asset1, balance1);
+
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                balance = tab.get(keyAccount3Asset1);
+
+        assertEquals(balance, balance1);
+
+        assertEquals(tab.size(), size + 4);
+
+        //////////////////
+        assetKeys = tab.assetKeys(assetKey1).iterator();
+
+        int found1 = 0;
+        int found2 = 0;
+        int found3 = 0;
+        iteratorSize = 0;
+        while (assetKeys.hasNext()) {
+            iteratorSize++;
+
+            byte[] key = assetKeys.next();
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            assertEquals(assetKey, assetKey1);
+            byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
+
+            BigDecimal balanceTMP = tab.get(key).a.b;
+
+            if (account1.equals(shortAddress)) {
+                found1++;
+            } else if (account2.equals(shortAddress)) {
+                found2++;
+            } else if (account3.equals(shortAddress)) {
+                found3++;
+            }
+        }
+        assertEquals(1, found1);
+        assertEquals(1, found2);
+        assertEquals(1, found3);
+        assertEquals(3, iteratorSize);
+
+
+        //////////////////
+        assetKeys = tab.assetKeys(assetKey2).iterator();
+        iteratorSize = 0;
+        found1 = 0;
+        found2 = 0;
+        found3 = 0;
+        while (assetKeys.hasNext()) {
+            iteratorSize++;
+
+            byte[] key = assetKeys.next();
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            assertEquals(assetKey, assetKey2);
+
+            if (account1.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                found1++;
+            } else if (account2.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                found2++;
+            } else if (account3.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                found3++;
+            }
+        }
+        assertEquals(1, found1);
+        assertEquals(0, found2);
+        assertEquals(0, found3);
+        assertEquals(1, iteratorSize);
+
+
+        ///////////// тот же КЛЮЧ но новый баланс
+        tab.set(keyAccount3Asset1, balance3);
+
+        assetKeys = tab.assetKeys(assetKey1).iterator();
+        iteratorSize = 0;
+        found1 = 0;
+        found2 = 0;
+        found3 = 0;
+        while (assetKeys.hasNext()) {
+            iteratorSize++;
+
+            byte[] key = assetKeys.next();
+            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            assertEquals(assetKey, assetKey1);
+
+            if (account1.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                found1++;
+            } else if (account2.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                found2++;
+            } else if (account3.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                found3++;
+            }
+        }
+        assertEquals(1, found1);
+        assertEquals(1, found2);
+        assertEquals(1, found3);
+        assertEquals(3, iteratorSize);
+
+        balance = tab.get(keyAccount3Asset1);
+
+        assertEquals(balance, balance3);
+
+        tab.close();
+    }
+
 }

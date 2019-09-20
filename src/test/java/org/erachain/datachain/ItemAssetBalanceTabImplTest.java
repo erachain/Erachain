@@ -289,7 +289,7 @@ public class ItemAssetBalanceTabImplTest {
     }
 
     @Test
-    public void assetIterator() {
+    public void assetIteratorAndReplace() {
         for (int dbs: TESTED_DBS) {
             init(dbs);
 
