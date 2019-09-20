@@ -28,12 +28,13 @@ public class AddImageLabel extends JPanel {
     private int bezelWidth;
     private int bezelHeight;
     private Logger logger = LoggerFactory.getLogger(getClass());
-    private JLabel label = new JLabel();
+    private JLabel label;
     private JLabel mainLabel = new JLabel();
 
     public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize,int initialWidth,int initialHeight) {
         setLayout(new BorderLayout());
         this.text = text;
+        label = new JLabel("The Label", SwingConstants.CENTER);
         label.setText(this.text);
         add(label, BorderLayout.NORTH);
         add(mainLabel, BorderLayout.CENTER);

@@ -35,6 +35,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
 
     private Logger logger = LoggerFactory.getLogger(ImageCropDisplayPanelNavigator2D.class);
+    private boolean flag = false;
 
     public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, File imageFile, int cropWidth, int cropHeight) {
 
@@ -50,13 +51,22 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             logger.error("Error read image File in crop component", e);
         }
         addMouseListener(new MouseAdapter() {
+
             @Override
             public void mousePressed(MouseEvent e) {
+                if (e.getButton()==MouseEvent.BUTTON3) {
+                    flag = true;
+                    return;
+                }
                 currentPoint = e.getPoint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (e.getButton()==MouseEvent.BUTTON3) {
+                    flag  = false;
+                    return;
+                }
                 int button = e.getButton();
                 Point newPoint = e.getPoint();
                 currentPoint = newPoint;
@@ -74,6 +84,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                if (flag){
+                    return;
+                }
                 Point newPoint = e.getPoint();
                 Point2D deltaPoint = new Point2D.Double(newPoint.getX() - currentPoint.getX(), newPoint.getY() - currentPoint.getY());
                 currentPoint = newPoint;
@@ -85,6 +98,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
 
             @Override
             public void mouseMoved(MouseEvent e) {
+                if (flag) {
+                    return;
+                }
                 try {
                     currentPoint = e.getPoint();
                 } catch (Throwable exception) {
@@ -240,7 +256,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
             logger.error("Error size of sub image", e);
-            int shift = 2;
+            int shift = 5;
             return snapshot.getSubimage((int) pointZeroDst.x + shift, (int) pointZeroDst.y + shift,
                     snapshot.getWidth() - (int) pointZeroDst.x - shift,
                     snapshot.getHeight() - (int) pointZeroDst.y - shift);
