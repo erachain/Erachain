@@ -44,6 +44,15 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         //OPEN MAP
         getMap();
 
+        if(databaseSet != null) {
+            databaseSet.addExternalMaps(this);
+        }
+    }
+
+    // ЭТО внешняя база - которую надо закрывать и флушить отдельно
+    @Override
+    public boolean isExternal() {
+        return true;
     }
 
     @Override

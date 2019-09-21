@@ -118,7 +118,7 @@ public class ItemAssetBalanceTabImplTest {
             assertEquals(Arrays.equals(account.getShortAddressBytes(), account1.getShortAddressBytes()), true);
             assertEquals(account.getAddress(), account1.getAddress());
 
-            map.close();
+            dcSet.close();
         }
     }
 
@@ -192,7 +192,7 @@ public class ItemAssetBalanceTabImplTest {
                 assetKeyTMP = assetKey;
             }
 
-            map.close();
+            dcSet.close();
 
         }
     }
@@ -286,7 +286,7 @@ public class ItemAssetBalanceTabImplTest {
             }
             assertEquals(map.size(), iteratorSize);
 
-            map.close();
+            dcSet.close();
 
         }
     }
@@ -440,7 +440,7 @@ public class ItemAssetBalanceTabImplTest {
                 assertEquals(balance, balance3);
 
             } finally {
-                map.close();
+                dcSet.close();
             }
         }
     }
@@ -558,7 +558,7 @@ public class ItemAssetBalanceTabImplTest {
                 assertEquals(1, iteratorSize);
 
             } finally {
-                map.close();
+                dcSet.close();
             }
         }
     }

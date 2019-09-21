@@ -1422,19 +1422,29 @@ public class DCSet extends DBASet implements Observer {
 
     @Override
     public void close() {
+
         if (this.database != null) {
             // THIS IS not FORK
             if (!this.database.isClosed()) {
                 this.addUses();
 
                 if (this.getBlockMap().isProcessing()) {
+                    for (DBMapSuit suitMap: externalMaps) {
+                        //suitMap.rollback();
+                    }
                     this.database.rollback();
                     // not need on close!
                     // getBlockMap().resetLastBlockSignature();
                 } else {
+                    for (DBMapSuit suitMap: externalMaps) {
+                        //suitMap.commit();
+                    }
                     this.database.commit();
                 }
 
+                for (DBMapSuit suitMap: externalMaps) {
+                    suitMap.close();
+                }
                 this.database.close();
 
                 this.uses = 0;
@@ -1449,6 +1459,10 @@ public class DCSet extends DBASet implements Observer {
 
     public void rollback() {
         this.addUses();
+        for (DBMapSuit suitMap: externalMaps) {
+            //suitMap.rollback();
+        }
+
         this.database.rollback();
         getBlockMap().resetLastBlockSignature();
         this.actions = 0l;
@@ -1501,6 +1515,10 @@ public class DCSet extends DBASet implements Observer {
                 + (this.actions > ACTIONS_BEFORE_COMMIT? "by Actions:" + this.actions : "")
                 + (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB? "by diff Size Engine:" + diffSizeEngine : "")
                 );
+
+            for (DBMapSuit suitMap: externalMaps) {
+                //suitMap.commit();
+            }
 
             this.database.commit();
 

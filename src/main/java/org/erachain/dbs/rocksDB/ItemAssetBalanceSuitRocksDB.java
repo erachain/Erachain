@@ -78,9 +78,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                         1, 256, 32, false),
                 databaseSet);
 
-        if (databaseSet != null)
-            databaseSet.addExternalMaps(this);
-
     }
 
     @Override
