@@ -51,9 +51,9 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     //Для пересчета размеров таблицы
     private ByteableInteger byteableInteger = new ByteableInteger();
 
-    private int counterFlush = 0;
+    ///private int counterFlush = 0;
 
-    private final int numberBeforeFlush = 4000;
+    //private final int numberBeforeFlush = 4000;
 
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, String root) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), root);
@@ -105,7 +105,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     @Override
     public void put(K key, V value) {
         if (logON) logger.info("put invoked");
-        counterFlush++;
+        //counterFlush++;
         final byte[] keyBytes = byteableKey.toBytesObject(key);
         if (logON) logger.info("keyBytes.length = " + keyBytes.length);
         byte[] old = db.get(keyBytes);
@@ -176,10 +176,10 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
             }
         }
 
-        if (counterFlush % numberBeforeFlush == 0) {
-            db.flush();
-            counterFlush = 0;
-        }
+        //if (counterFlush % numberBeforeFlush == 0) {
+        //    db.flush();
+        //    counterFlush = 0;
+        //}
     }
 
     void removeIndexes(Object key, byte[] keyBytes, byte[] valueByte) {
