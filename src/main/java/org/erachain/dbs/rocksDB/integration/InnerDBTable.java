@@ -1,6 +1,5 @@
 package org.erachain.dbs.rocksDB.integration;
 
-import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.Collection;

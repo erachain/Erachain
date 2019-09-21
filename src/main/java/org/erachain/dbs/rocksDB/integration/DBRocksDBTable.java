@@ -14,7 +14,6 @@ import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
-import org.mapdb.Fun;
 import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.*;
@@ -116,7 +115,13 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
             size++;
             if (logON) logger.info("put size = " + size);
             db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+        } else {
+            // удалим вторичные ключи
+            if (indexes != null && !indexes.isEmpty()) {
+                removeIndexes(key, keyBytes, old);
+            }
         }
+
         byte[] bytesValue = byteableValue.toBytesObject(value);
         db.put(columnFamilyHandles.get(0), keyBytes, bytesValue);
         if (logON) logger.info("valueBytes.length = " + bytesValue.length);
@@ -177,21 +182,11 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         }
     }
 
-    @Override
-    public void remove(Object key) {
-        final byte[] keyBytes = byteableKey.toBytesObject(key);
-        byte[] old = db.get(keyBytes);
-        if (old != null && old.length != 0) {
-            byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
-            Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
-            size--;
-            db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
-        }
-        db.remove(columnFamilyHandles.get(0), keyBytes);
+    void removeIndexes(Object key, byte[] keyBytes, byte[] valueByte) {
         for (IndexDB indexDB : indexes) {
             if (indexDB instanceof SimpleIndexDB) {
                 SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
-                byte[] valueByte = db.get(keyBytes);
+                //byte[] valueByte = db.get(keyBytes);
                 if (valueByte == null) {
                     continue;
                 }
@@ -206,7 +201,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
             } else if (indexDB instanceof ArrayIndexDB) {
                 ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
                 BiFunction biFunction = arrayIndexDB.getBiFunction();
-                byte[] valueByte = db.get(keyBytes);
+                //byte[] valueByte = db.get(keyBytes);
                 if (valueByte == null) {
                     continue;
                 }
@@ -224,7 +219,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
             } else if (indexDB instanceof ListIndexDB) {
                 ListIndexDB listIndexDB = (ListIndexDB) indexDB;
                 BiFunction biFunction = listIndexDB.getBiFunction();
-                byte[] valueByte = db.get(keyBytes);
+                //byte[] valueByte = db.get(keyBytes);
                 if (valueByte == null) {
                     continue;
                 }
@@ -244,6 +239,22 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
             }
 
 
+        }
+
+    }
+    @Override
+    public void remove(Object key) {
+        final byte[] keyBytes = byteableKey.toBytesObject(key);
+        byte[] old = db.get(keyBytes);
+        if (old != null && old.length != 0) {
+            byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
+            Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+            size--;
+            db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+        }
+        db.remove(columnFamilyHandles.get(0), keyBytes);
+        if (indexes != null && !indexes.isEmpty()) {
+            removeIndexes(key, keyBytes, old);
         }
     }
 
