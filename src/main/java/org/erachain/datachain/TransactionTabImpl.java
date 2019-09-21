@@ -13,6 +13,7 @@ import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
+import org.erachain.dbs.rocksDB.TransactionSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.slf4j.Logger;
@@ -68,7 +69,6 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         super(parent, databaseSet);
     }
 
-    // TODO вставить настройки выбора СУБД
     @Override
     protected void getMap()
     {
@@ -86,7 +86,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                     map = new TransactionSuitMapDBFork((TransactionTab) parent, databaseSet);
                     break;
                 case DBS_ROCK_DB:
-                    map = new TransactionSuitRocksDB(databaseSet, database);
+                    map = new TransactionSuitRocksDBFork((TransactionTab) parent, databaseSet);
                     break;
                 default:
                     map = new nativeMapTreeMapFork(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
