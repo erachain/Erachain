@@ -10,6 +10,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionSuitMapDB;
+import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
@@ -18,6 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+import static org.erachain.database.IDB.DBS_MAP_DB;
+import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -69,24 +73,24 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     protected void getMap()
     {
         if (parent == null) {
-            String dbs = "MapDB";
-            if (dbs.equals("MapDB")) {
-                map = new TransactionSuitMapDB(databaseSet, database);
-            } else if (dbs.equals("RocksDB")) {
-                map = new TransactionSuitRocksDB(databaseSet, database);
-            } else {
-                map = new TransactionSuitMapDB(databaseSet, database);
+            switch (dbsUsed) {
+                case DBS_ROCK_DB:
+                    map = new TransactionSuitRocksDB(databaseSet, database);
+                    break;
+                default:
+                    map = new TransactionSuitMapDB(databaseSet, database);
             }
         } else {
-            String dbs = "mem";
-            if (dbs.equals("MapDB")) {
-                ; //map = new TransactionSuitMapDB((TransactionTab)parent, databaseSet);
-            } else if (dbs.equals("RocksDB")) {
-                ; //map = new TransactionSuitRocksDB(databaseSet, database);
-            } else {
-                map = new nativeMapTreeMapFork(parent, databaseSet, TransactionSuit.DEFAULT_VALUE);
+            switch (dbsUsed) {
+                case DBS_MAP_DB:
+                    map = new TransactionSuitMapDBFork((TransactionTab) parent, databaseSet);
+                    break;
+                case DBS_ROCK_DB:
+                    map = new TransactionSuitRocksDB(databaseSet, database);
+                    break;
+                default:
+                    map = new nativeMapTreeMapFork(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
             }
-
         }
     }
 

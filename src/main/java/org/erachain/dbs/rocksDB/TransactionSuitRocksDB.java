@@ -7,7 +7,6 @@ import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
-import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableLong;
@@ -36,16 +35,16 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     static Logger logger = LoggerFactory.getLogger(TransactionSuitRocksDB.class.getSimpleName());
 
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE";
-    private final String timestampUnconfirmedTransactionIndexName = "timestamp_unc_txs";
-    private final String senderUnconfirmedTransactionIndexName = "sender_unc_txs";
-    private final String recipientUnconfirmedTransactionIndexName = "recipient_unc_txs";
-    private final String addressTypeUnconfirmedTransactionIndexName = "address_type_unc_txs";
+    private final String timestampIndexName = "timestamp_unc_txs";
+    private final String senderIndexName = "sender_unc_txs";
+    private final String recipientsIndexName = "recipient_unc_txs";
+    private final String addressTypeIndexName = "address_type_unc_txs";
 
-    private SimpleIndexDB<Long, Transaction, Long> timestampUnconfirmedTransactionIndex;
+    private SimpleIndexDB<Long, Transaction, Long> timestampIndex;
     //private IndexByteableTuple3StringLongInteger indexByteableTuple3StringLongInteger;
-    private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderUnconfirmedTransactionIndex;
-    private ArrayIndexDB<Long, Transaction, String> recipientsUnconfirmedTransactionIndex;
-    ListIndexDB<Long, Transaction, Fun.Tuple3<String, Long, Integer>> addressTypeUnconfirmedTransactionIndex;
+    private SimpleIndexDB<Long, Transaction, Fun.Tuple2<String, Long>> senderIndex;
+    private ArrayIndexDB<Long, Transaction, String> recipientsIndex;
+    ListIndexDB<Long, Transaction, Fun.Tuple3<String, Long, Integer>> addressTypeIndex;
 
     public TransactionSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database);
@@ -54,7 +53,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     @Override
     protected void getMap() {
 
-        timestampUnconfirmedTransactionIndex = new SimpleIndexDB<>(timestampUnconfirmedTransactionIndexName,
+        timestampIndex = new SimpleIndexDB<>(timestampIndexName,
                 new BiFunction<Long, Transaction, Long>() {
                     @Override
                     public Long apply(Long aLong, Transaction transaction) {
@@ -63,7 +62,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 //}, (result, key) ->new ByteableLong().toBytesObject(result)); // создает Класс на лету и переопределяет его метод
                 }, new IndexByteableLong()); // а тут мы уже создали заранее Класс
 
-        senderUnconfirmedTransactionIndex = new SimpleIndexDB<>(senderUnconfirmedTransactionIndexName,
+        senderIndex = new SimpleIndexDB<>(senderIndexName,
                 new BiFunction<Long, Transaction, Fun.Tuple2<String, Long>>() {
                     @Override
                     public Fun.Tuple2<String, Long> apply(Long aLong, Transaction transaction) {
@@ -74,13 +73,13 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 new ByteableString().toBytesObject(result.a),
                 new ByteableLong().toBytesObject(result.b)));
 
-        recipientsUnconfirmedTransactionIndex = new ArrayIndexDB<>(recipientUnconfirmedTransactionIndexName,
+        recipientsIndex = new ArrayIndexDB<>(recipientsIndexName,
                 (aLong, transaction) -> transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new),
                 (result, key) -> new ByteableString().toBytesObject(result));
 
         //indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
-        addressTypeUnconfirmedTransactionIndex
-                = new ListIndexDB<>(addressTypeUnconfirmedTransactionIndexName,
+        addressTypeIndex
+                = new ListIndexDB<>(addressTypeIndexName,
                 (aLong, transaction) -> {
                     Integer type = transaction.getType();
                     return transaction.getInvolvedAccounts().stream().map(
@@ -88,16 +87,21 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 }, new IndexByteableTuple3StringLongInteger());
 
         List indexes = new ArrayList<>();
-        indexes.add(timestampUnconfirmedTransactionIndex);
-        indexes.add(addressTypeUnconfirmedTransactionIndex);
-        indexes.add(senderUnconfirmedTransactionIndex);
-        indexes.add(recipientsUnconfirmedTransactionIndex);
+        indexes.add(timestampIndex);
+        indexes.add(addressTypeIndex);
+        indexes.add(senderIndex);
+        indexes.add(recipientsIndex);
 
         map = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
                 ROCKS_DB_FOLDER);
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected void createIndexes() {
     }
 
     @Override
@@ -109,24 +113,24 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     public Iterable typeKeys(String sender, Long timestamp, Integer type) {
         return ((RocksDB)map).filterAppropriateValuesAsKeys(
                 toBytesStringLongInteger.toBytes(sender, timestamp, type),
-                addressTypeUnconfirmedTransactionIndex.getColumnFamilyHandle());
+                addressTypeIndex.getColumnFamilyHandle());
     }
 
     @Override
     public Iterable senderKeys(String sender) {
         return ((RocksDB)map).filterAppropriateValuesAsKeys(sender.getBytes(),
-                senderUnconfirmedTransactionIndex.getColumnFamilyHandle());
+                senderIndex.getColumnFamilyHandle());
     }
 
     @Override
     public Iterable recipientKeys(String recipient) {
         return ((RocksDB)map).filterAppropriateValuesAsKeys(recipient.getBytes(),
-                recipientsUnconfirmedTransactionIndex.getColumnFamilyHandle());
+                recipientsIndex.getColumnFamilyHandle());
     }
 
     @Override
     public Iterator<Long> getTimestampIterator() {
-        return map.getIndexIterator(timestampUnconfirmedTransactionIndex.getColumnFamilyHandle(), false);
+        return map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), false);
     }
 
     @Override

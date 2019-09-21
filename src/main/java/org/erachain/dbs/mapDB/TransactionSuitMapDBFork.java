@@ -21,10 +21,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Array;
 import java.util.*;
 
-public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
+public class TransactionSuitMapDBFork extends DBMapSuit<Long, Transaction> implements TransactionSuit
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
+    static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDBFork.class.getSimpleName());
 
     @SuppressWarnings("rawtypes")
     public NavigableSet senderKey;
@@ -33,7 +33,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     @SuppressWarnings("rawtypes")
     public NavigableSet typeKey;
 
-    public TransactionSuitMapDB(DBASet databaseSet, DB database) {
+    public TransactionSuitMapDBFork(DBASet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
@@ -152,14 +152,14 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     }
 
     public Iterable typeKeys(String sender, Long timestamp, Integer type) {
-        return Fun.filter(((TransactionSuitMapDB)map).typeKey,
+        return Fun.filter(((TransactionSuitMapDBFork)map).typeKey,
                 new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
     }
     public Iterable senderKeys(String sender) {
-        return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender);
+        return Fun.filter(((TransactionSuitMapDBFork)map).senderKey, sender);
     }
     public Iterable recipientKeys(String recipient) {
-        return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient);
+        return Fun.filter(((TransactionSuitMapDBFork)map).recipientKey, recipient);
     }
 
     @Override

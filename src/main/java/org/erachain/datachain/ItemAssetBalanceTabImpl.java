@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.database.DBASet;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
@@ -86,12 +85,11 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
                     map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet);
                     break;
                 //case DBS_ROCK_DB:
-                    //map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
-                    //break;
+                //    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
+                //    break;
                 default:
                     map = new nativeMapTreeMapFork(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
             }
-
         }
     }
 
