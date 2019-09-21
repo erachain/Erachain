@@ -2,15 +2,12 @@ package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.Account;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
-import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
-import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
@@ -20,11 +17,11 @@ import org.rocksdb.RocksIterator;
 
 import java.io.File;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import static org.erachain.dbs.rocksDB.RockSets.ROCK_BIG_DECIMAL_LEN;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 @Slf4j
@@ -37,6 +34,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         >>
             implements ItemAssetBalanceSuit {
 
+    private IndexByteableBigDecimal seralizerBigDecimal = new IndexByteableBigDecimal();
     private final String NAME_TABLE = "ITEM_ASSET_BALANCE_TABLE";
     private final String balanceKeyAssetIndexName = "balances_by_asset";
     private final String balanceAddressIndexName = "balances_by_address";
@@ -101,66 +99,8 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     byte[] assetKeyBytes = new byte[8];
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
-                    int sign = -value.a.b.signum();
-                    // берем абсолютное значение
-                    BigDecimal shiftForSortBG = value.a.b.abs().setScale(TransactionAmount.maxSCALE);
-                    BigInteger shiftForSortBI = shiftForSortBG.unscaledValue();
-                    byte[] shiftForSortOrig = shiftForSortBI.toByteArray();
-
-                    assert (ROCK_BIG_DECIMAL_LEN > shiftForSortOrig.length);
-
-                    byte[] shiftForSortBuff = new byte[ROCK_BIG_DECIMAL_LEN];
-                    System.arraycopy(shiftForSortOrig, 0, shiftForSortBuff,
-                            ROCK_BIG_DECIMAL_LEN - shiftForSortOrig.length, shiftForSortOrig.length);
-
-                    if (false) {
-                        String logBytes = "";
-                        for (byte b : shiftForSortBuff) {
-                            logBytes += b + ",";
-                        }
-                        logger.info("\n before shift: " + logBytes + " -- " + value.a.b.toString() + " ->" + shiftForSortBI.toString());
-                    }
-
-                    if (sign >= 0) {
-                        // учтем знак числа
-                        // сковертируем
-                        int shiftSign = 0;
-                        for (int i = ROCK_BIG_DECIMAL_LEN - 1; i >= 0; i--) {
-                            int temp = 128 + Byte.toUnsignedInt(shiftForSortBuff[i]) + shiftSign;
-                            shiftForSortBuff[i] = (byte)(temp);
-
-                            // учтем перенос на следующий байт
-                            if (temp > 255) {
-                                shiftSign = 1;
-                            } else {
-                                shiftSign = 0;
-                            }
-
-                        }
-                    } else {
-                        // учтем знак числа
-                        // сковертируем
-                        int shiftSign = 0;
-                        for (int i = ROCK_BIG_DECIMAL_LEN - 1; i >= 0; i--) {
-                            int temp = 128 - Byte.toUnsignedInt(shiftForSortBuff[i]) - shiftSign;
-                            shiftForSortBuff[i] = (byte)(temp);
-
-                            // учтем перенос на следующий байт
-                            if (temp < 0 ) {
-                                shiftSign = 1;
-                            } else {
-                                shiftSign = 0;
-                            }
-                        }
-                    }
-
-                    if (false) {
-                        String logBytes = "";
-                        for (byte b : shiftForSortBuff) {
-                            logBytes += b + ",";
-                        }
-                        logger.info("after shift: " + logBytes);
-                    }
+                    byte[] shiftForSortBuff;
+                    shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b.negate(), null);
 
                     return org.bouncycastle.util.Arrays.concatenate(
                             assetKeyBytes,
