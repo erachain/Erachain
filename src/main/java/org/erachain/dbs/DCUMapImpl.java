@@ -453,7 +453,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
      * уведомляет только счетчик если он разрешен, иначе Сбросить
      */
     @Override
-    public void reset() {
+    public void clear() {
         //RESET MAP
         this.map.clear();
 

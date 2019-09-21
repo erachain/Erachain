@@ -63,7 +63,7 @@ public class AccountTest {
         assertEquals(((BigDecimal)balance2.b).intValue(), 331417);
 
         ItemAssetBalanceTab map = db.getAssetBalanceAccountingMap();
-        map.reset();
+        map.clear();
 
         Fun.Tuple2 balance3 = account.getBalance(db, Transaction.RIGHTS_KEY, 1);
 

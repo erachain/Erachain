@@ -268,7 +268,7 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
         }
     }
 
-    public void reset() {
+    public void clear() {
         synchronized (this.publickKeys) {
             this.publickKeys.clear();
             this.assetsBalanceMap.clear();

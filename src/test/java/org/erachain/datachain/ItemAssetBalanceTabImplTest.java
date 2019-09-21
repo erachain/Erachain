@@ -9,6 +9,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
+import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -55,7 +56,8 @@ public class ItemAssetBalanceTabImplTest {
         logger.info("DBS_TEST: " + dbs);
 
         try {
-            File tempDir = new File(ConstantsRocksDB.ROCKS_DB_FOLDER);
+            // NEED DELETE RocksDB file !!!
+            File tempDir = new File(Settings.getInstance().getDataDir() + ConstantsRocksDB.ROCKS_DB_FOLDER);
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {
         }
@@ -334,6 +336,7 @@ public class ItemAssetBalanceTabImplTest {
                 assertEquals(1, iteratorSize);
 
 
+                ////////
                 map.set(Bytes.concat(account2.getShortAddressBytes(), Longs.toByteArray(assetKey1)), balance2);
 
                 byte[] keyAccount3Asset1 = Bytes.concat(account3.getShortAddressBytes(), Longs.toByteArray(assetKey1));

@@ -76,7 +76,7 @@ public interface DBTabSuitCommon<T, U> {
 
     int getDefaultIndex();
 
-    void reset();
+    void clear();
 
     void close();
 

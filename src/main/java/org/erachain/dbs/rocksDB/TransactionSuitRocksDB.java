@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
-
 public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
 {
 
@@ -96,7 +94,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
-                ROCKS_DB_FOLDER);
+                databaseSet);
     }
 
     @Override

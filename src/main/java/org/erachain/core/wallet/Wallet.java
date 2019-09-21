@@ -619,18 +619,18 @@ public class Wallet extends Observable implements Observer {
             this.database.hardFlush();
 
             // RESET MAPS
-			this.database.getTransactionMap().reset();
-			this.database.getBlocksHeadMap().reset();
-			this.database.getNameMap().reset();
-			this.database.getNameSaleMap().reset();
-            this.database.getPollMap_old().reset();
-			this.database.getAssetMap().reset();
-			this.database.getImprintMap().reset();
-			this.database.getTemplateMap().reset();
-			this.database.getPersonMap().reset();
-			this.database.getStatusMap().reset();
-			this.database.getUnionMap().reset();
-			this.database.getOrderMap().reset();
+			this.database.getTransactionMap().clear();
+			this.database.getBlocksHeadMap().clear();
+			this.database.getNameMap().clear();
+			this.database.getNameSaleMap().clear();
+            this.database.getPollMap_old().clear();
+			this.database.getAssetMap().clear();
+			this.database.getImprintMap().clear();
+			this.database.getTemplateMap().clear();
+			this.database.getPersonMap().clear();
+			this.database.getStatusMap().clear();
+			this.database.getUnionMap().clear();
+			this.database.getOrderMap().clear();
 
             LOGGER.info("   >>>>  Maps was Resetted");
 

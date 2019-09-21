@@ -472,14 +472,14 @@ public class DCSet extends DBASet implements Observer {
         if (instance.actions < 0) {
             dbFile.delete();
             for (DBMapSuit map: instance.externalMaps) {
-                map.reset();
+                map.clear();
             }
             throw new Exception("error in DATACHAIN:" + instance.actions);
         }
 
         // очистим полностью перед компактом
         if (Controller.getInstance().compactDConStart) {
-            instance.getTransactionTab().reset();
+            instance.getTransactionTab().clear();
             instance.database.commit();
             LOGGER.debug("try COMPACT");
             database.compact();
@@ -560,76 +560,76 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
-        this.addressForging.reset();
-        this.credit_AddressesMap.reset();
-        this.assetBalanceMap.reset();
-        this.addressStatement_Refs.reset();
-        this.assetBalanceAccountingMap.reset();
-        this.kKAssetStatusMap.reset();
-        this.kKPersonStatusMap.reset();
-        this.kKUnionStatusMap.reset();
-        this.kKAssetUnionMap.reset();
-        this.kKPersonUnionMap.reset();
-        this.kKPollUnionMap.reset();
+        this.addressForging.clear();
+        this.credit_AddressesMap.clear();
+        this.assetBalanceMap.clear();
+        this.addressStatement_Refs.clear();
+        this.assetBalanceAccountingMap.clear();
+        this.kKAssetStatusMap.clear();
+        this.kKPersonStatusMap.clear();
+        this.kKUnionStatusMap.clear();
+        this.kKAssetUnionMap.clear();
+        this.kKPersonUnionMap.clear();
+        this.kKPollUnionMap.clear();
 
-        this.kKStatusUnionMap.reset();
-        this.addressPersonMap.reset();
-        this.personAddressMap.reset();
-        this.kK_KPersonStatusUnionMapPersonStatusUnionTable.reset();
-        this.vouchRecordMap.reset();
-        this.hashesMap.reset();
-        this.hashesSignsMap.reset();
-        this.blockMap.reset();
-        this.blockSignsMap.reset();
-        this.blocksHeadsMap.reset();
+        this.kKStatusUnionMap.clear();
+        this.addressPersonMap.clear();
+        this.personAddressMap.clear();
+        this.kK_KPersonStatusUnionMapPersonStatusUnionTable.clear();
+        this.vouchRecordMap.clear();
+        this.hashesMap.clear();
+        this.hashesSignsMap.clear();
+        this.blockMap.clear();
+        this.blockSignsMap.clear();
+        this.blocksHeadsMap.clear();
 
-        this.referenceMap.reset();
-        this.transactionFinalMap.reset();
-        this.transactionFinalCalculatedMap.reset();        
-        this.transactionFinalMapSigns.reset();
-        this.transactionTab.reset();
-        this.nameMap.reset();
-        this.nameStorageMap.reset();
-        this.orphanNameStorageMap.reset();
-        this.orphanNameStorageHelperMap.reset();
-        this.sharedPostsMap.reset();
-        this.commentPostMap.reset();
+        this.referenceMap.clear();
+        this.transactionFinalMap.clear();
+        this.transactionFinalCalculatedMap.clear();
+        this.transactionFinalMapSigns.clear();
+        this.transactionTab.clear();
+        this.nameMap.clear();
+        this.nameStorageMap.clear();
+        this.orphanNameStorageMap.clear();
+        this.orphanNameStorageHelperMap.clear();
+        this.sharedPostsMap.clear();
+        this.commentPostMap.clear();
 
-        this.postCommentMap.reset();
-        this.localDataMap.reset();
-        this.blogPostMap.reset();
-        this.hashtagPostMap.reset();
-        this.nameExchangeMap.reset();
-        this.updateNameMap.reset();
-        this.cancelSellNameMap.reset();
-        this.pollMap.reset();
-        this.voteOnPollMap.reset();
-        this.voteOnItemPollMap.reset();
+        this.postCommentMap.clear();
+        this.localDataMap.clear();
+        this.blogPostMap.clear();
+        this.hashtagPostMap.clear();
+        this.nameExchangeMap.clear();
+        this.updateNameMap.clear();
+        this.cancelSellNameMap.clear();
+        this.pollMap.clear();
+        this.voteOnPollMap.clear();
+        this.voteOnItemPollMap.clear();
 
-        this.tradeMap.reset();
+        this.tradeMap.clear();
 
-        this.orderMap.reset();
-        this.completedOrderMap.reset();
-        this.issueAssetMap.reset();
-        this.itemAssetMap.reset();
-        this.issueImprintMap.reset();
-        this.itemImprintMap.reset();
-        this.issueTemplateMap.reset();
-        this.itemStatementMap.reset();
-        this.issueStatementMap.reset();
-        this.itemTemplateMap.reset();
+        this.orderMap.clear();
+        this.completedOrderMap.clear();
+        this.issueAssetMap.clear();
+        this.itemAssetMap.clear();
+        this.issueImprintMap.clear();
+        this.itemImprintMap.clear();
+        this.issueTemplateMap.clear();
+        this.itemStatementMap.clear();
+        this.issueStatementMap.clear();
+        this.itemTemplateMap.clear();
 
-        this.issuePersonMap.reset();
-        this.itemPersonMap.reset();
-        this.issuePollMap.reset();
-        this.itemPollMap.reset();
-        this.issueStatusMap.reset();
-        this.itemStatusMap.reset();
-        this.issueUnionMap.reset();
-        this.itemUnionMap.reset();
-        this.atMap.reset();
-        this.atStateMap.reset();
-        this.atTransactionMap.reset();
+        this.issuePersonMap.clear();
+        this.itemPersonMap.clear();
+        this.issuePollMap.clear();
+        this.itemPollMap.clear();
+        this.issueStatusMap.clear();
+        this.itemStatusMap.clear();
+        this.issueUnionMap.clear();
+        this.itemUnionMap.clear();
+        this.atMap.clear();
+        this.atStateMap.clear();
+        this.atTransactionMap.clear();
         //this.blockCreatorMap.reset();
 
         this.outUses();
@@ -1475,7 +1475,7 @@ public class DCSet extends DBASet implements Observer {
             LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
             this.actions += sizeUTX;
             Collection<Transaction> items = utxMap.values();
-            instance.getTransactionTab().reset();
+            instance.getTransactionTab().clear();
             for (Transaction item: items) {
                 utxMap.add(item);
             }

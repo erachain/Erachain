@@ -50,6 +50,10 @@ abstract public class DBASet implements IDB {
         return u;
     }
 
+    public File getFile() {
+        return DATA_FILE;
+    }
+
     public void setVersion(int version) {
         this.uses++;
         this.database.getAtomicInteger(VERSION).set(version);

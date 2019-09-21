@@ -258,7 +258,7 @@ public class PeersResource {
     @DELETE
     @Path("/known")
     public String clearPeers() {
-        Controller.getInstance().getDBSet().getPeerMap().reset();
+        Controller.getInstance().getDBSet().getPeerMap().clear();
 
         return "OK";
     }

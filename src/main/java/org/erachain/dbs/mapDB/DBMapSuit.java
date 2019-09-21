@@ -270,7 +270,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
      * уведомляет только счетчик если он разрешен, иначе Сбросить
      */
     @Override
-    public void reset() {
+    public void clear() {
         this.addUses();
 
         //RESET MAP

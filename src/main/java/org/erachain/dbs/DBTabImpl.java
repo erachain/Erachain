@@ -196,9 +196,9 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
      * уведомляет только счетчик если он разрешен, иначе Сбросить
      */
     @Override
-    public void reset() {
+    public void clear() {
         //RESET MAP
-        this.map.reset();
+        this.map.clear();
 
         // NOTYFIES
         if (this.observableData != null) {

@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
+import org.erachain.database.DBASet;
 import org.erachain.dbs.rocksDB.common.DBIterator;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
@@ -14,11 +15,14 @@ import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
+import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+
+import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
  * тут происходит обработка настроенных вторичных индексов
@@ -55,22 +59,25 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
 
     //private final int numberBeforeFlush = 4000;
 
-    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, String root) {
-        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), root);
+    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
+        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
     }
 
-    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, String root) {
+    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, DBASet dbaSet) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.NAME_TABLE = NAME_TABLE;
         this.settings = settings;
-        this.root = root;
+        this.root = (dbaSet == null // in TESTs
+                || dbaSet.getFile() == null? // in Memory or in TESTs
+                Settings.getInstance().getDataDir()
+                    : dbaSet.getFile().getPath()) + ROCKS_DB_FOLDER;
         // Чтобы не было NullPointerException
         if (indexes == null) {
             indexes = new ArrayList<>();
         }
         this.indexes = indexes;
-        db = new RocksDB(NAME_TABLE, indexes, settings, root);
+        db = new RocksDB(NAME_TABLE, indexes, settings, this.root);
         columnFamilyHandles = db.getColumnFamilyHandles();
         for (int i = 0; i < indexes.size(); i++) {
             indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));

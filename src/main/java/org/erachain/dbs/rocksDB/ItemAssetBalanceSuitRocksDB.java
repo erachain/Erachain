@@ -15,14 +15,10 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 import org.rocksdb.RocksIterator;
 
-import java.io.File;
 import java.math.BigDecimal;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 @Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
@@ -80,7 +76,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 128,
                         1, 256, 32, false),
-                ROCKS_DB_FOLDER);
+                databaseSet);
 
         if (databaseSet != null)
             databaseSet.addExternalMaps(this);
@@ -137,14 +133,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         return DEFAULT_VALUE;
     }
 
-    @Override
-    public void reset() {
-        databaseSet.close();
-        File dbFile = new File(Paths.get(ROCKS_DB_FOLDER).toString(), NAME_TABLE);
-        dbFile.delete();
-    }
-
-
     // TODO - release it
 
     public List<byte[]> assetKeys_bad(long assetKey) {
@@ -191,11 +179,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     @Override
     public Iterator<byte[]> accountIterator(Account account) {
         return accountKeys(account).iterator();
-    }
-
-    @Override
-    public void close() {
-        map.close();
     }
 
 }

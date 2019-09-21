@@ -22,13 +22,6 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
 
     static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDBFork.class.getSimpleName());
 
-    @SuppressWarnings("rawtypes")
-    public NavigableSet senderKey;
-    @SuppressWarnings("rawtypes")
-    public NavigableSet recipientKey;
-    @SuppressWarnings("rawtypes")
-    public NavigableSet typeKey;
-
     public TransactionSuitMapDBFork(TransactionTab parent, DBASet databaseSet) {
         super(parent, databaseSet);
     }
@@ -82,19 +75,24 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
         return DEFAULT_VALUE;
     }
 
+    @Override
+    public Iterator<Long> getTimestampIterator() {
+        return getIterator(TIMESTAMP_INDEX, false);
+    }
+
+    @Override
     public Iterable typeKeys(String sender, Long timestamp, Integer type) {
-        return null;
-    }
-    public Iterable senderKeys(String sender) {
-        return null;
-    }
-    public Iterable recipientKeys(String recipient) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getTimestampIterator() {
-        return getIterator(TIMESTAMP_INDEX, false);
+    public Iterable senderKeys(String sender) {
+        return null;
+    }
+
+    @Override
+    public Iterable recipientKeys(String recipient) {
+        return null;
     }
 
     @Override

@@ -19,8 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
-
 public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionSuit
 {
 
@@ -54,7 +52,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
-                ROCKS_DB_FOLDER);
+                databaseSet);
     }
 
     @Override
@@ -65,6 +63,11 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     @Override
     public Transaction getDefaultValue() {
         return DEFAULT_VALUE;
+    }
+
+    @Override
+    public Iterator<Long> getTimestampIterator() {
+        return map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), false);
     }
 
     @Override
@@ -80,11 +83,6 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     @Override
     public Iterable recipientKeys(String recipient) {
         return null;
-    }
-
-    @Override
-    public Iterator<Long> getTimestampIterator() {
-        return map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), false);
     }
 
     @Override

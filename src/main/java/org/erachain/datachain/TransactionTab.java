@@ -85,6 +85,6 @@ public interface TransactionTab extends DBTab<Long, Transaction> {
     void addObserver(Observer o);
     void deleteObserver(Observer o);
 
-    void reset();
+    void clear();
 
 }

@@ -66,7 +66,7 @@ public interface ItemAssetBalanceTab extends DBTab<byte[], Tuple5<
 
     Iterator<byte[]> getIterator(int index, boolean descending);
 
-    void reset();
+    void clear();
 
     void addObserver(Observer o);
 

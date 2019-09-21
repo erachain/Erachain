@@ -135,7 +135,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public void reset() {
+    public void clear() {
         map.clear();
     }
 

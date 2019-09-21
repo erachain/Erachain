@@ -21,10 +21,10 @@ public class UpdateUtil {
     static Logger LOGGER = LoggerFactory.getLogger(UpdateUtil.class.getName());
 
     public static void repopulateNameStorage(int height) {
-        DCSet.getInstance().getNameStorageMap().reset();
-        DCSet.getInstance().getOrphanNameStorageHelperMap().reset();
-        DCSet.getInstance().getOrphanNameStorageMap().reset();
-        DCSet.getInstance().getHashtagPostMap().reset();
+        DCSet.getInstance().getNameStorageMap().clear();
+        DCSet.getInstance().getOrphanNameStorageHelperMap().clear();
+        DCSet.getInstance().getOrphanNameStorageMap().clear();
+        DCSet.getInstance().getHashtagPostMap().clear();
 
         SortableList<Integer, Block> blocks = DCSet.getInstance().getBlockMap().getList();
         blocks.sort(BlockMap.HEIGHT_INDEX);
@@ -91,7 +91,7 @@ public class UpdateUtil {
 
     public static void repopulateTransactionFinalMap(DCSet dcSet) {
 
-        dcSet.getTransactionFinalMap().reset();
+        dcSet.getTransactionFinalMap().clear();
 
         Block b = new GenesisBlock();
         do {
@@ -115,7 +115,7 @@ public class UpdateUtil {
     }
 
     public static void repopulateCommentPostMap() {
-        DCSet.getInstance().getPostCommentMap().reset();
+        DCSet.getInstance().getPostCommentMap().clear();
 
         Block b = new GenesisBlock();
         int height = b.getHeight();
