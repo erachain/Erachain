@@ -186,7 +186,4 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         return observableData.get(messageType) == thisMessageType;
     }
 
-    @Override
-    public void close() {}
-
 }

@@ -211,4 +211,7 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
         }
     }
 
+    @Override
+    public void close() { map.close(); }
+
 }

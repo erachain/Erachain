@@ -469,6 +469,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     }
 
     @Override
+    public void close() {}
+
+    @Override
     public String toString() {
         if (parent == null)  {
             return getClass().getName();

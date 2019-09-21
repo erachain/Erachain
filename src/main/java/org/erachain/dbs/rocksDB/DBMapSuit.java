@@ -139,7 +139,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         map.clear();
     }
 
-    //@Override
+    @Override
     public void close() {
         map.close();
     }

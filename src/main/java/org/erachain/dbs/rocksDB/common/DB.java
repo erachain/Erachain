@@ -1,9 +1,7 @@
 package org.erachain.dbs.rocksDB.common;
 
-import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.rocksdb.ColumnFamilyHandle;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -32,5 +30,7 @@ public interface DB<K, V> {
     List<byte[]> filterAppropriateValuesAsKeys(byte[] filter, int indexDB);
 
     List<byte[]> filterAppropriateValuesAsKeys(byte[] filter);
+
+    void close();
 
 }

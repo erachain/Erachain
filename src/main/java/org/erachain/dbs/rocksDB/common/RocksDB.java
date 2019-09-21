@@ -4,12 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
-import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
@@ -18,7 +20,8 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
  *
  */
 @Slf4j
-public class RocksDB implements DB<byte[], byte[]>, Flusher {
+public class RocksDB implements DB<byte[], byte[]>, Flusher
+{
 
     @Getter
     @Setter

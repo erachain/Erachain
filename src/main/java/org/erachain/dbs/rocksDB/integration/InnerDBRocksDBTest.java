@@ -4,13 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 import org.erachain.dbs.rocksDB.common.DB;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
-import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.rocksdb.ColumnFamilyHandle;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     @Getter
@@ -67,10 +69,6 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     }
 
     @Override
-    public void close() {
-    }
-
-    @Override
     public Iterator<K> getIterator(boolean descending) {
         return null;
     }
@@ -92,4 +90,7 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     private Set<V> receiveValues() {
         return (Set<V>) db.values();
     }
+
+    @Override
+    public void close() { db.close(); }
 }

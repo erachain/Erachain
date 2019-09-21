@@ -1,11 +1,7 @@
 package org.erachain.dbs;
 
-import org.erachain.database.IDB;
-import org.erachain.database.SortableList;
-
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -81,5 +77,7 @@ public interface DBTabSuitCommon<T, U> {
     int getDefaultIndex();
 
     void reset();
+
+    void close();
 
 }

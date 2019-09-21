@@ -8,7 +8,4 @@ public interface Flusher {
 
   void flush();
 
-  void close();
-
-  void reset();
 }
