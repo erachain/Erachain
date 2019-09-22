@@ -1610,7 +1610,7 @@ import java.util.*;
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionTab unconfirmedMap = validatingDC.getTransactionTab();
-            TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
+            TransactionFinalMapImpl finalMap = validatingDC.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSigns = validatingDC.getTransactionFinalMapSigns();
 
             int seqNo = 0;
@@ -2103,7 +2103,7 @@ import java.util.*;
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
             TransactionTab unconfirmedMap = dcSet.getTransactionTab();
-            TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+            TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
             long timerProcess = 0;
@@ -2294,7 +2294,7 @@ import java.util.*;
         boolean notFork = !dcSet.isFork();
 
         TransactionTab unconfirmedMap = dcSet.getTransactionTab();
-        TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+        TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
         this.getTransactions();

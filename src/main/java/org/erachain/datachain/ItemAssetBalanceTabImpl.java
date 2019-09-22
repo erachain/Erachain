@@ -47,9 +47,6 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> implements ItemAssetBalanceTab {
 
-    int ASSET_AMOUNT_INDEX = 1;
-    int ADDRESS_ASSET_INDEX = 2;
-
     public ItemAssetBalanceTabImpl(int dbsUsed, DCSet databaseSet, DB database) {
         super(dbsUsed, databaseSet, database);
 

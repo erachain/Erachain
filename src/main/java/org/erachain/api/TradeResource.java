@@ -10,10 +10,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetMap;
-import org.erachain.datachain.OrderMap;
-import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.*;
 import org.erachain.utils.Pair;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -356,7 +353,7 @@ public class TradeResource {
 
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
-        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
         Transaction createOrder;
 
         JSONArray out = new JSONArray();

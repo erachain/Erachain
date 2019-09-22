@@ -17,6 +17,10 @@ public class nativeMapTreeMapFork<T, U> extends DBMapSuitFotk<T, U>
         super(parent, databaseSet);
         DEFAULT_VALUE = defaultValue;
     }
+    public nativeMapTreeMapFork(DBTab parent, DBASet databaseSet) {
+        super(parent, databaseSet);
+        DEFAULT_VALUE = null;
+    }
 
     @Override
     protected void getMap() {

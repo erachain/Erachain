@@ -128,7 +128,7 @@ public class DCSet extends DBASet {
     private ATMap atMap;
     private ATStateMap atStateMap;
     private ATTransactionMap atTransactionMap;
-    private TransactionFinalMap transactionFinalMap;
+    private TransactionFinalMapImpl transactionFinalMap;
     private TransactionFinalCalculatedMap transactionFinalCalculatedMap;
     private TransactionFinalMapSigns transactionFinalMapSigns;
     private TransactionTab transactionTab;
@@ -178,7 +178,7 @@ public class DCSet extends DBASet {
             this.addressPersonMap = new AddressPersonMap(this, database);
             this.personAddressMap = new PersonAddressMap(this, database);
             this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(this, database);
-            this.transactionFinalMap = new TransactionFinalMap(this, database);
+            this.transactionFinalMap = new TransactionFinalMapImpl(this, database);
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
             this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
@@ -304,7 +304,7 @@ public class DCSet extends DBASet {
         this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap, this);
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap, this);
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable, this);
-        this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
+        this.transactionFinalMap = new TransactionFinalMapImpl(parent.transactionFinalMap, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
@@ -991,7 +991,7 @@ public class DCSet extends DBASet {
      * ++ recipient_txs
      * ++ address_type_txs
      */
-    public TransactionFinalMap getTransactionFinalMap() {
+    public TransactionFinalMapImpl getTransactionFinalMap() {
         return this.transactionFinalMap;
     }
 

@@ -1187,7 +1187,7 @@ public class BlockExplorer {
         BigDecimal sumSellingAmount = BigDecimal.ZERO;
         BigDecimal sumSellingAmountGood = BigDecimal.ZERO;
 
-        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
         Transaction createOrder;
 
         BigDecimal vol;
@@ -2496,7 +2496,7 @@ public class BlockExplorer {
         output.put("type", "transactions");
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or signature or BlockNo-SeqNo", langObj));
 
-        TransactionFinalMap map = dcSet.getTransactionFinalMap();
+        TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
         int size = 200;
         List<Transaction> transactions;
         if (filterStr != null) {

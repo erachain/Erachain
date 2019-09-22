@@ -12,6 +12,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.ATTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
@@ -76,7 +77,7 @@ public class ATAPIPlatformImpl extends ATAPIImpl {
 
             } else if (txp != null && pairP.a < forkHeight) {
                 atTxs = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).getATTransactions(pairP.a).size();
-                Transaction transaction = ((TransactionFinalMap) dcSet.getTransactionFinalMap().getParentMap()).get(txp);
+                Transaction transaction = ((TransactionFinalMapImpl) dcSet.getTransactionFinalMap().getParentMap()).get(txp);
 
                 long txAmount = getAmount((Transaction) transaction, new Account(Base58.encode(state.getId())), state.getHeight());
 
