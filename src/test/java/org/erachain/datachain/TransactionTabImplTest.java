@@ -7,7 +7,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -25,6 +24,7 @@ public class TransactionTabImplTest {
     int[] TESTED_DBS = new int[]{DCSet.DBS_ROCK_DB, DCSet.DBS_MAP_DB, DCSet.DBS_NATIVE_MAP
             ,DCSet.DBS_ROCK_DB};
 
+    String testsPath = Settings.getInstance().getDataTempDir();
     DCSet dcSet;
     Account account1 = new Account("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
     Account account2 = new Account("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS");
@@ -45,12 +45,13 @@ public class TransactionTabImplTest {
 
         try {
             // NEED DELETE RocksDB file !!!
-            File tempDir = new File(Settings.getInstance().getDataDir() + ConstantsRocksDB.ROCKS_DB_FOLDER);
+            ///File tempDir = new File(Settings.getInstance().getDataDir() + ConstantsRocksDB.ROCKS_DB_FOLDER);
+            File tempDir = new File(testsPath);
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {
         }
 
-        dcSet = DCSet.createEmptyDatabaseSet(dbs);
+        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(testsPath, dbs);
         map = dcSet.getTransactionTab();
 
         accounts.add(account1);
@@ -104,7 +105,10 @@ public class TransactionTabImplTest {
 
     @Test
     public void getFromToKeys() {
-        for (int dbs : TESTED_DBS) {
+        for (int dbs :
+                //TESTED_DBS
+                new int[]{DCSet.DBS_MAP_DB}
+                ) {
             init(dbs);
 
             make();

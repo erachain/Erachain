@@ -19,7 +19,7 @@ public class AccountTest {
     Account account;
 
     void init() {
-        db = DCSet.createEmptyHardDatabaseSet();
+        db = DCSet.createEmptyHardDatabaseSet(0);
         gb = new GenesisBlock();
 
         try {

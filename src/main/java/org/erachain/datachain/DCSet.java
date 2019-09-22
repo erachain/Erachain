@@ -400,18 +400,7 @@ public class DCSet extends DBASet implements Observer {
         return instance;
     }
 
-    /**
-     * remake data set
-     *
-     * @param withObserver [true] - for switch on GUI observers
-     * @param dynamicGUI   [true] - for switch on GUI observers fir dynamic interface
-     * @throws Exception
-     */
-    public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
-
-        //OPEN DB
-        File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
-        dbFile.getParentFile().mkdirs();
+    public static DB makeFileDB(File dbFile) {
 
         /// https://jankotek.gitbooks.io/mapdb/performance/
         DBMaker databaseStruc = DBMaker.newFileDB(dbFile)
@@ -447,7 +436,7 @@ public class DCSet extends DBASet implements Observer {
                 ///// добавил dcSet.clearCache(); --
                 databaseStruc
                         .cacheSize(32 + 32 << Controller.HARD_WORK)
-                    ;
+                ;
 
             } else {
                 databaseStruc
@@ -460,19 +449,36 @@ public class DCSet extends DBASet implements Observer {
                         // у другого типа КЭША происходит утечка памяти
                         .cacheHardRefEnable()
 
-                        ///.cacheSoftRefEnable()
-                        ///.cacheSize(32 << Controller.HARD_WORK)
+                ///.cacheSoftRefEnable()
+                ///.cacheSize(32 << Controller.HARD_WORK)
 
-                        ///.cacheWeakRefEnable()
-                        ///.cacheSize(32 << Controller.HARD_WORK)
-                    ;
+                ///.cacheWeakRefEnable()
+                ///.cacheSize(32 << Controller.HARD_WORK)
+                ;
 
             }
         } else {
             databaseStruc.cacheDisable();
         }
 
-        DB database = databaseStruc.make();
+        return databaseStruc.make();
+
+    }
+
+    /**
+     * remake data set
+     *
+     * @param withObserver [true] - for switch on GUI observers
+     * @param dynamicGUI   [true] - for switch on GUI observers fir dynamic interface
+     * @throws Exception
+     */
+    public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
+
+        //OPEN DB
+        File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
+        dbFile.getParentFile().mkdirs();
+
+        DB database = makeFileDB(dbFile);
 
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false, 0);
@@ -521,8 +527,21 @@ public class DCSet extends DBASet implements Observer {
         return instance;
     }
 
-    public static DCSet createEmptyHardDatabaseSet() {
-        instance = new DCSet(null, getHardBase(), false, false, true, 0);
+    public static DCSet createEmptyHardDatabaseSet(int defaultDBS) {
+        instance = new DCSet(null, getHardBase(), false, false, true, defaultDBS);
+        return instance;
+    }
+
+    public static DCSet createEmptyHardDatabaseSetWithFlush(String path, int defaultDBS) {
+        // найдем новый не созданный уже файл
+        File dbFile;
+        do {
+            dbFile = new File(path == null? Settings.getInstance().getDataTempDir() : path, "fork" + randFork.nextInt() + ".dat");
+        } while (dbFile.exists());
+
+        dbFile.getParentFile().mkdirs();
+
+        instance = new DCSet(dbFile, makeFileDB(dbFile), false, false, true, defaultDBS);
         return instance;
     }
 
