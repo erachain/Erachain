@@ -51,8 +51,8 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
 
     public int totalDeleted = 0;
 
-    public TransactionTabImpl(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+    public TransactionTabImpl(int dbsUsed, DCSet databaseSet, DB database) {
+        super(dbsUsed, databaseSet, database);
 
         DEFAULT_INDEX = TransactionSuit.TIMESTAMP_INDEX;
 
@@ -65,8 +65,8 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
 
     }
 
-    public TransactionTabImpl(TransactionTab parent, DCSet databaseSet) {
-        super(parent, databaseSet);
+    public TransactionTabImpl(int dbsUsed, TransactionTab parent, DCSet databaseSet) {
+        super(dbsUsed, parent, databaseSet);
     }
 
     @Override

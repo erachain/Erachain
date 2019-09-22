@@ -151,7 +151,9 @@ public class DCSet extends DBASet implements Observer {
             this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
                     DBS_ROCK_DB, //DBS_MAP_DB,
                     this, database);
-            this.transactionTab = new TransactionTabImpl(this, database);
+            this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
+                    DBS_ROCK_DB, //DBS_MAP_DB,
+                    this, database);
 
             this.actions = 0L;
 
@@ -163,7 +165,6 @@ public class DCSet extends DBASet implements Observer {
             this.addressForging = new AddressForging(this, database);
             this.credit_AddressesMap = new CreditAddressesMap(this, database);
             this.addressStatement_Refs = new AddressStatementRefs(this, database);
-            //this.assetBalanceAccountingMap = new ItemAssetBalanceRocksMap(this, database);
 
             this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
             this.kKPersonStatusMap = new KKPersonStatusMap(this, database);
@@ -282,12 +283,11 @@ public class DCSet extends DBASet implements Observer {
 
         // переделанные поновой таблицы
         this.assetBalanceMap = new ItemAssetBalanceTabImpl(DBS_MAP_DB, parent.assetBalanceMap, this);
-        this.transactionTab = new TransactionTabImpl(parent.transactionTab, this);
+        this.transactionTab = new TransactionTabImpl(DBS_MAP_DB, parent.transactionTab, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
         this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs, this);
-        //this.assetBalanceAccountingMap = new ItemAssetBalanceRocksMap((ItemAssetBalanceRocksMap)parent.assetBalanceAccountingMap, this);
         this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap, this);
         this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap, this);
         this.kKUnionStatusMap = new KKUnionStatusMap(parent.kKUnionStatusMap, this);
