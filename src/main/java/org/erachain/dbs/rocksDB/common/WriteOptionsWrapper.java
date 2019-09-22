@@ -14,6 +14,7 @@ public class WriteOptionsWrapper {
     return wrapper;
   }
 
+  // TODO ??
   public WriteOptionsWrapper sync(boolean bool) {
     rocks.setSync(bool);
     return this;

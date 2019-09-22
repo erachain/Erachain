@@ -109,6 +109,11 @@ public class TransactionTabImplTest {
 
             make();
 
+            map.clear();
+            assertEquals(map.size(), 0);
+
+            make();
+
             dcSet.close();
         }
     }

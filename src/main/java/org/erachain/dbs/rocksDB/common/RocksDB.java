@@ -25,6 +25,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
 
     @Getter
     @Setter
+    // TODO ??
     private boolean dbSync;
 
     @Getter

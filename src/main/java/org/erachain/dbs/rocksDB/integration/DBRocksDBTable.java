@@ -63,6 +63,15 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
     }
 
+    /**
+     *
+     * @param byteableKey
+     * @param byteableValue
+     * @param NAME_TABLE
+     * @param indexes is null - not use size Counter
+     * @param settings
+     * @param dbaSet
+     */
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, DBASet dbaSet) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
@@ -73,9 +82,9 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
                 Settings.getInstance().getDataDir()
                     : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
         // Чтобы не было NullPointerException
-        if (indexes == null) {
-            indexes = new ArrayList<>();
-        }
+        //if (indexes == null) {
+        //    indexes = new ArrayList<>();
+        //}
         this.indexes = indexes;
         db = new RocksDB(NAME_TABLE, indexes, settings, this.root);
         columnFamilyHandles = db.getColumnFamilyHandles();
@@ -269,9 +278,6 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         FileUtil.recursiveDelete(db.getDb().getDbPath().toString());
         db = new RocksDB(NAME_TABLE, indexes, settings, root);
         columnFamilyHandles = db.getColumnFamilyHandles();
-        for (int i = 0; i < indexes.size(); i++) {
-            indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
-        }
         columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
     }
 

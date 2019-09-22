@@ -76,14 +76,14 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public void closeDB() {
+    public synchronized void closeDB() {
         resetDbLock.writeLock().lock();
         try {
             if (!isAlive()) {
                 return;
             }
-            database.close();
             alive = false;
+            database.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -227,7 +227,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             }
 
             Preconditions.checkNotNull(dataBaseName, "no name set to the dbStore");
-            try (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeUniversalStyleCompaction()) {
+            try  (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeUniversalStyleCompaction()) {
                 final List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
                 columnFamilyHandles = new ArrayList<>();
                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
@@ -288,7 +288,8 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                 for (ColumnFamilyDescriptor columnFamilyDescriptor : columnFamilyDescriptors) {
                                     ColumnFamilyHandle columnFamilyHandle = database.createColumnFamily(columnFamilyDescriptor);
                                     columnFamilyHandles.add(columnFamilyHandle);
-                                    indexes.get(indexID++).setColumnFamilyHandle(columnFamilyHandle);
+                                    if (indexes != null && indexes.size() > indexID)
+                                        indexes.get(indexID++).setColumnFamilyHandle(columnFamilyHandle);
                                 }
                                 create = true;
                             } catch (RocksDBException e) {
@@ -312,8 +313,10 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                 columnFamilyDescriptors.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts));
                                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
                                 database = TransactionDB.open(dbOptions, dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
-                                for (int i = 0; i < indexes.size(); i++) {
-                                    indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                if (indexes != null && !indexes.isEmpty()) {
+                                    for (int i = 0; i < indexes.size(); i++) {
+                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                    }
                                 }
 
                             }
@@ -358,8 +361,8 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             for (IndexDB index : indexes) {
                 columnFamilyDescriptors.add(new ColumnFamilyDescriptor(index.getNameIndex().getBytes(StandardCharsets.UTF_8), cfOpts));
             }
+            columnFamilyDescriptors.add(new ColumnFamilyDescriptor(sizeDescriptorName.getBytes(StandardCharsets.UTF_8), cfOpts));
         }
-        columnFamilyDescriptors.add(new ColumnFamilyDescriptor(sizeDescriptorName.getBytes(StandardCharsets.UTF_8), cfOpts));
     }
 
     @Override

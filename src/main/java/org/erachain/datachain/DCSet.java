@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOError;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Observable;
@@ -1458,7 +1459,10 @@ public class DCSet extends DBASet implements Observer {
                     try {
                         this.database.commit();
                     } catch (IOError e) {
-                        LOGGER.error(e.getMessage(), e);
+                        LOGGER.error(e.getMessage());
+                        String err = new String(e.getMessage().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+                        LOGGER.error(err);
+                        LOGGER.error(e.getLocalizedMessage(), e);
                     }
                 }
 
