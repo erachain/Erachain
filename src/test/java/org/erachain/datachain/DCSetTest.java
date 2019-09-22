@@ -161,9 +161,7 @@ public class DCSetTest {
     // нужно сделать проверку нормального сохранения на диск с разрывом в таблицах на внешних базах данных
     @Test
     public void commit() {
-        for (int dbs :
-                TESTED_DBS
-        ) {
+        for (int dbs: TESTED_DBS) {
             init(dbs);
 
             int counter = make();

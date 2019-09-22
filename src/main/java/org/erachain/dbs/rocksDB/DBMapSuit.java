@@ -153,4 +153,14 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         map.close();
     }
 
+    @Override
+    public void commit() {
+        map.commit();
+    }
+
+    @Override
+    public void rollback() {
+        map.rollback();
+    }
+
 }

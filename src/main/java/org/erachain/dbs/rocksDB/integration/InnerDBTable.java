@@ -32,6 +32,10 @@ public interface InnerDBTable<K, V> {
 
     void close();
 
+    void commit();
+
+    void rollback();
+
     //NavigableSet<Fun.Tuple2<?, K>> getIndex(int index, boolean descending);
 
     Iterator<K> getIterator(boolean descending);

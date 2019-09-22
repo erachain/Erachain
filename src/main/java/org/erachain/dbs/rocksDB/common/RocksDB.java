@@ -123,11 +123,24 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
 
     @Override
     public void close() {
-        db.closeDB();
+        db.close();
+    }
+
+    // TODO найти реализацию
+    @Override
+    public void commit() {
+        db.commit();
+    }
+
+    // TODO найти реализацию
+    @Override
+    public void rollback() {
+        db.rollback();
     }
 
     @Override
     public void reset() {
+        db.reset();
     }
 
     @Override

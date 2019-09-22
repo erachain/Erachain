@@ -29,8 +29,12 @@ import static org.rocksdb.RocksDB.loadLibrary;
 @NoArgsConstructor
 public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     private String dataBaseName;
+
     @Getter
     public RocksDB database;
+    //public TransactionDB database;
+    //public OptimisticTransactionDB database;
+
     private boolean alive;
     private String parentName;
 
@@ -76,7 +80,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public synchronized void closeDB() {
+    public void close() {
         resetDbLock.writeLock().lock();
         try {
             if (!isAlive()) {
@@ -89,6 +93,22 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         } finally {
             resetDbLock.writeLock().unlock();
         }
+    }
+
+    // TODO нати реализацию
+    @Override
+    public void commit() {
+        //database.beginTransaction()
+        //TransactionDB.commit
+    }
+
+    // TODO нати реализацию
+    @Override
+    public void rollback() {
+    }
+
+    @Override
+    public void reset() {
     }
 
     private boolean quitIfNotAlive() {

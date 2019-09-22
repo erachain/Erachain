@@ -295,4 +295,13 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     }
 
+    @Override
+    public void close() {}
+
+    @Override
+    public void commit() {}
+
+    @Override
+    public void rollback() {}
+
 }

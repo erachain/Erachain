@@ -17,12 +17,4 @@ public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
 
     protected U getDefaultValue() { return null; }
 
-    @Override
-    public void close() {}
-
-    @Override
-    public void commit() {}
-
-    @Override
-    public void rollback() {}
 }

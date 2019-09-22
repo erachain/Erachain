@@ -93,4 +93,8 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
 
     @Override
     public void close() { db.close(); }
+    @Override
+    public void commit() {}
+    @Override
+    public void rollback() {}
 }

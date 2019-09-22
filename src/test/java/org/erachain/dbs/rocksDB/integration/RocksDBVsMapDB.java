@@ -4,15 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.junit.Before;
 import org.junit.Test;
-import org.mapdb.DB;
-import org.mapdb.DBMaker;
-import org.mapdb.Serializer;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.Transaction;
 import org.rocksdb.TransactionDB;
 import org.rocksdb.WriteOptions;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -111,104 +107,5 @@ public class RocksDBVsMapDB {
         db.close();
         logger.info("End test RocksDB productivity");
     }
-
-    @Test
-    public void mapDBProductivityClose() {
-        logger.info("Start test MapDB productivity simple close");
-        String NAME_DATABASE = "TestMapDB";
-        new File(NAME_DATABASE).mkdir();
-        File dbFile = new File(NAME_DATABASE, "chain.dat");
-        long timeMillisBefore = System.currentTimeMillis();
-        DB db = DBMaker.newFileDB(dbFile)
-                .cacheHardRefEnable()
-                .cacheSize(1000)
-                .checksumEnable()
-                .mmapFileEnableIfSupported()
-                .commitFileSyncDisable()
-                .freeSpaceReclaimQ(5)
-                .make();
-        Map<byte[], byte[]> map = db.createHashMap(NAME_DATABASE)
-                .keySerializer(Serializer.BYTE_ARRAY)
-                .makeOrGet();
-        DBMapDB<byte[], byte[]> mapDB = new DBMapDB<>();
-        mapDB.setMap(map);
-        for (Map.Entry<byte[], byte[]> entry : entrySet) {
-            mapDB.put(entry.getKey(), entry.getValue());
-        }
-        db.commit();
-        db.close();
-        long timeMillisAfter = System.currentTimeMillis();
-        long total = timeMillisAfter - timeMillisBefore;
-        logger.info("total time mapDB = " + total);
-        logger.info("End test MapDB productivity");
-    }
-
-    @Test
-    public void mapDBProductivity() {
-        logger.info("Start test MapDB productivity simple");
-        String NAME_DATABASE = "TestMapDB";
-        new File(NAME_DATABASE).mkdir();
-        File dbFile = new File(NAME_DATABASE, "chain.dat");
-        long timeMillisBefore = System.currentTimeMillis();
-        DB db = DBMaker.newFileDB(dbFile)
-                .cacheHardRefEnable()
-                .cacheSize(1000)
-                .checksumEnable()
-                .mmapFileEnableIfSupported()
-                .commitFileSyncDisable()
-                .freeSpaceReclaimQ(5)
-                .make();
-        Map<byte[], byte[]> map = db.createHashMap(NAME_DATABASE)
-                .keySerializer(Serializer.BYTE_ARRAY)
-                .makeOrGet();
-        DBMapDB<byte[], byte[]> mapDB = new DBMapDB<>();
-        mapDB.setMap(map);
-        for (Map.Entry<byte[], byte[]> entry : entrySet) {
-            mapDB.put(entry.getKey(), entry.getValue());
-        }
-        db.commit();
-        long timeMillisAfter = System.currentTimeMillis();
-        long total = timeMillisAfter - timeMillisBefore;
-        logger.info("total time mapDB = " + total);
-        db.close();
-        logger.info("End test MapDB productivity");
-    }
-
-    @Test
-    public void mapDBProductivityCommit() {
-        logger.info("Start test MapDB productivity commit");
-        String NAME_DATABASE = "TestMapDB";
-        new File(NAME_DATABASE).mkdir();
-        File dbFile = new File(NAME_DATABASE, "chain.dat");
-        long timeMillisBefore = System.currentTimeMillis();
-        DB db = DBMaker.newFileDB(dbFile)
-                .cacheHardRefEnable()
-                .cacheSize(1000)
-                .checksumEnable()
-                .mmapFileEnableIfSupported()
-                .commitFileSyncDisable()
-                .freeSpaceReclaimQ(5)
-                .make();
-        Map<byte[], byte[]> map = db.createHashMap(NAME_DATABASE)
-                .keySerializer(Serializer.BYTE_ARRAY)
-                .makeOrGet();
-        DBMapDB<byte[], byte[]> mapDB = new DBMapDB<>();
-        mapDB.setMap(map);
-        int k = 0;
-        for (Map.Entry<byte[], byte[]> entry : entrySet) {
-            mapDB.put(entry.getKey(), entry.getValue());
-            if (k % 1000 == 0) {
-                db.commit();
-            }
-            k++;
-        }
-        db.commit();
-        long timeMillisAfter = System.currentTimeMillis();
-        long total = timeMillisAfter - timeMillisBefore;
-        logger.info("total time mapDB = " + total);
-        db.close();
-        logger.info("End test MapDB productivity");
-    }
-
 
 }

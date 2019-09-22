@@ -32,5 +32,7 @@ public interface DB<K, V> {
     List<byte[]> filterAppropriateValuesAsKeys(byte[] filter);
 
     void close();
+    void commit();
+    void rollback();
 
 }

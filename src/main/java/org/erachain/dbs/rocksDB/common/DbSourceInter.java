@@ -39,7 +39,10 @@ public interface DbSourceInter<V> extends BatchSourceInter<byte[], V> {
 
     boolean isAlive();
 
-    void closeDB();
+    void close();
+    void commit();
+    void rollback();
+    void reset();
 
     Set<byte[]> allKeys() throws RuntimeException;
 

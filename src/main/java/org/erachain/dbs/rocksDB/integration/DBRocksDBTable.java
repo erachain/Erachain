@@ -348,6 +348,12 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
     public void close() {
         db.close();
     }
+    public void commit() {
+        db.commit();
+    }
+    public void rollback() {
+        db.rollback();
+    }
 
     @Override
     public Iterator<K> getIterator(boolean descending) {
