@@ -16,10 +16,7 @@ import org.junit.Test;
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -65,7 +62,7 @@ public class TransactionTabImplTest {
     public void make() {
         Random random = new Random();
 
-        int max = 100;
+        int max = 10;
         int counter = max;
         List<PrivateKeyAccount> test2Creators = new ArrayList<>();
         while (counter-- > 0) {
@@ -92,7 +89,7 @@ public class TransactionTabImplTest {
                 String address = creator.getAddress();
                 Transaction messageTx = new RSend(creator, (byte) 0, recipient, 1L, amount,
                         "title test", null, new byte[]{(byte) 1},
-                        new byte[]{(byte) 0}, timestamp++, 0l);
+                        new byte[]{(byte) 0}, timestamp + random.nextInt(10000), 0l);
                 messageTx.sign(creator, Transaction.FOR_NETWORK);
 
                 map.add(messageTx);
@@ -118,6 +115,28 @@ public class TransactionTabImplTest {
 
     @Test
     public void getTimestampIterator() {
+        for (int dbs : TESTED_DBS) {
+            init(dbs);
+
+            make();
+
+            long ntp = NTP.getTime();
+            long timestampTMP = 0;
+            Iterator<Long> iterator = map.getTimestampIterator();
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                Transaction item = map.get(key);
+                long timestamp = item.getTimestamp();
+                if (timestampTMP > 0 && timestampTMP > timestamp) {
+                    logger.error((timestampTMP - ntp) + " err : " + (timestamp - ntp));
+                    assertEquals(timestampTMP, timestamp);
+                }
+                timestampTMP = timestamp;
+
+            }
+
+            dcSet.close();
+        }
     }
 
     @Test
