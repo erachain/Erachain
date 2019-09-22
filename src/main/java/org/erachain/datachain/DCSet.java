@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOError;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Observable;
@@ -1430,22 +1431,49 @@ public class DCSet extends DBASet implements Observer {
 
                 if (this.getBlockMap().isProcessing()) {
                     for (DBMapSuit suitMap: externalMaps) {
-                        //suitMap.rollback();
+                        try {
+                            //suitMap.rollback();
+                        } catch (IOError e) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
                     }
-                    this.database.rollback();
+
+                    try {
+                        this.database.rollback();
+                    } catch (IOError e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+
                     // not need on close!
                     // getBlockMap().resetLastBlockSignature();
                 } else {
                     for (DBMapSuit suitMap: externalMaps) {
-                        //suitMap.commit();
+                        try {
+                            //suitMap.commit();
+                        } catch (IOError e) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
                     }
-                    this.database.commit();
+
+                    try {
+                        this.database.commit();
+                    } catch (IOError e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
                 }
 
                 for (DBMapSuit suitMap: externalMaps) {
-                    suitMap.close();
+                    try {
+                        suitMap.close();
+                    } catch (IOError e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
                 }
-                this.database.close();
+                try {
+                    this.database.close();
+                } catch (IOError e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
 
                 this.uses = 0;
             }

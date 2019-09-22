@@ -71,7 +71,7 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         this.root = (dbaSet == null // in TESTs
                 || dbaSet.getFile() == null? // in Memory or in TESTs
                 Settings.getInstance().getDataDir()
-                    : dbaSet.getFile().getPath()) + ROCKS_DB_FOLDER;
+                    : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
         // Чтобы не было NullPointerException
         if (indexes == null) {
             indexes = new ArrayList<>();
@@ -79,9 +79,6 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         this.indexes = indexes;
         db = new RocksDB(NAME_TABLE, indexes, settings, this.root);
         columnFamilyHandles = db.getColumnFamilyHandles();
-        for (int i = 0; i < indexes.size(); i++) {
-            indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
-        }
         columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
     }
 

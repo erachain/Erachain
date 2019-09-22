@@ -284,9 +284,11 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                             try {
                                 database = TransactionDB.open(options, transactionDbOptions, dbPath.toString());
                                 columnFamilyHandles.add(database.getDefaultColumnFamily());
+                                int indexID = 0;
                                 for (ColumnFamilyDescriptor columnFamilyDescriptor : columnFamilyDescriptors) {
                                     ColumnFamilyHandle columnFamilyHandle = database.createColumnFamily(columnFamilyDescriptor);
                                     columnFamilyHandles.add(columnFamilyHandle);
+                                    indexes.get(indexID++).setColumnFamilyHandle(columnFamilyHandle);
                                 }
                                 create = true;
                             } catch (RocksDBException e) {
@@ -310,6 +312,10 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                 columnFamilyDescriptors.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts));
                                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
                                 database = TransactionDB.open(dbOptions, dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
+                                for (int i = 0; i < indexes.size(); i++) {
+                                    indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                }
+
                             }
 
                         } catch (RocksDBException e) {
