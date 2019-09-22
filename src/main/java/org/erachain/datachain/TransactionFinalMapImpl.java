@@ -15,7 +15,6 @@ import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
 import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 
@@ -90,18 +89,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
-        BTreeMap map = (BTreeMap) this.map;
-        // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        Collection<Long> keys = ((BTreeMap<Long, Transaction>) map)
-                .subMap(Transaction.makeDBRef(height, 0),
-                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet();
 
-        // DELETE TRANSACTIONS
-        for (Long key : keys) {
-            if (this.contains(key))
-                this.remove(key);
+        Iterator<Long> iterator = ((TransactionFinalSuit) map).getBlockIterator(height);
+        while(iterator.hasNext()) {
+            map.delete(iterator.next());
         }
-        keys = null;
+
     }
 
     @Override
@@ -156,8 +149,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByBlock(Integer block, int offset, int limit) {
 
-        //Collection<Long> keys = ((BTreeMap) map)
-        //        .subMap(Transaction.makeDBRef(block, 0), Transaction.makeDBRef(block, Integer.MAX_VALUE)).keySet();
         Iterator iter = ((TransactionFinalSuit)map).getBlockIterator(block);
 
         Iterable<Long> keys = (Iterable) iter;
