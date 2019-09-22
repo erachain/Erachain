@@ -53,7 +53,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
     @SuppressWarnings("rawtypes")
     private NavigableSet recipientKey;
     @SuppressWarnings("rawtypes")
-    private NavigableSet typeKey;
+    private NavigableSet addressTypeKey;
 
     @SuppressWarnings("rawtypes")
     private NavigableSet titleKey;
@@ -118,9 +118,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
                     }
                 });
 
-        this.typeKey = database.createTreeSet("address_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.addressTypeKey = database.createTreeSet("address_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
-        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.typeKey,
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.addressTypeKey,
                 new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
                     @Override
                     public Tuple2<String, Integer>[] run(Long key, Transaction val) {
@@ -200,8 +200,8 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Iterator<Long> getIteratorByTypeAndAddress(String address, Integer type) {
-        Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
+    public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
+        Iterable keys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(address, type));
         Iterator iter = keys.iterator();
         return iter;
     }
@@ -209,11 +209,15 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Iterator<Long> getIteratorByTitleAndType(String filter, Integer type) {
+    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
 
-        Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type), true,
-                new Tuple2<String, Integer>(filter + "я", //new String(new byte[]{(byte)254}),
-                        type), true);
+        String filterLower = filter.toLowerCase();
+        Iterable keys = Fun.filter(this.titleKey,
+                new Tuple2<String, Integer>(filterLower,
+                        type==0?0:type), true,
+                new Tuple2<String, Integer>(asFilter?
+                        filterLower + new String(new byte[]{(byte)255}) : filterLower,
+                        type==0?Integer.MAX_VALUE:type), true);
 
         Iterator iter = keys.iterator();
         return iter;
@@ -322,7 +326,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
 
         if (sender != null) {
             if (type != 0) {
-                senderKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
+                senderKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(sender, type));
             } else {
                 senderKeys = Fun.filter(this.senderKey, sender);
             }
@@ -330,7 +334,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
 
         if (recipient != null) {
             if (type != 0) {
-                recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
+                recipientKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(recipient, type));
             } else {
                 recipientKeys = Fun.filter(this.recipientKey, recipient);
             }

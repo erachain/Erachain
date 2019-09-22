@@ -17,7 +17,6 @@ import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
@@ -48,21 +47,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     private static int CUT_NAME_INDEX = 12;
 
-    @SuppressWarnings("rawtypes")
-    private NavigableSet senderKey;
-    @SuppressWarnings("rawtypes")
-    private NavigableSet recipientKey;
-    @SuppressWarnings("rawtypes")
-    private NavigableSet typeKey;
-
-    @SuppressWarnings("rawtypes")
-    private NavigableSet titleKey;
-
-    //@SuppressWarnings("rawtypes")
-    //private NavigableSet block_Key;
-    // private NavigableSet <Tuple2<String,Tuple2<Integer,
-    // Integer>>>signature_key;
-
     public TransactionFinalMapImpl(int dbsUsed, DCSet databaseSet, DB database) {
         super(dbsUsed, databaseSet, database);
 
@@ -76,9 +60,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     public TransactionFinalMapImpl(int dbsUsed, TransactionFinalMap parent, DCSet dcSet) {
         super(dbsUsed, parent, dcSet);
-    }
-
-    protected void createIndexes() {
     }
 
     @Override
@@ -146,9 +127,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByRecipient(String address, int limit) {
-        Iterable keys = Fun.filter(this.recipientKey, address);
-        Iterator iter = keys.iterator();
-        keys = null;
+        //Iterable keys = Fun.filter(this.recipientKey, address);
+        //Iterator iter = keys.iterator();
+        Iterator iter = ((TransactionFinalSuit)map).getIteratorByRecipient(address);
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
@@ -163,7 +144,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             txs.add(item);
             counter++;
         }
-        iter = null;
         return txs;
     }
 
@@ -176,8 +156,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByBlock(Integer block, int offset, int limit) {
 
-        Collection<Long> keys = ((BTreeMap) map)
-                .subMap(Transaction.makeDBRef(block, 0), Transaction.makeDBRef(block, Integer.MAX_VALUE)).keySet();
+        //Collection<Long> keys = ((BTreeMap) map)
+        //        .subMap(Transaction.makeDBRef(block, 0), Transaction.makeDBRef(block, Integer.MAX_VALUE)).keySet();
+        Iterator iter = ((TransactionFinalSuit)map).getBlockIterator(block);
+
+        Iterable<Long> keys = (Iterable) iter;
 
         if (offset > 0)
             keys = (Collection) Iterables.skip(keys, offset);
@@ -201,9 +184,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsBySender(String address, int limit) {
-        Iterable keys = Fun.filter(this.senderKey, address);
-        Iterator iter = keys.iterator();
-        keys = null;
+        //Iterable keys = Fun.filter(this.senderKey, address);
+        //Iterator iter = keys.iterator();
+        Iterator iter = ((TransactionFinalSuit)map).getIteratorBySender(address);
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
@@ -217,17 +200,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             txs.add(item);
             counter++;
         }
-        iter = null;
         return txs;
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByTypeAndAddress(String address, Integer type, int limit) {
-        Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
-        Iterator iter = keys.iterator();
-        keys = null;
+    public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit) {
+        //Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
+        //Iterator iter = keys.iterator();
+        Iterator iter = ((TransactionFinalSuit)map).getIteratorByAddressAndType(address, type);
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
@@ -241,7 +223,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             txs.add(item);
             counter++;
         }
-        iter = null;
         return txs;
     }
 
@@ -250,11 +231,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending) {
 
-        Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type), true,
-                new Tuple2<String, Integer>(filter + "я", //new String(new byte[]{(byte)254}),
-                        type), true);
+        //Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type), true,
+        //        new Tuple2<String, Integer>(filter + "я", //new String(new byte[]{(byte)254}),
+        //                type), true);
 
-        Iterator iter = keys.iterator();
+        //Iterator iter = keys.iterator();
+        Iterator iter = ((TransactionFinalSuit)map).getIteratorByTitleAndType(filter, true, type);
 
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
@@ -269,7 +251,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             txs.add(item);
             counter++;
         }
-        iter = null;
         return txs;
     }
 
@@ -277,13 +258,15 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterable getKeysByTitleAndType(String filter, Integer type, int offset, int limit) {
 
-        String filtrLower = filter.toLowerCase();
+        //String filtrLower = filter.toLowerCase();
 
-        Iterable keys = Fun.filter(this.titleKey,
-                new Tuple2<String, Integer>(filtrLower,
-                        type==0?0:type), true,
-                new Tuple2<String, Integer>(filtrLower + new String(new byte[]{(byte)254}),
-                        type==0?Integer.MAX_VALUE:type), true);
+        //Iterable keys = Fun.filter(this.titleKey,
+        //        new Tuple2<String, Integer>(filtrLower,
+        //                type==0?0:type), true,
+        //        new Tuple2<String, Integer>(filtrLower + new String(new byte[]{(byte)254}),
+        //                type==0?Integer.MAX_VALUE:type), true);
+
+        Iterable keys = ((TransactionFinalSuit) map).getIteratorByTitleAndType(filter, true, type, offset, limit);
 
         if (offset > 0)
             keys = Iterables.skip(keys, offset);
@@ -295,20 +278,22 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     }
 
-
     @Override
     public Pair<Integer, HashSet<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
 
         Iterable keys;
+        Iterator iterator;
 
         String stepFilter = filterArray[step];
         if (!stepFilter.endsWith("!")) {
             // это сокращение для диаппазона
             if (stepFilter.length() < 5) {
                 // ошибка - ищем как полное слово
-                keys = Fun.filter(this.titleKey,
-                        new Tuple2<String, Integer>(stepFilter, 0), true,
-                        new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
+                //keys = Fun.filter(this.titleKey,
+                //        new Tuple2<String, Integer>(stepFilter, 0), true,
+                //        new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
+                iterator = ((TransactionFinalSuit)map).getIteratorByTitleAndType(stepFilter, false, 0);
+
             } else {
 
                 if (stepFilter.length() > CUT_NAME_INDEX) {
@@ -316,9 +301,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 }
 
                 // поиск диаппазона
-                keys = Fun.filter(this.titleKey,
-                        new Tuple2<String, Integer>(stepFilter, 0), true,
-                        new Tuple2<String, Integer>(stepFilter + new String(new byte[]{(byte) 254}), Integer.MAX_VALUE), true);
+                //keys = Fun.filter(this.titleKey,
+                //        new Tuple2<String, Integer>(stepFilter, 0), true,
+                //        new Tuple2<String, Integer>(stepFilter + new String(new byte[]{(byte) 254}), Integer.MAX_VALUE), true);
+                iterator = ((TransactionFinalSuit)map).getIteratorByTitleAndType(stepFilter, true, 0);
+
             }
 
         } else {
@@ -330,9 +317,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
             }
 
-            keys = Fun.filter(this.titleKey,
-                    new Tuple2<String, Integer>(stepFilter, 0), true,
-                    new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
+            //keys = Fun.filter(this.titleKey,
+            //        new Tuple2<String, Integer>(stepFilter, 0), true,
+            //        new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
+            iterator = ((TransactionFinalSuit)map).getIteratorByTitleAndType(stepFilter, false, 0);
         }
 
         if (step > 0) {
@@ -345,7 +333,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             }
 
             // в рекурсии все хорошо - соберем ключи
-            Iterator iterator = keys.iterator();
+            ///Iterator iterator = keys.iterator();
             HashSet<Long> hashSet = result.getB();
             HashSet<Long> andHashSet = new HashSet<Long>();
 
@@ -362,7 +350,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } else {
 
             // последний шаг - просто все добавим
-            Iterator iterator = keys.iterator();
+            //Iterator iterator = keys.iterator();
             HashSet<Long> hashSet = new HashSet<>();
             while (iterator.hasNext()) {
                 Long key = (Long) iterator.next();
@@ -469,15 +457,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator getIteratorByAddress(String address) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+        //Iterable senderKeys = Fun.filter(this.senderKey, address);
+        //Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
-        Set<Long> treeKeys = new TreeSet<>();
+        //Set<Long> treeKeys = new TreeSet<>();
 
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+        //treeKeys.addAll(Sets.newTreeSet(senderKeys));
+        //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
-        return ((TreeSet<Long>) treeKeys).descendingIterator();
+        //return ((TreeSet<Long>) treeKeys).descendingIterator();
+        return getIteratorByAddress(address);
     }
 
     @Override
@@ -513,23 +502,25 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public int getTransactionsByAddressCount(String address) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+        //Iterable senderKeys = Fun.filter(this.senderKey, address);
+        //Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
-        Set<Long> treeKeys = new TreeSet<>();
+        //Set<Long> treeKeys = new TreeSet<>();
 
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+        //treeKeys.addAll(Sets.newTreeSet(senderKeys));
+        //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
-        return treeKeys.size();
+        //return treeKeys.size();
+        return getTransactionsByAddressCount(address);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, String address) {
-        Iterable keys = Fun.filter(this.recipientKey, address);
-        Iterator iter = keys.iterator();
+        //Iterable keys = Fun.filter(this.recipientKey, address);
+        //Iterator iter = keys.iterator();
+        Iterator iter = ((TransactionFinalSuit)map).getIteratorByRecipient(address);
         int prevKey = startHeight;
         while (iter.hasNext()) {
             Long key = (Long) iter.next();
@@ -539,17 +530,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     numOfTx = 0;
                 }
                 prevKey = pair.a;
-                if (pair.b > numOfTx)
-                    iter = null;
-                return key;
+                if (pair.b > numOfTx) {
+                    return key;
+                }
             }
         }
         return null;
-    }
-
-    @Override
-    public DBTab<Long, Transaction> getParentMap() {
-        return this.parent;
     }
 
     @Override
@@ -615,17 +601,21 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         if (sender != null) {
             if (type != 0) {
-                senderKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
+                //senderKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
+                senderKeys = (Iterable)((TransactionFinalSuit)map).getIteratorByAddressAndType(sender, type);
             } else {
-                senderKeys = Fun.filter(this.senderKey, sender);
+                //senderKeys = Fun.filter(this.senderKey, sender);
+                senderKeys = (Iterable)((TransactionFinalSuit)map).getIteratorBySender(sender);
             }
         }
 
         if (recipient != null) {
             if (type != 0) {
-                recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
+                //recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
+                recipientKeys = (Iterable)((TransactionFinalSuit)map).getIteratorByAddressAndType(recipient, type);
             } else {
-                recipientKeys = Fun.filter(this.recipientKey, recipient);
+                //recipientKeys = Fun.filter(this.recipientKey, recipient);
+                recipientKeys = (Iterable)((TransactionFinalSuit)map).getIteratorByRecipient(recipient);
             }
         }
 

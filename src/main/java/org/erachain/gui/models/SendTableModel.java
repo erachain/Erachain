@@ -97,7 +97,7 @@ public class SendTableModel extends JTable implements Observer {
         }
 
         for (Account account : Controller.getInstance().getAccounts()) {
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
         }
 
         for (Transaction messagetx : transactions) {

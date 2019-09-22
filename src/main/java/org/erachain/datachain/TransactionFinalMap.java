@@ -37,7 +37,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    List<Transaction> getTransactionsByTypeAndAddress(String address, Integer type, int limit);
+    List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
@@ -70,8 +70,6 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, String address);
-
-    DBTab<Long, Transaction> getParentMap();
 
     @SuppressWarnings("rawtypes")
     List<Transaction> findTransactions(String address, String sender, String recipient, int minHeight,

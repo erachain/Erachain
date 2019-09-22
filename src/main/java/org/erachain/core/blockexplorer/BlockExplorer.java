@@ -20,9 +20,10 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
-import org.erachain.database.SortableList;
 import org.erachain.database.FilteredByStringArray;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.*;
+import org.erachain.dbs.DBTab;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
@@ -96,7 +97,7 @@ public class BlockExplorer {
     public void makePage(Class type, int start, int pageSize,
                          Map output, JSONObject langObj) {
 
-        DCUMap map = dcSet.getMap(type);
+        DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
         int size = map.size();
 
@@ -125,7 +126,7 @@ public class BlockExplorer {
     public void makePage(Class type, long start, int pageSize,
                          Map output, JSONObject langObj) {
 
-        DCUMap map = dcSet.getMap(type);
+        DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
         long size = map.size();
 
@@ -166,7 +167,7 @@ public class BlockExplorer {
         JSONArray array = new JSONArray();
 
         if (size > 0) {
-            DCUMap map = dcSet.getMap(type);
+            DBTab map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
             while (index > start - pageSize && index > 0) {
@@ -205,7 +206,7 @@ public class BlockExplorer {
         //В зависимости от выбранного языка(ru,en)
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
 
-        DCUMap map = dcSet.getMap(type);
+        DBTab map = dcSet.getMap(type);
 
         try {
             //Если в строке ввели число
@@ -881,7 +882,7 @@ public class BlockExplorer {
         } else {
             // OLD
             List<Transaction> transactions = dcSet.getTransactionFinalMap()
-                    .getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
+                    .getTransactionsByAddressAndType(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
             for (Transaction transaction : transactions) {
                 IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
                 if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
@@ -1642,7 +1643,7 @@ public class BlockExplorer {
 
                     String acc = personModel.getValueAt(i, 0).toString();
 
-                    myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(acc,
+                    myIssuePersons.addAll(transactionsMap.getTransactionsByAddressAndType(acc,
                             Transaction.ISSUE_PERSON_TRANSACTION, 200));
 
                     Account account = new Account(acc);
@@ -1707,7 +1708,7 @@ public class BlockExplorer {
 
                     accountsJSON.put(i++, accountJSON);
 
-                    myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(address,
+                    myIssuePersons.addAll(transactionsMap.getTransactionsByAddressAndType(address,
                             Transaction.ISSUE_PERSON_TRANSACTION, 200));
 
                     Account account = new Account(address);

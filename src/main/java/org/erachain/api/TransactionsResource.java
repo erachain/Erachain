@@ -493,7 +493,7 @@ public class TransactionsResource {
                                                   @PathParam("limit") int limit) {
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address,
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address,
                 type, limit);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());

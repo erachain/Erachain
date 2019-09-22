@@ -3,13 +3,15 @@ package org.erachain.gui.items;
 import org.erachain.controller.Controller;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
-import org.erachain.datachain.DCUMap;
+import org.erachain.dbs.DBTabCommonImpl;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Long, Object> implements Observer, ObserverWaiter {
@@ -21,7 +23,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
 
     protected FavoriteItemMap favoriteMap;
 
-    public FavoriteItemModelTable(DCUMap map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
+    public FavoriteItemModelTable(DBTabCommonImpl map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
         super(columnNames, columnAutoHeight, false);
 

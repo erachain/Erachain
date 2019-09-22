@@ -19,6 +19,7 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuit;
+import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
@@ -156,6 +157,12 @@ public class DCSet extends DBASet {
                     DBS_ROCK_DB
                     , this, database);
 
+            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0? defaultDBS:
+                    DBS_MAP_DB
+                    //DBS_ROCK_DB
+                    , this, database);
+
+
             this.actions = 0L;
 
             this.blockMap = new BlockMap(this, database);
@@ -178,7 +185,6 @@ public class DCSet extends DBASet {
             this.addressPersonMap = new AddressPersonMap(this, database);
             this.personAddressMap = new PersonAddressMap(this, database);
             this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(this, database);
-            this.transactionFinalMap = new TransactionFinalMapImpl(this, database);
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
             this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
@@ -289,6 +295,12 @@ public class DCSet extends DBASet {
                 //DBS_ROCK_DB
                 DBS_NATIVE_MAP
                 , parent.transactionTab, this);
+        this.transactionFinalMap = new TransactionFinalMapImpl(
+                //DBS_MAP_DB
+                //DBS_ROCK_DB
+                DBS_NATIVE_MAP
+                , parent.transactionFinalMap, this);
+
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
@@ -304,7 +316,6 @@ public class DCSet extends DBASet {
         this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap, this);
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap, this);
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable, this);
-        this.transactionFinalMap = new TransactionFinalMapImpl(parent.transactionFinalMap, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
         this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
@@ -1324,7 +1335,7 @@ public class DCSet extends DBASet {
         return null;
     }
 
-    public DCUMap getMap(Class type) {
+    public DBTab getMap(Class type) {
 
         if(type == Transaction.class) {
             return this.getTransactionFinalMap();
