@@ -466,7 +466,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
         //return ((TreeSet<Long>) treeKeys).descendingIterator();
-        return getIteratorByAddress(address);
+        return ((TransactionFinalSuit)map).getIteratorByAddress(address);
     }
 
     @Override
@@ -511,7 +511,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
         //return treeKeys.size();
-        return getTransactionsByAddressCount(address);
+        return ((TransactionFinalSuit)map).getTransactionsByAddressCount(address);
     }
 
     @Override
