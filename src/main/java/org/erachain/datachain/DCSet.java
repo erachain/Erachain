@@ -30,8 +30,6 @@ import java.io.File;
 import java.io.IOError;
 import java.nio.file.Files;
 import java.util.Collection;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Random;
 
 /**
@@ -39,7 +37,7 @@ import java.util.Random;
  * Но почемуто парент хранится в каждой таблице - хотя там сразу ссылка на форкнутую таблицу есть
  * а в ней уже хранится объект набора DCSet
  */
-public class DCSet extends DBASet implements Observer {
+public class DCSet extends DBASet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN;
@@ -1457,7 +1455,7 @@ public class DCSet extends DBASet implements Observer {
                 if (this.getBlockMap().isProcessing()) {
                     for (DBMapSuit suitMap: externalMaps) {
                         try {
-                            //suitMap.rollback();
+                            suitMap.rollback();
                         } catch (IOError e) {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1474,7 +1472,7 @@ public class DCSet extends DBASet implements Observer {
                 } else {
                     for (DBMapSuit suitMap: externalMaps) {
                         try {
-                            //suitMap.commit();
+                            suitMap.commit();
                         } catch (IOError e) {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1610,14 +1608,8 @@ public class DCSet extends DBASet implements Observer {
         this.outUses();
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-    }
-
     public long getEngineSize() {
-
         return this.database.getEngine().preallocate();
-
     }
     
     public String toString() {

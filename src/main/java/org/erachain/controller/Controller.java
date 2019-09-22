@@ -870,10 +870,6 @@ public class Controller extends Observable {
         if (Settings.getInstance().isTestnet())
             this.status = STATUS_OK;
 
-        // REGISTER DATABASE OBSERVER
-        // this.addObserver(this.DLSet.getPeerMap());
-        this.addObserver(this.dcSet);
-
         // start memory viewer
         MemoryViewer mamoryViewer = new MemoryViewer(this);
         mamoryViewer.start();

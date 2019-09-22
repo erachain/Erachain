@@ -469,6 +469,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     }
 
     @Override
+    public void commit() {}
+
+    @Override
+    public void rollback() {}
+
+    @Override
     public void close() {}
 
     @Override

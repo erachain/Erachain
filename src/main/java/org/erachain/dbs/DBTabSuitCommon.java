@@ -78,6 +78,10 @@ public interface DBTabSuitCommon<T, U> {
 
     void clear();
 
+    void commit();
+
+    void rollback();
+
     void close();
 
 }
