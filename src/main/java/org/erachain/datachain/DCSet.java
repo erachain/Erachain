@@ -148,12 +148,12 @@ public class DCSet extends DBASet {
         try {
             // переделанные таблицы
             this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
-                    DBS_MAP_DB
-                    //DBS_ROCK_DB
+                    //DBS_MAP_DB
+                    DBS_ROCK_DB
                     , this, database);
             this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
-                    DBS_MAP_DB
-                    //DBS_ROCK_DB
+                    //DBS_MAP_DB
+                    DBS_ROCK_DB
                     , this, database);
 
             this.actions = 0L;

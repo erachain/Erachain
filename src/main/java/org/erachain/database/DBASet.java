@@ -88,7 +88,7 @@ abstract public class DBASet implements IDB {
         }
     }
 
-    public List getExternalMaps() {
+    public List<DBMapSuit> getExternalMaps() {
         return externalMaps;
     }
 
