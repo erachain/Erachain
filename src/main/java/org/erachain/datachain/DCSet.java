@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOError;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collection;
 import java.util.Observable;
@@ -151,11 +150,13 @@ public class DCSet extends DBASet implements Observer {
         try {
             // переделанные таблицы
             this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
-                    DBS_ROCK_DB, //DBS_MAP_DB,
-                    this, database);
+                    DBS_MAP_DB
+                    //DBS_ROCK_DB
+                    , this, database);
             this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
-                    DBS_ROCK_DB, //DBS_MAP_DB,
-                    this, database);
+                    DBS_MAP_DB
+                    //DBS_ROCK_DB
+                    , this, database);
 
             this.actions = 0L;
 
@@ -285,7 +286,11 @@ public class DCSet extends DBASet implements Observer {
 
         // переделанные поновой таблицы
         this.assetBalanceMap = new ItemAssetBalanceTabImpl(DBS_MAP_DB, parent.assetBalanceMap, this);
-        this.transactionTab = new TransactionTabImpl(DBS_MAP_DB, parent.transactionTab, this);
+        this.transactionTab = new TransactionTabImpl(
+                //DBS_MAP_DB
+                //DBS_ROCK_DB
+                DBS_NATIVE_MAP
+                , parent.transactionTab, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
@@ -1423,7 +1428,7 @@ public class DCSet extends DBASet implements Observer {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
 
         if (this.database != null) {
             // THIS IS not FORK
@@ -1459,10 +1464,7 @@ public class DCSet extends DBASet implements Observer {
                     try {
                         this.database.commit();
                     } catch (IOError e) {
-                        LOGGER.error(e.getMessage());
-                        String err = new String(e.getMessage().getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-                        LOGGER.error(err);
-                        LOGGER.error(e.getLocalizedMessage(), e);
+                        LOGGER.error(e.getMessage(), e);
                     }
                 }
 

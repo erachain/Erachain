@@ -676,7 +676,6 @@ public class Controller extends Observable {
             // Error open DB
             error = 1;
             LOGGER.error("Error during startup detected trying to restore backup DataChain...");
-            //LOGGER.trace(e.getMessage(), e);
             LOGGER.error(e.getMessage(), e);
             try {
                 reCreateDC(inMemoryDC);
