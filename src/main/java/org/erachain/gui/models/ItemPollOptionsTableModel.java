@@ -21,7 +21,7 @@ public class ItemPollOptionsTableModel extends AbstractTableModel {
     public static final int COLUMN_VOTES = 4;
     public static final int COLUMN_PERCENTAGE = 5;
     private String[] columnNames = Lang.getInstance().translate(
-            new String[]{"Number", "Name", "Persons", "% of Total", "Votes", "% of Total"});
+            new String[]{"Number", "Name", "Vote #P", "Vote % #P", "Share #Vote", "Share % #Vote"});
     private PollCls poll;
     private AssetCls asset;
     private Fun.Tuple4<Integer, long[], BigDecimal, BigDecimal[]> votesWithPersons;
