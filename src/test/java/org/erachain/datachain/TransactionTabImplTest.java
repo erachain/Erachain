@@ -131,12 +131,25 @@ public class TransactionTabImplTest {
 
             long ntp = NTP.getTime();
             long timestampTMP = 0;
-            Iterator<Long> iterator = map.getTimestampIterator(descending);
+            Iterator<Long> iterator = map.getTimestampIterator(false);
             while (iterator.hasNext()) {
                 Long key = iterator.next();
                 Transaction item = map.get(key);
                 long timestamp = item.getTimestamp();
                 if (timestampTMP > 0 && timestampTMP > timestamp) {
+                    logger.error((timestampTMP - ntp) + " err : " + (timestamp - ntp));
+                    assertEquals(timestampTMP, timestamp);
+                }
+                timestampTMP = timestamp;
+
+            }
+
+            iterator = map.getTimestampIterator(true);
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                Transaction item = map.get(key);
+                long timestamp = item.getTimestamp();
+                if (timestampTMP > 0 && timestampTMP < timestamp) {
                     logger.error((timestampTMP - ntp) + " err : " + (timestamp - ntp));
                     assertEquals(timestampTMP, timestamp);
                 }
