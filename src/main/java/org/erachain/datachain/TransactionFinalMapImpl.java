@@ -4,6 +4,8 @@ package org.erachain.datachain;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
@@ -118,15 +120,15 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByRecipient(String address, int limit) {
         //Iterable keys = Fun.filter(this.recipientKey, address);
-        //Iterator iter = keys.iterator();
-        Iterator iter = ((TransactionFinalSuit)map).getIteratorByRecipient(address);
+        //Iterator iterator = keys.iterator();
+        Iterator iterator = ((TransactionFinalSuit)map).getIteratorByRecipient(address);
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
         Long key;
-        while (iter.hasNext() && (limit == 0 || counter < limit)) {
+        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
 
-            key = (Long) iter.next();
+            key = (Long) iterator.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -146,19 +148,17 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByBlock(Integer block, int offset, int limit) {
 
-        Iterator iter = ((TransactionFinalSuit)map).getBlockIterator(block);
-
-        Iterable<Long> keys = (Iterable) iter;
+        Iterator<Long> iterator = ((TransactionFinalSuit)map).getBlockIterator(block);
 
         if (offset > 0)
-            keys = (Collection) Iterables.skip(keys, offset);
+            Iterators.advance(iterator, offset);
 
         if (limit > 0)
-            keys = (Collection) Iterables.limit(keys, limit);
+            iterator = Iterators.limit(iterator, limit);
 
         List<Transaction> txs = new ArrayList<>();
-        for (Long key : keys) {
-            txs.add(map.get(key));
+        while (iterator.hasNext()) {
+            txs.add(map.get(iterator.next()));
         }
         return txs;
 
@@ -173,14 +173,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsBySender(String address, int limit) {
         //Iterable keys = Fun.filter(this.senderKey, address);
-        //Iterator iter = keys.iterator();
-        Iterator iter = ((TransactionFinalSuit)map).getIteratorBySender(address);
+        //Iterator iterator = keys.iterator();
+        Iterator iterator = ((TransactionFinalSuit)map).getIteratorBySender(address);
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
         Long key;
-        while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            key = (Long) iter.next();
+        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+            key = (Long) iterator.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -196,14 +196,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit) {
         //Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
-        //Iterator iter = keys.iterator();
-        Iterator iter = ((TransactionFinalSuit)map).getIteratorByAddressAndType(address, type);
+        //Iterator iterator = keys.iterator();
+        Iterator iterator = ((TransactionFinalSuit)map).getIteratorByAddressAndType(address, type);
         List<Transaction> txs = new ArrayList<>();
         int counter = 0;
         Transaction item;
         Long key;
-        while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            key = (Long) iter.next();
+        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+            key = (Long) iterator.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -244,7 +244,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterable getKeysByTitleAndType(String filter, Integer type, int offset, int limit) {
+    public Iterator getKeysByTitleAndType(String filter, Integer type, int offset, int limit) {
 
         //String filtrLower = filter.toLowerCase();
 
@@ -254,22 +254,21 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         //        new Tuple2<String, Integer>(filtrLower + new String(new byte[]{(byte)254}),
         //                type==0?Integer.MAX_VALUE:type), true);
 
-        Iterable keys = ((TransactionFinalSuit) map).getIteratorByTitleAndType(filter, true, type, offset, limit);
+        Iterator iterator = ((TransactionFinalSuit) map).getIteratorByTitleAndType(filter, true, type, offset, limit);
 
         if (offset > 0)
-            keys = Iterables.skip(keys, offset);
+            Iterators.advance(iterator, offset);
 
         if (limit > 0)
-            keys = Iterables.limit(keys, limit);
+            iterator = Iterators.limit(iterator, limit);
 
-        return keys;
+        return iterator;
 
     }
 
     @Override
-    public Pair<Integer, HashSet<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
+    public Pair<Integer, Iterator<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
 
-        Iterable keys;
         Iterator iterator;
 
         String stepFilter = filterArray[step];
@@ -314,7 +313,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (step > 0) {
 
             // погнали в РЕКУРСИЮ
-            Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
+            Pair<Integer, Iterator<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
 
             if (result.getA() > 0) {
                 return result;
@@ -322,30 +321,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
             // в рекурсии все хорошо - соберем ключи
             ///Iterator iterator = keys.iterator();
-            HashSet<Long> hashSet = result.getB();
-            HashSet<Long> andHashSet = new HashSet<Long>();
+            Iterator<Long> rescurseIterator = result.getB();
+            iterator = Iterators.concat(iterator, rescurseIterator);
 
-            // берем только совпадающие в обоих списках
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                if (hashSet.contains(key)) {
-                    andHashSet.add(key);
-                }
-            }
-
-            return new Pair<>(0, andHashSet);
+            return new Pair<>(0, iterator);
 
         } else {
 
-            // последний шаг - просто все добавим
-            //Iterator iterator = keys.iterator();
-            HashSet<Long> hashSet = new HashSet<>();
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                hashSet.add(key);
-            }
-
-            return new Pair<Integer, HashSet<Long>>(0, hashSet);
+            return new Pair<Integer, Iterator<Long>>(0, iterator);
 
         }
 
@@ -363,28 +346,24 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
+    public Pair<String, Iterator> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
         String[] filterArray = filter.toLowerCase().split(DCSet.SPLIT_CHARS);
 
-        Pair<Integer, HashSet<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
+        Pair<Integer, Iterator<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
         if (result.getA() > 0) {
             return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
         }
 
-        HashSet<Long> hashSet = result.getB();
-
-        Iterable iterable;
+        Iterator<Long> iterator = result.getB();
 
         if (offset > 0)
-            iterable = Iterables.skip(hashSet, offset);
-        else
-            iterable = hashSet;
+            Iterators.advance(iterator, offset);
 
         if (limit > 0)
-            iterable = Iterables.limit(iterable, limit);
+            iterator = Iterators.limit(iterator, limit);
 
-        return new Pair<>(null, iterable);
+        return new Pair<>(null, iterator);
 
     }
 
@@ -396,14 +375,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        Pair<String, Iterator> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
         if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }
 
         List<Long> result = new ArrayList<>();
 
-        Iterator<Long> iterator = resultKeys.getB().iterator();
+        Iterator<Long> iterator = resultKeys.getB();
 
         while (iterator.hasNext()) {
             Long key = iterator.next();
@@ -424,14 +403,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return new ArrayList<>();
         }
 
-        Pair<String, Iterable> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        Pair<String, Iterator> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
         if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }
 
         List<Transaction> result = new ArrayList<>();
 
-        Iterator<Long> iterator = resultKeys.getB().iterator();
+        Iterator<Long> iterator = resultKeys.getB();
 
         while (iterator.hasNext()) {
             Transaction item = get(iterator.next());
@@ -530,16 +509,15 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings("rawtypes")
     public List<Transaction> findTransactions(String address, String sender, String recipient, final int minHeight,
                                               final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        Iterable keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
+        Iterator iterator = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
                 offset, limit);
 
-        Iterator iter = keys.iterator();
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
         Long key;
 
-        while (iter.hasNext()) {
-            key = (Long) iter.next();
+        while (iterator.hasNext()) {
+            key = (Long) iterator.next();
             Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
             item = this.map.get(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -552,9 +530,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings("rawtypes")
     public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
                                      final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        Iterable keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
+        Iterator keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
                 offset, limit);
-        return Iterables.size(keys);
+        return Iterators.size(keys);
     }
 
     /**
@@ -572,11 +550,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterable findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
+    public Iterator<Long> findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
                                          final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
-        Iterable senderKeys = null;
-        Iterable recipientKeys = null;
-        Set<Long> treeKeys = new TreeSet<>();
+        Iterator<Long> senderKeys = null;
+        Iterator<Long> recipientKeys = null;
+        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
 
         if (address != null) {
             sender = address;
@@ -590,37 +568,36 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (sender != null) {
             if (type != 0) {
                 //senderKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
-                senderKeys = (Iterable)((TransactionFinalSuit)map).getIteratorByAddressAndType(sender, type);
+                senderKeys = ((TransactionFinalSuit)map).getIteratorByAddressAndType(sender, type);
             } else {
                 //senderKeys = Fun.filter(this.senderKey, sender);
-                senderKeys = (Iterable)((TransactionFinalSuit)map).getIteratorBySender(sender);
+                senderKeys = ((TransactionFinalSuit)map).getIteratorBySender(sender);
             }
         }
 
         if (recipient != null) {
             if (type != 0) {
                 //recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
-                recipientKeys = (Iterable)((TransactionFinalSuit)map).getIteratorByAddressAndType(recipient, type);
+                recipientKeys = ((TransactionFinalSuit)map).getIteratorByAddressAndType(recipient, type);
             } else {
                 //recipientKeys = Fun.filter(this.recipientKey, recipient);
-                recipientKeys = (Iterable)((TransactionFinalSuit)map).getIteratorByRecipient(recipient);
+                recipientKeys = ((TransactionFinalSuit)map).getIteratorByRecipient(recipient);
             }
         }
 
         if (address != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            treeKeys = Iterators.concat(senderKeys, recipientKeys);
         } else if (sender != null && recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
+            treeKeys = senderKeys;
+            Iterators.retainAll(treeKeys, Lists.newArrayList(recipientKeys));
         } else if (sender != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
+            treeKeys = senderKeys;
         } else if (recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            treeKeys = recipientKeys;
         }
 
         if (minHeight != 0 || maxHeight != 0) {
-            treeKeys = Sets.filter(treeKeys, new Predicate<Long>() {
+            treeKeys = Iterators.filter(treeKeys, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
@@ -630,7 +607,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
-            treeKeys = Sets.filter(treeKeys, new Predicate<Long>() {
+            treeKeys = Iterators.filter(treeKeys, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     ArbitraryTransaction tx = (ArbitraryTransaction) map.get(key);
@@ -639,16 +616,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             });
         }
 
-        Iterable keys;
         if (desc) {
-            keys = ((TreeSet) treeKeys).descendingSet();
-        } else {
-            keys = treeKeys;
+            treeKeys = ((TreeSet) treeKeys).descendingIterator();
         }
 
-        limit = (limit == 0) ? Iterables.size(keys) : limit;
+        limit = (limit == 0) ? Iterators.size(treeKeys) : limit;
+        Iterators.advance(treeKeys, offset);
 
-        return Iterables.limit(Iterables.skip(keys, offset), limit);
+        return Iterators.limit(treeKeys, limit);
     }
 
     @Override

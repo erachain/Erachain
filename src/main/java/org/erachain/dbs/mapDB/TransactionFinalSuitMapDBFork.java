@@ -86,7 +86,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public Iterable getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit) {
+    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit) {
         return null;
 
     }
@@ -108,7 +108,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public Iterable findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
+    public Iterator findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
                                          final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
         return null;
     }

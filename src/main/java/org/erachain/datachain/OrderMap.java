@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.*;
@@ -253,21 +254,18 @@ public class OrderMap extends DCUMap<Long, Order> {
     public List<Order> getOrdersWant(long want, int limit) {
 
         //FILTER ALL KEYS
-        Collection<Long> keys = ((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
+        Iterator<Long> iterator = ((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(want, null, null, null),
-                Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values();
+                Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values().iterator();
 
-        Iterable<Long> iterable;
-        if (limit > 0 && keys.size() > limit) {
-            iterable = Iterables.limit(keys, limit);
-        } else {
-            iterable = keys;
+
+        if (limit > 0 && Iterators.size(iterator) > limit) {
+            Iterators.advance(iterator, limit);
         }
 
-        Iterator iterator = iterable.iterator();
         List<Order> orders = new ArrayList<>();
         while (iterator.hasNext()) {
-            orders.add(get((Long) iterator.next()));
+            orders.add(get(iterator.next()));
         }
 
         return orders;

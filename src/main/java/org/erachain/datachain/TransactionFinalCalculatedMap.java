@@ -2,6 +2,8 @@ package org.erachain.datachain;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -190,16 +192,14 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Calculated> getCalculatedsByRecipient(String address, int limit) {
-        Iterable keys = Fun.filter(this.recipientKey, address);
-        Iterator iter = keys.iterator();
-        keys = null;
+        Iterator iterator = Fun.filter(this.recipientKey, address).iterator();
+
         List<Calculated> txs = new ArrayList<>();
         int counter = 0;
-        while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            txs.add(this.map.get(iter.next()));
+        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+            txs.add(this.map.get(iterator.next()));
             counter++;
         }
-        iter = null;
         return txs;
     }
 
@@ -243,116 +243,98 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Calculated> getCalculatedsBySender(String address, int limit) {
-        Iterable keys = Fun.filter(this.senderKey, address);
-        Iterator iter = keys.iterator();
-        keys = null;
+        Iterator iterator = Fun.filter(this.senderKey, address).iterator();
+
         List<Calculated> txs = new ArrayList<>();
         int counter = 0;
-        while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            txs.add(this.map.get(iter.next()));
+        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+            txs.add(this.map.get(iterator.next()));
             counter++;
         }
-        iter = null;
         return txs;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Calculated> getCalculatedsByTypeAndAddress(String address, Integer type, int limit) {
-        Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
-        Iterator iter = keys.iterator();
-        keys = null;
+        Iterator iterator = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type)).iterator();
         List<Calculated> txs = new ArrayList<>();
         int counter = 0;
-        while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            txs.add(this.map.get(iter.next()));
+        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+            txs.add(this.map.get(iterator.next()));
             counter++;
         }
-        iter = null;
         return txs;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Set<BlExpUnit> getBlExpCalculatedsByAddress(String address) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+        Iterator senderKeys = Fun.filter(this.senderKey, address).iterator();
+        Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
-        Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
+        Iterator<Tuple2<Integer, Integer>> iterator = new TreeSet<Tuple2<Integer, Integer>>().iterator();
 
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
-        Iterator iter = treeKeys.iterator();
-        treeKeys = null;
-        recipientKeys = null;
-        senderKeys = null;
+        iterator = Iterators.concat(senderKeys, recipientKeys);
+
         Set<BlExpUnit> txs = new TreeSet<>();
-        while (iter.hasNext()) {
-            Tuple2<Integer, Integer> request = (Tuple2<Integer, Integer>) iter.next();
+        while (iterator.hasNext()) {
+            Tuple2<Integer, Integer> request = (Tuple2<Integer, Integer>) iterator.next();
             txs.add(new BlExpUnit(request.a, request.b, this.map.get(request)));
         }
-        iter = null;
         return txs;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Calculated> getCalculatedsByAddress(String address) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+        Iterator senderKeys = Fun.filter(this.senderKey, address).iterator();
+        Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
-        Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
+        Iterator<Tuple2<Integer, Integer>> iterator = new TreeSet<Tuple2<Integer, Integer>>().iterator();
 
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+        iterator = Iterators.concat(senderKeys, recipientKeys);
 
-        Iterator iter = treeKeys.iterator();
-        treeKeys = null;
-        recipientKeys = null;
-        senderKeys = null;
         List<Calculated> txs = new ArrayList<>();
-        while (iter.hasNext()) {
-            txs.add(this.map.get(iter.next()));
+        while (iterator.hasNext()) {
+            txs.add(this.map.get(iterator.next()));
         }
-        treeKeys = null;
         return txs;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public int getCalculatedsByAddressCount(String address) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+        Iterator senderKeys = Fun.filter(this.senderKey, address).iterator();
+        Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
         Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
 
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+        Iterator<Tuple2<Integer, Integer>> iterator = new TreeSet<Tuple2<Integer, Integer>>().iterator();
 
-        return treeKeys.size();
+        iterator = Iterators.concat(senderKeys, recipientKeys);
+
+        return Iterators.size(iterator);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Tuple2<Integer, Integer> getCalculatedsAfterTimestamp(int startHeight, int numOfTx, String address) {
-        Iterable keys = Fun.filter(this.recipientKey, address);
-        Iterator iter = keys.iterator();
+        Iterator iterator = Fun.filter(this.recipientKey, address).iterator();
         int prevKey = startHeight;
-        keys = null;
-        while (iter.hasNext()) {
-            Tuple2<Integer, Integer> key = (Tuple2<Integer, Integer>) iter.next();
+        while (iterator.hasNext()) {
+            Tuple2<Integer, Integer> key = (Tuple2<Integer, Integer>) iterator.next();
             if (key.a >= startHeight) {
                 if (key.a != prevKey) {
                     numOfTx = 0;
                 }
                 prevKey = key.a;
-                if (key.b > numOfTx)
-                    iter = null;
-                return key;
+                if (key.b > numOfTx) {
+                    return key;
+                }
             }
         }
-        iter = null;
         return null;
     }
 
@@ -363,34 +345,31 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
     @SuppressWarnings("rawtypes")
     public List<Calculated> findCalculateds(String address, String sender, String recipient, final int minHeight,
                                               final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        Iterable keys = findCalculatedsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
+        Iterator iterator = findCalculatedsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
                 offset, limit);
 
-        Iterator iter = keys.iterator();
-        keys = null;
         List<Calculated> txs = new ArrayList<>();
 
-        while (iter.hasNext()) {
-            txs.add(this.map.get(iter.next()));
+        while (iterator.hasNext()) {
+            txs.add(this.map.get(iterator.next()));
         }
-        iter = null;
         return txs;
     }
 
     @SuppressWarnings("rawtypes")
     public int findCalculatedsCount(String address, String sender, String recipient, final int minHeight,
                                      final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        Iterable keys = findCalculatedsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
+        Iterator keys = findCalculatedsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
                 offset, limit);
-        return Iterables.size(keys);
+        return Iterators.size(keys);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterable findCalculatedsKeys(String address, String sender, String recipient, final int minHeight,
+    public Iterator findCalculatedsKeys(String address, String sender, String recipient, final int minHeight,
                                          final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
-        Iterable senderKeys = null;
-        Iterable recipientKeys = null;
-        Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
+        Iterator senderKeys = null;
+        Iterator recipientKeys = null;
+        Iterator<Tuple2<Integer, Integer>> iterator = new TreeSet<Tuple2<Integer, Integer>>().iterator();
 
         if (address != null) {
             sender = address;
@@ -398,39 +377,38 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         }
 
         if (sender == null && recipient == null) {
-            return treeKeys;
+            return iterator;
         }
 
         if (sender != null) {
             if (type > 0) {
-                senderKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
+                senderKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type)).iterator();
             } else {
-                senderKeys = Fun.filter(this.senderKey, sender);
+                senderKeys = Fun.filter(this.senderKey, sender).iterator();
             }
         }
 
         if (recipient != null) {
             if (type > 0) {
-                recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
+                recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type)).iterator();
             } else {
-                recipientKeys = Fun.filter(this.recipientKey, recipient);
+                recipientKeys = Fun.filter(this.recipientKey, recipient).iterator();
             }
         }
 
         if (address != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            iterator = Iterators.concat(senderKeys, recipientKeys);
         } else if (sender != null && recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
+            iterator = senderKeys;
+            Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
         } else if (sender != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
+            iterator = senderKeys;
         } else if (recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            iterator = recipientKeys;
         }
 
         if (minHeight != 0 || maxHeight != 0) {
-            treeKeys = Sets.filter(treeKeys, new Predicate<Tuple2<Integer, Integer>>() {
+            iterator = Iterators.filter(iterator, new Predicate<Tuple2<Integer, Integer>>() {
                 @Override
                 public boolean apply(Tuple2<Integer, Integer> key) {
                     return (minHeight == 0 || key.a >= minHeight) && (maxHeight == 0 || key.a <= maxHeight);
@@ -438,16 +416,16 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
             });
         }
 
-        Iterable keys;
         if (desc) {
-            keys = ((TreeSet) treeKeys).descendingSet();
-        } else {
-            keys = treeKeys;
+            //iterator = ((TreeSet) iterator).descendingSet();
+            iterator = ((TreeSet) iterator).descendingIterator();
+
         }
 
-        limit = (limit == 0) ? Iterables.size(keys) : limit;
+        limit = (limit == 0) ? Iterators.size(iterator) : limit;
+        Iterators.advance(iterator, offset);
 
-        return Iterables.limit(Iterables.skip(keys, offset), limit);
+        return Iterators.limit(iterator, limit);
     }
 
 }

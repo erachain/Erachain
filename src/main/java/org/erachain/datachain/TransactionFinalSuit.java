@@ -17,7 +17,7 @@ public interface TransactionFinalSuit {
 
     Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type);
 
-    Iterable getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit);
+    Iterator getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit);
 
     Iterator<Long> getIteratorByAddress(String address);
 
@@ -26,6 +26,6 @@ public interface TransactionFinalSuit {
     int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
                               final int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
-    Iterable findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
+    Iterator findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
                                   final int maxHeight, int type, final int service, boolean desc, int offset, int limit);
 }

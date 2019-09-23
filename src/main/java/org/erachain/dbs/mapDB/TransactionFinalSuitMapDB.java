@@ -4,6 +4,8 @@ package org.erachain.dbs.mapDB;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -234,24 +236,24 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
      */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterable getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit) {
+    public Iterator getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit) {
 
         String filterLower = filter.toLowerCase();
 
-        Iterable keys = Fun.filter(this.titleKey,
+        Iterator iterator = Fun.filter(this.titleKey,
                 new Tuple2<String, Integer>(filterLower,
                         type==0?0:type), true,
                 new Tuple2<String, Integer>(asFilter?
                         filterLower + new String(new byte[]{(byte)255}) : filterLower,
-                        type==0?Integer.MAX_VALUE:type), true);
+                        type==0?Integer.MAX_VALUE:type), true).iterator();
 
         if (offset > 0)
-            keys = Iterables.skip(keys, offset);
+            Iterators.advance(iterator, offset);
 
         if (limit > 0)
-            keys = Iterables.limit(keys, limit);
+            iterator = Iterators.limit(iterator, limit);
 
-        return keys;
+        return iterator;
 
     }
 
@@ -259,39 +261,37 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator<Long> getIteratorByAddress(String address) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+        Iterator<Long> senderKeys = Fun.filter(this.senderKey, address).iterator();
+        Iterator<Long> recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
-        Set<Long> treeKeys = new TreeSet<>();
+        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
 
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+        treeKeys = Iterators.concat(senderKeys, recipientKeys);
 
-        return ((TreeSet<Long>) treeKeys).descendingIterator();
+        return treeKeys; //((TreeSet<Long>) treeKeys).descendingIterator();
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public int getTransactionsByAddressCount(String address) {
-        Iterable senderKeys = Fun.filter(this.senderKey, address);
-        Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+        Iterator senderKeys = Fun.filter(this.senderKey, address).iterator();
+        Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
-        Set<Long> treeKeys = new TreeSet<>();
+        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
 
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+        treeKeys = Iterators.concat(senderKeys, recipientKeys);
 
-        return treeKeys.size();
+        return Iterators.size(treeKeys);
     }
 
     @Override
     @SuppressWarnings("rawtypes")
     public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
                                      final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        Iterable keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
+        Iterator keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
                 offset, limit);
-        return Iterables.size(keys);
+        return Iterators.size(keys);
     }
 
     /**
@@ -309,11 +309,11 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterable findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
+    public Iterator findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
                                          final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
-        Iterable senderKeys = null;
-        Iterable recipientKeys = null;
-        Set<Long> treeKeys = new TreeSet<>();
+        Iterator senderKeys = null;
+        Iterator recipientKeys = null;
+        Iterator iterator = new TreeSet<>().iterator();
 
         if (address != null) {
             sender = address;
@@ -321,39 +321,38 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
         }
 
         if (sender == null && recipient == null) {
-            return treeKeys;
+            return iterator;
         }
 
         if (sender != null) {
             if (type != 0) {
-                senderKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(sender, type));
+                senderKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(sender, type)).iterator();
             } else {
-                senderKeys = Fun.filter(this.senderKey, sender);
+                senderKeys = Fun.filter(this.senderKey, sender).iterator();
             }
         }
 
         if (recipient != null) {
             if (type != 0) {
-                recipientKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(recipient, type));
+                recipientKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(recipient, type)).iterator();
             } else {
-                recipientKeys = Fun.filter(this.recipientKey, recipient);
+                recipientKeys = Fun.filter(this.recipientKey, recipient).iterator();
             }
         }
 
         if (address != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            iterator = Iterators.concat(senderKeys, recipientKeys);
         } else if (sender != null && recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
+            iterator = senderKeys;
+            Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
         } else if (sender != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
+            iterator = senderKeys;
         } else if (recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            iterator = recipientKeys;
         }
 
         if (minHeight != 0 || maxHeight != 0) {
-            treeKeys = Sets.filter(treeKeys, new Predicate<Long>() {
+            iterator = Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
@@ -363,7 +362,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
         }
 
         if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
-            treeKeys = Sets.filter(treeKeys, new Predicate<Long>() {
+            iterator = Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     ArbitraryTransaction tx = (ArbitraryTransaction) map.get(key);
@@ -372,16 +371,19 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
             });
         }
 
-        Iterable keys;
         if (desc) {
-            keys = ((TreeSet) treeKeys).descendingSet();
-        } else {
-            keys = treeKeys;
+            //keys = ((TreeSet) iterator).descendingSet();
+            iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
         }
 
-        limit = (limit == 0) ? Iterables.size(keys) : limit;
+        //limit = (limit == 0) ? Iterables.size(keys) : limit;
+        limit = (limit == 0) ? Iterators.size(iterator) : limit;
 
-        return Iterables.limit(Iterables.skip(keys, offset), limit);
+        Iterators.advance(iterator, offset);
+        iterator = Iterators.limit(iterator, limit);
+
+
+        return iterator;
     }
 
 }

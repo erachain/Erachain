@@ -315,10 +315,10 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         // DESCENDING + 1000
         Iterator iterator =((TransactionSuit)map).getTimestampIterator(true);
         Iterators.advance(iterator, (int)fromKey);
-        Iterator<Fun.Tuple2<Long, Long>> iteratorLimit = Iterators.limit(iterator, (int) (toKey - fromKey));
+        Iterator<Long> iteratorLimit = Iterators.limit(iterator, (int) (toKey - fromKey));
 
         while (iteratorLimit.hasNext()) {
-            treeKeys.add(iteratorLimit.next().b);
+            treeKeys.add(iteratorLimit.next());
         }
 
         return treeKeys;

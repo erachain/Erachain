@@ -2502,14 +2502,14 @@ public class BlockExplorer {
         List<Transaction> transactions;
         if (filterStr != null) {
             //transactions = map.getTransactionsByTitleAndType(filterStr, null, size, true);
-            Pair<String, Iterable> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
+            Pair<String, Iterator> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
             if (pair.getA() != null) {
                 output.put("error", pair.getA());
                 return;
             }
 
             transactions = new ArrayList<>();
-            Iterator iterator = pair.getB().iterator();
+            Iterator iterator = pair.getB();
             while (iterator.hasNext()) {
                 transactions.add(map.get((Long) iterator.next()));
             }

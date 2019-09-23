@@ -113,6 +113,9 @@ public class TransactionTabImplTest {
 
             make();
 
+            Collection<Long> keys = map.getFromToKeys(10, 20);
+            assertEquals(keys.size(), 10);
+
             map.clear();
             assertEquals(map.size(), 0);
 

@@ -6,7 +6,6 @@ import org.erachain.dbs.DBTab;
 import org.erachain.utils.Pair;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -44,12 +43,12 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    Iterable getKeysByTitleAndType(String filter, Integer type, int offset, int limit);
+    Iterator getKeysByTitleAndType(String filter, Integer type, int offset, int limit);
 
-    Pair<Integer, HashSet<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray);
+    Pair<Integer, Iterator<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    Pair<String, Iterable> getKeysIteratorByFilterAsArray(String filter, int offset, int limit);
+    Pair<String, Iterator> getKeysIteratorByFilterAsArray(String filter, int offset, int limit);
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -80,7 +79,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
                               int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    Iterable findTransactionsKeys(String address, String sender, String recipient, int minHeight,
+    Iterator findTransactionsKeys(String address, String sender, String recipient, int minHeight,
                                   int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
