@@ -1136,13 +1136,21 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 LOGGER.error(e.getMessage(), e);
                 ctrl.stopAll(96);
                 return;
+            } catch (Exception e) {
+                if (ctrl.isOnStopping()) {
+                    this.local_status = -1;
+                    return;
+                }
+
+                LOGGER.error(e.getMessage(), e);
+
             } catch (Throwable e) {
                 if (ctrl.isOnStopping()) {
                     this.local_status = -1;
                     return;
                 }
 
-                LOGGER.trace(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
 
             }
         }
