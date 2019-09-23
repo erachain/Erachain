@@ -434,12 +434,12 @@ public class TransactionMap extends DCMap<Long, Transaction> implements Observer
      * @return
      */
     public Transaction get(long key) {
-        Transaction transaction = this.get(key);
+        Transaction transaction = super.get(key);
         transaction.setHeightSeq(0, 0);
         return transaction;
     }
     public Transaction get(Long key) {
-        Transaction transaction = this.get(key);
+        Transaction transaction = super.get(key);
         transaction.setHeightSeq(0, 0);
         return transaction;
     }
