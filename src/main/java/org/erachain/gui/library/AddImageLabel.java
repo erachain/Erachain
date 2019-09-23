@@ -31,7 +31,7 @@ public class AddImageLabel extends JPanel {
     private JLabel label;
     private JLabel mainLabel = new JLabel();
 
-    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize,int initialWidth,int initialHeight) {
+    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight) {
         setLayout(new BorderLayout());
         this.text = text;
         label = new JLabel("The Label", SwingConstants.CENTER);
@@ -100,23 +100,23 @@ public class AddImageLabel extends JPanel {
                         }
 
                         imgBytes = imageStream.toByteArray();
-//                        if (minSize > 0) {
-//                            int templWidth = bezelWidth;
-//                            int templHeight = bezelHeight;
-//                            int counter = 0;
-//                            while (imgBytes.length < minSize && counter++ < 5) {
-//                                imageStream.reset();
-//                                templWidth *= 1.2;
-//                                templHeight *= 1.2;
-//                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
-//                                writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
-//                            }
-//                        }
-                        if (maxSize > 0) {
-                            int templWidth = bezelWidth;
-                            int templHeight = bezelHeight;
+                        if (minSize > 0) {
+                            int templWidth = image.getWidth();
+                            int templHeight = image.getHeight();
                             int counter = 0;
-                            while (imgBytes.length > maxSize && counter++ < 10) {
+                            while (imgBytes.length < minSize && counter++ < 100) {
+                                imageStream.reset();
+                                templWidth *= 1.2;
+                                templHeight *= 1.2;
+                                Image scaledImage = image.getScaledInstance(templWidth, templHeight, Image.SCALE_AREA_AVERAGING);
+                                writeImage(imageStream, templWidth, templHeight, scaledImage, typeOfImage);
+                            }
+                        }
+                        if (maxSize > 0) {
+                            int templWidth = image.getWidth();
+                            int templHeight = image.getHeight();
+                            int counter = 0;
+                            while (imgBytes.length > maxSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth /= 1.2;
                                 templHeight /= 1.2;

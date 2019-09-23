@@ -50,6 +50,12 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         } catch (IOException e) {
             logger.error("Error read image File in crop component", e);
         }
+        AffineTransform newTransformBegin = new AffineTransform();
+        newTransformBegin.concatenate(AffineTransform.getTranslateInstance(
+                -image.getWidth() / 2 + cropX + cropWidth / 2,
+                -image.getHeight() / 2 + cropY + cropHeight / 2));
+        newTransformBegin.concatenate(currentTransform);
+        currentTransform = newTransformBegin;
         addMouseListener(new MouseAdapter() {
 
             @Override
@@ -194,7 +200,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         Point2D.Double cropPointRightBottom = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
         Point2D.Double pointCropDstRightBottom = new Point2D.Double();
         currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
-        int shift = 5;
+        int shift = 2;
         try {
             cropX += shift;
             cropY += shift;
