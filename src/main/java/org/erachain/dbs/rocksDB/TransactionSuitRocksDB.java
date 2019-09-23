@@ -1,9 +1,11 @@
 package org.erachain.dbs.rocksDB;
 
+import com.google.common.collect.Iterables;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionSuit;
+import org.erachain.dbs.rocksDB.common.DBIterator;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
@@ -133,7 +135,18 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     @Override
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-        return null;
+        Iterable iterable = (Iterable) map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), true);
+        Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
+
+        List<Long> treeKeys = new ArrayList<Long>();
+
+        Iterator<Fun.Tuple2<Long, Long>> iterator = iterableLimit.iterator();
+        while (iterator.hasNext()) {
+            treeKeys.add(iterator.next().b);
+        }
+
+        return treeKeys;
+
     }
 
 
