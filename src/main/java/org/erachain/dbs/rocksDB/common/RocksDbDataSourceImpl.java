@@ -518,6 +518,9 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         return new RockStoreIterator(database.newIterator(columnFamilyHandle), descending, true);
     }
 
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
+        return new RockStoreIteratorFilter(database.newIterator(), descending, true, filter);
+    }
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
         return new RockStoreIteratorFilter(database.newIterator(columnFamilyHandle), descending, true, filter);
     }

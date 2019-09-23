@@ -45,8 +45,7 @@ import java.util.*;
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
-        implements TransactionFinalSuit {
+public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit {
 
     private static int CUT_NAME_INDEX = 12;
 
@@ -166,11 +165,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction>
                         return keys;
                     }
                 });
-    }
-
-    @Override
-    protected Transaction getDefaultValue() {
-        return null;
     }
 
     @Override
