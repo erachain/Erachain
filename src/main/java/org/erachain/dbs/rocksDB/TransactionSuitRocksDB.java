@@ -1,12 +1,10 @@
 package org.erachain.dbs.rocksDB;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionSuit;
-import org.erachain.dbs.rocksDB.common.DBIterator;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
@@ -111,44 +109,25 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     }
 
     @Override
-    public Iterable typeKeys(String sender, Long timestamp, Integer type) {
-        return ((RocksDB)map).filterAppropriateValuesAsKeys(
-                toBytesStringLongInteger.toBytes(sender, timestamp, type),
-                addressTypeIndex.getColumnFamilyHandle());
+    public Iterator<Long> typeIterator(String sender, Long timestamp, Integer type) {
+        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, addressTypeIndex.getColumnFamilyHandle(),
+                        toBytesStringLongInteger.toBytes(sender, timestamp, type)
+                       );
     }
 
     @Override
-    public Iterable senderKeys(String sender) {
-        return ((RocksDB)map).filterAppropriateValuesAsKeys(sender.getBytes(),
-                senderIndex.getColumnFamilyHandle());
+    public Iterator<Long> senderIterator(String sender) {
+        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, senderIndex.getColumnFamilyHandle(), sender.getBytes());
     }
 
     @Override
-    public Iterable recipientKeys(String recipient) {
-        return ((RocksDB)map).filterAppropriateValuesAsKeys(recipient.getBytes(),
-                recipientsIndex.getColumnFamilyHandle());
+    public Iterator<Long> recipientIterator(String recipient) {
+        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, recipientsIndex.getColumnFamilyHandle(), recipient.getBytes());
     }
 
     @Override
-    public Iterator<Long> getTimestampIterator() {
-        return map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), false);
-    }
-
-    @Override
-    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-
-        Iterator<Long> iterator = map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), true);
-        Iterators.advance(iterator, (int) fromKey);
-        iterator = Iterators.limit(iterator, (int) (toKey - fromKey));
-
-        List<Long> treeKeys = new ArrayList<Long>();
-
-        while (iterator.hasNext()) {
-            treeKeys.add(iterator.next());
-        }
-
-        return treeKeys;
-
+    public Iterator<Long> getTimestampIterator(boolean descending) {
+        return map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), descending);
     }
 
 

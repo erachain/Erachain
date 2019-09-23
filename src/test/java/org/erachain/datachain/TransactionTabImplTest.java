@@ -131,7 +131,7 @@ public class TransactionTabImplTest {
 
             long ntp = NTP.getTime();
             long timestampTMP = 0;
-            Iterator<Long> iterator = map.getTimestampIterator();
+            Iterator<Long> iterator = map.getTimestampIterator(descending);
             while (iterator.hasNext()) {
                 Long key = iterator.next();
                 Transaction item = map.get(key);

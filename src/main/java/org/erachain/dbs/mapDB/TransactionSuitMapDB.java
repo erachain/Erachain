@@ -151,42 +151,20 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         return DEFAULT_VALUE;
     }
 
-    public Iterable typeKeys(String sender, Long timestamp, Integer type) {
+    public Iterator typeIterator(String sender, Long timestamp, Integer type) {
         return Fun.filter(((TransactionSuitMapDB)map).typeKey,
-                new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type));
+                new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type)).iterator();
     }
-    public Iterable senderKeys(String sender) {
-        return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender);
+    public Iterator senderIterator(String sender) {
+        return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender).iterator();
     }
-    public Iterable recipientKeys(String recipient) {
-        return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient);
-    }
-
-    @Override
-    public Iterator<Long> getTimestampIterator() {
-        return getIterator(TIMESTAMP_INDEX, false);
+    public Iterator recipientIterator(String recipient) {
+        return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient).iterator();
     }
 
     @Override
-    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-
-        List<Long> treeKeys = new ArrayList<Long>();
-
-        //NavigableMap set = new NavigableMap<Long, Transaction>();
-        // NodeIterator
-
-
-        // DESCENDING + 1000
-        Iterable iterable = this.indexes.get(TransactionSuit.TIMESTAMP_INDEX + DESCENDING_SHIFT_INDEX);
-        Iterable iterableLimit = Iterables.limit(Iterables.skip(iterable, (int) fromKey), (int) (toKey - fromKey));
-
-        Iterator<Tuple2<Long, Long>> iterator = iterableLimit.iterator();
-        while (iterator.hasNext()) {
-            treeKeys.add(iterator.next().b);
-        }
-
-        return treeKeys;
-
+    public Iterator<Long> getTimestampIterator(boolean descending) {
+        return getIterator(TIMESTAMP_INDEX, descending);
     }
 
     //@Override

@@ -1,7 +1,7 @@
 package org.erachain.datachain;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -16,6 +16,7 @@ import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +106,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
 
         List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getTimestampIterator();
+        Iterator<Long> iterator = this.getTimestampIterator(false);
         Transaction transaction;
         int count = 0;
         int bytesTotal = 0;
@@ -188,7 +189,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
              */
             //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
             //Iterator<Tuple2<?, Long>> iterator = map.getIterator(TIMESTAMP_INDEX, false);
-            Iterator<Long> iterator = ((TransactionSuit)map).getTimestampIterator();
+            Iterator<Long> iterator = ((TransactionSuit)map).getTimestampIterator(false);
             tickerIter = System.currentTimeMillis() - tickerIter;
             if (tickerIter > 10) {
                 LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
@@ -309,13 +310,24 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
 
-        return ((TransactionSuit)map).getFromToKeys(fromKey, toKey);
+        List<Long> treeKeys = new ArrayList<Long>();
+
+        // DESCENDING + 1000
+        Iterator iterator =((TransactionSuit)map).getTimestampIterator(true);
+        Iterators.advance(iterator, (int)fromKey);
+        Iterator<Fun.Tuple2<Long, Long>> iteratorLimit = Iterators.limit(iterator, (int) (toKey - fromKey));
+
+        while (iteratorLimit.hasNext()) {
+            treeKeys.add(iteratorLimit.next().b);
+        }
+
+        return treeKeys;
 
     }
 
     @Override
-    public Iterator<Long> getTimestampIterator() {
-        return ((TransactionSuit)map).getTimestampIterator();
+    public Iterator<Long> getTimestampIterator(boolean descending) {
+        return ((TransactionSuit)map).getTimestampIterator(descending);
     }
 
     /**
@@ -333,11 +345,12 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
 
-    public Iterable findTransactionsKeys(String address, String sender, String recipient,
+    public Iterator findTransactionsKeys(String address, String sender, String recipient,
                                          int type, boolean desc, int offset, int limit, long timestamp) {
-        Iterable senderKeys = null;
-        Iterable recipientKeys = null;
-        TreeSet<Object> treeKeys = new TreeSet<>();
+        Iterator senderKeys = null;
+        Iterator recipientKeys = null;
+        //TreeSet<Object> treeKeys = new TreeSet<>();
+        Iterator treeKeys = new TreeSet<>().iterator();
 
         if (address != null) {
             sender = address;
@@ -350,47 +363,54 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         //  timestamp = null;
         if (sender != null) {
             if (type > 0) {
-                senderKeys = ((TransactionSuit)map).typeKeys(sender, timestamp, type);
+                senderKeys = ((TransactionSuit)map).typeIterator(sender, timestamp, type);
             } else {
-                senderKeys = ((TransactionSuit)map).senderKeys(sender);
+                senderKeys = ((TransactionSuit)map).senderIterator(sender);
             }
         }
 
         if (recipient != null) {
             if (type > 0) {
                 //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
-                recipientKeys = ((TransactionSuit)map).typeKeys(recipient, timestamp, type);
+                recipientKeys = ((TransactionSuit)map).typeIterator(recipient, timestamp, type);
             } else {
                 //recipientKeys = Fun.filter(this.recipientKey, recipient);
-                recipientKeys = ((TransactionSuit)map).recipientKeys(recipient);
+                recipientKeys = ((TransactionSuit)map).recipientIterator(recipient);
             }
         }
 
         if (address != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            //treeKeys.addAll(Sets.newTreeSet(senderKeys));
+            Iterators.concat(treeKeys, senderKeys);
+            //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            Iterators.concat(treeKeys, recipientKeys);
         } else if (sender != null && recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
+            //treeKeys.addAll(Sets.newTreeSet(senderKeys));
+            Iterators.concat(treeKeys, senderKeys);
+            //treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
+            Iterators.retainAll(treeKeys, Lists.newArrayList(recipientKeys));
         } else if (sender != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
+            //treeKeys.addAll(Sets.newTreeSet(senderKeys));
+            Iterators.concat(treeKeys, senderKeys);
         } else if (recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+            Iterators.concat(treeKeys, recipientKeys);
         }
 
-        Iterable keys;
+        Iterator keys;
         if (desc) {
-            keys = ((TreeSet) treeKeys).descendingSet();
+            //keys = ((TreeSet) treeKeys).descendingSet();
+            keys = ((TreeSet) treeKeys).descendingIterator();
         } else {
             keys = treeKeys;
         }
 
         if (offset > 0) {
-            keys = Iterables.skip(keys, offset);
+            Iterators.advance(keys, offset);
         }
 
         if (limit > 0) {
-            keys = Iterables.limit(keys, limit);
+            keys = Iterators.limit(keys, limit);
         }
 
         return  keys;
@@ -399,15 +419,14 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> findTransactions(String address, String sender, String recipient,
                                               int type, boolean desc, int offset, int limit, long timestamp) {
 
-        Iterable keys = findTransactionsKeys(address, sender, recipient,
+        Iterator keys = findTransactionsKeys(address, sender, recipient,
                 type, desc, offset, limit, timestamp);
         return getUnconfirmedTransaction(keys);
 
     }
 
 
-    public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
-        Iterator iter = keys.iterator();
+    public List<Transaction> getUnconfirmedTransaction(Iterator iter) {
         List<Transaction> transactions = new ArrayList<>();
         Transaction item;
         Long key;
@@ -423,17 +442,18 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     // TODO выдает ошибку на шаге treeKeys.addAll(Sets.newTreeSet(senderKeys));
     public List<Transaction> getTransactionsByAddressFast100(String address) {
 
-        Iterable senderKeys = null;
-        Iterable recipientKeys = null;
-        TreeSet<Object> treeKeys = new TreeSet<>();
+        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
 
-        senderKeys = Iterables.limit(((TransactionSuit)map).senderKeys(address), 100);
-        recipientKeys = Iterables.limit(((TransactionSuit)map).recipientKeys(address), 100);
+        Iterator<Long> senderKeys = ((TransactionSuit)map).senderIterator(address);
+        Iterator<Long> recipientKeys = ((TransactionSuit)map).recipientIterator(address);
 
-        treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+        Iterators.advance(senderKeys, 100);
+        Iterators.advance(recipientKeys, 100);
 
-        return getUnconfirmedTransaction(Iterables.limit(treeKeys, 100));
+        treeKeys  = Iterators.concat(senderKeys, recipientKeys);
+        Iterators.advance(treeKeys, 100);
+
+        return getUnconfirmedTransaction(treeKeys);
 
     }
 
@@ -441,7 +461,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> getTransactionsByAddress(String address) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = ((TransactionSuit)map).getTimestampIterator();
+        Iterator<Long> iterator = ((TransactionSuit)map).getTimestampIterator(false);
         Account account = new Account(address);
 
         Transaction transaction;

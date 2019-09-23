@@ -235,7 +235,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int counter = 0;
 
         TransactionTab map = dcSet.getTransactionTab();
-        Iterator<Long> iterator = map.getTimestampIterator();
+        Iterator<Long> iterator = map.getTimestampIterator(descending);
 
         needRemoveInvalids = new ArrayList<byte[]>();
 
@@ -369,7 +369,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long start = System.currentTimeMillis();
 
         TransactionTab map = dcSet.getTransactionTab();
-        Iterator<Long> iterator = map.getTimestampIterator();
+        Iterator<Long> iterator = map.getTimestampIterator(descending);
         LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 
         needRemoveInvalids = new ArrayList<byte[]>();

@@ -3,29 +3,17 @@ package org.erachain.dbs.rocksDB.common;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksIterator;
 
-import java.io.IOException;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 @Slf4j
-public class RockStoreIterator implements DBIterator {
+public final class RockStoreIteratorFilter extends RockStoreIterator {
 
-  protected boolean jumpToLast;
-  protected boolean isIndex;
-  protected RocksIterator dbIterator;
-  protected boolean descending;
-  protected boolean first = true;
+  byte[] filter;
 
-  public RockStoreIterator(RocksIterator dbIterator, boolean descending, boolean isIndex) {
-    this.dbIterator = dbIterator;
-    this.descending = descending;
-    jumpToLast = descending;
-    this.isIndex = isIndex;
-  }
-
-  @Override
-  public void close() {
-    dbIterator.close();
+  public RockStoreIteratorFilter(RocksIterator dbIterator, boolean descending, boolean isIndex, byte[] filter) {
+    super(dbIterator, descending, isIndex);
+    this.filter = filter;
+    //this.dbIterator.seek(filter);
   }
 
   @Override
@@ -33,12 +21,14 @@ public class RockStoreIterator implements DBIterator {
     boolean hasNext = false;
     try {
       if (jumpToLast) {
-        dbIterator.seekToLast();
+        //dbIterator.seekToLast();
+        dbIterator.seekForPrev(filter);
         jumpToLast = false;
         first = false;
       }
       if (first) {
-        dbIterator.seekToFirst();
+        //dbIterator.seekToFirst();
+        dbIterator.seek(filter);
         first = false;
       }
       if (!(hasNext = dbIterator.isValid())) {
@@ -52,6 +42,8 @@ public class RockStoreIterator implements DBIterator {
         logger.error(e1.getMessage(),e1);
       }
     }
+
+    hasNext = hasNext && new String(dbIterator.key()).startsWith(new String(filter));
     return hasNext;
   }
 

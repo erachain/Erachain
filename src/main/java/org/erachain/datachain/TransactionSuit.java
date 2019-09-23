@@ -12,16 +12,14 @@ public interface TransactionSuit {
 
     Transaction DEFAULT_VALUE = null;
 
-    Iterable typeKeys(String sender, Long timestamp, Integer type);
+    Iterator<Long> typeIterator(String sender, Long timestamp, Integer type);
 
-    Iterable senderKeys(String sender);
+    Iterator<Long> senderIterator(String sender);
 
-    Iterable recipientKeys(String recipient);
+    Iterator<Long> recipientIterator(String recipient);
 
-    Iterator<Long> getTimestampIterator();
+    Iterator<Long> getTimestampIterator(boolean descending);
 
     //Iterator<Long> getCeatorIterator();
-
-    Collection<Long> getFromToKeys(long fromKey, long toKey);
 
 }

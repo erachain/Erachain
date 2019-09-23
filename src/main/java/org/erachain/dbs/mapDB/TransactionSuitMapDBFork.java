@@ -76,27 +76,23 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
     }
 
     @Override
-    public Iterator<Long> getTimestampIterator() {
-        return getIterator(TIMESTAMP_INDEX, false);
+    public Iterator<Long> getTimestampIterator(boolean descending) {
+        return getIterator(TIMESTAMP_INDEX, descending);
     }
 
     @Override
-    public Iterable typeKeys(String sender, Long timestamp, Integer type) {
+    public Iterator typeIterator(String sender, Long timestamp, Integer type) {
         return null;
     }
 
     @Override
-    public Iterable senderKeys(String sender) {
+    public Iterator senderIterator(String sender) {
         return null;
     }
 
     @Override
-    public Iterable recipientKeys(String recipient) {
+    public Iterator recipientIterator(String recipient) {
         return null;
     }
 
-    @Override
-    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-        return null;
-    }
 }

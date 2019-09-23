@@ -28,7 +28,7 @@ public interface TransactionTab extends DBTab<Long, Transaction> {
 
     Integer setObservableData(int index, Integer data);
 
-    Iterator<Long> getTimestampIterator();
+    Iterator<Long> getTimestampIterator(boolean descending);
 
     //Iterator<Long> getCeatorIterator();
 
@@ -56,13 +56,13 @@ public interface TransactionTab extends DBTab<Long, Transaction> {
     Collection<Long> getFromToKeys(long fromKey, long toKey);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    Iterable findTransactionsKeys(String address, String sender, String recipient,
+    Iterator findTransactionsKeys(String address, String sender, String recipient,
                                   int type, boolean desc, int offset, int limit, long timestamp);
 
     List<Transaction> findTransactions(String address, String sender, String recipient,
                                        int type, boolean desc, int offset, int limit, long timestamp);
 
-    List<Transaction> getUnconfirmedTransaction(Iterable keys);
+    List<Transaction> getUnconfirmedTransaction(Iterator keys);
 
     // TODO выдает ошибку на шаге treeKeys.addAll(Sets.newTreeSet(senderKeys));
     List<Transaction> getTransactionsByAddressFast100(String address);
@@ -74,8 +74,8 @@ public interface TransactionTab extends DBTab<Long, Transaction> {
 
     List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending);
 
-    public void setTotalDeleted(int value);
-    public int getTotalDeleted();
+    void setTotalDeleted(int value);
+    int getTotalDeleted();
 
     int size();
     Iterator<Long> getIterator(int index, boolean descending);
