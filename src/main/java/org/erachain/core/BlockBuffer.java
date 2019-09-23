@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BlockBuffer extends Thread {
     private static final int BUFFER_SIZE = 5 + (256 >> Controller.HARD_WORK);
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlockBuffer.class.getSimpleName());
+    private final Logger LOGGER;
     private List<byte[]> signatures;
     private Peer peer;
     private int counter;
@@ -37,6 +37,7 @@ public class BlockBuffer extends Thread {
         this.counter = 0;
         this.error = false;
         this.setName("Thread BlockBuffer - " + this.getId() + " for " + peer);
+        LOGGER = LoggerFactory.getLogger(this.getName());
         this.blocks = new HashMap<byte[], BlockingQueue<Block>>(BUFFER_SIZE << 1, 1);
 
         // Если в момент набора блков пир останвитьь то нужно чтобы этот буфер тоже почитили
