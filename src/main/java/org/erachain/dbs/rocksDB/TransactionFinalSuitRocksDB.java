@@ -11,19 +11,14 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
-import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
-import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableLong;
-import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableTuple3StringLongInteger;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
-import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -35,8 +30,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit
 {
@@ -73,6 +66,8 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
+
+        indexes = new ArrayList<>();
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return;
@@ -136,7 +131,6 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                 }
             );
 
-        indexes = new ArrayList<>();
         indexes.add(senderTxs);
         indexes.add(recipientTxs);
         indexes.add(addressTypeTxs);
