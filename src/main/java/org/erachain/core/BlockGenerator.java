@@ -3,7 +3,9 @@ package org.erachain.core;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
@@ -20,6 +22,8 @@ import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -212,6 +216,45 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 forgingValue, winValue, previousTarget);
         newBlock.sign(account);
         return newBlock;
+
+    }
+
+    private static List<Transaction> testTransactions() {
+
+        SecureRandom randomSecure = new SecureRandom();
+
+        boolean generateNewAccount = false;
+        if (DCSet.getInstance().getAssetBalanceMap().size() < 1000)
+            generateNewAccount = true;
+
+        long assetKey = 2L;
+        BigDecimal amount = new BigDecimal("0.00000001");
+        RSend messageTx;
+        byte[] isText = new byte[]{1};
+        byte[] encryptMessage = new byte[]{0};
+
+        PublicKeyAccount recipient;
+        List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>();
+        for (int index = 0; index < TEST_DB; index++) {
+
+            if (generateNewAccount) {
+                byte[] seedRecipient = new byte[32];
+                randomSecure.nextBytes(seedRecipient);
+                recipient = new PublicKeyAccount(seedRecipient);
+            } else {
+                if (index > TEST_DB << 1)
+                    recipient = TEST_DB_ACCOUNTS[(TEST_DB >> 1) - 1 - index];
+                else
+                    recipient = TEST_DB_ACCOUNTS[TEST_DB - 1 - index];
+            }
+
+            messageTx = new R_Send(TEST_DB_ACCOUNTS[index], (byte) 0, recipient, assetKey,
+                    amount, "weripwoeit", null, isText, encryptMessage, NTP.getTime(), 0l);
+            messageTx.sign(TEST_DB_ACCOUNTS[index], Transaction.FOR_NETWORK);
+            unconfirmedTransactions.add(messageTx);
+        }
+
+        return unconfirmedTransactions;
 
     }
 
