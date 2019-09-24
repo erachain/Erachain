@@ -80,9 +80,9 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         this.NAME_TABLE = NAME_TABLE;
         this.settings = settings;
         this.root = (dbaSet == null // in TESTs
-                || dbaSet.getFile() == null? // in Memory or in TESTs
+                || dbaSet.getFile() == null ? // in Memory or in TESTs
                 Settings.getInstance().getDataDir()
-                    : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
+                : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
         // Чтобы не было NullPointerException
         //if (indexes == null) {
         //    indexes = new ArrayList<>();
@@ -90,7 +90,10 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         this.indexes = indexes;
         db = new RocksDB(NAME_TABLE, indexes, settings, this.root);
         columnFamilyHandles = db.getColumnFamilyHandles();
-        columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+        if (columnFamilyHandles.size() > 1) {
+            // если indexes = null то размер не будем считать
+            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+        }
     }
 
     @Override
@@ -125,11 +128,13 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         if (logON) logger.info("keyBytes.length = " + keyBytes.length);
         byte[] old = db.get(keyBytes);
         if (old == null || old.length == 0) {
-            byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
-            Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
-            size++;
-            if (logON) logger.info("put size = " + size);
-            db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+            if (columnFamilyFieldSize != null) {
+                byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
+                Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+                size++;
+                if (logON) logger.info("put size = " + size);
+                db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+            }
         } else {
             // удалим вторичные ключи
             if (indexes != null && !indexes.isEmpty()) {
@@ -276,15 +281,17 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         final byte[] keyBytes = byteableKey.toBytesObject(key);
         byte[] old = db.get(keyBytes);
         if (old != null && old.length != 0) {
-            byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
-            Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
-            size--;
-            db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+            if (columnFamilyFieldSize != null) {
+                byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
+                Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+                size--;
+                db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+            }
+            if (indexes != null && !indexes.isEmpty()) {
+                removeIndexes(key, keyBytes, old);
+            }
         }
         db.remove(columnFamilyHandles.get(0), keyBytes);
-        if (indexes != null && !indexes.isEmpty()) {
-            removeIndexes(key, keyBytes, old);
-        }
     }
 
 
@@ -294,7 +301,10 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         FileUtil.recursiveDelete(db.getDb().getDbPath().toString());
         db = new RocksDB(NAME_TABLE, indexes, settings, root);
         columnFamilyHandles = db.getColumnFamilyHandles();
-        columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+        if (columnFamilyHandles.size() > 1) {
+            // если indexes = null то размер не будем считать
+            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+        }
     }
 
     @Override
