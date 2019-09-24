@@ -9,6 +9,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.rocksDB.common.RocksDB;
@@ -53,7 +54,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     SimpleIndexDB<Long, Transaction, String> senderTxs;
     ListIndexDB<Long, Transaction, String> recipientTxs;
     ListIndexDB<Long, Transaction, Fun.Tuple2<String, Integer>> addressTypeTxs;
-    ArrayIndexDB<Long, Transaction, String> titleTypeTxs;
+    ArrayIndexDB<Long, Transaction, Fun.Tuple2<String, Integer>> titleTypeTxs;
 
     public TransactionFinalSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database);
@@ -112,19 +113,28 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         titleTypeTxs = new ArrayIndexDB<>(titleTypeTransactionsIndexName,
                 (aLong, transaction) -> {
                     String title = transaction.getTitle();
-                    if (title == null || title.isEmpty()) {
-                        return new String[0];
-                    }
-                    String[] tokens = title.toLowerCase().split(" ");
-                    String[] keys = new String[tokens.length];
-                    for (int i = 0; i < tokens.length; i++) {
+                    if (title == null || title.isEmpty() || title.equals(""))
+                        return null;
+
+                    // see https://regexr.com/
+                    String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
+                    Tuple2<String, Integer>[] keys = new Tuple2[tokens.length];
+                    for (int i = 0; i < tokens.length; ++i) {
                         if (tokens[i].length() > CUT_NAME_INDEX) {
                             tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
                         }
-                        keys[i] = tokens[i];
+                        //keys[i] = tokens[i];
+                        keys[i] = new Tuple2<String, Integer>(tokens[i], transaction.getType());
                     }
+
                     return keys;
-                }, (result, key) -> result.getBytes());
+                }, (result, key) -> {
+                    if (result == null) {
+                        return null;
+                    }
+                    return org.bouncycastle.util.Arrays.concatenate(result.a.getBytes(), Ints.toByteArray(result.b));
+                }
+            );
 
         indexes = new ArrayList<>();
         indexes.add(senderTxs);
@@ -158,7 +168,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
         return (Iterator) ((RocksDB)map).indexIteratorFilter(false, addressTypeTxs.getColumnFamilyHandle(),
-                Arrays.concatenate(address.getBytes(), Ints.toByteArray(type));
+                Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)));
     }
 
     @Override
@@ -166,48 +176,17 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
 
-
         String filterLower = filter.toLowerCase();
-        Iterable keys = Fun.filter(this.titleKey,
-                new Tuple2<String, Integer>(filterLower,
-                        type==0?0:type), true,
-                new Tuple2<String, Integer>(asFilter?
-                        filterLower + new String(new byte[]{(byte)255}) : filterLower,
-                        type==0?Integer.MAX_VALUE:type), true);
+        //Iterable keys = Fun.filter(this.titleKey,
+        //        new Tuple2<String, Integer>(filterLower,
+        //                type==0?0:type), true,
+        //        new Tuple2<String, Integer>(asFilter?
+        //                filterLower + new String(new byte[]{(byte)255}) : filterLower,
+        //                type==0?Integer.MAX_VALUE:type), true);
 
-        Iterator iter = keys.iterator();
-        return iter;
-    }
-
-    /**
-     *
-     * @param filter
-     * @param asFilter - use filter
-     * @param type
-     * @param offset
-     * @param limit
-     * @return
-     */
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit) {
-
-        String filterLower = filter.toLowerCase();
-
-        Iterator iterator = Fun.filter(this.titleKey,
-                new Tuple2<String, Integer>(filterLower,
-                        type==0?0:type), true,
-                new Tuple2<String, Integer>(asFilter?
-                        filterLower + new String(new byte[]{(byte)255}) : filterLower,
-                        type==0?Integer.MAX_VALUE:type), true).iterator();
-
-        if (offset > 0)
-            Iterators.advance(iterator, offset);
-
-        if (limit > 0)
-            iterator = Iterators.limit(iterator, limit);
-
-        return iterator;
+        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, titleTypeTxs.getColumnFamilyHandle(),
+                type == 0? filter.getBytes()
+                    : Arrays.concatenate(filter.getBytes(), Ints.toByteArray(type)));
 
     }
 
@@ -215,36 +194,16 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator<Long> getIteratorByAddress(String address) {
-        Iterator<Long> senderKeys = (Iterator)((RocksDB)map).indexIteratorFilter(false, senderTxs.getColumnFamilyHandle(), address.getBytes());
-        Iterator<Long> recipientKeys = (Iterator)((RocksDB)map).indexIteratorFilter(false, recipientTxs.getColumnFamilyHandle(), address.getBytes());
+        Iterator senderKeys = ((RocksDB)map).indexIteratorFilter(false, senderTxs.getColumnFamilyHandle(), address.getBytes());
+        Iterator recipientKeys = ((RocksDB)map).indexIteratorFilter(false, recipientTxs.getColumnFamilyHandle(), address.getBytes());
 
         return Iterators.concat(senderKeys, recipientKeys);
     }
 
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public int getTransactionsByAddressCount(String address) {
-        Iterator senderKeys = Fun.filter(this.senderKey, address).iterator();
-        Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
-
-        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
-
-        treeKeys = Iterators.concat(senderKeys, recipientKeys);
-
-        return Iterators.size(treeKeys);
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
-                                     final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        Iterator keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
-                offset, limit);
-        return Iterators.size(keys);
-    }
-
     /**
+     * Пока это не используется - на верхнем уровне своя сборка общая от получаемых Итераторов с этого класса.
+     * Возможно потом с более конкретным проходом по DESCENDING + OFFSET & LIMIT буджет реализация у каждой СУБД своя?
+     * Хотя нет - просто в Iterator перебор по индексаю таблицы у СУБД уже свой реализован
      * @param address
      * @param sender
      * @param recipient
@@ -276,17 +235,21 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         if (sender != null) {
             if (type != 0) {
-                senderKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(sender, type)).iterator();
+                //senderKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(sender, type)).iterator();
+                senderKeys = ((RocksDB)map).indexIteratorFilter(false, addressTypeTxs.getColumnFamilyHandle(),
+                        Arrays.concatenate(sender.getBytes(), Ints.toByteArray(type)));
             } else {
-                senderKeys = Fun.filter(this.senderKey, sender).iterator();
+                senderKeys = ((RocksDB)map).indexIteratorFilter(false, senderTxs.getColumnFamilyHandle(), address.getBytes());
             }
         }
 
         if (recipient != null) {
             if (type != 0) {
-                recipientKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(recipient, type)).iterator();
+                //recipientKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(recipient, type)).iterator();
+                senderKeys = ((RocksDB)map).indexIteratorFilter(false, addressTypeTxs.getColumnFamilyHandle(),
+                        Arrays.concatenate(recipient.getBytes(), Ints.toByteArray(type)));
             } else {
-                recipientKeys = Fun.filter(this.recipientKey, recipient).iterator();
+                recipientKeys = ((RocksDB)map).indexIteratorFilter(false, recipientTxs.getColumnFamilyHandle(), address.getBytes());
             }
         }
 
@@ -334,95 +297,6 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
 
         return iterator;
-    }
-
-    ///////////
-    //////////////////
-
-
-
-
-    private Pair<Integer, Set<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
-
-        keys = rocksDBTable.filterAppropriateValuesAsKeys(stepFilter.getBytes(),
-                rocksDBTable.receiveIndexByName(titleTypeTransactionsIndexName));
-
-        Set<Long> keys;
-        String stepFilter = filterArray[step];
-        if (!stepFilter.endsWith("!")) {
-            // это сокращение для диаппазона
-            if (stepFilter.length() < 5) {
-                // ошибка - ищем как полное слово
-                keys = rocksDBTable.filterAppropriateValuesAsKeys(stepFilter.getBytes(),
-                        rocksDBTable.receiveIndexByName(titleTypeTransactionsIndexName));
-            } else {
-                if (stepFilter.length() > CUT_NAME_INDEX) {
-                    stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
-                }
-                keys = rocksDBTable.filterAppropriateValuesAsKeys(stepFilter.getBytes(),
-                        rocksDBTable.receiveIndexByName(titleTypeTransactionsIndexName));
-            }
-        } else {
-            // поиск целиком
-            stepFilter = stepFilter.substring(0, stepFilter.length() - 1);
-            if (stepFilter.length() > CUT_NAME_INDEX) {
-                stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
-            }
-            keys = rocksDBTable.filterAppropriateValuesAsKeys(stepFilter.getBytes(),
-                    rocksDBTable.receiveIndexByName(titleTypeTransactionsIndexName));
-        }
-        if (step > 0) {
-            // погнали в РЕКУРСИЮ
-            Pair<Integer, Set<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
-
-            if (result.getA() > 0) {
-                return result;
-            }
-
-            // в рекурсии все хорошо - соберем ключи
-            Iterator iterator = keys.iterator();
-            Set<Long> hashSet = result.getB();
-            Set<Long> andHashSet = new HashSet<Long>();
-
-            // берем только совпадающие в обоих списках
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                if (hashSet.contains(key)) {
-                    andHashSet.add(key);
-                }
-            }
-
-            return new Pair<>(0, andHashSet);
-
-        } else {
-
-            // последний шаг - просто все добавим
-            Iterator iterator = keys.iterator();
-            HashSet<Long> hashSet = new HashSet<>();
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                hashSet.add(key);
-            }
-
-            return new Pair<>(0, hashSet);
-
-        }
-
-    }
-
-    private List<Transaction> transformKeysIntoTransactions(Set<Long> keys, int limit) {
-        Iterator<Long> iter = keys.iterator();
-        List<Transaction> transactions = new ArrayList<>();
-        int counter = 0;
-        while (iter.hasNext() && (limit == 0 || counter < limit)) {
-            Long key = iter.next();
-            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-            Transaction item = rocksDBTable.get(key);
-            item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.f0, pair.f1);
-            transactions.add(item);
-            counter++;
-        }
-        return transactions;
     }
 
 }

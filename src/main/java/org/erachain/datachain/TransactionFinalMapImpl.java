@@ -256,7 +256,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         //        new Tuple2<String, Integer>(filtrLower + new String(new byte[]{(byte)254}),
         //                type==0?Integer.MAX_VALUE:type), true);
 
-        Iterator iterator = ((TransactionFinalSuit) map).getIteratorByTitleAndType(filter, true, type, offset, limit);
+        Iterator iterator = ((TransactionFinalSuit) map).getIteratorByTitleAndType(filter, true, type);
 
         if (offset > 0)
             Iterators.advance(iterator, offset);
@@ -471,16 +471,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public int getTransactionsByAddressCount(String address) {
-        //Iterable senderKeys = Fun.filter(this.senderKey, address);
-        //Iterable recipientKeys = Fun.filter(this.recipientKey, address);
-
-        //Set<Long> treeKeys = new TreeSet<>();
-
-        //treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-
-        //return treeKeys.size();
-        return ((TransactionFinalSuit)map).getTransactionsByAddressCount(address);
+        return Iterators.size(getIteratorByAddress(address));
     }
 
     @Override

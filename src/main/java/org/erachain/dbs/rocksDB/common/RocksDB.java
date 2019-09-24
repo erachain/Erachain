@@ -105,7 +105,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
         return db.indexIterator(descending, index);
     }
     public DBIterator indexIteratorFilter(boolean descending, byte[] filter) {
-        return db.indexIteratorFilter(descending, index, filter);
+        return db.indexIteratorFilter(descending, filter);
     }
     public DBIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle index, byte[] filter) {
         return db.indexIteratorFilter(descending, index, filter);

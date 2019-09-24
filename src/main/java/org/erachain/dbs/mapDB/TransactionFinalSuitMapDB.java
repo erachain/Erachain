@@ -219,38 +219,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         return iter;
     }
 
-    /**
-     *
-     * @param filter
-     * @param asFilter - use filter
-     * @param type
-     * @param offset
-     * @param limit
-     * @return
-     */
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit) {
-
-        String filterLower = filter.toLowerCase();
-
-        Iterator iterator = Fun.filter(this.titleKey,
-                new Tuple2<String, Integer>(filterLower,
-                        type==0?0:type), true,
-                new Tuple2<String, Integer>(asFilter?
-                        filterLower + new String(new byte[]{(byte)255}) : filterLower,
-                        type==0?Integer.MAX_VALUE:type), true).iterator();
-
-        if (offset > 0)
-            Iterators.advance(iterator, offset);
-
-        if (limit > 0)
-            iterator = Iterators.limit(iterator, limit);
-
-        return iterator;
-
-    }
-
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
@@ -265,30 +233,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         return treeKeys; //((TreeSet<Long>) treeKeys).descendingIterator();
     }
 
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public int getTransactionsByAddressCount(String address) {
-        Iterator senderKeys = Fun.filter(this.senderKey, address).iterator();
-        Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
-
-        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
-
-        treeKeys = Iterators.concat(senderKeys, recipientKeys);
-
-        return Iterators.size(treeKeys);
-    }
-
-    @Override
-    @SuppressWarnings("rawtypes")
-    public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
-                                     final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        Iterator keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
-                offset, limit);
-        return Iterators.size(keys);
-    }
-
     /**
+     * Пока это не используется - на верхнем уровне своя сборка общая от получаемых Итераторов с этого класса.
+     * Возможно потом с более конкретным проходом по DESCENDING + OFFSET & LIMIT буджет реализация у каждой СУБД своя?
+     * Хотя нет - просто в Iterator перебор по индексаю таблицы у СУБД уже свой реализован
      * @param address
      * @param sender
      * @param recipient

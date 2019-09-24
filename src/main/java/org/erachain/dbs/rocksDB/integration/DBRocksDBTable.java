@@ -157,6 +157,9 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
                 ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
                 BiFunction biFunction = arrayIndexDB.getBiFunction();
                 Object[] apply = (Object[]) biFunction.apply(key, value);
+                if (apply == null) {
+                    continue;
+                }
                 if (logON) logger.info("ArrayIndex.count.elements = " + apply.length);
                 for (Object valueIndex : apply) {
                     byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
@@ -173,6 +176,9 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
                 ListIndexDB listIndexDB = (ListIndexDB) indexDB;
                 BiFunction biFunction = listIndexDB.getBiFunction();
                 List<Object> apply = (List<Object>) biFunction.apply(key, value);
+                if (apply == null) {
+                    continue;
+                }
                 if (logON) logger.info("ListIndex.count.elements = " + apply.size());
                 for (Object valueIndex : apply) {
                     byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
@@ -220,6 +226,9 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
                 }
                 Object value = byteableValue.receiveObjectFromBytes(valueByte);
                 Object[] apply = (Object[]) biFunction.apply(key, value);
+                if (apply == null) {
+                    continue;
+                }
                 for (Object valueIndex : apply) {
                     byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
                     if (bytes == null) {
@@ -238,6 +247,9 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
                 }
                 Object value = byteableValue.receiveObjectFromBytes(valueByte);
                 List<Object> apply = (List<Object>) biFunction.apply(key, value);
+                if (apply == null) {
+                    continue;
+                }
                 for (Object valueIndex : apply) {
                     byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
                     if (bytes == null) {
