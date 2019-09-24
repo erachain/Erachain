@@ -35,8 +35,10 @@ import java.util.*;
  */
 public class BlockGenerator extends MonitoredThread implements Observer {
 
+    // сколько трназакции в блоке - если больше 0 то запускает тест на старте
     public static final int TEST_DB = 10000;
-    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS;
+    // размер балансового поля - чем больше тем сложнее
+    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[10000];
 
     private static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
 
@@ -612,11 +614,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         Random random = new Random();
         if (TEST_DB > 0) {
 
-            TEST_DB_ACCOUNTS = new PrivateKeyAccount[100000];
+            // REST balances! иначе там копится размер таблицы
+            dcSet.getAssetBalanceMap().reset();
 
             byte[] seed = Crypto.getInstance().digest("test24243k2l3j42kl43j".getBytes());
             byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-            PrivateKeyAccount certifier = new PrivateKeyAccount(privateKey);
             BigDecimal balance = new BigDecimal("10000");
 
             for (int nonce = 0; nonce < TEST_DB_ACCOUNTS.length; nonce++) {
