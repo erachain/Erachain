@@ -5,6 +5,7 @@ package org.erachain.datachain;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.RCalculated;
@@ -42,6 +43,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
+@Slf4j
 public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implements TransactionFinalMap {
 
     private static int CUT_NAME_INDEX = 12;
@@ -67,9 +69,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
+                    logger.info("use DBS_ROCK_DB");
                     map = new TransactionFinalSuitRocksDB(databaseSet, database);
                     break;
                 default:
+                    logger.info("use DBS_MAP_DB");
                     map = new TransactionFinalSuitMapDB(databaseSet, database);
             }
         } else {

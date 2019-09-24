@@ -3,6 +3,7 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
@@ -17,8 +18,6 @@ import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -41,11 +40,10 @@ import static org.erachain.database.IDB.*;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
+@Slf4j
 class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         implements TransactionTab
 {
-
-    static Logger logger = LoggerFactory.getLogger(TransactionTabImpl.class.getName());
 
     //public int TIMESTAMP_INDEX = 1;
 
@@ -75,12 +73,15 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
+                    logger.info("use DBS_ROCK_DB");
                     map = new TransactionSuitRocksDB(databaseSet, database);
                     break;
                 case DBS_MAP_DB_IN_MEM:
+                    logger.info("use DBS_MAP_DB_IN_MEM");
                     map = new TransactionSuitMapDBinMem(databaseSet, database);
                     break;
                 default:
+                    logger.info("use DBS_MAP_DB");
                     map = new TransactionSuitMapDB(databaseSet, database);
             }
         } else {

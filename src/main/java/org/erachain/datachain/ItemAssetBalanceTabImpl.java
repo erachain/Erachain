@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
@@ -38,7 +39,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  *
  */
 // TODO SOFT HARD TRUE
-
+@Slf4j
 public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
@@ -71,9 +72,11 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
+                    logger.info("use DBS_ROCK_DB");
                     map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
                     break;
                 default:
+                    logger.info("use DBS_MAP_DB");
                     map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
             }
         } else {
