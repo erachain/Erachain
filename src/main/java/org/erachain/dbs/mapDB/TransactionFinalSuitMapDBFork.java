@@ -86,25 +86,8 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type, int offset, int limit) {
-        return null;
-
-    }
-
-    @Override
     public Iterator<Long> getIteratorByAddress(String address) {
         return null;
-    }
-
-    @Override
-    public int getTransactionsByAddressCount(String address) {
-        return 0;
-    }
-
-    @Override
-    public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
-                                     final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        return 0;
     }
 
     @Override

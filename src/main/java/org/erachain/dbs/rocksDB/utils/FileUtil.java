@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-@Slf4j(topic = "utils")
+@Slf4j //(topic = "utils")
 public class FileUtil {
 
   public static List<String> recursiveList(String path) throws IOException {
