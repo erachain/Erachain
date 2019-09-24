@@ -1385,14 +1385,7 @@ public class DCSet extends DBASet {
     }
 
     static Random randFork = new Random();
-    private static DB getHardBase() {
-        //OPEN DB
-
-        // найдем новый не созданный уже файл
-        File dbFile;
-        do {
-            dbFile = new File(Settings.getInstance().getDataTempDir(), "fork" + randFork.nextInt() + ".dat");
-        } while (dbFile.exists());
+    public static DB getHardBase(File dbFile) {
 
         dbFile.getParentFile().mkdirs();
 
@@ -1431,6 +1424,20 @@ public class DCSet extends DBASet {
                 .make();
 
         return database;
+    }
+
+    public static DB getHardBase() {
+        //OPEN DB
+
+        // найдем новый не созданный уже файл
+        File dbFile;
+        do {
+            dbFile = new File(Settings.getInstance().getDataTempDir(), "fork" + randFork.nextInt() + ".dat");
+        } while (dbFile.exists());
+
+        dbFile.getParentFile().mkdirs();
+
+        return getHardBase(dbFile);
     }
 
     /**
@@ -1603,6 +1610,10 @@ public class DCSet extends DBASet {
             }
 
             try {
+
+                // там же лежит и он
+                ///transactionTab.close();
+
                 // удалим все в папке Temp
                 File tempDir = new File(Settings.getInstance().getDataTempDir());
                 Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
