@@ -36,7 +36,7 @@ import java.util.*;
 public class BlockGenerator extends MonitoredThread implements Observer {
 
     public static final int TEST_DB = 10000;
-    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = new PrivateKeyAccount[TEST_DB];
+    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS;
 
     private static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
 
@@ -222,19 +222,25 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-    private static List<Transaction> testTransactions() {
+    private List<Transaction> testTransactions(int blockHeight, long timestamp) {
 
         SecureRandom randomSecure = new SecureRandom();
 
+        LOGGER.info("generate txs for time:" + new Date(timestamp));
+
         boolean generateNewAccount = false;
-        if (DCSet.getInstance().getAssetBalanceMap().size() < 1000)
-            generateNewAccount = true;
+        //if (DCSet.getInstance().getAssetBalanceMap().size() < 1000)
+        //    generateNewAccount = true;
 
         long assetKey = 2L;
         BigDecimal amount = new BigDecimal("0.00000001");
         RSend messageTx;
         byte[] isText = new byte[]{1};
         byte[] encryptMessage = new byte[]{0};
+
+        TransactionMap map = dcSet.getTransactionMap();
+
+        Random random = new Random();
 
         PublicKeyAccount recipient;
         List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>();
@@ -245,16 +251,17 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 randomSecure.nextBytes(seedRecipient);
                 recipient = new PublicKeyAccount(seedRecipient);
             } else {
-                if (index > TEST_DB << 1)
-                    recipient = TEST_DB_ACCOUNTS[(TEST_DB >> 1) - 1 - index];
-                else
-                    recipient = TEST_DB_ACCOUNTS[TEST_DB - 1 - index];
+                recipient = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
             }
 
-            messageTx = new RSend(TEST_DB_ACCOUNTS[index], (byte) 0, recipient, assetKey,
-                    amount, "weripwoeit", null, isText, encryptMessage, NTP.getTime(), 0l);
-            messageTx.sign(TEST_DB_ACCOUNTS[index], Transaction.FOR_NETWORK);
-            unconfirmedTransactions.add(messageTx);
+            PrivateKeyAccount creator = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
+            messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                    amount, "TEST for " + blockHeight + ", tx: " + index, null, isText, encryptMessage, timestamp, 0l);
+            messageTx.sign(creator, Transaction.FOR_NETWORK);
+
+            //unconfirmedTransactions.add(messageTx);
+            map.add(messageTx);
+
         }
 
         return unconfirmedTransactions;
@@ -263,10 +270,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
-
-        if (TEST_DB > 0) {
-            return new Tuple2<List<Transaction>, Integer>(testTransactions(), TEST_DB);
-        }
 
         Timestamp timestampPoit = new Timestamp(timestamp);
         LOGGER.debug("* * * * * COLLECT TRANSACTIONS on " + timestampPoit);
@@ -608,12 +611,15 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         Random random = new Random();
         if (TEST_DB > 0) {
+
+            TEST_DB_ACCOUNTS = new PrivateKeyAccount[100000];
+
             byte[] seed = Crypto.getInstance().digest("test24243k2l3j42kl43j".getBytes());
             byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
             PrivateKeyAccount certifier = new PrivateKeyAccount(privateKey);
             BigDecimal balance = new BigDecimal("10000");
 
-            for (int nonce = 0; nonce < TEST_DB; nonce++) {
+            for (int nonce = 0; nonce < TEST_DB_ACCOUNTS.length; nonce++) {
                 TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
                 // SET BALANCES
                 TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true);
@@ -691,7 +697,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (timeTmp > NTP.getTime())
                     continue;
 
-                if (TEST_DB > 0 || timePoint != timeTmp) {
+                if (timePoint != timeTmp) {
                     timePoint = timeTmp;
                     timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS(height);
                     betterPeer = null;
@@ -827,7 +833,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         bchain, winned_winValue);
                             }
                         } else {
+                            /// тестовый аккаунт
                             acc_winner = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
+                            /// закатем в очередь транзакции
+                            testTransactions(height, timePointForValidTX);
                         }
 
                         if (acc_winner != null) {

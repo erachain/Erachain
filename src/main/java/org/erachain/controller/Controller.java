@@ -3566,6 +3566,13 @@ public class Controller extends Observable {
                 }
                 continue;
             }
+
+            // TESTS
+            if (BlockGenerator.TEST_DB > 0) {
+                useGui = false;
+                continue;
+            }
+
             if (arg.startsWith("-seed=") && arg.length() > 6) {
                 seedCommand = arg.substring(6).split(":");
                 continue;
@@ -3668,7 +3675,7 @@ public class Controller extends Observable {
 
                 Status.getinstance();
 
-                if (!useGui || BlockGenerator.TEST_DB > 0) {
+                if (!useGui) {
                     LOGGER.info("-nogui used");
                 } else {
 
