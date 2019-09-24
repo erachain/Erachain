@@ -11,19 +11,18 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
+import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
 import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static org.erachain.database.IDB.DBS_MAP_DB;
-import static org.erachain.database.IDB.DBS_ROCK_DB;
+import static org.erachain.database.IDB.*;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -77,6 +76,9 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
                     map = new TransactionSuitRocksDB(databaseSet, database);
+                    break;
+                case DBS_MAP_DB_IN_MEM:
+                    map = new TransactionSuitMapDBinMem(databaseSet, database);
                     break;
                 default:
                     map = new TransactionSuitMapDB(databaseSet, database);

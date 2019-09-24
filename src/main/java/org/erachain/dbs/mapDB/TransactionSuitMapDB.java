@@ -49,73 +49,6 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
                 .counterEnable()
                 .makeOrGet();
 
-
-        if (Controller.getInstance().onlyProtocolIndexing)
-            // NOT USE SECONDARY INDEXES
-            return;
-
-        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-
-        Bind.secondaryKey((Bind.MapWithModificationListener)map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
-            @Override
-            public Tuple2<String, Long> run(Long key, Transaction val) {
-                Account account = val.getCreator();
-                return new Tuple2<String, Long>(account == null ? "genesis" : account.getAddress(), val.getTimestamp());
-            }
-        });
-
-        this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-        Bind.secondaryKeys((Bind.MapWithModificationListener)map, this.recipientKey,
-                new Fun.Function2<String[], Long, Transaction>() {
-                    @Override
-                    public String[] run(Long key, Transaction val) {
-                        List<String> recps = new ArrayList<String>();
-
-                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                        val.setDC((DCSet)databaseSet);
-
-                        for (Account acc : val.getRecipientAccounts()) {
-                            // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
-                            recps.add(acc.getAddress());
-                        }
-                        String[] ret = new String[recps.size()];
-                        ret = recps.toArray(ret);
-                        return ret;
-                    }
-                });
-
-        this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-        Bind.secondaryKeys((Bind.MapWithModificationListener)map, this.typeKey,
-                new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
-                    @Override
-                    public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
-                        List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
-                        Integer type = val.getType();
-
-                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                        val.setDC((DCSet)databaseSet);
-
-                        for (Account acc : val.getInvolvedAccounts()) {
-                            recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
-
-                        }
-                        // Tuple2<Integer, String>[] ret = (Tuple2<Integer,
-                        // String>[]) new Object[ recps.size() ];
-                        Fun.Tuple3<String, Long, Integer>[] ret = (Fun.Tuple3<String, Long, Integer>[])
-                                Array.newInstance(Fun.Tuple3.class, recps.size());
-
-                        ret = recps.toArray(ret);
-
-                        return ret;
-                    }
-                });
-
     }
 
     @Override
@@ -147,6 +80,74 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
                         return value.getTimestamp();
                     }
                 });
+
+        ///////////////
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return;
+
+        this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
+
+        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
+            @Override
+            public Tuple2<String, Long> run(Long key, Transaction val) {
+                Account account = val.getCreator();
+                return new Tuple2<String, Long>(account == null ? "genesis" : account.getAddress(), val.getTimestamp());
+            }
+        });
+
+        this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.recipientKey,
+                new Fun.Function2<String[], Long, Transaction>() {
+                    @Override
+                    public String[] run(Long key, Transaction val) {
+                        List<String> recps = new ArrayList<String>();
+
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                        val.setDC((DCSet) databaseSet);
+
+                        for (Account acc : val.getRecipientAccounts()) {
+                            // recps.add(acc.getAddress() + val.viewTimestamp()); уникальнось внутри Бинда делается
+                            recps.add(acc.getAddress());
+                        }
+                        String[] ret = new String[recps.size()];
+                        ret = recps.toArray(ret);
+                        return ret;
+                    }
+                });
+
+        this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
+        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.typeKey,
+                new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
+                    @Override
+                    public Fun.Tuple3<String, Long, Integer>[] run(Long key, Transaction val) {
+                        List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
+                        Integer type = val.getType();
+
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                        val.setDC((DCSet) databaseSet);
+
+                        for (Account acc : val.getInvolvedAccounts()) {
+                            recps.add(new Fun.Tuple3<String, Long, Integer>(acc.getAddress(), val.getTimestamp(), type));
+
+                        }
+                        // Tuple2<Integer, String>[] ret = (Tuple2<Integer,
+                        // String>[]) new Object[ recps.size() ];
+                        Fun.Tuple3<String, Long, Integer>[] ret = (Fun.Tuple3<String, Long, Integer>[])
+                                Array.newInstance(Fun.Tuple3.class, recps.size());
+
+                        ret = recps.toArray(ret);
+
+                        return ret;
+                    }
+                });
+
 
     }
 
