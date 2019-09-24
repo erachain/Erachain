@@ -222,7 +222,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-    private List<Transaction> testTransactions(long timestamp) {
+    private List<Transaction> testTransactions(int blockHeight, long timestamp) {
 
         SecureRandom randomSecure = new SecureRandom();
 
@@ -254,9 +254,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 recipient = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
             }
 
-            messageTx = new RSend(TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)], (byte) 0, recipient, assetKey,
-                    amount, "weripwoeit", null, isText, encryptMessage, timestamp, 0l);
-            messageTx.sign(TEST_DB_ACCOUNTS[index], Transaction.FOR_NETWORK);
+            PrivateKeyAccount creator = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
+            messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                    amount, "TEST for " + blockHeight + ", tx: " + index, null, isText, encryptMessage, timestamp, 0l);
+            messageTx.sign(creator, Transaction.FOR_NETWORK);
 
             //unconfirmedTransactions.add(messageTx);
             map.add(messageTx);
@@ -835,7 +836,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             /// тестовый аккаунт
                             acc_winner = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
                             /// закатем в очередь транзакции
-                            testTransactions(timePointForValidTX);
+                            testTransactions(height, timePointForValidTX);
                         }
 
                         if (acc_winner != null) {
