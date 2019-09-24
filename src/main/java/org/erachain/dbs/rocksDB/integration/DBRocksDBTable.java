@@ -398,6 +398,38 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         };
     }
 
+    @Override
+    public Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending) {
+        DBIterator iterator = db.indexIteratorFilter(descending, filter);
+        return new Iterator<K>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public K next() {
+                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
+            }
+        };
+    }
+
+    @Override
+    public Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending) {
+        DBIterator iterator = db.indexIteratorFilter(descending, indexDB, filter);
+        return new Iterator<K>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public K next() {
+                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
+            }
+        };
+    }
+
     public Iterator<K> getIndexIterator(int index, boolean descending) {
         return getIndexIterator(columnFamilyHandles.get(index), descending);
     }

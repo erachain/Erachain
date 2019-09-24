@@ -11,7 +11,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
-import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
@@ -141,28 +140,28 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, Ints.toByteArray(height));
+        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(Ints.toByteArray(height), false);
 
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getIteratorBySender(String address) {
-        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, senderTxs.getColumnFamilyHandle(), address.getBytes());
+        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getIteratorByRecipient(String address) {
-        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, recipientTxs.getColumnFamilyHandle(), address.getBytes());
+        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
-        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, addressTypeTxs.getColumnFamilyHandle(),
-                Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)));
+        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), false
+        );
     }
 
     @Override
@@ -178,9 +177,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         //                filterLower + new String(new byte[]{(byte)255}) : filterLower,
         //                type==0?Integer.MAX_VALUE:type), true);
 
-        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, titleTypeTxs.getColumnFamilyHandle(),
-                type == 0? filter.getBytes()
-                    : Arrays.concatenate(filter.getBytes(), Ints.toByteArray(type)));
+        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(titleTypeTxs.getColumnFamilyHandle(), type == 0 ? filter.getBytes()
+                        : Arrays.concatenate(filter.getBytes(), Ints.toByteArray(type))
+                , false);
 
     }
 
@@ -188,8 +187,8 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator<Long> getIteratorByAddress(String address) {
-        Iterator senderKeys = ((RocksDB)map).indexIteratorFilter(false, senderTxs.getColumnFamilyHandle(), address.getBytes());
-        Iterator recipientKeys = ((RocksDB)map).indexIteratorFilter(false, recipientTxs.getColumnFamilyHandle(), address.getBytes());
+        Iterator senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
+        Iterator recipientKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false);
 
         return Iterators.concat(senderKeys, recipientKeys);
     }
@@ -230,20 +229,20 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         if (sender != null) {
             if (type != 0) {
                 //senderKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(sender, type)).iterator();
-                senderKeys = ((RocksDB)map).indexIteratorFilter(false, addressTypeTxs.getColumnFamilyHandle(),
-                        Arrays.concatenate(sender.getBytes(), Ints.toByteArray(type)));
+                senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(sender.getBytes(), Ints.toByteArray(type))
+                        , false);
             } else {
-                senderKeys = ((RocksDB)map).indexIteratorFilter(false, senderTxs.getColumnFamilyHandle(), address.getBytes());
+                senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
             }
         }
 
         if (recipient != null) {
             if (type != 0) {
                 //recipientKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(recipient, type)).iterator();
-                senderKeys = ((RocksDB)map).indexIteratorFilter(false, addressTypeTxs.getColumnFamilyHandle(),
-                        Arrays.concatenate(recipient.getBytes(), Ints.toByteArray(type)));
+                senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(recipient.getBytes(), Ints.toByteArray(type))
+                        , false);
             } else {
-                recipientKeys = ((RocksDB)map).indexIteratorFilter(false, recipientTxs.getColumnFamilyHandle(), address.getBytes());
+                recipientKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false);
             }
         }
 

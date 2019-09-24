@@ -42,6 +42,10 @@ public interface InnerDBTable<K, V> {
 
     Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending);
 
+    Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending);
+
+    Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending);
+
     Iterator<K> getIndexIterator(int indexDB, boolean descending);
 
 }

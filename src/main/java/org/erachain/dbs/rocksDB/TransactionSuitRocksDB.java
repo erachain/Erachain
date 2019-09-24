@@ -1,11 +1,9 @@
 package org.erachain.dbs.rocksDB;
 
-import com.google.common.collect.Iterators;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionSuit;
-import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
@@ -22,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -110,19 +107,18 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     @Override
     public Iterator<Long> typeIterator(String sender, Long timestamp, Integer type) {
-        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, addressTypeIndex.getColumnFamilyHandle(),
-                        toBytesStringLongInteger.toBytes(sender, timestamp, type)
-                       );
+        return ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeIndex.getColumnFamilyHandle(), toBytesStringLongInteger.toBytes(sender, timestamp, type)
+                , false);
     }
 
     @Override
     public Iterator<Long> senderIterator(String sender) {
-        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, senderIndex.getColumnFamilyHandle(), sender.getBytes());
+        return ((DBRocksDBTable) map).getIndexIteratorFilter(senderIndex.getColumnFamilyHandle(), sender.getBytes(), false);
     }
 
     @Override
     public Iterator<Long> recipientIterator(String recipient) {
-        return (Iterator) ((RocksDB)map).indexIteratorFilter(false, recipientsIndex.getColumnFamilyHandle(), recipient.getBytes());
+        return ((DBRocksDBTable) map).getIndexIteratorFilter(recipientsIndex.getColumnFamilyHandle(), recipient.getBytes(), false);
     }
 
     @Override

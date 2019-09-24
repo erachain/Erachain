@@ -79,6 +79,16 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     }
 
     @Override
+    public Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending) {
+        return null;
+    }
+
+    @Override
+    public Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending) {
+        return null;
+    }
+
+    @Override
     public Iterator<K> getIndexIterator(int indexDB, boolean descending) {
         return null;
     }
