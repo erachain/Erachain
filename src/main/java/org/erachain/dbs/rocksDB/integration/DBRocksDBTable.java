@@ -25,7 +25,9 @@ import java.util.stream.Collectors;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
- * тут происходит обработка настроенных вторичных индексов
+ *  TODO ??
+ *
+ * Походу тут происходит обработка настроенных вторичных индексов
  *
  * @param <K>
  * @param <V>

@@ -21,6 +21,11 @@ package org.erachain.dbs.rocksDB.common;
 import java.util.Map;
 
 
+/**
+ * TODO ??
+ * @param <K>
+ * @param <V>
+ */
 public interface BatchSourceInter<K, V> extends SourceInter<K, V> {
 
 

@@ -25,7 +25,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-@Slf4j //(topic = "utils")
+/**
+ * а зачем если у нас уже есть:
+ *     Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+ */
+@Slf4j //(topic = "RocksDB.FileUtil")
 public class FileUtil {
 
   public static List<String> recursiveList(String path) throws IOException {

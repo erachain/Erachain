@@ -23,7 +23,7 @@ import java.util.Set;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DBMapSuitFotk<T, U> extends DBMapSuit<T, U> {
+public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
@@ -39,7 +39,7 @@ public abstract class DBMapSuitFotk<T, U> extends DBMapSuit<T, U> {
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFotk(DBTab parent, DBASet dcSet) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet) {
         this.databaseSet = dcSet;
         this.database = dcSet.database;
 

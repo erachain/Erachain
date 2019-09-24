@@ -15,9 +15,10 @@ import java.util.Set;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
-/** Обертка база данных как файл с обработкой закрыть открыть сохранить.
+/**
+ * TODO ??
  *
- *
+ * ЯФ так опнял это Обертка база данных как файл с обработкой закрыть открыть сохранить.
  */
 @Slf4j
 public class RocksDB implements DB<byte[], byte[]>, Flusher

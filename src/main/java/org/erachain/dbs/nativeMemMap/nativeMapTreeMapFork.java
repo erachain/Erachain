@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.TreeMap;
 
-public class nativeMapTreeMapFork<T, U> extends DBMapSuitFotk<T, U>
+public class nativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U>
 {
 
     static Logger logger = LoggerFactory.getLogger(nativeMapTreeMapFork.class.getSimpleName());

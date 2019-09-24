@@ -5,6 +5,11 @@ import org.rocksdb.ColumnFamilyHandle;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * TODO ?
+ * @param <K>
+ * @param <V>
+ */
 public interface DB<K, V> {
 
     V get(K k);

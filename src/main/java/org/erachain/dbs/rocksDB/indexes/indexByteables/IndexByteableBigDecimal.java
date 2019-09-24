@@ -6,7 +6,7 @@ import org.erachain.dbs.rocksDB.indexes.IndexByteable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static org.erachain.dbs.rocksDB.RockSets.ROCK_BIG_DECIMAL_LEN;
+import static org.erachain.dbs.rocksDB.RockDBSetts.ROCK_BIG_DECIMAL_LEN;
 
 /**
  * Это преобразователь для вторичного индекса включает сортировочное преобразование,

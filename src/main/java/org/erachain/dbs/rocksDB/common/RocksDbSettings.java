@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ *  TODO ??
+ */
 @Slf4j
 @NoArgsConstructor
 public class RocksDbSettings {

@@ -20,6 +20,12 @@ package org.erachain.dbs.rocksDB.common;
 
 import org.rocksdb.RocksDBException;
 
+/**
+ *  TODO ??
+ *
+ * @param <K>
+ * @param <V>
+ */
 public interface SourceInter<K, V> {
 
 

@@ -15,6 +15,7 @@ import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
+import org.erachain.dbs.rocksDB.transformation.toBytesStringLongInteger;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.slf4j.Logger;

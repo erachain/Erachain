@@ -7,6 +7,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ *  TODO ??
+ * @param <K>
+ * @param <V>
+ */
 public interface InnerDBTable<K, V> {
 
     Map<K,V> getMap();

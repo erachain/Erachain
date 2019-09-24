@@ -13,6 +13,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+
+/**
+ *  TODO ??
+ */
 @Slf4j
 public class SettingsDBRocksDBTable {
     //  интерфейс доступа к БД

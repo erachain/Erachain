@@ -3,6 +3,9 @@ package org.erachain.dbs.rocksDB.common;
 import lombok.Getter;
 import org.rocksdb.WriteOptions;
 
+/**
+ *  TODO ??
+ */
 public class WriteOptionsWrapper {
 
   @Getter
