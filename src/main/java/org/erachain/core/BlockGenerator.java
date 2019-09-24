@@ -226,11 +226,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         SecureRandom randomSecure = new SecureRandom();
 
+        LOGGER.info("generate txs for time:" + new Date(timestamp));
+
         boolean generateNewAccount = false;
         //if (DCSet.getInstance().getAssetBalanceMap().size() < 1000)
         //    generateNewAccount = true;
-
-        PrivateKeyAccount[] TEST_DB_ACCOUNTS = new PrivateKeyAccount[TEST_DB];
 
         long assetKey = 2L;
         BigDecimal amount = new BigDecimal("0.00000001");
@@ -244,7 +244,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         PublicKeyAccount recipient;
         List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>();
-        for (int index = 0; index < TEST_DB_ACCOUNTS.length; index++) {
+        for (int index = 0; index < TEST_DB; index++) {
 
             if (generateNewAccount) {
                 byte[] seedRecipient = new byte[32];
@@ -254,7 +254,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 recipient = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
             }
 
-            messageTx = new RSend(TEST_DB_ACCOUNTS[index], (byte) 0, recipient, assetKey,
+            messageTx = new RSend(TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)], (byte) 0, recipient, assetKey,
                     amount, "weripwoeit", null, isText, encryptMessage, timestamp, 0l);
             messageTx.sign(TEST_DB_ACCOUNTS[index], Transaction.FOR_NETWORK);
 
@@ -610,12 +610,15 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         Random random = new Random();
         if (TEST_DB > 0) {
+
+            TEST_DB_ACCOUNTS = new PrivateKeyAccount[100000];
+
             byte[] seed = Crypto.getInstance().digest("test24243k2l3j42kl43j".getBytes());
             byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
             PrivateKeyAccount certifier = new PrivateKeyAccount(privateKey);
             BigDecimal balance = new BigDecimal("10000");
 
-            for (int nonce = 0; nonce < TEST_DB; nonce++) {
+            for (int nonce = 0; nonce < TEST_DB_ACCOUNTS.length; nonce++) {
                 TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
                 // SET BALANCES
                 TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true);
