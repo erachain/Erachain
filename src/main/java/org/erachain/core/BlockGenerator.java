@@ -35,7 +35,6 @@ import java.util.*;
  */
 public class BlockGenerator extends MonitoredThread implements Observer {
 
-    public static final boolean TEST_001 = false;
     public static final int TEST_DB = 10000;
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = new PrivateKeyAccount[TEST_DB];
 

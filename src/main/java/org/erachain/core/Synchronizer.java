@@ -1,6 +1,5 @@
 package org.erachain.core;
 
-import javafx.scene.control.Control;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -320,7 +319,7 @@ public class Synchronizer extends Thread {
 
         DCSet fork;
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-        if (BlockGenerator.TEST_001) {
+        if (BlockGenerator.TEST_DB > 0) {
             /// checkNewBlocks(dcSet.forkinFile(), lastCommonBlock, newBlocks,
             /// peer);
             fork = dcSet.fork();
