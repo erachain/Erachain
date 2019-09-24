@@ -155,8 +155,8 @@ public class DCSet extends DBASet {
 
             this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
                     //DBS_MAP_DB
-                    //DBS_ROCK_DB
-                    DBS_MAP_DB_IN_MEM
+                    DBS_ROCK_DB
+                    //DBS_MAP_DB_IN_MEM
                     , this, database);
 
             this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0? defaultDBS:
