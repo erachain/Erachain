@@ -66,9 +66,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         super(databaseSet, database);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     protected void getMap() {
         // OPEN MAP

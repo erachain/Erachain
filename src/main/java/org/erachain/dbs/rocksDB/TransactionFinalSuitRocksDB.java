@@ -66,6 +66,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
 
+        // USE counter index
         indexes = new ArrayList<>();
 
         if (Controller.getInstance().onlyProtocolIndexing) {

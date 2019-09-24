@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
@@ -82,6 +83,12 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public void createIndexes() {
+
+        // indexes = new ArrayList<>(); - null - not use SIZE index and counter
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            // NOT USE SECONDARY INDEXES
+            return;
 
         balanceKeyAssetIndex = new SimpleIndexDB<>(balanceKeyAssetIndexName,
                 (key, value) -> {

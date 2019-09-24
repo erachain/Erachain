@@ -14,9 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.BiFunction;
 
 public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionSuit
@@ -36,18 +34,6 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     @Override
     protected void getMap() {
 
-        timestampIndex = new SimpleIndexDB<>(timestampIndexName,
-                new BiFunction<Long, Transaction, Long>() {
-                    @Override
-                    public Long apply(Long aLong, Transaction transaction) {
-                        return transaction.getTimestamp();
-                    }
-                //}, (result, key) ->new ByteableLong().toBytesObject(result)); // создает Класс на лету и переопределяет его метод
-                }, new IndexByteableLong()); // а тут мы уже создали заранее Класс
-
-        List indexes = new ArrayList<>();
-        indexes.add(timestampIndex);
-
         map = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
@@ -58,6 +44,18 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
+
+        timestampIndex = new SimpleIndexDB<>(timestampIndexName,
+                new BiFunction<Long, Transaction, Long>() {
+                    @Override
+                    public Long apply(Long aLong, Transaction transaction) {
+                        return transaction.getTimestamp();
+                    }
+                    //}, (result, key) ->new ByteableLong().toBytesObject(result)); // создает Класс на лету и переопределяет его метод
+                }, new IndexByteableLong()); // а тут мы уже создали заранее Класс
+
+        indexes = new ArrayList<>();
+        indexes.add(timestampIndex);
     }
 
     @Override

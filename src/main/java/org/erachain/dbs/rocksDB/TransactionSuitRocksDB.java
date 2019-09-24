@@ -1,5 +1,6 @@
 package org.erachain.dbs.rocksDB;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
@@ -23,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
@@ -51,14 +51,35 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     @Override
     protected void getMap() {
 
+        map = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
+                RocksDbSettings.initCustomSettings(7, 64, 32,
+                        256, 10,
+                        1, 256, 32, false),
+                databaseSet);
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected void createIndexes() {
+
+        // USE counter index
+        indexes = new ArrayList<>();
+
         timestampIndex = new SimpleIndexDB<>(timestampIndexName,
                 new BiFunction<Long, Transaction, Long>() {
                     @Override
                     public Long apply(Long aLong, Transaction transaction) {
                         return transaction.getTimestamp();
                     }
-                //}, (result, key) ->new ByteableLong().toBytesObject(result)); // создает Класс на лету и переопределяет его метод
+                    //}, (result, key) ->new ByteableLong().toBytesObject(result)); // создает Класс на лету и переопределяет его метод
                 }, new IndexByteableLong()); // а тут мы уже создали заранее Класс
+
+        indexes.add(timestampIndex);
+
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return;
+        }
 
         senderIndex = new SimpleIndexDB<>(senderIndexName,
                 new BiFunction<Long, Transaction, Fun.Tuple2<String, Long>>() {
@@ -90,22 +111,10 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                             (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());
                 }, new IndexByteableTuple3StringLongInteger());
 
-        List indexes = new ArrayList<>();
-        indexes.add(timestampIndex);
         indexes.add(addressTypeIndex);
         indexes.add(senderIndex);
         indexes.add(recipientsIndex);
 
-        map = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
-                RocksDbSettings.initCustomSettings(7, 64, 32,
-                        256, 10,
-                        1, 256, 32, false),
-                databaseSet);
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes() {
     }
 
     @Override
