@@ -52,6 +52,15 @@ public abstract class PollCls extends ItemCls {
         return this.options;
     }
 
+    public List<String> viewOptions() {
+        List<String> result = new ArrayList<>();
+        int count = 0;
+        for (String option: this.options) {
+            result.add(++count + ": " + option);
+        }
+        return result;
+    }
+
     @Override
     public ItemMap getDBMap(DCSet dc) {
         return dc.getItemPollMap();
