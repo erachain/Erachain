@@ -238,7 +238,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         byte[] isText = new byte[]{1};
         byte[] encryptMessage = new byte[]{0};
 
-        TransactionMap map = dcSet.getTransactionMap();
+        TransactionTab map = dcSet.getTransactionTab();
 
         Random random = new Random();
 
