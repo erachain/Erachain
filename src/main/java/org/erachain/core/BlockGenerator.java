@@ -775,49 +775,54 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         //this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);
                         this.acc_winner = null;
 
+                        if (TEST_DB == 0) {
 
-                        //unconfirmedTransactionsHash = null;
-                        winned_winValue = 0;
-                        winned_forgingValue = 0;
-                        //max_winned_value_account = 0;
-                        height = bchain.getHeight(dcSet) + 1;
-                        previousTarget = bchain.getTarget(dcSet);
+                            //unconfirmedTransactionsHash = null;
+                            winned_winValue = 0;
+                            winned_forgingValue = 0;
+                            //max_winned_value_account = 0;
+                            height = bchain.getHeight(dcSet) + 1;
+                            previousTarget = bchain.getTarget(dcSet);
 
-                        ///if (height > BlockChain.BLOCK_COUNT) return;
+                            ///if (height > BlockChain.BLOCK_COUNT) return;
 
-                        //PREVENT CONCURRENT MODIFY EXCEPTION
-                        List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
-                        synchronized (knownAccounts) {
+                            //PREVENT CONCURRENT MODIFY EXCEPTION
+                            List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
+                            synchronized (knownAccounts) {
 
-                            local_status = 5;
-                            this.setMonitorStatus("local_status " + viewStatus());
+                                local_status = 5;
+                                this.setMonitorStatus("local_status " + viewStatus());
 
-                            for (PrivateKeyAccount account : knownAccounts) {
+                                for (PrivateKeyAccount account : knownAccounts) {
 
-                                forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue);
-                                if (winValue < 1)
-                                    continue;
+                                    forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue);
+                                    if (winValue < 1)
+                                        continue;
 
-                                targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
-                                if (targetedWinValue < 1)
-                                    continue;
+                                    targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
+                                    if (targetedWinValue < 1)
+                                        continue;
 
-                                if (winValue > winned_winValue) {
-                                    //this.winners.put(account, winned_value);
-                                    acc_winner = account;
-                                    winned_winValue = winValue;
-                                    winned_forgingValue = forgingValue;
-                                    //max_winned_value_account = winned_value_account;
+                                    if (winValue > winned_winValue) {
+                                        //this.winners.put(account, winned_value);
+                                        acc_winner = account;
+                                        winned_winValue = winValue;
+                                        winned_forgingValue = forgingValue;
+                                        //max_winned_value_account = winned_value_account;
 
+                                    }
                                 }
                             }
-                        }
 
-                        if (BlockChain.CHECK_BUGS > 7) {
-                            Tuple2<List<Transaction>, Integer> unconfirmedTransactions
-                                    = getUnconfirmedTransactions(height, timePointForValidTX,
-                                    bchain, winned_winValue);
+                            if (BlockChain.CHECK_BUGS > 7) {
+                                Tuple2<List<Transaction>, Integer> unconfirmedTransactions
+                                        = getUnconfirmedTransactions(height, timePointForValidTX,
+                                        bchain, winned_winValue);
+                            }
+                        } else {
+                            if (index > TEST_DB_ACCOUNTS.length)
+                                acc_winner = TEST_DB_ACCOUNTS[index++];
                         }
 
                         if (acc_winner != null) {
