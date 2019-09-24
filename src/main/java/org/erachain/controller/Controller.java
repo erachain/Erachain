@@ -355,21 +355,27 @@ public class Controller extends Observable {
 
         JSONObject jsonObj = new JSONObject();
         Controller cnt = Controller.getInstance();
+        long timing;
 
-        jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
-        jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
-        jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false));
-        jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
-        jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
-        jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
+        if (network != null) {
+            jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
+            jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
+            jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false));
+            jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
+            jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
+            jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
 
-        long timing = cnt.getInstance().network.telegramer.messageTimingAverage;
-        if (timing > 0) {
-            timing = 1000000000L / timing;
+            timing = cnt.getInstance().network.telegramer.messageTimingAverage;
+
+            if (timing > 0) {
+                timing = 1000000000L / timing;
+            } else {
+                timing = 0;
+            }
+            jsonObj.put("msgTimingAvrg", timing);
         } else {
-            timing = 0;
+            jsonObj.put("network", "shutdown");
         }
-        jsonObj.put("msgTimingAvrg", timing);
 
         timing = cnt.getInstance().getUnconfigmedMessageTimingAverage();
         if (timing > 0) {
