@@ -80,9 +80,9 @@ import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
 import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -854,7 +854,9 @@ public class Controller extends Observable {
         this.blockGenerator.start();
 
         // CREATE NETWORK
-        this.network = new Network(this);
+        if (BlockGenerator.TEST_DB == 0) {
+            this.network = new Network(this);
+        }
 
         // CLOSE ON UNEXPECTED SHUTDOWN
         Runtime.getRuntime().addShutdownHook(new Thread(null, null, "ShutdownHook") {

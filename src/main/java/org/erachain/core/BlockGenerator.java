@@ -603,6 +603,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         this.initMonitor();
 
+        Random random = new Random();
         if (TEST_DB > 0) {
             byte[] seed = Crypto.getInstance().digest("test24243k2l3j42kl43j".getBytes());
             byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -775,14 +776,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         //this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);
                         this.acc_winner = null;
 
-                        if (TEST_DB == 0) {
+                        //unconfirmedTransactionsHash = null;
+                        winned_winValue = 0;
+                        winned_forgingValue = 0;
+                        //max_winned_value_account = 0;
+                        height = bchain.getHeight(dcSet) + 1;
+                        previousTarget = bchain.getTarget(dcSet);
 
-                            //unconfirmedTransactionsHash = null;
-                            winned_winValue = 0;
-                            winned_forgingValue = 0;
-                            //max_winned_value_account = 0;
-                            height = bchain.getHeight(dcSet) + 1;
-                            previousTarget = bchain.getTarget(dcSet);
+                        if (TEST_DB == 0) {
 
                             ///if (height > BlockChain.BLOCK_COUNT) return;
 
@@ -821,8 +822,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         bchain, winned_winValue);
                             }
                         } else {
-                            if (index > TEST_DB_ACCOUNTS.length)
-                                acc_winner = TEST_DB_ACCOUNTS[index++];
+                            acc_winner = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
                         }
 
                         if (acc_winner != null) {
@@ -832,60 +832,64 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 return;
                             }
 
+                            newWinner = false;
                             // Соберем тут танзакции сразу же чтобы потом не тратить время
                             Tuple2<List<Transaction>, Integer> unconfirmedTransactions
                                     = getUnconfirmedTransactions(height, timePointForValidTX,
                                     bchain, winned_winValue);
 
-                            wait_new_block_broadcast = (timeStartBroadcast + BlockChain.FLUSH_TIMEPOINT(height)) >> 1;
-                            int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
-                            wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
+                            if (TEST_DB == 0) {
 
-                            // сдвиг на заранее - только на 1/4 максимум
-                            if (wait_new_block_broadcast < timeStartBroadcast) {
-                                wait_new_block_broadcast = timeStartBroadcast;
-                            } else if (wait_new_block_broadcast > BlockChain.FLUSH_TIMEPOINT(height)) {
-                                wait_new_block_broadcast = BlockChain.FLUSH_TIMEPOINT(height);
-                            }
+                                wait_new_block_broadcast = (timeStartBroadcast + BlockChain.FLUSH_TIMEPOINT(height)) >> 1;
+                                int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
+                                wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
 
-                            newWinner = false;
-                            if (wait_new_block_broadcast > 0
-                                    // и мы не отстаем
-                                    && NTP.getTime() < timePoint + wait_new_block_broadcast) {
-
-                                local_status = 6;
-                                this.setMonitorStatus("local_status " + viewStatus());
-
-                                LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
-                                // SLEEP and WATCH break
-                                wait_step = wait_new_block_broadcast / WAIT_STEP_MS;
-
-                                this.setMonitorStatus("wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
-
-                                do {
-                                    try {
-                                        Thread.sleep(WAIT_STEP_MS);
-                                    } catch (InterruptedException e) {
-                                        local_status = -1;
-                                        return;
-                                    }
-
-                                    if (ctrl.isOnStopping()) {
-                                        local_status = -1;
-                                        return;
-                                    }
-
-                                    waitWin = bchain.getWaitWinBuffer();
-                                    if (waitWin != null && waitWin.calcWinValue(dcSet) > winned_winValue) {
-                                        // NEW WINNER received
-                                        newWinner = true;
-                                        break;
-                                    }
-
+                                // сдвиг на заранее - только на 1/4 максимум
+                                if (wait_new_block_broadcast < timeStartBroadcast) {
+                                    wait_new_block_broadcast = timeStartBroadcast;
+                                } else if (wait_new_block_broadcast > BlockChain.FLUSH_TIMEPOINT(height)) {
+                                    wait_new_block_broadcast = BlockChain.FLUSH_TIMEPOINT(height);
                                 }
-                                while (this.orphanto <= 0 && wait_step-- > 0
-                                        && NTP.getTime() < timePoint + wait_new_block_broadcast
-                                        && betterPeer == null && !ctrl.needUpToDate());
+
+                                if (wait_new_block_broadcast > 0
+                                        // и мы не отстаем
+                                        && NTP.getTime() < timePoint + wait_new_block_broadcast) {
+
+                                    local_status = 6;
+                                    this.setMonitorStatus("local_status " + viewStatus());
+
+                                    LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
+                                    // SLEEP and WATCH break
+                                    wait_step = wait_new_block_broadcast / WAIT_STEP_MS;
+
+                                    this.setMonitorStatus("wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
+
+                                    do {
+                                        try {
+                                            Thread.sleep(WAIT_STEP_MS);
+                                        } catch (InterruptedException e) {
+                                            local_status = -1;
+                                            return;
+                                        }
+
+                                        if (ctrl.isOnStopping()) {
+                                            local_status = -1;
+                                            return;
+                                        }
+
+                                        waitWin = bchain.getWaitWinBuffer();
+                                        if (waitWin != null && waitWin.calcWinValue(dcSet) > winned_winValue) {
+                                            // NEW WINNER received
+                                            newWinner = true;
+                                            break;
+                                        }
+
+                                    }
+                                    while (this.orphanto <= 0 && wait_step-- > 0
+                                            && NTP.getTime() < timePoint + wait_new_block_broadcast
+                                            && betterPeer == null && !ctrl.needUpToDate());
+                                }
+
                             }
 
                             if (this.orphanto > 0) {
@@ -1013,7 +1017,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
 
                     // ждем основное время просто
-                    while (this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
+                    while (TEST_DB == 0 && this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
