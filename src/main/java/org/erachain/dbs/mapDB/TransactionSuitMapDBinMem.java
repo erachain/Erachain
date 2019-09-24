@@ -21,8 +21,8 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
 
         database = DBMaker
                 .newMemoryDB()
-                .transactionDisable()
-                .cacheHardRefEnable()
+                //.transactionDisable()
+                //.cacheHardRefEnable()
                 //
                 //.newMemoryDirectDB()
                 .make();
