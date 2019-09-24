@@ -5,6 +5,7 @@ package org.erachain.dbs.mapDB;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.ArbitraryTransaction;
@@ -43,6 +44,7 @@ import java.util.*;
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
+@Slf4j
 public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit {
 
     private static int CUT_NAME_INDEX = 12;
@@ -63,7 +65,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     // Integer>>>signature_key;
 
     public TransactionFinalSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, logger);
     }
 
     @Override

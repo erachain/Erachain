@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
@@ -15,7 +16,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
 import org.mapdb.SerializerBase;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -23,10 +23,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 
+@Slf4j
 public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
 {
-
-    static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDB.class.getSimpleName());
 
     @SuppressWarnings("rawtypes")
     public NavigableSet senderKey;
@@ -36,7 +35,11 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     public NavigableSet typeKey;
 
     public TransactionSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, logger);
+    }
+
+    public TransactionSuitMapDB(DBASet databaseSet, DB database, Logger logger) {
+        super(databaseSet, database, logger);
     }
 
     @Override
@@ -160,9 +163,11 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         return Fun.filter(((TransactionSuitMapDB)map).typeKey,
                 new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type)).iterator();
     }
+
     public Iterator senderIterator(String sender) {
         return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender).iterator();
     }
+
     public Iterator recipientIterator(String recipient) {
         return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient).iterator();
     }

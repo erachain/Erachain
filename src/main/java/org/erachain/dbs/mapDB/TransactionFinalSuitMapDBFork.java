@@ -2,6 +2,7 @@ package org.erachain.dbs.mapDB;
 
 //04/01 +- 
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
@@ -31,11 +32,12 @@ import java.util.Iterator;
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
+@Slf4j
 public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transaction>
         implements TransactionFinalSuit {
 
     public TransactionFinalSuitMapDBFork(TransactionFinalMap parent, DBASet databaseSet) {
-        super(parent, databaseSet);
+        super(parent, databaseSet, logger);
     }
 
     @Override

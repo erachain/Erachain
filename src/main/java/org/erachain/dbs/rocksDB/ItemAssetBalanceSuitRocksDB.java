@@ -56,7 +56,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
             byte[]> balanceAddressIndex;
 
     public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, logger);
     }
 
     //private final ByteableBigDecimal byteableBigDecimal = new ByteableBigDecimal();

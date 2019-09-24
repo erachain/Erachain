@@ -1,13 +1,12 @@
 package org.erachain.dbs.rocksDB;
 
-import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
+import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -17,7 +16,6 @@ import java.util.TreeMap;
  * @param <T>
  * @param <U>
  */
-@Slf4j
 public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
 
     protected DBTab<T, U> parent;
@@ -29,7 +27,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
+        this.logger = logger;
         assert (parent != null);
 
         this.databaseSet = dcSet;

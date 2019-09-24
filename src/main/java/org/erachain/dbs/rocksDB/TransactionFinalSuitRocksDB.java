@@ -4,6 +4,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.ArbitraryTransaction;
@@ -21,8 +22,6 @@ import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.spongycastle.util.Arrays;
 
 import java.util.ArrayList;
@@ -30,10 +29,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
+@Slf4j
 public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit
 {
-
-    static Logger logger = LoggerFactory.getLogger(TransactionFinalSuitRocksDB.class.getSimpleName());
 
     private static final int CUT_NAME_INDEX = 12;
     private final String NAME_TABLE = "TRANSACTION_FINAL_TABLE";
@@ -49,7 +47,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     ArrayIndexDB<Long, Transaction, Fun.Tuple2<String, Integer>> titleTypeTxs;
 
     public TransactionFinalSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, logger);
     }
 
     @Override
@@ -136,12 +134,12 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
                     return keys;
                 }, (result, key) -> {
-                    if (result == null) {
-                        return null;
-                    }
-                    return org.bouncycastle.util.Arrays.concatenate(result.a.getBytes(), Ints.toByteArray(result.b));
-                }
-            );
+            if (result == null) {
+                return null;
+            }
+            return org.bouncycastle.util.Arrays.concatenate(result.a.getBytes(), Ints.toByteArray(result.b));
+        }
+        );
 
         indexes.add(senderTxs);
         indexes.add(recipientTxs);

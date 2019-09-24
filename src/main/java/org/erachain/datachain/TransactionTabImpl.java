@@ -73,15 +73,12 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    logger.info("use DBS_ROCK_DB");
                     map = new TransactionSuitRocksDB(databaseSet, database);
                     break;
                 case DBS_MAP_DB_IN_MEM:
-                    logger.info("use DBS_MAP_DB_IN_MEM");
                     map = new TransactionSuitMapDBinMem(databaseSet, database);
                     break;
                 default:
-                    logger.info("use DBS_MAP_DB");
                     map = new TransactionSuitMapDB(databaseSet, database);
             }
         } else {

@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
@@ -7,8 +8,6 @@ import org.erachain.datachain.ItemAssetBalanceTab;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -16,15 +15,14 @@ import java.util.List;
 
 // TODO SOFT HARD TRUE
 
+@Slf4j
 public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-            implements ItemAssetBalanceSuit {
-
-    static Logger logger = LoggerFactory.getLogger(ItemAssetBalanceSuitMapDBFork.class.getSimpleName());
+        implements ItemAssetBalanceSuit {
 
     public ItemAssetBalanceSuitMapDBFork(ItemAssetBalanceTab parent, DBASet databaseSet) {
-        super(parent, databaseSet);
+        super(parent, databaseSet, logger);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -88,6 +86,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
     public Iterator<byte[]> accountIterator(Account account) {
         return null;
     }
+
     @Override
     // NOT used in FORK
     public List<byte[]> accountKeys(Account account) {

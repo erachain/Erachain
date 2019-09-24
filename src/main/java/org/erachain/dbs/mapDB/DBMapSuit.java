@@ -9,6 +9,7 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
 
 import java.util.*;
 
@@ -21,6 +22,7 @@ import java.util.*;
 @Slf4j
 public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
+    protected Logger logger;
     public int DESCENDING_SHIFT_INDEX = 10000;
 
     protected DBASet databaseSet;
@@ -33,11 +35,13 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
+        this.logger = logger;
         this.databaseSet = databaseSet;
         this.database = database;
         getMap();
         createIndexes();
+        logger.info("USED");
     }
 
     /**

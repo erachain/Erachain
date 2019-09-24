@@ -1,21 +1,19 @@
 package org.erachain.dbs.nativeMemMap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.mapDB.DBMapSuit;
 import org.mapdb.DB;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
+@Slf4j
 public class NativeMapHashMap<T, U> extends DBMapSuit<T, U> {
-
-    static Logger logger = LoggerFactory.getLogger(NativeMapHashMap.class.getSimpleName());
 
     private U DEFAULT_VALUE;
 
     public NativeMapHashMap(DBASet databaseSet, DB database, U defaultValue) {
-        super(databaseSet, database);
+        super(databaseSet, database, logger);
         DEFAULT_VALUE = defaultValue;
     }
 

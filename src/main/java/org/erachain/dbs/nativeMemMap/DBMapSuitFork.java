@@ -6,7 +6,6 @@ import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.mapDB.DBMapSuit;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,8 +24,6 @@ import java.util.Set;
  */
 public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
 
-    protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
-
     protected DBTab<T, U> parent;
 
     /**
@@ -39,7 +36,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
+        this.logger = logger;
         this.databaseSet = dcSet;
         this.database = dcSet.database;
 
@@ -155,7 +153,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
             this.outUses();
             return old != null;
         } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
 
         this.outUses();

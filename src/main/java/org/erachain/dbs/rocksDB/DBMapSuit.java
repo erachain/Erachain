@@ -1,12 +1,12 @@
 package org.erachain.dbs.rocksDB;
 
-import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.InnerDBTable;
 import org.mapdb.DB;
+import org.slf4j.Logger;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -20,9 +20,9 @@ import java.util.Set;
  * @param <U>
  */
 
-@Slf4j
 public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
+    protected Logger logger;
     protected DBASet databaseSet;
     protected DB database;
 
@@ -33,8 +33,9 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
 
+        this.logger = logger;
         this.databaseSet = databaseSet;
         // database - is null
 
@@ -47,6 +48,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         if(databaseSet != null) {
             databaseSet.addExternalMaps(this);
         }
+        logger.info("USED");
     }
 
     // ЭТО внешняя база - которую надо закрывать и флушить отдельно

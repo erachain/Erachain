@@ -72,11 +72,9 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    logger.info("use DBS_ROCK_DB");
                     map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
                     break;
                 default:
-                    logger.info("use DBS_MAP_DB");
                     map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
             }
         } else {

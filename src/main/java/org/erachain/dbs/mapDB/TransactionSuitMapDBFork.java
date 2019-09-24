@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
@@ -10,20 +11,16 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple2Comparator;
 import org.mapdb.SerializerBase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.NavigableSet;
 
+@Slf4j
 public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionSuit
 {
 
-    static Logger logger = LoggerFactory.getLogger(TransactionSuitMapDBFork.class.getSimpleName());
-
     public TransactionSuitMapDBFork(TransactionTab parent, DBASet databaseSet) {
-        super(parent, databaseSet);
+        super(parent, databaseSet, logger);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.erachain.dbs.rocksDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
@@ -19,18 +20,15 @@ import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.erachain.dbs.rocksDB.transformation.toBytesStringLongInteger;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
 {
-
-    static Logger logger = LoggerFactory.getLogger(TransactionSuitRocksDB.class.getSimpleName());
 
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE";
     private final String timestampIndexName = "timestamp_unc_txs";
@@ -45,7 +43,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     ListIndexDB<Long, Transaction, Fun.Tuple3<String, Long, Integer>> addressTypeIndex;
 
     public TransactionSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, logger);
     }
 
     @Override
@@ -146,174 +144,174 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     /*********************** GLEB
 
-    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-        List<Long> result = new ArrayList<>();
-        for (long key = fromKey; key < toKey; key++) {
-            if (rocksDBTable.containsKey(key)) {
-                result.add(key);
-            }
-        }
-        return result;
+     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
+     List<Long> result = new ArrayList<>();
+     for (long key = fromKey; key < toKey; key++) {
+     if (rocksDBTable.containsKey(key)) {
+     result.add(key);
+     }
+     }
+     return result;
 
-    }
+     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+     @SuppressWarnings({"rawtypes", "unchecked"})
 
-    public Iterable findTransactionsKeys(String address, String sender, String recipient,
-                                         int type, boolean desc, int offset, int limit, long timestamp) {
-        Iterable senderKeys = null;
-        Iterable recipientKeys = null;
-        TreeSet<Object> treeKeys = new TreeSet<>();
+     public Iterable findTransactionsKeys(String address, String sender, String recipient,
+     int type, boolean desc, int offset, int limit, long timestamp) {
+     Iterable senderKeys = null;
+     Iterable recipientKeys = null;
+     TreeSet<Object> treeKeys = new TreeSet<>();
 
-        if (address != null) {
-            sender = address;
-            recipient = address;
-        }
+     if (address != null) {
+     sender = address;
+     recipient = address;
+     }
 
-        if (sender == null && recipient == null) {
-            return treeKeys;
-        }
-        //  timestamp = null;
-        senderKeys = receiveIndexKeys(sender, type, timestamp, senderKeys, senderUnconfirmedTransactionIndexName);
-        recipientKeys = receiveIndexKeys(recipient, type, timestamp, recipientKeys, recipientUnconfirmedTransactionIndexName);
-        if (address != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-        } else if (sender != null && recipient != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
-        } else if (sender != null) {
-            treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        } else {
-            treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-        }
+     if (sender == null && recipient == null) {
+     return treeKeys;
+     }
+     //  timestamp = null;
+     senderKeys = receiveIndexKeys(sender, type, timestamp, senderKeys, senderUnconfirmedTransactionIndexName);
+     recipientKeys = receiveIndexKeys(recipient, type, timestamp, recipientKeys, recipientUnconfirmedTransactionIndexName);
+     if (address != null) {
+     treeKeys.addAll(Sets.newTreeSet(senderKeys));
+     treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+     } else if (sender != null && recipient != null) {
+     treeKeys.addAll(Sets.newTreeSet(senderKeys));
+     treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
+     } else if (sender != null) {
+     treeKeys.addAll(Sets.newTreeSet(senderKeys));
+     } else {
+     treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+     }
 
-        Iterable keys;
-        if (desc) {
-            keys = ((TreeSet) treeKeys).descendingSet();
-        } else {
-            keys = treeKeys;
-        }
-        limit = (limit == 0) ? Iterables.size(keys) : limit;
-        return Iterables.limit(Iterables.skip(keys, offset), limit);
+     Iterable keys;
+     if (desc) {
+     keys = ((TreeSet) treeKeys).descendingSet();
+     } else {
+     keys = treeKeys;
+     }
+     limit = (limit == 0) ? Iterables.size(keys) : limit;
+     return Iterables.limit(Iterables.skip(keys, offset), limit);
 
-    }
+     }
 
-    private Iterable receiveIndexKeys(String recipient, int type, long timestamp, Iterable recipientKeys, String recipientUnconfirmedTransactionIndexName) {
-        if (recipient != null) {
-            if (type > 0) {
-                recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(
-                        indexByteableTuple3StringLongInteger.toBytes(new Tuple3<>(recipient, timestamp, type), null),
-                        rocksDBTable.getIndexByName(addressTypeUnconfirmedTransactionIndexName));
-            } else {
-                recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(recipient.getBytes(), rocksDBTable.getIndexByName(recipientUnconfirmedTransactionIndexName));
-            }
-        }
-        return recipientKeys;
-    }
+     private Iterable receiveIndexKeys(String recipient, int type, long timestamp, Iterable recipientKeys, String recipientUnconfirmedTransactionIndexName) {
+     if (recipient != null) {
+     if (type > 0) {
+     recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(
+     indexByteableTuple3StringLongInteger.toBytes(new Tuple3<>(recipient, timestamp, type), null),
+     rocksDBTable.getIndexByName(addressTypeUnconfirmedTransactionIndexName));
+     } else {
+     recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(recipient.getBytes(), rocksDBTable.getIndexByName(recipientUnconfirmedTransactionIndexName));
+     }
+     }
+     return recipientKeys;
+     }
 
-    public List<Transaction> findTransactions(String address, String sender, String recipient,
-                                              int type, boolean desc, int offset, int limit, long timestamp) {
+     public List<Transaction> findTransactions(String address, String sender, String recipient,
+     int type, boolean desc, int offset, int limit, long timestamp) {
 
-        Iterable keys = findTransactionsKeys(address, sender, recipient,
-                type, desc, offset, limit, timestamp);
-        return getUnconfirmedTransaction(keys);
+     Iterable keys = findTransactionsKeys(address, sender, recipient,
+     type, desc, offset, limit, timestamp);
+     return getUnconfirmedTransaction(keys);
 
-    }
+     }
 
 
-    public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
-        Iterator iter = keys.iterator();
-        List<Transaction> transactions = new ArrayList<>();
-        Transaction item;
-        Long key;
-        while (iter.hasNext()) {
-            key = (Long) iter.next();
-            item = this.rocksDBTable.get(key);
-            transactions.add(item);
-        }
-        return transactions;
-    }
+     public List<Transaction> getUnconfirmedTransaction(Iterable keys) {
+     Iterator iter = keys.iterator();
+     List<Transaction> transactions = new ArrayList<>();
+     Transaction item;
+     Long key;
+     while (iter.hasNext()) {
+     key = (Long) iter.next();
+     item = this.rocksDBTable.get(key);
+     transactions.add(item);
+     }
+     return transactions;
+     }
 
-    public List<Transaction> getTransactionsByAddressFast100(String address, int limitSize) {
-        HashSet<Long> treeKeys = new HashSet<>();
-        Set<Long> senderKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.getIndexByName(senderUnconfirmedTransactionIndexName));
-        List<Long> senderKeysLimit = senderKeys.stream().limit(limitSize).collect(Collectors.toList());
-        Set<Long> recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.getIndexByName(recipientUnconfirmedTransactionIndexName));
-        List<Long> recipientKeysLimit = recipientKeys.stream().limit(limitSize).collect(Collectors.toList());
-        treeKeys.addAll(senderKeysLimit);
-        treeKeys.addAll(recipientKeysLimit);
-        return getUnconfirmedTransaction(Iterables.limit(treeKeys, limitSize));
+     public List<Transaction> getTransactionsByAddressFast100(String address, int limitSize) {
+     HashSet<Long> treeKeys = new HashSet<>();
+     Set<Long> senderKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.getIndexByName(senderUnconfirmedTransactionIndexName));
+     List<Long> senderKeysLimit = senderKeys.stream().limit(limitSize).collect(Collectors.toList());
+     Set<Long> recipientKeys = rocksDBTable.filterAppropriateValuesAsKeys(address.getBytes(), rocksDBTable.getIndexByName(recipientUnconfirmedTransactionIndexName));
+     List<Long> recipientKeysLimit = recipientKeys.stream().limit(limitSize).collect(Collectors.toList());
+     treeKeys.addAll(senderKeysLimit);
+     treeKeys.addAll(recipientKeysLimit);
+     return getUnconfirmedTransaction(Iterables.limit(treeKeys, limitSize));
 
-    }
+     }
 
-    // slow?? without index
-    public List<Transaction> getTransactionsByAddress(String address) {
-        ArrayList<Transaction> result = new ArrayList<Transaction>();
-        Iterator<Long> iterator = getIterator(false);
-        Account account = new Account(address);
+     // slow?? without index
+     public List<Transaction> getTransactionsByAddress(String address) {
+     ArrayList<Transaction> result = new ArrayList<Transaction>();
+     Iterator<Long> iterator = getIterator(false);
+     Account account = new Account(address);
 
-        Transaction transaction;
-        boolean ok;
+     Transaction transaction;
+     boolean ok;
 
-        int i = 0;
-        int n = 100;
-        while (iterator.hasNext()) {
-            transaction = rocksDBTable.get(iterator.next());
-            ok = transaction.getCreator().getAddress().equals(address);
-            if (!ok) {
-                HashSet<Account> recipients = transaction.getRecipientAccounts();
-                if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
-                    continue;
-                }
-            }
-            // SET LIMIT
-            if (++i > n) {
-                break;
-            }
-            result.add(transaction);
-        }
-        return result;
-    }
+     int i = 0;
+     int n = 100;
+     while (iterator.hasNext()) {
+     transaction = rocksDBTable.get(iterator.next());
+     ok = transaction.getCreator().getAddress().equals(address);
+     if (!ok) {
+     HashSet<Account> recipients = transaction.getRecipientAccounts();
+     if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
+     continue;
+     }
+     }
+     // SET LIMIT
+     if (++i > n) {
+     break;
+     }
+     result.add(transaction);
+     }
+     return result;
+     }
 
-    public List<Transaction> getTransactions(boolean descending) {
-        ArrayList<Transaction> result = new ArrayList<Transaction>();
-        logger.debug("get ITERATOR");
-        Iterator<Long> iterator = getIterator(descending);
-        logger.debug("get ITERATOR - DONE");
+     public List<Transaction> getTransactions(boolean descending) {
+     ArrayList<Transaction> result = new ArrayList<Transaction>();
+     logger.debug("get ITERATOR");
+     Iterator<Long> iterator = getIterator(descending);
+     logger.debug("get ITERATOR - DONE");
 
-        Transaction transaction;
-        while (iterator.hasNext()) {
-            transaction = get(iterator.next());
-            result.add(transaction);
-        }
-        return result;
-    }
+     Transaction transaction;
+     while (iterator.hasNext()) {
+     transaction = get(iterator.next());
+     result.add(transaction);
+     }
+     return result;
+     }
 
-    public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
-        ArrayList<Transaction> result = new ArrayList<>();
-        Iterator<Long> iterator = getIterator(descending);
-        Account account = new Account(address);
-        int i = 0;
-        Transaction transaction;
-        while (iterator.hasNext()) {
-            transaction = rocksDBTable.get(iterator.next());
-            if (type != 0 && type != transaction.getType()) {
-                continue;
-            }
-            HashSet<Account> recipients = transaction.getRecipientAccounts();
-            if (recipients == null || recipients.isEmpty()) {
-                continue;
-            }
-            if (recipients.contains(account) && transaction.getTimestamp() >= timestamp) {
-                result.add(transaction);
-                i++;
-                if (count > 0 && i > count) {
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-    */
+     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
+     ArrayList<Transaction> result = new ArrayList<>();
+     Iterator<Long> iterator = getIterator(descending);
+     Account account = new Account(address);
+     int i = 0;
+     Transaction transaction;
+     while (iterator.hasNext()) {
+     transaction = rocksDBTable.get(iterator.next());
+     if (type != 0 && type != transaction.getType()) {
+     continue;
+     }
+     HashSet<Account> recipients = transaction.getRecipientAccounts();
+     if (recipients == null || recipients.isEmpty()) {
+     continue;
+     }
+     if (recipients.contains(account) && transaction.getTimestamp() >= timestamp) {
+     result.add(transaction);
+     i++;
+     if (count > 0 && i > count) {
+     break;
+     }
+     }
+     }
+     return result;
+     }
+     */
 }

@@ -69,11 +69,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    logger.info("use DBS_ROCK_DB");
                     map = new TransactionFinalSuitRocksDB(databaseSet, database);
                     break;
                 default:
-                    logger.info("use DBS_MAP_DB");
                     map = new TransactionFinalSuitMapDB(databaseSet, database);
             }
         } else {

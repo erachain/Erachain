@@ -1,5 +1,6 @@
 package org.erachain.dbs.rocksDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionSuit;
@@ -10,17 +11,14 @@ import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableLong;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.BiFunction;
 
+@Slf4j
 public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionSuit
 {
-
-    static Logger logger = LoggerFactory.getLogger(TransactionSuitRocksDBFork.class.getSimpleName());
 
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE_FORK";
     private final String timestampIndexName = "timestamp_unc_txs";
@@ -28,7 +26,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     private SimpleIndexDB<Long, Transaction, Long> timestampIndex;
 
     public TransactionSuitRocksDBFork(TransactionTab parent, DBASet databaseSet) {
-        super(parent, databaseSet);
+        super(parent, databaseSet, logger);
     }
 
     @Override
