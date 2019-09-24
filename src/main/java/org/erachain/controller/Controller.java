@@ -826,27 +826,30 @@ public class Controller extends Observable {
 
         }
 
-        guiTimer = new GuiTimer();
+        if (BlockGenerator.TEST_DB == 0) {
+            guiTimer = new GuiTimer();
 
-        if (this.wallet.isWalletDatabaseExisting()) {
-            this.wallet.initiateItemsFavorites();
+            if (this.wallet.isWalletDatabaseExisting()) {
+                this.wallet.initiateItemsFavorites();
+            }
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
+
+            if (Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
+                    && !this.wallet.getAccounts().isEmpty()) {
+                this.wallet.synchronize(true);
+            }
+            // create telegtam
+
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Telegram")));
+            this.telegramStore = TelegramStore.getInstanse(this.dcSetWithObserver, this.dynamicGUI);
+
+
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Telegram OK")));
+
         }
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
-
-        if (Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
-                && !this.wallet.getAccounts().isEmpty()) {
-            this.wallet.synchronize(true);
-        }
-        // create telegtam
-
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Open Telegram")));
-        this.telegramStore = TelegramStore.getInstanse(this.dcSetWithObserver, this.dynamicGUI);
-
-
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Telegram OK")));
 
         // CREATE BLOCKGENERATOR
         this.blockGenerator = new BlockGenerator(this.dcSet, this.blockChain, true);
@@ -1623,16 +1626,23 @@ public class Controller extends Observable {
     }
 
     public void addActivePeersObserver(Observer o) {
-        this.network.addObserver(o);
-        this.guiTimer.addObserver(o);
+        if (this.network != null)
+            this.network.addObserver(o);
+        if (this.guiTimer != null)
+            this.guiTimer.addObserver(o);
     }
 
     public void removeActivePeersObserver(Observer o) {
-        this.guiTimer.deleteObserver(o);
-        this.network.deleteObserver(o);
+        if (this.network != null)
+            this.guiTimer.deleteObserver(o);
+        if (this.guiTimer != null)
+            this.network.deleteObserver(o);
     }
 
     public void broadcastWinBlock(Block newBlock) {
+
+        if (network == null)
+            return;
 
         LOGGER.info("broadcast winBlock " + newBlock.toString() + " size:" + newBlock.getTransactionCount());
 
@@ -2647,7 +2657,9 @@ public class Controller extends Observable {
 
         try {
             this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
-            this.network.clearHandledWinBlockMessages();
+            if (network != null) {
+                this.network.clearHandledWinBlockMessages();
+            }
 
         } catch (Exception e) {
             if (this.isOnStopping()) {
@@ -2662,8 +2674,10 @@ public class Controller extends Observable {
 
         /// logger.info("and broadcast it");
 
-        // broadcast my HW
-        broadcastHWeightFull();
+        if (network != null) {
+            // broadcast my HW
+            broadcastHWeightFull();
+        }
 
         return true;
     }
@@ -3459,13 +3473,17 @@ public class Controller extends Observable {
     }
 
     public void addWalletObserver(Observer o) {
-        this.wallet.addObserver(o);
-        this.guiTimer.addObserver(o); // обработка repaintGUI
+        if (this.wallet != null)
+            this.wallet.addObserver(o);
+        if (this.guiTimer != null)
+            this.guiTimer.addObserver(o); // обработка repaintGUI
     }
 
     public void deleteWalletObserver(Observer o) {
-        this.guiTimer.deleteObserver(o); // нужно для перерисовки раз в 2 сек
-        this.wallet.deleteObserver(o);
+        if (this.guiTimer != null)
+            this.guiTimer.deleteObserver(o); // нужно для перерисовки раз в 2 сек
+        if (this.wallet != null)
+            this.wallet.deleteObserver(o);
     }
 
     public void addWalletFavoritesObserver(Observer o) {
@@ -3653,7 +3671,7 @@ public class Controller extends Observable {
 
                 Status.getinstance();
 
-                if (!useGui) {
+                if (!useGui || BlockGenerator.TEST_DB > 0) {
                     LOGGER.info("-nogui used");
                 } else {
 

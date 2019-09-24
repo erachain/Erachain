@@ -36,7 +36,7 @@ import java.util.*;
 public class BlockGenerator extends MonitoredThread implements Observer {
 
     public static final boolean TEST_001 = false;
-    public static final int TEST_DB = 1000;
+    public static final int TEST_DB = 10000;
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = new PrivateKeyAccount[TEST_DB];
 
     private static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
@@ -264,6 +264,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
+
+        if (TEST_DB > 0) {
+            return new Tuple2<List<Transaction>, Integer>(testTransactions(), TEST_DB);
+        }
 
         Timestamp timestampPoit = new Timestamp(timestamp);
         LOGGER.debug("* * * * * COLLECT TRANSACTIONS on " + timestampPoit);
@@ -646,7 +650,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // GET real HWeight
                 // пингуем всех тут чтобы знать кому слать свои транакции
                 // на самом деле они сами присылают свое состояние после апдейта
-                if (NTP.getTime() - pointPing > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 1) {
+                if (TEST_DB > 0) {
+                    pointPing = 0;
+                } else if (NTP.getTime() - pointPing > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 1) {
                     // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
                     pointPing = NTP.getTime();
                     ctrl.pingAllPeers(false);
@@ -686,7 +692,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (timeTmp > NTP.getTime())
                     continue;
 
-                if (timePoint != timeTmp) {
+                if (TEST_DB > 0 || timePoint != timeTmp) {
                     timePoint = timeTmp;
                     timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS(height);
                     betterPeer = null;
@@ -707,7 +713,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 // is WALLET
-                if (ctrl.doesWalletExists()) {
+                if (TEST_DB > 0 || ctrl.doesWalletExists()) {
 
                     if (timePoint > NTP.getTime()) {
                         continue;
@@ -721,7 +727,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // поэтому сдвиг = 0
                     ctrl.checkStatusAndObserve(0);
 
-                    if (forgingStatus == ForgingStatus.FORGING_WAIT
+                    if (TEST_DB == 0 && forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 1) < NTP.getTime()
                             || (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) && height < 100
                             || height < 10)) {
@@ -729,7 +735,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         setForgingStatus(ForgingStatus.FORGING);
                     }
 
-                    if (//true ||
+                    if (TEST_DB > 0 ||
                             (forgingStatus == ForgingStatus.FORGING // FORGING enabled
                                     && betterPeer == null && !ctrl.needUpToDate()
                                     && (this.solvingReference == null // AND GENERATING NOT MAKED
@@ -1098,7 +1104,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (flushPoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()) {
+                            if (TEST_DB == 0 && flushPoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()) {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша
