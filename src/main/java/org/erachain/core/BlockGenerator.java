@@ -5,8 +5,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.lang.Lang;
@@ -250,7 +252,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     recipient = TEST_DB_ACCOUNTS[TEST_DB - 1 - index];
             }
 
-            messageTx = new R_Send(TEST_DB_ACCOUNTS[index], (byte) 0, recipient, assetKey,
+            messageTx = new RSend(TEST_DB_ACCOUNTS[index], (byte) 0, recipient, assetKey,
                     amount, "weripwoeit", null, isText, encryptMessage, NTP.getTime(), 0l);
             messageTx.sign(TEST_DB_ACCOUNTS[index], Transaction.FOR_NETWORK);
             unconfirmedTransactions.add(messageTx);
@@ -600,6 +602,19 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long pointLogWaitFlush = 0;
 
         this.initMonitor();
+
+        if (TEST_DB > 0) {
+            byte[] seed = Crypto.getInstance().digest("test24243k2l3j42kl43j".getBytes());
+            byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+            PrivateKeyAccount certifier = new PrivateKeyAccount(privateKey);
+            BigDecimal balance = new BigDecimal("10000");
+
+            for (int nonce = 0; nonce < TEST_DB; nonce++) {
+                TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
+                // SET BALANCES
+                TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true);
+            }
+        }
 
         while (!ctrl.isOnStopping()) {
 
