@@ -105,6 +105,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
 
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                         val.setDC((DCSet) databaseSet);
 
                         for (Account acc : val.getRecipientAccounts()) {

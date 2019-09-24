@@ -81,6 +81,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         recipientTxs = new ListIndexDB<>(recipientTransactionsIndexName,
                 (Long aLong, Transaction transaction) -> {
                     List<String> recipients = new ArrayList<>();
+
+                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                    transaction.setDC((DCSet) databaseSet);
+
                     for (Account account : transaction.getRecipientAccounts()) {
                         recipients.add(account.getAddress());
                     }
@@ -89,6 +93,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         addressTypeTxs = new ListIndexDB<>(addressTypeTransactionsIndexName,
                 (aLong, transaction) -> {
+
+                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                    transaction.setDC((DCSet) databaseSet);
+
                     Integer type = transaction.getType();
                     List<Tuple2<String, Integer>> addressesTypes = new ArrayList<>();
                     for (Account account : transaction.getInvolvedAccounts()) {
@@ -106,6 +114,10 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         titleTypeTxs = new ArrayIndexDB<>(titleTypeTransactionsIndexName,
                 (aLong, transaction) -> {
+
+                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                    transaction.setDC((DCSet) databaseSet);
+
                     String title = transaction.getTitle();
                     if (title == null || title.isEmpty() || title.equals(""))
                         return null;

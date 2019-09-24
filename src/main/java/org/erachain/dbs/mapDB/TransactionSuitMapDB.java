@@ -1,6 +1,5 @@
 package org.erachain.dbs.mapDB;
 
-import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
@@ -19,7 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NavigableSet;
 
 public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionSuit
 {
@@ -73,6 +75,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
                     public String[] run(Long key, Transaction val) {
                         List<String> recps = new ArrayList<String>();
 
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                         val.setDC((DCSet)databaseSet);
 
                         for (Account acc : val.getRecipientAccounts()) {
@@ -95,6 +98,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
                         List<Fun.Tuple3<String, Long, Integer>> recps = new ArrayList<Fun.Tuple3<String, Long, Integer>>();
                         Integer type = val.getType();
 
+                        // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
                         val.setDC((DCSet)databaseSet);
 
                         for (Account acc : val.getInvolvedAccounts()) {

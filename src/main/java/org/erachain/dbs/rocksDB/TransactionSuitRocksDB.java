@@ -3,6 +3,7 @@ package org.erachain.dbs.rocksDB;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
@@ -70,13 +71,19 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                 new ByteableLong().toBytesObject(result.b)));
 
         recipientsIndex = new ArrayIndexDB<>(recipientsIndexName,
-                (aLong, transaction) -> transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new),
+                (aLong, transaction) -> {
+                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                    transaction.setDC((DCSet) databaseSet);
+                    return transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new);
+                },
                 (result, key) -> new ByteableString().toBytesObject(result));
 
         //indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
         addressTypeIndex
                 = new ListIndexDB<>(addressTypeIndexName,
                 (aLong, transaction) -> {
+                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                    transaction.setDC((DCSet) databaseSet);
                     Integer type = transaction.getType();
                     return transaction.getInvolvedAccounts().stream().map(
                             (account) -> (new Fun.Tuple3<>(account.getAddress(), transaction.getTimestamp(), type))).collect(Collectors.toList());
