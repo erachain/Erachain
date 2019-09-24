@@ -3,7 +3,6 @@ package org.erachain.dbs.mapDB;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
-import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -24,14 +23,53 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
         if (false) {
             database = DBMaker
                     .newMemoryDB()
+                    .freeSpaceReclaimQ(4)
                     //.transactionDisable()
                     //.cacheHardRefEnable()
                     //
                     //.newMemoryDirectDB()
                     .make();
         } else {
+
             File dbFile = new File(Settings.getInstance().getDataDir(), "txPool.dat");
-            database = DCSet.getHardBase(dbFile);
+            dbFile.getParentFile().mkdirs();
+
+            /// https://jankotek.gitbooks.io/mapdb/performance/
+            //CREATE DATABASE
+            database = DBMaker.newFileDB(dbFile)
+
+                    .deleteFilesAfterClose()
+                    .transactionDisable()
+
+                    ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
+                    //////
+                    // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                    // у другого типа КЭША происходит утечка памяти
+                    //.cacheHardRefEnable()
+                    //.cacheLRUEnable()
+                    ///.cacheSoftRefEnable()
+                    .cacheWeakRefEnable()
+
+                    // количество точек в таблице которые хранятся в HashMap как в КЭШе
+                    // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
+                    // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
+                    .cacheSize(1024)
+
+                    .checksumEnable()
+                    .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
+                    .commitFileSyncDisable() // ++
+
+                    //.snapshotEnable()
+                    //.asyncWriteEnable()
+                    //.asyncWriteFlushDelay(100)
+
+                    // если при записи на диск блока процессор сильно нагружается - то уменьшить это
+                    // не нагружать процессор для поиска свободного места в базе данных
+                    // >2 - удаляет удаленные записи полностью и не раздувает базу
+                    // 2 - не удаляет ключи и не сжимает базу при удалении записей, база растет
+                    .freeSpaceReclaimQ(0)
+                    .sizeLimit(0.3) // ограничивает рост базы - если freeSpaceReclaimQ < 3
+                    .make();
         }
 
         // OPEN MAP
@@ -40,7 +78,6 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
-
 
     }
 

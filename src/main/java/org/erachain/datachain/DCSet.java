@@ -1552,7 +1552,7 @@ public class DCSet extends DBASet {
         this.addUses();
 
         // try repopulate table
-        if (System.currentTimeMillis() - poinClear > 6000000) {
+        if (false && System.currentTimeMillis() - poinClear > 6000000) {
             poinClear = System.currentTimeMillis();
             TransactionTab utxMap = getTransactionTab();
             LOGGER.debug("try CLEAR UTXs");
@@ -1621,7 +1621,7 @@ public class DCSet extends DBASet {
                 LOGGER.error(e.getMessage(), e);
             }
 
-            LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " +getEngineSize() + "   %%%%%%  commit time: "
+            LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
                     + (System.currentTimeMillis() - start) / 1000);
 
             this.actions = 0l;
