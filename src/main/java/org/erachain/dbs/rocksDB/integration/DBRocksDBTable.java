@@ -140,60 +140,62 @@ public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integratio
         byte[] bytesValue = byteableValue.toBytesObject(value);
         db.put(columnFamilyHandles.get(0), keyBytes, bytesValue);
         if (logON) logger.info("valueBytes.length = " + bytesValue.length);
-        for (IndexDB indexDB: indexes) {
-            if (indexDB instanceof SimpleIndexDB) {
-                if (logON) logger.info("SimpleIndex");
-                ////// тут получаем ответы от двух функций Индекса - формирования ключа и преобразования его в байты
-                //// причем у Глеба тут опять передается ключ первичный - даже для серилиазации результат из вервого вызова
-                SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
-                Object apply = simpleIndexDB.getBiFunction().apply(key, value);
-                byte[] bytes = indexDB.getIndexByteable().toBytes(apply, key);
-                if (bytes == null) {
-                    continue;
-                }
-                if (logON) logger.info("SimpleIndex.bytes.length = " + bytes.length);
-                byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                db.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
-            } else if (indexDB instanceof ArrayIndexDB) {
-                if (logON) logger.info("ArrayIndex");
-                ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
-                BiFunction biFunction = arrayIndexDB.getBiFunction();
-                Object[] apply = (Object[]) biFunction.apply(key, value);
-                if (apply == null) {
-                    continue;
-                }
-                if (logON) logger.info("ArrayIndex.count.elements = " + apply.length);
-                for (Object valueIndex : apply) {
-                    byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
+        if (indexes != null && !indexes.isEmpty()) {
+            for (IndexDB indexDB : indexes) {
+                if (indexDB instanceof SimpleIndexDB) {
+                    if (logON) logger.info("SimpleIndex");
+                    ////// тут получаем ответы от двух функций Индекса - формирования ключа и преобразования его в байты
+                    //// причем у Глеба тут опять передается ключ первичный - даже для серилиазации результат из вервого вызова
+                    SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
+                    Object apply = simpleIndexDB.getBiFunction().apply(key, value);
+                    byte[] bytes = indexDB.getIndexByteable().toBytes(apply, key);
                     if (bytes == null) {
                         continue;
                     }
+                    if (logON) logger.info("SimpleIndex.bytes.length = " + bytes.length);
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    if (logON) logger.info("ArrayIndex.bytes.length = " + bytes.length);
                     db.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
-                }
-
-            } else if (indexDB instanceof ListIndexDB) {
-                if (logON) logger.info("ListIndex");
-                ListIndexDB listIndexDB = (ListIndexDB) indexDB;
-                BiFunction biFunction = listIndexDB.getBiFunction();
-                List<Object> apply = (List<Object>) biFunction.apply(key, value);
-                if (apply == null) {
-                    continue;
-                }
-                if (logON) logger.info("ListIndex.count.elements = " + apply.size());
-                for (Object valueIndex : apply) {
-                    byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
-                    if (bytes == null) {
+                } else if (indexDB instanceof ArrayIndexDB) {
+                    if (logON) logger.info("ArrayIndex");
+                    ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
+                    BiFunction biFunction = arrayIndexDB.getBiFunction();
+                    Object[] apply = (Object[]) biFunction.apply(key, value);
+                    if (apply == null) {
                         continue;
                     }
-                    byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    if (logON) logger.info("ListIndex.bytes.length = " + bytes.length);
-                    db.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
-                }
+                    if (logON) logger.info("ArrayIndex.count.elements = " + apply.length);
+                    for (Object valueIndex : apply) {
+                        byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
+                        if (bytes == null) {
+                            continue;
+                        }
+                        byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
+                        if (logON) logger.info("ArrayIndex.bytes.length = " + bytes.length);
+                        db.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
+                    }
 
-            } else {
-                throw new UnsupportedTypeIndexException();
+                } else if (indexDB instanceof ListIndexDB) {
+                    if (logON) logger.info("ListIndex");
+                    ListIndexDB listIndexDB = (ListIndexDB) indexDB;
+                    BiFunction biFunction = listIndexDB.getBiFunction();
+                    List<Object> apply = (List<Object>) biFunction.apply(key, value);
+                    if (apply == null) {
+                        continue;
+                    }
+                    if (logON) logger.info("ListIndex.count.elements = " + apply.size());
+                    for (Object valueIndex : apply) {
+                        byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
+                        if (bytes == null) {
+                            continue;
+                        }
+                        byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
+                        if (logON) logger.info("ListIndex.bytes.length = " + bytes.length);
+                        db.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
+                    }
+
+                } else {
+                    throw new UnsupportedTypeIndexException();
+                }
             }
         }
 
