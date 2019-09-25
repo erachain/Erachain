@@ -19,6 +19,8 @@ import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -325,7 +327,17 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             // делать форк только если есть трнзакции - так как это сильно кушает память
             if (newBlockDC == null) {
                 //CREATE FORK OF GIVEN DATABASE
-                newBlockDC = dcSet.fork();
+                // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+                DB database = DBMaker
+                        .newMemoryDB()
+                        .freeSpaceReclaimQ(5)
+                        .transactionDisable()
+                        .cacheHardRefEnable()
+                        .deleteFilesAfterClose()
+                        //
+                        //.newMemoryDirectDB()
+                        .make();
+                newBlockDC = dcSet.fork(database);
             }
 
             transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
