@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
@@ -17,7 +18,10 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
  * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
- *
+ * Этот класс позаимствовани из проекта "tron". Скорее всего он использовался для разделения функционала.
+ * Это средняя прослойка между верхним и нижним интерфейсом. Используется для инициализации БД и перенаправления индексов.
+ * Можно обойтись без этой прослойки
+ * Встроить можно все что угодно куда угодно
  * ЯФ так опнял это Обертка база данных как файл с обработкой закрыть открыть сохранить.
  */
 @Slf4j
@@ -28,6 +32,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
     @Setter
 
     // TODO ?? зачем эта переменная? какой функционал
+    //эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     private boolean dbSync;
 
     @Getter
@@ -36,8 +41,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
     private WriteOptionsWrapper optionsWrapper;
 
     public RocksDB(String name) {
-        db = new RocksDbDataSourceImpl(
-                Paths.get(ROCKS_DB_FOLDER).toString(), name);
+        db = new RocksDbDataSourceImpl(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name);
         optionsWrapper = WriteOptionsWrapper.getInstance().sync(dbSync);
         db.initDB(new ArrayList<>());
     }

@@ -68,11 +68,16 @@ public class RocksDBVsMapDB {
     }
 
 
+    /**
+     * Если тут создается новый файл то все проходит успешно. Если файл уже создан то он открывается и ошибка преобразования
+     * Нужно удалять файл для успешного теста
+     * Видимо dbOptions не такие же как при создании базы
+     */
     @Test
     public void rocksDBProductivityWithCommits() {
         logger.info("Start test RocksDB productivity commit");
         InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest<>();
-        String NAME_DATABASE = "TestRocksDB";
+        String NAME_DATABASE = "TestRocksDB1";
         long timeMillisBefore = System.currentTimeMillis();
         RocksDB db = new RocksDB(NAME_DATABASE);
         TransactionDB transactionDB = (TransactionDB) db.getDb().getDatabase();
