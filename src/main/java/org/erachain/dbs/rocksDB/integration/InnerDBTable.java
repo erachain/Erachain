@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  TODO ??
+ * TODO зачем выделен этот файл, какой функционал он несет
+ * Почему не взять сразу RocksDB ?
  * @param <K>
  * @param <V>
  */

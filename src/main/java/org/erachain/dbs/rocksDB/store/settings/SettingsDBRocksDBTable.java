@@ -5,9 +5,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableAtomicLong;
-import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
-import org.mapdb.Atomic;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +13,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- *  TODO ??
+ * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
+ * он вообще не используется
  */
 @Slf4j
 public class SettingsDBRocksDBTable {

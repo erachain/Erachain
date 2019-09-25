@@ -21,7 +21,8 @@ package org.erachain.dbs.rocksDB.common;
 import org.rocksdb.RocksDBException;
 
 /**
- *  TODO ??
+ * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
+ * Почему putData а не put и т.д.?
  *
  * @param <K>
  * @param <V>

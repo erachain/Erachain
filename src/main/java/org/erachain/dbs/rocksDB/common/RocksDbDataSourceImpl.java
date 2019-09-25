@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import static org.rocksdb.RocksDB.loadLibrary;
 
 /**
- *  TODO ??
+ * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
  */
 @Slf4j
 @NoArgsConstructor

@@ -137,7 +137,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         return DEFAULT_VALUE;
     }
 
-    // TODO - release it
+    // TODO - release it on Iterators
 
     public List<byte[]> assetKeys_bad(long assetKey) {
         return ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
