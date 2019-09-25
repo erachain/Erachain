@@ -18,6 +18,7 @@ import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
 import java.util.*;
 
@@ -90,7 +91,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                     map = new TransactionSuitRocksDBFork((TransactionTab) parent, databaseSet);
                     break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, ItemAssetBalanceSuit.DEFAULT_VALUE);
+                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.COMPARATOR, ItemAssetBalanceSuit.DEFAULT_VALUE);
             }
         }
     }

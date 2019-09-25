@@ -7,10 +7,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.mapDB.DBMapSuit;
 import org.slf4j.Logger;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Observer;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Это только форкнутые таблицы
@@ -31,12 +28,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
      */
     boolean OLD_USED_NOW = false;
 
+    protected Comparator COMPARATOR;
+
     //ConcurrentHashMap deleted;
     HashMap deleted;
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Comparator comparator, Logger logger) {
         this.logger = logger;
         this.databaseSet = dcSet;
         this.database = dcSet.database;
@@ -52,9 +51,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
         }
 
         this.parent = parent;
+        COMPARATOR = comparator;
 
         this.getMap();
 
+    }
+
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
+        this(parent, dcSet, null, logger);
     }
 
 
