@@ -275,7 +275,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
 //                    options.setMaxBackgroundCompactions(settings.getCompactThreads());
 //                    options.setLevel0FileNumCompactionTrigger(settings.getLevel0FileNumCompactionTrigger());
 //                    options.setTargetFileSizeMultiplier(settings.getTargetFileSizeMultiplier());
-//                    options.setTargetFileSizeBase(settings.getTargetFileSizeBase());
+                    //options.setTargetFileSizeBase(settings.getTargetFileSizeBase());
 
 //                    BlockBasedTableConfig tableCfg = settingsBlockBasedTable(settings);
 //                    options.setTableFormatConfig(tableCfg);

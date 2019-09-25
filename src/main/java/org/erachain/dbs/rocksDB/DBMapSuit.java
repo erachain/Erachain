@@ -45,9 +45,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         //OPEN MAP
         getMap();
 
-        if(databaseSet != null) {
-            databaseSet.addExternalMaps(this);
-        }
         logger.info("USED");
     }
 
@@ -153,6 +150,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     @Override
     public void close() {
         map.close();
+        logger.info("closed");
     }
 
     @Override

@@ -18,7 +18,6 @@ import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -509,10 +508,10 @@ public class DCSet extends DBASet {
         //CREATE INSTANCE
         instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false, 0);
         if (instance.actions < 0) {
-            dbFile.delete();
-            for (DBMapSuit map: instance.externalMaps) {
-                map.clear();
+            for (DBTab tab : instance.tables) {
+                tab.clear();
             }
+            dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
         }
 
@@ -1492,9 +1491,9 @@ public class DCSet extends DBASet {
                 this.addUses();
 
                 if (this.getBlockMap().isProcessing()) {
-                    for (DBMapSuit suitMap: externalMaps) {
+                    for (DBTab tab : tables) {
                         try {
-                            suitMap.rollback();
+                            tab.rollback();
                         } catch (IOError e) {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1509,9 +1508,9 @@ public class DCSet extends DBASet {
                     // not need on close!
                     // getBlockMap().resetLastBlockSignature();
                 } else {
-                    for (DBMapSuit suitMap: externalMaps) {
+                    for (DBTab tab : tables) {
                         try {
-                            suitMap.commit();
+                            tab.commit();
                         } catch (IOError e) {
                             LOGGER.error(e.getMessage(), e);
                         }
@@ -1524,9 +1523,9 @@ public class DCSet extends DBASet {
                     }
                 }
 
-                for (DBMapSuit suitMap: externalMaps) {
+                for (DBTab tab : tables) {
                     try {
-                        suitMap.close();
+                        tab.close();
                     } catch (IOError e) {
                         LOGGER.error(e.getMessage(), e);
                     }
@@ -1549,8 +1548,8 @@ public class DCSet extends DBASet {
 
     public void rollback() {
         this.addUses();
-        for (DBMapSuit suitMap: externalMaps) {
-            //suitMap.rollback();
+        for (DBTab tab : tables) {
+            tab.commit();
         }
 
         this.database.rollback();
@@ -1608,8 +1607,8 @@ public class DCSet extends DBASet {
                 + (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB? "by diff Size Engine:" + diffSizeEngine : "")
                 );
 
-            for (DBMapSuit suitMap: externalMaps) {
-                //suitMap.commit();
+            for (DBTab tab : tables) {
+                tab.commit();
             }
 
             this.database.commit();

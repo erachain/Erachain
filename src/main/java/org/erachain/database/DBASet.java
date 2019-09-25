@@ -1,7 +1,7 @@
 package org.erachain.database;
 // 30/03 ++
 
-import org.erachain.dbs.DBMapSuit;
+import org.erachain.dbs.DBTab;
 import org.mapdb.DB;
 
 import java.io.File;
@@ -18,9 +18,9 @@ abstract public class DBASet implements IDB {
 
     protected File DATA_FILE;
     public DB database;
-    protected int uses;
+    protected List<DBTab> tables = new ArrayList<>();
 
-    protected List<DBMapSuit> externalMaps = new ArrayList<>();
+    protected int uses;
 
     private boolean withObserver;// observe
     private boolean dynamicGUI;// observe
@@ -66,6 +66,10 @@ abstract public class DBASet implements IDB {
         this.uses--;
     }
 
+    public void addTable(DBTab table) {
+        tables.add(table);
+    }
+
     public boolean isWithObserver() {
         return this.withObserver;
     }
@@ -92,14 +96,6 @@ abstract public class DBASet implements IDB {
         } else {
             return false;
         }
-    }
-
-    public List<DBMapSuit> getExternalMaps() {
-        return externalMaps;
-    }
-
-    public void addExternalMaps(DBMapSuit mapSuit) {
-        externalMaps.add(mapSuit);
     }
 
     public void clearCache() {

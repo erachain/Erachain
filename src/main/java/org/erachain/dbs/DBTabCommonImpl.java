@@ -57,6 +57,8 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
             observableData = new HashMap<Integer, Integer>(8, 1);
         }
 
+        this.databaseSet.addTable(this);
+
     }
 
     public DBTabCommonImpl(DBASet databaseSet, DB database) {
