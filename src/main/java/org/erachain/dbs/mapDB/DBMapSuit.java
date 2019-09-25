@@ -35,6 +35,15 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
+    /**
+     *
+     * @param databaseSet
+     * @param database - общая база данных для данного набора - вообще надо ее в набор свтавить и все.
+     *                 У каждой таблицы внутри может своя база данных открытьваться.
+     *                 А команды базы данных типа close commit должны из таблицы передаваться в свою.
+     *                 Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
+     * @param logger
+     */
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
         this.logger = logger;
         this.databaseSet = databaseSet;

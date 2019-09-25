@@ -136,6 +136,18 @@ public class DCSet extends DBASet {
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
+    /**
+     *
+     * @param dbFile
+     * @param database общая база данных для данного набора - вообще надо ее в набор свтавить и все.
+     *               У каждой таблицы внутри может своя база данных открытьваться.
+     *               А команды базы данных типа close commit должны из таблицы передаваться в свою.
+     *               Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
+     * @param withObserver
+     * @param dynamicGUI
+     * @param inMemory
+     * @param defaultDBS
+     */
     public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory, int defaultDBS) {
         super(dbFile, database, withObserver, dynamicGUI);
 

@@ -28,14 +28,20 @@ abstract public class DBASet implements IDB {
     public DBASet() {
     }
 
-    public DBASet(File DATA_FILE, boolean withObserver, boolean dynamicGUI) {
+    /**
+     *
+     * @param DATA_FILE
+     * @param database общая база данных для данного набора - вообще надо ее в набор свтавить и все.
+     *               У каждой таблицы внутри может своя база данных открытьваться.
+     *               А команды базы данных типа close commit должны из таблицы передаваться в свою.
+     *               Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
+     * @param withObserver
+     * @param dynamicGUI
+     */
+    public DBASet(File DATA_FILE, DB database, boolean withObserver, boolean dynamicGUI) {
         this.DATA_FILE = DATA_FILE;
         this.withObserver = withObserver;
         this.dynamicGUI = dynamicGUI;
-    }
-
-    public DBASet(File DATA_FILE, DB database, boolean withObserver, boolean dynamicGUI) {
-        this(DATA_FILE, withObserver, dynamicGUI);
         this.database = database;
     }
 

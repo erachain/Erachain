@@ -68,6 +68,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
                     // >2 - удаляет удаленные записи полностью и не раздувает базу
                     // 2 - не удаляет ключи и не сжимает базу при удалении записей, база растет
                     .freeSpaceReclaimQ(0)
+                    // .remove + .put - java.io.IOError: java.io.IOException: no free space to expand Volume
                     .sizeLimit(0.3) // ограничивает рост базы - если freeSpaceReclaimQ < 3
                     .make();
         }
