@@ -2,18 +2,17 @@ package org.erachain.datachain;
 
 //04/01 +- 
 
-import com.google.common.primitives.Longs;
 import org.mapdb.DB;
+import org.mapdb.Hasher;
 import org.mapdb.SerializerBase;
-
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Поиск по подписи ссылки на транзакцию
  * signature (as UUID bytes16) -> <BlockHeoght, Record No> (as Long)
  */
-public class TransactionFinalMapSigns extends DCUMap<UUID, Long> {
+public class TransactionFinalMapSigns extends DCUMap<byte[], Long> {
+
+    static int KEY_LEN = 12;
 
     public TransactionFinalMapSigns(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -23,31 +22,21 @@ public class TransactionFinalMapSigns extends DCUMap<UUID, Long> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<UUID, Long> openMap(DB database) {
-
-        // HASH map is so QUICK
-        return database.createHashMap("signature_final_tx")
-                .keySerializer(SerializerBase.UUID)
-                //.hasher(Hasher.UUID)
-                .valueSerializer(SerializerBase.LONG)
-                .makeOrGet();
-
-    }
-
     @Override
     protected void getMap() {
         //OPEN MAP
-        map = openMap(database);
+        // HASH map is so QUICK
+        map = database.createHashMap("signature_final_tx")
+                .keySerializer(SerializerBase.BYTE_ARRAY)
+                .hasher(Hasher.BYTE_ARRAY)
+                .valueSerializer(SerializerBase.LONG)
+                .makeOrGet();
     }
 
     @Override
     protected void getMemoryMap() {
         //OPEN MAP
-        this.getMap();
+        getMap();
     }
 
     @Override
@@ -57,44 +46,33 @@ public class TransactionFinalMapSigns extends DCUMap<UUID, Long> {
 
     public boolean contains(byte[] signature) {
 
-        // make 12 bytes KEY
-        long key1 = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
-                signature[4], signature[5], signature[6], signature[7]);
-        long key2 = Longs.fromBytes(signature[8], signature[9], signature[10], signature[11],
-                (byte)0, (byte)0, (byte)0, (byte)0);
-
-        UUID key = new UUID(key1, key2);
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
         return super.contains(key);
     }
 
     public Long get(byte[] signature) {
-        long key1 = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
-                signature[4], signature[5], signature[6], signature[7]);
-        long key2 = Longs.fromBytes(signature[8], signature[9], signature[10], signature[11],
-                (byte)0, (byte)0, (byte)0, (byte)0);
-
-        UUID key = new UUID(key1, key2);
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
         return super.get(key);
     }
 
-    public Long delete(byte[] signature) {
-        long key1 = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
-                signature[4], signature[5], signature[6], signature[7]);
-        long key2 = Longs.fromBytes(signature[8], signature[9], signature[10], signature[11],
-                (byte)0, (byte)0, (byte)0, (byte)0);
+    public void delete(byte[] signature) {
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        super.remove(key);
+    }
 
-        UUID key = new UUID(key1, key2);
+    public Long remove(byte[] signature) {
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
         return super.remove(key);
     }
 
     public boolean set(byte[] signature, Long refernce) {
-        long key1 = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
-                signature[4], signature[5], signature[6], signature[7]);
-        long key2 = Longs.fromBytes(signature[8], signature[9], signature[10], signature[11],
-                (byte)0, (byte)0, (byte)0, (byte)0);
-
-        UUID key = new UUID(key1, key2);
-        return this.set(key, refernce);
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        return super.set(key, refernce);
 
     }
 
