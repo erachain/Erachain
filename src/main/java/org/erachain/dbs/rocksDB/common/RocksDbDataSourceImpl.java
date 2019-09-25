@@ -294,6 +294,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                     options.setDbWriteBufferSize(dbWriteBufferSize);
                     options.setParanoidFileChecks(false);
                     options.setCompressionType(CompressionType.NO_COMPRESSION);
+
                     options.setParanoidChecks(false);
                     options.setAllowMmapReads(true);
                     options.setAllowMmapWrites(true);
@@ -307,7 +308,10 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                         try (final DBOptions dbOptions = new DBOptions()) {
                             TransactionDBOptions transactionDbOptions = new TransactionDBOptions();
                             try {
+
+                                // MAKE DATABASE
                                 database = TransactionDB.open(options, transactionDbOptions, dbPath.toString());
+
                                 columnFamilyHandles.add(database.getDefaultColumnFamily());
                                 int indexID = 0;
                                 for (ColumnFamilyDescriptor columnFamilyDescriptor : columnFamilyDescriptors) {
@@ -319,7 +323,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                 create = true;
                             } catch (RocksDBException e) {
                                 dbOptions.setCreateIfMissing(true);
-                                dbOptions.setCreateMissingColumnFamilies(true);
+                                //dbOptions.setCreateMissingColumnFamilies(true);
 //                                dbOptions.setIncreaseParallelism(3);
 //                                dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
 //                                dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
@@ -331,13 +335,18 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
 //                                dbOptions.setMaxBackgroundCompactions(8);
 //                                dbOptions.setMaxSubcompactions(4);
                                 dbOptions.setDbWriteBufferSize(dbWriteBufferSize);
+
                                 dbOptions.setParanoidChecks(false);
                                 dbOptions.setAllowMmapReads(true);
                                 dbOptions.setAllowMmapWrites(true);
+
                                 columnFamilyDescriptors.clear();
                                 columnFamilyDescriptors.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts));
                                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
+
+                                // MAKE DATABASE
                                 database = TransactionDB.open(dbOptions, dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
+
                                 if (indexes != null && !indexes.isEmpty()) {
                                     for (int i = 0; i < indexes.size(); i++) {
                                         indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));

@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 
@@ -40,8 +41,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
     private WriteOptionsWrapper optionsWrapper;
 
     public RocksDB(String name) {
-        db = new RocksDbDataSourceImpl(
-                Paths.get(ROCKS_DB_FOLDER).toString(), name);
+        db = new RocksDbDataSourceImpl(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name);
         optionsWrapper = WriteOptionsWrapper.getInstance().sync(dbSync);
         db.initDB(new ArrayList<>());
     }
