@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.rocksdb.WriteOptions;
 
 /**
- *  TODO ??
+ * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
  */
 public class WriteOptionsWrapper {
 

@@ -1,14 +1,11 @@
 package org.erachain.dbs.mapDB;
 
-import com.google.common.collect.Iterables;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
-import org.erachain.datachain.TransactionSuit;
-import org.erachain.datachain.TransactionTab;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -16,12 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-
-// TODO SOFT HARD TRUE
 
 public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,

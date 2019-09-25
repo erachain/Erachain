@@ -27,7 +27,7 @@ import java.util.Set;
 
 
 /**
- * TODO ??
+ * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
  * @param <V>
  */
 public interface DbSourceInter<V> extends BatchSourceInter<byte[], V> {

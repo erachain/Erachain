@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
- *  TODO ??
+ * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
  *
  * Походу тут происходит обработка настроенных вторичных индексов
  *

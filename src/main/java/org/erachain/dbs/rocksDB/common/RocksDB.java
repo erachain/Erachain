@@ -16,7 +16,7 @@ import java.util.Set;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
- * TODO ??
+ * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
  *
  * ЯФ так опнял это Обертка база данных как файл с обработкой закрыть открыть сохранить.
  */
@@ -26,7 +26,8 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
 
     @Getter
     @Setter
-    // TODO ??
+
+    // TODO ?? зачем эта переменная? какой функционал
     private boolean dbSync;
 
     @Getter

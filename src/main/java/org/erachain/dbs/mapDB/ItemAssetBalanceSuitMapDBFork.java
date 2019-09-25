@@ -11,11 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-// TODO SOFT HARD TRUE
 
 public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
