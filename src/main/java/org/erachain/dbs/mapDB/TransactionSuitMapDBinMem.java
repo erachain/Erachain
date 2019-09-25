@@ -14,18 +14,19 @@ import java.io.File;
 public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
 
     public TransactionSuitMapDBinMem(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, null, logger);
     }
 
     @Override
     public void getMap() {
 
-        if (false) {
+        if (true) {
             database = DBMaker
                     .newMemoryDB()
-                    .freeSpaceReclaimQ(4)
-                    //.transactionDisable()
-                    //.cacheHardRefEnable()
+                    .freeSpaceReclaimQ(5)
+                    .transactionDisable()
+                    .cacheHardRefEnable()
+                    .deleteFilesAfterClose()
                     //
                     //.newMemoryDirectDB()
                     .make();
@@ -89,7 +90,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
 
     @Override
     public void clear() {
-        database.close();
+        close();
         getMap();
         createIndexes();
     }

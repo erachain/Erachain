@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOError;
 import java.nio.file.Files;
-import java.util.Collection;
 import java.util.Random;
 
 /**
@@ -1564,15 +1563,17 @@ public class DCSet extends DBASet {
         this.addUses();
 
         // try repopulate table
-        if (false && System.currentTimeMillis() - poinClear > 6000000) {
+        if (System.currentTimeMillis() - poinClear > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1)) {
             poinClear = System.currentTimeMillis();
             TransactionTab utxMap = getTransactionTab();
             LOGGER.debug("try CLEAR UTXs");
             int sizeUTX = utxMap.size();
             LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
             this.actions += sizeUTX;
-            Collection<Transaction> items = utxMap.values();
-            instance.getTransactionTab().clear();
+            // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
+            // так .values() выдает не отдельный массив а объект базы данных!
+            Transaction[] items = utxMap.values().toArray(new Transaction[]{});
+            utxMap.clear();
             for (Transaction item: items) {
                 utxMap.add(item);
             }
@@ -1621,16 +1622,22 @@ public class DCSet extends DBASet {
                 }
             }
 
-            try {
+            if (true) {
+                // нельзя папку с базами форков чистить между записями блоков
+                // так как еще другие процессы с форками есть - например создание своих трнзакций или своего блока
+                // они же тоже тут создаются
+                // а хотя тогда они и не удалятся - так как они не закрытые и сотанутся в папке... значит можно тут удалять - нужные не удлятся
+                try {
 
-                // там же лежит и он
-                ///transactionTab.close();
+                    // там же лежит и он
+                    ///transactionTab.close();
 
-                // удалим все в папке Temp
-                File tempDir = new File(Settings.getInstance().getDataTempDir());
-                Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
-            } catch (Throwable e) {
-                LOGGER.error(e.getMessage(), e);
+                    // удалим все в папке Temp
+                    File tempDir = new File(Settings.getInstance().getDataTempDir());
+                    Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                } catch (Throwable e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
