@@ -258,7 +258,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
             PrivateKeyAccount creator = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
             messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
-                    amount, "TEST for " + blockHeight + ", tx: " + index, null, isText, encryptMessage, timestamp, 0l);
+                    amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
 
             //unconfirmedTransactions.add(messageTx);
