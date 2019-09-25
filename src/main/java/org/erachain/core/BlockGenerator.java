@@ -273,8 +273,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
 
-        Timestamp timestampPoit = new Timestamp(timestamp);
-        LOGGER.debug("* * * * * COLLECT TRANSACTIONS on " + timestampPoit);
+        LOGGER.debug("* * * * * COLLECT TRANSACTIONS");
 
         long start = System.currentTimeMillis();
 

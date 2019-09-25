@@ -1455,11 +1455,11 @@ public class DCSet extends DBASet {
      * создать форк
      * @return
      */
-    public DCSet fork() {
+    public DCSet fork(DB database) {
         this.addUses();
 
         try {
-            DCSet fork = new DCSet(this, getHardBase());
+            DCSet fork = new DCSet(this, database == null ? getHardBase() : database);
 
             this.outUses();
             return fork;
@@ -1473,6 +1473,10 @@ public class DCSet extends DBASet {
             return null;
         }
 
+    }
+
+    public DCSet fork() {
+        return fork(getHardBase());
     }
 
     @Override

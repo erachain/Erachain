@@ -24,6 +24,7 @@ import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 import org.slf4j.Logger;
@@ -1529,7 +1530,16 @@ import java.util.*;
         return true;
     }
 
-    public boolean isValid(DCSet dcSet, boolean andProcess) {
+    /**
+     * проверка блока с возможностью исполнения. При этом с заданной базой где делать форк.
+     * Если проверка одного блока то в памяти можно делать форк
+     *
+     * @param dcSet
+     * @param database
+     * @param andProcess
+     * @return
+     */
+    public boolean isValid(DCSet dcSet, DB database, boolean andProcess) {
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
@@ -1595,7 +1605,7 @@ import java.util.*;
                 }
             } else {
                 long processTiming = System.nanoTime();
-                validatingDC = dcSet.fork();
+                validatingDC = dcSet.fork(database);
                 processTiming = (System.nanoTime() - processTiming) / 1000;
                 if (processTiming < 999999999999l) {
                     LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
@@ -1868,6 +1878,10 @@ import java.util.*;
 
         this.wasValidated = true;
         return true;
+    }
+
+    public boolean isValid(DCSet dcSet, boolean andProcess) {
+        return isValid(dcSet, DCSet.getHardBase(), andProcess);
     }
 
     //PROCESS/ORPHAN

@@ -33,6 +33,8 @@ import org.erachain.datachain.TransactionTab;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -72,7 +74,19 @@ public class TransactionCreator {
         if (this.fork != null) {
             this.fork.close();
         }
-        this.fork = DCSet.getInstance().fork();
+
+        // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+        DB database = DBMaker
+                .newMemoryDB()
+                .freeSpaceReclaimQ(5)
+                .transactionDisable()
+                .cacheHardRefEnable()
+                .deleteFilesAfterClose()
+                //
+                //.newMemoryDirectDB()
+                .make();
+
+        this.fork = DCSet.getInstance().fork(database);
 
         //UPDATE LAST BLOCK
         this.lastBlock = Controller.getInstance().getLastBlock();

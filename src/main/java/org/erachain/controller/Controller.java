@@ -53,6 +53,8 @@ import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.json.simple.JSONObject;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -2649,12 +2651,25 @@ public class Controller extends Observable {
             return false;
         }
 
-        if (!newBlock.isValidated())
+        if (!newBlock.isValidated()) {
             // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
             // или прри добавлении моего сгнерированного блока т.к. он не проверился?
-            if (!newBlock.isValid(dcSet, false))
+
+            // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+            DB database = DBMaker
+                    .newMemoryDB()
+                    .freeSpaceReclaimQ(5)
+                    .transactionDisable()
+                    .cacheHardRefEnable()
+                    .deleteFilesAfterClose()
+                    //
+                    //.newMemoryDirectDB()
+                    .make();
+
+            if (!newBlock.isValid(dcSet, database, false))
                 // тогда проверим заново полностью
                 return false;
+        }
 
         LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
 
