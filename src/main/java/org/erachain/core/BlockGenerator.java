@@ -312,6 +312,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             Transaction transaction = map.get(iterator.next());
+            if (transaction == null)
+                break;
 
             if (BlockChain.CHECK_BUGS > 7) {
                 LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));

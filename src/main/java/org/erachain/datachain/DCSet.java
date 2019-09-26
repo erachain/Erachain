@@ -1549,7 +1549,7 @@ public class DCSet extends DBASet {
     public void rollback() {
         this.addUses();
         for (DBTab tab : tables) {
-            tab.commit();
+            tab.rollback();
         }
 
         this.database.rollback();
