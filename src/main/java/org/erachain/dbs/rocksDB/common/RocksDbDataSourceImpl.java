@@ -35,7 +35,8 @@ import static org.rocksdb.RocksDB.loadLibrary;
 public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     private String dataBaseName;
     private Transaction transactionDB;
-    private WriteOptions transactionWriteOptions = new WriteOptions();
+    private WriteOptions transactionWriteOptions = new WriteOptions()
+            .setSync(false).setDisableWAL(true);
     @Getter
     //public RocksDB database;
     public TransactionDB database;
@@ -93,6 +94,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                 return;
             }
             alive = false;
+            transactionWriteOptions.dispose();
             database.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

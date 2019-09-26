@@ -34,7 +34,7 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
  * @param <V>
  */
 @Slf4j
-public class DBRocksDBTable<K, V> implements org.erachain.dbs.rocksDB.integration.InnerDBTable
+public class DBRocksDBTable<K, V> implements InnerDBTable
         <K, V> {
 
     private boolean logON = false;
