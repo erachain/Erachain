@@ -7,7 +7,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBMapSuit;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -21,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class DCSetTest {
@@ -167,10 +166,6 @@ public class DCSetTest {
             int counter = make();
             assertEquals(map.size(), counter);
 
-            List<DBMapSuit> externalTabs = dcSet.getExternalMaps();
-            for (DBMapSuit tab: externalTabs) {
-                //tab.;
-            }
             dcSet.commit();
 
             counter += make();

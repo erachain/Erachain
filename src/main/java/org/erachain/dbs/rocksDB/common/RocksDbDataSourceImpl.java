@@ -34,10 +34,11 @@ import static org.rocksdb.RocksDB.loadLibrary;
 @NoArgsConstructor
 public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     private String dataBaseName;
-
+    private Transaction transactionDB;
+    private WriteOptions transactionWriteOptions = new WriteOptions();
     @Getter
-    public RocksDB database;
-    //public TransactionDB database;
+    //public RocksDB database;
+    public TransactionDB database;
     //public OptimisticTransactionDB database;
 
     private boolean alive;
@@ -103,8 +104,17 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     // TODO нати реализацию
     @Override
     public void commit() {
-        //database.beginTransaction()
-        //TransactionDB.commit
+        // сольем старый и начнем новый
+        try {
+            transactionDB.commit();
+        } catch (RocksDBException e) {
+            try {
+                transactionDB.rollback();
+            } catch (RocksDBException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+        }
+        transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
     }
 
     // TODO нати реализацию
@@ -310,6 +320,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                             try {
 
                                 // MAKE DATABASE
+                                // USE transactions
                                 database = TransactionDB.open(options, transactionDbOptions, dbPath.toString());
 
                                 columnFamilyHandles.add(database.getDefaultColumnFamily());
@@ -321,6 +332,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                         indexes.get(indexID++).setColumnFamilyHandle(columnFamilyHandle);
                                 }
                                 create = true;
+                                logger.info("database created");
                             } catch (RocksDBException e) {
                                 dbOptions.setCreateIfMissing(true);
                                 //dbOptions.setCreateMissingColumnFamilies(true);
@@ -345,7 +357,9 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
 
                                 // MAKE DATABASE
-                                database = TransactionDB.open(dbOptions, dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
+                                // USE transactions
+                                database = TransactionDB.open(dbOptions, transactionDbOptions,
+                                        dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
 
                                 if (indexes != null && !indexes.isEmpty()) {
                                     for (int i = 0; i < indexes.size(); i++) {
@@ -353,12 +367,14 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
                                     }
                                 }
 
+                                logger.info("database opened");
                             }
 
                         } catch (RocksDBException e) {
                             logger.error(e.getMessage(), e);
                             throw new RuntimeException("Failed to initialize database", e);
                         }
+                        transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
                         alive = true;
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);
