@@ -32,6 +32,7 @@ public class ReferenceMap extends DCUMap<byte[], long[]> {
                 // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
                 .hasher(Hasher.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
                 // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
+                .valueSerializer(SerializerBase.LONG_ARRAY)
                 .counterEnable()
                 .makeOrGet();
     }

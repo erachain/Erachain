@@ -36,7 +36,8 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     private String dataBaseName;
     private Transaction transactionDB;
     private WriteOptions transactionWriteOptions = new WriteOptions()
-            .setSync(false).setDisableWAL(true);
+            .setSync(false) // не теряет данны при КРАХЕ
+            .setDisableWAL(true);
     @Getter
     //public RocksDB database;
     public TransactionDB database;

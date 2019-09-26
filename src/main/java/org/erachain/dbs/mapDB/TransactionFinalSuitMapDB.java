@@ -74,6 +74,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         // TREE MAP for sortable search
         map = database.createTreeMap("height_seq_transactions")
                 .keySerializer(BasicKeySerializer.BASIC)
+                //.keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
                 .valueSerializer(new TransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
