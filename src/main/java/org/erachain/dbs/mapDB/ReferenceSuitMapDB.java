@@ -45,4 +45,12 @@ public class ReferenceSuitMapDB extends DBMapSuit<byte[], long[]>
     }
      */
 
+    /*
+    @Override
+    public boolean set(byte[] key, long[] value) {
+        return super.set(key, value);
+    }
+
+     */
+
 }

@@ -49,7 +49,7 @@ public class ReferenceMapImpl extends DBTabImpl<byte[], long[]>
                     //map = new ReferenceSuitRocksDBFork((ReferenceMap) parent, databaseSet);
                     //break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.COMPARATOR);
+                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
             }
         }
     }

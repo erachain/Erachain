@@ -93,6 +93,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
             return u;
         } catch (Exception e) {
 
+            logger.error(e.getMessage(), e);
+
             U u = this.getDefaultValue();
             return u;
         }

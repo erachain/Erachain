@@ -35,10 +35,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Comparator comparator, Logger logger) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Comparator comparator, Logger logger, U defaultValue) {
         this.logger = logger;
         this.databaseSet = dcSet;
         this.database = dcSet.database;
+        this.defaultValue = defaultValue;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
@@ -58,7 +59,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
     }
 
     public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
-        this(parent, dcSet, null, logger);
+        this(parent, dcSet, null, logger, null);
     }
 
 
@@ -108,6 +109,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
             this.outUses();
             return u;
         } catch (Exception e) {
+
+            logger.error(e.getMessage(), e);
 
             U u = this.getDefaultValue();
             this.outUses();

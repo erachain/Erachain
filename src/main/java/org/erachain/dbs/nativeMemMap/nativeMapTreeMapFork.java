@@ -11,21 +11,8 @@ import java.util.TreeMap;
 public class nativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U>
 {
 
-    private U DEFAULT_VALUE;
-
     public nativeMapTreeMapFork(DBTab parent, DBASet databaseSet, Comparator comparator, U defaultValue) {
-        super(parent, databaseSet, comparator, logger);
-        DEFAULT_VALUE = defaultValue;
-    }
-
-    public nativeMapTreeMapFork(DBTab parent, DBASet databaseSet, U defaultValue) {
-        super(parent, databaseSet, logger);
-        DEFAULT_VALUE = defaultValue;
-    }
-
-    public nativeMapTreeMapFork(DBTab parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger);
-        DEFAULT_VALUE = null;
+        super(parent, databaseSet, comparator, logger, defaultValue);
     }
 
     @Override
@@ -44,10 +31,6 @@ public class nativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U>
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
-    }
-
-    public U getDefaultValue() {
-        return DEFAULT_VALUE;
     }
 
 }

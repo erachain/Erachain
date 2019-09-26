@@ -38,7 +38,7 @@ import java.util.*;
 public class BlockGenerator extends MonitoredThread implements Observer {
 
     // сколько трназакции в блоке - если больше 0 то запускает тест на старте
-    public static final int TEST_DB = 10000;
+    public static final int TEST_DB = 10;
     // размер балансового поля - чем больше тем сложнее
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[10000];
 
