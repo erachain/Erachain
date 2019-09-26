@@ -628,7 +628,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         if (TEST_DB > 0) {
 
             // REST balances! иначе там копится размер таблицы
-            dcSet.getAssetBalanceMap().clear();
+            //dcSet.getAssetBalanceMap().clear();
 
             byte[] seed = Crypto.getInstance().digest("test24243k2l3j42kl43j".getBytes());
             byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();

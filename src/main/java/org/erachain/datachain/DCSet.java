@@ -159,19 +159,19 @@ public class DCSet extends DBASet {
         try {
             // переделанные таблицы
             this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
-                    //DBS_MAP_DB
-                    DBS_ROCK_DB
+                    DBS_MAP_DB
+                    //DBS_ROCK_DB
                     , this, database);
 
             this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
-                    //DBS_MAP_DB
-                    DBS_ROCK_DB
+                    DBS_MAP_DB
+                    //DBS_ROCK_DB
                     //DBS_MAP_DB_IN_MEM
                     , this, database);
 
             this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0? defaultDBS:
-                    //DBS_MAP_DB
-                    DBS_ROCK_DB
+                    DBS_MAP_DB
+                    //DBS_ROCK_DB
                     , this, database);
 
 
@@ -302,19 +302,19 @@ public class DCSet extends DBASet {
 
         // переделанные поновой таблицы
         this.assetBalanceMap = new ItemAssetBalanceTabImpl(
-                //DBS_MAP_DB
+                DBS_MAP_DB
                 //DBS_ROCK_DB
-                DBS_NATIVE_MAP
+                //DBS_NATIVE_MAP
                 , parent.assetBalanceMap, this);
         this.transactionTab = new TransactionTabImpl(
-                //DBS_MAP_DB
+                DBS_MAP_DB
                 //DBS_ROCK_DB
-                DBS_NATIVE_MAP
+                //DBS_NATIVE_MAP
                 , parent.transactionTab, this);
         this.transactionFinalMap = new TransactionFinalMapImpl(
-                //DBS_MAP_DB
+                DBS_MAP_DB
                 //DBS_ROCK_DB
-                DBS_NATIVE_MAP
+                //DBS_NATIVE_MAP
                 , parent.transactionFinalMap, this);
 
 
