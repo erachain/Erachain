@@ -4,6 +4,7 @@ import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.ReferenceSuitMapDB;
 import org.erachain.dbs.mapDB.ReferenceSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
+import org.erachain.dbs.rocksDB.ReferenceSuitRocksDB;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
@@ -35,8 +36,8 @@ public class ReferenceMapImpl extends DBTabImpl<byte[], long[]>
                     //map = new ReferenceSuitMapDB(databaseSet, database);
                     //break;
                 case DBS_MAP_DB_IN_MEM:
-                    //map = new ReferenceSuitRocksDB(databaseSet, database);
-                    //break;
+                    map = new ReferenceSuitRocksDB(databaseSet, database);
+                    break;
                 default:
                     map = new ReferenceSuitMapDB(databaseSet, database);
             }
