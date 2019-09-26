@@ -38,10 +38,11 @@ public class ReferenceMap extends DCUMap<byte[], long[]> {
 
     @Override
     protected void getMemoryMap() {
-        map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
-    }
-
-    protected void createIndexes() {
+        if (database == null) {
+            map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
+        } else {
+            getMap();
+        }
     }
 
     @Override
