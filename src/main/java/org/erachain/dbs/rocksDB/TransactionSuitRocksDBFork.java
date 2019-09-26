@@ -26,7 +26,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     private SimpleIndexDB<Long, Transaction, Long> timestampIndex;
 
     public TransactionSuitRocksDBFork(TransactionTab parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger);
+        super(parent, databaseSet, logger, null);
     }
 
     @Override
@@ -54,11 +54,6 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
 
         indexes = new ArrayList<>();
         indexes.add(timestampIndex);
-    }
-
-    @Override
-    public Transaction getDefaultValue() {
-        return DEFAULT_VALUE;
     }
 
     @Override

@@ -27,8 +27,11 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     protected BTreeMap assetKeyMap;
     protected BTreeMap addressKeyMap;
 
-    public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+    public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database,
+                                     Tuple5<
+                                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> defaultValue) {
+        super(databaseSet, database, logger, defaultValue);
 
     }
 
@@ -138,14 +141,6 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
         });
 
     }
-
-    @Override
-    public Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getDefaultValue() {
-        return DEFAULT_VALUE;
-    }
-
 
     @Override
     public Collection<byte[]> assetKeys(long assetKey) {

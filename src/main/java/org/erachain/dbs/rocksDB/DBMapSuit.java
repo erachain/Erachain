@@ -33,11 +33,13 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue) {
 
-        this.logger = logger;
         this.databaseSet = databaseSet;
         // database - is null
+        this.database = database;
+        this.logger = logger;
+        this.defaultValue = defaultValue;
 
         // create INDEXES before
         createIndexes();
@@ -48,10 +50,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         logger.info("USED");
     }
 
-    // ЭТО внешняя база - которую надо закрывать и флушить отдельно
-    @Override
-    public boolean isExternal() {
-        return true;
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
+        this(databaseSet, database, logger, null);
     }
 
     @Override

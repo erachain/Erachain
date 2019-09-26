@@ -27,12 +27,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
-        this.logger = logger;
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
+        this.logger = logger;
+        this.defaultValue = defaultValue;
 
         if (false) {
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {

@@ -10,11 +10,8 @@ import java.util.HashMap;
 @Slf4j
 public class NativeMapHashMap<T, U> extends DBMapSuit<T, U> {
 
-    private U DEFAULT_VALUE;
-
     public NativeMapHashMap(DBASet databaseSet, DB database, U defaultValue) {
-        super(databaseSet, database, logger);
-        DEFAULT_VALUE = defaultValue;
+        super(databaseSet, database, logger, defaultValue);
     }
 
     @Override
@@ -28,10 +25,6 @@ public class NativeMapHashMap<T, U> extends DBMapSuit<T, U> {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
-    }
-
-    public U getDefaultValue() {
-        return DEFAULT_VALUE;
     }
 
 }

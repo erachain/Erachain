@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
 
+    protected U defaultValue;
+
     @Override
     public int getDefaultIndex() {
         return 0;
@@ -15,6 +17,9 @@ public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
     protected void createIndexes() {
     }
 
-    protected U getDefaultValue() { return null; }
+    @Override
+    public U getDefaultValue() {
+        return defaultValue;
+    }
 
 }

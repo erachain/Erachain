@@ -35,11 +35,11 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     public NavigableSet typeKey;
 
     public TransactionSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, null);
     }
 
     public TransactionSuitMapDB(DBASet databaseSet, DB database, Logger logger) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, null);
     }
 
     @Override
@@ -152,11 +152,6 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
                 });
 
 
-    }
-
-    @Override
-    public Transaction getDefaultValue() {
-        return DEFAULT_VALUE;
     }
 
     public Iterator typeIterator(String sender, Long timestamp, Integer type) {

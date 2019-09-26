@@ -91,7 +91,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                     map = new TransactionSuitRocksDBFork((TransactionTab) parent, databaseSet);
                     break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.COMPARATOR, ItemAssetBalanceSuit.DEFAULT_VALUE);
+                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.COMPARATOR, null);
             }
         }
     }

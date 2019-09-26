@@ -21,8 +21,11 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
         implements ItemAssetBalanceSuit {
 
-    public ItemAssetBalanceSuitMapDBFork(ItemAssetBalanceTab parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger);
+    public ItemAssetBalanceSuitMapDBFork(ItemAssetBalanceTab parent, DBASet databaseSet,
+                                         Tuple5<
+                                                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+                                                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> defaultValue) {
+        super(parent, databaseSet, logger, defaultValue);
     }
 
     @SuppressWarnings({"unchecked"})
@@ -60,13 +63,6 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
             map = treeMap;
         }
 
-    }
-
-    @Override
-    public Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getDefaultValue() {
-        return DEFAULT_VALUE;
     }
 
     @Override

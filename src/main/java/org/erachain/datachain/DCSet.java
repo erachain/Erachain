@@ -88,7 +88,7 @@ public class DCSet extends DBASet {
     //private BlockCreatorMap blockCreatorMap;
     private BlockSignsMap blockSignsMap;
     private BlocksHeadsMap blocksHeadsMap;
-    private ReferenceMap referenceMap;
+    private ReferenceMapImpl referenceMap;
     private NameMap nameMap;
     private NameStorageMap nameStorageMap;
     private OrphanNameStorageMap orphanNameStorageMap;
@@ -174,6 +174,12 @@ public class DCSet extends DBASet {
                     DBS_MAP_DB_IN_MEM // fast
                     , this, database);
 
+            this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
+                    //DBS_MAP_DB // slow
+                    //DBS_ROCK_DB // crash
+                    DBS_MAP_DB_IN_MEM // fast
+                    , this, database);
+
 
             this.actions = 0L;
 
@@ -181,7 +187,6 @@ public class DCSet extends DBASet {
             //this.blockCreatorMap = new BlockCreatorMap(this, database);
             this.blockSignsMap = new BlockSignsMap(this, database);
             this.blocksHeadsMap = new BlocksHeadsMap(this, database);
-            this.referenceMap = new ReferenceMap(this, database);
             this.addressForging = new AddressForging(this, database);
             this.credit_AddressesMap = new CreditAddressesMap(this, database);
             this.addressStatement_Refs = new AddressStatementRefs(this, database);
@@ -317,6 +322,11 @@ public class DCSet extends DBASet {
                 //DBS_NATIVE_MAP
                 , parent.transactionFinalMap, this);
 
+        this.referenceMap = new ReferenceMapImpl(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.referenceMap, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
@@ -341,7 +351,6 @@ public class DCSet extends DBASet {
         this.blockMap = new BlockMap(parent.blockMap, this);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
         this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
-        this.referenceMap = new ReferenceMap(parent.referenceMap, this);
         //this.nameMap = new NameMap(parent.nameMap);
         //this.nameStorageMap = new NameStorageMap(parent.nameStorageMap);
         //this.orphanNameStorageMap = new OrphanNameStorageMap(parent.orphanNameStorageMap);
@@ -1004,7 +1013,7 @@ public class DCSet extends DBASet {
      * account.address -> <tx2.parentTimestamp>
      *
      */
-    public ReferenceMap getReferenceMap() {
+    public ReferenceMapImpl getReferenceMap() {
         return this.referenceMap;
     }
 

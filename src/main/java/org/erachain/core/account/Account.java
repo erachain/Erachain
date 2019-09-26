@@ -17,7 +17,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.datachain.OrderMap;
-import org.erachain.datachain.ReferenceMap;
+import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
@@ -753,7 +753,7 @@ public class Account {
 
     public void setLastTimestamp(long[] currentPoint, DCSet dcSet) {
 
-        ReferenceMap map = dcSet.getReferenceMap();
+        ReferenceMapImpl map = dcSet.getReferenceMap();
 
         // GET CURRENT REFERENCE
         long[] reference = map.get(shortBytes);
@@ -773,7 +773,7 @@ public class Account {
 
     public void removeLastTimestamp(DCSet dcSet) {
 
-        ReferenceMap map = dcSet.getReferenceMap();
+        ReferenceMapImpl map = dcSet.getReferenceMap();
 
         // GET LAST TIMESTAMP
         long[] lastPoint = map.get(shortBytes);

@@ -20,7 +20,7 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
 {
 
     public TransactionSuitMapDBFork(TransactionTab parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger);
+        super(parent, databaseSet, logger, null);
     }
 
     @Override
@@ -65,11 +65,6 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
                     }
                 });
 
-    }
-
-    @Override
-    public Transaction getDefaultValue() {
-        return DEFAULT_VALUE;
     }
 
     @Override

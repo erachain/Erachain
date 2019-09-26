@@ -1,6 +1,5 @@
 package org.erachain.dbs.mapDB;
 
-import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
 import org.mapdb.BTreeMap;
@@ -19,7 +18,6 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-@Slf4j
 public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     protected Logger logger;
@@ -44,13 +42,20 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
      *                 Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
      * @param logger
      */
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
-        this.logger = logger;
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue) {
+
         this.databaseSet = databaseSet;
         this.database = database;
+        this.logger = logger;
+        this.defaultValue = defaultValue;
+
         getMap();
         createIndexes();
         logger.info("USED");
+    }
+
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
+        this(databaseSet, database, logger, null);
     }
 
     /**
@@ -113,21 +118,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     /**
-     * Эти таблицы внутренние
+     *
+     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param descending true if need descending sort
      * @return
      */
-    @Override
-    public boolean isExternal() {
-        return false;
-    }
-
-
-        /**
-         *
-         * @param index <b>primary Index = 0</b>, secondary index = 1...10000
-         * @param descending true if need descending sort
-         * @return
-         */
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();
@@ -306,6 +301,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
         this.outUses();
 
+    }
+
+    @Override
+    public U getDefaultValue() {
+        return defaultValue;
     }
 
     @Override

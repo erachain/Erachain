@@ -30,12 +30,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
     TreeMap<T, Boolean> deleted;
     int shiftSize;
 
-            public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
+            public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
         assert (parent != null);
 
-                this.logger = logger;
         this.databaseSet = dcSet;
         this.database = dcSet.database;
+                this.logger = logger;
+                this.defaultValue = defaultValue;
 
         if (false) {
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {

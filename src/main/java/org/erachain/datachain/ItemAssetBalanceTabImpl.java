@@ -49,6 +49,19 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> implements ItemAssetBalanceTab {
 
+    protected final static
+    Fun.Tuple5<
+            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+            DEFAULT_VALUE = new Fun.Tuple5<
+            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
+            Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+            (new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                    new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                    new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                    new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
+                    new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
+
     public ItemAssetBalanceTabImpl(int dbsUsed, DCSet databaseSet, DB database) {
         super(dbsUsed, databaseSet, database);
 
@@ -73,21 +86,21 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
+                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, DEFAULT_VALUE);
                     break;
                 default:
-                    map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
+                    map = new ItemAssetBalanceSuitMapDB(databaseSet, database, DEFAULT_VALUE);
             }
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet);
+                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet, DEFAULT_VALUE);
                     break;
                 //case DBS_ROCK_DB:
-                //    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
+                //    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, DEFAULT_VALUE);
                 //    break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, ItemAssetBalanceSuit.DEFAULT_VALUE);
+                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, DEFAULT_VALUE);
             }
         }
     }

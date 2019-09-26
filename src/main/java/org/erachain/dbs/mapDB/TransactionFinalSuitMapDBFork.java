@@ -37,7 +37,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         implements TransactionFinalSuit {
 
     public TransactionFinalSuitMapDBFork(TransactionFinalMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger);
+        super(parent, databaseSet, logger, null);
     }
 
     @Override
@@ -51,11 +51,6 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 .counterEnable()
                 .makeOrGet();
 
-    }
-
-    @Override
-    protected Transaction getDefaultValue() {
-        return null;
     }
 
     @Override

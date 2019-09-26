@@ -55,8 +55,14 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     Tuple2<BigDecimal, BigDecimal>>,
             byte[]> balanceAddressIndex;
 
-    public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+    public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database,
+                                       Tuple5<
+                                               Tuple2<BigDecimal, BigDecimal>,
+                                               Tuple2<BigDecimal, BigDecimal>,
+                                               Tuple2<BigDecimal, BigDecimal>,
+                                               Tuple2<BigDecimal, BigDecimal>,
+                                               Tuple2<BigDecimal, BigDecimal>> defaultValue) {
+        super(databaseSet, database, logger, defaultValue);
     }
 
     //private final ByteableBigDecimal byteableBigDecimal = new ByteableBigDecimal();
@@ -128,13 +134,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         indexes = new ArrayList<>();
         indexes.add(balanceKeyAssetIndex);
         indexes.add(balanceAddressIndex);
-    }
-
-    @Override
-    public Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getDefaultValue() {
-        return DEFAULT_VALUE;
     }
 
     // TODO - release it on Iterators

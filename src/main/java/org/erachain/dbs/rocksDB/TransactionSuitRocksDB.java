@@ -116,11 +116,6 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     }
 
     @Override
-    public Transaction getDefaultValue() {
-        return DEFAULT_VALUE;
-    }
-
-    @Override
     public Iterator<Long> typeIterator(String sender, Long timestamp, Integer type) {
         return ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeIndex.getColumnFamilyHandle(), toBytesStringLongInteger.toBytes(sender, timestamp, type)
                 , false);
