@@ -25,8 +25,11 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
                     .newMemoryDB()
                     .freeSpaceReclaimQ(5)
                     .transactionDisable()
-                    .cacheHardRefEnable()
                     .deleteFilesAfterClose()
+
+                    //.cacheHardRefEnable()
+                    .cacheDisable()
+
                     //
                     //.newMemoryDirectDB()
                     .make();

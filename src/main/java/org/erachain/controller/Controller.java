@@ -2658,10 +2658,14 @@ public class Controller extends Observable {
             // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
             DB database = DBMaker
                     .newMemoryDB()
-                    .freeSpaceReclaimQ(5)
                     .transactionDisable()
-                    .cacheHardRefEnable()
                     .deleteFilesAfterClose()
+
+                    //.cacheHardRefEnable()
+                    .cacheDisable()
+
+                    .freeSpaceReclaimQ(0)
+
                     //
                     //.newMemoryDirectDB()
                     .make();

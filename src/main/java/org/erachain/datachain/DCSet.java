@@ -45,7 +45,7 @@ public class DCSet extends DBASet {
     private static final long DELETIONS_BEFORE_COMPACT = BlockChain.MAX_BLOCK_SIZE_GEN << 6;
 
     /**
-     * если задано то выбран такой КЭШ который нужнос амим чистиь иначе реперолнение будет
+     * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
      */
     private static final boolean needClearCache = false;
 
@@ -175,9 +175,8 @@ public class DCSet extends DBASet {
                     , this, database);
 
             this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
-                    //DBS_MAP_DB // slow
-                    //DBS_ROCK_DB // crash
-                    DBS_MAP_DB_IN_MEM // fast
+                    DBS_MAP_DB // fast
+                    //DBS_ROCK_DB // slow
                     , this, database);
 
 
@@ -323,9 +322,9 @@ public class DCSet extends DBASet {
                 , parent.transactionFinalMap, this);
 
         this.referenceMap = new ReferenceMapImpl(
-                DBS_MAP_DB
+                //DBS_MAP_DB
                 //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                DBS_NATIVE_MAP
                 , parent.referenceMap, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
@@ -442,6 +441,10 @@ public class DCSet extends DBASet {
 
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
+
+                // try to FAST
+                .mmapFileEnablePartial()
+
                 .commitFileSyncDisable() // ++
 
                 //.snapshotEnable()
@@ -449,7 +452,8 @@ public class DCSet extends DBASet {
                 //.asyncWriteFlushDelay(100)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
+                // < 3 не удаляет записи физически при их удалении из базы логически иразмер растет постоянно
+                .freeSpaceReclaimQ(3)// не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
                 ;

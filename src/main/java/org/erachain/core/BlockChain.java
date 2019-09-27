@@ -13,6 +13,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -979,8 +981,24 @@ public class BlockChain {
 
         }
 
+        // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+        DB database = DBMaker
+                .newMemoryDB()
+                .transactionDisable()
+                .deleteFilesAfterClose()
+
+                //.cacheHardRefEnable()
+                .cacheDisable()
+                .mmapFileEnablePartial()
+
+                .freeSpaceReclaimQ(0)
+
+                //
+                //.newMemoryDirectDB()
+                .make();
+
         // FULL VALIDATE because before was only HEAD validating
-        if (!block.isValid(dcSet, false)) {
+        if (!block.isValid(dcSet, database, false)) {
 
             LOGGER.info("new winBlock is BAD!");
             if (peer != null)
