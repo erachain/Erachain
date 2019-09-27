@@ -28,7 +28,7 @@ public interface DB<K, V> {
 
     Set<K> keySet();
 
-    void reset();
+    //void reset();
 
     List<ColumnFamilyHandle> getColumnFamilyHandles();
 

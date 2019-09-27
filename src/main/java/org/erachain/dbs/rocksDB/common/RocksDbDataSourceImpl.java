@@ -106,8 +106,9 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
 
     // TODO нати реализацию
     @Override
-    public void commit() {
+    public synchronized void commit() {
         // сольем старый и начнем новый
+        resetDbLock.writeLock().lock();
         try {
             transactionDB.commit();
         } catch (RocksDBException e) {
@@ -116,6 +117,8 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             } catch (RocksDBException ex) {
                 logger.error(ex.getMessage(), ex);
             }
+        } finally {
+            resetDbLock.writeLock().unlock();
         }
         transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
     }
@@ -123,10 +126,19 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     // TODO нати реализацию
     @Override
     public void rollback() {
-    }
-
-    @Override
-    public void reset() {
+        resetDbLock.writeLock().lock();
+        try {
+            transactionDB.rollback();
+        } catch (RocksDBException e) {
+            try {
+                transactionDB.commit();
+            } catch (RocksDBException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+        } finally {
+            resetDbLock.writeLock().unlock();
+        }
+        transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
     }
 
     private boolean quitIfNotAlive() {

@@ -62,11 +62,6 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     }
 
     @Override
-    public void clear() {
-        db.reset();
-    }
-
-    @Override
     public Set<K> keySet() {
         return receiveKeySet();
     }
@@ -115,4 +110,9 @@ public class InnerDBRocksDBTest<K, V> implements InnerDBTable<K, V> {
     public void commit() {}
     @Override
     public void rollback() {}
+
+    @Override
+    public void clear() {
+    }
+
 }

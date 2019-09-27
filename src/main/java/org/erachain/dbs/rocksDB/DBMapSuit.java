@@ -143,11 +143,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public void clear() {
-        map.clear();
-    }
-
-    @Override
     public void close() {
         map.close();
         logger.info("closed");
@@ -161,6 +156,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     @Override
     public void rollback() {
         map.rollback();
+    }
+
+    @Override
+    public void clear() {
+        map.clear();
     }
 
 }

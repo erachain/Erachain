@@ -151,11 +151,6 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
     }
 
     @Override
-    public void reset() {
-        db.reset();
-    }
-
-    @Override
     public List<byte[]> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
         return db.filterApprropriateValues(filter, indexDB);
     }

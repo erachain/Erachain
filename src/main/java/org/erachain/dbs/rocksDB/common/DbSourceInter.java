@@ -49,7 +49,7 @@ public interface DbSourceInter<V> extends BatchSourceInter<byte[], V> {
     void close();
     void commit();
     void rollback();
-    void reset();
+    //void reset();
 
     Set<byte[]> allKeys() throws RuntimeException;
 
