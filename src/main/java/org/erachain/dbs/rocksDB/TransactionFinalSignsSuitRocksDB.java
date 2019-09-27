@@ -12,7 +12,7 @@ import org.mapdb.DB;
 @Slf4j
 public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> implements TransactionFinalMapSignsSuit {
 
-    private final String NAME_TABLE = "TRANS_FINAL_SIGNS_TABLE";
+    private final String NAME_TABLE = "TRANSACTION_FINAL_SIGNS_TABLE";
 
     public TransactionFinalSignsSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger);

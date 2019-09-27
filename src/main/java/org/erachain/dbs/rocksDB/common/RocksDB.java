@@ -33,7 +33,7 @@ public class RocksDB implements DB<byte[], byte[]>, Flusher
 
     // TODO ?? зачем эта переменная? какой функционал
     //эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
-    private boolean dbSync;
+    private boolean dbSync = true;
 
     @Getter
     public RocksDbDataSourceImpl db;
