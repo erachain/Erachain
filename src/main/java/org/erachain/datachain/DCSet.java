@@ -159,8 +159,8 @@ public class DCSet extends DBASet {
         try {
             // переделанные таблицы
             this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
-                    DBS_MAP_DB
-                    //DBS_ROCK_DB // very SLOW потому что BigDecimal 20 байт - хотя с -opi этоне делаем
+                    //DBS_MAP_DB
+                    DBS_ROCK_DB // very SLOW потому что BigDecimal 20 байт - хотя с -opi этоне делаем
                     , this, database);
 
             this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0 ? defaultDBS :
@@ -175,8 +175,8 @@ public class DCSet extends DBASet {
                     , this, database);
 
             this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
-                    DBS_MAP_DB // fast
-                    //DBS_ROCK_DB // slow
+                    //DBS_MAP_DB // fast
+                    DBS_ROCK_DB // slow
                     , this, database);
 
             this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
@@ -467,7 +467,7 @@ public class DCSet extends DBASet {
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
 
                 //
-                ////.mmapFileEnablePartial() // тормозит сильно но возможно когда файл большеой не падает скорость сильно
+                .mmapFileEnablePartial() // тормозит сильно но возможно когда файл большеой не падает скорость сильно
 
                 // Если этот отключить (закомментировать) то файлы на лету не обновляются на диске а только в момент Флуша
                 // типа быстрее работают но по факту с Флушем нет и в описании предупрежджение - что
