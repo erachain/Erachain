@@ -448,24 +448,20 @@ public class DCSet extends DBASet {
                 .checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
 
-                // try to FAST
-                ////.mmapFileEnablePartial() // ??
+                //
+                ///.mmapFileEnablePartial() // тормозит сильно но возможно когда файл большеой не падает скорость сильно
 
-                /// вероятность поломки при КРАХЕ системы во время коммита - если включть эту опцию
-                // но если включить то очень быстро работает но видимо окнфликтует с asyncWriteEnable
+                //
                 .commitFileSyncDisable() // ++
 
-                ////.asyncWriteEnable() ////
-
-                ////.asyncWriteFlushDelay(100)
+                //.snapshotEnable()
+                //.asyncWriteEnable()
+                //.asyncWriteFlushDelay(100)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                // < 3 не удаляет записи физически при их удалении из базы логически иразмер растет постоянно
                 .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
-                //.snapshotEnable()
-
                 ;
 
         /**

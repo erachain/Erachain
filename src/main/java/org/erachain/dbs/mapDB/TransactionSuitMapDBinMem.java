@@ -3,6 +3,7 @@ package org.erachain.dbs.mapDB;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -21,18 +22,22 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     public void getMap() {
 
         if (true) {
+            /*
             database = DBMaker
                     .newMemoryDB()
                     .freeSpaceReclaimQ(5)
                     .transactionDisable()
                     .deleteFilesAfterClose()
 
-                    //.cacheHardRefEnable()
-                    .cacheDisable()
+                    .cacheHardRefEnable()
+                    //.cacheDisable()
 
                     //
                     //.newMemoryDirectDB()
                     .make();
+
+             */
+            database = DCSet.makeDBinMemory();
         } else {
 
             File dbFile = new File(Settings.getInstance().getDataDir(), "txPool.dat");
