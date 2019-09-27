@@ -54,7 +54,6 @@ import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.json.simple.JSONObject;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
@@ -2656,19 +2655,7 @@ public class Controller extends Observable {
             // или прри добавлении моего сгнерированного блока т.к. он не проверился?
 
             // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-            DB database = DBMaker
-                    .newMemoryDB()
-                    .transactionDisable()
-                    .deleteFilesAfterClose()
-
-                    //.cacheHardRefEnable()
-                    .cacheDisable()
-
-                    .freeSpaceReclaimQ(0)
-
-                    //
-                    //.newMemoryDirectDB()
-                    .make();
+            DB database = DCSet.makeDBinMemory();
 
             if (!newBlock.isValid(dcSet, database, false))
                 // тогда проверим заново полностью

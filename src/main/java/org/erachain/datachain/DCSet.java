@@ -433,6 +433,12 @@ public class DCSet extends DBASet {
         return instance;
     }
 
+    /**
+     * Создание файла для основной базы данных
+     *
+     * @param dbFile
+     * @return
+     */
     public static DB makeFileDB(File dbFile) {
 
         /// https://jankotek.gitbooks.io/mapdb/performance/
@@ -443,19 +449,23 @@ public class DCSet extends DBASet {
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
 
                 // try to FAST
-                .mmapFileEnablePartial()
+                ////.mmapFileEnablePartial() // ??
 
+                /// вероятность поломки при КРАХЕ системы во время коммита - если включть эту опцию
+                // но если включить то очень быстро работает но видимо окнфликтует с asyncWriteEnable
                 .commitFileSyncDisable() // ++
 
-                //.snapshotEnable()
-                //.asyncWriteEnable()
-                //.asyncWriteFlushDelay(100)
+                ////.asyncWriteEnable() ////
+
+                ////.asyncWriteFlushDelay(100)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 // < 3 не удаляет записи физически при их удалении из базы логически иразмер растет постоянно
-                .freeSpaceReclaimQ(3)// не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
 
                 //.compressionEnable()
+                //.snapshotEnable()
+
                 ;
 
         /**
@@ -501,6 +511,22 @@ public class DCSet extends DBASet {
 
         return databaseStruc.make();
 
+    }
+
+    public static DB makeDBinMemory() {
+        return DBMaker
+                .newMemoryDB()
+                .transactionDisable()
+                .deleteFilesAfterClose()
+
+                .cacheHardRefEnable()
+                //.cacheDisable()
+
+                .freeSpaceReclaimQ(0)
+
+                //
+                //.newMemoryDirectDB()
+                .make();
     }
 
     /**
@@ -566,7 +592,7 @@ public class DCSet extends DBASet {
     }
 
     public static DCSet createEmptyHardDatabaseSet(int defaultDBS) {
-        instance = new DCSet(null, getHardBase(), false, false, true, defaultDBS);
+        instance = new DCSet(null, getHardBaseForFork(), false, false, true, defaultDBS);
         return instance;
     }
 
@@ -590,7 +616,7 @@ public class DCSet extends DBASet {
      */
     public static DB createForkbase() {
 
-        return getHardBase();
+        return getHardBaseForFork();
     }
 
     public static boolean isStoped() {
@@ -1412,7 +1438,14 @@ public class DCSet extends DBASet {
     }
 
     static Random randFork = new Random();
-    public static DB getHardBase(File dbFile) {
+
+    /**
+     * Эта база используется для откатов, возможно глубоких
+     *
+     * @param dbFile
+     * @return
+     */
+    public static DB getHardBaseForFork(File dbFile) {
 
         dbFile.getParentFile().mkdirs();
 
@@ -1420,6 +1453,7 @@ public class DCSet extends DBASet {
         //CREATE DATABASE
         DB database = DBMaker.newFileDB(dbFile)
 
+                // включим самоудаление после закрытия
                 .deleteFilesAfterClose()
                 .transactionDisable()
 
@@ -1435,9 +1469,9 @@ public class DCSet extends DBASet {
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
                 // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
-                .cacheSize(1024)
+                /////.cacheSize(1024)
 
-                .checksumEnable()
+                //.checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
                 .commitFileSyncDisable() // ++
 
@@ -1446,14 +1480,14 @@ public class DCSet extends DBASet {
                 //.asyncWriteFlushDelay(100)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(2) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(5) // не нагружать процессор для поиска свободного места в базе данных
 
                 .make();
 
         return database;
     }
 
-    public static DB getHardBase() {
+    public static DB getHardBaseForFork() {
         //OPEN DB
 
         // найдем новый не созданный уже файл
@@ -1464,7 +1498,7 @@ public class DCSet extends DBASet {
 
         dbFile.getParentFile().mkdirs();
 
-        return getHardBase(dbFile);
+        return getHardBaseForFork(dbFile);
     }
 
     /**
@@ -1475,7 +1509,7 @@ public class DCSet extends DBASet {
         this.addUses();
 
         try {
-            DCSet fork = new DCSet(this, database == null ? getHardBase() : database);
+            DCSet fork = new DCSet(this, database == null ? getHardBaseForFork() : database);
 
             this.outUses();
             return fork;
@@ -1492,7 +1526,7 @@ public class DCSet extends DBASet {
     }
 
     public DCSet fork() {
-        return fork(getHardBase());
+        return fork(getHardBaseForFork());
     }
 
     @Override
@@ -1654,7 +1688,9 @@ public class DCSet extends DBASet {
 
                     // удалим все в папке Temp
                     File tempDir = new File(Settings.getInstance().getDataTempDir());
-                    Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                    if (tempDir.exists()) {
+                        Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                    }
                 } catch (Throwable e) {
                     LOGGER.error(e.getMessage(), e);
                 }

@@ -1881,7 +1881,7 @@ import java.util.*;
     }
 
     public boolean isValid(DCSet dcSet, boolean andProcess) {
-        return isValid(dcSet, DCSet.getHardBase(), andProcess);
+        return isValid(dcSet, DCSet.getHardBaseForFork(), andProcess);
     }
 
     //PROCESS/ORPHAN
