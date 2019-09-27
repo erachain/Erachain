@@ -84,7 +84,7 @@ public class DCSet extends DBASet {
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
-    private BlockMap blockMap;
+    private BlocksMapImpl blockMap;
     //private BlockCreatorMap blockCreatorMap;
     private BlockSignsMap blockSignsMap;
     private BlocksHeadsMap blocksHeadsMap;
@@ -179,10 +179,14 @@ public class DCSet extends DBASet {
                     //DBS_ROCK_DB // slow
                     , this, database);
 
+            this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
+                    DBS_MAP_DB // fast
+                    //DBS_ROCK_DB // slow
+                    , this, database);
+
 
             this.actions = 0L;
 
-            this.blockMap = new BlockMap(this, database);
             //this.blockCreatorMap = new BlockCreatorMap(this, database);
             this.blockSignsMap = new BlockSignsMap(this, database);
             this.blocksHeadsMap = new BlocksHeadsMap(this, database);
@@ -327,6 +331,12 @@ public class DCSet extends DBASet {
                 DBS_NATIVE_MAP
                 , parent.referenceMap, this);
 
+        this.blockMap = new BlocksMapImpl(
+                //DBS_MAP_DB
+                //DBS_ROCK_DB
+                DBS_NATIVE_MAP
+                , parent.blockMap, this);
+
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
         this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs, this);
@@ -347,7 +357,6 @@ public class DCSet extends DBASet {
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
 
-        this.blockMap = new BlockMap(parent.blockMap, this);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
         this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
         //this.nameMap = new NameMap(parent.nameMap);
@@ -1014,7 +1023,7 @@ public class DCSet extends DBASet {
      *
      * @return
      */
-    public BlockMap getBlockMap() {
+    public BlocksMapImpl getBlockMap() {
         return this.blockMap;
     }
 

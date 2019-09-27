@@ -1,8 +1,8 @@
 package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.DBTab;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -21,7 +21,7 @@ import java.util.TreeMap;
  *   b - balance
  *   outcome = b - a
  */
-public class BalanceMap extends DCUMap<Tuple2<Long, Long>,
+public abstract class BalanceMap extends DCUMap<Tuple2<Long, Long>,
         Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> {
 
