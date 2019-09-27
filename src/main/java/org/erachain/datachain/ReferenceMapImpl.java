@@ -3,12 +3,11 @@ package org.erachain.datachain;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.ReferenceSuitMapDB;
 import org.erachain.dbs.mapDB.ReferenceSuitMapDBFork;
-import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.ReferenceSuitRocksDB;
 import org.mapdb.DB;
-import org.mapdb.Fun;
 
-import static org.erachain.database.IDB.*;
+import static org.erachain.database.IDB.DBS_MAP_DB;
+import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 
 /**
@@ -33,9 +32,6 @@ public class ReferenceMapImpl extends DBTabImpl<byte[], long[]>
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new ReferenceSuitMapDB(databaseSet, database);
-                    //break;
-                case DBS_MAP_DB_IN_MEM:
                     map = new ReferenceSuitRocksDB(databaseSet, database);
                     break;
                 default:
@@ -50,7 +46,8 @@ public class ReferenceMapImpl extends DBTabImpl<byte[], long[]>
                     //map = new ReferenceSuitRocksDBFork((ReferenceMap) parent, databaseSet);
                     //break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
+                    map = new ReferenceSuitMapDBFork((ReferenceMap) parent, databaseSet);
+                    //map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
             }
         }
     }
