@@ -5,6 +5,7 @@ package org.erachain.datachain;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionFinalSignsSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionFinalSignsSuitMapDBFork;
+import org.erachain.dbs.rocksDB.TransactionFinalSignsSuitRocksDB;
 import org.mapdb.DB;
 
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -17,12 +18,12 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
 
     static int KEY_LEN = 12;
 
-    public TransactionFinalMapSignsImpl(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+    public TransactionFinalMapSignsImpl(int dbs, DCSet databaseSet, DB database) {
+        super(dbs, databaseSet, database);
     }
 
-    public TransactionFinalMapSignsImpl(TransactionFinalMapSigns parent, DCSet dcSet) {
-        super(parent, dcSet);
+    public TransactionFinalMapSignsImpl(int dbs, TransactionFinalMapSigns parent, DCSet dcSet) {
+        super(dbs, parent, dcSet);
     }
 
     @Override
@@ -31,15 +32,15 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new TransactionFinalSignsSuitMapDB(databaseSet, database);
-                    //break;
+                    map = new TransactionFinalSignsSuitRocksDB(databaseSet, database);
+                    break;
                 default:
                     map = new TransactionFinalSignsSuitMapDB(databaseSet, database);
             }
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new TransactionFinalSuitRocksDBFork((TransactionTab) parent, databaseSet);
+                    //map = new TransactionFinalSignsSuitRocksDBFork((TransactionFinalMapSigns) parent, databaseSet);
                     //break;
                 default:
                     //map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);

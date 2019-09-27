@@ -184,6 +184,11 @@ public class DCSet extends DBASet {
                     DBS_ROCK_DB // slow
                     , this, database);
 
+            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
+                    //DBS_MAP_DB // fast
+                    DBS_ROCK_DB // slow
+                    , this, database);
+
 
             this.actions = 0L;
 
@@ -207,7 +212,6 @@ public class DCSet extends DBASet {
             this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(this, database);
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
-            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(this, database);
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
@@ -337,6 +341,12 @@ public class DCSet extends DBASet {
                 DBS_NATIVE_MAP
                 , parent.blockMap, this);
 
+        this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
+                //DBS_MAP_DB
+                //DBS_ROCK_DB
+                DBS_NATIVE_MAP
+                , parent.transactionFinalMapSigns, this);
+
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
         this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs, this);
@@ -352,7 +362,6 @@ public class DCSet extends DBASet {
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap, this);
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
-        this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(parent.transactionFinalMapSigns, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
