@@ -574,10 +574,7 @@ public class DCSet extends DBASet {
     }
 
     public static void reCreateDBinMEmory(boolean withObserver, boolean dynamicGUI) {
-        DB database = DBMaker
-                .newMemoryDB()
-                //.newMemoryDirectDB()
-                .make();
+        DB database = makeDBinMemory();
 
         instance = new DCSet(null, database, withObserver, dynamicGUI, true, 0);
 
@@ -590,10 +587,7 @@ public class DCSet extends DBASet {
          * @param defaultDBS
          */
     public static DCSet createEmptyDatabaseSet(int defaultDBS) {
-        DB database = DBMaker
-                .newMemoryDB()
-                //.newMemoryDirectDB()
-                .make();
+        DB database = DCSet.makeDBinMemory();
 
         instance = new DCSet(null, database, false, false, true, defaultDBS);
         return instance;

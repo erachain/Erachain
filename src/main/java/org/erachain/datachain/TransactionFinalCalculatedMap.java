@@ -1,15 +1,13 @@
 package org.erachain.datachain;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transCalculated.Calculated;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.CalculatedSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
@@ -148,8 +146,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
         // OPEN MAP
         this.getMap();
     }

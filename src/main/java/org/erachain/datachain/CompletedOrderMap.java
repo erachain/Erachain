@@ -1,13 +1,12 @@
 package org.erachain.datachain;
 
 import org.erachain.core.item.assets.Order;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.OrderSerializer;
+import org.erachain.dbs.DBTab;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import org.mapdb.Fun;
-import org.erachain.utils.ObserverMessage;
 
 import java.util.Map;
 
@@ -46,10 +45,7 @@ public class CompletedOrderMap extends DCUMap<Long, Order> {
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
-        //OPEN MAP
-        map = this.openMap(database);
+        getMap();
     }
 
     private Map<Long, Order> openMap(DB database) {

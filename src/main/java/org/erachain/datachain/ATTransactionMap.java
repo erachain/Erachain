@@ -2,11 +2,14 @@ package org.erachain.datachain;
 
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.ATTransactionSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
@@ -46,10 +49,8 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
-        //OPEN MAP
-        map = this.openMap(database);
+        database = DCSet.makeDBinMemory();
+        getMap();
     }
 
     @SuppressWarnings("unchecked")

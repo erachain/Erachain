@@ -4,11 +4,10 @@ package org.erachain.datachain;
 //import java.lang.reflect.Array;
 
 import org.erachain.dbs.DBTab;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -66,10 +65,7 @@ public class VouchRecordMap extends DCUMap<Long, Tuple2<BigDecimal, List<Long>>>
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
-        //OPEN MAP
-        this.getMap();
+        getMap();
     }
 
     @Override

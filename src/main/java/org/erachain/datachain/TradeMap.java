@@ -6,11 +6,14 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.TradeSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
@@ -58,10 +61,7 @@ public class TradeMap extends DCUMap<Tuple2<Long, Long>, Trade> {
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
-        //OPEN MAP
-        map = this.openMap(database);
+        getMap();
     }
 
     @SuppressWarnings("unchecked")

@@ -6,14 +6,20 @@ import org.erachain.at.AT;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.ATSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NavigableSet;
 
 //import org.erachain.dbs.DBMap;
 //import database.SortableList;
@@ -30,7 +36,7 @@ public class ATMap extends DCUMapImpl<String, AT> {
     private Map<String, String> hashCodes;
     private BTreeMap<String, Integer> atToNextHeight;
 
-    private ATMap parentATMap;
+    //private ATMap parentATMap;
 
     public ATMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -45,7 +51,7 @@ public class ATMap extends DCUMapImpl<String, AT> {
 
     public ATMap(ATMap parent, DCSet dcSet) {
         super(parent, dcSet);
-        this.parentATMap = parent;
+        //this.parentATMap = parent;
 
     }
 
@@ -60,10 +66,7 @@ public class ATMap extends DCUMapImpl<String, AT> {
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
-        //OPEN MAP
-        map = this.openMap(database);
+        getMap();
     }
 
     @SuppressWarnings("unchecked")
@@ -167,7 +170,7 @@ public class ATMap extends DCUMapImpl<String, AT> {
     public boolean validTypeHash(byte[] hash, String type, Integer forkHeight) {
         String hashString = Base58.encode(hash);
         if ((!this.hashCodes.containsValue(hashString) && !Fun.filter(this.typeATs, type).iterator().hasNext())) {
-            return (this.parentATMap != null) ? this.parentATMap.validTypeHash(hash, type, forkHeight) : true;
+            return (this.parent != null) ? ((ATMap) this.parent).validTypeHash(hash, type, forkHeight) : true;
         }
         if (this.hashCodes.containsValue(hashString) && Fun.filter(this.typeATs, type).iterator().hasNext()) {
             Iterable<String> ats = getTypeATs(type);

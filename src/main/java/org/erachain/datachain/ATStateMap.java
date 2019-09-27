@@ -3,7 +3,10 @@ package org.erachain.datachain;
 import org.erachain.at.ATConstants;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
@@ -32,8 +35,7 @@ public class ATStateMap extends DCUMap<Tuple2<Integer, String>, byte[]> {
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-        map = this.openMap(database);
+        getMap();
     }
 
 

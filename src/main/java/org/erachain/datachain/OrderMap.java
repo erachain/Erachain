@@ -5,11 +5,14 @@ import com.google.common.collect.Iterators;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.*;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.OrderSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple4;
 
 import java.math.BigDecimal;
@@ -62,10 +65,7 @@ public class OrderMap extends DCUMap<Long, Order> {
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
-        //OPEN MAP
-        map = this.openMap(database);
+        getMap();
     }
 
     @SuppressWarnings("unchecked")
