@@ -513,16 +513,28 @@ public class DCSet extends DBASet {
 
     }
 
+    /**
+     * Для проверкт одного блока в памяти - при добавлении в цепочку или в буфер ожидания
+     *
+     * @return
+     */
     public static DB makeDBinMemory() {
         return DBMaker
                 .newMemoryDB()
                 .transactionDisable()
                 .deleteFilesAfterClose()
+                .asyncWriteEnable() // улучшает чуток и не падает так как нет транзакционности
+
+                // это время добавляется к ожиданию конца - и если больше 100 то тормоз лишний
+                // но 10 - увеличивает скорость валидации трнзакций!
+                .asyncWriteFlushDelay(3)
+                // тут не влияет .commitFileSyncDisable()
 
                 .cacheHardRefEnable()
                 //.cacheDisable()
 
-                .freeSpaceReclaimQ(0)
+                .freeSpaceReclaimQ(0) // как-то слабо влияет в памяти
+                //.compressionEnable() // как-то не влияет в памяти
 
                 //
                 //.newMemoryDirectDB()
@@ -1473,6 +1485,7 @@ public class DCSet extends DBASet {
 
                 //.checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
+                .mmapFileEnablePartial()
                 .commitFileSyncDisable() // ++
 
                 //.snapshotEnable()
