@@ -11,6 +11,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.BlocksSuitMapDB;
 import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
+import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
@@ -61,8 +62,8 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new BlocksSuitMapDB(databaseSet, database);
-                    //break;
+                    map = new BlocksSuitRocksDB(databaseSet, database);
+                    break;
                 default:
                     map = new BlocksSuitMapDB(databaseSet, database);
             }

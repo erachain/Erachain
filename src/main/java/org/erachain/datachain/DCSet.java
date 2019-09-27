@@ -180,8 +180,8 @@ public class DCSet extends DBASet {
                     , this, database);
 
             this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
-                    DBS_MAP_DB // fast
-                    //DBS_ROCK_DB // slow
+                    //DBS_MAP_DB // fast
+                    DBS_ROCK_DB // slow
                     , this, database);
 
 

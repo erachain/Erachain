@@ -1,0 +1,40 @@
+package org.erachain.dbs.rocksDB;
+
+import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.block.Block;
+import org.erachain.database.DBASet;
+import org.erachain.datachain.BlocksSuit;
+import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.rocksDB.transformation.ByteableBlock;
+import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
+import org.mapdb.DB;
+
+import java.util.ArrayList;
+
+@Slf4j
+public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements BlocksSuit {
+
+    private final String NAME_TABLE = "BLOCKS_TABLE";
+
+    public BlocksSuitRocksDB(DBASet databaseSet, DB database) {
+        super(databaseSet, database, logger);
+    }
+
+    @Override
+    protected void getMap() {
+
+        map = new DBRocksDBTable<>(new ByteableInteger(), new ByteableBlock(), NAME_TABLE, indexes,
+                RocksDbSettings.initCustomSettings(7, 64, 32,
+                        256, 10,
+                        1, 256, 32, false),
+                databaseSet);
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected void createIndexes() {
+        // SIZE need count - make not empty LIST
+        indexes = new ArrayList<>();
+    }
+}
