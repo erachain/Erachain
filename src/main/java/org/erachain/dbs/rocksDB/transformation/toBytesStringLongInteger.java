@@ -1,11 +1,5 @@
 package org.erachain.dbs.rocksDB.transformation;
 
-import org.erachain.dbs.rocksDB.indexes.IndexByteable;
-import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
-import org.erachain.dbs.rocksDB.transformation.ByteableLong;
-import org.erachain.dbs.rocksDB.transformation.ByteableString;
-import org.mapdb.Fun;
-
 public class toBytesStringLongInteger {
 
     public static byte[] toBytes(String address, Long key, Integer type) {

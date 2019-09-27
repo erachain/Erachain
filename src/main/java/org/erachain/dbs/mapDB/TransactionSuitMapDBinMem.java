@@ -22,21 +22,6 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     public void getMap() {
 
         if (true) {
-            /*
-            database = DBMaker
-                    .newMemoryDB()
-                    .freeSpaceReclaimQ(5)
-                    .transactionDisable()
-                    .deleteFilesAfterClose()
-
-                    .cacheHardRefEnable()
-                    //.cacheDisable()
-
-                    //
-                    //.newMemoryDirectDB()
-                    .make();
-
-             */
             database = DCSet.makeDBinMemory();
         } else {
 
