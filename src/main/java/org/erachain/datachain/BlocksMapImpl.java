@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 // 30/03
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
@@ -12,11 +13,7 @@ import org.erachain.dbs.mapDB.BlocksSuitMapDB;
 import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Atomic;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
@@ -35,14 +32,12 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  *
  * @return
  */
+@Slf4j
 public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap {
-
-    static Logger logger = LoggerFactory.getLogger(BlocksMapImpl.class.getSimpleName());
 
     private byte[] lastBlockSignature;
     private Atomic.Boolean processingVar;
     private Boolean processing;
-    private BTreeMap<Tuple2<String, String>, Integer> generatorMap;
 
     public BlocksMapImpl(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
@@ -77,7 +72,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
                     //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
                     //break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, null, null); // - просто карту нельзя так как тут особые вызовы
+                    map = new nativeMapTreeMapFork(parent, databaseSet, null, null);
             }
         }
     }

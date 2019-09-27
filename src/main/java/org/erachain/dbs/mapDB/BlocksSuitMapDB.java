@@ -45,5 +45,4 @@ public class BlocksSuitMapDB extends DBMapSuit<Integer, Block> implements Blocks
                 .makeOrGet();
     }
 
-
 }

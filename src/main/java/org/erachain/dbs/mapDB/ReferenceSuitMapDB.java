@@ -34,23 +34,4 @@ public class ReferenceSuitMapDB extends DBMapSuit<byte[], long[]>
                 .makeOrGet();
     }
 
-    /*
-    @Override
-    protected void getMemoryMap() {
-        if (database == null) {
-            map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
-        } else {
-            getMap();
-        }
-    }
-     */
-
-    /*
-    @Override
-    public boolean set(byte[] key, long[] value) {
-        return super.set(key, value);
-    }
-
-     */
-
 }
