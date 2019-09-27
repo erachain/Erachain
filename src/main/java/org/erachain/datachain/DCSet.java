@@ -526,8 +526,8 @@ public class DCSet extends DBASet {
                 .asyncWriteEnable() // улучшает чуток и не падает так как нет транзакционности
 
                 // это время добавляется к ожиданию конца - и если больше 100 то тормоз лишний
-                // но 10 - увеличивает скорость валидации трнзакций!
-                .asyncWriteFlushDelay(3)
+                // но 1..10 - увеличивает скорость валидации трнзакций!
+                .asyncWriteFlushDelay(2)
                 // тут не влияет .commitFileSyncDisable()
 
                 .cacheHardRefEnable()
