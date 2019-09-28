@@ -2,7 +2,8 @@ package org.erachain.dbs.rocksDB.store.settings;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.erachain.dbs.rocksDB.common.RocksDB;
+import org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl;
+import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableAtomicLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
@@ -13,21 +14,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
- * он вообще не используется
  * Это важный класс, который реализует хранение переменных в БД.
- * Встроить можно все что угодно куда угодно
  */
 @Slf4j
 public class SettingsDBRocksDBTable {
     //  интерфейс доступа к БД
-    private RocksDB db;
+    private RocksDbDataSourceImpl db;
     private List<Tuple2<String, Byteable>> namesByteables;
     private ByteableAtomicLong byteableAtomicLong = new ByteableAtomicLong();
     private ByteableString byteableString = new ByteableString();
     public SettingsDBRocksDBTable(List<Tuple2<String, Byteable>> namesByteables, String nameTable) {
         this.namesByteables = namesByteables;
-        db = new RocksDB(nameTable);
+        db = new RocksDbDataSourceImpl(nameTable, null, RocksDbSettings.getSettings());
     }
 
     public Object get(String name) {

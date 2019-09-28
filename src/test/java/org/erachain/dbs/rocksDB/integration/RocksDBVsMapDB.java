@@ -1,7 +1,6 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.dbs.rocksDB.common.RocksDB;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
@@ -25,7 +24,7 @@ public class RocksDBVsMapDB {
 
     private Map<byte[], byte[]> data = new HashMap<>();
 
-    private long countData = 10000;
+    private long countData = 100000;
 
     private Set<Map.Entry<byte[], byte[]>> entrySet;
 
@@ -40,15 +39,13 @@ public class RocksDBVsMapDB {
     @Test
     public void rocksDBProductivityClose() {
         logger.info("Start test RocksDB productivity simple close");
-        InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest<>();
         String NAME_DATABASE = "TestRocksDB";
         long timeMillisBefore = System.currentTimeMillis();
-        RocksDB db = new RocksDB(NAME_DATABASE);
-        rocksDB.setDb(db);
+        InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest(NAME_DATABASE);
         for (Map.Entry<byte[], byte[]> entry : entrySet) {
             rocksDB.put(entry.getKey(), entry.getValue());
         }
-        db.close();
+        rocksDB.close();
         long timeMillisAfter = System.currentTimeMillis();
         long total = timeMillisAfter - timeMillisBefore;
         logger.info("total time rocksDB = " + total);
@@ -58,18 +55,16 @@ public class RocksDBVsMapDB {
     @Test
     public void rocksDBProductivity() {
         logger.info("Start test RocksDB productivity simple");
-        InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest<>();
         String NAME_DATABASE = "TestRocksDB";
         long timeMillisBefore = System.currentTimeMillis();
-        RocksDB db = new RocksDB(NAME_DATABASE);
-        rocksDB.setDb(db);
+        InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest(NAME_DATABASE);
         for (Map.Entry<byte[], byte[]> entry : entrySet) {
             rocksDB.put(entry.getKey(), entry.getValue());
         }
         long timeMillisAfter = System.currentTimeMillis();
         long total = timeMillisAfter - timeMillisBefore;
         logger.info("total time rocksDB = " + total);
-        db.close();
+        rocksDB.close();
         logger.info("End test RocksDB productivity");
     }
 
@@ -82,7 +77,6 @@ public class RocksDBVsMapDB {
     @Test
     public void rocksDBProductivityWithCommits() {
         logger.info("Start test RocksDB productivity commit");
-        InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest<>();
         String NAME_DATABASE = "TestRocksDB1";
 
         // УДАЛИМ перед первым проходом - для проверки трнзакционности
@@ -96,9 +90,8 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            RocksDB db = new RocksDB(NAME_DATABASE);
-            TransactionDB transactionDB = (TransactionDB) db.getDb().getDatabase();
-            rocksDB.setDb(db);
+            InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest(NAME_DATABASE);
+            TransactionDB transactionDB = (TransactionDB) rocksDB.db.database;
             boolean flagBegin = true;
             int k = 0;
             Transaction transaction = null;
@@ -126,7 +119,7 @@ public class RocksDBVsMapDB {
             long timeMillisAfter = System.currentTimeMillis();
             long total = timeMillisAfter - timeMillisBefore;
             logger.info("total time rocksDB = " + total);
-            db.close();
+            rocksDB.close();
             logger.info("End test RocksDB productivity");
             twice = !twice;
 

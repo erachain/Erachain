@@ -8,6 +8,7 @@ import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
+import org.erachain.settings.Settings;
 import org.mapdb.Fun;
 import org.rocksdb.RocksDB;
 import org.rocksdb.*;
@@ -23,17 +24,25 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.rocksdb.RocksDB.loadLibrary;
 
 /**
- * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
  * Самый низкий уровень доступа к функциям RocksDB
- * Встроить можно все что угодно куда угодно
  */
 @Slf4j
 @NoArgsConstructor
-public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
+public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB<byte[], byte[]>
+        //, Flusher, DbSourceInter<byte[]>
+{
     private String dataBaseName;
+    private WriteOptionsWrapper optionsWrapper;
+
+    //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
+    // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
+    // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
+    private boolean dbSync = true;
+
     private Transaction transactionDB;
     private WriteOptions transactionWriteOptions = new WriteOptions()
             .setSync(true) // TRUE - не теряет данны при КРАХЕ, но типа помедленней
@@ -45,6 +54,13 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
 
     private boolean alive;
     private String parentName;
+    List<IndexDB> indexes;
+    RocksDbSettings settings;
+    private boolean create = false;
+    protected String sizeDescriptorName = "size";
+    @Getter
+    private List<ColumnFamilyHandle> columnFamilyHandles;
+
 
     private ColumnFamilyHandle columnFamilyFieldSize;
     private ByteableInteger byteableInteger = new ByteableInteger();
@@ -64,25 +80,26 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
-    private boolean create = false;
-    protected String sizeDescriptorName = "size";
-
-    @Getter
-    private List<ColumnFamilyHandle> columnFamilyHandles;
-
-    private RocksDbSettings settings;
-
-
-    public RocksDbDataSourceImpl(String parentName, String name) {
+    public RocksDbDataSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this.dataBaseName = name;
         this.parentName = parentName;
+        optionsWrapper = WriteOptionsWrapper.getInstance().sync(dbSync);
+        this.indexes = indexes;
+        this.settings = settings;
+        initDB();
+
+    }
+    public RocksDbDataSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings) {
+        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
     }
 
+    @Override
     public Path getDbPath() {
         return Paths.get(parentName, dataBaseName);
     }
 
 
+    @Override
     public boolean isAlive() {
         return alive;
     }
@@ -104,7 +121,6 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
-    // TODO нати реализацию
     @Override
     public synchronized void commit() {
         // сольем старый и начнем новый
@@ -123,7 +139,6 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
     }
 
-    // TODO нати реализацию
     @Override
     public void rollback() {
         resetDbLock.writeLock().lock();
@@ -149,7 +164,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public Set<byte[]> allKeys() throws RuntimeException {
+    public Set<byte[]> keySet() throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
         }
@@ -166,7 +181,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public List<byte[]> allValues() throws RuntimeException {
+    public List<byte[]> values() throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
         }
@@ -217,6 +232,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
+    @Override
     public List<byte[]> filterApprropriateValues(byte[] filter) throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
@@ -249,6 +265,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
             resetDbLock.readLock().unlock();
         }
     }
+
     @Override
     public List<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException {
         return filterApprropriateValues(filter, columnFamilyHandles.get(indexDB));
@@ -259,18 +276,13 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         return dataBaseName;
     }
 
+    //public void initDB() {
+    //    initDB(RocksDbSettings.getSettings());
+    //}
+
     @Override
-    public void setDBName(String name) {
-    }
-
-    public void initDB(List<IndexDB> indexes) {
-        initDB(RocksDbSettings.getSettings(), indexes);
-    }
-
-
-    public void initDB(RocksDbSettings settings, List<IndexDB> indexes) {
+    public void initDB() {
         resetDbLock.writeLock().lock();
-        this.settings = settings;
         try {
             if (isAlive()) {
                 return;
@@ -398,7 +410,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
 
                     columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
                     if (create)
-                        putData(columnFamilyFieldSize, new byte[]{0}, new byte[]{0, 0, 0, 0});
+                        put(columnFamilyFieldSize, new byte[]{0}, new byte[]{0, 0, 0, 0});
 
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
                 }
@@ -431,7 +443,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public void putData(byte[] key, byte[] value) {
+    public void put(byte[] key, byte[] value) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -445,7 +457,8 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
-    public void putData(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value) {
+    @Override
+    public void put(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -460,7 +473,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public void putData(byte[] key, byte[] value, WriteOptionsWrapper optionsWrapper) {
+    public void put(byte[] key, byte[] value, WriteOptionsWrapper optionsWrapper) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -475,7 +488,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public byte[] getData(byte[] key) {
+    public byte[] get(byte[] key) {
         if (quitIfNotAlive()) {
             return null;
         }
@@ -490,7 +503,8 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         return null;
     }
 
-    public byte[] getData(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
         }
@@ -506,7 +520,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public void deleteData(byte[] key) {
+    public void remove(byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -520,7 +534,8 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
-    public void deleteData(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+    @Override
+    public void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -535,7 +550,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public void deleteData(byte[] key, WriteOptionsWrapper optionsWrapper) {
+    public void remove(byte[] key, WriteOptionsWrapper optionsWrapper) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -550,26 +565,25 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
     }
 
     @Override
-    public void flush() throws RocksDBException {
-        FlushOptions flushOptions = new FlushOptions();
-        database.flush(flushOptions);
-    }
-
     public RockStoreIterator iterator(boolean descending) {
         return new RockStoreIterator(database.newIterator(), descending, false);
     }
 
+    @Override
     public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
         return new RockStoreIterator(database.newIterator(columnFamilyHandle), descending, true);
     }
 
+    @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
         return new RockStoreIteratorFilter(database.newIterator(), descending, true, filter);
     }
+    @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
         return new RockStoreIteratorFilter(database.newIterator(columnFamilyHandle), descending, true, filter);
     }
 
+    @Override
     public RockStoreIterator indexIterator(boolean descending, int indexDB) {
         return new RockStoreIterator(database.newIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
@@ -651,6 +665,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
      * @param limit
      * @return
      */
+    @Override
     public Map<byte[], byte[]> getNext(byte[] key, long limit) {
         if (quitIfNotAlive()) {
             return null;
@@ -671,6 +686,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
+    @Override
     public List<byte[]> getLatestValues(long limit) {
         if (quitIfNotAlive()) {
             return null;
@@ -691,6 +707,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
+    @Override
     public List<byte[]> getValuesPrevious(byte[] key, long limit) {
         if (quitIfNotAlive()) {
             return null;
@@ -702,7 +719,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         try (RocksIterator iter = database.newIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
-            byte[] data = getData(key);
+            byte[] data = get(key);
             if (Objects.nonNull(data)) {
                 result.add(data);
                 i++;
@@ -716,6 +733,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
+    @Override
     public List<byte[]> getValuesNext(byte[] key, long limit) {
         if (quitIfNotAlive()) {
             return null;
@@ -736,6 +754,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
+    @Override
     public Set<byte[]> getKeysNext(byte[] key, long limit) {
         if (quitIfNotAlive()) {
             return null;
@@ -756,6 +775,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
+    @Override
     public Set<byte[]> getKeysNext(byte[] key, long limit, ColumnFamilyHandle columnFamilyHandle) {
         if (quitIfNotAlive()) {
             return null;
@@ -783,6 +803,7 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
      * @param precision
      * @return
      */
+    @Override
     public Map<byte[], byte[]> getPrevious(byte[] key, long limit, int precision) {
         if (quitIfNotAlive()) {
             return null;
@@ -809,18 +830,38 @@ public class RocksDbDataSourceImpl implements DbSourceInter<byte[]> {
         }
     }
 
+    @Override
     public void backup(String dir) throws RocksDBException {
         Checkpoint cp = Checkpoint.create(database);
         cp.createCheckpoint(dir + getDBName());
     }
 
+    @Override
     public boolean deleteDbBakPath(String dir) {
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
+    @Override
     public int size() {
-        byte[] sizeBytes = getData(columnFamilyFieldSize, new byte[]{0});
+        byte[] sizeBytes = get(columnFamilyFieldSize, new byte[]{0});
         return byteableInteger.receiveObjectFromBytes(sizeBytes);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+
+    @Override
+    public void flush(Map<byte[], byte[]> rows) {
+        updateByBatch(rows, optionsWrapper);
+
+    }
+
+    @Override
+    public void flush() throws RocksDBException {
+        FlushOptions flushOptions = new FlushOptions();
+        database.flush(flushOptions);
     }
 
 }

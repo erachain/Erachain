@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.rocksDB.common.DBIterator;
-import org.erachain.dbs.rocksDB.common.RocksDB;
+import org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedTypeIndexException;
@@ -14,6 +14,8 @@ import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
+import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
+import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
@@ -27,8 +29,8 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 /**
  * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
  * Данный класс представляет собой основной доступ и функционал к таблице БД RocksDB
- * Походу тут происходит обработка настроенных вторичных индексов
- * Встроить можно все что угодно куда угодно
+ * Походу тут происходит обработка настроенных вторичных индексов.
+ * вызывается из SUIT
  *
  * @param <K>
  * @param <V>
@@ -45,7 +47,7 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
     private ColumnFamilyHandle columnFamilyFieldSize;
 
     //  интерфейс доступа к БД
-    public RocksDB db;
+    public RocksDbDataSourceImpl db;
 
     //  Сериализатор ключей
     private Byteable byteableKey;
@@ -57,14 +59,6 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
 
     //Для пересчета размеров таблицы
     private ByteableInteger byteableInteger = new ByteableInteger();
-
-    ///private int counterFlush = 0;
-
-    //private final int numberBeforeFlush = 4000;
-
-    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
-        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
-    }
 
     /**
      *
@@ -89,12 +83,19 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
         //    indexes = new ArrayList<>();
         //}
         this.indexes = indexes;
-        db = new RocksDB(NAME_TABLE, indexes, settings, this.root);
+        db = new RocksDbDataSourceImpl(this.root, NAME_TABLE, indexes, settings);
         columnFamilyHandles = db.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {
             // если indexes = null то размер не будем считать
             columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
         }
+    }
+
+    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
+        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
+    }
+    public DBRocksDBTable(String NAME_TABLE, DBASet dbaSet) {
+        this(new ByteableTrivial(), new ByteableTransaction(), NAME_TABLE, null, RocksDbSettings.getDefaultSettings(), dbaSet);
     }
 
     @Override
@@ -130,11 +131,11 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
         byte[] old = db.get(keyBytes);
         if (old == null || old.length == 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
+                byte[] sizeBytes = db.get(columnFamilyFieldSize, new byte[]{0});
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
-                db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+                db.put(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
             }
         } else {
             // удалим вторичные ключи
@@ -283,10 +284,10 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
         byte[] old = db.get(keyBytes);
         if (old != null && old.length != 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = db.getDb().getData(columnFamilyFieldSize, new byte[]{0});
+                byte[] sizeBytes = db.get(columnFamilyFieldSize, new byte[]{0});
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
-                db.getDb().putData(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+                db.put(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
             }
             if (indexes != null && !indexes.isEmpty()) {
                 removeIndexes(key, keyBytes, old);
@@ -299,8 +300,8 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
     @Override
     public void clear() {
         db.close();
-        FileUtil.recursiveDelete(db.getDb().getDbPath().toString());
-        db = new RocksDB(NAME_TABLE, indexes, settings, root);
+        FileUtil.recursiveDelete(db.getDbPath().toString());
+        db = new RocksDbDataSourceImpl(root, NAME_TABLE, indexes, settings);
         columnFamilyHandles = db.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {
             // если indexes = null то размер не будем считать
@@ -320,28 +321,28 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     public List<K> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
-        return db.filterAppropriateValuesAsKeys(filter, indexDB)
+        return db.filterApprropriateValues(filter, indexDB)
                 .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
     public List<K> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB) {
-        return db.filterAppropriateValuesAsKeys(filter, indexDB)
+        return db.filterApprropriateValues(filter, indexDB)
                 .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
     public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, int indexDB) {
-        return db.filterAppropriateValuesAsKeys(filter, indexDB);
+        return db.filterApprropriateValues(filter, indexDB);
     }
     public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
-        return db.filterAppropriateValuesAsKeys(filter, indexDB);
+        return db.filterApprropriateValues(filter, indexDB);
     }
 
     public Set<K> filterAppropriateKeys(byte[] filter) {
-        return db.filterAppropriateValuesAsKeys(filter)
+        return db.filterApprropriateValues(filter)
                 .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
     }
 
     public List<V> filterAppropriateValues(byte[] filter) {
-        return db.filterAppropriateValues(filter)
+        return db.filterApprropriateValues(filter)
                 .stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
@@ -450,11 +451,11 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     public Set<K> keys(byte[] fromKey, long limit, int indexDB) {
-        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, indexes.get(indexDB));
+        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, indexes.get(indexDB).getColumnFamilyHandle());
         return keysNext.stream().map((bytes) -> (K) byteableKey.receiveObjectFromBytes(bytes)).collect(Collectors.toSet());
     }
     public List<V> values(byte[] fromKey, long limit, int indexDB) {
-        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, indexes.get(indexDB));
+        Set<byte[]> keysNext = db.getKeysNext(fromKey, limit, indexes.get(indexDB).getColumnFamilyHandle());
         return keysNext.stream().map((bytes) -> {
             byte[] value = db.get(bytes);
             if (value != null) {

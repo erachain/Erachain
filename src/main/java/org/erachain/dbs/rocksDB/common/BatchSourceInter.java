@@ -29,7 +29,8 @@ import java.util.Map;
  * @param <K>
  * @param <V>
  */
-public interface BatchSourceInter<K, V> extends SourceInter<K, V> {
+public interface BatchSourceInter<K, V>// extends SourceInter<K, V>
+    {
 
 
   void updateByBatch(Map<K, V> rows);
