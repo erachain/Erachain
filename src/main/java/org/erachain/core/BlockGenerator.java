@@ -37,11 +37,6 @@ import java.util.*;
  */
 public class BlockGenerator extends MonitoredThread implements Observer {
 
-    // сколько трназакции в блоке - если больше 0 то запускает тест на старте
-    public static final int TEST_DB = 10000;
-    // размер балансового поля - чем больше тем сложнее
-    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[10000];
-
     private static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
 
     private static int WAIT_STEP_MS = 100;
@@ -230,7 +225,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         SecureRandom randomSecure = new SecureRandom();
 
-        LOGGER.info("generate TEST txs: " + TEST_DB);
+        LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB);
 
         boolean generateNewAccount = false;
         //if (DCSet.getInstance().getAssetBalanceMap().size() < 1000)
@@ -248,17 +243,17 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         PublicKeyAccount recipient;
         List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>();
-        for (int index = 0; index < TEST_DB; index++) {
+        for (int index = 0; index < BlockChain.TEST_DB; index++) {
 
             if (generateNewAccount) {
                 byte[] seedRecipient = new byte[32];
                 randomSecure.nextBytes(seedRecipient);
                 recipient = new PublicKeyAccount(seedRecipient);
             } else {
-                recipient = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
+                recipient = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
             }
 
-            PrivateKeyAccount creator = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
+            PrivateKeyAccount creator = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
             messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
                     amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
@@ -628,7 +623,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         this.initMonitor();
 
         Random random = new Random();
-        if (TEST_DB > 0) {
+        if (BlockChain.TEST_DB > 0) {
 
             // REST balances! иначе там копится размер таблицы
             //dcSet.getAssetBalanceMap().clear();
@@ -637,10 +632,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
             BigDecimal balance = new BigDecimal("10000");
 
-            for (int nonce = 0; nonce < TEST_DB_ACCOUNTS.length; nonce++) {
-                TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
+            for (int nonce = 0; nonce < BlockChain.TEST_DB_ACCOUNTS.length; nonce++) {
+                BlockChain.TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
                 // SET BALANCES
-                TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true);
+                BlockChain.TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true);
             }
         }
 
@@ -673,7 +668,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 // GET real HWeight
                 // пингуем всех тут чтобы знать кому слать свои транакции
                 // на самом деле они сами присылают свое состояние после апдейта
-                if (TEST_DB > 0) {
+                if (BlockChain.TEST_DB > 0) {
                     pointPing = 0;
                 } else if (NTP.getTime() - pointPing > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 1) {
                     // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
@@ -736,7 +731,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
 
                 // is WALLET
-                if (TEST_DB > 0 || ctrl.doesWalletExists()) {
+                if (BlockChain.TEST_DB > 0 || ctrl.doesWalletExists()) {
 
                     if (timePoint > NTP.getTime()) {
                         continue;
@@ -750,7 +745,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // поэтому сдвиг = 0
                     ctrl.checkStatusAndObserve(0);
 
-                    if (TEST_DB == 0 && forgingStatus == ForgingStatus.FORGING_WAIT
+                    if (BlockChain.TEST_DB == 0 && forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 1) < NTP.getTime()
                             || (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) && height < 100
                             || height < 10)) {
@@ -758,7 +753,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         setForgingStatus(ForgingStatus.FORGING);
                     }
 
-                    if (TEST_DB > 0 ||
+                    if (BlockChain.TEST_DB > 0 ||
                             (forgingStatus == ForgingStatus.FORGING // FORGING enabled
                                     && betterPeer == null && !ctrl.needUpToDate()
                                     && (this.solvingReference == null // AND GENERATING NOT MAKED
@@ -812,7 +807,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         height = bchain.getHeight(dcSet) + 1;
                         previousTarget = bchain.getTarget(dcSet);
 
-                        if (TEST_DB == 0) {
+                        if (BlockChain.TEST_DB == 0) {
 
                             ///if (height > BlockChain.BLOCK_COUNT) return;
 
@@ -852,9 +847,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
                         } else {
                             /// тестовый аккаунт
-                            acc_winner = TEST_DB_ACCOUNTS[random.nextInt(TEST_DB_ACCOUNTS.length)];
+                            acc_winner = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
                             /// закатем в очередь транзакции
-                            testTransactions(height, timePointForValidTX);
+                            testTransactions(height, timePointForValidTX - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height));
                         }
 
                         if (acc_winner != null) {
@@ -865,12 +860,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             }
 
                             newWinner = false;
-                            // Соберем тут танзакции сразу же чтобы потом не тратить время
+                            // Соберем тут транзакции сразу же чтобы потом не тратить время
                             Tuple2<List<Transaction>, Integer> unconfirmedTransactions
                                     = getUnconfirmedTransactions(height, timePointForValidTX,
                                     bchain, winned_winValue);
 
-                            if (TEST_DB == 0) {
+                            if (BlockChain.TEST_DB == 0) {
 
                                 wait_new_block_broadcast = (timeStartBroadcast + BlockChain.FLUSH_TIMEPOINT(height)) >> 1;
                                 int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
@@ -1049,7 +1044,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
 
                     // ждем основное время просто
-                    while (TEST_DB == 0 && this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
+                    while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
@@ -1130,7 +1125,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (TEST_DB == 0 && flushPoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()) {
+                            if (BlockChain.TEST_DB == 0 && flushPoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()) {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша

@@ -19,8 +19,7 @@ import java.util.TreeMap;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
-        {
+public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
 
     protected DBTab<T, U> parent;
 
@@ -30,13 +29,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
     TreeMap<T, Boolean> deleted;
     int shiftSize;
 
-            public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
-                this.logger = logger;
-                this.defaultValue = defaultValue;
+        this.logger = logger;
+        this.defaultValue = defaultValue;
 
         if (false) {
             if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
@@ -205,4 +204,5 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U>
     public String toString() {
         return getClass().getName() + ".FORK";
     }
+
 }

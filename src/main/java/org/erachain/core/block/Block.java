@@ -1737,62 +1737,49 @@ import java.util.*;
                         if (cnt.isOnStopping())
                             return false;
 
-                        if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                                && ((RSend) transaction).getAssetKey() != 1) {
-                            ;
-                        } else {
+                        ///logger.debug("[" + seqNo + "] try finalMap.set" );
+                        processTimingLocal = System.nanoTime();
+                        Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
+                        finalMap.set(key, transaction);
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerFinalMap_set += processTimingLocalDiff / 1000;
 
-                            ///logger.debug("[" + seqNo + "] try finalMap.set" );
-                            processTimingLocal = System.nanoTime();
-                            Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                            finalMap.set(key, transaction);
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerFinalMap_set += processTimingLocalDiff / 1000;
-
-                            processTimingLocal = System.nanoTime();
-                            transFinalMapSigns.set(transactionSignature, key);
-                            List<byte[]> signatures = transaction.getOtherSignatures();
-                            if (signatures != null) {
-                                for (byte[] itemSignature : signatures) {
-                                    transFinalMapSigns.set(itemSignature, key);
-                                }
+                        processTimingLocal = System.nanoTime();
+                        transFinalMapSigns.set(transactionSignature, key);
+                        List<byte[]> signatures = transaction.getOtherSignatures();
+                        if (signatures != null) {
+                            for (byte[] itemSignature : signatures) {
+                                transFinalMapSigns.set(itemSignature, key);
                             }
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
-
                         }
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
 
                     } else {
 
-                        if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                                && ((RSend) transaction).getAssetKey() != 1) {
-                            ;
-                        } else {
+                        // for some TRANSACTIONs need add to FINAM MAP etc.
+                        // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
 
-                            // for some TRANSACTIONs need add to FINAM MAP etc.
-                            // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
+                        processTimingLocal = System.nanoTime();
+                        Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
+                        finalMap.set(key, transaction);
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerFinalMap_set += processTimingLocalDiff / 1000;
 
-                            processTimingLocal = System.nanoTime();
-                            Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                            finalMap.set(key, transaction);
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerFinalMap_set += processTimingLocalDiff / 1000;
-
-                            processTimingLocal = System.nanoTime();
-                            transFinalMapSigns.set(transactionSignature, key);
-                            List<byte[]> signatures = transaction.getOtherSignatures();
-                            if (signatures != null) {
-                                for (byte[] itemSignature : signatures) {
-                                    transFinalMapSigns.set(itemSignature, key);
-                                }
+                        processTimingLocal = System.nanoTime();
+                        transFinalMapSigns.set(transactionSignature, key);
+                        List<byte[]> signatures = transaction.getOtherSignatures();
+                        if (signatures != null) {
+                            for (byte[] itemSignature : signatures) {
+                                transFinalMapSigns.set(itemSignature, key);
                             }
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                         }
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                     }
 
                     System.arraycopy(transactionSignature, 0, transactionsSignatures, transactionsSignaturesPos, SIGNATURE_LENGTH);
@@ -2164,31 +2151,25 @@ import java.util.*;
                 unconfirmedMap.delete(transactionSignature);
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
-                if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                        && ((RSend) transaction).getAssetKey() != 1) {
+                Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
 
-                } else {
+                if (cnt.isOnStopping())
+                    throw new Exception("on stoping");
 
-                    Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-
-                    if (cnt.isOnStopping())
-                        throw new Exception("on stoping");
-
-                    ///logger.debug("[" + seqNo + "] try finalMap.set" );
-                    timerStart = System.currentTimeMillis();
-                    finalMap.set(key, transaction);
-                    timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                    //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
-                    timerStart = System.currentTimeMillis();
-                    transFinalMapSinds.set(transactionSignature, key);
-                    List<byte[]> signatures = transaction.getOtherSignatures();
-                    if (signatures != null) {
-                        for (byte[] itemSignature : signatures) {
-                            transFinalMapSinds.set(itemSignature, key);
-                        }
+                ///logger.debug("[" + seqNo + "] try finalMap.set" );
+                timerStart = System.currentTimeMillis();
+                finalMap.set(key, transaction);
+                timerFinalMap_set += System.currentTimeMillis() - timerStart;
+                //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
+                timerStart = System.currentTimeMillis();
+                transFinalMapSinds.set(transactionSignature, key);
+                List<byte[]> signatures = transaction.getOtherSignatures();
+                if (signatures != null) {
+                    for (byte[] itemSignature : signatures) {
+                        transFinalMapSinds.set(itemSignature, key);
                     }
-                    timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
                 }
+                timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 
             }
 

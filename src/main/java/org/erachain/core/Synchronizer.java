@@ -319,9 +319,7 @@ public class Synchronizer extends Thread {
 
         DCSet fork;
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-        if (BlockGenerator.TEST_DB > 0) {
-            /// checkNewBlocks(dcSet.forkinFile(), lastCommonBlock, newBlocks,
-            /// peer);
+        if (BlockChain.TEST_DB > 0) {
             fork = dcSet.fork();
             checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
             fork.close();

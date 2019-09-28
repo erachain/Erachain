@@ -834,7 +834,7 @@ public class Controller extends Observable {
 
         }
 
-        if (BlockGenerator.TEST_DB == 0) {
+        if (BlockChain.TEST_DB == 0) {
             guiTimer = new GuiTimer();
 
             if (this.wallet.isWalletDatabaseExisting()) {
@@ -865,7 +865,7 @@ public class Controller extends Observable {
         this.blockGenerator.start();
 
         // CREATE NETWORK
-        if (BlockGenerator.TEST_DB == 0) {
+        if (BlockChain.TEST_DB == 0) {
             this.network = new Network(this);
         }
 
@@ -3580,7 +3580,7 @@ public class Controller extends Observable {
             }
 
             // TESTS
-            if (BlockGenerator.TEST_DB > 0) {
+            if (BlockChain.TEST_DB > 0) {
                 useGui = false;
                 continue;
             }
