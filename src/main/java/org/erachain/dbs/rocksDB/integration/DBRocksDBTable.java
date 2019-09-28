@@ -14,7 +14,6 @@ import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
-import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
@@ -94,8 +93,9 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
     }
-    public DBRocksDBTable(String NAME_TABLE, DBASet dbaSet) {
-        this(new ByteableTrivial(), new ByteableTransaction(), NAME_TABLE, null, RocksDbSettings.getDefaultSettings(), dbaSet);
+    public DBRocksDBTable(String NAME_TABLE) {
+        this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
+                null, RocksDbSettings.getDefaultSettings(), null);
     }
 
     @Override

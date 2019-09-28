@@ -41,7 +41,7 @@ public class RocksDBVsMapDB {
         logger.info("Start test RocksDB productivity simple close");
         String NAME_DATABASE = "TestRocksDB";
         long timeMillisBefore = System.currentTimeMillis();
-        InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest(NAME_DATABASE);
+        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
         for (Map.Entry<byte[], byte[]> entry : entrySet) {
             rocksDB.put(entry.getKey(), entry.getValue());
         }
@@ -57,7 +57,7 @@ public class RocksDBVsMapDB {
         logger.info("Start test RocksDB productivity simple");
         String NAME_DATABASE = "TestRocksDB";
         long timeMillisBefore = System.currentTimeMillis();
-        InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest(NAME_DATABASE);
+        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
         for (Map.Entry<byte[], byte[]> entry : entrySet) {
             rocksDB.put(entry.getKey(), entry.getValue());
         }
@@ -90,7 +90,7 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            InnerDBRocksDBTest<byte[], byte[]> rocksDB = new InnerDBRocksDBTest(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
             TransactionDB transactionDB = (TransactionDB) rocksDB.db.database;
             boolean flagBegin = true;
             int k = 0;
