@@ -6,6 +6,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
+import org.erachain.datachain.ItemAssetBalanceTabImpl;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -55,14 +56,8 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     Tuple2<BigDecimal, BigDecimal>>,
             byte[]> balanceAddressIndex;
 
-    public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database,
-                                       Tuple5<
-                                               Tuple2<BigDecimal, BigDecimal>,
-                                               Tuple2<BigDecimal, BigDecimal>,
-                                               Tuple2<BigDecimal, BigDecimal>,
-                                               Tuple2<BigDecimal, BigDecimal>,
-                                               Tuple2<BigDecimal, BigDecimal>> defaultValue) {
-        super(databaseSet, database, logger, defaultValue);
+    public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database) {
+        super(databaseSet, database, logger, ItemAssetBalanceTabImpl.DEFAULT_VALUE);
     }
 
     //private final ByteableBigDecimal byteableBigDecimal = new ByteableBigDecimal();

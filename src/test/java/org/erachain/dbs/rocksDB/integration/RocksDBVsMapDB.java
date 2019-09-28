@@ -109,6 +109,7 @@ public class RocksDBVsMapDB {
                     transaction.commit();
                     flagBegin = true;
                 } catch (RocksDBException e) {
+                    logger.error(e.getMessage(), e);
                     try {
                         transaction.rollback();
                     } catch (RocksDBException ex) {

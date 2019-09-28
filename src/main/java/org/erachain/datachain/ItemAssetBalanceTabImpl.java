@@ -48,7 +48,7 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
         >> implements ItemAssetBalanceTab {
 
-    protected final static
+    public final static
     Fun.Tuple5<
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>,
             Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
@@ -85,21 +85,21 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, DEFAULT_VALUE);
+                    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database);
                     break;
                 default:
-                    map = new ItemAssetBalanceSuitMapDB(databaseSet, database, DEFAULT_VALUE);
+                    map = new ItemAssetBalanceSuitMapDB(databaseSet, database);
             }
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet, DEFAULT_VALUE);
+                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet);
                     break;
                 //case DBS_ROCK_DB:
                 //    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, DEFAULT_VALUE);
                 //    break;
                 default:
-                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet, DEFAULT_VALUE); // FAST
+                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet); // FAST
                     //map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, DEFAULT_VALUE); SLOW
             }
         }

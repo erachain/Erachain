@@ -4,15 +4,9 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.datachain.ItemAssetBalanceTab;
-import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
-import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
@@ -24,9 +18,11 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class DBRocksDBTableTest {
@@ -135,7 +131,7 @@ public class DBRocksDBTableTest {
                 balanceTmp;
 
         ColumnFamilyHandle indexDB = ((DBRocksDBTable) tab.map).getIndex(1).getColumnFamilyHandle();
-        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).db.db.database.newIterator(indexDB);
+        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).db.database.newIterator(indexDB);
         iteratorFilteredNative.seek(account1.getShortAddressBytes());
 
         long assetKeyTMP = 0;
@@ -164,7 +160,7 @@ public class DBRocksDBTableTest {
         }
         logger.error(" NATIVE completed ");
 
-        List<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).db.db.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
+        List<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).db.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
 
         assetKeyTMP = 0;
         iteratorSize = 0;
