@@ -330,15 +330,15 @@ public class DCSet extends DBASet {
                 , parent.transactionFinalMap, this);
 
         this.referenceMap = new ReferenceMapImpl(
-                //DBS_MAP_DB
+                DBS_MAP_DB
                 //DBS_ROCK_DB
-                DBS_NATIVE_MAP
+                //DBS_NATIVE_MAP
                 , parent.referenceMap, this);
 
         this.blockMap = new BlocksMapImpl(
-                //DBS_MAP_DB
+                DBS_MAP_DB
                 //DBS_ROCK_DB
-                DBS_NATIVE_MAP
+                //DBS_NATIVE_MAP
                 , parent.blockMap, this);
 
         this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
@@ -479,8 +479,8 @@ public class DCSet extends DBASet {
                 .commitFileSyncDisable() // ++
 
                 //.snapshotEnable()
-                //.asyncWriteEnable()
-                //.asyncWriteFlushDelay(100)
+                //.asyncWriteEnable() - крах при коммитах и откатах
+                .asyncWriteFlushDelay(2)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
@@ -1499,12 +1499,17 @@ public class DCSet extends DBASet {
 
                 //.checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
-                .mmapFileEnablePartial()
+
+                // тормозит сильно но возможно когда файл большеой не падает скорость сильно
+                // вдобавок не сохраняет на диск даже Транзакционный файл и КРАХ теряет данные
+                // НЕ ВКЛЮЧАТЬ!
+                // .mmapFileEnablePartial()
+
                 .commitFileSyncDisable() // ++
 
                 //.snapshotEnable()
-                //.asyncWriteEnable()
-                //.asyncWriteFlushDelay(100)
+                .asyncWriteEnable()
+                .asyncWriteFlushDelay(2)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
                 .freeSpaceReclaimQ(5) // не нагружать процессор для поиска свободного места в базе данных

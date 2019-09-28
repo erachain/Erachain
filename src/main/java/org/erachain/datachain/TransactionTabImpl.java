@@ -85,6 +85,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
+                case DBS_MAP_DB_IN_MEM:
                     map = new TransactionSuitMapDBFork((TransactionTab) parent, databaseSet);
                     break;
                 case DBS_ROCK_DB:
