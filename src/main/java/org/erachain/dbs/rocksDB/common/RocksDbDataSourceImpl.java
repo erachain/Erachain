@@ -35,39 +35,34 @@ import static org.rocksdb.RocksDB.loadLibrary;
 public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB<byte[], byte[]>
         //, Flusher, DbSourceInter<byte[]>
 {
-    private String dataBaseName;
-    private WriteOptionsWrapper optionsWrapper;
+    protected String dataBaseName;
+    protected WriteOptions writeOptions = new WriteOptions().setSync(true).setDisableWAL(false);
 
     //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
-    private boolean dbSync = true;
+    protected boolean dbSync = true;
 
-    public Transaction transactionDB;
-    public WriteOptions transactionWriteOptions = new WriteOptions()
-            .setSync(true) // TRUE - не теряет данны при КРАХЕ, но типа помедленней
-            .setDisableWAL(false) // ENABLE for commits!
-            ;
     @Getter
     //public RocksDB database;
     public TransactionDB dbCore;
     //public OptimisticTransactionDB database;
 
-    private boolean alive;
-    private String parentName;
+    protected boolean alive;
+    protected String parentName;
     List<IndexDB> indexes;
     RocksDbSettings settings;
-    private boolean create = false;
+    protected boolean create = false;
     protected String sizeDescriptorName = "size";
     @Getter
-    private List<ColumnFamilyHandle> columnFamilyHandles;
+    protected List<ColumnFamilyHandle> columnFamilyHandles;
 
 
-    private ColumnFamilyHandle columnFamilyFieldSize;
-    private ByteableInteger byteableInteger = new ByteableInteger();
+    protected ColumnFamilyHandle columnFamilyFieldSize;
+    protected ByteableInteger byteableInteger = new ByteableInteger();
 
 
-    private ReadWriteLock resetDbLock = new ReentrantReadWriteLock();
+    protected ReadWriteLock resetDbLock = new ReentrantReadWriteLock();
 
     static {
         try {
@@ -84,7 +79,6 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     public RocksDbDataSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this.dataBaseName = name;
         this.parentName = parentName;
-        optionsWrapper = WriteOptionsWrapper.getInstance().sync(dbSync);
         this.indexes = indexes;
         this.settings = settings;
         initDB();
@@ -113,7 +107,6 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                 return;
             }
             alive = false;
-            transactionWriteOptions.dispose();
             dbCore.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -122,37 +115,8 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
     }
 
-    @Override
-    public void commit() {
-        // сольем старый и начнем новый
-        resetDbLock.writeLock().lock();
-        try {
-            transactionDB.commit();
-        } catch (RocksDBException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            transactionDB = dbCore.beginTransaction(transactionWriteOptions);
-            resetDbLock.writeLock().unlock();
-        }
-    }
 
-    @Override
-    public void rollback() {
-        resetDbLock.writeLock().lock();
-        try {
-            logger.debug("size before ROLLBACK: " + size());
-            transactionDB.rollback();
-            logger.debug("size after ROLLBACK: " + size());
-        } catch (RocksDBException e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            logger.debug("size before ROLLBACK: " + size());
-            transactionDB = dbCore.beginTransaction(transactionWriteOptions);
-            resetDbLock.writeLock().unlock();
-        }
-    }
-
-    private boolean quitIfNotAlive() {
+    protected boolean quitIfNotAlive() {
         if (!isAlive()) {
             logger.warn("db is not alive");
         }
@@ -276,8 +240,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     //    initDB(RocksDbSettings.getSettings());
     //}
 
-    @Override
-    public void initDB() {
+    protected void initDB() {
         resetDbLock.writeLock().lock();
         try {
             if (isAlive()) {
@@ -397,7 +360,6 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                             logger.error(e.getMessage(), e);
                             throw new RuntimeException("Failed to initialize database", e);
                         }
-                        transactionDB = ((TransactionDB) dbCore).beginTransaction(transactionWriteOptions);
                         alive = true;
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);
@@ -469,13 +431,13 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     }
 
     @Override
-    public void put(byte[] key, byte[] value, WriteOptionsWrapper optionsWrapper) {
+    public void put(byte[] key, byte[] value, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
         }
         resetDbLock.readLock().lock();
         try {
-            dbCore.put(optionsWrapper.getRocks(), key, value);
+            dbCore.put(writeOptions, key, value);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -546,13 +508,13 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     }
 
     @Override
-    public void remove(byte[] key, WriteOptionsWrapper optionsWrapper) {
+    public void remove(byte[] key, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
         }
         resetDbLock.readLock().lock();
         try {
-            dbCore.delete(optionsWrapper.getRocks(), key);
+            dbCore.delete(writeOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -637,13 +599,13 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     }
 
     @Override
-    public void updateByBatch(Map<byte[], byte[]> rows, WriteOptionsWrapper optionsWrapper) {
+    public void updateByBatch(Map<byte[], byte[]> rows, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
         }
         resetDbLock.readLock().lock();
         try {
-            updateByBatchInner(rows, optionsWrapper.getRocks());
+            updateByBatchInner(rows, writeOptions);
         } catch (Exception e) {
             try {
                 updateByBatchInner(rows);
@@ -850,7 +812,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
     @Override
     public void flush(Map<byte[], byte[]> rows) {
-        updateByBatch(rows, optionsWrapper);
+        updateByBatch(rows, writeOptions);
 
     }
 

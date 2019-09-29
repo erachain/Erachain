@@ -3,6 +3,7 @@ package org.erachain.dbs.rocksDB.common;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
+import org.rocksdb.WriteOptions;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -15,10 +16,6 @@ public interface RocksDbDataSource {
     boolean isAlive();
 
     void close();
-
-    void commit();
-
-    void rollback();
 
     Set<byte[]> keySet() throws RuntimeException;
 
@@ -38,13 +35,11 @@ public interface RocksDbDataSource {
 
     String getDBName();
 
-    void initDB();
-
     void put(byte[] key, byte[] value);
 
     void put(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value);
 
-    void put(byte[] key, byte[] value, WriteOptionsWrapper optionsWrapper);
+    void put(byte[] key, byte[] value, WriteOptions writeOptions);
 
     byte[] get(byte[] key);
 
@@ -54,7 +49,7 @@ public interface RocksDbDataSource {
 
     void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key);
 
-    void remove(byte[] key, WriteOptionsWrapper optionsWrapper);
+    void remove(byte[] key, WriteOptions writeOptions);
 
     RockStoreIterator iterator(boolean descending);
 
@@ -68,7 +63,7 @@ public interface RocksDbDataSource {
 
     void updateByBatch(Map<byte[], byte[]> rows);
 
-    void updateByBatch(Map<byte[], byte[]> rows, WriteOptionsWrapper optionsWrapper);
+    void updateByBatch(Map<byte[], byte[]> rows, WriteOptions writeOptions);
 
     Map<byte[], byte[]> getNext(byte[] key, long limit);
 

@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.rocksDB.common.RocksDbTransactSourceImpl;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
@@ -88,6 +89,57 @@ public class RocksDBVsMapDB {
         do {
             long timeMillisBefore = System.currentTimeMillis();
             DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
+            int k = 0;
+            int rollbacks = 0;
+            for (Map.Entry<byte[], byte[]> entry : entrySet) {
+                k++;
+                rocksDB.put(entry.getKey(), entry.getValue());
+
+                if (k % 50 == 0) {
+                    // TRY ROLLBACK
+                    assertEquals(k, rocksDB.size());
+
+                    rocksDB.rollback();
+                    rollbacks += 10;
+                    assertEquals(k - rollbacks, rocksDB.size());
+
+                    break;
+
+                } else if (k % 10 == 0) {
+                    // TRY COMMIT
+                    rocksDB.commit();
+                    assertEquals(k, rocksDB.size());
+
+                }
+            }
+
+            long timeMillisAfter = System.currentTimeMillis();
+            long total = timeMillisAfter - timeMillisBefore;
+            logger.info("total time rocksDB = " + total);
+            rocksDB.close();
+            logger.info("End test RocksDB productivity");
+            twice = !twice;
+
+        } while (twice);
+    }
+
+    @Test
+    public void rocksDBProductivityWithCommitsIC() {
+        logger.info("Start test RocksDB productivity commit");
+        String NAME_DATABASE = "TestRocksDB1";
+
+        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
+        try {
+            File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
+        boolean twice = false;
+        do {
+            long timeMillisBefore = System.currentTimeMillis();
+            DBRocksDBTable<byte[], byte[]> rocksDB = new RocksDbTransactSourceImpl(NAME_DATABASE);
             int k = 0;
             int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
