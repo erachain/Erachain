@@ -50,7 +50,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             ;
     @Getter
     //public RocksDB database;
-    public TransactionDB db;
+    public TransactionDB dbCore;
     //public OptimisticTransactionDB database;
 
     private boolean alive;
@@ -114,7 +114,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             }
             alive = false;
             transactionWriteOptions.dispose();
-            db.close();
+            dbCore.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -131,7 +131,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            transactionDB = db.beginTransaction(transactionWriteOptions);
+            transactionDB = dbCore.beginTransaction(transactionWriteOptions);
             resetDbLock.writeLock().unlock();
         }
     }
@@ -140,11 +140,14 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     public void rollback() {
         resetDbLock.writeLock().lock();
         try {
+            logger.debug("size before ROLLBACK: " + size());
             transactionDB.rollback();
+            logger.debug("size after ROLLBACK: " + size());
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            transactionDB = db.beginTransaction(transactionWriteOptions);
+            logger.debug("size before ROLLBACK: " + size());
+            transactionDB = dbCore.beginTransaction(transactionWriteOptions);
             resetDbLock.writeLock().unlock();
         }
     }
@@ -163,7 +166,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet(Fun.BYTE_ARRAY_COMPARATOR);
-        try (final RocksIterator iter = db.newIterator()) {
+        try (final RocksIterator iter = dbCore.newIterator()) {
             for (iter.seekToFirst(); iter.isValid(); iter.next()) {
                 result.add(iter.key());
             }
@@ -180,7 +183,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         List<byte[]> result = new ArrayList<byte[]>();
-        try (final RocksIterator iter = db.newIterator()) {
+        try (final RocksIterator iter = dbCore.newIterator()) {
             for (iter.seekToFirst(); iter.isValid(); iter.next()) {
                 result.add(iter.value());
             }
@@ -196,7 +199,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return null;
         }
 
-        return db.newIterator(db.getDefaultColumnFamily());
+        return dbCore.newIterator(dbCore.getDefaultColumnFamily());
     }
 
     @Override
@@ -205,7 +208,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return null;
         }
 
-        return db.newIterator(indexDB);
+        return dbCore.newIterator(indexDB);
     }
 
     @Override
@@ -215,7 +218,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
-        try (final RocksIterator iter = db.newIterator(db.getDefaultColumnFamily())) {
+        try (final RocksIterator iter = dbCore.newIterator(dbCore.getDefaultColumnFamily())) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.key());
             }
@@ -232,7 +235,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         List<byte[]> result = new ArrayList<byte[]>();
-        try (final RocksIterator iter = db.newIterator(db.getDefaultColumnFamily())) {
+        try (final RocksIterator iter = dbCore.newIterator(dbCore.getDefaultColumnFamily())) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
             }
@@ -249,7 +252,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         List<byte[]> result = new ArrayList<byte[]>();
-        try (final RocksIterator iter = db.newIterator(indexDB)) {
+        try (final RocksIterator iter = dbCore.newIterator(indexDB)) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
             }
@@ -341,12 +344,12 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
                                 // MAKE DATABASE
                                 // USE transactions
-                                db = TransactionDB.open(options, transactionDbOptions, dbPath.toString());
+                                dbCore = TransactionDB.open(options, transactionDbOptions, dbPath.toString());
 
-                                columnFamilyHandles.add(db.getDefaultColumnFamily());
+                                columnFamilyHandles.add(dbCore.getDefaultColumnFamily());
                                 int indexID = 0;
                                 for (ColumnFamilyDescriptor columnFamilyDescriptor : columnFamilyDescriptors) {
-                                    ColumnFamilyHandle columnFamilyHandle = db.createColumnFamily(columnFamilyDescriptor);
+                                    ColumnFamilyHandle columnFamilyHandle = dbCore.createColumnFamily(columnFamilyDescriptor);
                                     columnFamilyHandles.add(columnFamilyHandle);
                                     if (indexes != null && indexes.size() > indexID)
                                         indexes.get(indexID++).setColumnFamilyHandle(columnFamilyHandle);
@@ -378,7 +381,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
                                 // MAKE DATABASE
                                 // USE transactions
-                                db = TransactionDB.open(dbOptions, transactionDbOptions,
+                                dbCore = TransactionDB.open(dbOptions, transactionDbOptions,
                                         dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
 
                                 if (indexes != null && !indexes.isEmpty()) {
@@ -394,7 +397,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                             logger.error(e.getMessage(), e);
                             throw new RuntimeException("Failed to initialize database", e);
                         }
-                        transactionDB = ((TransactionDB) db).beginTransaction(transactionWriteOptions);
+                        transactionDB = ((TransactionDB) dbCore).beginTransaction(transactionWriteOptions);
                         alive = true;
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);
@@ -442,7 +445,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         try {
-            db.put(key, value);
+            dbCore.put(key, value);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -457,7 +460,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         try {
-            db.put(columnFamilyHandle, key, value);
+            dbCore.put(columnFamilyHandle, key, value);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -472,7 +475,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         try {
-            db.put(optionsWrapper.getRocks(), key, value);
+            dbCore.put(optionsWrapper.getRocks(), key, value);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -487,7 +490,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         try {
-            return db.get(key);
+            return dbCore.get(key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -503,7 +506,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         try {
-            return db.get(columnFamilyHandle, key);
+            return dbCore.get(columnFamilyHandle, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -519,7 +522,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         try {
-            db.delete(key);
+            dbCore.delete(key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -534,7 +537,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         try {
-            db.delete(columnFamilyHandle, key);
+            dbCore.delete(columnFamilyHandle, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -549,7 +552,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
         resetDbLock.readLock().lock();
         try {
-            db.delete(optionsWrapper.getRocks(), key);
+            dbCore.delete(optionsWrapper.getRocks(), key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -559,26 +562,26 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
     @Override
     public RockStoreIterator iterator(boolean descending) {
-        return new RockStoreIterator(db.newIterator(), descending, false);
+        return new RockStoreIterator(dbCore.newIterator(), descending, false);
     }
 
     @Override
     public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
-        return new RockStoreIterator(db.newIterator(columnFamilyHandle), descending, true);
+        return new RockStoreIterator(dbCore.newIterator(columnFamilyHandle), descending, true);
     }
 
     @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
-        return new RockStoreIteratorFilter(db.newIterator(), descending, true, filter);
+        return new RockStoreIteratorFilter(dbCore.newIterator(), descending, true, filter);
     }
     @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
-        return new RockStoreIteratorFilter(db.newIterator(columnFamilyHandle), descending, true, filter);
+        return new RockStoreIteratorFilter(dbCore.newIterator(columnFamilyHandle), descending, true, filter);
     }
 
     @Override
     public RockStoreIterator indexIterator(boolean descending, int indexDB) {
-        return new RockStoreIterator(db.newIterator(columnFamilyHandles.get(indexDB)), descending, true);
+        return new RockStoreIterator(dbCore.newIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
 
     private void updateByBatchInner(Map<byte[], byte[]> rows) throws Exception {
@@ -593,7 +596,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                     batch.put(entry.getKey(), entry.getValue());
                 }
             }
-            db.write(new WriteOptions(), batch);
+            dbCore.write(new WriteOptions(), batch);
         }
     }
 
@@ -610,7 +613,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                     batch.put(entry.getKey(), entry.getValue());
                 }
             }
-            db.write(options, batch);
+            dbCore.write(options, batch);
         }
     }
 
@@ -667,7 +670,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return Collections.emptyMap();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = db.newIterator()) {
+        try (RocksIterator iter = dbCore.newIterator()) {
             Map<byte[], byte[]> result = new HashMap<>();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -688,7 +691,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = db.newIterator()) {
+        try (RocksIterator iter = dbCore.newIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             for (iter.seekToLast(); iter.isValid() && i < limit; iter.prev(), i++) {
@@ -709,7 +712,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = db.newIterator()) {
+        try (RocksIterator iter = dbCore.newIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             byte[] data = get(key);
@@ -735,7 +738,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return new ArrayList<>();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = db.newIterator()) {
+        try (RocksIterator iter = dbCore.newIterator()) {
             List<byte[]> result = new ArrayList<>();
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -756,7 +759,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = db.newIterator()) {
+        try (RocksIterator iter = dbCore.newIterator()) {
             Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -777,7 +780,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return new TreeSet(Fun.BYTE_ARRAY_COMPARATOR);
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iter = db.newIterator(columnFamilyHandle)) {
+        try (RocksIterator iter = dbCore.newIterator(columnFamilyHandle)) {
             Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             long i = 0;
             for (iter.seek(key); iter.isValid() && i < limit; iter.next(), i++) {
@@ -805,7 +808,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             return Collections.emptyMap();
         }
         resetDbLock.readLock().lock();
-        try (RocksIterator iterator = db.newIterator()) {
+        try (RocksIterator iterator = dbCore.newIterator()) {
             Map<byte[], byte[]> result = new HashMap<>();
             long i = 0;
             for (iterator.seekToFirst(); iterator.isValid() && i++ < limit; iterator.next()) {
@@ -825,7 +828,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
     @Override
     public void backup(String dir) throws RocksDBException {
-        Checkpoint cp = Checkpoint.create(db);
+        Checkpoint cp = Checkpoint.create(dbCore);
         cp.createCheckpoint(dir + getDBName());
     }
 
@@ -854,7 +857,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     @Override
     public void flush() throws RocksDBException {
         FlushOptions flushOptions = new FlushOptions();
-        db.flush(flushOptions);
+        dbCore.flush(flushOptions);
     }
 
 }

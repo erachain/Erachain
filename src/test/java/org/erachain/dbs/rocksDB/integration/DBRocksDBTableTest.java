@@ -131,7 +131,7 @@ public class DBRocksDBTableTest {
                 balanceTmp;
 
         ColumnFamilyHandle indexDB = ((DBRocksDBTable) tab.map).getIndex(1).getColumnFamilyHandle();
-        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).db.db.newIterator(indexDB);
+        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).dbSource.dbCore.newIterator(indexDB);
         iteratorFilteredNative.seek(account1.getShortAddressBytes());
 
         long assetKeyTMP = 0;
@@ -160,7 +160,7 @@ public class DBRocksDBTableTest {
         }
         logger.error(" NATIVE completed ");
 
-        List<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).db.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
+        List<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).dbSource.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
 
         assetKeyTMP = 0;
         iteratorSize = 0;

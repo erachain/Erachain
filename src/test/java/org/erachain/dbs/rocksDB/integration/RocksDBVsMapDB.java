@@ -76,8 +76,8 @@ public class RocksDBVsMapDB {
         logger.info("Start test RocksDB productivity commit");
         String NAME_DATABASE = "TestRocksDB1";
 
-        // УДАЛИМ перед первым проходом - для проверки трнзакционности
-        // а второй проход с уже отертой базой так же проверим а то может быть разница
+        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         try {
             File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
@@ -96,6 +96,8 @@ public class RocksDBVsMapDB {
 
                 if (k % 50 == 0) {
                     // TRY ROLLBACK
+                    assertEquals(k, rocksDB.size());
+
                     rocksDB.rollback();
                     rollbacks += 10;
                     assertEquals(k - rollbacks, rocksDB.size());
@@ -105,7 +107,7 @@ public class RocksDBVsMapDB {
                 } else if (k % 10 == 0) {
                     // TRY COMMIT
                     rocksDB.commit();
-                    assertEquals(k , rocksDB.size());
+                    assertEquals(k, rocksDB.size());
 
                 }
             }
