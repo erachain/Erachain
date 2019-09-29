@@ -131,7 +131,7 @@ public class DBRocksDBTableTest {
                 balanceTmp;
 
         ColumnFamilyHandle indexDB = ((DBRocksDBTable) tab.map).getIndex(1).getColumnFamilyHandle();
-        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).db.database.newIterator(indexDB);
+        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).db.db.newIterator(indexDB);
         iteratorFilteredNative.seek(account1.getShortAddressBytes());
 
         long assetKeyTMP = 0;

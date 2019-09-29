@@ -96,7 +96,7 @@ public interface RocksDbDataSource {
 
     void flush() throws RocksDBException;
 
-    org.rocksdb.TransactionDB getDatabase();
+    org.rocksdb.TransactionDB getDb();
 
     List<ColumnFamilyHandle> getColumnFamilyHandles();
 }

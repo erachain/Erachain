@@ -157,7 +157,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     account.getShortAddressBytes(),
                     balanceAddressIndex.getColumnFamilyHandle());
         } else {
-            RocksIterator iter = ((DBRocksDBTable) map).db.database.newIterator(
+            RocksIterator iter = ((DBRocksDBTable) map).db.db.newIterator(
                     balanceAddressIndex
                     //balanceKeyAssetIndex
                             .getColumnFamilyHandle());
