@@ -84,6 +84,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         initDB();
 
     }
+
     public RocksDbDataSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
     }
@@ -248,7 +249,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             }
 
             Preconditions.checkNotNull(dataBaseName, "no name set to the dbStore");
-            try  (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeUniversalStyleCompaction()) {
+            try (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeUniversalStyleCompaction()) {
                 final List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
                 columnFamilyHandles = new ArrayList<>();
                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
@@ -376,6 +377,32 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         } finally {
             resetDbLock.writeLock().unlock();
         }
+    }
+
+    public static TransactionDB initDB(Path dbPath, Options createOptions, DBOptions openOptions,
+               TransactionDBOptions transactionDbOptions,
+               List<ColumnFamilyDescriptor> columnFamilyDescriptors,
+               List<ColumnFamilyHandle> columnFamilyHandles) {
+
+        TransactionDB dbCore;
+        try {
+            dbCore = TransactionDB.open(createOptions, transactionDbOptions, dbPath.toString());
+            logger.info("database CREATED");
+
+        } catch (RocksDBException e) {
+            try {
+                dbCore = TransactionDB.open(openOptions, transactionDbOptions,
+                        dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
+
+            logger.info("database opened");
+
+            } catch (RocksDBException e) {
+                logger.error(e.getMessage(), e);
+                throw new RuntimeException("Failed to initialize database", e);
+            }
+        } finally {
+        }
+        return dbCore;
     }
 
     private BlockBasedTableConfig settingsBlockBasedTable(RocksDbSettings settings) {
