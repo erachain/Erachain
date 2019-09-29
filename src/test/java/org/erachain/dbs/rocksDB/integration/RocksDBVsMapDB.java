@@ -5,10 +5,6 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
 import org.junit.Test;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.Transaction;
-import org.rocksdb.TransactionDB;
-import org.rocksdb.WriteOptions;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -18,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 public class RocksDBVsMapDB {
@@ -91,32 +88,28 @@ public class RocksDBVsMapDB {
         do {
             long timeMillisBefore = System.currentTimeMillis();
             DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
-            TransactionDB transactionDB = (TransactionDB) rocksDB.db.database;
-            boolean flagBegin = true;
             int k = 0;
-            Transaction transaction = null;
+            int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
-                if (flagBegin) {
-                    transaction = transactionDB.beginTransaction(new WriteOptions());
-                    flagBegin = false;
-                }
                 k++;
-                try {
-                    if (k % 1000 != 0) {
-                        rocksDB.put(entry.getKey(), entry.getValue());
-                        continue;
-                    }
-                    transaction.commit();
-                    flagBegin = true;
-                } catch (RocksDBException e) {
-                    logger.error(e.getMessage(), e);
-                    try {
-                        transaction.rollback();
-                    } catch (RocksDBException ex) {
-                        logger.error(ex.getMessage(), ex);
-                    }
+                rocksDB.put(entry.getKey(), entry.getValue());
+
+                if (k % 50 == 0) {
+                    // TRY ROLLBACK
+                    rocksDB.rollback();
+                    rollbacks += 10;
+                    assertEquals(k - rollbacks, rocksDB.size());
+
+                    break;
+
+                } else if (k % 10 == 0) {
+                    // TRY COMMIT
+                    rocksDB.commit();
+                    assertEquals(k , rocksDB.size());
+
                 }
             }
+
             long timeMillisAfter = System.currentTimeMillis();
             long total = timeMillisAfter - timeMillisBefore;
             logger.info("total time rocksDB = " + total);

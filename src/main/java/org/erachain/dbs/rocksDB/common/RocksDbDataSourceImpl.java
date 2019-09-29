@@ -43,10 +43,11 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
     private boolean dbSync = true;
 
-    private Transaction transactionDB;
-    private WriteOptions transactionWriteOptions = new WriteOptions()
+    public Transaction transactionDB;
+    public WriteOptions transactionWriteOptions = new WriteOptions()
             .setSync(true) // TRUE - не теряет данны при КРАХЕ, но типа помедленней
-            .setDisableWAL(true);
+            .setDisableWAL(false) // ENABLE for commits!
+            ;
     @Getter
     //public RocksDB database;
     public TransactionDB database;
@@ -122,7 +123,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     }
 
     @Override
-    public synchronized void commit() {
+    public void commit() {
         // сольем старый и начнем новый
         resetDbLock.writeLock().lock();
         try {
@@ -135,9 +136,9 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                 logger.error(ex.getMessage(), ex);
             }
         } finally {
+            transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
             resetDbLock.writeLock().unlock();
         }
-        transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
     }
 
     @Override
@@ -152,9 +153,9 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                 logger.error(ex.getMessage(), ex);
             }
         } finally {
+            transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
             resetDbLock.writeLock().unlock();
         }
-        transactionDB = ((TransactionDB) database).beginTransaction(transactionWriteOptions);
     }
 
     private boolean quitIfNotAlive() {

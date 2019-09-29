@@ -93,9 +93,14 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
     }
+
+    /**
+     * for TESTs. new ArrayList<>() - size counter enable
+     * @param NAME_TABLE
+     */
     public DBRocksDBTable(String NAME_TABLE) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
-                null, RocksDbSettings.getDefaultSettings(), null);
+                new ArrayList<>(), RocksDbSettings.getDefaultSettings(), null);
     }
 
     @Override
