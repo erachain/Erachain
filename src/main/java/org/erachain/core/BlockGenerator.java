@@ -221,7 +221,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-    private List<Transaction> testTransactions(int blockHeight, long timestamp) {
+    private List<Transaction> testTransactions(int blockHeight, long blockTimestamp) {
 
         SecureRandom randomSecure = new SecureRandom();
 
@@ -243,6 +243,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         PublicKeyAccount recipient;
         List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>();
+        HashMap<PrivateKeyAccount, Long> creatorsReference = new HashMap<>();
+        long timestamp;
         for (int index = 0; index < BlockChain.TEST_DB; index++) {
 
             if (generateNewAccount) {
@@ -254,6 +256,15 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             PrivateKeyAccount creator = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+
+            // определим время создания для каждого счета
+            if (creatorsReference.containsKey(creator)) {
+                timestamp = creatorsReference.get(creator) + 1;
+            } else {
+                timestamp = blockTimestamp;
+            }
+            creatorsReference.put(creator, timestamp);
+
             messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
                     amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
