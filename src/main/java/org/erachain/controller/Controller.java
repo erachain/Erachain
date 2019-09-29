@@ -920,11 +920,11 @@ public class Controller extends Observable {
                 try {
                     Files.walkFileTree(dataChain.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
                 } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
+                    //LOGGER.error(e.getMessage(), e);
                 }
             }
             // copy Back dir to DataChain
-            if (dataChainBackUp.exists()) {
+            if (false && dataChainBackUp.exists()) {
 
                 try {
                     FileUtils.copyDirectory(dataChainBackUp, dataChain);

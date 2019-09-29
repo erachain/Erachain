@@ -128,6 +128,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         try {
             transactionDB.commit();
         } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
             try {
                 transactionDB.rollback();
             } catch (RocksDBException ex) {

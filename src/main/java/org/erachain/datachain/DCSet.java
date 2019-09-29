@@ -159,13 +159,13 @@ public class DCSet extends DBASet {
         try {
             // переделанные таблицы
             this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
-                    //DBS_MAP_DB
-                    DBS_ROCK_DB // very SLOW потому что BigDecimal 20 байт - хотя с -opi этоне делаем
+                    DBS_MAP_DB
+                    //DBS_ROCK_DB // very SLOW потому что BigDecimal 20 байт - хотя с -opi этоне делаем
                     , this, database);
 
             this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0 ? defaultDBS :
-                    //DBS_MAP_DB // SLOW then RocksDB
-                    DBS_ROCK_DB // more FAST
+                    DBS_MAP_DB // SLOW then RocksDB
+                    //DBS_ROCK_DB // more FAST
                     , this, database);
 
             this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
@@ -175,18 +175,18 @@ public class DCSet extends DBASet {
                     , this, database);
 
             this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
-                    //DBS_MAP_DB // fast
-                    DBS_ROCK_DB // slow
+                    DBS_MAP_DB // fast
+                    //DBS_ROCK_DB // slow
                     , this, database);
 
             this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
-                    //DBS_MAP_DB // fast
-                    DBS_ROCK_DB // slow
+                    DBS_MAP_DB // fast
+                    //DBS_ROCK_DB // slow
                     , this, database);
 
             this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
-                    //DBS_MAP_DB // fast
-                    DBS_ROCK_DB // slow
+                    DBS_MAP_DB // fast
+                    //DBS_ROCK_DB // slow
                     , this, database);
 
 
@@ -342,9 +342,9 @@ public class DCSet extends DBASet {
                 , parent.blockMap, this);
 
         this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
-                //DBS_MAP_DB
+                DBS_MAP_DB
                 //DBS_ROCK_DB
-                DBS_NATIVE_MAP
+                //DBS_NATIVE_MAP
                 , parent.transactionFinalMapSigns, this);
 
         this.addressForging = new AddressForging(parent.addressForging, this);
