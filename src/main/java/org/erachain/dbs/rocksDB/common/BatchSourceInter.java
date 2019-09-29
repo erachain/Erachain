@@ -18,14 +18,14 @@
 
 package org.erachain.dbs.rocksDB.common;
 
+import org.rocksdb.WriteOptions;
+
 import java.util.Map;
 
 
 /**
- * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
  * Этот интерфейс позаимствовани из проекта "tron". Скорее всего он использовался для разделения функционала.
  * Можно удалить.
- * Встроить можно все что угодно куда угодно
  * @param <K>
  * @param <V>
  */
@@ -35,5 +35,5 @@ public interface BatchSourceInter<K, V>// extends SourceInter<K, V>
 
   void updateByBatch(Map<K, V> rows);
 
-  void updateByBatch(Map<K, V> rows, WriteOptionsWrapper writeOptions);
+  void updateByBatch(Map<K, V> rows, WriteOptions writeOptions);
 }

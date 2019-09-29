@@ -1,7 +1,13 @@
 package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.settings.Settings;
 import org.rocksdb.*;
+
+import java.util.List;
+
+import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 @Slf4j
 public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements RocksDbTransactSource {
@@ -12,11 +18,16 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
     public ReadOptions transactionReadOptions = new ReadOptions()
             ;
 
+    public RocksDbTransactSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
+        super(parentName, name, indexes, settings);
+    }
+    public RocksDbTransactSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings) {
+        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
+    }
 
     protected void initDB() {
         super.initDB();
         dbCore = ((TransactionDB) super.dbCore).beginTransaction(writeOptions);
-
     }
 
     @Override

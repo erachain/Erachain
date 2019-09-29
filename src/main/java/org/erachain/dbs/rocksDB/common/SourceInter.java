@@ -19,13 +19,11 @@ package org.erachain.dbs.rocksDB.common;
 
 
 import org.rocksdb.RocksDBException;
+import org.rocksdb.WriteOptions;
 
 /**
- * TODO зачем выделен этот файл, какой функционал он несет, почему нельзя было его встрогить в супер
- * Почему putData а не put и т.д.?
  * Этот интерфейс позаимствовани из проекта "tron". Скорее всего он использовался для разделения функционала.
  * Можно удалить.
- * Встроить можно все что угодно куда угодно
  * @param <K>
  * @param <V>
  */
@@ -34,13 +32,13 @@ public interface SourceInter<K, V> {
 
   void putData(K key, V val);
 
-  void putData(K k, V v, WriteOptionsWrapper options);
+  void putData(K k, V v, WriteOptions options);
 
   V getData(K key);
 
   void deleteData(K key);
 
-  void deleteData(K k, WriteOptionsWrapper options);
+  void deleteData(K k, WriteOptions options);
 
   void flush() throws RocksDBException;
 

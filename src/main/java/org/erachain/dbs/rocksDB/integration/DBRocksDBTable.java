@@ -3,9 +3,7 @@ package org.erachain.dbs.rocksDB.integration;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
 import org.erachain.database.DBASet;
-import org.erachain.dbs.rocksDB.common.DBIterator;
-import org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl;
-import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.common.*;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedTypeIndexException;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
@@ -45,7 +43,8 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
     private ColumnFamilyHandle columnFamilyFieldSize;
 
     //  интерфейс доступа к БД
-    public RocksDbDataSourceImpl dbSource;
+    ///public RocksDbDataSourceImpl dbSource;
+    public RocksDbTransactSource dbSource;
 
     //  Сериализатор ключей
     private Byteable byteableKey;
@@ -81,7 +80,7 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
         //    indexes = new ArrayList<>();
         //}
         this.indexes = indexes;
-        dbSource = new RocksDbDataSourceImpl(this.root, NAME_TABLE, indexes, settings);
+        dbSource = new RocksDbTransactSourceImpl(this.root, NAME_TABLE, indexes, settings);
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {
             // если indexes = null то размер не будем считать
@@ -305,7 +304,7 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
     public void clear() {
         dbSource.close();
         FileUtil.recursiveDelete(dbSource.getDbPath().toString());
-        dbSource = new RocksDbDataSourceImpl(root, NAME_TABLE, indexes, settings);
+        dbSource = new RocksDbTransactSourceImpl(root, NAME_TABLE, indexes, settings);
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {
             // если indexes = null то размер не будем считать

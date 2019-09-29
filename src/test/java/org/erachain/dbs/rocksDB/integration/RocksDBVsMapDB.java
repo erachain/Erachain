@@ -1,7 +1,6 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.dbs.rocksDB.common.RocksDbTransactSourceImpl;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
@@ -124,7 +123,7 @@ public class RocksDBVsMapDB {
     }
 
     @Test
-    public void rocksDBProductivityWithCommitsIC() {
+    public void rocksDBProductivityWithCommitsICreator() {
         logger.info("Start test RocksDB productivity commit");
         String NAME_DATABASE = "TestRocksDB1";
 
@@ -139,7 +138,7 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new RocksDbTransactSourceImpl(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
             int k = 0;
             int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
