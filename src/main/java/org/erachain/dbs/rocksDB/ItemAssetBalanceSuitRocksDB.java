@@ -16,6 +16,7 @@ import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 import org.rocksdb.RocksIterator;
+import org.rocksdb.TransactionDB;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -157,7 +158,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     account.getShortAddressBytes(),
                     balanceAddressIndex.getColumnFamilyHandle());
         } else {
-            RocksIterator iter = ((DBRocksDBTable) map).dbSource.getDbCore().newIterator(
+            RocksIterator iter = ((TransactionDB) ((DBRocksDBTable) map).dbSource.getDbCore()).newIterator(
                     balanceAddressIndex
                     //balanceKeyAssetIndex
                             .getColumnFamilyHandle());

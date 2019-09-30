@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.mapdb.Fun;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.RocksIterator;
+import org.rocksdb.TransactionDB;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -131,7 +132,7 @@ public class DBRocksDBTableTest {
                 balanceTmp;
 
         ColumnFamilyHandle indexDB = ((DBRocksDBTable) tab.map).getIndex(1).getColumnFamilyHandle();
-        RocksIterator iteratorFilteredNative = ((DBRocksDBTable) tab.map).dbSource.getDbCore().newIterator(indexDB);
+        RocksIterator iteratorFilteredNative = ((TransactionDB) ((DBRocksDBTable) tab.map).dbSource.getDbCore()).newIterator(indexDB);
         iteratorFilteredNative.seek(account1.getShortAddressBytes());
 
         long assetKeyTMP = 0;

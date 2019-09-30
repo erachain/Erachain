@@ -1,19 +1,18 @@
 package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.dbs.rocksDB.indexes.IndexDB;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
 import org.junit.Test;
-import org.rocksdb.*;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.junit.Assert.assertEquals;
@@ -24,7 +23,7 @@ public class RocksDbTransactSourceImpl2Test {
 
     private Map<byte[], byte[]> data = new HashMap<>();
 
-    private long countData = 100000;
+    private long countData = 100;
 
     private Set<Map.Entry<byte[], byte[]>> entrySet;
 
@@ -49,37 +48,32 @@ public class RocksDbTransactSourceImpl2Test {
         } catch (Throwable e) {
         }
 
-        Path path = Paths.get(tempDir.toPath().toString(), NAME_TABLE);
-        List<IndexDB> indexes = new ArrayList<>();
-        RocksDbSettings settings = new RocksDbSettings();
-
-
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_TABLE);
-            WriteOptions transactWriteOptions = new WriteOptions().setSync(true).setDisableWAL(false);
-            ReadOptions transactReadOptions = new ReadOptions();
-
-            Transaction transaction1 = rocksDB.dbSource.getDbCore().beginTransaction(transactWriteOptions);
-            List<ColumnFamilyHandle> families = rocksDB.dbSource.getColumnFamilyHandles();
-            ColumnFamilyHandle sizeFamily = families.get(families.size() - 1);
-
-            RocksDbDataSourceImpl dbSource = new RocksDbDataSourceImpl(path.toString(), indexes, settings);
-            Transaction transaction2 = dbSource.dbCore.beginTransaction(transactWriteOptions);
+            DBRocksDBTableTransact<byte[], byte[]> rocksDB = new DBRocksDBTableTransact(NAME_TABLE);
 
             int k = 0;
+
+            for (Map.Entry<byte[], byte[]> entry : entrySet) {
+                if (k++ > 10) break;
+
+                rocksDB.put(entry.getKey(), entry.getValue());
+            }
+            logger.info("size :" + rocksDB.size());
+
+            k = 0;
             int rollbacks = 0;
 
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
                 k++;
                 try {
 
-                    if (k % 3 == 0) {
-                        transaction1.put(entry.getKey(), entry.getValue());
+                    if (true || k % 3 == 0) {
+                        rocksDB.put(entry.getKey(), entry.getValue());
                     } else if (true || k % 5 == 0) {
-                        transaction2.put(entry.getKey(), entry.getValue());
+                        //transaction2.put(entry.getKey(), entry.getValue());
                     }
                     //rocksDB.put(entry.getKey(), entry.getValue());
 
@@ -87,16 +81,12 @@ public class RocksDbTransactSourceImpl2Test {
                         // TRY ROLLBACK
                         //assertEquals(k, rocksDB.size());
 
-                        logger.info("size before ROLLBACK :" + RocksDbTransactSourceImpl2.size(transaction1, sizeFamily, transactReadOptions));
-                        transaction1.rollback();
-                        int size = RocksDbTransactSourceImpl2.size(transaction1, sizeFamily, transactReadOptions);
+                        logger.info("size before ROLLBACK :" + rocksDB.size());
+                        rocksDB.rollback();
+                        int size = rocksDB.size();
                         logger.info("size after ROLLBACK :" + size);
 
                         assertEquals(k - rollbacks, size);
-
-                        rocksDB.rollback();
-                        rollbacks += 10;
-                        assertEquals(k - rollbacks, rocksDB.size());
 
                         break;
 
@@ -106,7 +96,7 @@ public class RocksDbTransactSourceImpl2Test {
                         assertEquals(k, rocksDB.size());
 
                     }
-                } catch (RocksDBException e) {
+                } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
             }
