@@ -9,10 +9,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.junit.Assert.assertEquals;
@@ -49,53 +46,78 @@ public class RocksDbTransactSourceImpl2Test {
         }
 
         boolean twice = false;
+
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
             DBRocksDBTableTransact<byte[], byte[]> rocksDB = new DBRocksDBTableTransact(NAME_TABLE);
 
             int k = 0;
-
-            for (Map.Entry<byte[], byte[]> entry : entrySet) {
-                if (k++ > 10) break;
-
-                rocksDB.put(entry.getKey(), entry.getValue());
-            }
-            logger.info("size :" + rocksDB.size());
-
-            k = 0;
             int rollbacks = 0;
 
+            int stepInit = 10;
+            int stepCommit = twice ? stepInit << 1 : stepInit;
+            int stepRollback = twice ? 30 : 20;
+
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
+
                 k++;
-                try {
 
-                    rollbacks++;
-                    if (true || k % 3 == 0) {
-                        rocksDB.put(entry.getKey(), entry.getValue());
-                    } else if (true || k % 5 == 0) {
-                        //transaction2.put(entry.getKey(), entry.getValue());
+                if (twice && k <= stepCommit) {
+                    byte[] result = rocksDB.get(entry.getKey());
+                    if (k <= stepInit) {
+                        assertEquals(Arrays.equals(result, entry.getValue()), true);
+                    } else {
+                        assertEquals(result == null, true);
                     }
-                    //rocksDB.put(entry.getKey(), entry.getValue());
+                    if (k == 1) {
+                        logger.info("OPEN size :" + rocksDB.size());
+                        logger.info("OPEN size Parent:" + rocksDB.parentSize());
+                    }
 
-                    if (k % 50 == 0) {
-                        // TRY ROLLBACK
-                        //assertEquals(k, rocksDB.size());
+                }
 
-                        logger.info("size before ROLLBACK :" + rocksDB.size());
-                        rocksDB.rollback();
-                        int size = rocksDB.size();
-                        logger.info("size after ROLLBACK :" + size);
+                try {
+                    rocksDB.put(entry.getKey(), entry.getValue());
 
-                        assertEquals(k - rollbacks, size);
+                    // по второму кругу первые 10 уже внесены и надо дальше пройти
+                    if (k <= stepCommit) {
+                        if (k == stepCommit) {
+                            logger.info("size :" + rocksDB.size());
+                            logger.info("size Parent:" + rocksDB.parentSize());
+                            if (!twice) {
+                                assertEquals(stepCommit, rocksDB.size());
+                                assertEquals(0, rocksDB.parentSize());
+                            } else {
+                                assertEquals(stepCommit, rocksDB.size());
+                                assertEquals(stepInit, rocksDB.parentSize());
+                            }
 
-                        break;
+                            // TRY COMMIT
+                            rocksDB.commit();
 
-                    } else if (false && k % 10 == 0) {
-                        // TRY COMMIT
-                        rocksDB.commit();
-                        assertEquals(k, rocksDB.size());
+                            assertEquals(rocksDB.size(), rocksDB.parentSize());
+                            logger.info("size :" + rocksDB.size());
+                            logger.info("size Parent:" + rocksDB.parentSize());
+                        }
+                        continue;
+                    } else if (k <= stepRollback) {
+                        rollbacks++;
+                        if (k == stepRollback) {
+                            logger.info("size BEFORE rollback:" + rocksDB.size());
+                            logger.info("size Parent:" + rocksDB.parentSize());
 
+                            // TRY ROLLBACK
+                            rocksDB.rollback();
+
+                            byte[] result = rocksDB.get(entry.getKey());
+                            assertEquals(Arrays.equals(result, entry.getValue()), false);
+
+                            logger.info("size AFTER rollback:" + rocksDB.size());
+                            logger.info("size Parent:" + rocksDB.parentSize());
+                            assertEquals(k - rollbacks, rocksDB.size());
+                            break;
+                        }
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);

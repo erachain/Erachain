@@ -222,39 +222,40 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
                 final List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
                 columnFamilyHandles = new ArrayList<>();
                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
-//                BlockBasedTableConfig tableCfgCf = settingsBlockBasedTable(settings);
-//                cfOpts.setTableFormatConfig(tableCfgCf);
+                BlockBasedTableConfig tableCfgCf = settingsBlockBasedTable(settings);
+                cfOpts.setTableFormatConfig(tableCfgCf);
                 try (Options options = new Options()) {
 
-//                    if (settings.isEnableStatistics()) {
-//                        options.setStatistics(new Statistics());
-//                        options.setStatsDumpPeriodSec(60);
-//                    }
+                    if (settings.isEnableStatistics()) {
+                        options.setStatistics(new Statistics());
+                        options.setStatsDumpPeriodSec(60);
+                    }
+
                     options.setCreateIfMissing(true);
-//                    options.setIncreaseParallelism(3);
-//                    options.setLevelCompactionDynamicLevelBytes(true);
-//                    options.setMaxOpenFiles(settings.getMaxOpenFiles());
+                    options.setIncreaseParallelism(3);
+                    options.setLevelCompactionDynamicLevelBytes(true);
+                    options.setMaxOpenFiles(settings.getMaxOpenFiles());
 
-//                    options.setNumLevels(settings.getLevelNumber());
-//                    options.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
-//                    options.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
-//                    options.setMaxBackgroundCompactions(settings.getCompactThreads());
-//                    options.setLevel0FileNumCompactionTrigger(settings.getLevel0FileNumCompactionTrigger());
-//                    options.setTargetFileSizeMultiplier(settings.getTargetFileSizeMultiplier());
-                    //options.setTargetFileSizeBase(settings.getTargetFileSizeBase());
+                    options.setNumLevels(settings.getLevelNumber());
+                    options.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
+                    options.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
+                    options.setMaxBackgroundCompactions(settings.getCompactThreads());
+                    options.setLevel0FileNumCompactionTrigger(settings.getLevel0FileNumCompactionTrigger());
+                    options.setTargetFileSizeMultiplier(settings.getTargetFileSizeMultiplier());
+                    options.setTargetFileSizeBase(settings.getTargetFileSizeBase());
 
-//                    BlockBasedTableConfig tableCfg = settingsBlockBasedTable(settings);
-//                    options.setTableFormatConfig(tableCfg);
-//                    options.setAllowConcurrentMemtableWrite(true);
-//                    options.setMaxManifestFileSize(0);
-//                    options.setWalTtlSeconds(0);
-//                    options.setWalSizeLimitMB(0);
-//                    options.setLevel0FileNumCompactionTrigger(1);
-//                    options.setMaxBackgroundFlushes(4);
-//                    options.setMaxBackgroundCompactions(8);
-//                    options.setMaxSubcompactions(4);
-//                    options.setMaxWriteBufferNumber(3);
-//                    options.setMinWriteBufferNumberToMerge(2);
+                    BlockBasedTableConfig tableCfg = settingsBlockBasedTable(settings);
+                    options.setTableFormatConfig(tableCfg);
+                    options.setAllowConcurrentMemtableWrite(true);
+                    options.setMaxManifestFileSize(0);
+                    options.setWalTtlSeconds(0);
+                    options.setWalSizeLimitMB(0);
+                    options.setLevel0FileNumCompactionTrigger(1);
+                    options.setMaxBackgroundFlushes(4);
+                    options.setMaxBackgroundCompactions(8);
+                    options.setMaxSubcompactions(4);
+                    options.setMaxWriteBufferNumber(3);
+                    options.setMinWriteBufferNumberToMerge(2);
 
                     int dbWriteBufferSize = 512 * 1024 * 1024;
                     options.setDbWriteBufferSize(dbWriteBufferSize);
@@ -291,17 +292,17 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
                                 logger.info("database created");
                             } catch (RocksDBException e) {
                                 dbOptions.setCreateIfMissing(true);
-                                //dbOptions.setCreateMissingColumnFamilies(true);
-//                                dbOptions.setIncreaseParallelism(3);
-//                                dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
-//                                dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
-//                                dbOptions.setAllowConcurrentMemtableWrite(true);
-//                                dbOptions.setMaxManifestFileSize(0);
-//                                dbOptions.setWalTtlSeconds(0);
-//                                dbOptions.setWalSizeLimitMB(0);
-//                                dbOptions.setMaxBackgroundFlushes(4);
-//                                dbOptions.setMaxBackgroundCompactions(8);
-//                                dbOptions.setMaxSubcompactions(4);
+                                dbOptions.setCreateMissingColumnFamilies(true);
+                                dbOptions.setIncreaseParallelism(3);
+                                dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
+                                dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
+                                dbOptions.setAllowConcurrentMemtableWrite(true);
+                                dbOptions.setMaxManifestFileSize(0);
+                                dbOptions.setWalTtlSeconds(0);
+                                dbOptions.setWalSizeLimitMB(0);
+                                dbOptions.setMaxBackgroundFlushes(4);
+                                dbOptions.setMaxBackgroundCompactions(8);
+                                dbOptions.setMaxSubcompactions(4);
                                 dbOptions.setDbWriteBufferSize(dbWriteBufferSize);
 
                                 dbOptions.setParanoidChecks(false);
@@ -329,7 +330,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
                             alive = true;
 
                             columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-                            dbCoreParent.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+                            if (create)
+                                dbCoreParent.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
 
                             dbCore = dbCoreParent.beginTransaction(writeOptions);
 
@@ -808,6 +810,16 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
     }
 
     //@Override
+    public int parentSize() {
+        try {
+            byte[] sizeBytes = dbCoreParent.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            return byteableInteger.receiveObjectFromBytes(sizeBytes);
+        } catch (RocksDBException e) {
+            return -1;
+        }
+    }
+
+    //@Override
     public static int size(Transaction transaction, ColumnFamilyHandle columnFamilyFieldSize, ReadOptions transactReadOptions) {
         try {
             byte[] sizeBytes = transaction.get(columnFamilyFieldSize, transactReadOptions, RocksDbDataSourceImpl.SIZE_BYTE_KEY);
@@ -863,6 +875,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
+            dbCore.close();
             dbCore = dbCoreParent.beginTransaction(writeOptions);
             resetDbLock.writeLock().unlock();
         }
@@ -876,6 +889,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
+            dbCore.close();
             dbCore = dbCoreParent.beginTransaction(writeOptions);
             resetDbLock.writeLock().unlock();
         }
@@ -889,8 +903,9 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
                 return;
             }
             alive = false;
-            writeOptions.dispose();
+            dbCore.commit();
             dbCore.close();
+            writeOptions.dispose();
             dbCoreParent.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
