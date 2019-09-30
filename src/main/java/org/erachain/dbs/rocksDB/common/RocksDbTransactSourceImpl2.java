@@ -44,10 +44,12 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
     protected boolean dbSync = true;
 
     protected WriteOptions writeOptions = new WriteOptions().setSync(dbSync).setDisableWAL(false);
+    protected ReadOptions transactReadOptions = new ReadOptions();
 
     @Getter
-    //public RocksDB database;
-    public TransactionDB dbCore;
+    public Transaction dbCore;
+    @Getter
+    public TransactionDB dbCoreParent;
     //public OptimisticTransactionDB database;
 
     protected boolean alive;
@@ -309,12 +311,12 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
 
                                 // MAKE DATABASE
                                 // USE transactions
-                                dbCore = TransactionDB.open(options, transactionDbOptions, dbPath.toString());
+                                dbCoreParent = TransactionDB.open(options, transactionDbOptions, dbPath.toString());
 
-                                columnFamilyHandles.add(dbCore.getDefaultColumnFamily());
+                                columnFamilyHandles.add(dbCoreParent.getDefaultColumnFamily());
                                 int indexID = 0;
                                 for (ColumnFamilyDescriptor columnFamilyDescriptor : columnFamilyDescriptors) {
-                                    ColumnFamilyHandle columnFamilyHandle = dbCore.createColumnFamily(columnFamilyDescriptor);
+                                    ColumnFamilyHandle columnFamilyHandle = dbCoreParent.createColumnFamily(columnFamilyDescriptor);
                                     columnFamilyHandles.add(columnFamilyHandle);
                                     if (indexes != null && indexes.size() > indexID)
                                         indexes.get(indexID++).setColumnFamilyHandle(columnFamilyHandle);
@@ -346,7 +348,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
 
                                 // MAKE DATABASE
                                 // USE transactions
-                                dbCore = TransactionDB.open(dbOptions, transactionDbOptions,
+                                dbCoreParent = TransactionDB.open(dbOptions, transactionDbOptions,
                                         dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
 
                                 if (indexes != null && !indexes.isEmpty()) {
@@ -363,6 +365,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
                             throw new RuntimeException("Failed to initialize database", e);
                         }
                         alive = true;
+                        dbCore = dbCoreParent.beginTransaction(writeOptions);
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);
                         throw new RuntimeException("Failed to initialize database", ioe);
@@ -465,7 +468,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
         }
         resetDbLock.readLock().lock();
         try {
-            dbCore.put(writeOptions, key, value);
+            dbCore.put(key, value);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -480,7 +483,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
         }
         resetDbLock.readLock().lock();
         try {
-            return dbCore.get(key);
+            return dbCore.get(transactReadOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -496,7 +499,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
         }
         resetDbLock.readLock().lock();
         try {
-            return dbCore.get(columnFamilyHandle, key);
+            return dbCore.get(columnFamilyHandle, transactReadOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -542,7 +545,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
         }
         resetDbLock.readLock().lock();
         try {
-            dbCore.delete(writeOptions, key);
+            dbCore.delete(key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -862,7 +865,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implemen
     @Override
     public void flush() throws RocksDBException {
         FlushOptions flushOptions = new FlushOptions();
-        dbCore.flush(flushOptions);
+        dbCoreParent.flush(flushOptions);
     }
 
 }
