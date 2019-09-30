@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.common;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.rocksdb.RocksDB.loadLibrary;
 
@@ -31,11 +33,10 @@ import static org.rocksdb.RocksDB.loadLibrary;
  */
 @Slf4j
 @NoArgsConstructor
-public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB<byte[], byte[]>
+public class RocksDbTransactSourceImpl2 implements RocksDbDataSource // implements DB<byte[], byte[]>
         //, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
-    public static final byte[] SIZE_BYTE_KEY = new byte[]{0};
 
     //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
@@ -77,7 +78,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         }
     }
 
-    public RocksDbDataSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
+    public RocksDbTransactSourceImpl2(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this.dataBaseName = name;
         this.parentName = parentName;
         this.indexes = indexes;
@@ -86,7 +87,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
     }
 
-    public RocksDbDataSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings) {
+    public RocksDbTransactSourceImpl2(String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
     }
 
@@ -116,7 +117,6 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
             resetDbLock.writeLock().unlock();
         }
     }
-
 
     protected boolean quitIfNotAlive() {
         if (!isAlive()) {
@@ -381,9 +381,9 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     }
 
     public static TransactionDB initDB(Path dbPath, Options createOptions, DBOptions openOptions,
-               TransactionDBOptions transactionDbOptions,
-               List<ColumnFamilyDescriptor> columnFamilyDescriptors,
-               List<ColumnFamilyHandle> columnFamilyHandles) {
+                                       TransactionDBOptions transactionDbOptions,
+                                       List<ColumnFamilyDescriptor> columnFamilyDescriptors,
+                                       List<ColumnFamilyHandle> columnFamilyHandles) {
 
         TransactionDB dbCore;
         try {
@@ -395,11 +395,11 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                 dbCore = TransactionDB.open(openOptions, transactionDbOptions,
                         dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
 
-            logger.info("database opened");
+                logger.info("database opened");
 
             } catch (RocksDBException ex) {
                 logger.error(ex.getMessage(), ex);
-                throw new RuntimeException("Failed to initialize database", e);
+                throw new RuntimeException("Failed to initialize database", ex);
             }
         } finally {
         }
@@ -564,6 +564,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
         return new RockStoreIteratorFilter(dbCore.newIterator(), descending, true, filter);
     }
+
     @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
         return new RockStoreIteratorFilter(dbCore.newIterator(columnFamilyHandle), descending, true, filter);
@@ -647,6 +648,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
     /**
      * Unsorted!
+     *
      * @param key
      * @param limit
      * @return
@@ -784,6 +786,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
     /**
      * Unsorted!
+     *
      * @param key
      * @param limit
      * @param precision
@@ -831,6 +834,18 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
     public int size() {
         byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
         return byteableInteger.receiveObjectFromBytes(sizeBytes);
+    }
+
+    //@Override
+    public static int size(Transaction transaction, ColumnFamilyHandle columnFamilyFieldSize, ReadOptions transactReadOptions) {
+        try {
+            byte[] sizeBytes = transaction.get(columnFamilyFieldSize, transactReadOptions, RocksDbDataSourceImpl.SIZE_BYTE_KEY);
+            return Ints.fromByteArray(sizeBytes);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return -1;
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl;
-import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
@@ -11,7 +10,6 @@ import org.rocksdb.*;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
@@ -57,7 +55,7 @@ public class RocksDBTransactions {
 
             List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
             List<ColumnFamilyHandle> columnFamilyHandles = new ArrayList<>();
-            //DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
             TransactionDB rocksDBTransact = RocksDbDataSourceImpl.initDB(
                     tempDir.toPath(), createOptions, openOptions, transactionDBOptions,
                     columnFamilyDescriptors, columnFamilyHandles);
@@ -74,12 +72,12 @@ public class RocksDBTransactions {
 
                     if (k % 50 == 0) {
                         // TRY ROLLBACK
-                        assertEquals(k, rocksDBTransact.size());
+                        assertEquals(k, rocksDB.size());
 
                         transaction.rollback();
 
                         rollbacks += 10;
-                        assertEquals(k - rollbacks, rocksDBTransact.size());
+                        assertEquals(k - rollbacks, rocksDB.size());
 
                         break;
 

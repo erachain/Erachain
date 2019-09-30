@@ -3,7 +3,10 @@ package org.erachain.dbs.rocksDB.integration;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
 import org.erachain.database.DBASet;
-import org.erachain.dbs.rocksDB.common.*;
+import org.erachain.dbs.rocksDB.common.DBIterator;
+import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.rocksDB.common.RocksDbTransactSource;
+import org.erachain.dbs.rocksDB.common.RocksDbTransactSourceImpl;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedTypeIndexException;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
@@ -21,6 +24,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
@@ -134,11 +138,11 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
         byte[] old = dbSource.get(keyBytes);
         if (old == null || old.length == 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, new byte[]{0});
+                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
-                dbSource.put(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+                dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
             }
         } else {
             // удалим вторичные ключи
@@ -287,10 +291,10 @@ public class DBRocksDBTable<K, V> implements InnerDBTable
         byte[] old = dbSource.get(keyBytes);
         if (old != null && old.length != 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, new byte[]{0});
+                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
-                dbSource.put(columnFamilyFieldSize, new byte[]{0}, byteableInteger.toBytesObject(size));
+                dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
             }
             if (indexes != null && !indexes.isEmpty()) {
                 removeIndexes(key, keyBytes, old);
