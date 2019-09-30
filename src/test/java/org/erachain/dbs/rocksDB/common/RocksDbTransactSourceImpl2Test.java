@@ -70,6 +70,7 @@ public class RocksDbTransactSourceImpl2Test {
                 k++;
                 try {
 
+                    rollbacks++;
                     if (true || k % 3 == 0) {
                         rocksDB.put(entry.getKey(), entry.getValue());
                     } else if (true || k % 5 == 0) {

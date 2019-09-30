@@ -326,22 +326,21 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
                                 logger.info("database opened");
                             }
 
+                            alive = true;
+
+                            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+                            dbCoreParent.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+
+                            dbCore = dbCoreParent.beginTransaction(writeOptions);
+
                         } catch (RocksDBException e) {
                             logger.error(e.getMessage(), e);
                             throw new RuntimeException("Failed to initialize database", e);
                         }
-                        alive = true;
-                        dbCore = dbCoreParent.beginTransaction(writeOptions);
+
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);
                         throw new RuntimeException("Failed to initialize database", ioe);
-                    }
-
-                    columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-                    if (create) {
-                        put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-                    } else {
-                        put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 1});
                     }
 
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
