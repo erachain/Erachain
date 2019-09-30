@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionFinalMapSignsSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
@@ -21,7 +21,7 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTable<>(new ByteableTrivial(), new ByteableLong(), NAME_TABLE, indexes,
+        map = new DBRocksDBTableTransact<>(new ByteableTrivial(), new ByteableLong(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),

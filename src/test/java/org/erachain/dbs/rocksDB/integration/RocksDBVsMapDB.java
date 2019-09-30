@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.Transacted;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
@@ -38,7 +39,7 @@ public class RocksDBVsMapDB {
         logger.info("Start test RocksDB productivity simple close");
         String NAME_DATABASE = "TestRocksDB";
         long timeMillisBefore = System.currentTimeMillis();
-        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
+        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableSimple(NAME_DATABASE);
         for (Map.Entry<byte[], byte[]> entry : entrySet) {
             rocksDB.put(entry.getKey(), entry.getValue());
         }
@@ -54,7 +55,7 @@ public class RocksDBVsMapDB {
         logger.info("Start test RocksDB productivity simple");
         String NAME_DATABASE = "TestRocksDB";
         long timeMillisBefore = System.currentTimeMillis();
-        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
+        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableSimple(NAME_DATABASE);
         for (Map.Entry<byte[], byte[]> entry : entrySet) {
             rocksDB.put(entry.getKey(), entry.getValue());
         }
@@ -87,7 +88,7 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransact(NAME_DATABASE);
             int k = 0;
             int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
@@ -98,7 +99,7 @@ public class RocksDBVsMapDB {
                     // TRY ROLLBACK
                     assertEquals(k, rocksDB.size());
 
-                    rocksDB.rollback();
+                    ((Transacted) rocksDB).rollback();
                     rollbacks += 10;
                     assertEquals(k - rollbacks, rocksDB.size());
 
@@ -106,7 +107,7 @@ public class RocksDBVsMapDB {
 
                 } else if (k % 10 == 0) {
                     // TRY COMMIT
-                    rocksDB.commit();
+                    ((Transacted) rocksDB).commit();
                     assertEquals(k, rocksDB.size());
 
                 }
@@ -138,7 +139,7 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransact(NAME_DATABASE);
             int k = 0;
             int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
@@ -149,7 +150,7 @@ public class RocksDBVsMapDB {
                     // TRY ROLLBACK
                     assertEquals(k, rocksDB.size());
 
-                    rocksDB.rollback();
+                    ((Transacted) rocksDB).rollback();
                     rollbacks += 10;
                     assertEquals(k - rollbacks, rocksDB.size());
 
@@ -157,7 +158,7 @@ public class RocksDBVsMapDB {
 
                 } else if (k % 10 == 0) {
                     // TRY COMMIT
-                    rocksDB.commit();
+                    ((Transacted) rocksDB).commit();
                     assertEquals(k, rocksDB.size());
 
                 }

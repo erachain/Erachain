@@ -1,6 +1,8 @@
 package org.erachain.dbs.rocksDB.common;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
 import org.rocksdb.*;
@@ -10,12 +12,15 @@ import java.util.List;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 @Slf4j
-public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements RocksDbTransactSource {
+public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements Transacted {
 
-    //public Transaction transactionDB;
-    private Transaction dbCore;
+    @Getter
+    public TransactionDB dbCoreParent;
+    public Transaction dbCore;
 
-    public ReadOptions transactionReadOptions = new ReadOptions()
+    protected ReadOptions transactReadOptions = new ReadOptions();
+
+    TransactionDBOptions transactionDbOptions = new TransactionDBOptions()
             ;
 
     public RocksDbTransactSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
@@ -25,9 +30,16 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
     }
 
-    protected void initDB() {
-        super.initDB();
-        dbCore = ((TransactionDB) super.dbCore).beginTransaction(writeOptions);
+    @Override
+    protected void createDB(Options options) throws RocksDBException {
+        dbCoreParent = TransactionDB.open(options, transactionDbOptions, getDbPath().toString());
+        dbCore = dbCoreParent.beginTransaction(writeOptions);
+    }
+
+    @Override
+    protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
+        dbCoreParent = TransactionDB.open(dbOptions, transactionDbOptions, getDbPath().toString(), columnFamilyDescriptors, columnFamilyHandles);
+        dbCore = dbCoreParent.beginTransaction(writeOptions);
     }
 
     @Override
@@ -36,7 +48,7 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
             return null;
         }
 
-        return dbCore.getIterator(transactionReadOptions, super.dbCore.getDefaultColumnFamily());
+        return dbCore.getIterator(transactReadOptions, dbCoreParent.getDefaultColumnFamily());
     }
 
     @Override
@@ -45,8 +57,18 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
             return null;
         }
 
-        return dbCore.getIterator(transactionReadOptions, indexDB);
+        return dbCore.getIterator(transactReadOptions, indexDB);
     }
+
+    public int parentSize() {
+        try {
+            byte[] sizeBytes = dbCoreParent.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            return byteableInteger.receiveObjectFromBytes(sizeBytes);
+        } catch (RocksDBException e) {
+            return -1;
+        }
+    }
+
 
     @Override
     public void commit() {
@@ -57,7 +79,8 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            dbCore = super.dbCore.beginTransaction(writeOptions);
+            dbCore.close();
+            dbCore = dbCoreParent.beginTransaction(writeOptions);
             resetDbLock.writeLock().unlock();
         }
     }
@@ -66,14 +89,12 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
     public void rollback() {
         resetDbLock.writeLock().lock();
         try {
-            logger.debug("size before ROLLBACK: " + size());
             dbCore.rollback();
-            logger.debug("size after ROLLBACK: " + size());
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            logger.debug("size before ROLLBACK: " + size());
-            dbCore = super.dbCore.beginTransaction(writeOptions);
+            dbCore.close();
+            dbCore = dbCoreParent.beginTransaction(writeOptions);
             resetDbLock.writeLock().unlock();
         }
     }
@@ -86,9 +107,10 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
                 return;
             }
             alive = false;
-            writeOptions.dispose();
+            dbCore.commit();
             dbCore.close();
-            super.dbCore.close();
+            writeOptions.dispose();
+            dbCoreParent.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {

@@ -1,10 +1,10 @@
 package org.erachain.dbs.rocksDB.common;
 
 import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
@@ -33,7 +33,7 @@ import static org.rocksdb.RocksDB.loadLibrary;
  */
 @Slf4j
 @NoArgsConstructor
-public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTransactSource // implements DB<byte[], byte[]>
+public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted // implements DB<byte[], byte[]>
         //, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
@@ -817,18 +817,6 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, RocksDbTra
         } catch (RocksDBException e) {
             return -1;
         }
-    }
-
-    //@Override
-    public static int size(Transaction transaction, ColumnFamilyHandle columnFamilyFieldSize, ReadOptions transactReadOptions) {
-        try {
-            byte[] sizeBytes = transaction.get(columnFamilyFieldSize, transactReadOptions, RocksDbDataSourceImpl.SIZE_BYTE_KEY);
-            return Ints.fromByteArray(sizeBytes);
-        } catch (RocksDBException e) {
-            logger.error(e.getMessage(), e);
-        }
-
-        return -1;
     }
 
     @Override

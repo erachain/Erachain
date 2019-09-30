@@ -6,7 +6,7 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.datachain.TransactionTab;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 
@@ -26,7 +26,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTable<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
+        map = new DBRocksDBTableTransact<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),

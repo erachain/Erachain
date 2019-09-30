@@ -4,7 +4,7 @@ import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
-import org.erachain.dbs.rocksDB.integration.InnerDBTable;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
 import org.mapdb.DB;
 import org.slf4j.Logger;
 
@@ -26,7 +26,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     protected DBASet databaseSet;
     protected DB database;
 
-    public InnerDBTable<T, U> map;
+    public DBRocksDBTableTransact<T, U> map;
     protected List<IndexDB> indexes;
 
     // for DCMapSuit

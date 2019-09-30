@@ -31,8 +31,8 @@ import static org.rocksdb.RocksDB.loadLibrary;
  */
 @Slf4j
 @NoArgsConstructor
-public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB<byte[], byte[]>
-        //, Flusher, DbSourceInter<byte[]>
+public class RocksDbDataSourceImpl implements RocksDbDataSource
+        // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
     public static final byte[] SIZE_BYTE_KEY = new byte[]{0};
@@ -46,8 +46,9 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
     @Getter
     //public RocksDB database;
-    public TransactionDB dbCore;
+    public RocksDB dbCore;
     //public OptimisticTransactionDB database;
+    Options options;
 
     protected boolean alive;
     protected String parentName;
@@ -238,9 +239,15 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         return dataBaseName;
     }
 
-    //public void initDB() {
-    //    initDB(RocksDbSettings.getSettings());
-    //}
+
+    protected void createDB(Options options) throws RocksDBException {
+        dbCore = RocksDB.open(options, getDbPath().toString());
+    }
+
+    protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
+        dbCore = RocksDB.open(dbOptions, getDbPath().toString(), columnFamilyDescriptors, columnFamilyHandles);
+    }
+
 
     protected void initDB() {
         resetDbLock.writeLock().lock();
@@ -254,39 +261,39 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                 final List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
                 columnFamilyHandles = new ArrayList<>();
                 addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
-//                BlockBasedTableConfig tableCfgCf = settingsBlockBasedTable(settings);
-//                cfOpts.setTableFormatConfig(tableCfgCf);
+                BlockBasedTableConfig tableCfgCf = settingsBlockBasedTable(settings);
+                cfOpts.setTableFormatConfig(tableCfgCf);
                 try (Options options = new Options()) {
 
-//                    if (settings.isEnableStatistics()) {
-//                        options.setStatistics(new Statistics());
-//                        options.setStatsDumpPeriodSec(60);
-//                    }
+                    if (settings.isEnableStatistics()) {
+                        options.setStatistics(new Statistics());
+                        options.setStatsDumpPeriodSec(60);
+                    }
                     options.setCreateIfMissing(true);
-//                    options.setIncreaseParallelism(3);
-//                    options.setLevelCompactionDynamicLevelBytes(true);
-//                    options.setMaxOpenFiles(settings.getMaxOpenFiles());
+                    options.setIncreaseParallelism(3);
+                    options.setLevelCompactionDynamicLevelBytes(true);
+                    options.setMaxOpenFiles(settings.getMaxOpenFiles());
 
-//                    options.setNumLevels(settings.getLevelNumber());
-//                    options.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
-//                    options.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
-//                    options.setMaxBackgroundCompactions(settings.getCompactThreads());
-//                    options.setLevel0FileNumCompactionTrigger(settings.getLevel0FileNumCompactionTrigger());
-//                    options.setTargetFileSizeMultiplier(settings.getTargetFileSizeMultiplier());
-                    //options.setTargetFileSizeBase(settings.getTargetFileSizeBase());
+                    options.setNumLevels(settings.getLevelNumber());
+                    options.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
+                    options.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
+                    options.setMaxBackgroundCompactions(settings.getCompactThreads());
+                    options.setLevel0FileNumCompactionTrigger(settings.getLevel0FileNumCompactionTrigger());
+                    options.setTargetFileSizeMultiplier(settings.getTargetFileSizeMultiplier());
+                    options.setTargetFileSizeBase(settings.getTargetFileSizeBase());
 
-//                    BlockBasedTableConfig tableCfg = settingsBlockBasedTable(settings);
-//                    options.setTableFormatConfig(tableCfg);
-//                    options.setAllowConcurrentMemtableWrite(true);
-//                    options.setMaxManifestFileSize(0);
-//                    options.setWalTtlSeconds(0);
-//                    options.setWalSizeLimitMB(0);
-//                    options.setLevel0FileNumCompactionTrigger(1);
-//                    options.setMaxBackgroundFlushes(4);
-//                    options.setMaxBackgroundCompactions(8);
-//                    options.setMaxSubcompactions(4);
-//                    options.setMaxWriteBufferNumber(3);
-//                    options.setMinWriteBufferNumberToMerge(2);
+                    BlockBasedTableConfig tableCfg = settingsBlockBasedTable(settings);
+                    options.setTableFormatConfig(tableCfg);
+                    options.setAllowConcurrentMemtableWrite(true);
+                    options.setMaxManifestFileSize(0);
+                    options.setWalTtlSeconds(0);
+                    options.setWalSizeLimitMB(0);
+                    options.setLevel0FileNumCompactionTrigger(1);
+                    options.setMaxBackgroundFlushes(4);
+                    options.setMaxBackgroundCompactions(8);
+                    options.setMaxSubcompactions(4);
+                    options.setMaxWriteBufferNumber(3);
+                    options.setMinWriteBufferNumberToMerge(2);
 
                     int dbWriteBufferSize = 512 * 1024 * 1024;
                     options.setDbWriteBufferSize(dbWriteBufferSize);
@@ -304,12 +311,11 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                         }
 
                         try (final DBOptions dbOptions = new DBOptions()) {
-                            TransactionDBOptions transactionDbOptions = new TransactionDBOptions();
                             try {
 
                                 // MAKE DATABASE
                                 // USE transactions
-                                dbCore = TransactionDB.open(options, transactionDbOptions, dbPath.toString());
+                                createDB(options);
 
                                 columnFamilyHandles.add(dbCore.getDefaultColumnFamily());
                                 int indexID = 0;
@@ -323,17 +329,17 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
                                 logger.info("database created");
                             } catch (RocksDBException e) {
                                 dbOptions.setCreateIfMissing(true);
-                                //dbOptions.setCreateMissingColumnFamilies(true);
-//                                dbOptions.setIncreaseParallelism(3);
-//                                dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
-//                                dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
-//                                dbOptions.setAllowConcurrentMemtableWrite(true);
-//                                dbOptions.setMaxManifestFileSize(0);
-//                                dbOptions.setWalTtlSeconds(0);
-//                                dbOptions.setWalSizeLimitMB(0);
-//                                dbOptions.setMaxBackgroundFlushes(4);
-//                                dbOptions.setMaxBackgroundCompactions(8);
-//                                dbOptions.setMaxSubcompactions(4);
+                                dbOptions.setCreateMissingColumnFamilies(true);
+                                dbOptions.setIncreaseParallelism(3);
+                                dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
+                                dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
+                                dbOptions.setAllowConcurrentMemtableWrite(true);
+                                dbOptions.setMaxManifestFileSize(0);
+                                dbOptions.setWalTtlSeconds(0);
+                                dbOptions.setWalSizeLimitMB(0);
+                                dbOptions.setMaxBackgroundFlushes(4);
+                                dbOptions.setMaxBackgroundCompactions(8);
+                                dbOptions.setMaxSubcompactions(4);
                                 dbOptions.setDbWriteBufferSize(dbWriteBufferSize);
 
                                 dbOptions.setParanoidChecks(false);
@@ -346,8 +352,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
 
                                 // MAKE DATABASE
                                 // USE transactions
-                                dbCore = TransactionDB.open(dbOptions, transactionDbOptions,
-                                        dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
+                                openDB(dbOptions, columnFamilyDescriptors);
 
                                 if (indexes != null && !indexes.isEmpty()) {
                                     for (int i = 0; i < indexes.size(); i++) {
@@ -410,9 +415,9 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource // implements DB
         BlockBasedTableConfig tableCfg = new BlockBasedTableConfig();
         tableCfg.setBlockCache(new LRUCache(128 << 20));
         tableCfg.setBlockSize(settings.getBlockSize());
-//        tableCfg.setBlockSize(1024);
+        tableCfg.setBlockSize(1024);
         tableCfg.setBlockCacheSize(settings.getBlockCacheSize());
-//        tableCfg.setBlockCacheSize(2<<20);
+        tableCfg.setBlockCacheSize(64 << 20);
         tableCfg.setCacheIndexAndFilterBlocks(true);
         tableCfg.setPinL0FilterAndIndexBlocksInCache(true);
         tableCfg.setFilter(new BloomFilter(10, false));

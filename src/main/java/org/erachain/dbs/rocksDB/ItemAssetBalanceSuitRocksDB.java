@@ -10,6 +10,7 @@ import org.erachain.datachain.ItemAssetBalanceTabImpl;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
@@ -67,7 +68,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTable<byte[], Tuple5<
+        map = new DBRocksDBTableTransact<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
                 Tuple2<BigDecimal, BigDecimal>, // in DEBT
                 Tuple2<BigDecimal, BigDecimal>, // in STOCK

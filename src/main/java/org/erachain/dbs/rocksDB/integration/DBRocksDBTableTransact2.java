@@ -3,9 +3,8 @@ package org.erachain.dbs.rocksDB.integration;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
 import org.erachain.database.DBASet;
-import org.erachain.dbs.rocksDB.common.DBIterator;
-import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
-import org.erachain.dbs.rocksDB.common.RocksDbSettings;
+import org.erachain.dbs.Transacted;
+import org.erachain.dbs.rocksDB.common.*;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedTypeIndexException;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
@@ -35,41 +34,40 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
  * @param <V>
  */
 @Slf4j
-public abstract class DBRocksDBTable<K, V> implements InnerDBTable
+public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         <K, V> {
 
-    protected boolean logON = false;
+    private boolean logON = false;
 
     // индексы
-    protected List<IndexDB> indexes;
-    protected List<ColumnFamilyHandle> columnFamilyHandles;
-    protected ColumnFamilyHandle columnFamilyFieldSize;
+    private List<IndexDB> indexes;
+    private List<ColumnFamilyHandle> columnFamilyHandles;
+    private ColumnFamilyHandle columnFamilyFieldSize;
 
     //  интерфейс доступа к БД
     ///public RocksDbDataSourceImpl dbSource;
     public RocksDbDataSource dbSource;
 
     //  Сериализатор ключей
-    protected Byteable byteableKey;
+    private Byteable byteableKey;
     //  Сериализатор значений
-    protected Byteable byteableValue;
-    protected String NAME_TABLE;
-    protected RocksDbSettings settings;
-    protected String root;
+    private Byteable byteableValue;
+    private String NAME_TABLE;
+    private RocksDbSettings settings;
+    private String root;
 
     //Для пересчета размеров таблицы
-    protected ByteableInteger byteableInteger = new ByteableInteger();
+    private ByteableInteger byteableInteger = new ByteableInteger();
 
     /**
-     *
      * @param byteableKey
      * @param byteableValue
      * @param NAME_TABLE
-     * @param indexes is null - not use size Counter
+     * @param indexes       is null - not use size Counter
      * @param settings
      * @param dbaSet
      */
-    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, DBASet dbaSet) {
+    public DBRocksDBTableTransact2(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, DBASet dbaSet) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.NAME_TABLE = NAME_TABLE;
@@ -78,10 +76,12 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 || dbaSet.getFile() == null ? // in Memory or in TESTs
                 Settings.getInstance().getDataDir()
                 : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
+        // Чтобы не было NullPointerException
+        //if (indexes == null) {
+        //    indexes = new ArrayList<>();
+        //}
         this.indexes = indexes;
-
-        openSource();
-
+        dbSource = new RocksDbTransactSourceImpl2(this.root, NAME_TABLE, indexes, settings);
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {
             // если indexes = null то размер не будем считать
@@ -89,15 +89,16 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         }
     }
 
-    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
+    public DBRocksDBTableTransact2(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
     }
 
     /**
      * for TESTs. new ArrayList<>() - size counter enable
+     *
      * @param NAME_TABLE
      */
-    public DBRocksDBTable(String NAME_TABLE) {
+    public DBRocksDBTableTransact2(String NAME_TABLE) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(), null);
     }
@@ -108,8 +109,17 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
+    public void openSource() {
+        dbSource = new RocksDbTransactSourceImpl(this.root, NAME_TABLE, indexes, settings);
+    }
+
+    @Override
     public int size() {
         return dbSource.size();
+    }
+
+    public int parentSize() {
+        return ((RocksDbTransactSourceImpl2) dbSource).parentSize();
     }
 
     @Override
@@ -282,6 +292,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         }
 
     }
+
     @Override
     public void remove(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);
@@ -305,7 +316,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     public void clear() {
         dbSource.close();
         FileUtil.recursiveDelete(dbSource.getDbPath().toString());
-        openSource();
+        dbSource = new RocksDbTransactSourceImpl2(root, NAME_TABLE, indexes, settings);
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {
             // если indexes = null то размер не будем считать
@@ -328,6 +339,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         return dbSource.filterApprropriateValues(filter, indexDB)
                 .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
+
     public List<K> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB)
                 .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
@@ -336,6 +348,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, int indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB);
     }
+
     public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB);
     }
@@ -379,6 +392,14 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     public void close() {
         dbSource.close();
+    }
+
+    public void commit() {
+        ((Transacted) dbSource).commit();
+    }
+
+    public void rollback() {
+        ((Transacted) dbSource).rollback();
     }
 
     @Override
@@ -452,6 +473,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         Set<byte[]> keysNext = dbSource.getKeysNext(fromKey, limit, indexes.get(indexDB).getColumnFamilyHandle());
         return keysNext.stream().map((bytes) -> (K) byteableKey.receiveObjectFromBytes(bytes)).collect(Collectors.toSet());
     }
+
     public List<V> values(byte[] fromKey, long limit, int indexDB) {
         Set<byte[]> keysNext = dbSource.getKeysNext(fromKey, limit, indexes.get(indexDB).getColumnFamilyHandle());
         return keysNext.stream().map((bytes) -> {

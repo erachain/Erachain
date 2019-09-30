@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -55,7 +56,7 @@ public class RocksDBTransactions {
 
             List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
             List<ColumnFamilyHandle> columnFamilyHandles = new ArrayList<>();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTable(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransact(NAME_DATABASE);
             TransactionDB rocksDBTransact = RocksDbDataSourceImpl.initDB(
                     tempDir.toPath(), createOptions, openOptions, transactionDBOptions,
                     columnFamilyDescriptors, columnFamilyHandles);
@@ -84,7 +85,7 @@ public class RocksDBTransactions {
 
                     } else if (k % 10 == 0) {
                         // TRY COMMIT
-                        rocksDB.commit();
+                        ((Transacted) rocksDB).commit();
                         assertEquals(k, rocksDB.size());
 
                     }

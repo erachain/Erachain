@@ -5,7 +5,7 @@ import org.erachain.core.block.Block;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.BlocksSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
 import org.erachain.dbs.rocksDB.transformation.ByteableBlock;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.mapdb.DB;
@@ -24,7 +24,7 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTable<>(new ByteableInteger(), new ByteableBlock(), NAME_TABLE, indexes,
+        map = new DBRocksDBTableTransact<>(new ByteableInteger(), new ByteableBlock(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),

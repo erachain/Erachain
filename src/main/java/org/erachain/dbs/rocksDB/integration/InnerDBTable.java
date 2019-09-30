@@ -15,6 +15,8 @@ import java.util.Set;
  */
 public interface InnerDBTable<K, V> {
 
+    void openSource();
+
     Map<K,V> getMap();
 
     int size();
@@ -37,10 +39,6 @@ public interface InnerDBTable<K, V> {
     Collection<V> values();
 
     void close();
-
-    void commit();
-
-    void rollback();
 
     //NavigableSet<Fun.Tuple2<?, K>> getIndex(int index, boolean descending);
 
