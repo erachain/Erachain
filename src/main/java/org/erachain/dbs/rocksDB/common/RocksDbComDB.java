@@ -1,6 +1,5 @@
 package org.erachain.dbs.rocksDB.common;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.*;
 
@@ -8,21 +7,13 @@ import org.rocksdb.*;
  * Самый низкий уровень доступа к функциям RocksDB
  */
 @Slf4j
-@NoArgsConstructor
-public class RocksDbComTransact implements RocksDbCom
-{
-    public Transaction dbCore;
-    public TransactionDB dbCoreParent;
-    WriteOptions writeOptions;
-    ReadOptions readOptions;
+public class RocksDbComDB implements RocksDbCom {
 
-    public RocksDbComTransact(TransactionDB dbCoreParent, WriteOptions writeOptions, ReadOptions readOptions) {
-        this.dbCoreParent = dbCoreParent;
-        this.writeOptions = writeOptions;
-        this.readOptions = readOptions;
-        dbCore = dbCoreParent.beginTransaction(writeOptions);
+    RocksDB dbCore;
+
+    public RocksDbComDB(RocksDB rocksDB) {
+        this.dbCore = rocksDB;
     }
-
 
     @Override
     public void put(byte[] key, byte[] value) throws RocksDBException {
@@ -41,12 +32,12 @@ public class RocksDbComTransact implements RocksDbCom
 
     @Override
     public byte[] get(byte[] key) throws RocksDBException {
-        return dbCore.get(readOptions, key);
+        return dbCore.get(key);
     }
 
     @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) throws RocksDBException {
-        return dbCore.get(columnFamilyHandle, readOptions, key);
+        return dbCore.get(columnFamilyHandle, key);
     }
 
     @Override
@@ -66,23 +57,17 @@ public class RocksDbComTransact implements RocksDbCom
 
     @Override
     public RocksIterator getIterator() {
-        return dbCore.getIterator(readOptions, dbCoreParent.getDefaultColumnFamily());
+        return dbCore.newIterator(dbCore.getDefaultColumnFamily());
     }
 
     @Override
     public RocksIterator getIterator(ColumnFamilyHandle indexDB) {
-        return dbCore.getIterator(readOptions, indexDB);
+        return dbCore.newIterator(indexDB);
     }
 
     @Override
     public void close() {
-        try {
-            dbCore.commit();
-            dbCore.close();
-            writeOptions.dispose();
-            dbCoreParent.close();
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
+        dbCore.close();
     }
+
 }

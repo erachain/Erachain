@@ -1,41 +1,28 @@
 package org.erachain.dbs.rocksDB.common;
 
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.RocksDBException;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.WriteOptions;
 
-import java.nio.file.Path;
-import java.util.List;
-
 public interface RocksDbCom {
-    Path getDbPath();
 
-    boolean isAlive();
 
-    String getDBName();
+    void put(byte[] key, byte[] value) throws RocksDBException;
 
-    void put(byte[] key, byte[] value);
+    void put(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value) throws RocksDBException;
 
-    void put(ColumnFamilyHandle columnFamilyHandle, byte[] key, byte[] value);
+    void put(byte[] key, byte[] value, WriteOptions writeOptions) throws RocksDBException;
 
-    void put(byte[] key, byte[] value, WriteOptions writeOptions);
+    byte[] get(byte[] key) throws RocksDBException;
 
-    byte[] get(byte[] key);
+    byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) throws RocksDBException;
 
-    byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key);
+    void remove(byte[] key) throws RocksDBException;
 
-    void remove(byte[] key);
+    void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key) throws RocksDBException;
 
-    void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key);
-
-    void remove(byte[] key, WriteOptions writeOptions);
-
-    int size();
-
-    //@Override
-    int parentSize();
-
-    boolean isEmpty();
+    void remove(byte[] key, WriteOptions writeOptions) throws RocksDBException;
 
     RocksIterator getIterator();
 
@@ -43,9 +30,4 @@ public interface RocksDbCom {
 
     void close();
 
-    org.rocksdb.Transaction getDbCore();
-
-    org.rocksdb.TransactionDB getDbCoreParent();
-
-    List<ColumnFamilyHandle> getColumnFamilyHandles();
 }

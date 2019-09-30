@@ -15,8 +15,8 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements Transacted {
 
     @Getter
-    public TransactionDB dbCoreParent;
-    public Transaction dbCore;
+    public Transaction dbCoreTransact;
+    public TransactionDB dbCore;
 
     protected ReadOptions transactReadOptions = new ReadOptions();
 
@@ -33,14 +33,14 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
     @Override
     protected void createDB(Options options) throws RocksDBException {
         transactionDbOptions = new TransactionDBOptions();
-        dbCoreParent = TransactionDB.open(options, transactionDbOptions, getDbPath().toString());
-        dbCore = dbCoreParent.beginTransaction(writeOptions);
+        dbCore = TransactionDB.open(options, transactionDbOptions, getDbPath().toString());
+        dbCoreTransact = dbCore.beginTransaction(writeOptions);
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        dbCoreParent = TransactionDB.open(dbOptions, transactionDbOptions, getDbPath().toString(), columnFamilyDescriptors, columnFamilyHandles);
-        dbCore = dbCoreParent.beginTransaction(writeOptions);
+        dbCore = TransactionDB.open(dbOptions, transactionDbOptions, getDbPath().toString(), columnFamilyDescriptors, columnFamilyHandles);
+        dbCoreTransact = dbCore.beginTransaction(writeOptions);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
             return null;
         }
 
-        return dbCore.getIterator(transactReadOptions, dbCoreParent.getDefaultColumnFamily());
+        return dbCoreTransact.getIterator(transactReadOptions, dbCore.getDefaultColumnFamily());
     }
 
     @Override
@@ -58,12 +58,12 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
             return null;
         }
 
-        return dbCore.getIterator(transactReadOptions, indexDB);
+        return dbCoreTransact.getIterator(transactReadOptions, indexDB);
     }
 
     public int parentSize() {
         try {
-            byte[] sizeBytes = dbCoreParent.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            byte[] sizeBytes = dbCore.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
             return byteableInteger.receiveObjectFromBytes(sizeBytes);
         } catch (RocksDBException e) {
             return -1;
@@ -76,12 +76,12 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
         // сольем старый и начнем новый
         resetDbLock.writeLock().lock();
         try {
-            dbCore.commit();
+            dbCoreTransact.commit();
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            dbCore.close();
-            dbCore = dbCoreParent.beginTransaction(writeOptions);
+            dbCoreTransact.close();
+            dbCoreTransact = dbCore.beginTransaction(writeOptions);
             resetDbLock.writeLock().unlock();
         }
     }
@@ -90,12 +90,12 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
     public void rollback() {
         resetDbLock.writeLock().lock();
         try {
-            dbCore.rollback();
+            dbCoreTransact.rollback();
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            dbCore.close();
-            dbCore = dbCoreParent.beginTransaction(writeOptions);
+            dbCoreTransact.close();
+            dbCoreTransact = dbCore.beginTransaction(writeOptions);
             resetDbLock.writeLock().unlock();
         }
     }
@@ -108,10 +108,10 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
                 return;
             }
             alive = false;
-            dbCore.commit();
-            dbCore.close();
+            dbCoreTransact.commit();
+            dbCoreTransact.close();
             writeOptions.dispose();
-            dbCoreParent.close();
+            dbCore.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
