@@ -164,8 +164,8 @@ public class DCSet extends DBASet {
                     , this, database);
 
             this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0 ? defaultDBS :
-                    //DBS_MAP_DB // SLOW then RocksDB
-                    DBS_ROCK_DB // more FAST
+                    DBS_MAP_DB // SLOW then RocksDB
+                    //DBS_ROCK_DB // more FAST
                     , this, database);
 
             this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
