@@ -68,11 +68,11 @@ public class BlockChain {
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
-    public static final int TESTNET_PORT = DEVELOP_USE ? 9065 : 9045;
-    public static final int MAINNET_PORT = DEVELOP_USE ? 9066 : 9046;
+    public static final int TESTNET_PORT = TEST_DB > 0? 9005 : DEVELOP_USE ? 9065 : 9045;
+    public static final int MAINNET_PORT = TEST_DB > 0? 9006 : DEVELOP_USE ? 9066 : 9046;
 
-    public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9067 : 9047;
-    public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9068 : 9048;
+    public static final int DEFAULT_WEB_PORT = TEST_DB > 0? 9007 : DEVELOP_USE ? 9067 : 9047;
+    public static final int DEFAULT_RPC_PORT = TEST_DB > 0? 9008 : DEVELOP_USE ? 9068 : 9048;
 
     //TESTNET
     //   1486444444444l

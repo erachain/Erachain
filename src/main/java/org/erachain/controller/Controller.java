@@ -611,7 +611,7 @@ public class Controller extends Observable {
         this.peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>(20, 1);
 
         // CHECK NETWORK PORT AVAILABLE
-        if (!Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
+        if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {
             throw new Exception(Lang.getInstance().translate("Network port %port% already in use!").replace("%port%",
                     String.valueOf(Controller.getInstance().getNetworkPort())));
         }
