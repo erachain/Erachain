@@ -1,14 +1,14 @@
 package org.erachain.dbs.rocksDB.common;
 
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.*;
+
+import java.util.List;
 
 /**
  * Самый низкий уровень доступа к функциям RocksDB
  */
 @Slf4j
-@NoArgsConstructor
 public class RocksDbComTransaction implements RocksDbCom
 {
     public Transaction dbTransaction;
@@ -16,13 +16,26 @@ public class RocksDbComTransaction implements RocksDbCom
     WriteOptions writeOptions;
     ReadOptions readOptions;
 
+    protected final ColumnFamilyHandle defaultColumnFamily;
+
     public RocksDbComTransaction(TransactionDB parentDB, WriteOptions writeOptions, ReadOptions readOptions) {
         this.parentDB = parentDB;
+        defaultColumnFamily = parentDB.getDefaultColumnFamily();
+
         this.writeOptions = writeOptions;
         this.readOptions = readOptions;
         dbTransaction = parentDB.beginTransaction(writeOptions);
     }
 
+    public static dbTransaction createDB(String file, Options options) throws RocksDBException {
+        return RocksDB.open(options, file);
+    }
+
+    public static dbTransaction openDB(String file, DBOptions dbOptions,
+                                 List<ColumnFamilyDescriptor> columnFamilyDescriptors,
+                                 List<ColumnFamilyHandle> columnFamilyHandles) throws RocksDBException {
+        return RocksDB.open(dbOptions, file, columnFamilyDescriptors, columnFamilyHandles);
+    }
 
     @Override
     public void put(byte[] key, byte[] value) throws RocksDBException {
@@ -66,7 +79,7 @@ public class RocksDbComTransaction implements RocksDbCom
 
     @Override
     public RocksIterator getIterator() {
-        return dbTransaction.getIterator(readOptions, parentDB.getDefaultColumnFamily());
+        return dbTransaction.getIterator(readOptions, defaultColumnFamily);
     }
 
     @Override

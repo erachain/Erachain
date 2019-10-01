@@ -54,7 +54,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
     Options options;
 
     protected boolean alive;
-    protected String parentName;
+    protected String pathName;
     List<IndexDB> indexes;
     RocksDbSettings settings;
     protected boolean create = false;
@@ -62,7 +62,6 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
     @Getter
     protected List<ColumnFamilyHandle> columnFamilyHandles;
 
-    protected ColumnFamilyHandle defaultColumnFamily;
     protected ColumnFamilyHandle columnFamilyFieldSize;
     protected ByteableInteger byteableInteger = new ByteableInteger();
 
@@ -81,14 +80,13 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
         }
     }
 
-    public RocksDbDataSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
+    public RocksDbDataSourceImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this.dataBaseName = name;
-        this.parentName = parentName;
+        this.pathName = pathName;
         this.indexes = indexes;
         this.settings = settings;
         initDB();
         openTable();
-        defaultColumnFamily = dbCore.getDefaultColumnFamily();
 
     }
 
@@ -97,12 +95,12 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     public void openTable() {
-        table = new RocksDbComTransactDB(dbCore);
+        table = new RocksDbComTransactDB((TransactionDB)dbCore);
     }
 
     @Override
     public Path getDbPath() {
-        return Paths.get(parentName, dataBaseName);
+        return Paths.get(pathName, dataBaseName);
     }
 
 
