@@ -2,10 +2,12 @@ package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
+import org.erachain.dbs.rocksDB.common.RocksDbDataSourceDB;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
+import org.rocksdb.WriteOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,21 +24,25 @@ import java.util.List;
 public class DBRocksDBTableSimple<K, V> extends DBRocksDBTable
         <K, V> {
 
-    public DBRocksDBTableSimple(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, dbaSet);
+    public DBRocksDBTableSimple(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
+                                RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
     }
 
-    public DBRocksDBTableSimple(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
-        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
+    public DBRocksDBTableSimple(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
+                                DBASet dbaSet) {
+        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
+                new WriteOptions().setSync(true).setDisableWAL(false), dbaSet);
     }
 
     public DBRocksDBTableSimple(String NAME_TABLE) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
-                new ArrayList<>(), RocksDbSettings.getDefaultSettings(), null);
+                new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
+                new WriteOptions().setSync(true).setDisableWAL(false), null);
     }
 
     @Override
     public void openSource() {
-        ///dbSource = new RocksDbDataSourceImpl(this.root, NAME_TABLE, indexes, settings);
+        dbSource = new RocksDbDataSourceDB(this.root, NAME_TABLE, indexes, settings, writeOptions);
     }
 }

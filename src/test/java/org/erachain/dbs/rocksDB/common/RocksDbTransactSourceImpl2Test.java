@@ -1,8 +1,8 @@
 package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact2;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransactionSingle;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
@@ -51,7 +51,7 @@ public class RocksDbTransactSourceImpl2Test {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableTransact<byte[], byte[]> rocksDB = new DBRocksDBTableTransact(NAME_TABLE);
+            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
 
             int k = 0;
             int rollbacks = 0;

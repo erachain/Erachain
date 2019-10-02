@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ReferenceSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransactionSingle;
 import org.erachain.dbs.rocksDB.transformation.ByteableLongArray;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
+import org.rocksdb.ReadOptions;
+import org.rocksdb.WriteOptions;
 
 @Slf4j
 public class ReferenceSuitRocksDB extends DBMapSuit<byte[], long[]> implements ReferenceSuit {
@@ -21,10 +23,12 @@ public class ReferenceSuitRocksDB extends DBMapSuit<byte[], long[]> implements R
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTableTransact<>(new ByteableTrivial(), new ByteableLongArray(), NAME_TABLE, indexes,
+        map = new DBRocksDBTableTransactionSingle<>(new ByteableTrivial(), new ByteableLongArray(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
+                new WriteOptions().setSync(true).setDisableWAL(false),
+                new ReadOptions(),
                 databaseSet);
     }
 

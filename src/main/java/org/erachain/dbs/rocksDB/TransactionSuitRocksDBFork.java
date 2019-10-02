@@ -6,9 +6,11 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.datachain.TransactionTab;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransactionSingle;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
+import org.rocksdb.ReadOptions;
+import org.rocksdb.WriteOptions;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,10 +28,12 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTableTransact<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
+        map = new DBRocksDBTableTransactionSingle<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
+                new WriteOptions().setSync(true).setDisableWAL(false),
+                new ReadOptions(),
                 databaseSet);
     }
 

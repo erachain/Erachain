@@ -18,6 +18,7 @@ import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.WriteOptions;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -60,6 +61,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     //Для пересчета размеров таблицы
     protected ByteableInteger byteableInteger = new ByteableInteger();
 
+    protected WriteOptions writeOptions;
     /**
      *
      * @param byteableKey
@@ -69,11 +71,13 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
      * @param settings
      * @param dbaSet
      */
-    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, DBASet dbaSet) {
+    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
+                          RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.NAME_TABLE = NAME_TABLE;
         this.settings = settings;
+        this.writeOptions = writeOptions;
         this.root = (dbaSet == null // in TESTs
                 || dbaSet.getFile() == null ? // in Memory or in TESTs
                 Settings.getInstance().getDataDir()
@@ -90,7 +94,8 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
-        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
+        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
+                new WriteOptions().setSync(true).setDisableWAL(false), dbaSet);
     }
 
     /**
@@ -99,7 +104,8 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
      */
     public DBRocksDBTable(String NAME_TABLE) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
-                new ArrayList<>(), RocksDbSettings.getDefaultSettings(), null);
+                new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
+                new WriteOptions().setSync(true).setDisableWAL(false), null);
     }
 
     @Override

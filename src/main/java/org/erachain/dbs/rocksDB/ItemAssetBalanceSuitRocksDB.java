@@ -10,14 +10,16 @@ import org.erachain.datachain.ItemAssetBalanceTabImpl;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransact;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransactionSingle;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
+import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksIterator;
 import org.rocksdb.TransactionDB;
+import org.rocksdb.WriteOptions;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -68,7 +70,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTableTransact<byte[], Tuple5<
+        map = new DBRocksDBTableTransactionSingle<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
                 Tuple2<BigDecimal, BigDecimal>, // in DEBT
                 Tuple2<BigDecimal, BigDecimal>, // in STOCK
@@ -80,6 +82,8 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 128,
                         1, 256, 32, false),
+                new WriteOptions().setSync(true).setDisableWAL(false),
+                new ReadOptions(),
                 databaseSet);
 
     }

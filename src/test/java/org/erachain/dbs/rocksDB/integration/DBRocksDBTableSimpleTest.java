@@ -1,6 +1,7 @@
-package org.erachain.dbs.rocksDB.common;
+package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -15,11 +16,11 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
-public class RocksDbDataSourceDBTest {
+public class DBRocksDBTableSimpleTest {
 
     private List<Map.Entry<byte[], byte[]>> data = new ArrayList<>();
 
-    private long countData = 10000;
+    private long countData = 100000;
 
     @Before
     public void generateData() {
@@ -50,7 +51,7 @@ public class RocksDbDataSourceDBTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            RocksDbDataSourceDB rocksDB = new RocksDbDataSourceDB(NAME_TABLE, indexes, dbSettings);
+            DBRocksDBTable rocksDB = new DBRocksDBTableSimple(NAME_TABLE);
 
             int k = 0;
 
@@ -72,8 +73,8 @@ public class RocksDbDataSourceDBTest {
 
                 k++;
 
-                found = rocksDB.contains(entry.getKey());
-                found = rocksDB.contains(UUID.randomUUID().toString().getBytes());
+                found = rocksDB.containsKey(entry.getKey());
+                found = rocksDB.containsKey(UUID.randomUUID().toString().getBytes());
 
             }
 
@@ -82,12 +83,12 @@ public class RocksDbDataSourceDBTest {
 
                 k++;
 
-                found = rocksDB.contains(entry.getKey());
+                found = rocksDB.containsKey(entry.getKey());
                 assertEquals(found, true);
 
                 rocksDB.remove(entry.getKey());
 
-                found = rocksDB.contains(entry.getKey());
+                found = rocksDB.containsKey(entry.getKey());
                 assertEquals(found, false);
 
             }
@@ -103,9 +104,5 @@ public class RocksDbDataSourceDBTest {
 
         } while (twice);
 
-    }
-
-    @Test
-    public void openDB() {
     }
 }

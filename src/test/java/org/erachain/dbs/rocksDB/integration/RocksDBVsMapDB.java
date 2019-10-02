@@ -88,7 +88,7 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransact(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_DATABASE);
             int k = 0;
             int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
@@ -139,7 +139,7 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransact(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_DATABASE);
             int k = 0;
             int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
