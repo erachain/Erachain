@@ -6,7 +6,7 @@ import org.rocksdb.*;
 import java.util.List;
 
 /**
- * Самый низкий уровень доступа к функциям RocksDB
+ * Обычная база данных RocksDB
  */
 @Slf4j
 public class RocksDbComDB implements RocksDbCom {

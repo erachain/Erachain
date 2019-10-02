@@ -3,10 +3,10 @@ package org.erachain.dbs.rocksDB.common;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.*;
 
-import java.util.List;
-
 /**
- * Самый низкий уровень доступа к функциям RocksDB
+ * Транзакция RocksDB. Может существовать отдельно от Базы и их быть несколько у одной базы
+ * Работа с записями идет в Транзакцию и изменения сольются в родительскую базу только после commit.
+ * По сути это аналог реализации форка от бюазы данных в MapDB
  */
 @Slf4j
 public class RocksDbComTransaction implements RocksDbCom
@@ -25,16 +25,6 @@ public class RocksDbComTransaction implements RocksDbCom
         this.writeOptions = writeOptions;
         this.readOptions = readOptions;
         dbTransaction = parentDB.beginTransaction(writeOptions);
-    }
-
-    public static dbTransaction createDB(String file, Options options) throws RocksDBException {
-        return RocksDB.open(options, file);
-    }
-
-    public static dbTransaction openDB(String file, DBOptions dbOptions,
-                                 List<ColumnFamilyDescriptor> columnFamilyDescriptors,
-                                 List<ColumnFamilyHandle> columnFamilyHandles) throws RocksDBException {
-        return RocksDB.open(dbOptions, file, columnFamilyDescriptors, columnFamilyHandles);
     }
 
     @Override

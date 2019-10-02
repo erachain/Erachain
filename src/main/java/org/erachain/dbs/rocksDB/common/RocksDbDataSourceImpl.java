@@ -95,7 +95,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     public void openTable() {
-        table = new RocksDbComTransactDB((TransactionDB)dbCore);
+        table = new RocksDbComTransactedDB((TransactionDB) dbCore);
     }
 
     @Override
