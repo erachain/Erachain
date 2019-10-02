@@ -31,8 +31,7 @@ public class DBRocksDBTableSimple<K, V> extends DBRocksDBTable
 
     public DBRocksDBTableSimple(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
                                 DBASet dbaSet) {
-        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), dbaSet);
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, dbaSet);
     }
 
     public DBRocksDBTableSimple(String NAME_TABLE) {

@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
+import static org.rocksdb.RocksDB.loadLibrary;
 
 /**
  * Данный класс представляет собой основной доступ и функционал к таблице БД RocksDB
@@ -62,6 +63,19 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     protected ByteableInteger byteableInteger = new ByteableInteger();
 
     protected WriteOptions writeOptions;
+
+    static {
+        try {
+            logger.info("load libraries");
+            loadLibrary(new ArrayList<String>() {{
+                add(".");
+            }});
+            logger.info("loaded success");
+        } catch (Throwable throwable) {
+            logger.error(throwable.getMessage(), throwable);
+        }
+    }
+
     /**
      *
      * @param byteableKey
