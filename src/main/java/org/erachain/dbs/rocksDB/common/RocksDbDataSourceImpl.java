@@ -179,6 +179,13 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 // USE transactions
                                 createDB(options, columnFamilyDescriptors);
 
+                                // MAKE COLUMNS FAMILY
+                                columnFamilyHandles.add(dbCore.getDefaultColumnFamily());
+                                for (ColumnFamilyDescriptor columnFamilyDescriptor : columnFamilyDescriptors) {
+                                    ColumnFamilyHandle columnFamilyHandle = dbCore.createColumnFamily(columnFamilyDescriptor);
+                                    columnFamilyHandles.add(columnFamilyHandle);
+                                }
+
                                 create = true;
                                 logger.info("database created");
                             } catch (RocksDBException e) {

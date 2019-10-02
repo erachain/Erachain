@@ -39,12 +39,14 @@ public class RocksDbDataSourceOptTransactionSingle extends RocksDbDataSourceImpl
 
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        dbCore = RocksDbComOptTransactedDB.createDB(getDbPathAndFile().toString(), options, columnFamilyDescriptors, columnFamilyHandles);
+        dbCore = OptimisticTransactionDB.open(options, getDbPathAndFile().toString());
+
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        dbCore = RocksDbComOptTransactedDB.openDB(getDbPathAndFile().toString(), dbOptions, columnFamilyDescriptors, columnFamilyHandles);
+        dbCore = OptimisticTransactionDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
+
     }
 
 }

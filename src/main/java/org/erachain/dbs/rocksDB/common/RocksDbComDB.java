@@ -3,8 +3,6 @@ package org.erachain.dbs.rocksDB.common;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.*;
 
-import java.util.List;
-
 /**
  * Обычная база данных RocksDB - без Транзакционной системы
  */
@@ -17,38 +15,6 @@ public class RocksDbComDB implements RocksDbCom {
     public RocksDbComDB(RocksDB rocksDB) {
         this.rocksDB = rocksDB;
         defaultColumnFamily = rocksDB.getDefaultColumnFamily();
-    }
-
-    /**
-     * Create DB and columnFamily
-     *
-     * @param file
-     * @param options
-     * @param columnFamilyDescriptors
-     * @param columnFamilyHandles
-     * @return
-     * @throws RocksDBException
-     */
-    public static RocksDB createDB(String file, Options options,
-                                   List<ColumnFamilyDescriptor> columnFamilyDescriptors,
-                                   List<ColumnFamilyHandle> columnFamilyHandles) throws RocksDBException {
-        // MAKE DATABASE
-        RocksDB rocksDB = RocksDB.open(options, file);
-
-        // MAKE COLUMNS FAMILY
-        columnFamilyHandles.add(rocksDB.getDefaultColumnFamily());
-        for (ColumnFamilyDescriptor columnFamilyDescriptor : columnFamilyDescriptors) {
-            ColumnFamilyHandle columnFamilyHandle = rocksDB.createColumnFamily(columnFamilyDescriptor);
-            columnFamilyHandles.add(columnFamilyHandle);
-        }
-
-        return rocksDB;
-    }
-
-    public static RocksDB openDB(String file, DBOptions dbOptions,
-                     List<ColumnFamilyDescriptor> columnFamilyDescriptors,
-                     List<ColumnFamilyHandle> columnFamilyHandles) throws RocksDBException {
-        return RocksDB.open(dbOptions, file, columnFamilyDescriptors, columnFamilyHandles);
     }
 
     @Override

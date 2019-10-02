@@ -38,12 +38,12 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl {
     }
 
     @Override
-    protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) {
+    protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         return;
     }
 
     @Override
-    protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) {
+    protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         return;
     }
 

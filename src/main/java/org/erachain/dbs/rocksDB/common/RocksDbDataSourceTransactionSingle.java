@@ -13,6 +13,8 @@ import java.util.List;
 @Slf4j
 public class RocksDbDataSourceTransactionSingle extends RocksDbDataSourceImpl {
 
+    TransactionDBOptions transactionDbOptions = new TransactionDBOptions();
+
     ReadOptions readOptions;
     WriteOptions writeOptions;
 
@@ -39,12 +41,12 @@ public class RocksDbDataSourceTransactionSingle extends RocksDbDataSourceImpl {
 
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        dbCore = RocksDbComTransactedDB.createDB(getDbPathAndFile().toString(), options, columnFamilyDescriptors, columnFamilyHandles);
+        dbCore = TransactionDB.open(options, transactionDbOptions, getDbPathAndFile().toString());
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        dbCore = RocksDbComTransactedDB.openDB(getDbPathAndFile().toString(), dbOptions, columnFamilyDescriptors, columnFamilyHandles);
+        dbCore = TransactionDB.open(dbOptions, transactionDbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
     }
 
 }

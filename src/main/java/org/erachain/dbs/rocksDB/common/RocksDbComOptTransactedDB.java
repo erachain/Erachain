@@ -16,10 +16,7 @@ public class RocksDbComOptTransactedDB extends RocksDbComDB {
         super(transactionDB);
     }
 
-    public static OptimisticTransactionDB createDB(String file, Options options) throws RocksDBException {
-        return OptimisticTransactionDB.open(options, file);
-    }
-
+    //@Override
     public static OptimisticTransactionDB openDB(String file, DBOptions dbOptions,
                                                  List<ColumnFamilyDescriptor> columnFamilyDescriptors,
                                                  List<ColumnFamilyHandle> columnFamilyHandles) throws RocksDBException {

@@ -21,20 +21,20 @@ import java.util.List;
  * @param <V>
  */
 @Slf4j
-public class DBRocksDBTableSimple<K, V> extends DBRocksDBTable
+public class DBRocksDBTableDB<K, V> extends DBRocksDBTable
         <K, V> {
 
-    public DBRocksDBTableSimple(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                                RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
+    public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
+                            RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
     }
 
-    public DBRocksDBTableSimple(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                                DBASet dbaSet) {
+    public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
+                            DBASet dbaSet) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, dbaSet);
     }
 
-    public DBRocksDBTableSimple(String NAME_TABLE) {
+    public DBRocksDBTableDB(String NAME_TABLE) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
                 new WriteOptions().setSync(true).setDisableWAL(false), null);

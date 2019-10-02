@@ -16,11 +16,11 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
-public class DBRocksDBTableSimpleTest {
+public class DBRocksDBTableDBTest {
 
     private List<Map.Entry<byte[], byte[]>> data = new ArrayList<>();
 
-    private long countData = 100000;
+    private long countData = 10000;
 
     @Before
     public void generateData() {
@@ -32,7 +32,7 @@ public class DBRocksDBTableSimpleTest {
     @Test
     public void test1() {
         logger.info("Start test RocksDB productivity commit");
-        String NAME_TABLE = "RocksDbDataSourceDB";
+        String NAME_TABLE = "RocksDbTable";
 
         // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
@@ -51,7 +51,7 @@ public class DBRocksDBTableSimpleTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTable rocksDB = new DBRocksDBTableSimple(NAME_TABLE);
+            DBRocksDBTable rocksDB = new DBRocksDBTableDB(NAME_TABLE);
 
             int k = 0;
 
