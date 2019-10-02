@@ -31,7 +31,7 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
     }
 
     @Override
-    protected void createDB(Options options) throws RocksDBException {
+    protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         transactionDbOptions = new TransactionDBOptions();
         dbCore = TransactionDB.open(options, transactionDbOptions, getDbPathAndFile().toString());
         dbCoreTransact = dbCore.beginTransaction(writeOptions);

@@ -288,13 +288,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                 return;
             }
             alive = false;
-            if (table != null) {
-                try {
-                    table.close();
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
             dbCore.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -302,7 +295,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             resetDbLock.writeLock().unlock();
         }
     }
-
 
     protected boolean quitIfNotAlive() {
         if (!isAlive()) {

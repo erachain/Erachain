@@ -17,27 +17,47 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl {
     WriteOptions writeOptions;
 
     public RocksDbDataSourceTransaction(String pathName, String name, List<IndexDB> indexes,
-                                        TransactionDB dbCore, WriteOptions writeOptions, ReadOptions readOptions) {
+                                        TransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles,
+                                        WriteOptions writeOptions, ReadOptions readOptions) {
         super(pathName, name, indexes, null);
         this.dbCore = dbCore;
+        this.columnFamilyHandles = columnFamilyHandles;
         this.readOptions = readOptions;
         this.writeOptions = writeOptions;
-        ////initDB();
-        table = new RocksDbComTransaction(dbCore);
+
+        table = new RocksDbComTransaction(dbCore, writeOptions, readOptions);
+
     }
 
-    public RocksDbDataSourceTransaction(TransactionDB dbCore, ReadOptions readOptions) {
-        this.dbCore = dbCore;
-        this.readOptions = readOptions;
+    public RocksDbDataSourceTransaction(String pathName, String name, List<IndexDB> indexes,
+                                        TransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles) {
+        this(pathName, name, indexes, dbCore, columnFamilyHandles,
+                new WriteOptions().setSync(true).setDisableWAL(false),
+                new ReadOptions());
     }
 
-    protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors,
-                            ) throws RocksDBException {
+    @Override
+    protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) {
         return;
     }
 
-    protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
+    @Override
+    protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) {
         return;
+    }
+
+    /**
+     * Close only Transaction - not parentDB
+     */
+    @Override
+    public void close() {
+        resetDbLock.writeLock().lock();
+        try {
+            table.close();
+        } catch (Exception e) {
+        } finally {
+            resetDbLock.writeLock().unlock();
+        }
     }
 
 }

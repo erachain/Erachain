@@ -28,10 +28,12 @@ public class RocksDbDataSourceDB extends RocksDbDataSourceImpl {
                 new WriteOptions().setSync(true).setDisableWAL(false));
     }
 
+    @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = RocksDbComDB.createDB(getDbPathAndFile().toString(), options, columnFamilyDescriptors, columnFamilyHandles);
     }
 
+    @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = RocksDbComDB.openDB(getDbPathAndFile().toString(), dbOptions, columnFamilyDescriptors, columnFamilyHandles);
     }

@@ -2,7 +2,6 @@ package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
-import org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
@@ -38,6 +37,6 @@ public class DBRocksDBTableSimple<K, V> extends DBRocksDBTable
 
     @Override
     public void openSource() {
-        dbSource = new RocksDbDataSourceImpl(this.root, NAME_TABLE, indexes, settings);
+        ///dbSource = new RocksDbDataSourceImpl(this.root, NAME_TABLE, indexes, settings);
     }
 }

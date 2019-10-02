@@ -3,7 +3,6 @@ package org.erachain.dbs.rocksDB.store.settings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl;
-import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableAtomicLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
@@ -25,7 +24,7 @@ public class SettingsDBRocksDBTable {
     private ByteableString byteableString = new ByteableString();
     public SettingsDBRocksDBTable(List<Tuple2<String, Byteable>> namesByteables, String nameTable) {
         this.namesByteables = namesByteables;
-        db = new RocksDbDataSourceImpl(nameTable, null, RocksDbSettings.getSettings());
+        ////db = new RocksDbDataSourceImpl(nameTable, null, RocksDbSettings.getSettings());
     }
 
     public Object get(String name) {
