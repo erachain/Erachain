@@ -72,13 +72,13 @@ public class RocksDbComDB implements RocksDbCom {
     final StringBuilder inCache = new StringBuilder();
     @Override
     public boolean contains(byte[] key) {
-        return rocksDB.keyMayExist(key, null //inCache
+        return rocksDB.keyMayExist(key, inCache // NULL not worked
         );
     }
 
     @Override
     public boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
-        return rocksDB.keyMayExist(columnFamilyHandle, key, null // inCache
+        return rocksDB.keyMayExist(columnFamilyHandle, key, inCache // NULL not worked
         );
     }
 
@@ -104,7 +104,12 @@ public class RocksDbComDB implements RocksDbCom {
 
     @Override
     public void remove(byte[] key, WriteOptions writeOptions) throws RocksDBException {
-        rocksDB.delete(key);
+        rocksDB.delete(writeOptions, key);
+    }
+
+    @Override
+    public void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key, WriteOptions writeOptions) throws RocksDBException {
+        rocksDB.delete(columnFamilyHandle, writeOptions, key);
     }
 
     @Override

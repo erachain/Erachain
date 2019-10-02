@@ -28,6 +28,8 @@ public interface RocksDbCom {
 
     void remove(byte[] key, WriteOptions writeOptions) throws RocksDBException;
 
+    void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key, WriteOptions writeOptions) throws RocksDBException;
+
     RocksIterator getIterator();
 
     RocksIterator getIterator(ColumnFamilyHandle indexDB);

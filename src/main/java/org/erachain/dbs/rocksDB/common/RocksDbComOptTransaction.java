@@ -9,16 +9,15 @@ import org.rocksdb.*;
  * По сути это аналог реализации форка от бюазы данных в MapDB
  */
 @Slf4j
-public class RocksDbComTransaction implements RocksDbCom
-{
+public class RocksDbComOptTransaction implements RocksDbCom {
     public Transaction dbTransaction;
-    public TransactionDB parentDB;
+    public OptimisticTransactionDB parentDB;
     WriteOptions writeOptions;
     ReadOptions readOptions;
 
     protected final ColumnFamilyHandle defaultColumnFamily;
 
-    public RocksDbComTransaction(TransactionDB parentDB, WriteOptions writeOptions, ReadOptions readOptions) {
+    public RocksDbComOptTransaction(OptimisticTransactionDB parentDB, WriteOptions writeOptions, ReadOptions readOptions) {
         this.parentDB = parentDB;
         defaultColumnFamily = parentDB.getDefaultColumnFamily();
 
@@ -104,7 +103,7 @@ public class RocksDbComTransaction implements RocksDbCom
 
     @Override
     public void close() {
-            dbTransaction.close();
-            writeOptions.dispose();
+        dbTransaction.close();
+        writeOptions.dispose();
     }
 }

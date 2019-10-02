@@ -18,7 +18,7 @@ public class RocksDbDataSourceDBTest {
 
     private List<Map.Entry<byte[], byte[]>> data = new ArrayList<>();
 
-    private long countData = 100;
+    private long countData = 100000;
 
     @Before
     public void generateData() {
@@ -41,6 +41,7 @@ public class RocksDbDataSourceDBTest {
         }
 
         boolean twice = false;
+        boolean found;
 
         List<IndexDB> indexes = new ArrayList<>();
         RocksDbSettings dbSettings = new RocksDbSettings();
@@ -63,15 +64,29 @@ public class RocksDbDataSourceDBTest {
                 }
             }
 
+            logger.info("SIZE = " + rocksDB.size());
+
             k = 0;
             for (Map.Entry<byte[], byte[]> entry : data) {
 
                 k++;
 
-                boolean found = rocksDB.contains(entry.getKey());
+                found = rocksDB.contains(entry.getKey());
                 found = rocksDB.contains(UUID.randomUUID().toString().getBytes());
 
             }
+
+            k = 0;
+            for (Map.Entry<byte[], byte[]> entry : data) {
+
+                k++;
+
+                rocksDB.remove(entry.getKey());
+                found = rocksDB.contains(UUID.randomUUID().toString().getBytes());
+
+            }
+
+            logger.info("SIZE = " + rocksDB.size());
 
             long timeMillisAfter = System.currentTimeMillis();
             long total = timeMillisAfter - timeMillisBefore;
