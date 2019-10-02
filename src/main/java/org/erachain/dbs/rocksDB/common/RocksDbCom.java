@@ -14,6 +14,10 @@ public interface RocksDbCom {
 
     void put(byte[] key, byte[] value, WriteOptions writeOptions) throws RocksDBException;
 
+    boolean contains(byte[] key);
+
+    boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key);
+
     byte[] get(byte[] key) throws RocksDBException;
 
     byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) throws RocksDBException;

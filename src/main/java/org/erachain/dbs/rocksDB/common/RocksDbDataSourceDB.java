@@ -21,6 +21,7 @@ public class RocksDbDataSourceDB extends RocksDbDataSourceImpl {
         initDB();
         // оборачиваем ее к костюм
         table = new RocksDbComDB(dbCore);
+        afterOpenTable();
     }
 
     public RocksDbDataSourceDB(String name, List<IndexDB> indexes, RocksDbSettings settings) {

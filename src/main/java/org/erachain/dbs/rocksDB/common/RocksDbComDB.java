@@ -66,6 +66,22 @@ public class RocksDbComDB implements RocksDbCom {
         rocksDB.put(key, value);
     }
 
+    /**
+     * if a value is found in block-cache
+     */
+    final StringBuilder inCache = new StringBuilder();
+    @Override
+    public boolean contains(byte[] key) {
+        return rocksDB.keyMayExist(key, null //inCache
+        );
+    }
+
+    @Override
+    public boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        return rocksDB.keyMayExist(columnFamilyHandle, key, null // inCache
+        );
+    }
+
     @Override
     public byte[] get(byte[] key) throws RocksDBException {
         return rocksDB.get(key);

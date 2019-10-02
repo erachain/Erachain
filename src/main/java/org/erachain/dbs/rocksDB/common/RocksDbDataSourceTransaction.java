@@ -26,6 +26,7 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl {
         this.writeOptions = writeOptions;
 
         table = new RocksDbComTransaction(dbCore, writeOptions, readOptions);
+        afterOpenTable();
 
     }
 

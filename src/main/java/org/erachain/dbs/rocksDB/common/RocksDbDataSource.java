@@ -41,6 +41,10 @@ public interface RocksDbDataSource {
 
     void put(byte[] key, byte[] value, WriteOptions writeOptions);
 
+    boolean contains(byte[] key);
+
+    boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key);
+
     byte[] get(byte[] key);
 
     byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key);

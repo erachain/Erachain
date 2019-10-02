@@ -43,6 +43,26 @@ public class RocksDbComTransaction implements RocksDbCom
     }
 
     @Override
+    public boolean contains(byte[] key) {
+        try {
+            return dbTransaction.get(readOptions, key) != null;
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        try {
+            return dbTransaction.get(columnFamilyHandle, readOptions, key) != null;
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
+    @Override
     public byte[] get(byte[] key) throws RocksDBException {
         return dbTransaction.get(readOptions, key);
     }

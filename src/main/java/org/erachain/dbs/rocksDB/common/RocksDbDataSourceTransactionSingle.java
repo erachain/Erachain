@@ -27,6 +27,7 @@ public class RocksDbDataSourceTransactionSingle extends RocksDbDataSourceImpl {
 
         // оборачиваем в костюм Транзакцию от нее
         table = new RocksDbComTransactionSingle((TransactionDB) dbCore, writeOptions, readOptions);
+        afterOpenTable();
 
     }
 

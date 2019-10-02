@@ -228,9 +228,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                     }
 
                     columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-                    if (create)
-                        put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
                 }
             }
@@ -265,8 +262,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         return dbCore;
     }
 
-    public void openTable() {
-        table = new RocksDbComTransactedDB((TransactionDB) dbCore);
+    public void afterOpenTable() {
+        if (create) {
+            put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+            create = false;
+        }
     }
 
     @Override
@@ -481,6 +481,38 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         } finally {
             resetDbLock.readLock().unlock();
         }
+    }
+
+    @Override
+    public boolean contains(byte[] key) {
+        if (quitIfNotAlive()) {
+            return false;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return table.contains(key);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        if (quitIfNotAlive()) {
+            return false;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return table.contains(columnFamilyHandle, key);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return false;
     }
 
     @Override

@@ -446,6 +446,42 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         }
     }
 
+    /**
+     * if a value is found in block-cache
+     */
+    final StringBuilder inCache = new StringBuilder();
+    @Override
+    public boolean contains(byte[] key) {
+        if (quitIfNotAlive()) {
+            return false;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCoreParent.keyMayExist(key, inCache);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        if (quitIfNotAlive()) {
+            return false;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCoreParent.keyMayExist(columnFamilyHandle, key, inCache);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return false;
+    }
+
     @Override
     public byte[] get(byte[] key) {
         if (quitIfNotAlive()) {
