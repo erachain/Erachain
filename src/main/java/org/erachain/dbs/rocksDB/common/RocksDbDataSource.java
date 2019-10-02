@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface RocksDbDataSource {
-    Path getDbPath();
+    Path getDbPathAndFile();
 
     boolean isAlive();
 

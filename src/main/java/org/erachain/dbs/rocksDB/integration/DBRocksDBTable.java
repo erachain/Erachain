@@ -304,7 +304,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     @Override
     public void clear() {
         dbSource.close();
-        FileUtil.recursiveDelete(dbSource.getDbPath().toString());
+        FileUtil.recursiveDelete(dbSource.getDbPathAndFile().toString());
         openSource();
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {

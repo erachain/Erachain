@@ -315,7 +315,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
     @Override
     public void clear() {
         dbSource.close();
-        FileUtil.recursiveDelete(dbSource.getDbPath().toString());
+        FileUtil.recursiveDelete(dbSource.getDbPathAndFile().toString());
         dbSource = new RocksDbTransactSourceImpl2(root, NAME_TABLE, indexes, settings);
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
         if (columnFamilyHandles.size() > 1) {

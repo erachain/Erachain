@@ -94,7 +94,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
-    public Path getDbPath() {
+    public Path getDbPathAndFile() {
         return Paths.get(parentName, dataBaseName);
     }
 
@@ -267,7 +267,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
                     options.setAllowMmapWrites(true);
                     try {
                         logger.info("Opening database");
-                        final Path dbPath = getDbPath();
+                        final Path dbPath = getDbPathAndFile();
                         if (!Files.isSymbolicLink(dbPath.getParent())) {
                             Files.createDirectories(dbPath.getParent());
                         }

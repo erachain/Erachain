@@ -2,7 +2,6 @@ package org.erachain.dbs.rocksDB.common;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
@@ -30,8 +29,7 @@ import static org.rocksdb.RocksDB.loadLibrary;
  * Самый низкий уровень доступа к функциям RocksDB
  */
 @Slf4j
-@NoArgsConstructor
-public class RocksDbDataSourceImpl implements RocksDbDataSource
+public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
@@ -40,9 +38,9 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
     //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
-    protected boolean dbSync = true;
+    //protected boolean dbSync = true;
 
-    protected WriteOptions writeOptions = new WriteOptions().setSync(dbSync).setDisableWAL(false);
+    protected WriteOptions writeOptions;
 
     @Getter
     //public RocksDB database;
@@ -80,18 +78,191 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
         }
     }
 
-    public RocksDbDataSourceImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
+    public RocksDbDataSourceImpl(TransactionDB dbCore, RocksDbCom table,
+                                 String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
+                                 WriteOptions writeOptions) {
         this.dataBaseName = name;
         this.pathName = pathName;
         this.indexes = indexes;
         this.settings = settings;
-        initDB();
-        openTable();
+        this.writeOptions = writeOptions;
+        this.dbCore = dbCore;
+        this.table = table;
+    }
 
+    public RocksDbDataSourceImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
+                                 WriteOptions writeOptions) {
+        this.dataBaseName = name;
+        this.pathName = pathName;
+        this.indexes = indexes;
+        this.settings = settings;
+        this.writeOptions = writeOptions;
+    }
+
+    public RocksDbDataSourceImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
+        this(pathName, name, indexes, settings, new WriteOptions().setSync(true).setDisableWAL(false));
     }
 
     public RocksDbDataSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
+    }
+
+    abstract protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException;
+
+    abstract protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException;
+
+    public void initDB() {
+        resetDbLock.writeLock().lock();
+        try {
+            if (isAlive()) {
+                return;
+            }
+
+            Preconditions.checkNotNull(dataBaseName, "no name set to the dbStore");
+            try (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeUniversalStyleCompaction()) {
+                final List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
+                columnFamilyHandles = new ArrayList<>();
+                addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
+                BlockBasedTableConfig tableCfgCf = settingsBlockBasedTable(settings);
+                cfOpts.setTableFormatConfig(tableCfgCf);
+                try (Options options = new Options()) {
+
+                    if (settings.isEnableStatistics()) {
+                        options.setStatistics(new Statistics());
+                        options.setStatsDumpPeriodSec(60);
+                    }
+                    options.setCreateIfMissing(true);
+                    options.setIncreaseParallelism(3);
+                    options.setLevelCompactionDynamicLevelBytes(true);
+                    options.setMaxOpenFiles(settings.getMaxOpenFiles());
+
+                    options.setNumLevels(settings.getLevelNumber());
+                    options.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
+                    options.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
+                    options.setMaxBackgroundCompactions(settings.getCompactThreads());
+                    options.setLevel0FileNumCompactionTrigger(settings.getLevel0FileNumCompactionTrigger());
+                    options.setTargetFileSizeMultiplier(settings.getTargetFileSizeMultiplier());
+                    options.setTargetFileSizeBase(settings.getTargetFileSizeBase());
+
+                    BlockBasedTableConfig tableCfg = settingsBlockBasedTable(settings);
+                    options.setTableFormatConfig(tableCfg);
+                    options.setAllowConcurrentMemtableWrite(true);
+                    options.setMaxManifestFileSize(0);
+                    options.setWalTtlSeconds(0);
+                    options.setWalSizeLimitMB(0);
+                    options.setLevel0FileNumCompactionTrigger(1);
+                    options.setMaxBackgroundFlushes(4);
+                    options.setMaxBackgroundCompactions(8);
+                    options.setMaxSubcompactions(4);
+                    options.setMaxWriteBufferNumber(3);
+                    options.setMinWriteBufferNumberToMerge(2);
+
+                    int dbWriteBufferSize = 512 * 1024 * 1024;
+                    options.setDbWriteBufferSize(dbWriteBufferSize);
+                    options.setParanoidFileChecks(false);
+                    options.setCompressionType(CompressionType.NO_COMPRESSION);
+
+                    options.setParanoidChecks(false);
+                    options.setAllowMmapReads(true);
+                    options.setAllowMmapWrites(true);
+                    try {
+                        logger.info("Opening database");
+                        final Path dbPath = getDbPathAndFile();
+                        if (!Files.isSymbolicLink(dbPath.getParent())) {
+                            Files.createDirectories(dbPath.getParent());
+                        }
+
+                        try (final DBOptions dbOptions = new DBOptions()) {
+                            try {
+
+                                // MAKE DATABASE
+                                // USE transactions
+                                createDB(options, columnFamilyDescriptors);
+
+                                create = true;
+                                logger.info("database created");
+                            } catch (RocksDBException e) {
+                                dbOptions.setCreateIfMissing(true);
+                                dbOptions.setCreateMissingColumnFamilies(true);
+                                dbOptions.setIncreaseParallelism(3);
+                                dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
+                                dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
+                                dbOptions.setAllowConcurrentMemtableWrite(true);
+                                dbOptions.setMaxManifestFileSize(0);
+                                dbOptions.setWalTtlSeconds(0);
+                                dbOptions.setWalSizeLimitMB(0);
+                                dbOptions.setMaxBackgroundFlushes(4);
+                                dbOptions.setMaxBackgroundCompactions(8);
+                                dbOptions.setMaxSubcompactions(4);
+                                dbOptions.setDbWriteBufferSize(dbWriteBufferSize);
+
+                                dbOptions.setParanoidChecks(false);
+                                dbOptions.setAllowMmapReads(true);
+                                dbOptions.setAllowMmapWrites(true);
+
+                                columnFamilyDescriptors.clear();
+                                columnFamilyDescriptors.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts));
+                                addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
+
+                                // MAKE DATABASE
+                                // USE transactions
+                                openDB(dbOptions, columnFamilyDescriptors);
+
+                                if (indexes != null && !indexes.isEmpty()) {
+                                    for (int i = 0; i < indexes.size(); i++) {
+                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                    }
+                                }
+
+                                logger.info("database opened");
+                            }
+
+                        } catch (RocksDBException e) {
+                            logger.error(e.getMessage(), e);
+                            throw new RuntimeException("Failed to initialize database", e);
+                        }
+                        alive = true;
+                    } catch (IOException ioe) {
+                        logger.error(ioe.getMessage(), ioe);
+                        throw new RuntimeException("Failed to initialize database", ioe);
+                    }
+
+                    columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+                    if (create)
+                        put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+
+                    logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
+                }
+            }
+        } finally {
+            resetDbLock.writeLock().unlock();
+        }
+    }
+
+    public static TransactionDB initDB(Path dbPath, Options createOptions, DBOptions openOptions,
+                                       TransactionDBOptions transactionDbOptions,
+                                       List<ColumnFamilyDescriptor> columnFamilyDescriptors,
+                                       List<ColumnFamilyHandle> columnFamilyHandles) {
+
+        TransactionDB dbCore;
+        try {
+            dbCore = TransactionDB.open(createOptions, transactionDbOptions, dbPath.toString());
+            logger.info("database CREATED");
+
+        } catch (RocksDBException e) {
+            try {
+                dbCore = TransactionDB.open(openOptions, transactionDbOptions,
+                        dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
+
+                logger.info("database opened");
+
+            } catch (RocksDBException ex) {
+                logger.error(ex.getMessage(), ex);
+                throw new RuntimeException("Failed to initialize database", e);
+            }
+        } finally {
+        }
+        return dbCore;
     }
 
     public void openTable() {
@@ -99,7 +270,7 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public Path getDbPath() {
+    public Path getDbPathAndFile() {
         return Paths.get(pathName, dataBaseName);
     }
 
@@ -251,178 +422,6 @@ public class RocksDbDataSourceImpl implements RocksDbDataSource
     @Override
     public String getDBName() {
         return dataBaseName;
-    }
-
-
-    protected void createDB(Options options) throws RocksDBException {
-        dbCore = RocksDB.open(options, getDbPath().toString());
-    }
-
-    protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        dbCore = RocksDB.open(dbOptions, getDbPath().toString(), columnFamilyDescriptors, columnFamilyHandles);
-    }
-
-
-    protected void initDB() {
-        resetDbLock.writeLock().lock();
-        try {
-            if (isAlive()) {
-                return;
-            }
-
-            Preconditions.checkNotNull(dataBaseName, "no name set to the dbStore");
-            try (final ColumnFamilyOptions cfOpts = new ColumnFamilyOptions().optimizeUniversalStyleCompaction()) {
-                final List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
-                columnFamilyHandles = new ArrayList<>();
-                addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
-                BlockBasedTableConfig tableCfgCf = settingsBlockBasedTable(settings);
-                cfOpts.setTableFormatConfig(tableCfgCf);
-                try (Options options = new Options()) {
-
-                    if (settings.isEnableStatistics()) {
-                        options.setStatistics(new Statistics());
-                        options.setStatsDumpPeriodSec(60);
-                    }
-                    options.setCreateIfMissing(true);
-                    options.setIncreaseParallelism(3);
-                    options.setLevelCompactionDynamicLevelBytes(true);
-                    options.setMaxOpenFiles(settings.getMaxOpenFiles());
-
-                    options.setNumLevels(settings.getLevelNumber());
-                    options.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
-                    options.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
-                    options.setMaxBackgroundCompactions(settings.getCompactThreads());
-                    options.setLevel0FileNumCompactionTrigger(settings.getLevel0FileNumCompactionTrigger());
-                    options.setTargetFileSizeMultiplier(settings.getTargetFileSizeMultiplier());
-                    options.setTargetFileSizeBase(settings.getTargetFileSizeBase());
-
-                    BlockBasedTableConfig tableCfg = settingsBlockBasedTable(settings);
-                    options.setTableFormatConfig(tableCfg);
-                    options.setAllowConcurrentMemtableWrite(true);
-                    options.setMaxManifestFileSize(0);
-                    options.setWalTtlSeconds(0);
-                    options.setWalSizeLimitMB(0);
-                    options.setLevel0FileNumCompactionTrigger(1);
-                    options.setMaxBackgroundFlushes(4);
-                    options.setMaxBackgroundCompactions(8);
-                    options.setMaxSubcompactions(4);
-                    options.setMaxWriteBufferNumber(3);
-                    options.setMinWriteBufferNumberToMerge(2);
-
-                    int dbWriteBufferSize = 512 * 1024 * 1024;
-                    options.setDbWriteBufferSize(dbWriteBufferSize);
-                    options.setParanoidFileChecks(false);
-                    options.setCompressionType(CompressionType.NO_COMPRESSION);
-
-                    options.setParanoidChecks(false);
-                    options.setAllowMmapReads(true);
-                    options.setAllowMmapWrites(true);
-                    try {
-                        logger.info("Opening database");
-                        final Path dbPath = getDbPath();
-                        if (!Files.isSymbolicLink(dbPath.getParent())) {
-                            Files.createDirectories(dbPath.getParent());
-                        }
-
-                        try (final DBOptions dbOptions = new DBOptions()) {
-                            try {
-
-                                // MAKE DATABASE
-                                // USE transactions
-                                createDB(options);
-
-                                columnFamilyHandles.add(dbCore.getDefaultColumnFamily());
-                                int indexID = 0;
-                                for (ColumnFamilyDescriptor columnFamilyDescriptor : columnFamilyDescriptors) {
-                                    ColumnFamilyHandle columnFamilyHandle = dbCore.createColumnFamily(columnFamilyDescriptor);
-                                    columnFamilyHandles.add(columnFamilyHandle);
-                                    if (indexes != null && indexes.size() > indexID)
-                                        indexes.get(indexID++).setColumnFamilyHandle(columnFamilyHandle);
-                                }
-                                create = true;
-                                logger.info("database created");
-                            } catch (RocksDBException e) {
-                                dbOptions.setCreateIfMissing(true);
-                                dbOptions.setCreateMissingColumnFamilies(true);
-                                dbOptions.setIncreaseParallelism(3);
-                                dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
-                                dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
-                                dbOptions.setAllowConcurrentMemtableWrite(true);
-                                dbOptions.setMaxManifestFileSize(0);
-                                dbOptions.setWalTtlSeconds(0);
-                                dbOptions.setWalSizeLimitMB(0);
-                                dbOptions.setMaxBackgroundFlushes(4);
-                                dbOptions.setMaxBackgroundCompactions(8);
-                                dbOptions.setMaxSubcompactions(4);
-                                dbOptions.setDbWriteBufferSize(dbWriteBufferSize);
-
-                                dbOptions.setParanoidChecks(false);
-                                dbOptions.setAllowMmapReads(true);
-                                dbOptions.setAllowMmapWrites(true);
-
-                                columnFamilyDescriptors.clear();
-                                columnFamilyDescriptors.add(new ColumnFamilyDescriptor(RocksDB.DEFAULT_COLUMN_FAMILY, cfOpts));
-                                addIndexColumnFamilies(indexes, cfOpts, columnFamilyDescriptors);
-
-                                // MAKE DATABASE
-                                // USE transactions
-                                openDB(dbOptions, columnFamilyDescriptors);
-
-                                if (indexes != null && !indexes.isEmpty()) {
-                                    for (int i = 0; i < indexes.size(); i++) {
-                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
-                                    }
-                                }
-
-                                logger.info("database opened");
-                            }
-
-                        } catch (RocksDBException e) {
-                            logger.error(e.getMessage(), e);
-                            throw new RuntimeException("Failed to initialize database", e);
-                        }
-                        alive = true;
-                    } catch (IOException ioe) {
-                        logger.error(ioe.getMessage(), ioe);
-                        throw new RuntimeException("Failed to initialize database", ioe);
-                    }
-
-                    columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-                    if (create)
-                        put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-
-                    logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
-                }
-            }
-        } finally {
-            resetDbLock.writeLock().unlock();
-        }
-    }
-
-    public static TransactionDB initDB(Path dbPath, Options createOptions, DBOptions openOptions,
-               TransactionDBOptions transactionDbOptions,
-               List<ColumnFamilyDescriptor> columnFamilyDescriptors,
-               List<ColumnFamilyHandle> columnFamilyHandles) {
-
-        TransactionDB dbCore;
-        try {
-            dbCore = TransactionDB.open(createOptions, transactionDbOptions, dbPath.toString());
-            logger.info("database CREATED");
-
-        } catch (RocksDBException e) {
-            try {
-                dbCore = TransactionDB.open(openOptions, transactionDbOptions,
-                        dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
-
-            logger.info("database opened");
-
-            } catch (RocksDBException ex) {
-                logger.error(ex.getMessage(), ex);
-                throw new RuntimeException("Failed to initialize database", e);
-            }
-        } finally {
-        }
-        return dbCore;
     }
 
     private BlockBasedTableConfig settingsBlockBasedTable(RocksDbSettings settings) {
