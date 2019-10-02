@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.rocksdb.*;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * Причем сама база не делает commit & rollback. Для этого нужно отдельно создавать Транзакцию
  */
 @Slf4j
-public class RocksDbDataSourceOptTransactionSingle extends RocksDbDataSourceImpl {
+public class RocksDbDataSourceOptTransactionSingle extends RocksDbDataSourceImpl implements Transacted {
 
     ReadOptions readOptions;
     WriteOptions writeOptions;
@@ -47,6 +48,41 @@ public class RocksDbDataSourceOptTransactionSingle extends RocksDbDataSourceImpl
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = OptimisticTransactionDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
 
+    }
+
+    @Override
+    public void commit() {
+        try {
+            ((Transacted) table).commit();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void rollback() {
+        try {
+            ((Transacted) table).rollback();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public void close() {
+        resetDbLock.writeLock().lock();
+        try {
+            ((Transaction) table).commit();
+            table.close();
+        } catch (Exception e) {
+        } finally {
+            resetDbLock.writeLock().unlock();
+        }
+        super.close();
     }
 
 }

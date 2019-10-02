@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.TransactedThrows;
 import org.rocksdb.*;
 
 /**
@@ -9,7 +10,7 @@ import org.rocksdb.*;
  * По сути это аналог реализации форка от бюазы данных в MapDB
  */
 @Slf4j
-public class RocksDbComOptTransaction implements RocksDbCom {
+public class RocksDbComOptTransaction implements RocksDbCom, TransactedThrows {
     public Transaction dbTransaction;
     public OptimisticTransactionDB parentDB;
     WriteOptions writeOptions;
@@ -99,6 +100,16 @@ public class RocksDbComOptTransaction implements RocksDbCom {
     @Override
     public RocksIterator getIterator(ColumnFamilyHandle indexDB) {
         return dbTransaction.getIterator(readOptions, indexDB);
+    }
+
+    @Override
+    public void commit() throws RocksDBException {
+        dbTransaction.commit();
+    }
+
+    @Override
+    public void rollback() throws RocksDBException {
+        dbTransaction.rollback();
     }
 
     @Override

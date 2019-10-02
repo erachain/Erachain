@@ -33,6 +33,8 @@ public class DBRocksDBTableTransactionSingle<K, V> extends DBRocksDBTable<K, V> 
                                            WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
         this.readOptions = readOptions;
+        openSource();
+        afterOpen();
     }
 
     public DBRocksDBTableTransactionSingle(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
@@ -64,4 +66,7 @@ public class DBRocksDBTableTransactionSingle<K, V> extends DBRocksDBTable<K, V> 
         ((Transacted) dbSource).rollback();
     }
 
+    public void close() {
+        dbSource.close();
+    }
 }

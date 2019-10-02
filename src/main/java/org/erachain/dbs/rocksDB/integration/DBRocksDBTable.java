@@ -98,13 +98,6 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
         this.indexes = indexes;
 
-        openSource();
-
-        columnFamilyHandles = dbSource.getColumnFamilyHandles();
-        if (columnFamilyHandles.size() > 1) {
-            // если indexes = null то размер не будем считать
-            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-        }
     }
 
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
@@ -120,6 +113,14 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
                 new WriteOptions().setSync(true).setDisableWAL(false), null);
+    }
+
+    protected void afterOpen() {
+        columnFamilyHandles = dbSource.getColumnFamilyHandles();
+        if (columnFamilyHandles.size() > 1) {
+            // если indexes = null то размер не будем считать
+            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+        }
     }
 
     @Override

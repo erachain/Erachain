@@ -52,6 +52,7 @@ public class DBRocksDBTableTransactionSingleTest {
             long timeMillisBefore = System.currentTimeMillis();
 
             DBRocksDBTable rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
+            logger.info("SIZE = " + rocksDB.size());
 
             int k = 0;
 
@@ -63,6 +64,7 @@ public class DBRocksDBTableTransactionSingleTest {
                     rocksDB.put(entry.getKey(), entry.getValue());
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
+                    break;
                 }
             }
 

@@ -27,6 +27,8 @@ public class DBRocksDBTableDB<K, V> extends DBRocksDBTable
     public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
                             RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+        openSource();
+        afterOpen();
     }
 
     public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
