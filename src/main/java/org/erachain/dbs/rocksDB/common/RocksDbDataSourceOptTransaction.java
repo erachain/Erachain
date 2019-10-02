@@ -27,9 +27,6 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
         this.readOptions = readOptions;
         this.writeOptions = writeOptions;
 
-        table = new RocksDbComOptTransaction(dbCore, writeOptions, readOptions);
-        afterOpenTable();
-
     }
 
     public RocksDbDataSourceOptTransaction(String pathName, String name, List<IndexDB> indexes,
@@ -47,6 +44,16 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) {
         return;
+    }
+
+    @Override
+    public int parentSize() {
+        try {
+            byte[] sizeBytes = dbCore.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            return byteableInteger.receiveObjectFromBytes(sizeBytes);
+        } catch (RocksDBException e) {
+            return -1;
+        }
     }
 
     @Override

@@ -235,6 +235,14 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                     }
 
                     columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+
+                    // Нужно для того чтобы в базе дае у транзакционных был Размер уже
+                    try {
+                        dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+                    } catch (RocksDBException edb) {
+
+                    }
+
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
                 }
             }
@@ -271,8 +279,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     public void afterOpenTable() {
         if (create) {
-            put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-            create = false;
+            // уже есть выше put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
         }
     }
 

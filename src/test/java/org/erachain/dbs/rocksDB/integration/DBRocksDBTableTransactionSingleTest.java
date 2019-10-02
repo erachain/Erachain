@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
@@ -69,6 +70,7 @@ public class DBRocksDBTableTransactionSingleTest {
             }
 
             logger.info("SIZE = " + rocksDB.size());
+            logger.info("parent SIZE = " + ((Transacted) rocksDB).parentSize());
 
             k = 0;
             for (Map.Entry<byte[], byte[]> entry : data) {

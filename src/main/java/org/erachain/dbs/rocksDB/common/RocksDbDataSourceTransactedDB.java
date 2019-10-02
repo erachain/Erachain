@@ -29,7 +29,7 @@ public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceImpl {
         initDB();
         // оборачиваем ее к костюм
         table = new RocksDbComTransactedDB(dbCore);
-        afterOpenTable();
+
     }
 
     public RocksDbDataSourceTransactedDB(String name, List<IndexDB> indexes, RocksDbSettings settings) {

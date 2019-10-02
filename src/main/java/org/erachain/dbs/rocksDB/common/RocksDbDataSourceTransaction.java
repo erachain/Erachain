@@ -28,7 +28,6 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl implemen
         this.writeOptions = writeOptions;
 
         table = new RocksDbComTransaction(dbCore, writeOptions, readOptions);
-        afterOpenTable();
 
     }
 
@@ -47,6 +46,16 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl implemen
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         return;
+    }
+
+    @Override
+    public int parentSize() {
+        try {
+            byte[] sizeBytes = dbCore.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            return byteableInteger.receiveObjectFromBytes(sizeBytes);
+        } catch (RocksDBException e) {
+            return -1;
+        }
     }
 
     @Override

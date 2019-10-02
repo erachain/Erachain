@@ -29,7 +29,6 @@ public class RocksDbDataSourceOptTransactionSingle extends RocksDbDataSourceImpl
 
         // оборачиваем в костюм Транзакцию от нее
         table = new RocksDbComOptTransactionSingle((OptimisticTransactionDB) dbCore, writeOptions, readOptions);
-        afterOpenTable();
 
     }
 
@@ -49,6 +48,16 @@ public class RocksDbDataSourceOptTransactionSingle extends RocksDbDataSourceImpl
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = OptimisticTransactionDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
 
+    }
+
+    @Override
+    public int parentSize() {
+        try {
+            byte[] sizeBytes = dbCore.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            return byteableInteger.receiveObjectFromBytes(sizeBytes);
+        } catch (RocksDBException e) {
+            return -1;
+        }
     }
 
     @Override

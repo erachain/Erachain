@@ -5,7 +5,6 @@ import org.erachain.database.DBASet;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSourceTransactionSingle;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.common.RocksDbTransactSourceImpl;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
@@ -55,7 +54,7 @@ public class DBRocksDBTableTransactionSingle<K, V> extends DBRocksDBTable<K, V> 
     }
 
     public int parentSize() {
-        return ((RocksDbTransactSourceImpl) dbSource).parentSize();
+        return ((Transacted) dbSource).parentSize();
     }
 
     public void commit() {
