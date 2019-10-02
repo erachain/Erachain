@@ -53,8 +53,9 @@ public class RocksDbDataSourceTransactionSingle extends RocksDbDataSourceImpl im
 
     @Override
     public void commit() {
+        resetDbLock.writeLock().lock();
         try {
-            ((Transacted) table).commit();
+            ((TransactedThrows) table).commit();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -64,6 +65,7 @@ public class RocksDbDataSourceTransactionSingle extends RocksDbDataSourceImpl im
 
     @Override
     public void rollback() {
+        resetDbLock.writeLock().lock();
         try {
             ((TransactedThrows) table).rollback();
         } catch (Exception e) {
@@ -77,7 +79,7 @@ public class RocksDbDataSourceTransactionSingle extends RocksDbDataSourceImpl im
     public void close() {
         resetDbLock.writeLock().lock();
         try {
-            ((TransactedThrows) table).commit();
+            commit();
             table.close();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

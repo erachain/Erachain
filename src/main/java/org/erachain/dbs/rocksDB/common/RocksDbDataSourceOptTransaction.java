@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
+import org.erachain.dbs.TransactedThrows;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.rocksdb.*;
 
@@ -50,8 +51,9 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
 
     @Override
     public void commit() {
+        resetDbLock.writeLock().lock();
         try {
-            ((Transacted) table).commit();
+            ((TransactedThrows) table).commit();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -61,8 +63,9 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
 
     @Override
     public void rollback() {
+        resetDbLock.writeLock().lock();
         try {
-            ((Transacted) table).rollback();
+            ((TransactedThrows) table).rollback();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -77,7 +80,7 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
     public void close() {
         resetDbLock.writeLock().lock();
         try {
-            ((Transaction) table).commit();
+            commit();
             table.close();
         } catch (Exception e) {
         } finally {

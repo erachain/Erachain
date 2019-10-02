@@ -229,7 +229,7 @@ public class DBRocksDBTableTransactionSingleTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableTransact2<byte[], byte[]> rocksDB = new DBRocksDBTableTransact2(NAME_TABLE);
+            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
 
             int k = 0;
             int rollbacks = 0;
