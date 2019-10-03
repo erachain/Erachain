@@ -398,6 +398,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 .stream().map((bytes) -> (V) byteableValue.receiveObjectFromBytes(bytes)).collect(Collectors.toList());
     }
 
+    @Override
     public void close() {
         dbSource.close();
     }

@@ -39,6 +39,12 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
                 new ReadOptions());
     }
 
+    //public RocksDbDataSourceOptTransaction(DBRocksDBTable dbSource) {
+    //    this(dbSource., name, indexes, dbCore, columnFamilyHandles,
+    //            new WriteOptions().setSync(true).setDisableWAL(false),
+    //            new ReadOptions());
+    //}
+
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) {
         return;

@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBOptTransacted;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class RocksDbDataSourceOptTransactionTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            RocksDbDataSourceOptTransactedDB rocksDB = new RocksDbDataSourceOptTransactedDB(NAME_TABLE, indexes, dbSettings);
+            DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE);
 
             int k = 0;
             int step = 10;
@@ -78,13 +79,13 @@ public class RocksDbDataSourceOptTransactionTest {
 
                 if (k++ > step) break;
 
-                assertEquals(rocksDB.contains(entry.getKey()), true);
+                assertEquals(rocksDB.containsKey(entry.getKey()), true);
 
             }
 
             // теперь в транзакцию будем закатывать
             RocksDbDataSourceOptTransaction dbOptTrans = new RocksDbDataSourceOptTransaction(NAME_TABLE, indexes,
-                    (OptimisticTransactionDB) rocksDB.getDbCore(), rocksDB.getColumnFamilyHandles());
+                    (OptimisticTransactionDB) rocksDB, rocksDB.getColumnFamilyHandles());
 
             for (int i = 0; i < step; i++) {
 
