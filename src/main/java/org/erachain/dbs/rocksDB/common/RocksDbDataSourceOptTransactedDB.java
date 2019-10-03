@@ -28,7 +28,7 @@ public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceImpl {
         // Создаем или открываем ДБ
         initDB();
         // оборачиваем ее к костюм
-        table = new RocksDbComOptTransactedDB(dbCore);
+        table = new RocksDbComDB(dbCore);
     }
 
     public RocksDbDataSourceOptTransactedDB(String name, List<IndexDB> indexes, RocksDbSettings settings) {

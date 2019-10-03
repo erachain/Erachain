@@ -4,9 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.TransactedThrows;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
+import org.erachain.settings.Settings;
 import org.rocksdb.*;
 
 import java.util.List;
+
+import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
  * База данных RocksDB с поддержкой транзакционной модели.
@@ -29,9 +32,9 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
 
     }
 
-    public RocksDbDataSourceOptTransaction(String pathName, String name, List<IndexDB> indexes,
+    public RocksDbDataSourceOptTransaction(String name, List<IndexDB> indexes,
                                            OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles) {
-        this(pathName, name, indexes, dbCore, columnFamilyHandles,
+        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, dbCore, columnFamilyHandles,
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions());
     }

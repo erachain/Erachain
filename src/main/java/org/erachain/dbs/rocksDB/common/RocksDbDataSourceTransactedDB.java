@@ -28,7 +28,7 @@ public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceImpl {
         // Создаем или открываем ДБ
         initDB();
         // оборачиваем ее к костюм
-        table = new RocksDbComTransactedDB(dbCore);
+        table = new RocksDbComDB(dbCore);
 
     }
 
