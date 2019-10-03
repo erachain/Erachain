@@ -6,6 +6,7 @@ import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
 import org.rocksdb.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
@@ -15,12 +16,8 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
  * Причем сама база не делает commit & rollback. Для этого нужно отдельно создавать Транзакцию
  */
 @Slf4j
-public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceImpl {
+public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceTransactionedImpl {
 
-    TransactionDBOptions transactionDbOptions;
-    public Transaction dbTransaction;
-    WriteOptions writeOptions;
-    ReadOptions readOptions;
 
     public RocksDbDataSourceOptTransactedDB(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
                                             TransactionDBOptions transactionDbOptions,
@@ -35,6 +32,13 @@ public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceImpl {
 
     public RocksDbDataSourceOptTransactedDB(String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings,
+                new TransactionDBOptions(),
+                new WriteOptions().setSync(true).setDisableWAL(false));
+    }
+
+    public RocksDbDataSourceOptTransactedDB(String name) {
+        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, new ArrayList<>(),
+                new RocksDbSettings(),
                 new TransactionDBOptions(),
                 new WriteOptions().setSync(true).setDisableWAL(false));
     }
@@ -55,5 +59,14 @@ public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceImpl {
 
         this.dbTransaction = ((OptimisticTransactionDB) dbCore).beginTransaction(writeOptions);
 
+    }
+
+    public void beginTransaction() {
+        beginTransaction(new WriteOptions(), new ReadOptions());
+    }
+
+    @Override
+    public int parentSize() {
+        return size();
     }
 }

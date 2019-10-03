@@ -1,7 +1,6 @@
 package org.erachain.dbs.rocksDB.comm;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.dbs.rocksDB.common.RocksDbDataSourceOptTransaction;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBOptTransacted;
@@ -10,7 +9,6 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
 import org.junit.Test;
-import org.rocksdb.OptimisticTransactionDB;
 import org.rocksdb.WriteOptions;
 
 import java.io.File;
@@ -62,7 +60,8 @@ public class RocksDbDataSourceOptTransactedDBTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE);
+            RocksDbDataSourceOptTransactedDB rocksDB = new RocksDbDataSourceOptTransactedDB(NAME_TABLE);
+            rocksDB.beginTransaction();
 
             int k = 0;
             int step = 10;
@@ -82,36 +81,32 @@ public class RocksDbDataSourceOptTransactedDBTest {
 
                 if (++k > step) break;
 
-                assertEquals(rocksDB.containsKey(entry.getKey()), true);
+                assertEquals(rocksDB.contains(entry.getKey()), true);
 
             }
-
-            // теперь в транзакцию будем закатывать
-            RocksDbDataSourceOptTransaction dbOptTrans = new RocksDbDataSourceOptTransaction(NAME_TABLE,
-                    (OptimisticTransactionDB) rocksDB.dbSource.getDbCore(), rocksDB.dbSource.getColumnFamilyHandles());
 
             for (int i = k; i < step; i++) {
 
                 Map.Entry<byte[], byte[]> entry = data.get(i);
 
                 // поиск в родительской базе
-                assertEquals(rocksDB.containsKey(entry.getKey()), false);
+                assertEquals(rocksDB.contains(entry.getKey()), false);
 
-                dbOptTrans.put(entry.getKey(), entry.getValue());
-
-                // поиск в родительской базе
-                assertEquals(rocksDB.containsKey(entry.getKey()), true);
-
-                dbOptTrans.remove(entry.getKey());
+                rocksDB.put(entry.getKey(), entry.getValue());
 
                 // поиск в родительской базе
-                assertEquals(rocksDB.containsKey(entry.getKey()), false);
+                assertEquals(rocksDB.contains(entry.getKey()), true);
+
+                rocksDB.remove(entry.getKey());
+
+                // поиск в родительской базе
+                assertEquals(rocksDB.contains(entry.getKey()), false);
 
             }
 
             logger.info("SIZE = " + rocksDB.size());
 
-            dbOptTrans.commit();
+            rocksDB.commit();
 
             long timeMillisAfter = System.currentTimeMillis();
             long total = timeMillisAfter - timeMillisBefore;

@@ -15,12 +15,7 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
  * Причем сама база не делает commit & rollback. Для этого нужно отдельно создавать Транзакцию
  */
 @Slf4j
-public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceImpl {
-
-    TransactionDBOptions transactionDbOptions;
-    public Transaction dbTransaction;
-    WriteOptions writeOptions;
-    ReadOptions readOptions;
+public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceTransactionedImpl {
 
     public RocksDbDataSourceTransactedDB(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
                                          TransactionDBOptions transactionDbOptions,
@@ -56,6 +51,11 @@ public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceImpl {
 
         this.dbTransaction = ((TransactionDB) dbCore).beginTransaction(writeOptions);
 
+    }
+
+    @Override
+    public int parentSize() {
+        return size();
     }
 
 }
