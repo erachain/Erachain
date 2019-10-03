@@ -22,12 +22,14 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl implemen
                                         TransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles,
                                         WriteOptions writeOptions, ReadOptions readOptions) {
         super(pathName, name, indexes, null);
+        this.alive = true;
         this.dbCore = dbCore;
         this.columnFamilyHandles = columnFamilyHandles;
         this.readOptions = readOptions;
         this.writeOptions = writeOptions;
 
         table = new RocksDbComTransaction(dbCore, writeOptions, readOptions);
+        afterOpenTable();
 
     }
 
@@ -46,6 +48,15 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl implemen
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         return;
+    }
+
+    @Override
+    public void afterOpenTable() {
+        columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+
+        if (create) {
+            // уже есть выше put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+        }
     }
 
     @Override

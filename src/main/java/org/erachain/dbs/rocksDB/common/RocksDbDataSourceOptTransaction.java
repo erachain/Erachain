@@ -7,6 +7,7 @@ import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
 import org.rocksdb.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
@@ -25,10 +26,14 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
                                            OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles,
                                            WriteOptions writeOptions, ReadOptions readOptions) {
         super(pathName, name, indexes, null);
+        this.alive = true;
         this.dbCore = dbCore;
         this.columnFamilyHandles = columnFamilyHandles;
         this.readOptions = readOptions;
         this.writeOptions = writeOptions;
+
+        this.table = new RocksDbComOptTransaction(dbCore, writeOptions, readOptions);
+        afterOpenTable();
 
     }
 
@@ -37,6 +42,10 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, dbCore, columnFamilyHandles,
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions());
+    }
+
+    public RocksDbDataSourceOptTransaction(String name, OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles) {
+        this(name, new ArrayList<>(), dbCore, columnFamilyHandles);
     }
 
     //public RocksDbDataSourceOptTransaction(DBRocksDBTable dbSource) {
@@ -53,6 +62,15 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) {
         return;
+    }
+
+    @Override
+    public void afterOpenTable() {
+        columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+
+        if (create) {
+            // уже есть выше put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+        }
     }
 
     @Override
