@@ -18,6 +18,9 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceImpl {
 
     TransactionDBOptions transactionDbOptions;
+    public Transaction dbTransaction;
+    WriteOptions writeOptions;
+    ReadOptions readOptions;
 
     public RocksDbDataSourceTransactedDB(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
                                          TransactionDBOptions transactionDbOptions,
@@ -45,6 +48,14 @@ public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceImpl {
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = TransactionDB.open(dbOptions, transactionDbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
+    }
+
+    public void beginTransaction(WriteOptions writeOptions, ReadOptions readOptions) {
+        this.readOptions = readOptions;
+        this.writeOptions = writeOptions;
+
+        this.dbTransaction = ((TransactionDB) dbCore).beginTransaction(writeOptions);
+
     }
 
 }
