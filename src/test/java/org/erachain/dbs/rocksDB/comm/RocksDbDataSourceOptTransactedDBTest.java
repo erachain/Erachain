@@ -23,8 +23,8 @@ public class RocksDbDataSourceOptTransactedDBTest {
 
     private List<Map.Entry<byte[], byte[]>> data = new ArrayList<>();
 
-    private long countData = 100000;
-    private int countCommit = 10000;
+    private long countData = 10000;
+    private int countCommit = 1000;
 
     WriteOptions writeOptions;
     List<IndexDB> indexes = new ArrayList<>();
@@ -74,6 +74,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
                 rocksDB.put(entry.getKey(), entry.getValue());
             }
 
+            rocksDB.commit();
             logger.info("SIZE = " + rocksDB.size());
 
             k = 0;
