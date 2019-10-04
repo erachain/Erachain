@@ -32,7 +32,7 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
                     RocksDbSettings.initCustomSettings(7, 64, 32,
                             256, 10,
                             1, 256, 32, false),
-                    new WriteOptions().setSync(true).setDisableWAL(true),
+                    new WriteOptions().setSync(true).setDisableWAL(false),
                     databaseSet);
         } else {
             map = new DBRocksDBTableTransactionSingle<>(new ByteableInteger(), new ByteableBlock(), NAME_TABLE, indexes,
