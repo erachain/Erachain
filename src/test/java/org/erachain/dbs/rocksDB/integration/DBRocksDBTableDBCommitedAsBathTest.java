@@ -323,12 +323,17 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
             DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
             logger.info("SIZE = " + rocksDB.size());
+            assertEquals(rocksDB.size(), twice? 0 : step);
+
+            Map.Entry<byte[], byte[]> entry = data.get(step);
+            byte[] value = (byte[])rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
             int i = 0;
 
             do {
 
-                Map.Entry<byte[], byte[]> entry = data.get(k++);
+                entry = data.get(k++);
 
                 try {
                     rocksDB.put(entry.getKey(), entry.getValue());
@@ -344,10 +349,6 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             twice = !twice;
 
         } while (twice);
-    }
-
-    @Test
-    public void parentSize() {
     }
 
     @Test
