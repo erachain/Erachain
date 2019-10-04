@@ -168,7 +168,6 @@ public class RocksDbTransactSourceImpl2Test {
                     }
                     if (k == 1) {
                         logger.info("OPEN size :" + rocksDB.size());
-                        logger.info("OPEN size Parent:" + rocksDB.parentSize());
                     }
 
                 }
@@ -180,28 +179,22 @@ public class RocksDbTransactSourceImpl2Test {
                     if (k <= stepCommit) {
                         if (k == stepCommit) {
                             logger.info("size :" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                             if (!twice) {
                                 assertEquals(stepCommit, rocksDB.size());
-                                assertEquals(0, rocksDB.parentSize());
                             } else {
                                 assertEquals(stepCommit, rocksDB.size());
-                                assertEquals(stepInit, rocksDB.parentSize());
                             }
 
                             // TRY COMMIT
                             rocksDB.commit();
 
-                            assertEquals(rocksDB.size(), rocksDB.parentSize());
                             logger.info("size :" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                         }
                         continue;
                     } else if (k <= stepRollback) {
                         rollbacks++;
                         if (k == stepRollback) {
                             logger.info("size BEFORE rollback:" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
 
                             // TRY ROLLBACK
                             rocksDB.rollback();
@@ -210,7 +203,6 @@ public class RocksDbTransactSourceImpl2Test {
                             assertEquals(Arrays.equals(result, entry.getValue()), false);
 
                             logger.info("size AFTER rollback:" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                             assertEquals(k - rollbacks, rocksDB.size());
                             break;
                         }

@@ -119,15 +119,6 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
     }
 
     @Override
-    public void setSize(int size) {
-        dbSource.setSize(size);
-    }
-
-    public int parentSize() {
-        return ((RocksDbTransactSourceImpl2) dbSource).parentSize();
-    }
-
-    @Override
     public boolean containsKey(Object key) {
         return dbSource.get(byteableKey.toBytesObject(key)) != null;
     }

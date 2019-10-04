@@ -300,7 +300,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
     @Test
     public void size() {
-        logger.info("Start test RocksDB productivity commit");
+        logger.info("Start test RocksDB productivity size");
 
         // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
@@ -323,7 +323,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
             DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
             logger.info("SIZE = " + rocksDB.size());
-            assertEquals(rocksDB.size(), twice? 0 : step);
+            assertEquals(rocksDB.size(), twice? step : 0);
 
             Map.Entry<byte[], byte[]> entry = data.get(step);
             byte[] value = (byte[])rocksDB.get(entry.getKey().clone());
@@ -340,7 +340,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
-            } while (i++ < step);
+            } while (++i < step);
 
             logger.info("SIZE = " + rocksDB.size());
 
