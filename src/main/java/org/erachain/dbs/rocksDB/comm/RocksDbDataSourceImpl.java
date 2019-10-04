@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.comm;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.common.RockStoreIterator;
@@ -859,6 +860,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     public int size() {
         byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
         return byteableInteger.receiveObjectFromBytes(sizeBytes);
+    }
+
+    @Override
+    public void setSize(int size) {
+        put(columnFamilyFieldSize, SIZE_BYTE_KEY, Ints.toByteArray(size));
     }
 
     @Override

@@ -21,6 +21,8 @@ public interface InnerDBTable<K, V> {
 
     int size();
 
+    void setSize(int newSize);
+
     boolean containsKey(Object key);
 
     V get(Object key);

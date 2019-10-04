@@ -89,6 +89,8 @@ public interface RocksDbDataSource {
 
     int size();
 
+    void setSize(int size);
+
     boolean isEmpty();
 
     void flush(Map<byte[], byte[]> rows);

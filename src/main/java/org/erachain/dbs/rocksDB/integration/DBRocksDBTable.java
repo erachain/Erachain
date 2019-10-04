@@ -134,6 +134,11 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
+    public void setSize(int newSize) {
+        dbSource.setSize(newSize);
+    }
+
+    @Override
     public boolean containsKey(Object key) {
         return dbSource.contains(byteableKey.toBytesObject(key));
     }
