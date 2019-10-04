@@ -52,4 +52,11 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
         // SIZE need count - make not empty LIST
         indexes = new ArrayList<>();
     }
+
+    @Override
+    public boolean set(Integer height, Block block) {
+        boolean res = super.set(height, block);
+        logger.info("SIZE: " + size());
+        return res;
+    }
 }

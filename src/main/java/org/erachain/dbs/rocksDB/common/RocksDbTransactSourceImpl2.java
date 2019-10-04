@@ -26,7 +26,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
-import static org.rocksdb.RocksDB.loadLibrary;
 
 /**
  * Самый низкий уровень доступа к функциям RocksDB
@@ -67,6 +66,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
 
     protected ReadWriteLock resetDbLock = new ReentrantReadWriteLock();
 
+    /*
     static {
         try {
             logger.info("load libraries");
@@ -78,6 +78,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
             logger.error(throwable.getMessage(), throwable);
         }
     }
+
+     */
 
     public RocksDbTransactSourceImpl2(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this.dataBaseName = name;

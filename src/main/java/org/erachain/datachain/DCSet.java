@@ -180,8 +180,8 @@ public class DCSet extends DBASet {
                     , this, database);
 
             this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
-                    DBS_MAP_DB // fast
-                    //DBS_ROCK_DB // slow
+                    //DBS_MAP_DB // fast
+                    DBS_ROCK_DB // slow
                     , this, database);
 
             this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
@@ -274,7 +274,8 @@ public class DCSet extends DBASet {
         if (this.blockMap.size() != this.blocksHeadsMap.size()
                 || this.blockSignsMap.size() != this.blocksHeadsMap.size()) {
             LOGGER.info("reset DATACHAIN on height error (blockMap, blockSignsMap, blocksHeadsMap: "
-                    + this.blockMap.size() + " == " + this.blocksHeadsMap.size());
+                    + this.blockMap.size() + " != "
+                    + this.blockSignsMap.size() + " != " + this.blocksHeadsMap.size());
 
             this.close();
             this.actions = -1;

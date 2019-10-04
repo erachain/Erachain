@@ -27,7 +27,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
-import static org.rocksdb.RocksDB.loadLibrary;
 
 /**
  * Самый низкий уровень доступа к функциям RocksDB
@@ -68,6 +67,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     protected ReadWriteLock resetDbLock = new ReentrantReadWriteLock();
 
+    /*
     static {
         try {
             logger.info("load libraries");
@@ -79,6 +79,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             logger.error(throwable.getMessage(), throwable);
         }
     }
+
+     */
 
     public RocksDbDataSourceImpl(RocksDB dbCore,
                                  String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,

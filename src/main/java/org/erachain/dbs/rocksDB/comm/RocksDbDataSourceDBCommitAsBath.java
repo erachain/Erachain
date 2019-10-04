@@ -239,10 +239,16 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             dbCore.write(writeOptions, writeBatch);
+            logger.debug(" dbCore.write");
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            writeBatch.clear();
+            if (true) {
+                writeBatch.close();
+                writeBatch = new WriteBatch();
+            } else {
+                writeBatch.clear();
+            }
             ///writeBatch = new WriteBatch();
             deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
@@ -259,13 +265,22 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
 
-        writeBatch.clear();
+        if (true) {
+            writeBatch.close();
+            writeBatch = new WriteBatch();
+        } else {
+            writeBatch.clear();
+        }
+
+        logger.debug("writeBatch close");
 
         ///writeBatch = new WriteBatch();
         deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
 
+
         resetDbLock.readLock().unlock();
 
     }
+
 }

@@ -2,10 +2,8 @@ package org.erachain.network.message;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
-import org.erachain.network.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
