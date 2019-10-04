@@ -21,6 +21,7 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl implements Transacted {
 
     ReadOptions readOptions;
+    DBOptions dbOptions = new DBOptions();
     /**
      * Нужно для учета удаленных ключей
      */
@@ -110,12 +111,18 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            if (deleted.contains(key))
-                return false;
-            if (puts.containsKey(key))
-                return true;
+            if (true) {
+                if (writeBatch.getFromBatch(dbOptions, key) != null)
+                    return true;
+                return dbCore.keyMayExist(key, inCache);
+            } else {
+                if (deleted.contains(key))
+                    return false;
+                if (puts.containsKey(key))
+                    return true;
 
-            return dbCore.keyMayExist(key, inCache);
+                return dbCore.keyMayExist(key, inCache);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -132,6 +139,10 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             if (true) {
+                if (writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null)
+                    return true;
+                return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
+            } else {
                 if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
                     return false;
                 if (puts.containsKey(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
@@ -155,7 +166,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             if (true) {
-                writeBatch.getFromBatchAndDB(dbCore, readOptions, key);
+                return writeBatch.getFromBatchAndDB(dbCore, readOptions, key);
             } else {
                 if (deleted.contains(key))
                     return null;
@@ -167,10 +178,10 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             }
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
+            return null;
         } finally {
             resetDbLock.readLock().unlock();
         }
-        return null;
     }
 
     @Override
@@ -181,7 +192,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             if (true) {
-                writeBatch.getFromBatchAndDB(dbCore, columnFamilyHandle, readOptions, key);
+                return writeBatch.getFromBatchAndDB(dbCore, columnFamilyHandle, readOptions, key);
             } else {
                 if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
                     return null;
@@ -192,10 +203,10 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             }
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
+            return null;
         } finally {
             resetDbLock.readLock().unlock();
         }
-        return null;
     }
 
     @Override
