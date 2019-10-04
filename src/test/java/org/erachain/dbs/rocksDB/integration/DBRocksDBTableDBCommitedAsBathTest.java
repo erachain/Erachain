@@ -80,9 +80,11 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
                 k++;
 
-                found = rocksDB.containsKey(entry.getKey());
+                // CLONE - чтобы не было совпадения по ссылке на память где объект лежит
+                found = rocksDB.containsKey(entry.getKey().clone());
                 assertEquals(found, true);
                 found = rocksDB.containsKey(UUID.randomUUID().toString().getBytes());
+                assertEquals(found, false);
 
             }
 
@@ -91,12 +93,12 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
                 k++;
 
-                found = rocksDB.containsKey(entry.getKey());
+                found = rocksDB.containsKey(entry.getKey().clone());
                 assertEquals(found, true);
 
-                rocksDB.remove(entry.getKey());
+                rocksDB.remove(entry.getKey().clone());
 
-                found = rocksDB.containsKey(entry.getKey());
+                found = rocksDB.containsKey(entry.getKey().clone());
                 assertEquals(found, false);
 
             }
@@ -157,7 +159,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
                 if (++k > step) break;
 
-                assertEquals(rocksDB.containsKey(entry.getKey()), true);
+                assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
 
             }
 
@@ -166,17 +168,17 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 Map.Entry<byte[], byte[]> entry = data.get(i);
 
                 // поиск в родительской базе
-                assertEquals(rocksDB.containsKey(entry.getKey()), false);
+                assertEquals(rocksDB.containsKey(entry.getKey().clone()), false);
 
                 rocksDB.put(entry.getKey(), entry.getValue());
 
                 // поиск в родительской базе
-                assertEquals(rocksDB.containsKey(entry.getKey()), true);
+                assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
 
-                rocksDB.remove(entry.getKey());
+                rocksDB.remove(entry.getKey().clone());
 
                 // поиск в родительской базе
-                assertEquals(rocksDB.containsKey(entry.getKey()), false);
+                assertEquals(rocksDB.containsKey(entry.getKey().clone()), false);
 
             }
 
@@ -220,7 +222,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            rocksDB.put(entry.getKey(), entry.getValue());
+            rocksDB.put(entry.getKey().clone(), entry.getValue());
         }
 
         logger.info("SIZE = " + rocksDB.size());
@@ -248,7 +250,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            rocksDB.remove(entry.getKey());
+            rocksDB.remove(entry.getKey().clone());
         }
 
         // теперь в транзакцию будем закатывать
@@ -265,8 +267,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            rocksDB.put(entry.getKey(), entry.getValue());
-            assertEquals(rocksDB.containsKey(entry.getKey()), true);
+            rocksDB.put(entry.getKey().clone(), entry.getValue());
+            assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
 
         }
 
@@ -292,6 +294,215 @@ public class DBRocksDBTableDBCommitedAsBathTest {
     }
 
     @Test
-    public void rollback() {
+    public void rollbackPut() {
+        logger.info("Start test RocksDB productivity commit");
+
+        int step = 10;
+
+        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
+        File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
+        try {
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
+        int countCommitTMP = 0;
+
+        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+
+        logger.info("pun in WriteBatch");
+
+        int size;
+        int k = step;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            rocksDB.put(entry.getKey(), entry.getValue());
+        }
+
+        size = rocksDB.size();
+        logger.info("SIZE = " + size);
+
+        logger.info("seek in uncommitted");
+
+        /// проверим поиск с КЛОНЕ - первая половина должна находиться а вторая нет
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            assertEquals(rocksDB.containsKey(entry.getKey().clone()), k >= step);
+        }
+
+        logger.info("try commit");
+        rocksDB.commit();
+
+        assertEquals(size, rocksDB.size());
+        logger.info("after commit SIZE = " + size);
+
+        /// проверим поиск с КЛОНЕ после КОММИТ - первая половина должна находиться а вторая нет
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            assertEquals(rocksDB.containsKey(entry.getKey().clone()), k >= step);
+        }
+
+        // добавим то что уже есть и сверх еще
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            rocksDB.put(entry.getKey().clone(), entry.getValue());
+        }
+
+        logger.info("uncommitted SIZE = " + rocksDB.size());
+        assertEquals(size + step, rocksDB.size());
+
+        /// должны все найтись
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            boolean found = rocksDB.containsKey(entry.getKey().clone());
+            assertEquals(found, true);
+        }
+
+        assertEquals(size + step, rocksDB.size());
+        logger.info("new put SIZE = " + size);
+
+        rocksDB.rollback();
+
+        assertEquals(size, rocksDB.size());
+        logger.info("rollback SIZE = " + rocksDB.size());
+
+        /// проверим поиск с КЛОНЕ после ROLLBACK - первая половина должна находиться а вторая нет
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            assertEquals(rocksDB.containsKey(entry.getKey().clone()), k >= step);
+        }
+
+        rocksDB.close();
+        logger.info("End test RocksDB productivity");
     }
+
+    @Test
+    public void rollbackRemove() {
+        logger.info("Start test RocksDB productivity commit");
+
+        int step = 10;
+
+        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
+        File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
+        try {
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
+        int countCommitTMP = 0;
+
+        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+
+        logger.info("pun in WriteBatch");
+
+        int size;
+        int k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            rocksDB.put(entry.getKey().clone(), entry.getValue());
+        }
+
+        size = rocksDB.size();
+        assertEquals(size, step << 1);
+
+        logger.info("SIZE = " + size);
+
+        logger.info("seek in uncommitted");
+
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+        }
+
+        logger.info("try commit");
+        rocksDB.commit();
+
+        assertEquals(size, rocksDB.size());
+        logger.info("after commit SIZE = " + size);
+
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+        }
+
+        // половину удалим
+        k = step;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            rocksDB.remove(entry.getKey().clone());
+        }
+
+        logger.info("uncommitted SIZE = " + rocksDB.size());
+        assertEquals(size >> 1, rocksDB.size());
+
+        /// проверим - первая половина должна НЕ находиться в базе а вторая должна
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            // тут первые должны быть найдены а вторая порция нет
+            assertEquals(rocksDB.containsKey(entry.getKey().clone()), k < step);
+        }
+
+        rocksDB.rollback();
+
+        assertEquals(size, rocksDB.size());
+        logger.info("rollback SIZE = " + rocksDB.size());
+
+        /// проверим - должны все опять находиться
+
+        k = step << 1;
+        for (Map.Entry<byte[], byte[]> entry : data) {
+
+            if (--k < 0)
+                break;
+
+            assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+        }
+
+        rocksDB.close();
+        logger.info("End test RocksDB productivity");
+    }
+
 }
