@@ -24,6 +24,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
     private long countData = 10000;
     private int countCommit = 1000;
 
+    String NAME_TABLE = "RocksDbTableAsBatch";
+
     WriteOptions writeOptions;
     List<IndexDB> indexes = new ArrayList<>();
     RocksDbSettings dbSettings = new RocksDbSettings();
@@ -38,7 +40,6 @@ public class DBRocksDBTableDBCommitedAsBathTest {
     @Test
     public void test1() {
         logger.info("Start test RocksDB productivity commit");
-        String NAME_TABLE = "RocksDbTable";
 
         // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
@@ -117,7 +118,6 @@ public class DBRocksDBTableDBCommitedAsBathTest {
     public void test2() {
 
         logger.info("Start test RocksDB productivity commit");
-        String NAME_TABLE = "RocksDbDataSourceDB";
 
         // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
@@ -198,7 +198,6 @@ public class DBRocksDBTableDBCommitedAsBathTest {
     public void testBench() {
 
         logger.info("Start test RocksDB productivity commit");
-        String NAME_TABLE = "RocksDbDataSourceDB";
 
         // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
@@ -253,7 +252,6 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         }
 
         // теперь в транзакцию будем закатывать
-        DBRocksDBTableDBCommitedAsBath dbOptTrans = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
 
         countCommitTMP = 0;
         timeMillisBefore = System.currentTimeMillis();
@@ -261,18 +259,18 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
             if (++countCommitTMP > countCommit) {
                 countCommitTMP = 0;
-                dbOptTrans.commit();
-                logger.info("parent SIZE: " + rocksDB.size() + " parenSize: " + dbOptTrans.parentSize());
-                logger.info("PUT to rocksDB on SIZE: " + dbOptTrans.size() + " ms: " + (System.currentTimeMillis() - timeMillisBefore));
+                rocksDB.commit();
+                logger.info("parent SIZE: " + rocksDB.size() + " parenSize: " + rocksDB.parentSize());
+                logger.info("PUT to rocksDB on SIZE: " + rocksDB.size() + " ms: " + (System.currentTimeMillis() - timeMillisBefore));
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            dbOptTrans.put(entry.getKey(), entry.getValue());
+            rocksDB.put(entry.getKey(), entry.getValue());
             assertEquals(rocksDB.containsKey(entry.getKey()), true);
 
         }
 
-        dbOptTrans.commit();
+        rocksDB.commit();
         logger.info("SIZE = " + rocksDB.size());
 
         logger.info("PUT OPTIMISTIC TRANSACTION rocksDB = " + (System.currentTimeMillis() - timeMillisBefore));
