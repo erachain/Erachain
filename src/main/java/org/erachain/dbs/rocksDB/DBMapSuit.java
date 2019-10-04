@@ -2,9 +2,9 @@ package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransactionSingle;
 import org.mapdb.DB;
 import org.slf4j.Logger;
 
@@ -26,7 +26,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     protected DBASet databaseSet;
     protected DB database;
 
-    public DBRocksDBTableTransactionSingle<T, U> map;
+    public DBRocksDBTable<T, U> map;
     protected List<IndexDB> indexes;
 
     // for DCMapSuit
@@ -150,12 +150,12 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void commit() {
-        map.commit();
+        ((Transacted) map).commit();
     }
 
     @Override
     public void rollback() {
-        map.rollback();
+        ((Transacted) map).rollback();
     }
 
     @Override

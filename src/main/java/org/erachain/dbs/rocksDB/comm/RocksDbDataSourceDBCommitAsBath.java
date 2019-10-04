@@ -10,9 +10,7 @@ import org.erachain.settings.Settings;
 import org.mapdb.Fun;
 import org.rocksdb.*;
 
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
@@ -29,7 +27,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
     /**
      * Нужно для учета размера после слияния
      */
-    Set puts;
+    Map puts;
 
     WriteBatch writeBatch;
 
@@ -49,7 +47,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         dbCore = RocksDB.open(options, getDbPathAndFile().toString());
         writeBatch = new WriteBatch();
         deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
-        puts = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+        puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
     }
 
     @Override
@@ -57,7 +55,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         dbCore = RocksDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
         writeBatch = new WriteBatch();
         deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
-        puts = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+        puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
     }
 
     @Override
@@ -72,7 +70,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
 
             // запомним что это делали - если нет в родительской базе то запомним что добавляем
             if (!dbCore.keyMayExist(key, inCache)) {
-                puts.add(key);
+                puts.put(key, value);
             }
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
@@ -93,7 +91,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
 
             // запомним что это делали - если нет в родительской базе то запомним что добавляем
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
-                puts.add(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
+                puts.put(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key), value);
             }
 
         } catch (RocksDBException e) {
@@ -112,7 +110,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         try {
             if (deleted.contains(key))
                 return false;
-            if (puts.contains(key))
+            if (puts.containsKey(key))
                 return true;
             return dbCore.keyMayExist(key, inCache);
         } catch (Exception e) {
@@ -132,7 +130,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         try {
             if (deleted.contains(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key)))
                 return false;
-            if (puts.contains(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key)))
+            if (puts.containsKey(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key)))
                 return true;
             return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
         } catch (Exception e) {
@@ -150,6 +148,12 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
+            if (deleted.contains(key))
+                return null;
+            byte[] value = (byte[]) puts.get(key);
+            if (value != null)
+                return value;
+
             return dbCore.get(key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
@@ -166,6 +170,11 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
+            if (deleted.contains(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key)))
+                return null;
+            byte[] value = (byte[]) puts.get(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
+            if (value != null)
+                return value;
             return dbCore.get(columnFamilyHandle, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
@@ -236,7 +245,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             writeBatch.clear();
             ///writeBatch = new WriteBatch();
             deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
-            puts = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+            puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
 
             resetDbLock.readLock().unlock();
         }
@@ -254,7 +263,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
 
         ///writeBatch = new WriteBatch();
         deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
-        puts = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+        puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
 
         resetDbLock.readLock().unlock();
 

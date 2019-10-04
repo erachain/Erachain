@@ -83,6 +83,9 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 // CLONE - чтобы не было совпадения по ссылке на память где объект лежит
                 found = rocksDB.containsKey(entry.getKey().clone());
                 assertEquals(found, true);
+                byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+                assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
+
                 found = rocksDB.containsKey(UUID.randomUUID().toString().getBytes());
                 assertEquals(found, false);
 
@@ -95,11 +98,15 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
                 found = rocksDB.containsKey(entry.getKey().clone());
                 assertEquals(found, true);
+                byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+                assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
 
                 rocksDB.remove(entry.getKey().clone());
 
                 found = rocksDB.containsKey(entry.getKey().clone());
                 assertEquals(found, false);
+                value = (byte[]) rocksDB.get(entry.getKey().clone());
+                assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), false);
 
             }
 
@@ -160,6 +167,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 if (++k > step) break;
 
                 assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+                byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+                assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
 
             }
 
@@ -169,16 +178,22 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
                 // поиск в родительской базе
                 assertEquals(rocksDB.containsKey(entry.getKey().clone()), false);
+                byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+                assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), false);
 
                 rocksDB.put(entry.getKey(), entry.getValue());
 
                 // поиск в родительской базе
                 assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+                value = (byte[]) rocksDB.get(entry.getKey().clone());
+                assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
 
                 rocksDB.remove(entry.getKey().clone());
 
                 // поиск в родительской базе
                 assertEquals(rocksDB.containsKey(entry.getKey().clone()), false);
+                value = (byte[]) rocksDB.get(entry.getKey().clone());
+                assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), false);
 
             }
 
@@ -269,6 +284,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
             rocksDB.put(entry.getKey().clone(), entry.getValue());
             assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
 
         }
 
@@ -336,6 +353,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 break;
 
             assertEquals(rocksDB.containsKey(entry.getKey().clone()), k >= step);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), k >= step);
         }
 
         logger.info("try commit");
@@ -352,6 +371,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 break;
 
             assertEquals(rocksDB.containsKey(entry.getKey().clone()), k >= step);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), k >= step);
         }
 
         // добавим то что уже есть и сверх еще
@@ -376,6 +397,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
             boolean found = rocksDB.containsKey(entry.getKey().clone());
             assertEquals(found, true);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
         }
 
         assertEquals(size + step, rocksDB.size());
@@ -394,6 +417,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 break;
 
             assertEquals(rocksDB.containsKey(entry.getKey().clone()), k >= step);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), k >= step);
         }
 
         rocksDB.close();
@@ -444,6 +469,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 break;
 
             assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
         }
 
         logger.info("try commit");
@@ -459,6 +486,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 break;
 
             assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
         }
 
         // половину удалим
@@ -483,6 +512,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
             // тут первые должны быть найдены а вторая порция нет
             assertEquals(rocksDB.containsKey(entry.getKey().clone()), k < step);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), k < step);
         }
 
         rocksDB.rollback();
@@ -499,6 +530,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 break;
 
             assertEquals(rocksDB.containsKey(entry.getKey().clone()), true);
+            byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
         }
 
         rocksDB.close();

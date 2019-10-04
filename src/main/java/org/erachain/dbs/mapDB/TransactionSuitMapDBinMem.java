@@ -83,6 +83,8 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
 
     @Override
     public void clear() {
+        if (this.database.getEngine().isClosed())
+            return;
         close();
         getMap();
         createIndexes();

@@ -289,6 +289,10 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
      */
     @Override
     public void clear() {
+
+        if (this.database.getEngine().isClosed())
+            return;
+
         this.addUses();
 
         //RESET MAP

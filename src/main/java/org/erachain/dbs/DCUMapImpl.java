@@ -455,6 +455,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     @Override
     public void clear() {
         //RESET MAP
+        if (this.database.getEngine().isClosed())
+            return;
+
         this.map.clear();
 
         // NOTYFIES
