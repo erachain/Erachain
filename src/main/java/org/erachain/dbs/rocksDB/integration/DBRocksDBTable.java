@@ -135,7 +135,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     @Override
     public boolean containsKey(Object key) {
-        return dbSource.get(byteableKey.toBytesObject(key)) != null;
+        return dbSource.contains(byteableKey.toBytesObject(key));
     }
 
     @Override
@@ -170,7 +170,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         }
 
         byte[] bytesValue = byteableValue.toBytesObject(value);
-        dbSource.put(columnFamilyHandles.get(0), keyBytes, bytesValue);
+        dbSource.put(keyBytes, bytesValue);
         if (logON) logger.info("valueBytes.length = " + bytesValue.length);
         if (indexes != null && !indexes.isEmpty()) {
             for (IndexDB indexDB : indexes) {
@@ -318,7 +318,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 removeIndexes(key, keyBytes, old);
             }
         }
-        dbSource.remove(columnFamilyHandles.get(0), keyBytes);
+        dbSource.remove(keyBytes);
     }
 
 

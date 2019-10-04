@@ -2,7 +2,6 @@ package org.erachain.dbs.rocksDB.common;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
@@ -32,7 +31,6 @@ import static org.rocksdb.RocksDB.loadLibrary;
  * Самый низкий уровень доступа к функциям RocksDB
  */
 @Slf4j
-@NoArgsConstructor
 public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted // implements DB<byte[], byte[]>
         //, Flusher, DbSourceInter<byte[]>
 {
@@ -96,6 +94,11 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     @Override
     public Path getDbPathAndFile() {
         return Paths.get(parentName, dataBaseName);
+    }
+
+    @Override
+    public RocksDB getDbCore() {
+        return dbCoreParent;
     }
 
 
