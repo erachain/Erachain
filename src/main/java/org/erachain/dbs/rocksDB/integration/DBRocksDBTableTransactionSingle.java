@@ -53,10 +53,6 @@ public class DBRocksDBTableTransactionSingle<K, V> extends DBRocksDBTable<K, V> 
         dbSource = new RocksDbDataSourceTransactionSingle(this.root, NAME_TABLE, indexes, settings, writeOptions, readOptions);
     }
 
-    public int parentSize() {
-        return ((Transacted) dbSource).parentSize();
-    }
-
     public void commit() {
         ((Transacted) dbSource).commit();
     }

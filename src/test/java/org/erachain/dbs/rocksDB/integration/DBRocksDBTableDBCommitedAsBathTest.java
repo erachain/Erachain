@@ -277,7 +277,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             if (++countCommitTMP > countCommit) {
                 countCommitTMP = 0;
                 rocksDB.commit();
-                logger.info("parent SIZE: " + rocksDB.size() + " parenSize: " + rocksDB.parentSize());
+                logger.info("parent SIZE: " + rocksDB.size());
                 logger.info("PUT to rocksDB on SIZE: " + rocksDB.size() + " ms: " + (System.currentTimeMillis() - timeMillisBefore));
                 timeMillisBefore = System.currentTimeMillis();
             }

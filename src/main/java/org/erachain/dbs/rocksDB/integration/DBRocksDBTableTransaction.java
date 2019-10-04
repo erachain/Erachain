@@ -59,10 +59,6 @@ public class DBRocksDBTableTransaction<K, V> extends DBRocksDBTable<K, V> implem
     public void openSource() {
     }
 
-    public int parentSize() {
-        return ((Transacted) dbSource).parentSize();
-    }
-
     public void commit() {
         ((Transacted) dbSource).commit();
     }

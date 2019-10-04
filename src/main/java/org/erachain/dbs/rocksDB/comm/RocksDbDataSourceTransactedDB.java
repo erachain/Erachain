@@ -53,9 +53,4 @@ public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceTransactione
 
     }
 
-    @Override
-    public int parentSize() {
-        return size();
-    }
-
 }

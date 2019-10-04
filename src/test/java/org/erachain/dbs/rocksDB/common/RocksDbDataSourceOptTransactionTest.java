@@ -193,7 +193,7 @@ public class RocksDbDataSourceOptTransactionTest {
             if (++countCommitTMP > countCommit) {
                 countCommitTMP = 0;
                 dbOptTrans.commit();
-                logger.info("parent SIZE: " + rocksDB.size() + " parenSize: " + dbOptTrans.parentSize());
+                logger.info("parent SIZE: " + rocksDB.size() + " parenSize: ");
                 logger.info("PUT to rocksDB on SIZE: " + dbOptTrans.size() + " ms: " + (System.currentTimeMillis() - timeMillisBefore));
                 timeMillisBefore = System.currentTimeMillis();
             }

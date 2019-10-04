@@ -583,6 +583,7 @@ public class DCSet extends DBASet {
             for (DBTab tab : instance.tables) {
                 tab.clear();
             }
+            database.close();
             dbFile.delete();
             throw new Exception("error in DATACHAIN:" + instance.actions);
         }

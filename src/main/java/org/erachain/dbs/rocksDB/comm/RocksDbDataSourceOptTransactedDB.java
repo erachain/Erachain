@@ -65,8 +65,4 @@ public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceTransacti
         beginTransaction(new WriteOptions(), new ReadOptions());
     }
 
-    @Override
-    public int parentSize() {
-        return size();
-    }
 }

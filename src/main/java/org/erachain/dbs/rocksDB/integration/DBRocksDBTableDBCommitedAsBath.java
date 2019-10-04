@@ -49,21 +49,8 @@ public class DBRocksDBTableDBCommitedAsBath<K, V> extends DBRocksDBTable<K, V>
 
     }
 
-    /*
-    @Override
-    public int size() {
-        return super.size() + ((Transacted) dbSource).parentSize();
-    }
-     */
-
-    @Override
-    public int parentSize() {
-        return dbSource.size();
-    }
-
     @Override
     public void commit() {
-        ///super.setSize(super.size() + ((Transacted) dbSource).parentSize());
         ((Transacted) dbSource).commit();
     }
 

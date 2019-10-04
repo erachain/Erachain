@@ -74,16 +74,6 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
     }
 
     @Override
-    public int parentSize() {
-        try {
-            byte[] sizeBytes = dbCore.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
-            return byteableInteger.receiveObjectFromBytes(sizeBytes);
-        } catch (RocksDBException e) {
-            return -1;
-        }
-    }
-
-    @Override
     public void commit() {
         resetDbLock.writeLock().lock();
         try {

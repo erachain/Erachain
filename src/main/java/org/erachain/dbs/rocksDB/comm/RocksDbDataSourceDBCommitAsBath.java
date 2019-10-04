@@ -86,7 +86,6 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             writeBatch.put(columnFamilyHandle, key, value);
-            //deleted.remove(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
             deleted.remove(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
 
             // запомним что это делали в любом случае добавляем - ведь может быть новое значение
@@ -222,11 +221,6 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         } finally {
             resetDbLock.readLock().unlock();
         }
-    }
-
-    @Override
-    public int parentSize() {
-        return -deleted.size() + puts.size();
     }
 
     @Override

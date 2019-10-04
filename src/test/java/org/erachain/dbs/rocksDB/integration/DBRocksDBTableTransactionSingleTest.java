@@ -1,7 +1,6 @@
 package org.erachain.dbs.rocksDB.integration;
 
 import lombok.extern.slf4j.Slf4j;
-import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
@@ -70,7 +69,6 @@ public class DBRocksDBTableTransactionSingleTest {
             }
 
             logger.info("SIZE = " + rocksDB.size());
-            logger.info("parent SIZE = " + ((Transacted) rocksDB).parentSize());
 
             k = 0;
             for (Map.Entry<byte[], byte[]> entry : data) {
@@ -150,7 +148,6 @@ public class DBRocksDBTableTransactionSingleTest {
                     }
                     if (k == 1) {
                         logger.info("OPEN size :" + rocksDB.size());
-                        logger.info("OPEN size Parent:" + rocksDB.parentSize());
                     }
 
                 }
@@ -162,28 +159,22 @@ public class DBRocksDBTableTransactionSingleTest {
                     if (k <= stepCommit) {
                         if (k == stepCommit) {
                             logger.info("size :" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                             if (!twice) {
                                 assertEquals(stepCommit, rocksDB.size());
-                                assertEquals(0, rocksDB.parentSize());
                             } else {
                                 assertEquals(stepCommit, rocksDB.size());
-                                assertEquals(stepInit, rocksDB.parentSize());
                             }
 
                             // TRY COMMIT
                             rocksDB.commit();
 
-                            assertEquals(rocksDB.size(), rocksDB.parentSize());
                             logger.info("size :" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                         }
                         continue;
                     } else if (k <= stepRollback) {
                         rollbacks++;
                         if (k == stepRollback) {
                             logger.info("size BEFORE rollback:" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
 
                             // TRY ROLLBACK
                             rocksDB.rollback();
@@ -192,7 +183,6 @@ public class DBRocksDBTableTransactionSingleTest {
                             assertEquals(Arrays.equals(result, entry.getValue()), false);
 
                             logger.info("size AFTER rollback:" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                             assertEquals(k - rollbacks, rocksDB.size());
                             break;
                         }
@@ -253,7 +243,6 @@ public class DBRocksDBTableTransactionSingleTest {
                     }
                     if (k == 1) {
                         logger.info("OPEN size :" + rocksDB.size());
-                        logger.info("OPEN size Parent:" + rocksDB.parentSize());
                     }
 
                 }
@@ -265,28 +254,22 @@ public class DBRocksDBTableTransactionSingleTest {
                     if (k <= stepCommit) {
                         if (k == stepCommit) {
                             logger.info("size :" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                             if (!twice) {
                                 assertEquals(stepCommit, rocksDB.size());
-                                assertEquals(0, rocksDB.parentSize());
                             } else {
                                 assertEquals(stepCommit, rocksDB.size());
-                                assertEquals(stepInit, rocksDB.parentSize());
                             }
 
                             // TRY COMMIT
                             rocksDB.commit();
 
-                            assertEquals(rocksDB.size(), rocksDB.parentSize());
                             logger.info("size :" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                         }
                         continue;
                     } else if (k <= stepRollback) {
                         rollbacks++;
                         if (k == stepRollback) {
                             logger.info("size BEFORE rollback:" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
 
                             // TRY ROLLBACK
                             rocksDB.rollback();
@@ -295,7 +278,6 @@ public class DBRocksDBTableTransactionSingleTest {
                             assertEquals(Arrays.equals(result, entry.getValue()), false);
 
                             logger.info("size AFTER rollback:" + rocksDB.size());
-                            logger.info("size Parent:" + rocksDB.parentSize());
                             assertEquals(k - rollbacks, rocksDB.size());
                             break;
                         }
