@@ -44,7 +44,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     protected WriteOptions writeOptions = new WriteOptions().setSync(dbSync).setDisableWAL(false);
     protected ReadOptions transactReadOptions = new ReadOptions();
 
-    @Getter
+    ///@Getter
     public Transaction dbCore;
     @Getter
     public TransactionDB dbCoreParent;

@@ -41,7 +41,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
     public void test1() {
         logger.info("Start test RocksDB productivity commit");
 
-        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
         try {
@@ -128,7 +128,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         logger.info("Start test RocksDB productivity commit");
 
-        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
         try {
@@ -216,7 +216,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         logger.info("Start test RocksDB productivity commit");
 
-        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
         try {
@@ -302,7 +302,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
     public void size() {
         logger.info("Start test RocksDB productivity commit");
 
-        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
         try {
@@ -360,7 +360,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         int step = 10;
 
-        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
         try {
@@ -407,7 +407,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         assertEquals(size, rocksDB.size());
         logger.info("after commit SIZE = " + size);
 
-        /// проверим поиск с КЛОНЕ после КОММИТ - первая половина должна находиться а вторая нет
+        /// проверим поиск с КЛОНЕ после COMMIT - первая половина должна находиться а вторая нет
         k = step << 1;
         for (Map.Entry<byte[], byte[]> entry : data) {
 
@@ -475,7 +475,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         int step = 10;
 
-        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
         try {

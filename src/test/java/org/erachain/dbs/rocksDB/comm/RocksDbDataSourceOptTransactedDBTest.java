@@ -43,7 +43,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
         logger.info("Start test RocksDB productivity commit");
         String NAME_TABLE = "RocksDbDataSourceDB";
 
-        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
         try {
@@ -125,7 +125,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
         logger.info("Start test RocksDB productivity commit");
         String NAME_TABLE = "RocksDbDataSourceDB";
 
-        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // DELETE перед первым проходом - для проверки транзакционности при создании БД
         // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
         File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
         try {

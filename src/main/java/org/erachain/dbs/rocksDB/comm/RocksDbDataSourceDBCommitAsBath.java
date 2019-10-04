@@ -86,10 +86,11 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             writeBatch.put(columnFamilyHandle, key, value);
-            deleted.remove(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
+            //deleted.remove(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
+            deleted.remove(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
 
             // запомним что это делали в любом случае добавляем - ведь может быть новое значение
-            puts.put(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key), value);
+            puts.put(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key), value);
 
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
@@ -125,9 +126,9 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            if (deleted.contains(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key)))
+            if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
                 return false;
-            if (puts.containsKey(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key)))
+            if (puts.containsKey(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
                 return true;
             return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
         } catch (Exception e) {
@@ -167,9 +168,9 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            if (deleted.contains(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key)))
+            if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
                 return null;
-            byte[] value = (byte[]) puts.get(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
+            byte[] value = (byte[]) puts.get(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
             if (value != null)
                 return value;
             return dbCore.get(columnFamilyHandle, key);
@@ -210,11 +211,11 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             writeBatch.delete(columnFamilyHandle, key);
-            puts.remove(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
+            puts.remove(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
 
             // запомним что это делали
             if (dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
-                deleted.add(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
+                deleted.add(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
             }
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
