@@ -300,6 +300,50 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
     @Test
     public void size() {
+        logger.info("Start test RocksDB productivity commit");
+
+        // УДАЛИМ перед первым проходом - для проверки транзакционности при создании БД
+        // а второй проход с уже созданной базой так же проверим, а то может быть разница в настройках у транзакций
+        File tempDir = new File(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER);
+        try {
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
+        boolean twice = false;
+        boolean found;
+
+        List<IndexDB> indexes = new ArrayList<>();
+        RocksDbSettings dbSettings = new RocksDbSettings();
+
+        int k = 0;
+        int step = 3;
+
+        do {
+
+            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            logger.info("SIZE = " + rocksDB.size());
+
+            int i = 0;
+
+            do {
+
+                Map.Entry<byte[], byte[]> entry = data.get(k++);
+
+                try {
+                    rocksDB.put(entry.getKey(), entry.getValue());
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            } while (i++ < step);
+
+            logger.info("SIZE = " + rocksDB.size());
+
+            rocksDB.commit();
+            rocksDB.close();
+            twice = !twice;
+
+        } while (twice);
     }
 
     @Test

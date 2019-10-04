@@ -68,10 +68,9 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             writeBatch.put(key, value);
             deleted.remove(key);
 
-            // запомним что это делали - если нет в родительской базе то запомним что добавляем
-            if (!dbCore.keyMayExist(key, inCache)) {
-                puts.put(key, value);
-            }
+            // запомним что это делали в любом случае добавляем - ведь может быть новое значение
+            puts.put(key, value);
+
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -89,10 +88,8 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             writeBatch.put(columnFamilyHandle, key, value);
             deleted.remove(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key));
 
-            // запомним что это делали - если нет в родительской базе то запомним что добавляем
-            if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
-                puts.put(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key), value);
-            }
+            // запомним что это делали в любом случае добавляем - ведь может быть новое значение
+            puts.put(Bytes.concat(Ints.toByteArray(columnFamilyHandle.getID()), key), value);
 
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
