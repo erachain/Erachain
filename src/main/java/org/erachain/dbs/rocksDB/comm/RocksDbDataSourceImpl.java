@@ -662,7 +662,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             updateByBatchInner(rows, writeOptions);
         } catch (Exception e) {
             try {
-                updateByBatchInner(rows);
+                updateByBatchInner(rows, writeOptions);
             } catch (Exception e1) {
                 throw new RuntimeException(e);
             }

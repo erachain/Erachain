@@ -1,18 +1,7 @@
 package org.erachain.dbs.rocksDB.comm;
 
-import org.erachain.dbs.rocksDB.common.RockStoreIterator;
-import org.erachain.dbs.rocksDB.common.RockStoreIteratorFilter;
-import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.RocksIterator;
-import org.rocksdb.WriteOptions;
-
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-public interface RocksDbDataSource {
+public interface RocksDbDataSource extends org.erachain.dbs.rocksDB.common.RocksDbDataSource {
+    /*
     Path getDbPathAndFile();
 
     boolean isAlive();
@@ -100,4 +89,6 @@ public interface RocksDbDataSource {
     org.rocksdb.RocksObject getDbCore();
 
     List<ColumnFamilyHandle> getColumnFamilyHandles();
+
+     */
 }
