@@ -8,6 +8,7 @@ import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
+import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
 import java.util.ArrayList;
@@ -25,27 +26,26 @@ import java.util.List;
 public class DBRocksDBTableDBCommitedAsBath<K, V> extends DBRocksDBTable<K, V>
         implements Transacted {
 
-    public DBRocksDBTableDBCommitedAsBath(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                                          RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
-        openSource();
-        afterOpen();
-    }
+    ReadOptions readOptions;
 
     public DBRocksDBTableDBCommitedAsBath(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                                          DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, dbaSet);
+                  RocksDbSettings settings, WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+        this.readOptions = readOptions;
+        openSource();
+        afterOpen();
     }
 
     public DBRocksDBTableDBCommitedAsBath(String NAME_TABLE) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), null);
+                new WriteOptions().setSync(true).setDisableWAL(false),
+                new ReadOptions(), null);
     }
 
     @Override
     public void openSource() {
-        dbSource = new RocksDbDataSourceDBCommitAsBath(this.root, NAME_TABLE, indexes, settings, writeOptions);
+        dbSource = new RocksDbDataSourceDBCommitAsBath(this.root, NAME_TABLE, indexes, settings, writeOptions, readOptions);
 
     }
 

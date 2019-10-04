@@ -345,6 +345,11 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             logger.info("SIZE = " + rocksDB.size());
 
             rocksDB.commit();
+            try {
+                rocksDB.dbSource.flush();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
             rocksDB.close();
             twice = !twice;
 
