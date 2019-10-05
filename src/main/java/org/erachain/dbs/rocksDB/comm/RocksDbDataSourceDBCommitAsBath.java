@@ -31,7 +31,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
      */
     Map puts;
 
-    WriteBatchWithIndex writeBatch;
+    protected WriteBatchWithIndex writeBatch;
 
     public RocksDbDataSourceDBCommitAsBath(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
                                            WriteOptions writeOptions, ReadOptions readOptions) {
@@ -284,19 +284,19 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            dbCore.write(writeOptions, writeBatch);
             dbCore.flushWal(true);
+            dbCore.write(writeOptions, writeBatch);
             logger.debug(" dbCore.write");
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
-            if (true) {
+            if (false) {
                 writeBatch.close();
                 writeBatch = new WriteBatchWithIndex(true);
             } else {
                 writeBatch.clear();
             }
-            ///writeBatch = new WriteBatch();
+
             deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
             puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
 
@@ -312,7 +312,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
 
-        if (true) {
+        if (false) {
             writeBatch.close();
             writeBatch = new WriteBatchWithIndex(true);
         } else {
@@ -321,7 +321,6 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
 
         logger.debug("writeBatch close");
 
-        ///writeBatch = new WriteBatch();
         deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
 
@@ -338,7 +337,8 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
                 return;
             }
             alive = false;
-            //dbCore.write(new WriteOptions().setSync(true), new writeBatch);
+            writeBatch.close();
+            dbCore.write(new WriteOptions().setSync(true), new WriteBatch());
             dbCore.syncWal();
             dbCore.closeE();
         } catch (Exception e) {

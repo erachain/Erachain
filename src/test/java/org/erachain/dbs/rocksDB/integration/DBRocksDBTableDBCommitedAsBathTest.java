@@ -312,25 +312,24 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         }
 
         boolean twice = false;
-        boolean found;
-
-        List<IndexDB> indexes = new ArrayList<>();
-        RocksDbSettings dbSettings = new RocksDbSettings();
 
         int k = 0;
-        int step = 3;
+        int step = 33;
 
         do {
 
             DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            logger.info("SIZE = " + rocksDB.size());
+
             ColumnFamilyHandle columnFamilyHandle = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(1);
+
+            assertEquals(rocksDB.writeOptions.ignoreMissingColumnFamilies(), false);
 
             Map.Entry<byte[], byte[]> entry = data.get(step);
             byte[] value = (byte[])rocksDB.get(entry.getKey().clone());
             rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
-            logger.info("SIZE = " + rocksDB.size());
             assertEquals(rocksDB.size(), twice? step : 0);
 
             int iii = 0;
@@ -367,10 +366,12 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 }
             } while (++iii < step);
 
-            try {
-                rocksDB.dbSource.flush();
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+            if (false) {
+                try {
+                    rocksDB.dbSource.flush();
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
             rocksDB.close();
             twice = !twice;

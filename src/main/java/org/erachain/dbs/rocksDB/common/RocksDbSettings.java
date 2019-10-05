@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- *  TODO ??
  *  Для задания некоторых настроек таблицы
  */
 @Slf4j

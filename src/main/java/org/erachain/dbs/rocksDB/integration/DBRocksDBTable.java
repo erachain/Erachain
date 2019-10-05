@@ -62,7 +62,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     //Для пересчета размеров таблицы
     protected ByteableInteger byteableInteger = new ByteableInteger();
 
-    protected WriteOptions writeOptions;
+    public WriteOptions writeOptions;
 
     static {
         try {

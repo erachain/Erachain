@@ -42,7 +42,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
     //protected boolean dbSync = true;
 
-    protected WriteOptions writeOptions;
+    public WriteOptions writeOptions;
 
     @Getter
     //public RocksDB database;
