@@ -285,6 +285,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             dbCore.write(writeOptions, writeBatch);
+            dbCore.flushWal(true);
             logger.debug(" dbCore.write");
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
@@ -337,7 +338,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
                 return;
             }
             alive = false;
-            dbCore.write(new WriteOptions().setSync(true), writeBatch);
+            //dbCore.write(new WriteOptions().setSync(true), new writeBatch);
             dbCore.syncWal();
             dbCore.closeE();
         } catch (Exception e) {

@@ -324,13 +324,14 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
             DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
             ColumnFamilyHandle columnFamilyHandle = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(1);
-            logger.info("SIZE = " + rocksDB.size());
-            assertEquals(rocksDB.size(), twice? step : 0);
 
             Map.Entry<byte[], byte[]> entry = data.get(step);
             byte[] value = (byte[])rocksDB.get(entry.getKey().clone());
             rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
+
+            logger.info("SIZE = " + rocksDB.size());
+            assertEquals(rocksDB.size(), twice? step : 0);
 
             int iii = 0;
             do {
