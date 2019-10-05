@@ -298,7 +298,6 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         logger.info("End test RocksDB productivity");
     }
 
-
     @Test
     public void size() {
         logger.info("Start test RocksDB productivity size");
@@ -328,6 +327,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             Map.Entry<byte[], byte[]> entry = data.get(step);
             byte[] value = (byte[])rocksDB.get(entry.getKey().clone());
             rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
+
+            // AFTER OPEN DB not FOUND DATA in columnFamilyHandle HERE !!!
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
             assertEquals(rocksDB.size(), twice? step : 0);
