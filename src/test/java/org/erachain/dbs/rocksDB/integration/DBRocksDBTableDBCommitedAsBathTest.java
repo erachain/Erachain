@@ -7,6 +7,7 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Before;
 import org.junit.Test;
+import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.WriteOptions;
 
 import java.io.File;
@@ -322,29 +323,49 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         do {
 
             DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            ColumnFamilyHandle columnFamilyHandle = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(1);
             logger.info("SIZE = " + rocksDB.size());
             assertEquals(rocksDB.size(), twice? step : 0);
 
             Map.Entry<byte[], byte[]> entry = data.get(step);
             byte[] value = (byte[])rocksDB.get(entry.getKey().clone());
+            rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
-            int i = 0;
-
+            int iii = 0;
             do {
 
                 entry = data.get(k++);
 
                 try {
                     rocksDB.put(entry.getKey(), entry.getValue());
+                    rocksDB.dbSource.put(columnFamilyHandle, entry.getKey().clone(), entry.getValue());
+                    value = rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
+                    assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
+
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
-            } while (++i < step);
+            } while (++iii < step);
 
             logger.info("SIZE = " + rocksDB.size());
 
             rocksDB.commit();
+
+            iii = 0;
+            do {
+
+                entry = data.get(iii++);
+
+                try {
+                    value = rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
+                    assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
+
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            } while (++iii < step);
+
             try {
                 rocksDB.dbSource.flush();
             } catch (Exception e) {

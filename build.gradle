@@ -53,7 +53,8 @@ compileJava {
 
 dependencies {
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.2'
-    compile group: 'org.rocksdb', name: 'rocksdbjni', version: '5.15.10'
+// https://mvnrepository.com/artifact/org.rocksdb/rocksdbjni
+    compile group: 'org.rocksdb', name: 'rocksdbjni', version: '6.2.2'
     compile "com.madgag.spongycastle:core:1.58.0.0"
     compile "com.madgag.spongycastle:prov:1.58.0.0"
     compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
