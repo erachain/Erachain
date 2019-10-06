@@ -313,33 +313,46 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         boolean twice = false;
 
         int k = 0;
-        int step = 33;
+        int step = 5;
 
         do {
 
             DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
-            logger.info("SIZE = " + rocksDB.size());
+            logger.info("SIZE = " + rocksDB.size() + " columns: " + rocksDB.columnFamilyHandles.size());
 
+            ColumnFamilyHandle columnFamilyHandleDef = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(0);
             ColumnFamilyHandle columnFamilyHandle = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(1);
 
             assertEquals(rocksDB.writeOptions.ignoreMissingColumnFamilies(), false);
 
-            Map.Entry<byte[], byte[]> entry = data.get(step);
+            Map.Entry<byte[], byte[]> entry = data.get(step>>1);
+
             byte[] value = (byte[])rocksDB.get(entry.getKey().clone());
-            rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
 
             // AFTER OPEN DB not FOUND DATA in columnFamilyHandle HERE !!!
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
-            assertEquals(rocksDB.size(), twice? step : 0);
+            value = rocksDB.dbSource.get(columnFamilyHandleDef, entry.getKey().clone());
 
-            int iii = 0;
+            // AFTER OPEN DB not FOUND DATA in columnFamilyHandle HERE !!!
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
+
+            value = rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
+
+            // AFTER OPEN DB not FOUND DATA in columnFamilyHandle HERE !!!
+            assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
+
+            ///assertEquals(rocksDB.size(), twice? step : 0);
+
             do {
 
                 entry = data.get(k++);
 
                 try {
                     rocksDB.put(entry.getKey(), entry.getValue());
+                    value = rocksDB.dbSource.get(entry.getKey().clone());
+                    assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
+
                     rocksDB.dbSource.put(columnFamilyHandle, entry.getKey().clone(), entry.getValue());
                     value = rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
                     assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
@@ -347,25 +360,31 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
-            } while (++iii < step);
+            } while (k < step);
 
             logger.info("SIZE = " + rocksDB.size());
 
             rocksDB.commit();
 
-            iii = 0;
+            int iii = 0;
             do {
 
                 entry = data.get(iii++);
 
                 try {
+                    value = rocksDB.dbSource.get(entry.getKey().clone());
+                    assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), iii <= k);
+
                     value = rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
-                    assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
+                    assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), iii <= k);
+
+                    value = rocksDB.dbSource.get(columnFamilyHandleDef, entry.getKey().clone());
+                    assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), iii <= k);
 
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
-            } while (++iii < step);
+            } while (iii < k + step);
 
             if (false) {
                 try {
