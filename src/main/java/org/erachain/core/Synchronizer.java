@@ -321,12 +321,18 @@ public class Synchronizer extends Thread {
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
         if (BlockChain.TEST_DB > 0) {
             fork = dcSet.fork();
-            checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
-            fork.close();
+            try {
+                checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
+            } finally {
+                fork.close();
+            }
         } else {
             fork = dcSet.fork();
-            checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
-            fork.close();
+            try {
+                checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
+            } finally {
+                fork.close();
+            }
         }
 
         // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW

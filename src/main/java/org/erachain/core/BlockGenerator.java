@@ -437,83 +437,87 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         //CREATE FORK OF GIVEN DATABASE
         DCSet newBlockDC = dcSet.fork();
-        int blockHeight =  newBlockDC.getBlockMap().size() + 1;
 
-        //Block waitWin;
-        int counter = 0;
-        int totalBytes = 0;
+        try {
+            int blockHeight = newBlockDC.getBlockMap().size() + 1;
 
-        long start = System.currentTimeMillis();
+            //Block waitWin;
+            int counter = 0;
+            int totalBytes = 0;
 
-        TransactionTab map = dcSet.getTransactionTab();
-        Iterator<Long> iterator = map.getTimestampIterator(false);
-        LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
+            long start = System.currentTimeMillis();
 
-        needRemoveInvalids = new ArrayList<byte[]>();
+            TransactionTab map = dcSet.getTransactionTab();
+            Iterator<Long> iterator = map.getTimestampIterator(false);
+            LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 
-        this.setMonitorStatusBefore("checkForRemove");
+            needRemoveInvalids = new ArrayList<byte[]>();
 
-        while (iterator.hasNext()) {
+            this.setMonitorStatusBefore("checkForRemove");
 
-            if (ctrl.isOnStopping()) {
-                return;
-            }
-
-            Transaction transaction = map.get(iterator.next());
-
-            if (transaction.getTimestamp() > timestamp)
-                break;
-
-            transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
-
-            if (false // тут уже все проверено внутри нашей базы
-                    && !transaction.isSignatureValid(newBlockDC)) {
-                needRemoveInvalids.add(transaction.getSignature());
-                continue;
-            }
-
-            try {
-
-                if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                    needRemoveInvalids.add(transaction.getSignature());
-                    continue;
-                }
-
-                //CHECK IF ENOUGH ROOM
-                if (++counter > (BlockChain.MAX_BLOCK_SIZE << 2)) {
-                    break;
-                }
-
-                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-                if (totalBytes > (BlockChain.MAX_BLOCK_SIZE_BYTES_GEN << 2)) {
-                    break;
-                }
-
-                //PROCESS IN NEWBLOCKDB
-                transaction.process(null, Transaction.FOR_NETWORK);
-
-                // GO TO NEXT TRANSACTION
-                continue;
-
-            } catch (Exception e) {
+            while (iterator.hasNext()) {
 
                 if (ctrl.isOnStopping()) {
                     return;
                 }
 
-                //     transactionProcessed = true;
+                Transaction transaction = map.get(iterator.next());
 
-                LOGGER.error(e.getMessage(), e);
-                //REMOVE FROM LIST
-                needRemoveInvalids.add(transaction.getSignature());
+                if (transaction.getTimestamp() > timestamp)
+                    break;
 
-                continue;
+                transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
+                if (false // тут уже все проверено внутри нашей базы
+                        && !transaction.isSignatureValid(newBlockDC)) {
+                    needRemoveInvalids.add(transaction.getSignature());
+                    continue;
+                }
+
+                try {
+
+                    if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                        needRemoveInvalids.add(transaction.getSignature());
+                        continue;
+                    }
+
+                    //CHECK IF ENOUGH ROOM
+                    if (++counter > (BlockChain.MAX_BLOCK_SIZE << 2)) {
+                        break;
+                    }
+
+                    totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                    if (totalBytes > (BlockChain.MAX_BLOCK_SIZE_BYTES_GEN << 2)) {
+                        break;
+                    }
+
+                    //PROCESS IN NEWBLOCKDB
+                    transaction.process(null, Transaction.FOR_NETWORK);
+
+                    // GO TO NEXT TRANSACTION
+                    continue;
+
+                } catch (Exception e) {
+
+                    if (ctrl.isOnStopping()) {
+                        return;
+                    }
+
+                    //     transactionProcessed = true;
+
+                    LOGGER.error(e.getMessage(), e);
+                    //REMOVE FROM LIST
+                    needRemoveInvalids.add(transaction.getSignature());
+
+                    continue;
+
+                }
 
             }
 
+        } finally {
+            newBlockDC.close();
         }
-
-        newBlockDC.close();
 
         this.setMonitorStatusAfter();
 
