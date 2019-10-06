@@ -1,6 +1,5 @@
 package org.erachain.dbs.rocksDB.integration;
 
-import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
@@ -15,7 +14,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
 
-import static org.erachain.dbs.rocksDB.comm.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.junit.Assert.assertEquals;
 
@@ -325,26 +323,38 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             ColumnFamilyHandle columnFamilyHandleDef = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(0);
             ColumnFamilyHandle columnFamilyHandle = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(1);
 
+            Iterator iterator = rocksDB.getIterator(false);
+            int size = 0;
+            while (iterator.hasNext()) {
+                iterator.next();
+                size++;
+            }
+            logger.info("iterator 1 SIZE = " + size);
+            assertEquals(size, twice? step : 0);
+
+            iterator = rocksDB.getIndexIterator(columnFamilyHandle, false);
+            size = 0;
+            while (iterator.hasNext()) {
+                iterator.next();
+                size++;
+            }
+            logger.info("iterator 2 SIZE = " + size);
+            assertEquals(size, twice? step + 1 : 1);
+
             assertEquals(rocksDB.writeOptions.ignoreMissingColumnFamilies(), false);
 
             Map.Entry<byte[], byte[]> entry = data.get(step>>1);
 
             byte[] value = (byte[])rocksDB.get(entry.getKey().clone());
-
-            // AFTER OPEN DB not FOUND DATA in columnFamilyHandle HERE !!!
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
             value = rocksDB.dbSource.get(columnFamilyHandleDef, entry.getKey().clone());
-
-            // AFTER OPEN DB not FOUND DATA in columnFamilyHandle HERE !!!
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
             value = rocksDB.dbSource.get(columnFamilyHandle, entry.getKey().clone());
-
-            // AFTER OPEN DB not FOUND DATA in columnFamilyHandle HERE !!!
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
-            ///assertEquals(rocksDB.size(), twice? step : 0);
+            assertEquals(rocksDB.size(), twice? step : 0);
             int iii = 0;
 
             do {
@@ -367,10 +377,9 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
             logger.info("SIZE = " + rocksDB.size());
 
-            byte[] bytesSize = rocksDB.dbSource.get(columnFamilyHandle, SIZE_BYTE_KEY);
-
-            rocksDB.dbSource.put(columnFamilyHandle, SIZE_BYTE_KEY, Ints.toByteArray(rocksDB.size()));
+            assertEquals(rocksDB.size(), k);
             rocksDB.commit();
+            assertEquals(rocksDB.size(), k);
 
             iii = 0;
             do {
@@ -392,13 +401,8 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 }
             } while (iii < k + step);
 
-            if (false) {
-                try {
-                    rocksDB.dbSource.flush();
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
+            assertEquals(rocksDB.size(), k);
+
             rocksDB.close();
             twice = !twice;
 

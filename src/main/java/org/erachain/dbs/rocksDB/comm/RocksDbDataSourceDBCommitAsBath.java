@@ -257,7 +257,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             }
             alive = false;
             writeBatch.close();
-            dbCore.write(new WriteOptions().setSync(true), new WriteBatch());
+            ////dbCore.write(new WriteOptions().setSync(true), new WriteBatch());
             dbCore.syncWal();
             dbCore.closeE();
         } catch (Exception e) {

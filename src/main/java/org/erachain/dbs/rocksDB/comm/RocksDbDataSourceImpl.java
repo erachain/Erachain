@@ -1,13 +1,13 @@
 package org.erachain.dbs.rocksDB.comm;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.common.RockStoreIterator;
 import org.erachain.dbs.rocksDB.common.RockStoreIteratorFilter;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
-import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
@@ -44,11 +44,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     public WriteOptions writeOptions;
 
+    /**
+     * Base RocksDB
+     */
     @Getter
-    //public RocksDB database;
-    // база данных - сама
     public RocksDB dbCore;
-    //public OptimisticTransactionDB database;
     Options options;
 
     protected boolean alive;
@@ -61,25 +61,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     protected List<ColumnFamilyHandle> columnFamilyHandles;
 
     protected ColumnFamilyHandle columnFamilyFieldSize;
-    protected ByteableInteger byteableInteger = new ByteableInteger();
-
 
     protected ReadWriteLock resetDbLock = new ReentrantReadWriteLock();
-
-    /*
-    static {
-        try {
-            logger.info("load libraries");
-            loadLibrary(new ArrayList<String>() {{
-                add(".");
-            }});
-            logger.info("loaded success");
-        } catch (Throwable throwable) {
-            logger.error(throwable.getMessage(), throwable);
-        }
-    }
-
-     */
 
     public RocksDbDataSourceImpl(RocksDB dbCore,
                                  String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
@@ -238,11 +221,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
                     columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
 
-                    // Нужно для того чтобы в базе дае у транзакционных был Размер уже
-                    try {
-                        dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-                    } catch (RocksDBException edb) {
-
+                    if (create) {
+                        // Нужно для того чтобы в базе дае у транзакционных был Размер уже
+                        try {
+                            dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+                        } catch (RocksDBException edb) {
+                        }
                     }
 
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
@@ -860,7 +844,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     @Override
     public int size() {
         byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
-        return byteableInteger.receiveObjectFromBytes(sizeBytes);
+        return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
     }
 
     @Override

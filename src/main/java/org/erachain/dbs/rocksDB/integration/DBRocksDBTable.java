@@ -42,14 +42,14 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     protected boolean logON = false;
 
+    //  интерфейс доступа к БД
+    ///public RocksDbDataSourceImpl dbSource;
+    public RocksDbDataSource dbSource;
+
     // индексы
     protected List<IndexDB> indexes;
     protected List<ColumnFamilyHandle> columnFamilyHandles;
     protected ColumnFamilyHandle columnFamilyFieldSize;
-
-    //  интерфейс доступа к БД
-    ///public RocksDbDataSourceImpl dbSource;
-    public RocksDbDataSource dbSource;
 
     //  Сериализатор ключей
     protected Byteable byteableKey;
