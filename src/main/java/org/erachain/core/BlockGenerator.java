@@ -515,14 +515,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
             }
 
+            this.setMonitorStatusAfter();
+
+            LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + map.size()
+                    + " needRemoveInvalids:" + needRemoveInvalids.size());
+
         } finally {
             newBlockDC.close();
         }
-
-        this.setMonitorStatusAfter();
-
-        LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + map.size()
-                + " needRemoveInvalids:" + needRemoveInvalids.size());
 
     }
 
