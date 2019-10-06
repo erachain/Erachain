@@ -850,16 +850,6 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         return byteableInteger.receiveObjectFromBytes(sizeBytes);
     }
 
-    //@Override
-    public int parentSize() {
-        try {
-            byte[] sizeBytes = dbCoreParent.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
-            return byteableInteger.receiveObjectFromBytes(sizeBytes);
-        } catch (RocksDBException e) {
-            return -1;
-        }
-    }
-
     @Override
     public boolean isEmpty() {
         return size() == 0;

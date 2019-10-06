@@ -1,5 +1,6 @@
 package org.erachain.dbs.rocksDB.integration;
 
+import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
 
+import static org.erachain.dbs.rocksDB.comm.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.junit.Assert.assertEquals;
 
@@ -343,6 +345,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), twice);
 
             ///assertEquals(rocksDB.size(), twice? step : 0);
+            int iii = 0;
 
             do {
 
@@ -360,13 +363,16 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
-            } while (k < step);
+            } while (++iii < step);
 
             logger.info("SIZE = " + rocksDB.size());
 
+            byte[] bytesSize = rocksDB.dbSource.get(columnFamilyHandle, SIZE_BYTE_KEY);
+
+            rocksDB.dbSource.put(columnFamilyHandle, SIZE_BYTE_KEY, Ints.toByteArray(rocksDB.size()));
             rocksDB.commit();
 
-            int iii = 0;
+            iii = 0;
             do {
 
                 entry = data.get(iii++);

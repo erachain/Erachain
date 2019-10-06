@@ -61,16 +61,6 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
         return dbCoreTransact.getIterator(transactReadOptions, indexDB);
     }
 
-    public int parentSize() {
-        try {
-            byte[] sizeBytes = dbCore.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
-            return byteableInteger.receiveObjectFromBytes(sizeBytes);
-        } catch (RocksDBException e) {
-            return -1;
-        }
-    }
-
-
     @Override
     public void commit() {
         // сольем старый и начнем новый

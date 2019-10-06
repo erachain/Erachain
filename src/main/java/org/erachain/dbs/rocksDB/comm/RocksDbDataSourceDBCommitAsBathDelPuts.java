@@ -1,29 +1,41 @@
 package org.erachain.dbs.rocksDB.comm;
 
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
+import org.mapdb.Fun;
 import org.rocksdb.*;
 
-import java.util.List;
+import java.util.*;
 
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 
 /**
- * Транзакции с помощью пакета и нативные методы с пакетом типа writeBatch.getFromBatchAndDB
+ * Транзакции с помощью пакета и вспомогательных карт deleted & puts - скорее всего
+ * они медленне работают чем нативные методы с пакетом типа writeBatch.getFromBatchAndDB
  */
 @Slf4j
-public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl implements Transacted {
+public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImpl implements Transacted {
 
     ReadOptions readOptions;
     DBOptions dbOptions = new DBOptions();
+    /**
+     * Нужно для учета удаленных ключей
+     */
+    Set deleted;
+    /**
+     * Нужно для учета размера после слияния
+     */
+    Map puts;
 
     protected WriteBatchWithIndex writeBatch;
 
-    public RocksDbDataSourceDBCommitAsBath(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
-                                           WriteOptions writeOptions, ReadOptions readOptions) {
+    public RocksDbDataSourceDBCommitAsBathDelPuts(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
+                                                  WriteOptions writeOptions, ReadOptions readOptions) {
         super(pathName, name, indexes, settings, writeOptions);
         this.readOptions = readOptions;
 
@@ -31,7 +43,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         initDB();
     }
 
-    public RocksDbDataSourceDBCommitAsBath(String name, List<IndexDB> indexes, RocksDbSettings settings) {
+    public RocksDbDataSourceDBCommitAsBathDelPuts(String name, List<IndexDB> indexes, RocksDbSettings settings) {
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings,
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions());
@@ -41,12 +53,16 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = RocksDB.open(options, getDbPathAndFile().toString());
         writeBatch = new WriteBatchWithIndex(true);
+        deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+        puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = RocksDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
         writeBatch = new WriteBatchWithIndex(true);
+        deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+        puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
     }
 
     @Override
@@ -57,6 +73,11 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             writeBatch.put(key, value);
+            deleted.remove(key);
+
+            // запомним что это делали в любом случае добавляем - ведь может быть новое значение
+            puts.put(key, value);
+
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -72,6 +93,11 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             writeBatch.put(columnFamilyHandle, key, value);
+            deleted.remove(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
+
+            // запомним что это делали в любом случае добавляем - ведь может быть новое значение
+            puts.put(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key), value);
+
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -86,9 +112,18 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            if (writeBatch.getFromBatch(dbOptions, key) != null)
-                return true;
-            return dbCore.keyMayExist(key, inCache);
+            if (true) {
+                if (writeBatch.getFromBatch(dbOptions, key) != null)
+                    return true;
+                return dbCore.keyMayExist(key, inCache);
+            } else {
+                if (deleted.contains(key))
+                    return false;
+                if (puts.containsKey(key))
+                    return true;
+
+                return dbCore.keyMayExist(key, inCache);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -104,9 +139,18 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            if (writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null)
-                return true;
-            return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
+            if (true) {
+                if (writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null)
+                    return true;
+                return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
+            } else {
+                if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
+                    return false;
+                if (puts.containsKey(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
+                    return true;
+
+                return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -122,7 +166,17 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            return writeBatch.getFromBatchAndDB(dbCore, readOptions, key);
+            if (true) {
+                return writeBatch.getFromBatchAndDB(dbCore, readOptions, key);
+            } else {
+                if (deleted.contains(key))
+                    return null;
+                byte[] value = (byte[]) puts.get(key);
+                if (value != null)
+                    return value;
+
+                return dbCore.get(key);
+            }
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
             return null;
@@ -138,7 +192,16 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            return writeBatch.getFromBatchAndDB(dbCore, columnFamilyHandle, readOptions, key);
+            if (true) {
+                return writeBatch.getFromBatchAndDB(dbCore, columnFamilyHandle, readOptions, key);
+            } else {
+                if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
+                    return null;
+                byte[] value = (byte[]) puts.get(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
+                if (value != null)
+                    return value;
+                return dbCore.get(columnFamilyHandle, key);
+            }
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
             return null;
@@ -155,6 +218,12 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             writeBatch.delete(key);
+            puts.remove(key);
+
+            // запомним что это делали
+            if (dbCore.keyMayExist(key, inCache)) {
+                deleted.add(key);
+            }
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -170,6 +239,12 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             writeBatch.delete(columnFamilyHandle, key);
+            puts.remove(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
+
+            // запомним что это делали
+            if (dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
+                deleted.add(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
+            }
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -210,7 +285,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            ////dbCore.flushWal(true);
+            dbCore.flushWal(true);
             dbCore.write(writeOptions, writeBatch);
             logger.debug(" dbCore.write");
         } catch (RocksDBException e) {
@@ -222,6 +297,9 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             } else {
                 writeBatch.clear();
             }
+
+            deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+            puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
 
             resetDbLock.readLock().unlock();
         }
@@ -243,6 +321,10 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
 
         logger.debug("writeBatch close");
+
+        deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
+        puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
+
 
         resetDbLock.readLock().unlock();
 
