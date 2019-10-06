@@ -86,9 +86,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            if (writeBatch.getFromBatch(dbOptions, key) != null)
-                return true;
-            return dbCore.keyMayExist(key, inCache);
+            return writeBatch.getFromBatchAndDB(dbCore, readOptions, key) != null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -104,9 +102,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            if (writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null)
-                return true;
-            return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
+            return writeBatch.getFromBatchAndDB(dbCore, columnFamilyHandle, readOptions, key) != null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {

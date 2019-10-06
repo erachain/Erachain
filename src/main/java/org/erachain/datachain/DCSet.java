@@ -1733,7 +1733,7 @@ public class DCSet extends DBASet {
 
             clearGC = !clearGC;
             if (clearGC) {
-                //System.gc();
+                System.gc();
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "

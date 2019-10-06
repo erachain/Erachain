@@ -530,7 +530,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
     @Test
     public void rollbackRemove() {
-        logger.info("Start test RocksDB productivity commit");
+        logger.info("Start test RocksDB productivity rollback");
 
         int step = 10;
 
@@ -638,7 +638,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         }
 
         rocksDB.close();
-        logger.info("End test RocksDB productivity");
+        logger.info("End test RocksDB rollback");
     }
 
 }
