@@ -10,7 +10,7 @@ import org.erachain.datachain.ItemAssetBalanceTabImpl;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTableTransactionSingle;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
 import org.erachain.dbs.rocksDB.transformation.ByteableBigInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
@@ -70,13 +70,13 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTableTransactionSingle<byte[], Tuple5<
-                Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
-                Tuple2<BigDecimal, BigDecimal>, // in DEBT
-                Tuple2<BigDecimal, BigDecimal>, // in STOCK
-                Tuple2<BigDecimal, BigDecimal>, // it DO
-                Tuple2<BigDecimal, BigDecimal>  // on HOLD
-                >>(
+        map = new DBRocksDBTableDBCommitedAsBath<byte[], Tuple5<
+                        Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
+                        Tuple2<BigDecimal, BigDecimal>, // in DEBT
+                        Tuple2<BigDecimal, BigDecimal>, // in STOCK
+                        Tuple2<BigDecimal, BigDecimal>, // it DO
+                        Tuple2<BigDecimal, BigDecimal>  // on HOLD
+                        >>(
                 new ByteableTrivial(),
                 new org.erachain.dbs.rocksDB.transformation.differentLength.ByteableTuple5Tuples2BigDecimal(), NAME_TABLE, indexes,
                 org.erachain.dbs.rocksDB.common.RocksDbSettings.initCustomSettings(7, 64, 32,
