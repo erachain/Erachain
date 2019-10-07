@@ -123,23 +123,20 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
                 Fun.t4(have, want, null, null),
                 Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
 
-        //IF THIS IS A FORK
-        if (this.parent != null) {
+        //USE THE FORK KEYS
 
-            //GET ALL KEYS FOR FORK in PARENT - getOrdersForTradeWithFork
-            List<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
+        //GET ALL KEYS FOR FORK in PARENT - getOrdersForTradeWithFork
+        List<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
 
-            // REMOVE those who DELETED here
-            if (this.deleted != null) {
-                //DELETE DELETED
-                for (Object deleted : this.deleted.keySet()) {
-                    parentKeys.remove((Long) deleted);
-                }
+        // REMOVE those who DELETED here
+        if (this.deleted != null) {
+            //DELETE DELETED
+            for (Object deleted : this.deleted.keySet()) {
+                parentKeys.remove((Long) deleted);
             }
-
-            keys.addAll(parentKeys);
-
         }
+
+        keys.addAll(parentKeys);
 
         return keys;
     }

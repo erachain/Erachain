@@ -61,7 +61,7 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
      */
-    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;
+    public static final int UNCONF_TX_MAP = DBS_MAP_DB; //DBS_MAP_DB_IN_MEM;
 
     /**
      * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
@@ -504,7 +504,7 @@ public class DCSet extends DBASet {
                 .commitFileSyncDisable() // ++
 
                 //.snapshotEnable()
-                //.asyncWriteEnable() - крах при коммитах и откатах
+                //.asyncWriteEnable() - крах при коммитах и откатах тразакций - возможно надо asyncWriteFlushDelay больше задавать
                 .asyncWriteFlushDelay(2)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
@@ -665,16 +665,6 @@ public class DCSet extends DBASet {
 
         instance = new DCSet(dbFile, makeFileDB(dbFile), false, false, true, defaultDBS);
         return instance;
-    }
-
-    /**
-     * create FORK of DB
-     *
-     * @return
-     */
-    public static DB createForkbase() {
-
-        return getHardBaseForFork();
     }
 
     public static boolean isStoped() {
@@ -1524,7 +1514,7 @@ public class DCSet extends DBASet {
                 .commitFileSyncDisable() // ++
 
                 //.snapshotEnable()
-                .asyncWriteEnable()
+                .asyncWriteEnable() // тут нет Коммитов поэтому должно работать
                 .asyncWriteFlushDelay(2)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это

@@ -22,7 +22,8 @@ import org.mapdb.Fun;
 
 import java.util.*;
 
-import static org.erachain.database.IDB.*;
+import static org.erachain.database.IDB.DBS_MAP_DB_IN_MEM;
+import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -84,7 +85,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
             }
         } else {
             switch (dbsUsed) {
-                case DBS_MAP_DB:
+                //case DBS_MAP_DB:
                 case DBS_MAP_DB_IN_MEM:
                     map = new TransactionSuitMapDBFork((TransactionTab) parent, databaseSet);
                     break;

@@ -15,7 +15,6 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RCalculated;
-import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
@@ -1605,7 +1604,7 @@ import java.util.*;
                 }
             } else {
                 long processTiming = System.nanoTime();
-                validatingDC = dcSet.fork(database);
+                validatingDC = isPrimarySet && database != null ? dcSet.fork(database) : dcSet;
                 processTiming = (System.nanoTime() - processTiming) / 1000;
                 if (processTiming < 999999999999l) {
                     LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
@@ -1788,7 +1787,7 @@ import java.util.*;
                 }
 
             } finally {
-                if (!andProcess) {
+                if (!andProcess && database != null) {
                     // тут точно былл Фор базы данных для проверки
                     // закроем ее
                     validatingDC.close();
@@ -1868,7 +1867,15 @@ import java.util.*;
     }
 
     public boolean isValid(DCSet dcSet, boolean andProcess) {
-        return isValid(dcSet, DCSet.getHardBaseForFork(), andProcess);
+
+        DB file;
+        if (!andProcess) {
+            file = DCSet.makeDBinMemory();
+        } else {
+            file = null;
+        }
+
+        return isValid(dcSet, file, andProcess);
     }
 
     //PROCESS/ORPHAN

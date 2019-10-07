@@ -4,10 +4,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBTab;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionTab;
+import org.erachain.dbs.DBTab;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
 import org.erachain.network.message.Message;
@@ -281,7 +281,7 @@ public class Synchronizer extends Thread {
                     throw new Exception(mess);
                 }
 
-                if (!block.isValid(fork, true)) {
+                if (!block.isValid(fork, null, true)) {
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by not is Valid block, heigh: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
@@ -420,19 +420,6 @@ public class Synchronizer extends Thread {
         return orphanedTransactionsList;
     }
 
-    /*
-     * private List<byte[]> getBlockSignatures(Block start, int amount, Peer
-     * peer) throws Exception { //ASK NEXT 500 HEADERS SINCE START byte[]
-     * startSignature = start.getSignature(); List<byte[]> headers =
-     * this.getBlockSignatures(startSignature, peer); List<byte[]> nextHeaders;
-     * if(!headers.isEmpty() && headers.size() < amount) { do { nextHeaders =
-     * this.getBlockSignatures(headers.get(headers.size()-1), peer);
-     * headers.addAll(nextHeaders); } while(headers.size() < amount &&
-     * !nextHeaders.isEmpty()); }
-     *
-     * return headers; }
-     */
-
     public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception {
 
         Controller cnt = Controller.getInstance();
@@ -570,7 +557,7 @@ public class Synchronizer extends Thread {
                         }
 
                         try {
-                            if (!blockFromPeer.isValid(dcSet, false)) {
+                            if (!blockFromPeer.isValid(dcSet, null, false)) {
 
                                 errorMess = "invalid BLOCK";
                                 banTime = BAN_BLOCK_TIMES;
@@ -1152,7 +1139,7 @@ public class Synchronizer extends Thread {
     }
 
     /**
-     * проверка отставания от сети по сиде узлов рядом
+     * проверка отставания от сети по силе узлов рядом
       */
     public void run() {
 
