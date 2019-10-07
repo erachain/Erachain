@@ -47,11 +47,11 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int BLOCKS_MAP = DBS_ROCK_DB;
+    public static final int BLOCKS_MAP = DBS_MAP_DB;
     /**
      * DBS_MAP_DB - slow then DBS_ROCK_DB
      */
-    public static final int FINAL_TX_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_MAP = DBS_MAP_DB;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
@@ -79,8 +79,6 @@ public class DCSet extends DBASet {
      */
     private static final boolean needClearCache = false;
 
-    private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
-
     private static boolean isStoped = false;
     private volatile static DCSet instance;
     private DCSet parent;
@@ -98,7 +96,6 @@ public class DCSet extends DBASet {
     private CreditAddressesMap credit_AddressesMap;
     private ItemAssetBalanceTab assetBalanceMap;
     private AddressStatementRefs addressStatement_Refs;
-    private ItemAssetBalanceTab assetBalanceAccountingMap;
     private KKAssetStatusMap kKAssetStatusMap;
     private KKPersonStatusMap kKPersonStatusMap;
     //private KKPollStatusMap kKPollStatusMap;
@@ -115,7 +112,6 @@ public class DCSet extends DBASet {
     private HashesSignsMap hashesSignsMap;
 
     private BlocksMapImpl blockMap;
-    //private BlockCreatorMap blockCreatorMap;
     private BlockSignsMap blockSignsMap;
     private BlocksHeadsMap blocksHeadsMap;
     private ReferenceMapImpl referenceMap;
@@ -215,7 +211,6 @@ public class DCSet extends DBASet {
 
             this.actions = 0L;
 
-            //this.blockCreatorMap = new BlockCreatorMap(this, database);
             this.blockSignsMap = new BlockSignsMap(this, database);
             this.blocksHeadsMap = new BlocksHeadsMap(this, database);
             this.addressForging = new AddressForging(this, database);
@@ -711,7 +706,7 @@ public class DCSet extends DBASet {
         this.credit_AddressesMap.clear();
         this.assetBalanceMap.clear();
         this.addressStatement_Refs.clear();
-        this.assetBalanceAccountingMap.clear();
+        //this.assetBalanceAccountingMap.clear();
         this.kKAssetStatusMap.clear();
         this.kKPersonStatusMap.clear();
         this.kKUnionStatusMap.clear();
@@ -777,7 +772,6 @@ public class DCSet extends DBASet {
         this.atMap.clear();
         this.atStateMap.clear();
         this.atTransactionMap.clear();
-        //this.blockCreatorMap.reset();
 
         this.outUses();
     }
@@ -860,21 +854,6 @@ public class DCSet extends DBASet {
      */
     public AddressStatementRefs getAddressStatement_Refs() {
         return this.addressStatement_Refs;
-    }
-
-    /** (пока не используется - по идее для бухгалтерских единиц отдельная таблица)
-     * Балансы для заданного адреса на данный актив. balances for all account in blockchain<br>
-     * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
-     * Каждый баланс: Всего Пришло и Остаток<br><br>
-     *
-     * <b>Ключ:</b> account.address + asset key<br>
-     *
-     * <b>Значение:</b> Балансы. in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND)
-     *
-     */
-    // TODO SOFT HARD TRUE
-    public ItemAssetBalanceTab getAssetBalanceAccountingMap() {
-        return this.assetBalanceAccountingMap;
     }
 
     /**

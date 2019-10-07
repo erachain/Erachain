@@ -3,9 +3,7 @@ package org.erachain.datachain;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
-import org.erachain.dbs.DBMapSuit;
 import org.erachain.dbs.DBTab;
-import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
@@ -15,6 +13,7 @@ import java.util.Observer;
 import java.util.Set;
 
 /**
+ * Interface for MAP + static methods
  * addressShort[20] + assetKey[8] - > balance
  */
 public interface ItemAssetBalanceTab extends DBTab<byte[], Tuple5<
