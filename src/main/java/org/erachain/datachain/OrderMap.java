@@ -23,13 +23,14 @@ import java.util.*;
  * Ключ: ссылка на запись создавшую заказ
  * Значение: Ордер
  *
- ВНИМАНИЕ !!! ВТОричные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
- Поэтому нужно добавлять униальность
+ * ВНИМАНИЕ !!! ВТОричные ключи не хранят дубли если созданы вручную а не
+ *  в mapDB.DBMapSuit#createIndex() (тут первичный ключ добавится автоматически)
+ * - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
+ * Поэтому нужно добавлять униальность
  * @return
  */
 public class OrderMap extends DCUMap<Long, Order> {
 
-    private static boolean  useWantHaveKeys = true;
     @SuppressWarnings("rawtypes")
     private BTreeMap haveWantKeyMap;
     @SuppressWarnings("rawtypes")
@@ -384,36 +385,6 @@ public class OrderMap extends DCUMap<Long, Order> {
         return orders;
 
     }
-
-    /*
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersHaveSortableList(long have) {
-        //FILTER ALL KEYS
-        Collection<Long> keys = ((BTreeMap<Tuple3, Long>) this.haveWantKeyMap).subMap(
-                Fun.t3(have, null, null),
-                Fun.t3(have, Fun.HI(), Fun.HI())).values();
-
-        //RETURN
-        return new SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
-    }
-    */
-
-    /*
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-            Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>> getOrdersWantSortableList(long want) {
-        //FILTER ALL KEYS
-        Collection<Long> keys = ((BTreeMap<Tuple3, Long>) this.haveWantKeyMap).subMap(
-                Fun.t3(null, want, null),
-                Fun.t3(Fun.HI(), want, Fun.HI())).values();
-
-        //RETURN
-        return new SortableList<Long, Tuple3<Tuple5<Long, String, Long, Boolean, BigDecimal>,
-                Tuple3<Long, BigDecimal, BigDecimal>, Tuple2<Long, BigDecimal>>>(this, keys);
-    }
-    */
 
     public boolean set(Long id, Order order) {
         if (BlockChain.CHECK_BUGS > 0) {
