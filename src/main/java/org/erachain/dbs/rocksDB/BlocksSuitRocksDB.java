@@ -28,7 +28,8 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
     protected void getMap() {
 
         if (true) {
-            map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableInteger(), new ByteableBlock(), NAME_TABLE, indexes,
+            map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableInteger(), new ByteableBlock(),
+                    NAME_TABLE, indexes,
                     RocksDbSettings.initCustomSettings(7, 64, 32,
                             256, 10,
                             1, 256, 32, false),

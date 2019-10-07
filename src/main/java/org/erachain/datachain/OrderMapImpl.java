@@ -7,6 +7,8 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.OrdersSuitMapDB;
 import org.erachain.dbs.mapDB.OrdersSuitMapDBFork;
+import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
+import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
@@ -51,7 +53,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new TransactionFinalSuitRocksDB(databaseSet, database);
+                    map = new OrdersSuitRocksDB(databaseSet, database);
                     break;
                 default:
                     map = new OrdersSuitMapDB(databaseSet, database);
@@ -59,8 +61,8 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new TransactionFinalSuitRocksDBFork((TransactionTab) parent, databaseSet);
-                    //break;
+                    map = new nativeMapTreeMapFork(parent, databaseSet, null, null);
+                    break;
                 default:
                     ///map = new nativeMapTreeMapFork(parent, databaseSet); - просто карту нельзя так как тут особые вызовы
                     map = new OrdersSuitMapDBFork((OrderMap) parent, databaseSet);

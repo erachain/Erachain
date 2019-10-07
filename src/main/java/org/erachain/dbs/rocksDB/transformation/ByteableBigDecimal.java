@@ -4,6 +4,9 @@ package org.erachain.dbs.rocksDB.transformation;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+/**
+ * Dmitrii Ermolaev (icreator)
+ */
 public class ByteableBigDecimal implements Byteable<BigDecimal>{
     @Override
     public BigDecimal receiveObjectFromBytes(byte[] bytes) {
