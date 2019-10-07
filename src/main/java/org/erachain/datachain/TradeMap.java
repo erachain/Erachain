@@ -6,7 +6,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
@@ -242,28 +241,6 @@ public class TradeMap extends DCUMap<Tuple2<Long, Long>, Trade> {
         return trades;
     }
 
-    @SuppressWarnings("unchecked")
-    public SortableList<Tuple2<Long, Long>, Trade> getTrades(Long orderID) {
-        //ADD REVERSE KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
-                Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).values();
-
-        //RETURN
-        return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
-    }
-
-    @SuppressWarnings("unchecked")
-    public SortableList<Tuple2<Long, Long>, Trade> getTradesByOrderIDAsSorted(Long orderID) {
-        //ADD REVERSE KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
-                Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).values();
-
-        //RETURN
-        return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
-    }
-
     public List<Trade> getTradesByOrderID(Long orderID) {
         //ADD REVERSE KEYS
         Collection<Tuple2<Long, Long>> tradesKeys = ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
@@ -311,29 +288,6 @@ public class TradeMap extends DCUMap<Tuple2<Long, Long>, Trade> {
 
         //RETURN
         return trades;
-    }
-
-    @SuppressWarnings("unchecked")
-    public SortableList<Tuple2<Long, Long>, Trade> getTradesSortableList(long have, long want) {
-
-        String pairKey;
-        if (have > want) {
-            pairKey = have + "/" + want;
-        } else {
-            pairKey = want + "/" + have;
-        }
-
-        if (this.pairKeyMap != null) {
-            //FILTER ALL KEYS
-            Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                    Fun.t3(pairKey, null, null),
-                    Fun.t3(pairKey, Fun.HI(), Fun.HI())).values();
-
-            //RETURN
-            return new SortableList<Tuple2<Long, Long>, Trade>(this, keys);
-        }
-
-        return new SortableList<Tuple2<Long, Long>, Trade>(this, new ArrayList<>());
     }
 
     @SuppressWarnings("unchecked")

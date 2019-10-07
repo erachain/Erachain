@@ -11,7 +11,6 @@ import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
-import org.erachain.dbs.rocksDB.transformation.ByteableBigInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
@@ -63,9 +62,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger, ItemAssetBalanceTabImpl.DEFAULT_VALUE);
     }
-
-    //private final ByteableBigDecimal byteableBigDecimal = new ByteableBigDecimal();
-    private final ByteableBigInteger byteableBigInteger = new ByteableBigInteger();
 
     @Override
     protected void getMap() {

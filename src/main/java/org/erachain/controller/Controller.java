@@ -2772,12 +2772,6 @@ public class Controller extends Observable {
         return dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
     }
 
-
-    public SortableList<Tuple2<Long, Long>, Trade> getTrades(
-            AssetCls have, AssetCls want) {
-        return this.dcSet.getTradeMap().getTradesSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet));
-    }
-
     public List<Trade> getTradeByTimestmp(long have, long want, long timestamp, int limit) {
         return dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp, limit);
     }
