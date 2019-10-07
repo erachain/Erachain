@@ -45,6 +45,36 @@ public class DCSet extends DBASet {
     private static final long DELETIONS_BEFORE_COMPACT = BlockChain.MAX_BLOCK_SIZE_GEN << 6;
 
     /**
+     * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
+     */
+    public static final int BLOCKS_MAP = DBS_ROCK_DB;
+    /**
+     * DBS_MAP_DB - slow then DBS_ROCK_DB
+     */
+    public static final int FINAL_TX_MAP = DBS_ROCK_DB;
+
+    /**
+     * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
+     */
+    public static final int FINAL_TX_SIGNS_MAP = DBS_MAP_DB;
+
+    /**
+     * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
+     */
+    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;
+
+    /**
+     * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
+     */
+    public static final int ACCOUNT_BALANCES = DBS_MAP_DB;
+
+    /**
+     * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
+     */
+    public static final int ACCOUNTS_REFERENCES = DBS_MAP_DB;
+
+
+    /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
      */
     private static final boolean needClearCache = false;
@@ -159,34 +189,27 @@ public class DCSet extends DBASet {
         try {
             // переделанные таблицы
             this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
-                    DBS_MAP_DB
-                    //DBS_ROCK_DB // very SLOW потому что BigDecimal 20 байт - хотя с -opi этоне делаем
+                    ACCOUNT_BALANCES
                     , this, database);
 
             this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0 ? defaultDBS :
-                    //DBS_MAP_DB // SLOW then RocksDB
-                    DBS_ROCK_DB // more FAST
+                    FINAL_TX_MAP
                     , this, database);
 
             this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
-                    //DBS_MAP_DB // slow
-                    //DBS_ROCK_DB // crash
-                    DBS_MAP_DB_IN_MEM // fast
+                    UNCONF_TX_MAP
                     , this, database);
 
             this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
-                    DBS_MAP_DB // fast
-                    //DBS_ROCK_DB // slow
+                    ACCOUNTS_REFERENCES
                     , this, database);
 
             this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
-                    //DBS_MAP_DB // fast
-                    DBS_ROCK_DB // slow
+                    BLOCKS_MAP
                     , this, database);
 
             this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
-                    DBS_MAP_DB // fast
-                    //DBS_ROCK_DB // slow
+                    FINAL_TX_SIGNS_MAP
                     , this, database);
 
 
@@ -500,31 +523,37 @@ public class DCSet extends DBASet {
 
         if (true) {
             // USE CACHE
-            if (needClearCache) {
-                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCache(); --
+            if (BLOCKS_MAP != DBS_MAP_DB) {
+                // если блоки не сохраняются в общей базе данных
                 databaseStruc
-                        .cacheSize(32 + 32 << Controller.HARD_WORK)
-                ;
-
+                        .cacheSize(1024 << (5 + Controller.HARD_WORK));
             } else {
-                databaseStruc
+                if (needClearCache) {
+                    //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                    ///// добавил dcSet.clearCache(); --
+                    databaseStruc
+                            .cacheSize(32 + 32 << Controller.HARD_WORK)
+                    ;
 
-                        // при норм размере и досточной памяти скорость не хуже чем у остальных
-                        //.cacheLRUEnable() // скорость зависит от памяти и настроек -
-                        //.cacheSize(2048 + 64 << Controller.HARD_WORK)
+                } else {
+                    databaseStruc
 
-                        // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                        // у другого типа КЭША происходит утечка памяти
-                        .cacheHardRefEnable()
+                            // при норм размере и досточной памяти скорость не хуже чем у остальных
+                            //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                            //.cacheSize(2048 + 64 << Controller.HARD_WORK)
 
-                ///.cacheSoftRefEnable()
-                ///.cacheSize(32 << Controller.HARD_WORK)
+                            // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                            // у другого типа КЭША происходит утечка памяти
+                            .cacheHardRefEnable()
 
-                ///.cacheWeakRefEnable()
-                ///.cacheSize(32 << Controller.HARD_WORK)
-                ;
+                    ///.cacheSoftRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
 
+                    ///.cacheWeakRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
+                    ;
+
+                }
             }
         } else {
             databaseStruc.cacheDisable();

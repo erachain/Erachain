@@ -25,9 +25,9 @@ public class ReferenceSuitMapDB extends DBMapSuit<byte[], long[]>
     protected void getMap() {
         //OPEN MAP
         map = database.createHashMap("references")
-                .keySerializer(SerializerBase.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
+                .keySerializer(SerializerBase.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работать не будет поиск с байтами
                 // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
-                .hasher(Hasher.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
+                .hasher(Hasher.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работать не будет поиск с байтами
                 // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
                 .valueSerializer(SerializerBase.LONG_ARRAY)
                 .counterEnable()

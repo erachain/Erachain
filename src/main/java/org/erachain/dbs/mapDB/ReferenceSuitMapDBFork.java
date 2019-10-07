@@ -31,9 +31,9 @@ public class ReferenceSuitMapDBFork extends DBMapSuitFork<byte[], long[]>
             map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
         } else {
             map = database.createHashMap("references")
-                    .keySerializer(SerializerBase.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
+                    .keySerializer(SerializerBase.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работать не будет поиск с байтами
                     // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
-                    .hasher(Hasher.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
+                    .hasher(Hasher.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работать не будет поиск с байтами
                     // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
                     .valueSerializer(SerializerBase.LONG_ARRAY)
                     .counterEnable()
