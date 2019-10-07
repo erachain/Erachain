@@ -366,6 +366,13 @@ public class DCSet extends DBASet {
                 //DBS_NATIVE_MAP
                 , parent.transactionFinalMapSigns, this);
 
+        this.orderMap = new OrderMapImpl(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.orderMap, this);
+
+
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
         this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs, this);
@@ -409,7 +416,6 @@ public class DCSet extends DBASet {
 
         this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap, this);
         this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap(), this);
-        this.orderMap = new OrderMapImpl(parent.orderMap, this);
         this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap, this);
         this.tradeMap = new TradeMap(parent.tradeMap, this);
 

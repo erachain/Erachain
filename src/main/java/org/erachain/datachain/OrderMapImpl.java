@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.OrdersSuitMapDB;
+import org.erachain.dbs.mapDB.OrdersSuitMapDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
@@ -62,7 +63,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
                     //break;
                 default:
                     ///map = new nativeMapTreeMapFork(parent, databaseSet); - просто карту нельзя так как тут особые вызовы
-                    //map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
+                    map = new OrdersSuitMapDBFork((OrderMap) parent, databaseSet);
             }
         }
     }
@@ -110,8 +111,13 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
+    public List<Long> getSubKeysWithParent(long have, long want) {
+        return ((OrderMapSuit) map).getSubKeysWithParent(have, want);
+    }
+
+    @Override
     public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
-        return getOrdersForTradeWithFork(have, want, reverse);
+        return ((OrderMapSuit) map).getOrdersForTradeWithFork(have, want, reverse);
     }
 
     @Override
@@ -177,13 +183,11 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void add(Order order) {
-
         this.set(order.getId(), order);
     }
 
     @Override
     public void delete(Order order) {
-
         this.remove(order.getId());
     }
 }
