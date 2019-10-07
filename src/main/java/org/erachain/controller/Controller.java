@@ -2757,16 +2757,6 @@ public class Controller extends Observable {
         return (TemplateCls) this.dcSet.getItemTemplateMap().get(key);
     }
 
-    /*
-     * public SortableList<BigInteger, Order> getOrders(AssetCls have, AssetCls
-     * want) { return this.getOrders(have, want, true); }
-     */
-
-    public SortableList<Long, Order> getOrders(
-            AssetCls have, AssetCls want, boolean reverse) {
-        return this.dcSet.getOrderMap().getOrdersSortableList(have.getKey(this.dcSet), want.getKey(this.dcSet), reverse);
-    }
-
     public List<Order> getOrders(Long have, Long want) {
 
         return dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);

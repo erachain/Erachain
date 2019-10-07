@@ -16,7 +16,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceTab;
-import org.erachain.datachain.OrderMap;
+import org.erachain.datachain.OrderMapImpl;
 import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NameUtils;
@@ -242,7 +242,7 @@ public class Account {
 
     public static Map<byte[], BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<byte[], BigDecimal> values) {
 
-        OrderMap map = dcSet.getOrderMap();
+        OrderMapImpl map = dcSet.getOrderMap();
         Iterator<Long> iterator = map.getIterator(0, true);
         Order order;
         while (iterator.hasNext()) {

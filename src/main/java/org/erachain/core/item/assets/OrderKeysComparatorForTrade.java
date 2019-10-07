@@ -1,17 +1,9 @@
 package org.erachain.core.item.assets;
 
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.OrderMap;
-import org.mapdb.BTreeMap;
-import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
+import org.erachain.datachain.OrderMapImpl;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Comparator;
-import java.util.Map;
 
 /**
  * Sorts Orders by price and TIMESTAMP for resolve exchange
@@ -23,7 +15,7 @@ public class OrderKeysComparatorForTrade implements Comparator<Long> {
     @Override
     public int compare(Long orderKey1, Long orderKey2) {
 
-        OrderMap map = DCSet.getInstance().getOrderMap();
+        OrderMapImpl map = DCSet.getInstance().getOrderMap();
 
         Order order1 = map.get(orderKey1);
         Order order2 = map.get(orderKey2);

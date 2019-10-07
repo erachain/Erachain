@@ -133,7 +133,7 @@ public class DCSet extends DBASet {
     private VoteOnItemPollMap voteOnItemPollMap;
     private ItemAssetMap itemAssetMap;
     private IssueAssetMap issueAssetMap;
-    private OrderMap orderMap;
+    private OrderMapImpl orderMap;
     private CompletedOrderMap completedOrderMap;
     private TradeMap tradeMap;
     private ItemStatusMap itemStatusMap;
@@ -253,7 +253,7 @@ public class DCSet extends DBASet {
 
             this.itemAssetMap = new ItemAssetMap(this, database);
             this.issueAssetMap = new IssueAssetMap(this, database);
-            this.orderMap = new OrderMap(this, database);
+            this.orderMap = new OrderMapImpl(this, database);
             this.completedOrderMap = new CompletedOrderMap(this, database);
             this.tradeMap = new TradeMap(this, database);
 
@@ -409,7 +409,7 @@ public class DCSet extends DBASet {
 
         this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap, this);
         this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap(), this);
-        this.orderMap = new OrderMap(parent.orderMap, this);
+        this.orderMap = new OrderMapImpl(parent.orderMap, this);
         this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap, this);
         this.tradeMap = new TradeMap(parent.tradeMap, this);
 
@@ -1253,7 +1253,7 @@ public class DCSet extends DBASet {
      *
      * @return
      */
-    public OrderMap getOrderMap() {
+    public OrderMapImpl getOrderMap() {
         return this.orderMap;
     }
 
