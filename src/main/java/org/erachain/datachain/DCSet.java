@@ -61,7 +61,7 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
      */
-    public static final int UNCONF_TX_MAP = DBS_MAP_DB; //DBS_MAP_DB_IN_MEM;
+    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;
 
     /**
      * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
