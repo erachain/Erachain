@@ -75,6 +75,7 @@ public class DCSet extends DBASet {
 
     public static final int ORDERS_MAP = DBS_MAP_DB;
     public static final int COMPLETED_ORDERS_MAP = DBS_MAP_DB;
+    public static final int TRADES_MAP = DBS_MAP_DB;
 
 
     /**
@@ -216,6 +217,9 @@ public class DCSet extends DBASet {
             this.completedOrderMap = new CompletedOrderMapImpl(defaultDBS > 0 ? defaultDBS :
                     COMPLETED_ORDERS_MAP
                     , this, database);
+            this.tradeMap = new TradeMapImpl(defaultDBS > 0 ? defaultDBS :
+                    TRADES_MAP
+                    , this, database);
 
 
             this.actions = 0L;
@@ -262,7 +266,6 @@ public class DCSet extends DBASet {
 
             this.itemAssetMap = new ItemAssetMap(this, database);
             this.issueAssetMap = new IssueAssetMap(this, database);
-            this.tradeMap = new TradeMap(this, database);
 
             this.itemImprintMap = new ItemImprintMap(this, database);
             this.issueImprintMap = new IssueImprintMap(this, database);
@@ -383,6 +386,11 @@ public class DCSet extends DBASet {
                 //DBS_ROCK_DB
                 //DBS_NATIVE_MAP
                 , parent.completedOrderMap, this);
+        this.tradeMap = new TradeMapImpl(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.tradeMap, this);
 
 
         this.addressForging = new AddressForging(parent.addressForging, this);
@@ -428,7 +436,6 @@ public class DCSet extends DBASet {
 
         this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap, this);
         this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap(), this);
-        this.tradeMap = new TradeMap(parent.tradeMap, this);
 
         this.itemImprintMap = new ItemImprintMap(parent.itemImprintMap, this);
         this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap, this);
