@@ -20,7 +20,6 @@ import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -337,15 +336,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 if (newBlockDC == null) {
                     //CREATE FORK OF GIVEN DATABASE
                     // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-                    DB database = DBMaker
-                            .newMemoryDB()
-                            .freeSpaceReclaimQ(5)
-                            .transactionDisable()
-                            .cacheHardRefEnable()
-                            .deleteFilesAfterClose()
-                            //
-                            //.newMemoryDirectDB()
-                            .make();
+                    DB database = DCSet.makeDBinMemory();
                     newBlockDC = dcSet.fork(database);
                 }
 
@@ -436,9 +427,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public void checkForRemove(long timestamp) {
 
         //CREATE FORK OF GIVEN DATABASE
-        DCSet newBlockDC = dcSet.fork();
-
+        DB database = DCSet.makeDBinMemory();
         try {
+            DCSet newBlockDC = dcSet.fork(database);
             int blockHeight = newBlockDC.getBlockMap().size() + 1;
 
             //Block waitWin;
@@ -521,7 +512,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     + " needRemoveInvalids:" + needRemoveInvalids.size());
 
         } finally {
-            newBlockDC.close();
+            database.close();
         }
 
     }

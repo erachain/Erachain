@@ -36,22 +36,13 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
 
     public static final int BLOCK_COUNT = 0; ////
     // сколько трназакции в блоке - если больше 0 то запускает тест на старте
     public static final int TEST_DB = 0000;
     // размер балансового поля - чем больше тем сложнее
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[10000];
-
-    /**
-     * Используем для DCSet такую базу данных
-     */
-    static final public int DC_DBS_TYPE = 1; // 0 MapDB, 1 - RocksDB
-    /**
-     * Какую базу используем для форкеутого набора таблиц (DCSet.fork())
-     */
-    static final public int DCFORK_DBS_TYPE = 1; // 0 - NativeMemoryMap, 1- MapDB, 2 - RocksDB
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
@@ -996,17 +987,20 @@ public class BlockChain {
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         DB database = DCSet.makeDBinMemory();
+        try {
+            // FULL VALIDATE because before was only HEAD validating
+            if (!block.isValid(dcSet.fork(database), false)) {
 
-        // FULL VALIDATE because before was only HEAD validating
-        if (!block.isValid(dcSet, database, false)) {
+                LOGGER.info("new winBlock is BAD!");
+                if (peer != null)
+                    Controller.getInstance().banPeerOnError(peer, "invalid block", 10);
+                else
+                    LOGGER.error("MY WinBlock is INVALID! ignore...");
 
-            LOGGER.info("new winBlock is BAD!");
-            if (peer != null)
-                Controller.getInstance().banPeerOnError(peer, "invalid block", 10);
-            else
-                LOGGER.error("MY WinBlock is INVALID! ignore...");
-
-            return false;
+                return false;
+            }
+        } finally {
+            database.close();
         }
 
         this.waitWinBuffer = block;

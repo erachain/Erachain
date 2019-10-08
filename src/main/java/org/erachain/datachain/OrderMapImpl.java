@@ -32,8 +32,8 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  */
 public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
-    public OrderMapImpl(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+    public OrderMapImpl(int dbsUsed, DCSet databaseSet, DB database) {
+        super(dbsUsed, databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_ORDER_TYPE);

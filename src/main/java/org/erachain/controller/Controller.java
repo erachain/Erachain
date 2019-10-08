@@ -2656,10 +2656,13 @@ public class Controller extends Observable {
 
             // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
             DB database = DCSet.makeDBinMemory();
-
-            if (!newBlock.isValid(dcSet, database, false))
-                // тогда проверим заново полностью
-                return false;
+            try {
+                if (!newBlock.isValid(dcSet.fork(database), false))
+                    // тогда проверим заново полностью
+                    return false;
+            } finally {
+                database.close();
+            }
         }
 
         LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());

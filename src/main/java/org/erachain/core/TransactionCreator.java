@@ -34,7 +34,6 @@ import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -49,6 +48,7 @@ import java.util.*;
  */
 public class TransactionCreator {
     private DCSet fork;
+    DB database;
     private Block lastBlock;
     private int blockHeight;
     private int seqNo;
@@ -71,21 +71,13 @@ public class TransactionCreator {
 
     private synchronized void updateFork() {
         //CREATE NEW FORK
-        if (this.fork != null) {
-            this.fork.close();
+        if (this.database != null) {
+            // закроем сам файл базы - закрывать DCSet.fork - не нужно - он сам очистится
+            this.database.close();
         }
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-        DB database = DBMaker
-                .newMemoryDB()
-                .freeSpaceReclaimQ(5)
-                .transactionDisable()
-                .cacheHardRefEnable()
-                .deleteFilesAfterClose()
-                //
-                //.newMemoryDirectDB()
-                .make();
-
+        this.database = DCSet.makeDBinMemory();
         this.fork = DCSet.getInstance().fork(database);
 
         //UPDATE LAST BLOCK
@@ -148,7 +140,7 @@ public class TransactionCreator {
 
     public DCSet getFork() {
         if (this.fork == null) {
-            this.fork = DCSet.getInstance().fork();
+            updateFork();
         }
         return this.fork;
     }

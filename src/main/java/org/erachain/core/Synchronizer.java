@@ -15,6 +15,7 @@ import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.SignaturesMessage;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -281,7 +282,7 @@ public class Synchronizer extends Thread {
                     throw new Exception(mess);
                 }
 
-                if (!block.isValid(fork, null, true)) {
+                if (!block.isValid(fork, true)) {
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by not is Valid block, heigh: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
@@ -320,17 +321,21 @@ public class Synchronizer extends Thread {
         DCSet fork;
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
         if (BlockChain.TEST_DB > 0) {
-            fork = dcSet.fork();
+            DB database = DCSet.getHardBaseForFork();
+            fork = dcSet.fork(database);
             try {
                 checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
             } finally {
+                // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
                 fork.close();
             }
         } else {
-            fork = dcSet.fork();
+            DB database = DCSet.getHardBaseForFork();
+            fork = dcSet.fork(database);
             try {
                 checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
             } finally {
+                // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
                 fork.close();
             }
         }
@@ -557,11 +562,16 @@ public class Synchronizer extends Thread {
                         }
 
                         try {
-                            if (!blockFromPeer.isValid(dcSet, null, false)) {
+                            DB database = DCSet.makeDBinMemory();
+                            try {
+                                if (!blockFromPeer.isValid(dcSet.fork(database), false)) {
 
-                                errorMess = "invalid BLOCK";
-                                banTime = BAN_BLOCK_TIMES;
-                                break;
+                                    errorMess = "invalid BLOCK";
+                                    banTime = BAN_BLOCK_TIMES;
+                                    break;
+                                }
+                            } finally {
+                                database.close();
                             }
                         } catch (Exception e) {
                             LOGGER.debug(e.getMessage(), e);

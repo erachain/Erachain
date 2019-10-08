@@ -73,6 +73,11 @@ public class DCSet extends DBASet {
      */
     public static final int ACCOUNTS_REFERENCES = DBS_MAP_DB;
 
+    /**
+     * DBS_MAP_DB - ?, DBS_ROCK_DB - ?
+     */
+    public static final int ORDERS_MAP = DBS_MAP_DB;
+
 
     /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
@@ -207,6 +212,9 @@ public class DCSet extends DBASet {
             this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
                     FINAL_TX_SIGNS_MAP
                     , this, database);
+            this.orderMap = new OrderMapImpl(defaultDBS > 0 ? defaultDBS :
+                    ORDERS_MAP
+                    , this, database);
 
 
             this.actions = 0L;
@@ -253,7 +261,6 @@ public class DCSet extends DBASet {
 
             this.itemAssetMap = new ItemAssetMap(this, database);
             this.issueAssetMap = new IssueAssetMap(this, database);
-            this.orderMap = new OrderMapImpl(this, database);
             this.completedOrderMap = new CompletedOrderMap(this, database);
             this.tradeMap = new TradeMap(this, database);
 
@@ -1563,8 +1570,13 @@ public class DCSet extends DBASet {
 
     }
 
+    /**
+     * USe inMemory MapDB Database
+     *
+     * @return
+     */
     public DCSet fork() {
-        return fork(getHardBaseForFork());
+        return fork(makeDBinMemory());
     }
 
     @Override
