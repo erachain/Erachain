@@ -273,6 +273,25 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         }
 
+        // добавить невалидных трнзакций немного - по вермени создания
+        timestamp = blockTimestamp - 86400000 * 10;
+        PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
+        for (int index = 0; index < (BlockChain.TEST_DB >> 5); index++) {
+
+            recipient = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+
+            PrivateKeyAccount creator = creators[random.nextInt(creators.length)];
+
+            messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                    amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage,
+                    timestamp, 0l);
+            messageTx.sign(creator, Transaction.FOR_NETWORK);
+
+            //unconfirmedTransactions.add(messageTx);
+            map.add(messageTx);
+
+        }
+
         return unconfirmedTransactions;
 
     }

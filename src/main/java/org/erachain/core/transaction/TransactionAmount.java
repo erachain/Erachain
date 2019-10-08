@@ -477,10 +477,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
                 if (height > 0 || BlockChain.CHECK_BUGS > 7
                         || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
-                    pointLogg = System.currentTimeMillis();
-                    LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
-                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                            + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                    if (BlockChain.TEST_DB == 0) {
+                        pointLogg = System.currentTimeMillis();
+                        LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
+                                + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                    }
                 }
 
                 return INVALID_TIMESTAMP;
