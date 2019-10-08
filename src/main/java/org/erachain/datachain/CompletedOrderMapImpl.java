@@ -5,6 +5,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.CompletedOrdersSuitMapDB;
 import org.erachain.dbs.mapDB.CompletedOrdersSuitMapDBFork;
+import org.erachain.dbs.rocksDB.CompletedOrdersSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
@@ -39,8 +40,8 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new CompletedOrdersSuitRocksDB(databaseSet, database);
-                    //break;
+                    map = new CompletedOrdersSuitRocksDB(databaseSet, database);
+                    break;
                 default:
                     map = new CompletedOrdersSuitMapDB(databaseSet, database);
             }
