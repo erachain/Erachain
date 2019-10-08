@@ -5,8 +5,8 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
-import org.erachain.dbs.rocksDB.transformation.ByteableLongArray;
-import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
+import org.erachain.dbs.rocksDB.transformation.ByteableLong;
+import org.erachain.dbs.rocksDB.transformation.ByteableOrder;
 import org.mapdb.DB;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
@@ -23,7 +23,7 @@ public class CompletedOrdersSuitRocksDB extends DBMapSuit<Long, Order> {
     @Override
     protected void getMap() {
 
-        map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableTrivial(), new ByteableLongArray(), NAME_TABLE, indexes,
+        map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableLong(), new ByteableOrder(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
