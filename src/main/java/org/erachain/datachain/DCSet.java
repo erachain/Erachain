@@ -73,10 +73,8 @@ public class DCSet extends DBASet {
      */
     public static final int ACCOUNTS_REFERENCES = DBS_MAP_DB;
 
-    /**
-     * DBS_MAP_DB - ?, DBS_ROCK_DB - ?
-     */
     public static final int ORDERS_MAP = DBS_MAP_DB;
+    public static final int COMPLETED_ORDERS_MAP = DBS_MAP_DB;
 
 
     /**
@@ -139,7 +137,7 @@ public class DCSet extends DBASet {
     private ItemAssetMap itemAssetMap;
     private IssueAssetMap issueAssetMap;
     private OrderMapImpl orderMap;
-    private CompletedOrderMapImpl completedOrderMap;
+    private CompletedOrderMap completedOrderMap;
     private TradeMap tradeMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
@@ -215,6 +213,9 @@ public class DCSet extends DBASet {
             this.orderMap = new OrderMapImpl(defaultDBS > 0 ? defaultDBS :
                     ORDERS_MAP
                     , this, database);
+            this.completedOrderMap = new CompletedOrderMapImpl(defaultDBS > 0 ? defaultDBS :
+                    COMPLETED_ORDERS_MAP
+                    , this, database);
 
 
             this.actions = 0L;
@@ -261,7 +262,6 @@ public class DCSet extends DBASet {
 
             this.itemAssetMap = new ItemAssetMap(this, database);
             this.issueAssetMap = new IssueAssetMap(this, database);
-            this.completedOrderMap = new CompletedOrderMapImpl(this, database);
             this.tradeMap = new TradeMap(this, database);
 
             this.itemImprintMap = new ItemImprintMap(this, database);
@@ -378,6 +378,11 @@ public class DCSet extends DBASet {
                 //DBS_ROCK_DB
                 //DBS_NATIVE_MAP
                 , parent.orderMap, this);
+        this.completedOrderMap = new CompletedOrderMapImpl(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.completedOrderMap, this);
 
 
         this.addressForging = new AddressForging(parent.addressForging, this);
@@ -423,7 +428,6 @@ public class DCSet extends DBASet {
 
         this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap, this);
         this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap(), this);
-        this.completedOrderMap = new CompletedOrderMapImpl(parent.completedOrderMap, this);
         this.tradeMap = new TradeMap(parent.tradeMap, this);
 
         this.itemImprintMap = new ItemImprintMap(parent.itemImprintMap, this);
@@ -1266,7 +1270,7 @@ public class DCSet extends DBASet {
      * Ключ: ссылка на запись создания заказа<br>
      * Значение: заказ<br>
      */
-    public CompletedOrderMapImpl getCompletedOrderMap() {
+    public CompletedOrderMap getCompletedOrderMap() {
         return this.completedOrderMap;
     }
 

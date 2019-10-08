@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;

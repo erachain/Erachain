@@ -1,18 +1,11 @@
 package org.erachain.dbs.mapDB;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
-import org.erachain.datachain.CompletedOrderMap;
-import org.erachain.datachain.DCSet;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.DBTabImpl;
-import org.erachain.utils.ObserverMessage;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-
-import java.util.Map;
 
 /**
  * Хранит исполненные ордера, или отмененные - все что уже не активно<br>

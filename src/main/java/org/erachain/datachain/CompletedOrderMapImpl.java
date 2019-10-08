@@ -4,8 +4,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.CompletedOrdersSuitMapDB;
-import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
-import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
+import org.erachain.dbs.mapDB.CompletedOrdersSuitMapDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
@@ -35,10 +34,6 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     protected void getMap() {
         // OPEN MAP
         if (parent == null) {
@@ -55,7 +50,7 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
                     //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
                     //break;
                 default:
-                    map = new CompletedOrdersSuitMapDB(parent, databaseSet, null, null);
+                    map = new CompletedOrdersSuitMapDBFork((CompletedOrderMap) parent, databaseSet);
             }
         }
     }
