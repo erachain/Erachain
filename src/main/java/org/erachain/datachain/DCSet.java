@@ -1554,7 +1554,7 @@ public class DCSet extends DBASet {
         this.addUses();
 
         try {
-            DCSet fork = new DCSet(this, database == null ? getHardBaseForFork() : database);
+            DCSet fork = new DCSet(this, database);
 
             this.outUses();
             return fork;

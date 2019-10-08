@@ -220,15 +220,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-    private List<Transaction> testTransactions(int blockHeight, long blockTimestamp) {
+    private void testTransactions(int blockHeight, long blockTimestamp) {
 
         SecureRandom randomSecure = new SecureRandom();
 
         LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB);
 
         boolean generateNewAccount = false;
-        //if (DCSet.getInstance().getAssetBalanceMap().size() < 1000)
-        //    generateNewAccount = true;
 
         long assetKey = 2L;
         BigDecimal amount = new BigDecimal("0.00000001");
@@ -241,7 +239,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         Random random = new Random();
 
         PublicKeyAccount recipient;
-        List<Transaction> unconfirmedTransactions = new ArrayList<Transaction>();
         HashMap<PrivateKeyAccount, Long> creatorsReference = new HashMap<>();
         long timestamp;
         for (int index = 0; index < BlockChain.TEST_DB; index++) {
@@ -268,15 +265,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
 
-            //unconfirmedTransactions.add(messageTx);
             map.add(messageTx);
 
         }
 
         // добавить невалидных трнзакций немного - по вермени создания
-        timestamp = blockTimestamp - 86400000 * 10;
+        timestamp = blockTimestamp - 84600000 * 10;
         PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
-        for (int index = 0; index < (BlockChain.TEST_DB >> 5); index++) {
+        for (int index = 0; index < (BlockChain.TEST_DB >> 3); index++) {
 
             recipient = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
 
@@ -287,12 +283,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
 
-            //unconfirmedTransactions.add(messageTx);
             map.add(messageTx);
 
         }
-
-        return unconfirmedTransactions;
 
     }
 
