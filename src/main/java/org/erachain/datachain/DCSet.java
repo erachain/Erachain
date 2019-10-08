@@ -139,7 +139,7 @@ public class DCSet extends DBASet {
     private ItemAssetMap itemAssetMap;
     private IssueAssetMap issueAssetMap;
     private OrderMapImpl orderMap;
-    private CompletedOrderMap completedOrderMap;
+    private CompletedOrderMapImpl completedOrderMap;
     private TradeMap tradeMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
@@ -261,7 +261,7 @@ public class DCSet extends DBASet {
 
             this.itemAssetMap = new ItemAssetMap(this, database);
             this.issueAssetMap = new IssueAssetMap(this, database);
-            this.completedOrderMap = new CompletedOrderMap(this, database);
+            this.completedOrderMap = new CompletedOrderMapImpl(this, database);
             this.tradeMap = new TradeMap(this, database);
 
             this.itemImprintMap = new ItemImprintMap(this, database);
@@ -423,7 +423,7 @@ public class DCSet extends DBASet {
 
         this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap, this);
         this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap(), this);
-        this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap, this);
+        this.completedOrderMap = new CompletedOrderMapImpl(parent.completedOrderMap, this);
         this.tradeMap = new TradeMap(parent.tradeMap, this);
 
         this.itemImprintMap = new ItemImprintMap(parent.itemImprintMap, this);
@@ -1266,7 +1266,7 @@ public class DCSet extends DBASet {
      * Ключ: ссылка на запись создания заказа<br>
      * Значение: заказ<br>
      */
-    public CompletedOrderMap getCompletedOrderMap() {
+    public CompletedOrderMapImpl getCompletedOrderMap() {
         return this.completedOrderMap;
     }
 
