@@ -40,7 +40,7 @@ public class BlockChain {
 
     public static final int BLOCK_COUNT = 0; ////
     // сколько трназакции в блоке - если больше 0 то запускает тест на старте
-    public static final int TEST_DB = 10000;
+    public static final int TEST_DB = 0000;
     // размер балансового поля - чем больше тем сложнее
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[10000];
 
@@ -408,6 +408,11 @@ public class BlockChain {
                     new Pair<Integer, byte[]>(12, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("ETH",
                     new Pair<Integer, byte[]>(14, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("GOLD",
+                    new Pair<Integer, byte[]>(22, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("BREND",
+                    new Pair<Integer, byte[]>(24, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+
             NOVA_ASSETS.put("USD",
                     new Pair<Integer, byte[]>(95, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("EUR",
