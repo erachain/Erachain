@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -146,6 +147,15 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public void close() {
         map.close();
         logger.info("closed");
+    }
+
+    @Override
+    public void writeTo(DBTab targetMap) {
+        Iterator<T> iterator = this.map.keySet().iterator();
+        while (iterator.hasNext()) {
+            T key = iterator.next();
+            targetMap.put(key, this.map.get(key));
+        }
     }
 
     @Override

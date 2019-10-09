@@ -3399,7 +3399,7 @@ public class Controller extends Observable {
 
         this.dcSet.getBlockMap().addObserver(o);
         this.dcSet.getTransactionTab().addObserver(o);
-        // this.dcSet.getTransactionFinalMap().addObserver(o);
+        this.dcSet.getTransactionFinalMap().addObserver(o);
 
         if (this.dcSetWithObserver) {
             // ADD OBSERVER TO SYNCHRONIZER

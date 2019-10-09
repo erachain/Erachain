@@ -19,6 +19,7 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.ForkedMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
@@ -139,7 +140,7 @@ public class DCSet extends DBASet {
     private IssueAssetMap issueAssetMap;
     private OrderMapImpl orderMap;
     private CompletedOrderMap completedOrderMap;
-    private TradeMap tradeMap;
+    private TradeMapImpl tradeMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
     private ItemImprintMap itemImprintMap;
@@ -1287,7 +1288,7 @@ public class DCSet extends DBASet {
      * Значение - Сделка
      Initiator DBRef (Long) + Target DBRef (Long) -> Trade
      */
-    public TradeMap getTradeMap() {
+    public TradeMapImpl getTradeMap() {
         return this.tradeMap;
     }
 
@@ -1588,6 +1589,13 @@ public class DCSet extends DBASet {
      */
     public DCSet fork() {
         return fork(makeDBinMemory());
+    }
+
+    @Override
+    public void writeToParent() {
+        for (DBTab table : tables) {
+            ((ForkedMap) table).writeToParent();
+        }
     }
 
     @Override

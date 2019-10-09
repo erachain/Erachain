@@ -34,11 +34,13 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
     protected Map<Integer, Integer> observableData;
 
     public DBTabCommonImpl() {
+        databaseSet.addTable(this);
     }
 
     public DBTabCommonImpl(DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
+        databaseSet.addTable(this);
 
         if (databaseSet != null && databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
@@ -49,6 +51,7 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         this.dbsUsed = dbsUsed;
         this.databaseSet = databaseSet;
         this.database = database;
+        databaseSet.addTable(this);
 
         //OPEN MAP
         getMap();
@@ -56,8 +59,6 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
         }
-
-        this.databaseSet.addTable(this);
 
     }
 
@@ -76,6 +77,7 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;
         this.parent = parent;
+        databaseSet.addTable(this);
 
     }
     public DBTabCommonImpl(DBTab parent, DBASet databaseSet) {
@@ -83,6 +85,7 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;
         this.parent = parent;
+        databaseSet.addTable(this);
 
     }
 

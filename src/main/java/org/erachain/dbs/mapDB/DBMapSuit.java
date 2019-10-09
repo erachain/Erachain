@@ -2,6 +2,7 @@ package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.dbs.DBTab;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -310,6 +311,15 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     @Override
     public U getDefaultValue() {
         return defaultValue;
+    }
+
+    @Override
+    public void writeTo(DBTab targetMap) {
+        Iterator<T> iterator = this.map.keySet().iterator();
+        while (iterator.hasNext()) {
+            T key = iterator.next();
+            targetMap.put(key, this.map.get(key));
+        }
     }
 
     @Override

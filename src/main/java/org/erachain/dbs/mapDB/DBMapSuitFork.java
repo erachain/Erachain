@@ -1,11 +1,14 @@
 package org.erachain.dbs.mapDB;
 
+import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.ForkedMap;
 import org.slf4j.Logger;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -19,8 +22,9 @@ import java.util.TreeMap;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
+public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements ForkedMap {
 
+    @Getter
     protected DBTab<T, U> parent;
 
     //ConcurrentHashMap deleted;
@@ -198,6 +202,20 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
         }
 
         return false;
+    }
+
+    @Override
+    public void writeToParent() {
+        Iterator<T> iterator = this.map.keySet().iterator();
+        while (iterator.hasNext()) {
+            T key = iterator.next();
+            parent.put(key, this.map.get(key));
+        }
+
+        iterator = this.deleted.keySet().iterator();
+        while (iterator.hasNext()) {
+            parent.delete(iterator.next());
+        }
     }
 
     @Override

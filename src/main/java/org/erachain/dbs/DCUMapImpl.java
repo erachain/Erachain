@@ -1,5 +1,6 @@
 package org.erachain.dbs;
 
+import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.database.SortableList;
@@ -21,11 +22,12 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements DBTab<T, U> {
+public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements DBTab<T, U>, ForkedMap {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
     protected Map<T, U> map;
+    @Getter
     protected DBTab<T, U> parent;
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
@@ -468,6 +470,40 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
                 this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
             }
 
+        }
+    }
+
+    @Override
+    public void writeTo(DBTab targetMap) {
+        Iterator<T> iterator = this.map.keySet().iterator();
+        while (iterator.hasNext()) {
+            T key = iterator.next();
+            targetMap.put(key, this.map.get(key));
+        }
+
+        if (parent != null) {
+            iterator = this.deleted.keySet().iterator();
+            while (iterator.hasNext()) {
+                T key = iterator.next();
+                targetMap.delete(key);
+            }
+        }
+    }
+
+    @Override
+    public void writeToParent() {
+        Iterator<T> iterator = this.map.keySet().iterator();
+        while (iterator.hasNext()) {
+            T key = iterator.next();
+            parent.put(key, this.map.get(key));
+        }
+
+        if (parent != null) {
+            iterator = this.deleted.keySet().iterator();
+            while (iterator.hasNext()) {
+                T key = iterator.next();
+                parent.delete(key);
+            }
         }
     }
 

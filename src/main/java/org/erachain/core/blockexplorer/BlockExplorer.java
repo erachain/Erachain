@@ -2419,7 +2419,7 @@ public class BlockExplorer {
         pairsSet.addAll(list);
 
         OrderMap orders = dcSet.getOrderMap();
-        TradeMapImpl trades = dcSet.getTradeMap();
+        TradeMap trades = dcSet.getTradeMap();
 
         JSONArray pairsArray = new JSONArray();
 
