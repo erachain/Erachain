@@ -498,7 +498,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
             parent.put(key, this.map.get(key));
         }
 
-        if (parent != null) {
+        if (deleted != null) {
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
                 T key = iterator.next();

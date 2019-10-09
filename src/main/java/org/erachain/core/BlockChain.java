@@ -40,7 +40,7 @@ public class BlockChain {
 
     public static final int BLOCK_COUNT = 0; ////
     // сколько трназакции в блоке - если больше 0 то запускает тест на старте
-    public static final int TEST_DB = 0000;
+    public static final int TEST_DB = 10000;
     // размер балансового поля - чем больше тем сложнее
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[10000];
 
@@ -962,7 +962,14 @@ public class BlockChain {
 	}
 	 */
 
+    public int compareNewWin(DCSet dcSet, Block block) {
+        return this.waitWinBuffer == null ? -1 : this.waitWinBuffer.compareWin(block);
+    }
+
     public void clearWaitWinBuffer() {
+        if (this.waitWinBuffer != null) {
+            waitWinBuffer.close();
+        }
         this.waitWinBuffer = null;
     }
 
@@ -970,10 +977,6 @@ public class BlockChain {
         Block block = this.waitWinBuffer;
         this.waitWinBuffer = null;
         return block;
-    }
-
-    public int compareNewWin(DCSet dcSet, Block block) {
-        return this.waitWinBuffer == null ? -1 : this.waitWinBuffer.compareWin(block);
     }
 
     // SOLVE WON BLOCK
@@ -992,9 +995,11 @@ public class BlockChain {
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         DB database = DCSet.makeDBinMemory();
+        boolean noValid = true;
         try {
+            noValid = !block.isValid(dcSet.fork(database), true);
             // FULL VALIDATE because before was only HEAD validating
-            if (!block.isValid(dcSet.fork(database), false)) {
+            if (noValid) {
 
                 LOGGER.info("new winBlock is BAD!");
                 if (peer != null)
@@ -1005,10 +1010,13 @@ public class BlockChain {
                 return false;
             }
         } finally {
-            database.close();
+            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
+            if (noValid)
+                database.close();
         }
 
-        this.waitWinBuffer = block;
+        // set and close OLD
+        setWaitWinBufferUnchecked(block);
 
         LOGGER.info("new winBlock setted!!!" + block.toString());
         return true;
@@ -1022,6 +1030,9 @@ public class BlockChain {
      */
     public void setWaitWinBufferUnchecked(Block block) {
         if (this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
+            if (this.waitWinBuffer != null) {
+                waitWinBuffer.close();
+            }
             this.waitWinBuffer = block;
         }
     }

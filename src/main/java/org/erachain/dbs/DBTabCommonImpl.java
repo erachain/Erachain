@@ -1,5 +1,6 @@
 package org.erachain.dbs;
 
+import lombok.Getter;
 import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
@@ -29,6 +30,7 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
     public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
     protected DB database;
+    @Getter
     protected DBTab<T, U> parent;
 
     protected Map<Integer, Integer> observableData;

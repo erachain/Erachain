@@ -19,7 +19,6 @@ import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBTab;
-import org.erachain.dbs.ForkedMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
@@ -1594,7 +1593,7 @@ public class DCSet extends DBASet {
     @Override
     public void writeToParent() {
         for (DBTab table : tables) {
-            ((ForkedMap) table).writeToParent();
+            table.writeToParent();
         }
     }
 

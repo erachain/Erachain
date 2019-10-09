@@ -141,7 +141,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
     @Override
     protected void getMap() {
         // OPEN MAP
-        openMap(database);
+        map = openMap(database);
     }
 
     @Override

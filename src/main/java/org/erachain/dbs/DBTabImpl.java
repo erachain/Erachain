@@ -217,6 +217,11 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
     }
 
     @Override
+    public void writeToParent() {
+        this.map.writeTo(parent);
+    }
+
+    @Override
     public void close() { map.close(); }
 
     @Override

@@ -3,6 +3,7 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import lombok.Getter;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
@@ -97,6 +98,8 @@ import java.util.*;
 
     // was validated
     protected boolean wasValidated;
+    @Getter
+    protected DCSet validatedForkDB;
 
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
     public static class BlockHead implements ExplorerJsonLine {
@@ -1538,6 +1541,15 @@ import java.util.*;
      */
     public boolean isValid(DCSet dcSetPlace, boolean andProcess) {
 
+        if (validatedForkDB != null) {
+            try {
+                validatedForkDB.close();
+            } catch (Exception e) {
+            }
+        }
+        validatedForkDB = null;
+        wasValidated = false;
+
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
         // TRY CHECK HEAD
@@ -1845,7 +1857,31 @@ import java.util.*;
         }
 
         this.wasValidated = true;
+        if (andProcess) {
+            validatedForkDB = dcSetPlace;
+        }
         return true;
+    }
+
+    /**
+     * Закрывает базу в котрой производилась проверка блока
+     */
+    public void close() {
+        if (validatedForkDB != null) {
+            try {
+                validatedForkDB.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public void saveToChainFromvalidatedForkDB() {
+        validatedForkDB.writeToParent();
+        try {
+            validatedForkDB.close();
+        } catch (Exception e) {
+        }
+        validatedForkDB = null;
     }
 
     //PROCESS/ORPHAN
