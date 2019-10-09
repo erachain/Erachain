@@ -498,6 +498,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
             parent.put(key, this.map.get(key));
         }
 
+        // нужно очистить сразу так как общий размер изменится иначе будет ++ больше
+        // да и уже не нужны эти данные
+        // хотя пока можно это не делать this.map.clear();
+
         if (deleted != null) {
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {

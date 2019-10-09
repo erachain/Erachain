@@ -1,13 +1,13 @@
 package org.erachain.datachain;
 
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.core.block.Block;
 import org.erachain.database.serializer.BlockHeadSerializer;
 import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -26,7 +26,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
     // for saving in DB
     private Atomic.Long fullWeightVar;
     private Long fullWeight = 0L;
-    private int startedInForkHeight = 0;
+    //private int startedInForkHeight = 0;
 
 
     public BlocksHeadsMap(DCSet databaseSet, DB database) {
@@ -83,9 +83,9 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         return this.fullWeight;
     }
 
-    public int getStartedInForkHeight() {
-        return this.startedInForkHeight;
-    }
+    //public int getStartedInForkHeight() {
+    //    return this.startedInForkHeight;
+    //}
 
     public void recalcWeightFull(DCSet dcSet) {
 
@@ -112,9 +112,9 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         // get Win Value of block
         long weight = item.winValue;
 
-        if (startedInForkHeight == 0 && this.parent != null) {
-            startedInForkHeight = height;
-        }
+        //if (startedInForkHeight == 0 && this.parent != null) {
+        //    startedInForkHeight = height;
+        //}
 
         fullWeight += weight;
 
@@ -165,5 +165,11 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         return null;
     }
 
+    @Override
+    public void writeToParent() {
+        super.writeToParent();
+        ((BlocksHeadsMap) parent).fullWeightVar.set(this.fullWeight);
+        ((BlocksHeadsMap) parent).fullWeight = this.fullWeight;
+    }
 
 }

@@ -1590,11 +1590,21 @@ public class DCSet extends DBASet {
         return fork(makeDBinMemory());
     }
 
+    /**
+     * Нужно незабыть переменные внктри каждой таблицы тоже в Родителя скинуть
+     */
     @Override
     public void writeToParent() {
+
+        // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
+        // иначе размер больше будет в форке и не то значение
+        ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
+
         for (DBTab table : tables) {
             table.writeToParent();
         }
+        // теперь нужно все общие переменные переопределить
+
     }
 
     @Override

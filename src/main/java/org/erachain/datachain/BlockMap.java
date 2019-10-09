@@ -12,6 +12,8 @@ public interface BlockMap extends DBTab<Integer, Block> {
 
     byte[] getLastBlockSignature();
 
+    void setLastBlockSignature(byte[] signature);
+
     void resetLastBlockSignature();
 
     boolean isProcessing();

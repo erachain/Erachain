@@ -2,10 +2,10 @@ package org.erachain.datachain;
 
 
 import org.erachain.dbs.DBTab;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
@@ -107,6 +107,13 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
         // DECREMENT KEY
         --this.key;
 
+    }
+
+    @Override
+    public void writeToParent() {
+        super.writeToParent();
+        ((AutoIntegerByte) parent).atomicKey.set(this.key);
+        ((AutoIntegerByte) parent).key = this.key;
     }
 
 }

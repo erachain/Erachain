@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 // 30/03
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -36,6 +37,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 @Slf4j
 public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap {
 
+    @Setter
     private byte[] lastBlockSignature;
     private Atomic.Boolean processingVar;
     private Boolean processing;
@@ -100,7 +102,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         lastBlockSignature = ((DCSet) databaseSet).getBlocksHeadsMap().get(this.size()).signature;
     }
 
-    private void setLastBlockSignature(byte[] signature) {
+    public void setLastBlockSignature(byte[] signature) {
         lastBlockSignature = signature;
     }
 

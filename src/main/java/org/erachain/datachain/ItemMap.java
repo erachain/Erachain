@@ -3,8 +3,8 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.FilteredByStringArray;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 
@@ -380,6 +380,13 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     public NavigableMap<Long, ItemCls> getOwnerItems(String ownerPublicKey) {
         return this.ownerKeyMap.subMap(ownerPublicKey, ownerPublicKey);
+    }
+
+    @Override
+    public void writeToParent() {
+        super.writeToParent();
+        ((ItemMap) parent).atomicKey.set(this.key);
+        ((ItemMap) parent).key = this.key;
     }
 
 }
