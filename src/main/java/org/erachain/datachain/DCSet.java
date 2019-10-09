@@ -1694,7 +1694,7 @@ public class DCSet extends DBASet {
                 utxMap.add(item);
             }
 
-            if (needClearCache) {
+            if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
                 this.database.getEngine().clearCache();
             }
