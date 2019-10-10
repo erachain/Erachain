@@ -31,9 +31,9 @@ public class DBRocksDBTableDB<K, V> extends DBRocksDBTable
         afterOpen();
     }
 
-    public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                            DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, dbaSet);
+    public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
+                            RocksDbSettings settings, WriteOptions writeOptions) {
+        super(byteableKey, byteableValue, indexes, settings, writeOptions);
     }
 
     public DBRocksDBTableDB(String NAME_TABLE) {

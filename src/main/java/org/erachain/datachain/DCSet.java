@@ -1635,7 +1635,7 @@ public class DCSet extends DBASet {
                         try {
                             tab.commit();
                         } catch (IOError e) {
-                            LOGGER.error(e.getMessage(), e);
+                            LOGGER.error(tab.toString() + ": " + e.getMessage(), e);
                         }
                     }
 

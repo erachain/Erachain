@@ -104,16 +104,14 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     /**
      * Use random name for TMP Fork
-     *
-     * @param byteableKey
+     *  @param byteableKey
      * @param byteableValue
      * @param indexes
      * @param settings
      * @param writeOptions
-     * @param dbaSet
      */
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
-                          RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
+                          RocksDbSettings settings, WriteOptions writeOptions) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.settings = settings;

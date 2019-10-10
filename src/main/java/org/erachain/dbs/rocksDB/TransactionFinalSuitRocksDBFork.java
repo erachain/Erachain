@@ -8,10 +8,9 @@ import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
-import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
 import java.util.ArrayList;
@@ -27,13 +26,11 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     @Override
     protected void openMap() {
 
-        map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableLong(), new ByteableTransaction(), indexes,
+        map = new DBRocksDBTableDB<>(new ByteableLong(), new ByteableTransaction(), indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
-                new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(),
-                databaseSet);
+                new WriteOptions().setSync(true).setDisableWAL(false));
     }
 
     @Override

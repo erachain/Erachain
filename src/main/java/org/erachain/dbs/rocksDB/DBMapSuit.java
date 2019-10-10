@@ -132,16 +132,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         return map.containsKey(key);
     }
 
-    //@Override
-    public List<U> getLastValues(int limit) {
-        return ((DBRocksDBTable<T, U>) map).getLatestValues(limit);
-    }
-
-    //@Override
-    //public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
-    //    return map.getIndex(index, descending);
-    //}
-
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
         return map.getIndexIterator(index, descending);

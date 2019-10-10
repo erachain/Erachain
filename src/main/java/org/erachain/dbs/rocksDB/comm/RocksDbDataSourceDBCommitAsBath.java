@@ -18,7 +18,6 @@ import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl implements Transacted {
 
     ReadOptions readOptions;
-    //DBOptions dbOptions = new DBOptions();
 
     protected WriteBatchWithIndex writeBatch;
 

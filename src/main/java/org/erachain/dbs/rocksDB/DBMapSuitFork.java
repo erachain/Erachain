@@ -41,6 +41,9 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         this.parent = parent;
 
+        //OPEN MAP
+        openMap();
+
     }
 
     @Override
