@@ -63,6 +63,9 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this(parent, dcSet, null, logger, null);
     }
 
+    public Map getMap() {
+        return map;
+    }
 
     @Override
     public DBTab getParent() {

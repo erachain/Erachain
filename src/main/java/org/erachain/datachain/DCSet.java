@@ -51,7 +51,7 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - slow then DBS_ROCK_DB
      */
-    public static final int FINAL_TX_MAP = DBS_MAP_DB;
+    public static final int FINAL_TX_MAP = DBS_ROCK_DB;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
@@ -353,9 +353,7 @@ public class DCSet extends DBASet {
                 //DBS_NATIVE_MAP
                 , parent.transactionTab, this);
         this.transactionFinalMap = new TransactionFinalMapImpl(
-                //DBS_MAP_DB
-                DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                FINAL_TX_MAP
                 , parent.transactionFinalMap, this);
 
         this.referenceMap = new ReferenceMapImpl(

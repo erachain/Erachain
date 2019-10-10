@@ -55,6 +55,10 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         this(databaseSet, database, logger, null);
     }
 
+    public DBRocksDBTable getMap() {
+        return map;
+    }
+
     @Override
     public int size() {
         return map.size();

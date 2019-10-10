@@ -31,6 +31,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         // тут просто берем туже карту так как потом или сольем или убьем
         this.map = map;
+        this.wrriteBatch
 
     }
 

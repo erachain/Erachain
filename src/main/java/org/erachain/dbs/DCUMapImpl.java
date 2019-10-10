@@ -76,7 +76,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     protected void createIndexes() {
     }
 
-    public Map getMapSuit() {
+    public Map getMap() {
         return map;
     }
 

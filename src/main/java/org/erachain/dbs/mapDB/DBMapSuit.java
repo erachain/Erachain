@@ -100,6 +100,10 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
+    public Map getMap() {
+        return map;
+    }
+
     //@Override
     public NavigableSet<Tuple2<?, T>> getIndex(int index, boolean descending) {
 

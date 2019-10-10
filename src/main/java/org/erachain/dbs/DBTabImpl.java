@@ -62,7 +62,7 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
     // for TESTS etc.
     public void setMap(DBMapSuit map) { this.map = map; }
 
-    public DBMapSuit getMapSuit() {
+    public DBMapSuit getMap() {
         return map;
     }
 
