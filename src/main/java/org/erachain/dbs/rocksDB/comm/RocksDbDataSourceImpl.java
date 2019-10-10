@@ -586,6 +586,19 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         return new RockStoreIterator(dbCore.newIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
 
+    @Override
+    public void write(WriteBatch batch) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        try {
+            dbCore.write(new WriteOptions(), batch);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+
     private void updateByBatchInner(Map<byte[], byte[]> rows) throws Exception {
         if (quitIfNotAlive()) {
             return;

@@ -20,6 +20,7 @@ import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.WriteOptions;
 
+import java.io.File;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -62,6 +63,8 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     //Для пересчета размеров таблицы
     protected ByteableInteger byteableInteger = new ByteableInteger();
 
+    static Random randFork = new Random();
+
     public WriteOptions writeOptions;
 
     static {
@@ -97,6 +100,33 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 Settings.getInstance().getDataDir()
                 : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
         this.indexes = indexes;
+    }
+
+    /**
+     * Use random name for TMP Fork
+     *
+     * @param byteableKey
+     * @param byteableValue
+     * @param indexes
+     * @param settings
+     * @param writeOptions
+     * @param dbaSet
+     */
+    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
+                          RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
+        this.byteableKey = byteableKey;
+        this.byteableValue = byteableValue;
+        this.settings = settings;
+        this.writeOptions = writeOptions;
+        this.root = Settings.getInstance().getDataTempDir();
+        this.indexes = indexes;
+
+        File dbFile;
+        do {
+            dbFile = new File(root, "fork_RDB" + randFork.nextInt());
+        } while (dbFile.exists());
+
+        this.NAME_TABLE = dbFile.getName();
 
     }
 

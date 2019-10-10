@@ -151,10 +151,15 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void writeTo(DBTab targetMap) {
-        Iterator<T> iterator = this.map.keySet().iterator();
+        Iterator<T> iterator = this.map.getIterator(false);
         while (iterator.hasNext()) {
             T key = iterator.next();
-            targetMap.put(key, this.map.get(key));
+            U item = this.map.get(key);
+            if (item == null) {
+                targetMap.delete(key);
+            } else {
+                targetMap.put(key, item);
+            }
         }
     }
 

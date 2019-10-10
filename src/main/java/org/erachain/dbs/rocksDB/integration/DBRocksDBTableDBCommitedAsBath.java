@@ -36,6 +36,14 @@ public class DBRocksDBTableDBCommitedAsBath<K, V> extends DBRocksDBTable<K, V>
         afterOpen();
     }
 
+    public DBRocksDBTableDBCommitedAsBath(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
+                                          RocksDbSettings settings, WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
+        super(byteableKey, byteableValue, indexes, settings, writeOptions, dbaSet);
+        this.readOptions = readOptions;
+        openSource();
+        afterOpen();
+    }
+
     public DBRocksDBTableDBCommitedAsBath(String NAME_TABLE) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),

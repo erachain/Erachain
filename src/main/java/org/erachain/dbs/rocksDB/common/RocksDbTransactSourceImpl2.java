@@ -589,6 +589,10 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
 
+    @Override
+    public void write(WriteBatch batch) {
+    }
+
     private void updateByBatchInner(Map<byte[], byte[]> rows) throws Exception {
         if (quitIfNotAlive()) {
             return;

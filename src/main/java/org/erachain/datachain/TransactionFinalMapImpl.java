@@ -15,6 +15,7 @@ import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDBFork;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDB;
+import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -77,8 +78,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new TransactionFinalSuitRocksDBFork((TransactionTab) parent, databaseSet);
-                    //break;
+                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet);
+                    break;
                 default:
                     ///map = new nativeMapTreeMapFork(parent, databaseSet); - просто карту нельзя так как тут особые вызовы
                     map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
