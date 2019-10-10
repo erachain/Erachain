@@ -42,7 +42,7 @@ public class BlockChain {
     // сколько трназакции в блоке - если больше 0 то запускает тест на старте
     public static final int TEST_DB = 100;
     // размер балансового поля - чем больше тем сложнее
-    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[10000];
+    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[1000];
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100

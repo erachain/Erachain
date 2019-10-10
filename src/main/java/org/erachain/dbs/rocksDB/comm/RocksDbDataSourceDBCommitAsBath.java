@@ -73,6 +73,8 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             writeBatch.put(columnFamilyHandle, key, value);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         } finally {
             resetDbLock.readLock().unlock();
         }

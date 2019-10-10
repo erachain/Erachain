@@ -353,7 +353,7 @@ public class DCSet extends DBASet {
                 //DBS_NATIVE_MAP
                 , parent.transactionTab, this);
         this.transactionFinalMap = new TransactionFinalMapImpl(
-                FINAL_TX_MAP
+                DBS_MAP_DB //FINAL_TX_MAP
                 , parent.transactionFinalMap, this);
 
         this.referenceMap = new ReferenceMapImpl(
@@ -1613,36 +1613,39 @@ public class DCSet extends DBASet {
             if (!this.database.isClosed()) {
                 this.addUses();
 
-                if (this.getBlockMap().isProcessing()) {
-                    for (DBTab tab : tables) {
+                // если основная база то с откатом
+                if (parent == null) {
+                    if (this.getBlockMap().isProcessing()) {
+                        for (DBTab tab : tables) {
+                            try {
+                                tab.rollback();
+                            } catch (IOError e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
+
                         try {
-                            tab.rollback();
+                            this.database.rollback();
                         } catch (IOError e) {
                             LOGGER.error(e.getMessage(), e);
                         }
-                    }
 
-                    try {
-                        this.database.rollback();
-                    } catch (IOError e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-
-                    // not need on close!
-                    // getBlockMap().resetLastBlockSignature();
-                } else {
-                    for (DBTab tab : tables) {
-                        try {
-                            tab.commit();
-                        } catch (IOError e) {
-                            LOGGER.error(tab.toString() + ": " + e.getMessage(), e);
+                        // not need on close!
+                        // getBlockMap().resetLastBlockSignature();
+                    } else {
+                        for (DBTab tab : tables) {
+                            try {
+                                tab.commit();
+                            } catch (IOError e) {
+                                LOGGER.error(tab.toString() + ": " + e.getMessage(), e);
+                            }
                         }
-                    }
 
-                    try {
-                        this.database.commit();
-                    } catch (IOError e) {
-                        LOGGER.error(e.getMessage(), e);
+                        try {
+                            this.database.commit();
+                        } catch (IOError e) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
                     }
                 }
 
