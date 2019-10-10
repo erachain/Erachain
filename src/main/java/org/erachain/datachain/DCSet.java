@@ -353,8 +353,8 @@ public class DCSet extends DBASet {
                 //DBS_NATIVE_MAP
                 , parent.transactionTab, this);
         this.transactionFinalMap = new TransactionFinalMapImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
+                //DBS_MAP_DB
+                DBS_ROCK_DB
                 //DBS_NATIVE_MAP
                 , parent.transactionFinalMap, this);
 

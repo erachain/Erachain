@@ -1,8 +1,8 @@
 package org.erachain.core.web;
 
 import com.google.common.primitives.SignedBytes;
-import org.erachain.datachain.DCUMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.DCUMap;
 import org.mapdb.DB;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public class SharedPostsMap extends DCUMap<byte[], List<String>> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = database.createTreeMap("SharedPostsMap")
                 .comparator(SignedBytes.lexicographicalComparator())

@@ -1,9 +1,9 @@
 package org.erachain.core.web;
 
-import org.erachain.datachain.DCUMap;
 import org.erachain.datachain.DCSet;
-import org.mapdb.DB;
+import org.erachain.datachain.DCUMap;
 import org.erachain.utils.ByteArrayUtils;
+import org.mapdb.DB;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
 
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = database.createTreeMap("OrphanNameStorageHelperMap")
                 .makeOrGet();

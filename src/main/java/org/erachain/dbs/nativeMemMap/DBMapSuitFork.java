@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.ForkedMap;
 import org.erachain.dbs.mapDB.DBMapSuit;
 import org.slf4j.Logger;
 
@@ -19,7 +20,7 @@ import java.util.*;
 Поэтому нужно добавлять униальность
 
  */
-public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
+public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements ForkedMap {
 
     protected DBTab<T, U> parent;
 
@@ -54,7 +55,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
         this.parent = parent;
         COMPARATOR = comparator;
 
-        this.getMap();
+        this.openMap();
 
     }
 
@@ -62,6 +63,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
         this(parent, dcSet, null, logger, null);
     }
 
+
+    @Override
+    public DBTab getParent() {
+        return parent;
+    }
 
     // ERROR if key is not unique for each value:
     // After removing the key from the fork, which is in the parent, an incorrect post occurs
@@ -247,7 +253,20 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
         return false;
     }
 
-    public void addObserver(Observer o) {
+    @Override
+    public void writeToParent() {
+        Iterator<T> iterator = this.map.keySet().iterator();
+        while (iterator.hasNext()) {
+            T key = iterator.next();
+            parent.put(key, this.map.get(key));
+        }
+
+        if (deleted != null) {
+            iterator = this.deleted.keySet().iterator();
+            while (iterator.hasNext()) {
+                parent.delete(iterator.next());
+            }
+        }
     }
 
     @Override

@@ -21,7 +21,7 @@ public class ReferenceSuitRocksDB extends DBMapSuit<byte[], long[]> implements R
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableTrivial(), new ByteableLongArray(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,

@@ -24,7 +24,7 @@ public class UpdateNameMap extends DCUMap<byte[], Name> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("updateNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

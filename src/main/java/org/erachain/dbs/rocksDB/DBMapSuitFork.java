@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.ForkedMap;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.slf4j.Logger;
 
 /**
@@ -18,7 +19,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     @Getter
     protected DBTab<T, U> parent;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+    public DBMapSuitFork(DBTab parent, DBRocksDBTable map, DBASet dcSet, Logger logger, U defaultValue) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
@@ -28,8 +29,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         this.parent = parent;
 
-        this.getMap();
+        // тут просто берем туже карту так как потом или сольем или убьем
+        this.map = map;
 
+    }
+
+    @Override
+    public void openMap() {
     }
 
     /**

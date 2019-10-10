@@ -22,7 +22,7 @@ public class CompletedOrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("completed_orders")
                 .valueSerializer(new OrderSerializer())

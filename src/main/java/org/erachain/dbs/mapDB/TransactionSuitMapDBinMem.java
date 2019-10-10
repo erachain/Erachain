@@ -19,7 +19,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     }
 
     @Override
-    public void getMap() {
+    public void openMap() {
 
         if (true) {
             database = DCSet.makeDBinMemory();
@@ -86,7 +86,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
         if (this.database.getEngine().isClosed())
             return;
         close();
-        getMap();
+        openMap();
         createIndexes();
     }
 }

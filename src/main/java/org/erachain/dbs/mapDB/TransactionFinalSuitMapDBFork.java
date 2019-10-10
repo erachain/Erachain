@@ -41,7 +41,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         // TREE MAP for sortable search
         map = database.createTreeMap("height_seq_transactions")

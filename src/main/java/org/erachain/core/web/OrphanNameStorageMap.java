@@ -1,8 +1,8 @@
 package org.erachain.core.web;
 
 import com.google.common.primitives.SignedBytes;
-import org.erachain.datachain.DCUMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.DCUMap;
 import org.mapdb.DB;
 
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class OrphanNameStorageMap extends DCUMap<byte[], Map<String, String>> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = database.createTreeMap("OrphanNameStorageMap")
                 .comparator(SignedBytes.lexicographicalComparator())

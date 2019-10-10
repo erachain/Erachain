@@ -30,7 +30,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBRocksDBTable<T, U> map;
     protected List<IndexDB> indexes;
 
-    // for DCMapSuit
+    // for DBMapSuitFork
     public DBMapSuit() {
     }
 
@@ -46,7 +46,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         createIndexes();
 
         //OPEN MAP
-        getMap();
+        openMap();
 
         logger.info("USED");
     }

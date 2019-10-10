@@ -29,13 +29,13 @@ public class ATStateMap extends DCUMap<Tuple2<Integer, String>, byte[]> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         map = this.openMap(database);
     }
 
     @Override
     protected void getMemoryMap() {
-        getMap();
+        openMap();
     }
 
 

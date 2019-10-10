@@ -1,9 +1,8 @@
 package org.erachain.datachain;
 
+import com.google.common.primitives.UnsignedBytes;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
-
-import com.google.common.primitives.UnsignedBytes;
 
 /**
  * see datachain.IssueItemMap
@@ -20,7 +19,7 @@ public class IssueStatementMap extends IssueItemMap {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("statement_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

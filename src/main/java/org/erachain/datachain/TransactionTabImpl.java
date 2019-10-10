@@ -70,7 +70,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     }
 
     @Override
-    protected void getMap()
+    protected void openMap()
     {
         if (parent == null) {
             switch (dbsUsed) {
@@ -90,7 +90,8 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                     map = new TransactionSuitMapDBFork((TransactionTab) parent, databaseSet);
                     break;
                 case DBS_ROCK_DB:
-                    map = new TransactionSuitRocksDBFork((TransactionTab) parent, databaseSet);
+                    map = new TransactionSuitRocksDBFork((TransactionTab) parent,
+                            ((TransactionSuitRocksDB) parent).map, databaseSet);
                     break;
                 default:
                     map = new nativeMapTreeMapFork(parent, databaseSet, Fun.COMPARATOR, null);

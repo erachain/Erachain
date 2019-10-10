@@ -65,7 +65,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         if (parent == null) {
             switch (dbsUsed) {
@@ -78,7 +78,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet);
+                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent,
+                            ((TransactionFinalSuitRocksDB) parent).map, databaseSet);
                     break;
                 default:
                     ///map = new nativeMapTreeMapFork(parent, databaseSet); - просто карту нельзя так как тут особые вызовы

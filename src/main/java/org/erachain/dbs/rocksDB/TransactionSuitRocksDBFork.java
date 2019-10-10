@@ -5,12 +5,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionSuit;
 import org.erachain.datachain.TransactionTab;
-import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
-import org.erachain.dbs.rocksDB.transformation.ByteableLong;
-import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
-import org.rocksdb.ReadOptions;
-import org.rocksdb.WriteOptions;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,10 +16,11 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
 
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE_FORK";
 
-    public TransactionSuitRocksDBFork(TransactionTab parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+    public TransactionSuitRocksDBFork(TransactionTab parent, DBRocksDBTable parentMap, DBASet databaseSet) {
+        super(parent, parentMap, databaseSet, logger, null);
     }
 
+    /*
     @Override
     protected void getMap() {
 
@@ -36,6 +32,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
                 new ReadOptions(),
                 databaseSet);
     }
+     */
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})

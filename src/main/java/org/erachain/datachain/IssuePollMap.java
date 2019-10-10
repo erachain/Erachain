@@ -19,7 +19,7 @@ public class IssuePollMap extends IssueItemMap {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("poll_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

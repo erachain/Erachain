@@ -45,7 +45,7 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("vote_item_poll")
                 .keySerializer(BTreeKeySerializer.TUPLE3)

@@ -1,8 +1,8 @@
 package org.erachain.datachain;
 
+import org.erachain.utils.ByteArrayUtils;
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
-import org.erachain.utils.ByteArrayUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +21,7 @@ public class BlogPostMap extends DCUMap<String, List<byte[]>> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // / OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("BlogPostMap");
         map = createTreeMap.makeOrGet();

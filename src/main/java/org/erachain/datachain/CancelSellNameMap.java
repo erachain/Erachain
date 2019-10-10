@@ -3,9 +3,9 @@ package org.erachain.datachain;
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.transaction.CancelSellNameTransaction;
 import org.erachain.dbs.DBTab;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
-import org.erachain.utils.ObserverMessage;
 
 import java.math.BigDecimal;
 import java.util.TreeMap;
@@ -30,7 +30,7 @@ public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
     protected void createIndexes() {
     }
 
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("cancelNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

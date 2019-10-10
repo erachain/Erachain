@@ -1,10 +1,10 @@
 package org.erachain.datachain;
 
 import org.erachain.dbs.DBTab;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.ObserverMessage;
 
 import java.util.Stack;
 import java.util.TreeMap;
@@ -55,7 +55,7 @@ public class PersonAddressMap extends DCUMap<
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("person_address")
                 .keySerializer(BTreeKeySerializer.BASIC)

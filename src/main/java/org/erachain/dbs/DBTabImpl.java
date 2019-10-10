@@ -49,14 +49,14 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
         super(dbsUsed, parent, databaseSet);
 
         // OPEN MAP
-        this.getMap();
+        this.openMap();
     }
 
     public DBTabImpl(DBTab parent, DBASet databaseSet) {
         super(parent, databaseSet);
 
         // OPEN MAP
-        this.getMap();
+        this.openMap();
     }
 
     // for TESTS etc.
@@ -218,7 +218,7 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
 
     @Override
     public void writeToParent() {
-        this.map.writeTo(parent);
+        ((ForkedMap) this.map).writeToParent();
     }
 
     @Override

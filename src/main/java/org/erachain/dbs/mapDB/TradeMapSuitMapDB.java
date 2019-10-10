@@ -38,7 +38,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
 
         /* EXAMPLE for Long, Long

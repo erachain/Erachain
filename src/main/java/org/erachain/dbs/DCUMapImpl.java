@@ -65,11 +65,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
         if (parent != null || database == null) {
             this.getMemoryMap();
         } else {
-            this.getMap();
+            this.openMap();
         }
     }
 
-    protected abstract void getMap();
+    protected abstract void openMap();
     protected abstract void getMemoryMap();
     protected abstract U getDefaultValue();
 

@@ -5,18 +5,20 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.LongAndTransactionSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
-import org.mapdb.*;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.List;
 
 /**
  * Транзакции относящиеся к моим счетам. Сюда же записываться должны и неподтвержденные<br>
@@ -112,7 +114,7 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         BTreeMap mapTree = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.TUPLE2)

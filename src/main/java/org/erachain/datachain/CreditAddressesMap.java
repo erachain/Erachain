@@ -9,7 +9,10 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeMap;
 
 /** Общая сумма переданных средств в кредит на другой счет
  * Используется для проверки сумм которые отдаются или забираются у заемщика<br><br>
@@ -35,7 +38,7 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("credit_debt")
                 .keySerializer(BTreeKeySerializer.TUPLE3)

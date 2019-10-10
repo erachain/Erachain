@@ -2,8 +2,8 @@ package org.erachain.datachain;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.serializer.ItemSerializer;
-import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
 
 /**
  * Хранение активов.<br>
@@ -29,7 +29,7 @@ public class ItemTemplateMap extends ItemMap {
     }
 
     // type+name not initialized yet! - it call as Super in New
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))

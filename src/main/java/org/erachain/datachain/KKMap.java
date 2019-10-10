@@ -63,7 +63,7 @@ public class KKMap extends DCUMap<
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.BASIC)

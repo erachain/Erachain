@@ -1,8 +1,8 @@
 package org.erachain.core.web;
 
-import org.erachain.datachain.DCUMap;
-import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.DCUMap;
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 
@@ -19,7 +19,7 @@ public class NameStorageMap extends DCUMap<String, Map<String, String>> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("NameStorageMap");
         map = createTreeMap.makeOrGet();

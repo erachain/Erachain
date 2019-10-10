@@ -139,7 +139,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         map = openMap(database);
     }
@@ -147,7 +147,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
     @Override
     protected void getMemoryMap() {
         // OPEN MAP
-        this.getMap();
+        this.openMap();
     }
 
     @Override
