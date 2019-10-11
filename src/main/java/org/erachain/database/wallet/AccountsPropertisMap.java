@@ -30,7 +30,7 @@ public class AccountsPropertisMap extends DCUMapImpl<String, Tuple2<String, Stri
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         map = database.createTreeMap("accounts_propertis_map")
                 //.keySerializer(BTreeKeySerializer.STRING)

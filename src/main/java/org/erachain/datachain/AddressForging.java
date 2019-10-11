@@ -50,7 +50,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
 
     @Override
 
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         ////return database.createHashMap("address_forging").makeOrGet();
         map = database.getHashMap("address_forging");

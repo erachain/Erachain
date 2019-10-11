@@ -20,7 +20,7 @@ public class HashtagPostMap extends DCUMap<String, List<byte[]>> {
 
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // / OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("HashtagPostMap");
         map = createTreeMap.makeOrGet();

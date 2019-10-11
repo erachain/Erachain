@@ -12,7 +12,7 @@ public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
         return 0;
     }
 
-    protected abstract void getMap();
+    protected abstract void openMap();
 
     protected void createIndexes() {
     }

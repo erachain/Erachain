@@ -49,7 +49,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         this.logger = logger;
         this.defaultValue = defaultValue;
 
-        getMap();
+        openMap();
         createIndexes();
         logger.info("USED");
     }

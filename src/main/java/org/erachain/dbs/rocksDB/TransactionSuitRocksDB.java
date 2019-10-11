@@ -50,7 +50,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableLong(), new ByteableTransaction(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,

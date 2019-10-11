@@ -31,7 +31,7 @@ public class TransactionFinalSignsSuitMapDB extends DBMapSuit<byte[], Long> impl
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         // HASH map is so QUICK
         map = database.createHashMap("signature_final_tx")

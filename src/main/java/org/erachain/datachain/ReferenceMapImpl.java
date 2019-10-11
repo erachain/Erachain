@@ -27,7 +27,7 @@ public class ReferenceMapImpl extends DBTabImpl<byte[], long[]>
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         if (parent == null) {
             switch (dbsUsed) {

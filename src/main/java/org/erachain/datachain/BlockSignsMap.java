@@ -30,7 +30,7 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN HASH MAP
         //
         map = database.createHashMap("height")

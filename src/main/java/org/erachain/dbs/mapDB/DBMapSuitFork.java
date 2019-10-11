@@ -51,7 +51,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> {
 
         this.parent = parent;
 
-        this.getMap();
+        this.openMap();
 
     }
 

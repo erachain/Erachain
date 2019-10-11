@@ -45,7 +45,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         this.database = database;
 
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
-        getMap();
+        openMap();
 
         makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
 
@@ -65,7 +65,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         if (this.name == null)
             return;

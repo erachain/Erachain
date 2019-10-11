@@ -147,7 +147,7 @@ public class BlocksHeadMap extends DCUMapImpl<Tuple2<String, String>, Block.Bloc
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.TUPLE2) /// ТУТ тоже переделать на стандартный серилиазотор

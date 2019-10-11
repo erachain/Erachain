@@ -49,7 +49,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderMapS
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         map = database.createTreeMap("orders")
                 .valueSerializer(new OrderSerializer())
@@ -121,7 +121,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderMapS
 
     //@Override
     protected void getMemoryMap() {
-        getMap();
+        openMap();
     }
 
     @Override

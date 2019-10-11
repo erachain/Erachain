@@ -64,7 +64,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = new DBRocksDBTableDBCommitedAsBath<byte[], Tuple5<
                         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE

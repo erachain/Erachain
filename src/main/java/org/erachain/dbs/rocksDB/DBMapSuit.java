@@ -45,7 +45,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         createIndexes();
 
         //OPEN MAP
-        getMap();
+        openMap();
 
         logger.info("USED");
     }

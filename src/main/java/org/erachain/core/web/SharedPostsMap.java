@@ -20,7 +20,7 @@ public class SharedPostsMap extends DCUMap<byte[], List<String>> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = database.createTreeMap("SharedPostsMap")
                 .comparator(SignedBytes.lexicographicalComparator())

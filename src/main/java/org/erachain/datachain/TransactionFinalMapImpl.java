@@ -64,7 +64,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         if (parent == null) {
             switch (dbsUsed) {
