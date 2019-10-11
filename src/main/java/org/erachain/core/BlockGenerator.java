@@ -863,14 +863,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         = getUnconfirmedTransactions(height, timePointForValidTX,
                                         bchain, winned_winValue);
                             }
-                        } else {
+                        } else if (!BlockChain.STOP_GENERATE_BLOCKS) {
                             /// тестовый аккаунт
                             acc_winner = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
                             /// закатем в очередь транзакции
                             testTransactions(height, timePointForValidTX - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height));
                         }
 
-                        if (acc_winner != null) {
+                        if (!BlockChain.STOP_GENERATE_BLOCKS && acc_winner != null) {
 
                             if (ctrl.isOnStopping()) {
                                 local_status = -1;

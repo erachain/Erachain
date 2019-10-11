@@ -2543,7 +2543,11 @@ public class BlockExplorer {
             int counter = size;
             transactions = new ArrayList<>();
             while (iterator.hasNext() && counter > 0 ) {
+
                 Transaction transaction = map.get(iterator.next());
+                if (transaction == null)
+                    continue;
+
                 if (transaction.getType() == Transaction.CALCULATED_TRANSACTION
                         && ((RCalculated)transaction).getMessage().equals("forging"))
                     continue;

@@ -40,7 +40,9 @@ public class BlockChain {
 
     public static final int BLOCK_COUNT = 0; ////
     // сколько трназакции в блоке - если больше 0 то запускает тест на старте
-    public static final int TEST_DB = 100;
+    public static final int TEST_DB = 100000;
+    public static final boolean STOP_GENERATE_BLOCKS = true;
+
     // размер балансового поля - чем больше тем сложнее
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[1000];
 

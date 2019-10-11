@@ -81,7 +81,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet);
                     break;
                 default:
-                    ///map = new nativeMapTreeMapFork(parent, databaseSet); - просто карту нельзя так как тут особые вызовы
+                    //map = new nativeMapTreeMapFork(parent, databaseSet, null,  null); /// - просто карту нельзя так как тут особые вызовы
                     map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
             }
         }
