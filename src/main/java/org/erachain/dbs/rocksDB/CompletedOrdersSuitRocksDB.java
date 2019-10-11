@@ -21,7 +21,7 @@ public class CompletedOrdersSuitRocksDB extends DBMapSuit<Long, Order> {
     }
 
     @Override
-    protected void getMap() {
+    public void openMap() {
 
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableLong(), new ByteableOrder(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,

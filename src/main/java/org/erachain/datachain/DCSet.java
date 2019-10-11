@@ -139,7 +139,7 @@ public class DCSet extends DBASet {
     private IssueAssetMap issueAssetMap;
     private OrderMapImpl orderMap;
     private CompletedOrderMap completedOrderMap;
-    private TradeMap tradeMap;
+    private TradeMapImpl tradeMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
     private ItemImprintMap itemImprintMap;
@@ -1287,7 +1287,7 @@ public class DCSet extends DBASet {
      * Значение - Сделка
      Initiator DBRef (Long) + Target DBRef (Long) -> Trade
      */
-    public TradeMap getTradeMap() {
+    public TradeMapImpl getTradeMap() {
         return this.tradeMap;
     }
 
