@@ -21,7 +21,7 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableTrivial(), new ByteableLong(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,

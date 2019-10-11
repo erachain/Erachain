@@ -20,7 +20,7 @@ public class IssueStatementMap extends IssueItemMap {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("statement_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

@@ -35,7 +35,7 @@ public class BlocksSuitMapDB extends DBMapSuit<Integer, Block> implements Blocks
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         map = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.BASIC)

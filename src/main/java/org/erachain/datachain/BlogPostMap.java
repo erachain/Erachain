@@ -21,7 +21,7 @@ public class BlogPostMap extends DCUMap<String, List<byte[]>> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // / OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("BlogPostMap");
         map = createTreeMap.makeOrGet();

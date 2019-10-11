@@ -19,7 +19,7 @@ public class NameStorageMap extends DCUMap<String, Map<String, String>> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         // OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("NameStorageMap");
         map = createTreeMap.makeOrGet();

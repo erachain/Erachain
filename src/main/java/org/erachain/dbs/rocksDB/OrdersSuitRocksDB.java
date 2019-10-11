@@ -38,7 +38,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderMa
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableLong(), new ByteableOrder(),
                 NAME_TABLE, indexes,

@@ -18,7 +18,7 @@ public class IssueAssetMap extends IssueItemMap {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("asset_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

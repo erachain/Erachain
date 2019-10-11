@@ -51,7 +51,7 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         this.database = database;
 
         //OPEN MAP
-        getMap();
+        openMap();
 
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
@@ -91,7 +91,7 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         return this.databaseSet;
     }
 
-    protected abstract void getMap();
+    protected abstract void openMap();
 
     /**
      * Соединяется прямо к списку SortableList для отображения в ГУИ

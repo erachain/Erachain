@@ -88,7 +88,7 @@ public class NameSaleMap extends DCUMapImpl<Tuple2<String, String>, BigDecimal> 
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("namesales")
                 .keySerializer(BTreeKeySerializer.TUPLE2)

@@ -30,7 +30,7 @@ public class ItemStatementMap extends ItemMap {
     }
 
     // type+name not initialized yet! - it call as Super in New
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))

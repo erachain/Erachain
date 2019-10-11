@@ -21,7 +21,7 @@ public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
 
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = database.createTreeMap("OrphanNameStorageHelperMap")
                 .makeOrGet();

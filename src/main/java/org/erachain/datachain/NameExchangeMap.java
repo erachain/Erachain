@@ -60,7 +60,7 @@ public class NameExchangeMap extends DCUMap<String, BigDecimal> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("namesales")
                 .counterEnable()

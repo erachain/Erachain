@@ -49,7 +49,7 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = this.openMap(database);
     }

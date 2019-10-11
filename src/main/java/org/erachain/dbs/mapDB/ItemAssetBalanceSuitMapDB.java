@@ -35,7 +35,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
     @SuppressWarnings({"unchecked"})
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         BTreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,

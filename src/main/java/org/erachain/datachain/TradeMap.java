@@ -53,14 +53,14 @@ public class TradeMap extends DCUMap<Tuple2<Long, Long>, Trade> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = this.openMap(database);
     }
 
     @Override
     protected void getMemoryMap() {
-        getMap();
+        openMap();
     }
 
     @SuppressWarnings("unchecked")

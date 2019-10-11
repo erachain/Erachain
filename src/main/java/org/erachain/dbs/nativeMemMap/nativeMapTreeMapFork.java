@@ -16,7 +16,7 @@ public class nativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U>
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         // OPEN MAP
         if (COMPARATOR == null) {

@@ -22,7 +22,7 @@ public class LocalDataMap extends DCUMap<String, String> {
 
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         /// OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("LocalDataMap");
         map = createTreeMap.makeOrGet();

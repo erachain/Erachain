@@ -38,14 +38,14 @@ public class CompletedOrderMap extends DCUMap<Long, Order> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = this.openMap(database);
     }
 
     @Override
     protected void getMemoryMap() {
-        getMap();
+        openMap();
     }
 
     private Map<Long, Order> openMap(DB database) {

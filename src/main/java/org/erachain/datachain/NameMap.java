@@ -22,7 +22,7 @@ public class NameMap extends DCUMap<String, Name> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("names")
                 .valueSerializer(new NameSerializer())

@@ -19,7 +19,7 @@ public class OrphanNameStorageMap extends DCUMap<byte[], Map<String, String>> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
 
         map = database.createTreeMap("OrphanNameStorageMap")
                 .comparator(SignedBytes.lexicographicalComparator())

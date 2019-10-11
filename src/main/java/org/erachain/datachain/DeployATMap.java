@@ -21,7 +21,7 @@ public class DeployATMap extends DCUMap<byte[], Long> {
     }
 
     @Override
-    protected void getMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("DeployATOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
