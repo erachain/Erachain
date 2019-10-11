@@ -13,7 +13,7 @@ import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
-import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
+import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
@@ -94,7 +94,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                             ((TransactionSuitRocksDB) parent).map, databaseSet);
                     break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, Fun.COMPARATOR, null);
+                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.COMPARATOR, null);
             }
         }
     }

@@ -2,7 +2,6 @@ package org.erachain.datachain;
 
 // 30/03
 
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -11,7 +10,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.BlocksSuitMapDB;
-import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
+import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Atomic;
@@ -37,7 +36,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 @Slf4j
 public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap {
 
-    @Setter
+    //@Setter
     private byte[] lastBlockSignature;
     private Atomic.Boolean processingVar;
     private Boolean processing;
@@ -75,7 +74,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
                     //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
                     //break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, null, null);
+                    map = new NativeMapTreeMapFork(parent, databaseSet, null, null);
             }
         }
     }

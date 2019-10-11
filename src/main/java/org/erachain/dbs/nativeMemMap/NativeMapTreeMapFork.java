@@ -9,9 +9,9 @@ import java.util.Comparator;
 import java.util.TreeMap;
 
 @Slf4j
-public class nativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U> implements ForkedMap {
+public class NativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U> implements ForkedMap {
 
-    public nativeMapTreeMapFork(DBTab parent, DBASet databaseSet, Comparator comparator, U defaultValue) {
+    public NativeMapTreeMapFork(DBTab parent, DBASet databaseSet, Comparator comparator, U defaultValue) {
         super(parent, databaseSet, comparator, logger, defaultValue);
     }
 

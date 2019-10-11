@@ -13,7 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
-import org.erachain.dbs.mapDB.TransactionFinalSuitMapDBFork;
+import org.erachain.dbs.nativeMemMap.NativeMapHashMapFork;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
@@ -81,8 +81,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet);
                     break;
                 default:
-                    //map = new nativeMapTreeMapFork(parent, databaseSet, null,  null); /// - просто карту нельзя так как тут особые вызовы
-                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
+                    map = new NativeMapHashMapFork(parent, databaseSet, null);
+                    //map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
             }
         }
     }
