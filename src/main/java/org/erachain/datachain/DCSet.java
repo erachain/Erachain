@@ -48,25 +48,30 @@ public class DCSet extends DBASet {
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
     public static final int BLOCKS_MAP = DBS_ROCK_DB;
+    public static final int BLOCKS_MAP_FORK = DBS_NATIVE_MAP;
     /**
      * DBS_MAP_DB - slow then DBS_ROCK_DB
      */
     public static final int FINAL_TX_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_MAP_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
     public static final int FINAL_TX_SIGNS_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_SIGNS_MAP_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
      */
-    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;
+    public static final int UNCONF_TX_MAP = DBS_NATIVE_MAP; //DBS_MAP_DB_IN_MEM;
+    public static final int UNCONF_TX_MAP_FORK = DBS_NATIVE_MAP; //DBS_MAP_DB_IN_MEM;
 
     /**
      * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
      */
     public static final int ACCOUNT_BALANCES = DBS_ROCK_DB;
+    public static final int ACCOUNT_BALANCES_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
@@ -343,35 +348,24 @@ public class DCSet extends DBASet {
 
         // переделанные поновой таблицы
         this.assetBalanceMap = new ItemAssetBalanceTabImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                ACCOUNT_BALANCES_FORK
                 , parent.assetBalanceMap, this);
         this.transactionTab = new TransactionTabImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                UNCONF_TX_MAP_FORK
                 , parent.transactionTab, this);
         this.transactionFinalMap = new TransactionFinalMapImpl(
-                DBS_MAP_DB //FINAL_TX_MAP
+                FINAL_TX_MAP_FORK
                 , parent.transactionFinalMap, this);
-
         this.referenceMap = new ReferenceMapImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                DBS_NATIVE_MAP
                 , parent.referenceMap, this);
 
         this.blockMap = new BlocksMapImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                BLOCKS_MAP_FORK
                 , parent.blockMap, this);
 
         this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                FINAL_TX_SIGNS_MAP_FORK
                 , parent.transactionFinalMapSigns, this);
 
         this.orderMap = new OrderMapImpl(

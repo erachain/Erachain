@@ -10,12 +10,13 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.BlocksSuitMapDB;
-import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
+import org.erachain.dbs.nativeMemMap.NativeMapHashMapFork;
 import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 
+import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 ;
@@ -70,11 +71,14 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             }
         } else {
             switch (dbsUsed) {
+                case DBS_MAP_DB:
+                    //map = new BlocksSuitMapDBFork((TransactionTab) parent, databaseSet);
+                    //break;
                 case DBS_ROCK_DB:
                     //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
                     //break;
                 default:
-                    map = new NativeMapTreeMapFork(parent, databaseSet, null, null);
+                    map = new NativeMapHashMapFork(parent, databaseSet, null);
             }
         }
     }

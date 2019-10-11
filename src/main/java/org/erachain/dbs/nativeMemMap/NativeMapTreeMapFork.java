@@ -23,7 +23,6 @@ public class NativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U> implements F
             map = new TreeMap<T, U>();
         } else {
             map = new TreeMap<T, U>(COMPARATOR);
-            ///map = new HashMap<T, U>(Hasher.BYTE_ARRAY);
         }
 
     }

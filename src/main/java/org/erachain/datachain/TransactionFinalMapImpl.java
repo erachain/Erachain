@@ -13,6 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
+import org.erachain.dbs.mapDB.TransactionFinalSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.NativeMapHashMapFork;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDBFork;
@@ -23,6 +24,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
 
+import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 //import java.math.BigDecimal;
@@ -77,12 +79,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             }
         } else {
             switch (dbsUsed) {
+                case DBS_MAP_DB:
+                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
+                    break;
                 case DBS_ROCK_DB:
                     map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet);
                     break;
                 default:
                     map = new NativeMapHashMapFork(parent, databaseSet, null);
-                    //map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
             }
         }
     }
