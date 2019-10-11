@@ -200,12 +200,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 // USE transactions
                                 openDB(dbOptions, columnFamilyDescriptors);
 
-                                if (indexes != null && !indexes.isEmpty()) {
-                                    for (int i = 0; i < indexes.size(); i++) {
-                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
-                                    }
-                                }
-
                                 logger.info("database opened");
                             }
 
@@ -213,6 +207,13 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                             logger.error(e.getMessage(), e);
                             throw new RuntimeException("Failed to initialize database", e);
                         }
+
+                        if (indexes != null && !indexes.isEmpty()) {
+                            for (int i = 0; i < indexes.size(); i++) {
+                                indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                            }
+                        }
+
                         alive = true;
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);

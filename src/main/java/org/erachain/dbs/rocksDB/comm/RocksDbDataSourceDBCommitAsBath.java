@@ -74,6 +74,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
+            logger.error(this.getClass().getSimpleName() + " : " + columnFamilyHandle.toString());
             logger.error(e.getMessage(), e);
         } finally {
             resetDbLock.readLock().unlock();
@@ -209,7 +210,6 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         try {
             ////dbCore.flushWal(true);
             dbCore.write(writeOptions, writeBatch);
-            logger.debug(" dbCore.write");
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -219,6 +219,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             } else {
                 writeBatch.clear();
             }
+            logger.debug(" writeBatch commit");
 
             resetDbLock.readLock().unlock();
         }
@@ -239,7 +240,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             writeBatch.clear();
         }
 
-        logger.debug("writeBatch close");
+        logger.debug("writeBatch rollback");
 
         resetDbLock.readLock().unlock();
 
@@ -260,6 +261,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
+            logger.debug("writeBatch close");
             resetDbLock.writeLock().unlock();
         }
     }
