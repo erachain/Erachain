@@ -203,31 +203,30 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 logger.info("database opened");
                             }
 
+                            if (indexes != null && !indexes.isEmpty()) {
+                                for (int i = 0; i < indexes.size(); i++) {
+                                    indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                }
+                            }
+
+                            alive = true;
+
+                            // INIT SIZE INDEX
+                            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+
+                            if (create) {
+                                // Нужно для того чтобы в базе даже у транзакционных был Размер уже
+                                dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+                            }
+
                         } catch (RocksDBException e) {
                             logger.error(e.getMessage(), e);
                             throw new RuntimeException("Failed to initialize database", e);
                         }
 
-                        if (indexes != null && !indexes.isEmpty()) {
-                            for (int i = 0; i < indexes.size(); i++) {
-                                indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
-                            }
-                        }
-
-                        alive = true;
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);
                         throw new RuntimeException("Failed to initialize database", ioe);
-                    }
-
-                    columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-
-                    if (create) {
-                        // Нужно для того чтобы в базе дае у транзакционных был Размер уже
-                        try {
-                            dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-                        } catch (RocksDBException edb) {
-                        }
                     }
 
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
