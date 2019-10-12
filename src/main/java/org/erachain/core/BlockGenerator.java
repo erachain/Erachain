@@ -270,7 +270,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
 
         // добавить невалидных транзакций немного - по времени создания
-        timestamp = blockTimestamp - 84600000 * 100;
+        timestamp = blockTimestamp - 10000000L * 1L;
         PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
         for (int index = 0; index < (BlockChain.TEST_DB >> 3); index++) {
 
@@ -417,7 +417,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
 
         LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
-                + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size());
+                + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size()
+                + " from Poll: " + map.size());
 
         this.setMonitorStatusAfter();
 

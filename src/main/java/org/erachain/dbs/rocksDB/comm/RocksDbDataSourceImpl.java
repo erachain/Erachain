@@ -175,7 +175,9 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 logger.info("database created");
                             } catch (RocksDBException e) {
 
-                                logger.debug(e.getMessage(), e);
+                                /// если при открытии БД же есть то выдаст ошибку что в ней есть Инжекс SIZE
+                                // и прийдет сюда - тут открываем с индексами уже описанными
+                                ////logger.debug(e.getMessage(), e);
 
                                 dbOptions.setCreateIfMissing(true);
                                 dbOptions.setCreateMissingColumnFamilies(true);

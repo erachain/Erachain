@@ -1695,7 +1695,7 @@ public class DCSet extends DBASet {
 
         boolean needFlush = System.currentTimeMillis() - poinClear + 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1);
         // try repopulate table
-        if (needFlush) {
+        if (true || needFlush) {
             int height = blocksHeadsMap.size();
             poinClear = System.currentTimeMillis();
             TransactionTab utxMap = getTransactionTab();
