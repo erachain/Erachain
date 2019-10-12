@@ -1789,7 +1789,7 @@ public class DCSet extends DBASet {
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
-                    + (System.currentTimeMillis() - start) / 1000);
+                    + (System.currentTimeMillis() - start) + " ms");
 
             this.actions = 0l;
             this.engineSize = getEngineSize();
