@@ -2206,8 +2206,8 @@ import java.util.*;
 
         long tickets = System.currentTimeMillis() - start;
         if (transactionCount > 0 && tickets > 10 || tickets > 10) {
-            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets * 0.001
-                    + ", TXs= " + this.transactionCount
+            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets
+                    + " ms, TXs= " + this.transactionCount
                     + (transactionCount == 0? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
         }
 

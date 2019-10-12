@@ -1046,8 +1046,8 @@ public class Synchronizer extends Thread {
                     block.saveToChainFromvalidatedForkDB();
                     long tickets = System.currentTimeMillis() - start;
                     if (block.blockHead.transactionsCount > 0 || tickets > 10) {
-                        LOGGER.debug("[" + block.heightBlock + "] TOTAL processing time: " + tickets * 0.001
-                                + ", TXs= " + block.blockHead.transactionsCount
+                        LOGGER.debug("[" + block.heightBlock + "] TOTAL processing time: " + tickets
+                                + " ms, TXs= " + block.blockHead.transactionsCount
                                 + (block.blockHead.transactionsCount == 0 ? "" : " - " + (block.blockHead.transactionsCount * 1000 / tickets) + " tx/sec"));
                     }
                 }
