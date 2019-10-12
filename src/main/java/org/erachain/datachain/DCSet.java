@@ -1694,26 +1694,29 @@ public class DCSet extends DBASet {
         this.addUses();
 
         boolean needFlush = System.currentTimeMillis() - poinClear + 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1);
-        // try repopulate table
-        if (true || needFlush) {
-            int height = blocksHeadsMap.size();
+        // try repopulate UTX table
+        if (needFlush) {
             poinClear = System.currentTimeMillis();
+            int height = blocksHeadsMap.size();
             TransactionTab utxMap = getTransactionTab();
             LOGGER.debug("try CLEAR UTXs");
             int sizeUTX = utxMap.size();
             LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
-            this.actions += sizeUTX;
             // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
             // так .values() выдает не отдельный массив а объект базы данных!
             Transaction[] items = utxMap.values().toArray(new Transaction[]{});
             utxMap.clear();
             long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
+            int countDeleted = 0;
             for (Transaction item: items) {
                 if (timestamp > item.getDeadline()) {
+                    countDeleted++;
                     continue;
                 }
                 utxMap.add(item);
             }
+
+            this.actions += countDeleted ;
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
