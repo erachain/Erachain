@@ -174,6 +174,9 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 create = true;
                                 logger.info("database created");
                             } catch (RocksDBException e) {
+
+                                logger.debug(e.getMessage(), e);
+
                                 dbOptions.setCreateIfMissing(true);
                                 dbOptions.setCreateMissingColumnFamilies(true);
                                 dbOptions.setIncreaseParallelism(3);

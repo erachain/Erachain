@@ -360,7 +360,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     continue;
                 }
 
-                if (timestamp > transaction.getDeadline()) {
+                if (false && // тут нельзя пока удалять - может она будет включена
+                        // и пусть удаляется только если невалидная будет
+                        timestamp > transaction.getDeadline()) {
                     needRemoveInvalids.add(transaction.getSignature());
                     continue;
                 }

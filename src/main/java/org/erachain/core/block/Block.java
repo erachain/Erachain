@@ -1599,13 +1599,15 @@ import java.util.*;
 
             long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
 
-            // RESET forginf Info Updates
+            // RESET forging Info Updates
             this.forgingInfoUpdate = null;
 
             if (andProcess) {
-                if (!isPrimarySet || cnt.noCalculated) {
+                if (cnt.noCalculated) {
                     this.txCalculated = null;
                 } else {
+                    // даже если это в Форке - если Полный Расчет то Калкулатед нужно вычислять
+                    // для последующего слива в цепочку
                     // make pool for calculated
                     this.txCalculated = new ArrayList<RCalculated>();
                 }
@@ -1726,7 +1728,9 @@ import java.util.*;
 
                     //SET PARENT
                     ///logger.debug("[" + seqNo + "] try refsMap.set" );
-                    if (isPrimarySet) {
+                    if (true // в любом случае нужно просчитывать если Полный Просчет
+                            // - чтобы потом слить в основную цепочку
+                                || isPrimarySet) {
                         //REMOVE FROM UNCONFIRMED DATABASE
                         ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
