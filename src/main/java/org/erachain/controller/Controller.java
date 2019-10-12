@@ -352,6 +352,10 @@ public class Controller extends Observable {
         this.transactionMakeTimingAverage = transactionMakeTimingAverage;
     }
 
+    /**
+     *
+     * @return
+     */
     public JSONObject getBenchmarks() {
 
         JSONObject jsonObj = new JSONObject();

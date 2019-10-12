@@ -352,6 +352,10 @@ public class BlockChain {
     public long transactionValidateTimingAverage;
     public long transactionValidateTimingCounter;
 
+    /**
+     * Учитывает время очистки очереди неподтвержденных трнзакций и сброса на жесткий диск их памяти
+     * И поэтому это число хуже чем в Логе по подстчету обработки транзакций в блоке
+     */
     public long transactionProcessTimingAverage;
     public long transactionProcessTimingCounter;
 
@@ -626,7 +630,11 @@ public class BlockChain {
 
     public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
         int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
-        return DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
+        if (TEST_DB > 0) {
+            return GENERATING_MIN_BLOCK_TIME_MS(height);
+        } else {
+            return DEVELOP_USE ? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
+        }
     }
 
     public static int BLOCKS_PER_DAY(int height) {

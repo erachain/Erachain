@@ -360,6 +360,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     continue;
                 }
 
+                if (timestamp > transaction.getDeadline()) {
+                    needRemoveInvalids.add(transaction.getSignature());
+                    continue;
+                }
+
                 try {
 
                     if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
