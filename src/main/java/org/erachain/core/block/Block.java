@@ -1789,8 +1789,8 @@ import java.util.*;
 
             }
 
-            if (isPrimarySet) {
-                // если это просчет уже для записи в нашу базу данных а не при выборе Цепочки для синхронизации
+            if (andProcess) {
+                // если это просчет уже для записи в нашу базу данных
                 processTiming = System.nanoTime() - processTiming;
                 if (processTiming < 999999999999l) {
                     // при переполнении может быть минус

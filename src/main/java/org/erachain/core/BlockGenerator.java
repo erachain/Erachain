@@ -269,8 +269,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         }
 
-        // добавить невалидных трнзакций немного - по вермени создания
-        timestamp = blockTimestamp - 84600000 * 10;
+        // добавить невалидных транзакций немного - по времени создания
+        timestamp = blockTimestamp - 84600000 * 100;
         PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
         for (int index = 0; index < (BlockChain.TEST_DB >> 3); index++) {
 
