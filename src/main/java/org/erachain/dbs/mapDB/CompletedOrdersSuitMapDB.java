@@ -22,7 +22,7 @@ public class CompletedOrdersSuitMapDB extends DBMapSuit<Long, Order> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("completed_orders")
                 .valueSerializer(new OrderSerializer())

@@ -39,12 +39,24 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.logger = logger;
         this.defaultValue = defaultValue;
 
+        if (false) {
+            if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+                // System.out.println("########################### Free Memory:"
+                // + Runtime.getRuntime().freeMemory());
+                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                    System.gc();
+                    if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
+                        Controller.getInstance().stopAll(97);
+                }
+            }
+        }
+
         this.parent = parent;
 
-        //OPEN MAP
-        openMap();
+        this.openMap();
 
     }
+
 
     @Override
     public int size() {
