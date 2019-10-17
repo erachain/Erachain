@@ -44,7 +44,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public void openMap() {
+    protected void openMap() {
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:

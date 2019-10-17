@@ -2,8 +2,8 @@ package org.erachain.datachain;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.serializer.ItemSerializer;
-import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
 
 /**
  * Хранение активов.<br>

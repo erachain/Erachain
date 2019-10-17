@@ -1,9 +1,6 @@
 package org.erachain.dbs.rocksDB.common;
 
-import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.RocksIterator;
-import org.rocksdb.WriteOptions;
+import org.rocksdb.*;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -64,6 +61,8 @@ public interface RocksDbDataSource {
     RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter);
 
     RockStoreIterator indexIterator(boolean descending, int indexDB);
+
+    void write(WriteBatch batch);
 
     void updateByBatch(Map<byte[], byte[]> rows);
 

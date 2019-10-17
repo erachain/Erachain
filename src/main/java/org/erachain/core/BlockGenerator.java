@@ -269,8 +269,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         }
 
-        // добавить невалидных трнзакций немного - по вермени создания
-        timestamp = blockTimestamp - 84600000 * 10;
+        // добавить невалидных транзакций немного - по времени создания
+        timestamp = blockTimestamp - 10000000L * 1L;
         PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
         for (int index = 0; index < (BlockChain.TEST_DB >> 3); index++) {
 
@@ -360,6 +360,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     continue;
                 }
 
+                if (false && // тут нельзя пока удалять - может она будет включена
+                        // и пусть удаляется только если невалидная будет
+                        timestamp > transaction.getDeadline()) {
+                    needRemoveInvalids.add(transaction.getSignature());
+                    continue;
+                }
+
                 try {
 
                     if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
@@ -410,7 +417,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
 
         LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
-                + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size());
+                + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size()
+                + " from Poll: " + map.size());
 
         this.setMonitorStatusAfter();
 
@@ -863,14 +871,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         = getUnconfirmedTransactions(height, timePointForValidTX,
                                         bchain, winned_winValue);
                             }
-                        } else {
+                        } else if (!BlockChain.STOP_GENERATE_BLOCKS) {
                             /// тестовый аккаунт
                             acc_winner = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
                             /// закатем в очередь транзакции
                             testTransactions(height, timePointForValidTX - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height));
                         }
 
-                        if (acc_winner != null) {
+                        if (!BlockChain.STOP_GENERATE_BLOCKS && acc_winner != null) {
 
                             if (ctrl.isOnStopping()) {
                                 local_status = -1;

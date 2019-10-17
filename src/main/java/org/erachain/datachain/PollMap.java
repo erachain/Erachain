@@ -1,10 +1,10 @@
 package org.erachain.datachain;
 
 import org.erachain.core.voting.Poll;
-import org.erachain.dbs.DBTab;
 import org.erachain.database.serializer.PollSerializer;
-import org.mapdb.DB;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
 
 import java.util.HashMap;
 

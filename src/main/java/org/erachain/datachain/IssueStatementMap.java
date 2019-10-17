@@ -1,9 +1,8 @@
 package org.erachain.datachain;
 
+import com.google.common.primitives.UnsignedBytes;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
-
-import com.google.common.primitives.UnsignedBytes;
 
 /**
  * see datachain.IssueItemMap

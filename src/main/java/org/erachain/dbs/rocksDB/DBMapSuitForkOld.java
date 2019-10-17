@@ -14,12 +14,12 @@ import java.util.TreeMap;
 
 /**
  * Оболочка для Карты от конкретной СУБД чтобы эту оболочку вставлять в Таблицу, которая форкнута (см. fork()).
- * Тут всегда должен быть задан Родитель. Здесь другой порядок обработки данных в СУБД.
- * Так как тут есть слив в базу и WriteBatchIndexed - то не нужны всякие примочки с deleted
+ * Тут всегда должен быть задан Родитель. Здесь другой порядок обработки данных в СУБД
+ *
  * @param <T>
  * @param <U>
  */
-public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements ForkedMap {
+public abstract class DBMapSuitForkOld<T, U> extends DBMapSuit<T, U> implements ForkedMap {
 
     @Getter
     protected DBTab<T, U> parent;
@@ -31,7 +31,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+    public DBMapSuitForkOld(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
@@ -186,17 +186,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
         return false;
     }
-
-    /**
-     * просто стедаем коммит и все
-     * !!!!!!! нет нельзя так как в родиельской мапке тоже нету коммита еще и там свой WriteBatch есть и скорее всего
-     * текущий Батник не сольется туда правильно ни как - надо все же организовывать новую базу тут и все из нее
-     * сливать как и из МапДМФорк базы
-     @Override public void writeToParent() {
-     commit();
-     }
-     *
-     */
 
     @Override
     public void writeToParent() {

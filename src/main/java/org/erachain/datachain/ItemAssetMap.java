@@ -18,8 +18,6 @@ import org.mapdb.DB;
  */
 public class ItemAssetMap extends ItemMap {
 
-    // private Atomic.Long atomicKey;
-    // private long key;
     static final String NAME = "item_assets";
     static final int TYPE = ItemCls.ASSET_TYPE;
 

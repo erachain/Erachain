@@ -1,5 +1,6 @@
 package org.erachain.dbs;
 
+import lombok.Getter;
 import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
@@ -29,16 +30,19 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
     public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
     protected DB database;
+    @Getter
     protected DBTab<T, U> parent;
 
     protected Map<Integer, Integer> observableData;
 
     public DBTabCommonImpl() {
+        databaseSet.addTable(this);
     }
 
     public DBTabCommonImpl(DBASet databaseSet) {
 
         this.databaseSet = databaseSet;
+        databaseSet.addTable(this);
 
         if (databaseSet != null && databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
@@ -49,6 +53,7 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         this.dbsUsed = dbsUsed;
         this.databaseSet = databaseSet;
         this.database = database;
+        databaseSet.addTable(this);
 
         //OPEN MAP
         openMap();
@@ -56,8 +61,6 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         if (databaseSet.isWithObserver()) {
             observableData = new HashMap<Integer, Integer>(8, 1);
         }
-
-        this.databaseSet.addTable(this);
 
     }
 
@@ -76,6 +79,7 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;
         this.parent = parent;
+        databaseSet.addTable(this);
 
     }
     public DBTabCommonImpl(DBTab parent, DBASet databaseSet) {
@@ -83,15 +87,16 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;
         this.parent = parent;
+        databaseSet.addTable(this);
 
     }
+
+    protected abstract void openMap();
 
     @Override
     public IDB getDBSet() {
         return this.databaseSet;
     }
-
-    protected abstract void openMap();
 
     /**
      * Соединяется прямо к списку SortableList для отображения в ГУИ

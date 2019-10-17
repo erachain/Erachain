@@ -39,10 +39,13 @@ public class BlockChain {
     public static final boolean DEVELOP_USE = false;
 
     public static final int BLOCK_COUNT = 0; ////
-    // сколько трназакции в блоке - если больше 0 то запускает тест на старте
-    public static final int TEST_DB = 0000;
+    // сколько транзакции в блоке - если больше 0 то запускает тест на старте
+    public static final int TEST_DB = 10000;
+    // запрет сборки своих блоков в ТЕСТЕ
+    public static final boolean STOP_GENERATE_BLOCKS = false;
+
     // размер балансового поля - чем больше тем сложнее
-    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[10000];
+    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[1000];
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
@@ -349,6 +352,10 @@ public class BlockChain {
     public long transactionValidateTimingAverage;
     public long transactionValidateTimingCounter;
 
+    /**
+     * Учитывает время очистки очереди неподтвержденных трнзакций и сброса на жесткий диск их памяти
+     * И поэтому это число хуже чем в Логе по подстчету обработки транзакций в блоке
+     */
     public long transactionProcessTimingAverage;
     public long transactionProcessTimingCounter;
 
@@ -623,7 +630,11 @@ public class BlockChain {
 
     public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
         int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
-        return DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
+        if (TEST_DB > 0) {
+            return GENERATING_MIN_BLOCK_TIME_MS(height);
+        } else {
+            return DEVELOP_USE ? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
+        }
     }
 
     public static int BLOCKS_PER_DAY(int height) {
@@ -962,7 +973,14 @@ public class BlockChain {
 	}
 	 */
 
+    public int compareNewWin(DCSet dcSet, Block block) {
+        return this.waitWinBuffer == null ? -1 : this.waitWinBuffer.compareWin(block);
+    }
+
     public void clearWaitWinBuffer() {
+        if (this.waitWinBuffer != null) {
+            waitWinBuffer.close();
+        }
         this.waitWinBuffer = null;
     }
 
@@ -970,10 +988,6 @@ public class BlockChain {
         Block block = this.waitWinBuffer;
         this.waitWinBuffer = null;
         return block;
-    }
-
-    public int compareNewWin(DCSet dcSet, Block block) {
-        return this.waitWinBuffer == null ? -1 : this.waitWinBuffer.compareWin(block);
     }
 
     // SOLVE WON BLOCK
@@ -992,9 +1006,11 @@ public class BlockChain {
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         DB database = DCSet.makeDBinMemory();
+        boolean noValid = true;
         try {
+            noValid = !block.isValid(dcSet.fork(database), true);
             // FULL VALIDATE because before was only HEAD validating
-            if (!block.isValid(dcSet.fork(database), false)) {
+            if (noValid) {
 
                 LOGGER.info("new winBlock is BAD!");
                 if (peer != null)
@@ -1005,10 +1021,13 @@ public class BlockChain {
                 return false;
             }
         } finally {
-            database.close();
+            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
+            if (noValid)
+                database.close();
         }
 
-        this.waitWinBuffer = block;
+        // set and close OLD
+        setWaitWinBufferUnchecked(block);
 
         LOGGER.info("new winBlock setted!!!" + block.toString());
         return true;
@@ -1022,6 +1041,9 @@ public class BlockChain {
      */
     public void setWaitWinBufferUnchecked(Block block) {
         if (this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
+            if (this.waitWinBuffer != null) {
+                waitWinBuffer.close();
+            }
             this.waitWinBuffer = block;
         }
     }

@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -29,7 +30,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBRocksDBTable<T, U> map;
     protected List<IndexDB> indexes;
 
-    // for DCMapSuit
+    // for DBMapSuitFork
     public DBMapSuit() {
     }
 
@@ -52,6 +53,10 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
         this(databaseSet, database, logger, null);
+    }
+
+    public DBRocksDBTable getMap() {
+        return map;
     }
 
     @Override
@@ -127,16 +132,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         return map.containsKey(key);
     }
 
-    //@Override
-    public List<U> getLastValues(int limit) {
-        return ((DBRocksDBTable<T, U>) map).getLatestValues(limit);
-    }
-
-    //@Override
-    //public NavigableSet<Fun.Tuple2<?, T>> getIndex(int index, boolean descending) {
-    //    return map.getIndex(index, descending);
-    //}
-
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
         return map.getIndexIterator(index, descending);
@@ -146,6 +141,20 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public void close() {
         map.close();
         logger.info("closed");
+    }
+
+    @Override
+    public void writeTo(DBTab targetMap) {
+        Iterator<T> iterator = this.map.getIterator(false);
+        while (iterator.hasNext()) {
+            T key = iterator.next();
+            U item = this.map.get(key);
+            if (item == null) {
+                targetMap.delete(key);
+            } else {
+                targetMap.put(key, item);
+            }
+        }
     }
 
     @Override

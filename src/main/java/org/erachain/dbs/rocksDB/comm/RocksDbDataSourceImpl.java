@@ -174,6 +174,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 create = true;
                                 logger.info("database created");
                             } catch (RocksDBException e) {
+
+                                /// если при открытии БД же есть то выдаст ошибку что в ней есть Инжекс SIZE
+                                // и прийдет сюда - тут открываем с индексами уже описанными
+                                ////logger.debug(e.getMessage(), e);
+
                                 dbOptions.setCreateIfMissing(true);
                                 dbOptions.setCreateMissingColumnFamilies(true);
                                 dbOptions.setIncreaseParallelism(3);
@@ -200,33 +205,33 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 // USE transactions
                                 openDB(dbOptions, columnFamilyDescriptors);
 
-                                if (indexes != null && !indexes.isEmpty()) {
-                                    for (int i = 0; i < indexes.size(); i++) {
-                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
-                                    }
-                                }
-
                                 logger.info("database opened");
+                            }
+
+                            if (indexes != null && !indexes.isEmpty()) {
+                                for (int i = 0; i < indexes.size(); i++) {
+                                    indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                }
+                            }
+
+                            alive = true;
+
+                            // INIT SIZE INDEX
+                            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+
+                            if (create) {
+                                // Нужно для того чтобы в базе даже у транзакционных был Размер уже
+                                dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
                             }
 
                         } catch (RocksDBException e) {
                             logger.error(e.getMessage(), e);
                             throw new RuntimeException("Failed to initialize database", e);
                         }
-                        alive = true;
+
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);
                         throw new RuntimeException("Failed to initialize database", ioe);
-                    }
-
-                    columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-
-                    if (create) {
-                        // Нужно для того чтобы в базе дае у транзакционных был Размер уже
-                        try {
-                            dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-                        } catch (RocksDBException edb) {
-                        }
                     }
 
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
@@ -585,6 +590,19 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     public RockStoreIterator indexIterator(boolean descending, int indexDB) {
         return new RockStoreIterator(dbCore.newIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
+
+    @Override
+    public void write(WriteBatch batch) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        try {
+            dbCore.write(new WriteOptions(), batch);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
 
     private void updateByBatchInner(Map<byte[], byte[]> rows) throws Exception {
         if (quitIfNotAlive()) {

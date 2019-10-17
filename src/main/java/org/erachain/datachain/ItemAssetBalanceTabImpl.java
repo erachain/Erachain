@@ -10,6 +10,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDBFork;
+import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
@@ -99,8 +100,7 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
                 //    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, DEFAULT_VALUE);
                 //    break;
                 default:
-                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet); // FAST
-                    //map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, DEFAULT_VALUE); SLOW
+                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, DEFAULT_VALUE);
             }
         }
     }

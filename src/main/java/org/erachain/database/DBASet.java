@@ -1,6 +1,8 @@
 package org.erachain.database;
 // 30/03 ++
 
+import lombok.extern.slf4j.Slf4j;
+import org.erachain.controller.Controller;
 import org.erachain.dbs.DBTab;
 import org.mapdb.DB;
 
@@ -10,6 +12,7 @@ import java.util.List;
 
 //import org.mapdb.Serializer;
 
+@Slf4j
 abstract public class DBASet implements IDB {
 
     private static final String VERSION = "version";
@@ -100,6 +103,21 @@ abstract public class DBASet implements IDB {
 
     public void clearCache() {
         this.database.getEngine().clearCache();
+    }
+
+    public void writeToParent() {
+        this.addUses();
+
+        try {
+
+        } catch (java.lang.OutOfMemoryError e) {
+            logger.error(e.getMessage(), e);
+            this.outUses();
+            Controller.getInstance().stopAll(13);
+        } finally {
+            this.outUses();
+        }
+
     }
 
     public void commit() {

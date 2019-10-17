@@ -5,9 +5,12 @@ package org.erachain.datachain;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionFinalSignsSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionFinalSignsSuitMapDBFork;
+import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.TransactionFinalSignsSuitRocksDB;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
+import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 /**
@@ -39,12 +42,14 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
             }
         } else {
             switch (dbsUsed) {
+                case DBS_MAP_DB:
+                    map = new TransactionFinalSignsSuitMapDBFork((TransactionFinalMapSigns) parent, databaseSet);
+                    break;
                 case DBS_ROCK_DB:
                     //map = new TransactionFinalSignsSuitRocksDBFork((TransactionFinalMapSigns) parent, databaseSet);
                     //break;
                 default:
-                    //map = new nativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
-                    map = new TransactionFinalSignsSuitMapDBFork((TransactionFinalMapSigns) parent, databaseSet);
+                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
             }
         }
     }

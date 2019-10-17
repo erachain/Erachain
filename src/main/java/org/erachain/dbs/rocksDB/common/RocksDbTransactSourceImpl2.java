@@ -323,19 +323,21 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
                                 dbCoreParent = TransactionDB.open(dbOptions, transactionDbOptions,
                                         dbPath.toString(), columnFamilyDescriptors, columnFamilyHandles);
 
-                                if (indexes != null && !indexes.isEmpty()) {
-                                    for (int i = 0; i < indexes.size(); i++) {
-                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
-                                    }
-                                }
-
                                 logger.info("database opened");
+                            }
+
+                            if (indexes != null && !indexes.isEmpty()) {
+                                for (int i = 0; i < indexes.size(); i++) {
+                                    indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                }
                             }
 
                             alive = true;
 
+                            // INIT SIZE INDEX
                             columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
                             if (create)
+                                // Нужно для того чтобы в базе даже у транзакционных был Размер уже
                                 dbCoreParent.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
 
                             dbCore = dbCoreParent.beginTransaction(writeOptions);
@@ -587,6 +589,10 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     @Override
     public RockStoreIterator indexIterator(boolean descending, int indexDB) {
         return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, true);
+    }
+
+    @Override
+    public void write(WriteBatch batch) {
     }
 
     private void updateByBatchInner(Map<byte[], byte[]> rows) throws Exception {

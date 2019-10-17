@@ -7,12 +7,14 @@ public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
 
     protected U defaultValue;
 
+    protected abstract void openMap();
+
     @Override
     public int getDefaultIndex() {
         return 0;
     }
 
-    protected abstract void openMap();
+    //protected abstract void getMap();
 
     protected void createIndexes() {
     }

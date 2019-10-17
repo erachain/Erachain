@@ -894,9 +894,18 @@ public class Synchronizer extends Thread {
         return blocks;
     }
 
+    /**
+     * @param dcSet
+     * @param block
+     * @param doOrphan
+     * @param hardFlush
+     * @param notStoreTXs
+     * @throws Exception
+     */
     // SYNCHRONIZED DO NOT PROCCESS A BLOCK AT THE SAME TIME
     // SYNCHRONIZED MIGHT HAVE BEEN PROCESSING PREVIOUS BLOCK
-    public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush, boolean notStoreTXs)
+    public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush,
+                                                 boolean notStoreTXs)
             throws Exception {
         Controller cnt = Controller.getInstance();
 
@@ -1029,7 +1038,20 @@ public class Synchronizer extends Thread {
 
             // PROCESS
             try {
-                block.process(dcSet);
+                if (block.getValidatedForkDB() == null) {
+                    block.process(dcSet);
+                } else {
+                    // здесь просто заливаем все данные из Форка в цепочку - без процессинга - он уже был в Валидации
+                    long start = System.currentTimeMillis();
+                    block.saveToChainFromvalidatedForkDB();
+                    long tickets = System.currentTimeMillis() - start;
+                    if (block.blockHead.transactionsCount > 0 || tickets > 10) {
+                        LOGGER.debug("[" + block.heightBlock + "] TOTAL processing time: " + tickets
+                                + " ms, TXs= " + block.blockHead.transactionsCount
+                                + (block.blockHead.transactionsCount == 0 ? "" : " - " + (block.blockHead.transactionsCount * 1000 / tickets) + " tx/sec"));
+                    }
+                }
+
                 dcSet.getBlockMap().setProcessing(false);
                 //dcSet.updateTxCounter(block.getTransactionCount());
 
@@ -1141,7 +1163,7 @@ public class Synchronizer extends Thread {
             if (processTiming < 999999999999l) {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
-                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
+                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.blockHead.transactionsCount);
             }
         }
 

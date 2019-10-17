@@ -1,7 +1,7 @@
 package org.erachain.dbs;
 
-import org.erachain.database.SortableList;
 import org.erachain.database.DBASet;
+import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.slf4j.Logger;
@@ -62,7 +62,7 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
     // for TESTS etc.
     public void setMap(DBMapSuit map) { this.map = map; }
 
-    public DBMapSuit getMapSuit() {
+    public DBMapSuit getMap() {
         return map;
     }
 
@@ -209,6 +209,16 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
             }
 
         }
+    }
+
+    @Override
+    public void writeTo(DBTab targetMap) {
+        this.map.writeTo(targetMap);
+    }
+
+    @Override
+    public void writeToParent() {
+        ((ForkedMap) this.map).writeToParent();
     }
 
     @Override

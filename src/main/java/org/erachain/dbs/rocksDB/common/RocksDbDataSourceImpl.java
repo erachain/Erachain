@@ -224,23 +224,29 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 logger.info("database opened");
                             }
 
+                            if (indexes != null && !indexes.isEmpty()) {
+                                for (int i = 0; i < indexes.size(); i++) {
+                                    indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                }
+                            }
+
+                            alive = true;
+
+                            // INIT SIZE INDEX
+                            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+
+                            if (create) {
+                                dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+                            }
+
                         } catch (RocksDBException e) {
                             logger.error(e.getMessage(), e);
                             throw new RuntimeException("Failed to initialize database", e);
                         }
-                        alive = true;
+
                     } catch (IOException ioe) {
                         logger.error(ioe.getMessage(), ioe);
                         throw new RuntimeException("Failed to initialize database", ioe);
-                    }
-
-                    columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-
-                    if (create) {
-                        try {
-                            dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-                        } catch (RocksDBException edb) {
-                        }
                     }
 
                     logger.info("RocksDbDataSource.initDB(): " + dataBaseName);
@@ -628,6 +634,18 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     @Override
     public RockStoreIterator indexIterator(boolean descending, int indexDB) {
         return new RockStoreIterator(table.getIterator(columnFamilyHandles.get(indexDB)), descending, true);
+    }
+
+    @Override
+    public void write(WriteBatch batch) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        try {
+            dbCore.write(new WriteOptions(), batch);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private void updateByBatchInner(Map<byte[], byte[]> rows) throws Exception {

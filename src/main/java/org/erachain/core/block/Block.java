@@ -3,6 +3,7 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import lombok.Getter;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
@@ -97,6 +98,8 @@ import java.util.*;
 
     // was validated
     protected boolean wasValidated;
+    @Getter
+    protected DCSet validatedForkDB;
 
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
     public static class BlockHead implements ExplorerJsonLine {
@@ -1538,6 +1541,15 @@ import java.util.*;
      */
     public boolean isValid(DCSet dcSetPlace, boolean andProcess) {
 
+        if (validatedForkDB != null) {
+            try {
+                validatedForkDB.close();
+            } catch (Exception e) {
+            }
+        }
+        validatedForkDB = null;
+        wasValidated = false;
+
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
         // TRY CHECK HEAD
@@ -1587,13 +1599,15 @@ import java.util.*;
 
             long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
 
-            // RESET forginf Info Updates
+            // RESET forging Info Updates
             this.forgingInfoUpdate = null;
 
             if (andProcess) {
-                if (!isPrimarySet || cnt.noCalculated) {
+                if (cnt.noCalculated) {
                     this.txCalculated = null;
                 } else {
+                    // даже если это в Форке - если Полный Расчет то Калкулатед нужно вычислять
+                    // для последующего слива в цепочку
                     // make pool for calculated
                     this.txCalculated = new ArrayList<RCalculated>();
                 }
@@ -1714,7 +1728,9 @@ import java.util.*;
 
                     //SET PARENT
                     ///logger.debug("[" + seqNo + "] try refsMap.set" );
-                    if (isPrimarySet) {
+                    if (true // в любом случае нужно просчитывать если Полный Просчет
+                            // - чтобы потом слить в основную цепочку
+                                || isPrimarySet) {
                         //REMOVE FROM UNCONFIRMED DATABASE
                         ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
@@ -1777,8 +1793,8 @@ import java.util.*;
 
             }
 
-            if (isPrimarySet) {
-                // если это просчет уже для записи в нашу базу данных а не при выборе Цепочки для синхронизации
+            if (andProcess) {
+                // если это просчет уже для записи в нашу базу данных
                 processTiming = System.nanoTime() - processTiming;
                 if (processTiming < 999999999999l) {
                     // при переполнении может быть минус
@@ -1845,7 +1861,31 @@ import java.util.*;
         }
 
         this.wasValidated = true;
+        if (andProcess) {
+            validatedForkDB = dcSetPlace;
+        }
         return true;
+    }
+
+    /**
+     * Закрывает базу в котрой производилась проверка блока
+     */
+    public void close() {
+        if (validatedForkDB != null) {
+            try {
+                validatedForkDB.close();
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public void saveToChainFromvalidatedForkDB() {
+        validatedForkDB.writeToParent();
+        try {
+            validatedForkDB.close();
+        } catch (Exception e) {
+        }
+        validatedForkDB = null;
     }
 
     //PROCESS/ORPHAN
@@ -2166,8 +2206,8 @@ import java.util.*;
 
         long tickets = System.currentTimeMillis() - start;
         if (transactionCount > 0 && tickets > 10 || tickets > 10) {
-            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets * 0.001
-                    + ", TXs= " + this.transactionCount
+            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets
+                    + " ms, TXs= " + this.transactionCount
                     + (transactionCount == 0? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
         }
 

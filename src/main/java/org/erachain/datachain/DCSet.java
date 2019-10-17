@@ -47,31 +47,39 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int BLOCKS_MAP = DBS_MAP_DB;
+    public static final int BLOCKS_MAP = DBS_ROCK_DB;
+    public static final int BLOCKS_MAP_FORK = DBS_NATIVE_MAP;
     /**
      * DBS_MAP_DB - slow then DBS_ROCK_DB
      */
-    public static final int FINAL_TX_MAP = DBS_MAP_DB;
+    public static final int FINAL_TX_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_MAP_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int FINAL_TX_SIGNS_MAP = DBS_MAP_DB;
+    public static final int FINAL_TX_SIGNS_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_SIGNS_MAP_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
+     * нельзя делать DBS_NATIVE_MAP !!! - так как он не удаляет транзакции по вторичному индексу
+     * И трнзакции копятся пока полностью не будут удалены скопом при FLUSH что тормозит время
+     * блока на проверке и исполнении
      */
-    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;
+    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;;
+    public static final int UNCONF_TX_MAP_FORK = DBS_MAP_DB_IN_MEM;
 
     /**
      * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
      */
-    public static final int ACCOUNT_BALANCES = DBS_MAP_DB;
+    public static final int ACCOUNT_BALANCES = DBS_ROCK_DB;
+    public static final int ACCOUNT_BALANCES_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int ACCOUNTS_REFERENCES = DBS_MAP_DB;
+    public static final int ACCOUNTS_REFERENCES = DBS_ROCK_DB;
 
     public static final int ORDERS_MAP = DBS_MAP_DB;
     public static final int COMPLETED_ORDERS_MAP = DBS_MAP_DB;
@@ -343,37 +351,24 @@ public class DCSet extends DBASet {
 
         // переделанные поновой таблицы
         this.assetBalanceMap = new ItemAssetBalanceTabImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                ACCOUNT_BALANCES_FORK
                 , parent.assetBalanceMap, this);
         this.transactionTab = new TransactionTabImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                UNCONF_TX_MAP_FORK
                 , parent.transactionTab, this);
         this.transactionFinalMap = new TransactionFinalMapImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                FINAL_TX_MAP_FORK
                 , parent.transactionFinalMap, this);
-
         this.referenceMap = new ReferenceMapImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                DBS_NATIVE_MAP
                 , parent.referenceMap, this);
 
         this.blockMap = new BlocksMapImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                BLOCKS_MAP_FORK
                 , parent.blockMap, this);
 
         this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
-                DBS_MAP_DB
-                //DBS_ROCK_DB
-                //DBS_NATIVE_MAP
+                FINAL_TX_SIGNS_MAP_FORK
                 , parent.transactionFinalMapSigns, this);
 
         this.orderMap = new OrderMapImpl(
@@ -1590,6 +1585,23 @@ public class DCSet extends DBASet {
         return fork(makeDBinMemory());
     }
 
+    /**
+     * Нужно незабыть переменные внктри каждой таблицы тоже в Родителя скинуть
+     */
+    @Override
+    public void writeToParent() {
+
+        // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
+        // иначе размер больше будет в форке и не то значение
+        ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
+
+        for (DBTab table : tables) {
+            table.writeToParent();
+        }
+        // теперь нужно все общие переменные переопределить
+
+    }
+
     @Override
     public synchronized void close() {
 
@@ -1598,36 +1610,39 @@ public class DCSet extends DBASet {
             if (!this.database.isClosed()) {
                 this.addUses();
 
-                if (this.getBlockMap().isProcessing()) {
-                    for (DBTab tab : tables) {
+                // если основная база то с откатом
+                if (parent == null) {
+                    if (this.getBlockMap().isProcessing()) {
+                        for (DBTab tab : tables) {
+                            try {
+                                tab.rollback();
+                            } catch (IOError e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
+
                         try {
-                            tab.rollback();
+                            this.database.rollback();
                         } catch (IOError e) {
                             LOGGER.error(e.getMessage(), e);
                         }
-                    }
 
-                    try {
-                        this.database.rollback();
-                    } catch (IOError e) {
-                        LOGGER.error(e.getMessage(), e);
-                    }
+                        // not need on close!
+                        // getBlockMap().resetLastBlockSignature();
+                    } else {
+                        for (DBTab tab : tables) {
+                            try {
+                                tab.commit();
+                            } catch (IOError e) {
+                                LOGGER.error(tab.toString() + ": " + e.getMessage(), e);
+                            }
+                        }
 
-                    // not need on close!
-                    // getBlockMap().resetLastBlockSignature();
-                } else {
-                    for (DBTab tab : tables) {
                         try {
-                            tab.commit();
+                            this.database.commit();
                         } catch (IOError e) {
                             LOGGER.error(e.getMessage(), e);
                         }
-                    }
-
-                    try {
-                        this.database.commit();
-                    } catch (IOError e) {
-                        LOGGER.error(e.getMessage(), e);
                     }
                 }
 
@@ -1678,28 +1693,37 @@ public class DCSet extends DBASet {
 
         this.addUses();
 
-        // try repopulate table
-        if (System.currentTimeMillis() - poinClear > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1)) {
+        boolean needFlush = System.currentTimeMillis() - poinClear + 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1);
+        // try repopulate UTX table
+        if (needFlush) {
             poinClear = System.currentTimeMillis();
+            int height = blocksHeadsMap.size();
             TransactionTab utxMap = getTransactionTab();
             LOGGER.debug("try CLEAR UTXs");
             int sizeUTX = utxMap.size();
             LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
-            this.actions += sizeUTX;
             // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
             // так .values() выдает не отдельный массив а объект базы данных!
             Transaction[] items = utxMap.values().toArray(new Transaction[]{});
             utxMap.clear();
+            long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
+            int countDeleted = 0;
             for (Transaction item: items) {
+                if (timestamp > item.getDeadline()) {
+                    countDeleted++;
+                    continue;
+                }
                 utxMap.add(item);
             }
+
+            this.actions += countDeleted ;
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
                 this.database.getEngine().clearCache();
             }
 
-            LOGGER.debug("CLEARed UTXs: " + sizeUTX + " for " + (System.currentTimeMillis() - poinClear) + " ms");
+            LOGGER.debug("reADDEDed UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear) + " ms");
         }
 
         this.actions += size;
@@ -1709,7 +1733,7 @@ public class DCSet extends DBASet {
 
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
                 || diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB
-                || System.currentTimeMillis() - poinFlush > 3600000) {
+                || needFlush) {
             long start = poinFlush = System.currentTimeMillis();
             LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
                 + (this.actions > ACTIONS_BEFORE_COMMIT? "by Actions:" + this.actions : "")
@@ -1760,11 +1784,12 @@ public class DCSet extends DBASet {
 
             clearGC = !clearGC;
             if (clearGC) {
+                LOGGER.debug("CLEAR GC");
                 System.gc();
             }
 
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
-                    + (System.currentTimeMillis() - start) / 1000);
+                    + (System.currentTimeMillis() - start) + " ms");
 
             this.actions = 0l;
             this.engineSize = getEngineSize();

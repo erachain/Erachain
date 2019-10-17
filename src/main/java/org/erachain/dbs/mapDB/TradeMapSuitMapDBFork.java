@@ -28,7 +28,7 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     }
 
     @Override
-    public void openMap() {
+    protected void openMap() {
         //OPEN MAP
         map = database.createTreeMap("trades")
                 .valueSerializer(new TradeSerializer())

@@ -21,8 +21,7 @@ import java.util.List;
  * @param <V>
  */
 @Slf4j
-public class DBRocksDBTableDB<K, V> extends DBRocksDBTable
-        <K, V> {
+public class DBRocksDBTableDB<K, V> extends DBRocksDBTable<K, V> {
 
     public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
                             RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
@@ -31,9 +30,11 @@ public class DBRocksDBTableDB<K, V> extends DBRocksDBTable
         afterOpen();
     }
 
-    public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                            DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, dbaSet);
+    public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
+                            RocksDbSettings settings, WriteOptions writeOptions) {
+        super(byteableKey, byteableValue, indexes, settings, writeOptions);
+        openSource();
+        afterOpen();
     }
 
     public DBRocksDBTableDB(String NAME_TABLE) {

@@ -76,6 +76,8 @@ public interface DBTabSuitCommon<T, U> {
 
     int getDefaultIndex();
 
+    void writeTo(DBTab targetMap);
+
     void clear();
 
     void commit();

@@ -352,6 +352,10 @@ public class Controller extends Observable {
         this.transactionMakeTimingAverage = transactionMakeTimingAverage;
     }
 
+    /**
+     *
+     * @return
+     */
     public JSONObject getBenchmarks() {
 
         JSONObject jsonObj = new JSONObject();
@@ -2644,42 +2648,44 @@ public class Controller extends Observable {
         if (newBlock == null)
             return false;
 
-        // if last block is changed by core.Synchronizer.process(DLSet, Block)
-        // clear this win block
-        if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
-            return false;
-        }
-
-        if (!newBlock.isValidated()) {
-            // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
-            // или прри добавлении моего сгнерированного блока т.к. он не проверился?
-
-            // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-            DB database = DCSet.makeDBinMemory();
-            try {
-                if (!newBlock.isValid(dcSet.fork(database), false))
-                    // тогда проверим заново полностью
-                    return false;
-            } finally {
-                database.close();
-            }
-        }
-
-        LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
-
         try {
-            this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
-            if (network != null) {
-                this.network.clearHandledWinBlockMessages();
-            }
-
-        } catch (Exception e) {
-            if (this.isOnStopping()) {
-                throw new Exception("on stoping");
-            } else {
-                LOGGER.error(e.getMessage(), e);
+            // if last block is changed by core.Synchronizer.process(DLSet, Block)
+            // clear this win block
+            if (!Arrays.equals(dcSet.getBlockMap().getLastBlockSignature(), newBlock.getReference())) {
                 return false;
             }
+
+            LOGGER.info("+++ flushNewBlockGenerated TRY flush chainBlock: " + newBlock.toString());
+
+            if (!newBlock.isValidated()) {
+                // это может случиться при добавлении в момент синхронизации - тогда до расчета Победы не доходит
+                // или при добавлении моего сгнерированного блока т.к. он не проверился?
+
+                // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+                DB database = DCSet.makeDBinMemory();
+                // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
+                if (!newBlock.isValid(dcSet.fork(database), true)) {
+                    // тогда проверим заново полностью
+                    return false;
+                }
+            }
+
+            try {
+                this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
+                if (network != null) {
+                    this.network.clearHandledWinBlockMessages();
+                }
+
+            } catch (Exception e) {
+                if (this.isOnStopping()) {
+                    throw new Exception("on stoping");
+                } else {
+                    LOGGER.error(e.getMessage(), e);
+                    return false;
+                }
+            }
+        } finally {
+            newBlock.close();
         }
 
         LOGGER.info("+++ flushNewBlockGenerated OK");
@@ -2690,8 +2696,8 @@ public class Controller extends Observable {
             // broadcast my HW
             broadcastHWeightFull();
         }
-
         return true;
+
     }
 
     public List<Transaction> getUnconfirmedTransactions(int count, boolean descending) {
@@ -3399,7 +3405,7 @@ public class Controller extends Observable {
 
         this.dcSet.getBlockMap().addObserver(o);
         this.dcSet.getTransactionTab().addObserver(o);
-        // this.dcSet.getTransactionFinalMap().addObserver(o);
+        this.dcSet.getTransactionFinalMap().addObserver(o);
 
         if (this.dcSetWithObserver) {
             // ADD OBSERVER TO SYNCHRONIZER

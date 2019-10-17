@@ -10,12 +10,13 @@ import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.BlocksSuitMapDB;
-import org.erachain.dbs.nativeMemMap.nativeMapTreeMapFork;
+import org.erachain.dbs.nativeMemMap.NativeMapHashMapFork;
 import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
 
+import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 ;
@@ -36,6 +37,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 @Slf4j
 public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap {
 
+    //@Setter
     private byte[] lastBlockSignature;
     private Atomic.Boolean processingVar;
     private Boolean processing;
@@ -69,11 +71,14 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             }
         } else {
             switch (dbsUsed) {
+                case DBS_MAP_DB:
+                    //map = new BlocksSuitMapDBFork((TransactionTab) parent, databaseSet);
+                    //break;
                 case DBS_ROCK_DB:
                     //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
                     //break;
                 default:
-                    map = new nativeMapTreeMapFork(parent, databaseSet, null, null);
+                    map = new NativeMapHashMapFork(parent, databaseSet, null);
             }
         }
     }
@@ -100,7 +105,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         lastBlockSignature = ((DCSet) databaseSet).getBlocksHeadsMap().get(this.size()).signature;
     }
 
-    private void setLastBlockSignature(byte[] signature) {
+    public void setLastBlockSignature(byte[] signature) {
         lastBlockSignature = signature;
     }
 

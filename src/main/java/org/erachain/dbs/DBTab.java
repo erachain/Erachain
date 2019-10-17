@@ -10,7 +10,7 @@ import java.util.Map;
  * @param <T>
  * @param <U>
  */
-public interface DBTab<T, U> extends DBTabSuitCommon<T, U> {
+public interface DBTab<T, U> extends DBTabSuitCommon<T, U>, ForkedMap {
 
     IDB getDBSet();
 

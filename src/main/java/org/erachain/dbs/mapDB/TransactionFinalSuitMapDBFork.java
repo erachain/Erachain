@@ -54,7 +54,6 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
          return  ((BTreeMap<Long, Transaction>) map)

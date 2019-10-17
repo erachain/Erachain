@@ -19,7 +19,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     }
 
     @Override
-    public void openMap() {
+    protected void openMap() {
 
         if (true) {
             database = DCSet.makeDBinMemory();

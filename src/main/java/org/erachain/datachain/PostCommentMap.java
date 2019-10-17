@@ -1,8 +1,8 @@
 package org.erachain.datachain;
 
 import com.google.common.primitives.SignedBytes;
-import org.mapdb.DB;
 import org.erachain.utils.ByteArrayUtils;
+import org.mapdb.DB;
 
 import java.util.ArrayList;
 import java.util.HashMap;

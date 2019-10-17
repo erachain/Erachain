@@ -43,7 +43,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     }
 
     @Override
-    public void openMap() {
+    protected void openMap() {
 
         // OPEN MAP
         map = database.createHashMap("transactions")
