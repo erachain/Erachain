@@ -6,6 +6,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.datachain.TransactionTab;
 import org.erachain.dbs.DBTab;
 import org.erachain.network.Peer;
@@ -200,6 +201,12 @@ public class Synchronizer extends Thread {
         LOGGER.debug("*** checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
 
         // VALIDATE THE NEW BLOCKS
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            // TODO тут нужно обновить за последние 3-10 блоков значения в
+            ReferenceMapImpl map = fork.getReferenceMap();
+
+            return;
+        }
 
         // Height & Weight
         int myHeight = myHW.a; // + 1; // высота на котрой тестировать СИЛУ цепочки
@@ -463,6 +470,7 @@ public class Synchronizer extends Thread {
             // CREATE BLOCK BUFFER
             LOGGER.debug(
                     "START BUFFER" + " peer: " + peer + " for blocks: " + signatures.size());
+
             BlockBuffer blockBuffer = new BlockBuffer(signatures, peer);
             Block blockFromPeer = null;
             String errorMess = null;

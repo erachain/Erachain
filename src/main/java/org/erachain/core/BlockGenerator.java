@@ -10,6 +10,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.datachain.TransactionTab;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
@@ -725,6 +726,15 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
                     }
+
+                    if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+                        // TODO тут нужно обновить за последние 3-10 блоков значения в
+                        ReferenceMapImpl map = dcSet.getReferenceMap();
+
+                        return;
+                    }
+
+
                     this.orphanto = 0;
                     ctrl.checkStatusAndObserve(0);
 

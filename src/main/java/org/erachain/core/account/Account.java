@@ -755,6 +755,12 @@ public class Account {
 
         ReferenceMapImpl map = dcSet.getReferenceMap();
 
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            // SET NEW REFERENCE
+            map.set(shortBytes, currentPoint);
+            return;
+        }
+
         // GET CURRENT REFERENCE
         long[] reference = map.get(shortBytes);
 
@@ -774,6 +780,11 @@ public class Account {
     public void removeLastTimestamp(DCSet dcSet) {
 
         ReferenceMapImpl map = dcSet.getReferenceMap();
+
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            map.delete(shortBytes);
+            return;
+        }
 
         // GET LAST TIMESTAMP
         long[] lastPoint = map.get(shortBytes);
