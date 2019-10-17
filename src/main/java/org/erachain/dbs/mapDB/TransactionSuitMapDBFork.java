@@ -19,7 +19,7 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
     }
 
     @Override
-    public void openMap() {
+    protected void openMap() {
 
         // OPEN MAP
         map = database.createHashMap("transactions")
