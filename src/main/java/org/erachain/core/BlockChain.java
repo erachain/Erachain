@@ -44,7 +44,7 @@ public class BlockChain {
     // запрет сборки своих блоков в ТЕСТЕ
     public static final boolean STOP_GENERATE_BLOCKS = false;
 
-    public static final boolean NOT_STORE_REFFS_HISTORY = true;
+    public static final boolean NOT_STORE_REFFS_HISTORY = BLOCK_COUNT > 0;
 
     // размер балансового поля - чем больше тем сложнее
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[1000];
