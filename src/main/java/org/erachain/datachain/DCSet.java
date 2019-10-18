@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 // upd 09/03
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
@@ -36,6 +37,7 @@ import java.util.Random;
  * Но почемуто парент хранится в каждой таблице - хотя там сразу ссылка на форкнутую таблицу есть
  * а в ней уже хранится объект набора DCSet
  */
+@Slf4j
 public class DCSet extends DBASet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
@@ -1658,7 +1660,10 @@ public class DCSet extends DBASet {
 
                 this.uses = 0;
             }
+
+            logger.info("closed");
         }
+
     }
 
     @Override
@@ -1775,7 +1780,7 @@ public class DCSet extends DBASet {
                         Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
                     }
                 } catch (Throwable e) {
-                    LOGGER.error(e.getMessage(), e);
+                    ///LOGGER.error(e.getMessage(), e);
                 }
             }
 

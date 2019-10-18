@@ -375,6 +375,9 @@ public class Synchronizer extends Thread {
             LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
 
             // так как выше мы запоминаем откаченные транзакции то тут их не будем сохранять в базу
+
+            // Надо очистить что брали базу форкнутую - она уже закрыта
+            lastBlock.clearValidatedForkDB();
             this.pipeProcessOrOrphan(dcSet, lastBlock, true, false, true);
 
             lastBlock = dcSet.getBlockMap().last();
@@ -402,6 +405,9 @@ public class Synchronizer extends Thread {
 
             // SYNCHRONIZED PROCESSING
             LOGGER.debug("*** begin PIPE");
+
+            // Надо очистить что брали базу форкнутую - она уже закрыта
+            block.clearValidatedForkDB();
             this.pipeProcessOrOrphan(dcSet, block, false, false, false);
 
             LOGGER.debug("*** begin REMOVE orphanedTransactions");
@@ -664,8 +670,6 @@ public class Synchronizer extends Thread {
                     + "] for blocks: " + blocks.size());
             List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, lastCommonBlock, checkPointHeight,
                     blocks, peer);
-
-            blocks = null;
 
             if (cnt.isOnStopping()) {
                 throw new Exception("on stopping");

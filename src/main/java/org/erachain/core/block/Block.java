@@ -1868,12 +1868,20 @@ import java.util.*;
     }
 
     /**
+     * Скорее всего база уже закрыта выше - очистим
+     */
+    public void clearValidatedForkDB() {
+        validatedForkDB = null;
+    }
+
+    /**
      * Закрывает базу в котрой производилась проверка блока
      */
     public void close() {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
+                LOGGER.debug("validatedForkDB closed ");
             } catch (Exception e) {
             }
         }
