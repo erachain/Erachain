@@ -1,5 +1,7 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
@@ -16,6 +18,7 @@ import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
 import org.erachain.dbs.rocksDB.TransactionSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
 import java.util.*;
 
@@ -354,8 +357,8 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                                          int type, boolean desc, int offset, int limit, long timestamp) {
         Iterator senderKeys = null;
         Iterator recipientKeys = null;
-        //TreeSet<Object> treeKeys = new TreeSet<>();
-        Iterator treeKeys = new TreeSet<>().iterator();
+        //TreeSet<Object> iterator = new TreeSet<>();
+        Iterator iterator; // = new TreeSet<>().iterator();
 
         if (address != null) {
             sender = address;
@@ -363,11 +366,11 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         }
 
         if (sender == null && recipient == null) {
-            return treeKeys;
+            return new TreeSet<>().iterator();
         }
         //  timestamp = null;
         if (sender != null) {
-            if (type > 0) {
+            if (type > 0 || timestamp > 0) {
                 senderKeys = ((TransactionSuit)map).typeIterator(sender, timestamp, type);
             } else {
                 senderKeys = ((TransactionSuit)map).senderIterator(sender);
@@ -375,7 +378,7 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         }
 
         if (recipient != null) {
-            if (type > 0) {
+            if (type > 0 || timestamp > 0) {
                 //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
                 recipientKeys = ((TransactionSuit)map).typeIterator(recipient, timestamp, type);
             } else {
@@ -385,40 +388,42 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         }
 
         if (address != null) {
-            //treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            Iterators.concat(treeKeys, senderKeys);
-            //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-            Iterators.concat(treeKeys, recipientKeys);
+            //iterator.addAll(Sets.newTreeSet(senderKeys));
+            //iterator = senderKeys;
+            //iterator.addAll(Sets.newTreeSet(recipientKeys));
+            // not sorted! Iterators.concat(iterator, recipientKeys);
+            Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            iterator = mergedIterable.iterator();
+
         } else if (sender != null && recipient != null) {
-            //treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            Iterators.concat(treeKeys, senderKeys);
-            //treeKeys.retainAll(Sets.newTreeSet(recipientKeys));
-            Iterators.retainAll(treeKeys, Lists.newArrayList(recipientKeys));
+            //iterator.addAll(Sets.newTreeSet(senderKeys));
+            iterator = senderKeys;
+            //iterator.retainAll(Sets.newTreeSet(recipientKeys));
+            Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
         } else if (sender != null) {
-            //treeKeys.addAll(Sets.newTreeSet(senderKeys));
-            Iterators.concat(treeKeys, senderKeys);
+            //iterator.addAll(Sets.newTreeSet(senderKeys));
+            iterator = senderKeys;
         } else if (recipient != null) {
-            //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-            Iterators.concat(treeKeys, recipientKeys);
+            //iterator.addAll(Sets.newTreeSet(recipientKeys));
+            iterator = recipientKeys;
+        } else {
+            iterator = new TreeSet<>().iterator();
         }
 
-        Iterator keys;
         if (desc) {
-            //keys = ((TreeSet) treeKeys).descendingSet();
-            keys = ((TreeSet) treeKeys).descendingIterator();
-        } else {
-            keys = treeKeys;
+            //keys = ((TreeSet) iterator).descendingSet();
+            iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
         }
 
         if (offset > 0) {
-            Iterators.advance(keys, offset);
+            Iterators.advance(iterator, offset);
         }
 
         if (limit > 0) {
-            keys = Iterators.limit(keys, limit);
+            iterator = Iterators.limit(iterator, limit);
         }
 
-        return  keys;
+        return iterator;
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,
@@ -447,18 +452,19 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     // TODO выдает ошибку на шаге treeKeys.addAll(Sets.newTreeSet(senderKeys));
     public List<Transaction> getTransactionsByAddressFast100(String address) {
 
-        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
-
         Iterator<Long> senderKeys = ((TransactionSuit)map).senderIterator(address);
         Iterator<Long> recipientKeys = ((TransactionSuit)map).recipientIterator(address);
 
         Iterators.advance(senderKeys, 100);
         Iterators.advance(recipientKeys, 100);
 
-        treeKeys  = Iterators.concat(senderKeys, recipientKeys);
-        Iterators.advance(treeKeys, 100);
+        //treeKeys  = Iterators.concat(senderKeys, recipientKeys);
+        Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+        Iterator<Long> iterator = mergedIterable.iterator();
 
-        return getUnconfirmedTransaction(treeKeys);
+        Iterators.advance(iterator, 100);
+
+        return getUnconfirmedTransaction(iterator);
 
     }
 

@@ -1,5 +1,7 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
@@ -11,6 +13,7 @@ import org.erachain.dbs.mapDB.TradeMapSuitMapDB;
 import org.erachain.dbs.mapDB.TradeMapSuitMapDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
@@ -118,7 +121,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         if (iterator == null)
             return new ArrayList<Trade>();
 
-        iterator = Iterators.concat(((TradeMapSuit) this.map).getWantIterator(haveWant));
+        Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator,
+                ((TradeMapSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
+        iterator = mergedIterable.iterator();
 
         //GET ALL ORDERS FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();

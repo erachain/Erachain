@@ -3,6 +3,8 @@ package org.erachain.datachain;
 //04/01 +- 
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
@@ -326,9 +329,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             }
 
             // в рекурсии все хорошо - соберем ключи
-            ///Iterator iterator = keys.iterator();
-            Iterator<Long> rescurseIterator = result.getB();
-            iterator = Iterators.concat(iterator, rescurseIterator);
+            ///Iterator<Long> rescurseIterator = result.getB();
+            ///iterator = Iterators.concat(iterator, rescurseIterator);
+            Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
+            iterator = mergedIterable.iterator();
 
             return new Pair<>(0, iterator);
 
@@ -542,7 +546,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                                          final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
         Iterator<Long> senderKeys = null;
         Iterator<Long> recipientKeys = null;
-        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
+        Iterator<Long> iterator;
 
         if (address != null) {
             sender = address;
@@ -550,7 +554,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (sender == null && recipient == null) {
-            return treeKeys;
+            return new TreeSet<Long>().iterator();
         }
 
         if (sender != null) {
@@ -574,18 +578,22 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (address != null) {
-            treeKeys = Iterators.concat(senderKeys, recipientKeys);
+            //iterator = Iterators.concat(senderKeys, recipientKeys);
+            Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            iterator = mergedIterable.iterator();
         } else if (sender != null && recipient != null) {
-            treeKeys = senderKeys;
-            Iterators.retainAll(treeKeys, Lists.newArrayList(recipientKeys));
+            iterator = senderKeys;
+            Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
         } else if (sender != null) {
-            treeKeys = senderKeys;
+            iterator = senderKeys;
         } else if (recipient != null) {
-            treeKeys = recipientKeys;
+            iterator = recipientKeys;
+        } else {
+            iterator = new TreeSet<Long>().iterator();
         }
 
         if (minHeight != 0 || maxHeight != 0) {
-            treeKeys = Iterators.filter(treeKeys, new Predicate<Long>() {
+            iterator = Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
@@ -595,7 +603,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
-            treeKeys = Iterators.filter(treeKeys, new Predicate<Long>() {
+            iterator = Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     ArbitraryTransaction tx = (ArbitraryTransaction) map.get(key);
@@ -605,13 +613,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (desc) {
-            treeKeys = ((TreeSet) treeKeys).descendingIterator();
+            //iterator = ((TreeSet) iterator).descendingIterator();
+            iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
         }
 
-        limit = (limit == 0) ? Iterators.size(treeKeys) : limit;
-        Iterators.advance(treeKeys, offset);
+        limit = (limit == 0) ? Iterators.size(iterator) : limit;
+        Iterators.advance(iterator, offset);
 
-        return Iterators.limit(treeKeys, limit);
+        return Iterators.limit(iterator, limit);
     }
 
     @Override
