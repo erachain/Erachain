@@ -17,7 +17,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.RocksIterator;
-import org.rocksdb.TransactionDB;
 import org.rocksdb.WriteOptions;
 
 import java.math.BigDecimal;
@@ -135,12 +134,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     // TODO - release it on Iterators
 
-    public List<byte[]> assetKeys_bad(long assetKey) {
-        return ((DBRocksDBTable)map).filterAppropriateValuesAsKeys(
-                Longs.toByteArray(assetKey),
-                balanceKeyAssetIndex.getColumnFamilyHandle());
-    }
-
     public List<byte[]> assetKeys(long assetKey) {
         return ((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
                 Longs.toByteArray(assetKey),
@@ -154,26 +147,16 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     }
 
     public List<byte[]> accountKeys(Account account) {
-        if (false) {
-            return ((DBRocksDBTable) map).filterAppropriateValuesAsKeys(
-                    account.getShortAddressBytes(),
-                    balanceAddressIndex.getColumnFamilyHandle());
-        } else {
-            RocksIterator iter = ((TransactionDB) ((DBRocksDBTable) map).dbSource.getDbCore()).newIterator(
-                    balanceAddressIndex
-                    //balanceKeyAssetIndex
-                            .getColumnFamilyHandle());
-            List<byte[]> result = new ArrayList<byte[]>();
+        RocksIterator iterator = map.dbSource.getDbCore().newIterator(
+                balanceAddressIndex.getColumnFamilyHandle());
+        List<byte[]> result = new ArrayList<>();
 
-            for (iter.seek(account.getShortAddressBytes()); iter.isValid() && new String(iter.key())
-                    .startsWith(new String(account.getShortAddressBytes())); iter.next()) {
-                byte[] key = iter.key();
-                byte[] value = iter.value();
-                result.add(iter.value());
-            }
-            return result;
-
+        for (iterator.seek(account.getShortAddressBytes()); iterator.isValid() && new String(iterator.key())
+                .startsWith(new String(account.getShortAddressBytes())); iterator.next()) {
+            result.add(iterator.value());
         }
+
+        return result;
     }
 
     @Override

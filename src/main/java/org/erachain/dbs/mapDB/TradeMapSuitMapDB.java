@@ -166,6 +166,10 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
 
     @Override
     public Iterator<Tuple2<Long, Long>> getReverseIterator(Long orderID) {
+
+        if (reverseKeyMap == null)
+            return null;
+
         //ADD REVERSE KEYS
         return  ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
                 Fun.t2(orderID, null),
