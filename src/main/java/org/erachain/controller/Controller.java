@@ -181,6 +181,10 @@ public class Controller extends Observable {
     public boolean onlyProtocolIndexing;
     public boolean compactDConStart;
     public boolean inMemoryDC;
+    /**
+     * see org.erachain.datachain.DCSet#BLOCKS_MAP
+     */
+    public int databaseSystem;
 
     public static String getVersion() {
         return version;
@@ -3567,6 +3571,21 @@ public class Controller extends Observable {
                     if (hartWork > 0) {
                         HARD_WORK = hartWork;
                     }
+                } catch (Exception e) {
+                }
+                continue;
+            }
+
+            if (arg.startsWith("-dbschain=") && arg.length() > 10) {
+                try {
+                    String dbsChain = arg.substring(10).toLowerCase();
+
+                    if (dbsChain.equals("rocksdb")) {
+                        databaseSystem = DCSet.DBS_ROCK_DB;
+                    } else if (dbsChain.equals("mapdb")) {
+                        databaseSystem = DCSet.DBS_MAP_DB;
+                    }
+
                 } catch (Exception e) {
                 }
                 continue;

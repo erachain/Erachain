@@ -47,18 +47,18 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int BLOCKS_MAP = DBS_ROCK_DB;
+    public static final int BLOCKS_MAP = DBS_MAP_DB;
     public static final int BLOCKS_MAP_FORK = DBS_NATIVE_MAP;
     /**
      * DBS_MAP_DB - slow then DBS_ROCK_DB
      */
-    public static final int FINAL_TX_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_MAP = DBS_MAP_DB;
     public static final int FINAL_TX_MAP_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int FINAL_TX_SIGNS_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_SIGNS_MAP = DBS_MAP_DB;
     public static final int FINAL_TX_SIGNS_MAP_FORK = DBS_NATIVE_MAP;
 
     /**
@@ -73,13 +73,13 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
      */
-    public static final int ACCOUNT_BALANCES = DBS_ROCK_DB;
+    public static final int ACCOUNT_BALANCES = DBS_MAP_DB;
     public static final int ACCOUNT_BALANCES_FORK = DBS_NATIVE_MAP;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int ACCOUNTS_REFERENCES = DBS_ROCK_DB;
+    public static final int ACCOUNTS_REFERENCES = DBS_MAP_DB;
 
     public static final int ORDERS_MAP = DBS_MAP_DB;
     public static final int COMPLETED_ORDERS_MAP = DBS_MAP_DB;
@@ -621,7 +621,7 @@ public class DCSet extends DBASet {
         DB database = makeFileDB(dbFile);
 
         //CREATE INSTANCE
-        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false, 0);
+        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false, Controller.getInstance().databaseSystem);
         if (instance.actions < 0) {
             for (DBTab tab : instance.tables) {
                 tab.clear();
@@ -645,7 +645,7 @@ public class DCSet extends DBASet {
     public static void reCreateDBinMEmory(boolean withObserver, boolean dynamicGUI) {
         DB database = makeDBinMemory();
 
-        instance = new DCSet(null, database, withObserver, dynamicGUI, true, 0);
+        instance = new DCSet(null, database, withObserver, dynamicGUI, true, Controller.getInstance().databaseSystem);
 
     }
 
