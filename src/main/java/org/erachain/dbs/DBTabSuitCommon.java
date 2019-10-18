@@ -74,6 +74,8 @@ public interface DBTabSuitCommon<T, U> {
 
     Iterator<T> getIterator(int index, boolean descending);
 
+    Iterator<T> getIterator();
+
     int getDefaultIndex();
 
     void writeTo(DBTab targetMap);

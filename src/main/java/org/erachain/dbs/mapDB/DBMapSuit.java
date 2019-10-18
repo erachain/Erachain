@@ -136,7 +136,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         NavigableSet<Tuple2<?, T>> indexSet = getIndex(index, descending);
         if (indexSet != null) {
 
-            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(this.indexes.get(index));
+            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
             this.outUses();
             return u;
 
@@ -147,11 +147,22 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
                 return u;
             }
 
-            Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
+            Iterator<T> u = this.map.keySet().iterator();
             this.outUses();
             return u;
 
         }
+    }
+
+    @Override
+    public Iterator<T> getIterator() {
+        this.addUses();
+
+        Iterator<T> u = map.keySet().iterator();
+
+        this.outUses();
+        return u;
+
     }
 
     public void addUses() {

@@ -180,6 +180,11 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
     }
 
     @Override
+    public Iterator<T> getIterator() {
+        return map.getIterator();
+    }
+
+    @Override
     public SortableList<T, U> getList() {
         SortableList<T, U> list;
         if (this.size() < 1000) {

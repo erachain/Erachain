@@ -1,16 +1,16 @@
 package org.erachain.dbs.mapDB;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.ForkedMap;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Оболочка для Карты от конкретной СУБД чтобы эту оболочку вставлять в Таблицу, которая форкнута (см. fork()).
@@ -203,6 +203,53 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         return false;
     }
+
+    // TODO надо рекурсию к Родителю по итератору делать
+    @Override
+    public Iterator<T> getIterator(int index, boolean descending) {
+        this.addUses();
+
+        Iterator<T> iterator;
+
+        if (index > 0) {
+            // 0 - это главный индекс - он не в списке indexes
+            NavigableSet<Fun.Tuple2<?, T>> indexSet = getIndex(index, descending);
+            if (indexSet != null) {
+                iterator = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
+            } else {
+                if (descending) {
+                    iterator = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                } else {
+                    iterator = this.map.keySet().iterator();
+                }
+            }
+        } else {
+            if (descending) {
+                iterator = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+            } else {
+                iterator = this.map.keySet().iterator();
+            }
+        }
+
+        iterator = Iterators.mergeSorted(ImmutableList.of(parent.getIterator(index, descending), iterator), Fun.COMPARATOR);
+
+        this.outUses();
+        return iterator;
+
+    }
+
+    @Override
+    public Iterator<T> getIterator() {
+        this.addUses();
+
+        //Map uncastedMap = this.map;
+        Iterator<T> iterator = Iterators.mergeSorted(ImmutableList.of(parent.getIterator(), map.keySet().iterator()), Fun.COMPARATOR);
+
+        this.outUses();
+        return iterator;
+
+    }
+
 
     @Override
     public void writeToParent() {

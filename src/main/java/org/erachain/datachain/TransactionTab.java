@@ -3,7 +3,10 @@ package org.erachain.datachain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Observer;
 
 /**
  * Храним неподтвержденные транзакции - memory pool for unconfirmed transaction.
@@ -79,6 +82,8 @@ public interface TransactionTab extends DBTab<Long, Transaction> {
 
     int size();
     Iterator<Long> getIterator(int index, boolean descending);
+
+    Iterator<Long> getIterator();
 
     Collection<Transaction> values();
 

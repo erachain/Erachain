@@ -172,6 +172,17 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     }
 
     @Override
+    public Iterator<T> getIterator() {
+        this.addUses();
+
+        Iterator<T> u = this.map.keySet().iterator();
+
+        this.outUses();
+        return u;
+
+    }
+
+    @Override
     public SortableList<T, U> getList() {
         SortableList<T, U> list;
         if (this.size() < 1000) {
