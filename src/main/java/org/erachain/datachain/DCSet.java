@@ -195,7 +195,7 @@ public class DCSet extends DBASet {
 
         try {
             // переделанные таблицы
-            this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0? defaultDBS:
+            this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0 ? defaultDBS :
                     ACCOUNT_BALANCES
                     , this, database);
 
@@ -203,15 +203,13 @@ public class DCSet extends DBASet {
                     FINAL_TX_MAP
                     , this, database);
 
-            this.transactionTab = new TransactionTabImpl(defaultDBS > 0? defaultDBS:
-                    UNCONF_TX_MAP
-                    , this, database);
+            this.transactionTab = new TransactionTabImpl(UNCONF_TX_MAP, this, database);
 
             this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
                     ACCOUNTS_REFERENCES
                     , this, database);
 
-            this.blockMap = new BlocksMapImpl(
+            this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
                     BLOCKS_MAP
                     , this, database);
 
