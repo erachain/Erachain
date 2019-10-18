@@ -430,15 +430,6 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator getIteratorByAddress(String address) {
-        //Iterable senderKeys = Fun.filter(this.senderKey, address);
-        //Iterable recipientKeys = Fun.filter(this.recipientKey, address);
-
-        //Set<Long> treeKeys = new TreeSet<>();
-
-        //treeKeys.addAll(Sets.newTreeSet(senderKeys));
-        //treeKeys.addAll(Sets.newTreeSet(recipientKeys));
-
-        //return ((TreeSet<Long>) treeKeys).descendingIterator();
         return ((TransactionFinalSuit)map).getIteratorByAddress(address);
     }
 

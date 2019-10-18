@@ -3,8 +3,7 @@ package org.erachain.dbs.mapDB;
 //04/01 +- 
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
+import com.google.common.collect.*;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -221,15 +220,38 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    // скорость сортировки в том или ином случае может быть разная - нужны ТЕСТЫ на 3 варианта работы
+    // TODO need benchmark tests
     public Iterator<Long> getIteratorByAddress(String address) {
-        Iterator<Long> senderKeys = Fun.filter(this.senderKey, address).iterator();
-        Iterator<Long> recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
-        Iterator<Long> treeKeys = new TreeSet<Long>().iterator();
+        if (false) {
+            Iterable senderKeys = Fun.filter(this.senderKey, address);
+            Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
-        treeKeys = Iterators.concat(senderKeys, recipientKeys);
+            if (false) {
+                Set<Long> treeKeys = new TreeSet<>();
 
-        return treeKeys; //((TreeSet<Long>) treeKeys).descendingIterator();
+                treeKeys.addAll(Sets.newTreeSet(senderKeys));
+                treeKeys.addAll(Sets.newTreeSet(recipientKeys));
+
+                return ((TreeSet<Long>) treeKeys).descendingIterator();
+            } else {
+                // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
+                Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+                return Lists.newLinkedList(mergedIterable).descendingIterator();
+            }
+        } else {
+
+            // ТУТ СОРТИООВКА не в ту тсорону получается
+
+            Iterator<Long> senderKeys = Fun.filter(this.senderKey, address).iterator();
+            Iterator<Long> recipientKeys = Fun.filter(this.recipientKey, address).iterator();
+
+            // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
+            Iterator<Long> mergedIterator = Iterators.mergeSorted(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
+
+        }
     }
 
     /**

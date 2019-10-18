@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
@@ -205,8 +206,12 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     public Iterator<Long> getIteratorByAddress(String address) {
         Iterator senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
         Iterator recipientKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false);
+        //return Iterators.concat(senderKeys, recipientKeys);
 
-        return Iterators.concat(senderKeys, recipientKeys);
+        // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
+        Iterator<Long> mergedIterator = Iterators.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+        return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
+
     }
 
     /**
