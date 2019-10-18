@@ -94,13 +94,21 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
     }
 
+    /**
+     * Это протокольный вызов - поэтому в форке он тоже бывает
+     *
+     * @param height
+     */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
 
-        Iterator<Long> iterator = ((TransactionFinalSuit) map).getBlockIterator(height);
-        while(iterator.hasNext()) {
-            map.delete(iterator.next());
+        if (map instanceof TransactionFinalSuit) {
+            // если карта как NativeMapHashMapFork открыт то сюда не заходим
+            Iterator<Long> iterator = ((TransactionFinalSuit) map).getBlockIterator(height);
+            while (iterator.hasNext()) {
+                map.delete(iterator.next());
+            }
         }
 
     }
@@ -128,6 +136,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByRecipient(String address, int limit) {
+
+        if (parent != null) {
+            return null;
+        }
+
         //Iterable keys = Fun.filter(this.recipientKey, address);
         //Iterator iterator = keys.iterator();
         Iterator iterator = ((TransactionFinalSuit)map).getIteratorByRecipient(address);
@@ -157,6 +170,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByBlock(Integer block, int offset, int limit) {
 
+        if (parent != null) {
+            return null;
+        }
+
         Iterator<Long> iterator = ((TransactionFinalSuit)map).getBlockIterator(block);
 
         if (offset > 0)
@@ -181,6 +198,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsBySender(String address, int limit) {
+
+        if (parent != null) {
+            return null;
+        }
+
         //Iterable keys = Fun.filter(this.senderKey, address);
         //Iterator iterator = keys.iterator();
         Iterator iterator = ((TransactionFinalSuit)map).getIteratorBySender(address);
@@ -204,6 +226,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit) {
+
+        if (parent != null) {
+            return null;
+        }
+
         //Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
         //Iterator iterator = keys.iterator();
         Iterator iterator = ((TransactionFinalSuit)map).getIteratorByAddressAndType(address, type);
@@ -227,6 +254,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending) {
+
+        if (parent != null) {
+            return null;
+        }
 
         //Iterable keys = Fun.filter(this.titleKey, new Tuple2<String, Integer>(filter, type), true,
         //        new Tuple2<String, Integer>(filter + "я", //new String(new byte[]{(byte)254}),
@@ -255,6 +286,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator getKeysByTitleAndType(String filter, Integer type, int offset, int limit) {
 
+        if (parent != null) {
+            return null;
+        }
+
         //String filtrLower = filter.toLowerCase();
 
         //Iterable keys = Fun.filter(this.titleKey,
@@ -277,6 +312,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     public Pair<Integer, Iterator<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
+
+        if (parent != null) {
+            return null;
+        }
 
         Iterator iterator;
 
@@ -358,6 +397,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Pair<String, Iterator> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
+        if (parent != null) {
+            return null;
+        }
+
         String[] filterArray = filter.toLowerCase().split(DCSet.SPLIT_CHARS);
 
         Pair<Integer, Iterator<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
@@ -380,6 +423,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
+
+        if (parent != null) {
+            return null;
+        }
 
         if (filter == null || filter.isEmpty()){
             return new ArrayList<>();
@@ -409,6 +456,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getByFilterAsArray(String filter, int offset, int limit) {
 
+        if (parent != null) {
+            return null;
+        }
+
         if (filter == null || filter.isEmpty()){
             return new ArrayList<>();
         }
@@ -434,6 +485,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator getIteratorByAddress(String address) {
+        if (parent != null) {
+            return null;
+        }
+
         return ((TransactionFinalSuit)map).getIteratorByAddress(address);
     }
 
@@ -441,6 +496,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge) {
+        if (parent != null) {
+            return null;
+        }
+
         Iterator iterator = getIteratorByAddress(address);
         List<Transaction> txs = new ArrayList<>();
         Transaction item;
@@ -470,6 +529,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public int getTransactionsByAddressCount(String address) {
+        if (parent != null) {
+            return 0;
+        }
+
         return Iterators.size(getIteratorByAddress(address));
     }
 
@@ -477,6 +540,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, String address) {
+        if (parent != null) {
+            return null;
+        }
+
         //Iterable keys = Fun.filter(this.recipientKey, address);
         //Iterator iter = keys.iterator();
         Iterator iter = ((TransactionFinalSuit)map).getIteratorByRecipient(address);
@@ -501,6 +568,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings("rawtypes")
     public List<Transaction> findTransactions(String address, String sender, String recipient, final int minHeight,
                                               final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
+
+        if (parent != null) {
+            return null;
+        }
+
         Iterator iterator = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
                 offset, limit);
 
@@ -522,6 +594,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings("rawtypes")
     public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
                                      final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
+        if (parent != null) {
+            return 0;
+        }
         Iterator keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
                 offset, limit);
         return Iterators.size(keys);
@@ -543,7 +618,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Iterator<Long> findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
-                                         final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
+                                               final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
+        if (parent != null) {
+            return null;
+        }
         Iterator<Long> senderKeys = null;
         Iterator<Long> recipientKeys = null;
         Iterator<Long> iterator;
