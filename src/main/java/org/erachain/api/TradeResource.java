@@ -8,9 +8,11 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.*;
+import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -583,43 +585,61 @@ public class TradeResource {
 
                         address = creator.getAddress();
                         counter = counters.get(address);
-                        transaction = cnt.createOrder(creator,
-                                have, want, haveAmount, wantAmount, 0);
 
                         if (cnt.isOnStopping())
                             return;
-                    }
 
-                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-                    // CLEAR for HEAP
-                    transaction.setDC(null);
+                        if (false) {
+                            transaction = cnt.createOrder(creator,
+                                    have, want, haveAmount, wantAmount, 0);
 
-                    // CHECK VALIDATE MESSAGE
-                    if (result == Transaction.VALIDATE_OK) {
-                        orders.put(transaction.viewSignature(), address);
-                        counters.put(address, counter + 1);
+                            Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                            // CLEAR for HEAP
+                            transaction.setDC(null);
 
-                    } else {
-                        if (result == Transaction.NO_BALANCE
-                                || result == Transaction.NOT_ENOUGH_FEE
-                        ) {
+                            // CHECK VALIDATE MESSAGE
+                            if (result == Transaction.VALIDATE_OK) {
+                                orders.put(transaction.viewSignature(), address);
+                                counters.put(address, counter + 1);
 
-                            try {
-                                Thread.sleep(1);
-                            } catch (InterruptedException e) {
-                                break;
+                            } else {
+                                if (result == Transaction.NO_BALANCE
+                                        || result == Transaction.NOT_ENOUGH_FEE
+                                ) {
+
+                                    try {
+                                        Thread.sleep(1);
+                                    } catch (InterruptedException e) {
+                                        break;
+                                    }
+
+                                    continue;
+                                }
+
+                                // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
+                                try {
+                                    Thread.sleep(10000);
+                                } catch (InterruptedException e) {
+                                    break;
+                                }
+                                continue;
                             }
+                        } else {
 
-                            continue;
+                            long time = NTP.getTime();
+
+                            //CREATE ORDER TRANSACTION
+                            transaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(),
+                                    haveAmount, wantAmount, (byte) 0, time, 0l);
+
+                            transaction.sign(creator, Transaction.FOR_NETWORK);
+
+                            // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
+                            cnt.getDCSet().getTransactionTab().add(transaction);
+                            cnt.broadcastTransaction(transaction);
+
                         }
 
-                        // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
-                        continue;
                     }
 
                     try {
@@ -634,6 +654,7 @@ public class TradeResource {
                     // not see in Thread - logger.error(e10.getMessage(), e10);
                     String error = e10.getMessage();
                     error += "";
+                } catch (Throwable e10) {
                 }
 
             } while (true);

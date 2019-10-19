@@ -8,7 +8,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.TransactionTab;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.APIUtils;
@@ -357,9 +356,6 @@ public class RSendResource {
 
             do {
 
-                // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                TransactionTab map = cnt.getDCSet().getTransactionTab();
-
                 if (this.test1Delay <= 0) {
                     return;
                 }
@@ -446,7 +442,8 @@ public class RSendResource {
 
                         transaction.sign(creator, Transaction.FOR_NETWORK);
 
-                        map.add(transaction);
+                        // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
+                        cnt.getDCSet().getTransactionTab().add(transaction);
                         cnt.broadcastTransaction(transaction);
 
                     }
@@ -545,9 +542,6 @@ public class RSendResource {
 
             do {
 
-                // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                TransactionTab map = cnt.getDCSet().getTransactionTab();
-
                 if (this.test2Delay <= 0) {
                     return;
                 }
@@ -633,7 +627,8 @@ public class RSendResource {
 
                         transaction.sign(creator, Transaction.FOR_NETWORK);
 
-                        map.add(transaction);
+                        // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
+                        cnt.getDCSet().getTransactionTab().add(transaction);
                         cnt.broadcastTransaction(transaction);
 
                     }
