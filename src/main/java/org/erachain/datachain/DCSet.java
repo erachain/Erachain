@@ -1695,7 +1695,8 @@ public class DCSet extends DBASet {
 
         this.addUses();
 
-        boolean needFlush = System.currentTimeMillis() - poinClear > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 2;
+        int maxPoolSize = BlockChain.MAX_BLOCK_SIZE_GEN << 2;
+        boolean needFlush = System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 2;
         // try repopulate UTX table
         if (needFlush) {
             LOGGER.debug("try CLEAR UTXs");
@@ -1703,26 +1704,35 @@ public class DCSet extends DBASet {
             int height = blocksHeadsMap.size();
             TransactionTab utxMap = getTransactionTab();
             int sizeUTX = utxMap.size();
-            if (sizeUTX > BlockChain.MAX_BLOCK_SIZE_GEN >> 1) {
-                LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
-                // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
-                // так .values() выдает не отдельный массив а объект базы данных!
-                Transaction[] items = utxMap.values().toArray(new Transaction[]{});
-                utxMap.clear();
-                long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
-                int countDeleted = 0;
-                for (Transaction item : items) {
+            LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
+            // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
+            // так .values() выдает не отдельный массив а объект базы данных!
+            Transaction[] items = utxMap.values().toArray(new Transaction[]{});
+            utxMap.clear();
+            long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
+            int countDeleted = 0;
+            if (sizeUTX < maxPoolSize) {
+                for (Transaction item: items) {
                     if (timestamp > item.getDeadline()) {
                         countDeleted++;
                         continue;
                     }
                     utxMap.add(item);
                 }
-
-                this.actions += countDeleted;
             } else {
-                needFlush = false;
+                // переполненение - удалим все старые
+                int i = sizeUTX;
+                Transaction item;
+                do {
+                    item = items[--i];
+                    if (timestamp > item.getDeadline())
+                        continue;
+                    utxMap.add(item);
+                } while(sizeUTX - i < maxPoolSize);
+                countDeleted = sizeUTX - i;
             }
+
+            this.actions += countDeleted;
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
