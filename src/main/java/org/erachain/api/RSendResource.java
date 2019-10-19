@@ -589,7 +589,7 @@ public class RSendResource {
                         Transaction transaction = cnt.r_Send(creator,
                                 0, recipient,
                                 2l, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), encryptMessage,
                                 new byte[]{(byte) 1});
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
