@@ -1695,30 +1695,34 @@ public class DCSet extends DBASet {
 
         this.addUses();
 
-        boolean needFlush = System.currentTimeMillis() - poinClear + 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1);
+        boolean needFlush = System.currentTimeMillis() - poinClear > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 2;
         // try repopulate UTX table
         if (needFlush) {
+            LOGGER.debug("try CLEAR UTXs");
             poinClear = System.currentTimeMillis();
             int height = blocksHeadsMap.size();
             TransactionTab utxMap = getTransactionTab();
-            LOGGER.debug("try CLEAR UTXs");
             int sizeUTX = utxMap.size();
-            LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
-            // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
-            // так .values() выдает не отдельный массив а объект базы данных!
-            Transaction[] items = utxMap.values().toArray(new Transaction[]{});
-            utxMap.clear();
-            long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
-            int countDeleted = 0;
-            for (Transaction item: items) {
-                if (timestamp > item.getDeadline()) {
-                    countDeleted++;
-                    continue;
+            if (sizeUTX > BlockChain.MAX_BLOCK_SIZE_GEN >> 1) {
+                LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
+                // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
+                // так .values() выдает не отдельный массив а объект базы данных!
+                Transaction[] items = utxMap.values().toArray(new Transaction[]{});
+                utxMap.clear();
+                long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
+                int countDeleted = 0;
+                for (Transaction item : items) {
+                    if (timestamp > item.getDeadline()) {
+                        countDeleted++;
+                        continue;
+                    }
+                    utxMap.add(item);
                 }
-                utxMap.add(item);
-            }
 
-            this.actions += countDeleted ;
+                this.actions += countDeleted;
+            } else {
+                needFlush = false;
+            }
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
