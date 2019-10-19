@@ -16,7 +16,7 @@ public class AddressForgingTest {
 
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet(0);
+        db = DCSet.createEmptyDatabaseSet(1);
         forgingMap = db.getAddressForging();
 
     }
@@ -117,7 +117,7 @@ public class AddressForgingTest {
         assertEquals(currentPoint, lastPoint);
 
         height += 100;
-        weight -= 1000;
+        weight += 1000;
         Tuple2<Integer, Integer> currentPoint2 = new Tuple2<>(height, weight);
         forgingMap.set(address, height, weight);
 
@@ -158,6 +158,14 @@ public class AddressForgingTest {
         assertEquals(lastPoint5, lastPoint);
         assertEquals(prevPoint5, null);
 
+        // TRY DELETE FIRST
+        Tuple2<String, Integer> key5 = new Tuple2<>(address, lastPoint5.a);
+        point = forgingMap.remove(key5);
+        assertEquals(point, null);
+
+        Tuple2<Integer, Integer> lastPoint6 = forgingMap.getLast(address);
+        assertEquals(lastPoint6, null);
+
     }
 
     @Test
@@ -186,10 +194,11 @@ public class AddressForgingTest {
         Tuple2<Integer, Integer> lastPoint2 = forgingMap.getLast(address);
         assertEquals(currentPoint2, lastPoint2);
 
-        Tuple2<String, Integer> key2 = new Tuple2<>(address, height);
+        //Tuple2<String, Integer> key2 = new Tuple2<>(address, height);
 
         // TRY DELETE
         Tuple2<String, Integer> key3 = new Tuple2<>(address, height - 100);
+        /// здес должна быть ошибка поидее
         point = forgingMap.remove(key3);
 
     }
