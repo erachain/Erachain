@@ -307,6 +307,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         //	boolean transactionProcessed;
         long totalBytes = 0;
         int counter = 0;
+        int check_time = 0;
+        int max_time_gen = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) >> 3;
 
         TransactionTab map = dcSet.getTransactionTab();
         Iterator<Long> iterator = map.getTimestampIterator(false);
@@ -319,6 +321,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             long testTime = 0;
             while (iterator.hasNext()) {
 
+                // проверим иногда - вдруг уже слишком долго собираем - останов сборки транзакций
+                // так как иначе такой блок и сеткой остальной не успеет обработаться
+                if (check_time++ > 300) {
+                    if (System.currentTimeMillis() - start > max_time_gen) {
+                        break;
+                    }
+                    check_time = 0;
+                }
                 if (ctrl.isOnStopping()) {
                     break;
                 }
