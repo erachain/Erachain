@@ -18,7 +18,6 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
  * основной класс модуля Сети
@@ -336,7 +335,7 @@ public class Network extends Observable {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
         if (!controller.isOnStopping()) {
-            knownPeers = controller.getDBSet().getPeerMap().getBestPeers(
+            knownPeers = controller.getDLSet().getPeerMap().getBestPeers(
                     0, true);
         }
 

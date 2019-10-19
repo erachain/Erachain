@@ -5,9 +5,12 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
+import org.erachain.datachain.TransactionTab;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.ntp.NTP;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -351,6 +354,9 @@ public class RSendResource {
 
             Random random = new Random();
             Controller cnt = Controller.getInstance();
+            TransactionTab map = cnt.getDCSet().getTransactionTab();
+            byte[] isText = new byte[]{1};
+            byte[] encryptMessage = new byte[]{0};
 
             do {
 
@@ -386,48 +392,63 @@ public class RSendResource {
 
                     String address = creator.getAddress();
                     long counter = counters.get(address);
-                    Transaction transaction = cnt.r_Send(creator,
-                            0, recipient,
-                            2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
-                            (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
-                            new byte[]{(byte) 1});
 
-                    if (cnt.isOnStopping())
-                        return;
+                    if (false) {
+                        Transaction transaction = cnt.r_Send(creator,
+                                0, recipient,
+                                2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
+                                (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                new byte[]{(byte) 1});
 
-                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-                    // CLEAR for HEAP
-                    transaction.setDC(null);
+                        if (cnt.isOnStopping())
+                            return;
+
+                        Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                        // CLEAR for HEAP
+                        transaction.setDC(null);
 
 
-                    // CHECK VALIDATE MESSAGE
-                    if (result == Transaction.VALIDATE_OK) {
+                        // CHECK VALIDATE MESSAGE
+                        if (result == Transaction.VALIDATE_OK) {
 
-                        counters.put(address, counter + 1);
+                            counters.put(address, counter + 1);
 
-                    } else {
-                        if (result == Transaction.RECEIVER_NOT_PERSONALIZED
-                                || result == Transaction.CREATOR_NOT_PERSONALIZED
-                                || result == Transaction.NO_BALANCE
-                                || result == Transaction.NOT_ENOUGH_FEE
-                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
+                        } else {
+                            if (result == Transaction.RECEIVER_NOT_PERSONALIZED
+                                    || result == Transaction.CREATOR_NOT_PERSONALIZED
+                                    || result == Transaction.NO_BALANCE
+                                    || result == Transaction.NOT_ENOUGH_FEE
+                                    || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
 
+                                try {
+                                    Thread.sleep(1);
+                                } catch (InterruptedException e) {
+                                    break;
+                                }
+
+                                continue;
+                            }
+
+                            // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
                             try {
-                                Thread.sleep(1);
+                                Thread.sleep(10000);
                             } catch (InterruptedException e) {
                                 break;
                             }
-
                             continue;
                         }
+                    } else {
 
-                        // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
-                        continue;
+                        RSend transaction = new RSend(creator, (byte) 0, recipient,2l, null,
+                                "LoadTest_" + address.substring(1, 5) + " " + counter,
+                                (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                new byte[]{(byte) 1}, NTP.getTime(), 0l);
+
+                        transaction.sign(creator, Transaction.FOR_NETWORK);
+
+                        map.add(transaction);
+                        cnt.broadcastTransaction(transaction);
+
                     }
 
                     try {
@@ -516,6 +537,10 @@ public class RSendResource {
 
             Random random = new Random();
             Controller cnt = Controller.getInstance();
+            BigDecimal amount = new BigDecimal("0.00000001");
+            TransactionTab map = cnt.getDCSet().getTransactionTab();
+            byte[] isText = new byte[]{1};
+            byte[] encryptMessage = new byte[]{0};
 
             do {
 
@@ -549,52 +574,66 @@ public class RSendResource {
                     } while (recipient.equals(creator));
 
 
-                    String address = creator.getAddress();
-                    long counter = counters.get(address);
-                    // ERA - она еще форжинговые балансы изменяет - поэтому КОМПУ лучше всего
-                    Transaction transaction = cnt.r_Send(creator,
-                            0, recipient,
-                            2l, new BigDecimal("0.00000001"), "LoadTestSend_" + address.substring(1, 5) + " " + counter,
-                            (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
-                            new byte[]{(byte) 1});
-
                     if (cnt.isOnStopping())
                         return;
 
-                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-                    // CLEAR for HEAP
-                    transaction.setDC(null);
+                    String address = creator.getAddress();
+                    long counter = counters.get(address);
 
+                    if (false) {
+                        // ERA - она еще форжинговые балансы изменяет - поэтому КОМПУ лучше всего
+                        Transaction transaction = cnt.r_Send(creator,
+                                0, recipient,
+                                2l, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
+                                (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                new byte[]{(byte) 1});
 
-                    // CHECK VALIDATE MESSAGE
-                    if (result == Transaction.VALIDATE_OK) {
+                        Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                        // CLEAR for HEAP
+                        transaction.setDC(null);
 
-                        counters.put(address, counter + 1);
+                        // CHECK VALIDATE MESSAGE
+                        if (result == Transaction.VALIDATE_OK) {
 
-                    } else {
-                        if (result == Transaction.RECEIVER_NOT_PERSONALIZED
-                                || result == Transaction.CREATOR_NOT_PERSONALIZED
-                                || result == Transaction.NO_BALANCE
-                                || result == Transaction.NOT_ENOUGH_FEE
-                                || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
+                            counters.put(address, counter + 1);
 
+                        } else {
+                            if (result == Transaction.RECEIVER_NOT_PERSONALIZED
+                                    || result == Transaction.CREATOR_NOT_PERSONALIZED
+                                    || result == Transaction.NO_BALANCE
+                                    || result == Transaction.NOT_ENOUGH_FEE
+                                    || result == Transaction.UNKNOWN_PUBLIC_KEY_FOR_ENCRYPT) {
+
+                                try {
+                                    Thread.sleep(1);
+                                } catch (InterruptedException e) {
+                                    break;
+                                }
+
+                                continue;
+                            }
+
+                            // not work in Threads - logger.info("test2: " + OnDealClick.resultMess(result));
                             try {
-                                Thread.sleep(1);
+                                Thread.sleep(10000);
                             } catch (InterruptedException e) {
                                 break;
                             }
-
                             continue;
                         }
 
-                        // not work in Threads - logger.info("test2: " + OnDealClick.resultMess(result));
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
-                        continue;
+                    } else {
+
+                        RSend transaction = new RSend(creator, (byte) 0, recipient, 2L,
+                                amount, "TEST" + counter, null, isText, encryptMessage, NTP.getTime(), 0l);
+
+                        transaction.sign(creator, Transaction.FOR_NETWORK);
+
+                        map.add(transaction);
+                        cnt.broadcastTransaction(transaction);
+
                     }
+
 
                     try {
                         Thread.sleep(this.test2Delay);

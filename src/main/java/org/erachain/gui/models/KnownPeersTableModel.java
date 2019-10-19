@@ -104,7 +104,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
             return null;
         }
 
-        PeerInfo peerInfo = Controller.getInstance().getDBSet().getPeerMap().getInfo(peer.getAddress());
+        PeerInfo peerInfo = Controller.getInstance().getDLSet().getPeerMap().getInfo(peer.getAddress());
         if (peerInfo == null){
             return null;
         }
@@ -115,7 +115,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 
             case COLUMN_HEIGHT:
                 if (!peer.isUsed()) {
-                    int banMinutes = Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(peer);
+                    int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
                     if (banMinutes > 0) {
                         return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
                     } else {

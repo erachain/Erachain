@@ -273,8 +273,11 @@ public class Controller extends Observable {
         this.dcSet = db;
     }
 
-    public DLSet getDBSet() {
+    public DLSet getDLSet() {
         return this.dlSet;
+    }
+    public DCSet getDCSet() {
+        return this.dcSet;
     }
 
     public int getNetworkPort() {

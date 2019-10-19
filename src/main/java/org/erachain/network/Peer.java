@@ -644,14 +644,14 @@ public class Peer extends MonitoredThread {
     }
 
     public boolean isBad() {
-        return Controller.getInstance().getDBSet().getPeerMap().isBad(this.getAddress());
+        return Controller.getInstance().getDLSet().getPeerMap().isBad(this.getAddress());
     }
 
     public boolean isBanned() {
-        return Controller.getInstance().getDBSet().getPeerMap().isBanned(address.getAddress());
+        return Controller.getInstance().getDLSet().getPeerMap().isBanned(address.getAddress());
     }
     public int getBanMinutes() {
-        return Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(this);
+        return Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(this);
     }
 
     /**

@@ -64,7 +64,7 @@ public class PeersResource {
                     ApiErrorFactory.ERROR_INVALID_NETWORK_ADDRESS);
         }
         peer.addPingCounter();
-        Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
+        Controller.getInstance().getDLSet().getPeerMap().addPeer(peer, 0);
 
         return "OK";
     }
@@ -163,7 +163,7 @@ public class PeersResource {
 
         if (Controller.getInstance().getActivePeers().contains(peer)) {
             o.put("status", "connected");
-        } else if (Controller.getInstance().getDBSet().getPeerMap().contains(peer.getAddress().getAddress())) {
+        } else if (Controller.getInstance().getDLSet().getPeerMap().contains(peer.getAddress().getAddress())) {
             o.put("status", "known disconnected");
         }
 
@@ -182,8 +182,8 @@ public class PeersResource {
         }
 
 
-        if (Controller.getInstance().getDBSet().getPeerMap().contains(peer.getAddress().getAddress())) {
-            PeerInfo peerInfo = Controller.getInstance().getDBSet().getPeerMap().getInfo(peer.getAddress());
+        if (Controller.getInstance().getDLSet().getPeerMap().contains(peer.getAddress().getAddress())) {
+            PeerInfo peerInfo = Controller.getInstance().getDLSet().getPeerMap().getInfo(peer.getAddress());
 
             o.put("findingTime", DateTimeFormat.timestamptoString(peerInfo.getFindingTime()));
             o.put("findingTimeStamp", peerInfo.getFindingTime());
@@ -230,7 +230,7 @@ public class PeersResource {
     @GET
     @Path("known")
     public String getKnown() throws UnknownHostException {
-        List<String> addresses = Controller.getInstance().getDBSet().getPeerMap().getAllPeersAddresses(-1);
+        List<String> addresses = Controller.getInstance().getDLSet().getPeerMap().getAllPeersAddresses(-1);
 
         JSONArray array = new JSONArray();
 
@@ -258,7 +258,7 @@ public class PeersResource {
     @DELETE
     @Path("/known")
     public String clearPeers() {
-        Controller.getInstance().getDBSet().getPeerMap().clear();
+        Controller.getInstance().getDLSet().getPeerMap().clear();
 
         return "OK";
     }
