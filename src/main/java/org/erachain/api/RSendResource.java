@@ -354,11 +354,11 @@ public class RSendResource {
 
             Random random = new Random();
             Controller cnt = Controller.getInstance();
-            TransactionTab map = cnt.getDCSet().getTransactionTab();
-            byte[] isText = new byte[]{1};
-            byte[] encryptMessage = new byte[]{0};
 
             do {
+
+                // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
+                TransactionTab map = cnt.getDCSet().getTransactionTab();
 
                 if (this.test1Delay <= 0) {
                     return;
@@ -540,11 +540,13 @@ public class RSendResource {
             Random random = new Random();
             Controller cnt = Controller.getInstance();
             BigDecimal amount = new BigDecimal("0.00000001");
-            TransactionTab map = cnt.getDCSet().getTransactionTab();
             byte[] isText = new byte[]{1};
             byte[] encryptMessage = new byte[]{0};
 
             do {
+
+                // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
+                TransactionTab map = cnt.getDCSet().getTransactionTab();
 
                 if (this.test2Delay <= 0) {
                     return;
