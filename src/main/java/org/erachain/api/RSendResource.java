@@ -462,6 +462,7 @@ public class RSendResource {
 
                 } catch (Exception e10) {
                     // not see in Thread - logger.error(e10.getMessage(), e10);
+                } catch (Throwable e10) {
                 }
 
             } while (true);
@@ -646,6 +647,7 @@ public class RSendResource {
 
                 } catch (Exception e10) {
                     // not see in Thread - logger.error(e10.getMessage(), e10);
+                } catch (Throwable e10) {
                 }
 
             } while (true);
