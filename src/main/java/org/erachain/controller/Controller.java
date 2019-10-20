@@ -2282,11 +2282,6 @@ public class Controller extends Observable {
         this.wallet.synchronize(false);
     }
 
-    public void clearUnconfirmedRecords(boolean cutDeadTime) {
-        this.blockChain.clearUnconfirmedRecords(this.dcSet, cutDeadTime);
-
-    }
-
     /**
      * Check if wallet is unlocked
      *

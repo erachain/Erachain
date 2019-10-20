@@ -165,25 +165,26 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
      * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
      * @param timestamp
-     * @param cutDeadTime
+     * @param cutDeadTime - образать список только по максимальному размеру, инаяе образать список и по времени протухания
      */
     protected long pointClear;
-    public void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
+    public int clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
 
         // займем просецц или установим флаг
         if (isClearProcessedAndSet())
-            return;
+            return 0;
 
         long keepTime = BlockChain.VERS_30SEC_TIME < timestamp? 600000 : 240000;
+
         try {
             long realTime = System.currentTimeMillis();
 
             if (realTime - pointClear < keepTime) {
-                return;
+                return 0;
             }
 
-            int count = 0;
             long tickerIter = realTime;
+            int deletions = 0;
 
             timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
 
@@ -222,18 +223,20 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                         && deadline < timestamp)
                         || Controller.HARD_WORK <= 3
                         && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                        || size - count > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                        || size - deletions > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                     this.remove(key);
-                    count++;
+                    deletions++;
                 } else {
                     break;
                 }
             }
 
             long ticker = System.currentTimeMillis() - realTime;
-            if (ticker > 1000 || count > 0) {
-                LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + count);
+            if (ticker > 1000 || deletions > 0) {
+                LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + deletions);
             }
+
+            return deletions;
 
         } finally {
             // освободим процесс

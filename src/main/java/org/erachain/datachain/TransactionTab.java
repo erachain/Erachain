@@ -33,7 +33,7 @@ public interface TransactionTab extends DBTab<Long, Transaction> {
 
     Iterator<Long> getTimestampIterator(boolean descending);
 
-    void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
+    int clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
 
     boolean set(byte[] signature, Transaction transaction);
 

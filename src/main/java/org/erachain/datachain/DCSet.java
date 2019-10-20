@@ -1695,16 +1695,19 @@ public class DCSet extends DBASet {
 
         this.addUses();
 
-        boolean needFlush = System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 2;
+        boolean needRepopulateUTX = hardFlush
+                || System.currentTimeMillis() - poinClear - 1000 >
+                    BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 1;
         // try repopulate UTX table
-        if (needFlush) {
-
+        if (needRepopulateUTX) {
             Controller.getInstance().transactionsPool.needClear();
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
                 this.database.getEngine().clearCache();
             }
+
+            poinClear = System.currentTimeMillis();
 
         }
 
@@ -1715,7 +1718,7 @@ public class DCSet extends DBASet {
 
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
                 || diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB
-                || needFlush) {
+                || needRepopulateUTX) {
             long start = poinFlush = System.currentTimeMillis();
             LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
                 + (this.actions > ACTIONS_BEFORE_COMMIT? "by Actions:" + this.actions : "")
