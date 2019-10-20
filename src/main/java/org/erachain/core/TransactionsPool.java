@@ -225,7 +225,7 @@ public class TransactionsPool extends MonitoredThread {
                                     continue;
                                 utxMap.add(item);
                             } while (sizeUTX - i < BlockChain.MAX_UNCONFIGMED_MAP_SIZE);
-                            countDeleted = sizeUTX - i;
+                            countDeleted = sizeUTX - utxMap.size();
                             LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear)
                                     + " ms, DELETED by oversize:  " + countDeleted);
                         }
