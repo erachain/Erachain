@@ -52,9 +52,11 @@ public class TransactionsPool extends MonitoredThread {
         return result;
     }
 
-    Boolean EMPTY = Boolean.TRUE;
-    public synchronized void needClear() {
+    protected Boolean EMPTY = Boolean.TRUE;
+    protected boolean cutDeadTime;
+    public synchronized void needClear(boolean cutDeadTime) {
         needClearMap = true;
+        this.cutDeadTime = cutDeadTime;
         blockingQueue.offer(EMPTY);
     }
 
@@ -163,6 +165,7 @@ public class TransactionsPool extends MonitoredThread {
 
                 clearCount = 0;
                 pointClear = System.currentTimeMillis();
+                cutDeadTime = false;
                 needClearMap = true;
             }
 
@@ -237,7 +240,7 @@ public class TransactionsPool extends MonitoredThread {
                             // мы выстыпаем лишь как ретрнслятор - при этом у нас запас по времени хранения все равно должен быть
                             // чтобы помнить какие транзакции мы уже словили и ретранслировали
                             if (utxMap.size() > BlockChain.MAX_BLOCK_SIZE_GEN >> 2) {
-                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(NTP.getTime(), false);
+                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(NTP.getTime(), cutDeadTime);
                             }
                         }
                     }
