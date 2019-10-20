@@ -145,7 +145,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     @Override
     public void close() {
         map.close();
-        logger.info("closed");
+        //logger.info("closed");
     }
 
     @Override

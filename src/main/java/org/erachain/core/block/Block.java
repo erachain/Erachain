@@ -1734,7 +1734,7 @@ import java.util.*;
                         //REMOVE FROM UNCONFIRMED DATABASE
                         ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
-                        unconfirmedMap.delete(transactionSignature);
+                        unconfirmedMap.remove(transactionSignature);
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                         if (processTimingLocalDiff < 999999999999l)
                             timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
@@ -2173,7 +2173,7 @@ import java.util.*;
                 //REMOVE FROM UNCONFIRMED DATABASE
                 ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
-                unconfirmedMap.delete(transactionSignature);
+                unconfirmedMap.remove(transactionSignature);
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
                 Long key = Transaction.makeDBRef(this.heightBlock, seqNo);

@@ -98,17 +98,16 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_ADD_BLOCK_TYPE:
-                needUpdate = true;
-                return;
             case ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE:
                 needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_RESET_BLOCK_TYPE:
+            case ObserverMessage.RESET_UNC_TRANSACTION_TYPE:
                 counter = 0;
-                needUpdate = false;
-                refresh();
+                needUpdate = true;
                 return;
             case ObserverMessage.GUI_REPAINT:
+                // только тут запускаем пеперисовку - чтобы она основные процессы не тормозила
                 if (needUpdate) {
                     needUpdate = false;
                     refresh();

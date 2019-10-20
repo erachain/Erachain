@@ -2843,7 +2843,9 @@ public class Controller extends Observable {
 
     public void onTransactionCreate(Transaction transaction) {
         // ADD TO UNCONFIRMED TRANSACTIONS
-        this.dcSet.getTransactionTab().add(transaction);
+        //////this.dcSet.getTransactionTab().add(transaction);
+        /// чтобы не налететь на очситку таблицы - туда передадим
+        this.transactionsPool.offerMessage(transaction);
 
         // BROADCAST
         this.broadcastTransaction(transaction);

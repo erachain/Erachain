@@ -443,7 +443,7 @@ public class RSendResource {
                         transaction.sign(creator, Transaction.FOR_NETWORK);
 
                         // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                        cnt.getDCSet().getTransactionTab().add(transaction);
+                        cnt.transactionsPool.offerMessage(transaction);
                         cnt.broadcastTransaction(transaction);
 
                     }
@@ -628,7 +628,7 @@ public class RSendResource {
                         transaction.sign(creator, Transaction.FOR_NETWORK);
 
                         // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
-                        cnt.getDCSet().getTransactionTab().add(transaction);
+                        cnt.transactionsPool.offerMessage(transaction);
                         cnt.broadcastTransaction(transaction);
 
                     }

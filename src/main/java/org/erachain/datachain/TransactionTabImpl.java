@@ -43,7 +43,7 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 @Slf4j
-class TransactionTabImpl extends DBTabImpl<Long, Transaction>
+public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         implements TransactionTab
 {
 
@@ -242,26 +242,45 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         }
     }
 
+    /**
+     * Если таблица была закрыта для отчистки - то ошибку не пропускаем вверх
+     * @param key
+     * @param transaction
+     * @return
+     */
+    public boolean set(Long key, Transaction transaction) {
+        try {
+            return super.set(key, transaction);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public boolean set(byte[] signature, Transaction transaction) {
-
-        Long key = Longs.fromByteArray(signature);
-
-        return this.set(key, transaction);
+        return this.set(Longs.fromByteArray(signature), transaction);
 
     }
 
     public boolean add(Transaction transaction) {
-
-        return this.set(transaction.getSignature(), transaction);
-
+        return this.set(Longs.fromByteArray(transaction.getSignature()), transaction);
     }
 
-    public void delete(Transaction transaction) {
-        this.delete(transaction.getSignature());
+    public Transaction remove(Transaction transaction) {
+        return this.remove(Longs.fromByteArray(transaction.getSignature()));
     }
 
-    public Transaction delete(byte[] signature) {
+    public Transaction remove(byte[] signature) {
         return this.remove(Longs.fromByteArray(signature));
+    }
+
+    @Override
+    public void delete(Transaction transaction) {
+        this.delete(Longs.fromByteArray(transaction.getSignature()));
+    }
+
+    @Override
+    public void delete(byte[] signature) {
+        this.delete(Longs.fromByteArray(signature));
     }
 
 
@@ -271,15 +290,42 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
      * @param key
      * @return
      */
-    public /* synchronized */ Transaction remove(Long key) {
-        Transaction transaction = super.remove(key);
-        if (transaction != null) {
-            // DELETE only if DELETED
-            totalDeleted++;
+    public Transaction remove(Long key) {
+        try {
+            Transaction transaction = super.remove(key);
+            if (transaction != null) {
+                // DELETE only if DELETED
+                totalDeleted++;
+            }
+
+            return transaction;
+        } catch (Exception e) {
+
         }
 
-        return transaction;
+        return null;
 
+    }
+
+    public void delete(Long key) {
+        try {
+            Transaction transaction = super.remove(key);
+            if (transaction != null) {
+                // DELETE only if DELETED
+                totalDeleted++;
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public boolean contains(Long key) {
+        try {
+            return super.contains(key);
+        } catch (Exception e) {
+
+        }
+        return false;
     }
 
     public boolean contains(byte[] signature) {
@@ -297,23 +343,22 @@ class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     /**
      * Из-за того что для проверки валидности в core.TransactionCreator
      * задаются номер блоки и позиция даже когда она неподтвержденная
-     * То надо сбрасывать эти значения при получении из базы - иначе в КЭШе этот объект с установленными занчениями
+     * То надо сбрасывать эти значения при получении из базы - иначе в КЭШе этот объект с установленными занчениями.
+     * Так же чтобы не надететь на очистку карты из Пула - делаем отлов ошибок
      * @param key
      * @return
      */
-    public Transaction get(long key) {
-        Transaction transaction = super.get(key);
-        if (transaction != null) {
-            transaction.setHeightSeq(0, 0);
-        }
-        return transaction;
-    }
     public Transaction get(Long key) {
-        Transaction transaction = super.get(key);
-        if (transaction != null) {
-            transaction.setHeightSeq(0, 0);
+        try {
+            Transaction transaction = super.get(key);
+            if (transaction != null) {
+                transaction.setHeightSeq(0, 0);
+            }
+            return transaction;
+        } catch (Exception e) {
+
         }
-        return transaction;
+        return null;
     }
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {

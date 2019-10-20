@@ -683,8 +683,10 @@ public class Synchronizer extends Thread {
                 }
 
                 byte[] sign = transaction.getSignature();
-                if (!map.contains(sign))
-                    map.set(sign, transaction);
+                if (!map.contains(sign)) {
+                    // добавляем через Очередь - чтобы не налететь на очистку таблицы
+                    cnt.transactionsPool.offerMessage(transaction);
+                }
             }
         }
 
