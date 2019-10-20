@@ -165,8 +165,7 @@ public class TransactionsPool extends MonitoredThread {
 
                 clearCount = 0;
                 pointClear = System.currentTimeMillis();
-                cutDeadTime = false;
-                needClearMap = true;
+                needClear(false);
             }
 
             // BROADCAST
@@ -190,7 +189,7 @@ public class TransactionsPool extends MonitoredThread {
                     needClearMap = false;
 
                     int height = dcSet.getBlocksHeadsMap().size();
-                    boolean needReset = clearedUTXs > 100000 << (Controller.HARD_WORK >> 1)
+                    boolean needReset = clearedUTXs > 10000 << (Controller.HARD_WORK >> 1)
                             //|| System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 3
                             ;
                     // reset Map & repopulate UTX table
