@@ -185,7 +185,7 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
             int deletions = 0;
             long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
 
-            long timestampKeep = timestamp = (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
+            timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
 
             /**
              * по несколько секунд итератор берется - при том что таблица пустая -
@@ -216,7 +216,7 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                 }
 
                 long deadline = transaction.getDeadline();
-                if (deadline < timestampKeep
+                if (deadline < timestamp
                         || size - deletions >
                                 (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 4
                                         : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {

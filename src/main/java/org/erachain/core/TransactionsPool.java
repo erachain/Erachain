@@ -160,11 +160,7 @@ public class TransactionsPool extends MonitoredThread {
 
             // проверяем на переполнение пула чтобы лишние очистить
             boolean isStatusOk = controller.isStatusOK();
-            if (++clearCount > (isStatusOk? 2000 : 500) << (Controller.HARD_WORK >> 2)
-                    || System.currentTimeMillis() - pointClear
-                        > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(transaction.getTimestamp())
-                            << (isStatusOk? 2 : -1)) {
-
+            if (++clearCount > (isStatusOk? 2000 : 500) << (Controller.HARD_WORK >> 2)) {
                 clearCount = 0;
                 pointClear = System.currentTimeMillis();
                 needClearMap = true;
