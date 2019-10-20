@@ -5,7 +5,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionTabImpl;
 import org.erachain.network.message.TransactionMessage;
-import org.erachain.ntp.NTP;
 import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,8 +159,9 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             // проверяем на переполнение пула чтобы лишние очистить
-            if (++clearCount > 1000 << (Controller.HARD_WORK >> 2) && System.currentTimeMillis() - pointClear
-                    > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(transaction.getTimestamp()) << 2) {
+            if (++clearCount > 1000 << (Controller.HARD_WORK >> 2)
+                    || System.currentTimeMillis() - pointClear
+                        > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(transaction.getTimestamp()) << 3) {
 
                 clearCount = 0;
                 pointClear = System.currentTimeMillis();
@@ -235,7 +235,8 @@ public class TransactionsPool extends MonitoredThread {
                     } else {
                         if (controller.isStatusOK()) {
                             if (utxMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(NTP.getTime(), true);
+                                long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
+                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, true);
                             }
                         } else {
                             // если идет синхронизация, то удаляем все что есть не на текущее время
@@ -245,7 +246,8 @@ public class TransactionsPool extends MonitoredThread {
                             // мы выстыпаем лишь как ретрнслятор - при этом у нас запас по времени хранения все равно должен быть
                             // чтобы помнить какие транзакции мы уже словили и ретранслировали
                             if (utxMap.size() > BlockChain.MAX_BLOCK_SIZE_GEN >> 2) {
-                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(NTP.getTime(), cutDeadTime);
+                                long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
+                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, true);
                             }
                         }
                     }
