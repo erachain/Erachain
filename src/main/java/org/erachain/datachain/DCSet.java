@@ -1688,7 +1688,7 @@ public class DCSet extends DBASet {
     private long engineSize;
     private long poinClear;
     private boolean clearGC = false;
-    public void flush(int size, boolean hardFlush) {
+    public void flush(int size, boolean hardFlush, boolean doOrphan) {
 
         if (parent != null)
             return;
@@ -1700,7 +1700,7 @@ public class DCSet extends DBASet {
                     BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 1;
         // try repopulate UTX table
         if (needRepopulateUTX) {
-            Controller.getInstance().transactionsPool.needClear(false);
+            Controller.getInstance().transactionsPool.needClear(doOrphan);
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
