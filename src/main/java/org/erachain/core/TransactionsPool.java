@@ -159,13 +159,15 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             // проверяем на переполнение пула чтобы лишние очистить
-            if (++clearCount > 1000 << (Controller.HARD_WORK >> 2)
+            boolean isStatusOk = controller.isStatusOK();
+            if (++clearCount > (isStatusOk? 2000 : 500) << (Controller.HARD_WORK >> 2)
                     || System.currentTimeMillis() - pointClear
-                        > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(transaction.getTimestamp()) << 3) {
+                        > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(transaction.getTimestamp())
+                            << (isStatusOk? 2 : -1)) {
 
                 clearCount = 0;
                 pointClear = System.currentTimeMillis();
-                needClear(false);
+                needClear(!controller.isStatusOK());
             }
 
             // BROADCAST
