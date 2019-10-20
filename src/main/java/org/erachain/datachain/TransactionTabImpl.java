@@ -148,7 +148,7 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
     public void setTotalDeleted(int value) { totalDeleted = value; }
     public int getTotalDeleted() { return totalDeleted; }
 
-    private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
+    //private static long MAX_DEADTIME = 1000 * 60 * 60 * 1;
 
     private boolean clearProcessed = false;
     private synchronized boolean isClearProcessedAndSet() {
@@ -165,26 +165,25 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
      * очищает  только по признаку протухания и ограничения на размер списка - без учета валидности
      * С учетом валидности очистка идет в Генераторе после каждого запоминания блока
      * @param timestamp
-     * @param cutDeadTime - образать список только по максимальному размеру, инаяе образать список и по времени протухания
+     * @param cutMaximum - образать список только по максимальному размеру, инаяе образать список и по времени протухания
      */
     protected long pointClear;
-    public int clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime) {
+    public int clearByDeadTimeAndLimit(long timestamp, boolean cutMaximum) {
 
         // займем просецц или установим флаг
         if (isClearProcessedAndSet())
             return 0;
 
-        long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
-
         try {
             long realTime = System.currentTimeMillis();
 
-            if (realTime - pointClear < keepTime) {
+            if (realTime - pointClear < 10000) {
                 return 0;
             }
 
             long tickerIter = realTime;
             int deletions = 0;
+            long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
 
             timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
 
@@ -217,13 +216,10 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                 }
 
                 long deadline = transaction.getDeadline();
-                if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                        || (Controller.HARD_WORK > 3
-                            || cutDeadTime)
-                                && deadline < timestamp
-                        || Controller.HARD_WORK <= 3
-                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
-                        || size - deletions > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                if (deadline < timestamp
+                        || size - deletions >
+                                (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 2
+                                        : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
                     this.remove(key);
                     deletions++;
                 } else {
