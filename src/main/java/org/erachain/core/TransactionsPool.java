@@ -187,9 +187,12 @@ public class TransactionsPool extends MonitoredThread {
             if (needClearMap) {
                 /////// CLEAR
                 try {
+                    needClearMap = false;
+
                     int height = dcSet.getBlocksHeadsMap().size();
-                    boolean needReset = clearedUTXs > 1000 << (Controller.HARD_WORK >> 1)
-                            || System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
+                    boolean needReset = clearedUTXs > 100000 << (Controller.HARD_WORK >> 1)
+                            //|| System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 3
+                            ;
                     // reset Map & repopulate UTX table
                     if (needReset) {
                         clearedUTXs = 0;
@@ -211,6 +214,8 @@ public class TransactionsPool extends MonitoredThread {
                                 }
                                 utxMap.add(item);
                             }
+                            LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear)
+                                    + " ms, DELETED by Deadlime:  " + countDeleted);
                         } else {
                             // переполненение - удалим все старые
                             int i = sizeUTX;
@@ -221,11 +226,11 @@ public class TransactionsPool extends MonitoredThread {
                                     continue;
                                 utxMap.add(item);
                             } while (sizeUTX - i < BlockChain.MAX_UNCONFIGMED_MAP_SIZE);
-                            countDeleted = sizeUTX - i;
+                            countDeleted = sizeUTX - utxMap.size();
+                            LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear)
+                                    + " ms, DELETED by oversize:  " + countDeleted);
                         }
 
-                        LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear)
-                                + " ms, DELETED:  " + countDeleted);
 
                     } else {
                         if (controller.isStatusOK()) {

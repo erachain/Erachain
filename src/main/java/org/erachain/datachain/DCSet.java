@@ -1700,7 +1700,7 @@ public class DCSet extends DBASet {
                     BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 1;
         // try repopulate UTX table
         if (needRepopulateUTX) {
-            Controller.getInstance().transactionsPool.needClear();
+            Controller.getInstance().transactionsPool.needClear(false);
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
