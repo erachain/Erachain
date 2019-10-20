@@ -419,7 +419,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public boolean trueEquals(Object transaction) {
-        if (transaction instanceof Transaction)
+        if (transaction == null)
+            return false;
+        else if (transaction instanceof Transaction)
             return Arrays.equals(this.toBytes(FOR_NETWORK, true),
                     ((Transaction) transaction).toBytes(FOR_NETWORK, true));
         return false;

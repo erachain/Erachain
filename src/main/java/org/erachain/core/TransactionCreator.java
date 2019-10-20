@@ -123,13 +123,13 @@ public class TransactionCreator {
             transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
             if (!transactionAccount.isSignatureValid(this.fork)) {
                 //THE TRANSACTION BECAME INVALID LET
-                this.fork.getTransactionTab().delete(transactionAccount);
+                this.fork.getTransactionTab().remove(transactionAccount);
             } else {
                 if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0l) == Transaction.VALIDATE_OK) {
                     transactionAccount.process(null, Transaction.FOR_NETWORK);
                 } else {
                     //THE TRANSACTION BECAME INVALID LET
-                    this.fork.getTransactionTab().delete(transactionAccount);
+                    this.fork.getTransactionTab().remove(transactionAccount);
                 }
                 // CLEAR for HEAP
                 transactionAccount.setDC(null);

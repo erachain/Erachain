@@ -445,7 +445,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     return;
                 }
                 if (transactionsMap.contains(signature))
-                    transactionsMap.delete(signature);
+                    transactionsMap.remove(signature);
             }
             LOGGER.debug("clear INVALID Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size()
                     + " LEFT: " + transactionsMap.size());

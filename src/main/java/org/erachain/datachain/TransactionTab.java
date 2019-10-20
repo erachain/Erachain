@@ -33,25 +33,19 @@ public interface TransactionTab extends DBTab<Long, Transaction> {
 
     Iterator<Long> getTimestampIterator(boolean descending);
 
-    //Iterator<Long> getCeatorIterator();
+    int clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
 
-    //List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime);
-
-    void clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
-
-    //void update(Observable o, Object arg);
-
-    boolean set(Long key, Transaction transaction);
     boolean set(byte[] signature, Transaction transaction);
 
     boolean add(Transaction transaction);
 
+    Transaction remove(Transaction transaction);
+    Transaction remove(byte[] signature);
+
     void delete(Transaction transaction);
-    Transaction delete(byte[] signature);
-    Transaction remove(Long key);
+    void delete(byte[] signature);
 
     boolean contains(byte[] signature);
-    boolean contains(Long key);
     boolean contains(Transaction transaction);
 
     Transaction get(byte[] signature);

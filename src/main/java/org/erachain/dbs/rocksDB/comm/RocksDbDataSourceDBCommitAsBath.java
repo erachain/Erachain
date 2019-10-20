@@ -219,7 +219,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             } else {
                 writeBatch.clear();
             }
-            logger.debug(" writeBatch commit");
+            //logger.debug(" writeBatch commit");
 
             resetDbLock.readLock().unlock();
         }
@@ -240,7 +240,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             writeBatch.clear();
         }
 
-        logger.debug("writeBatch rollback");
+        //logger.debug("writeBatch rollback");
 
         resetDbLock.readLock().unlock();
 
@@ -261,7 +261,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
-            logger.debug("writeBatch close");
+            //logger.debug("writeBatch close");
             resetDbLock.writeLock().unlock();
         }
     }

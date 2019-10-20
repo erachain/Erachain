@@ -169,7 +169,7 @@ public class DCSet extends DBASet {
     private TransactionFinalMapImpl transactionFinalMap;
     private TransactionFinalCalculatedMap transactionFinalCalculatedMap;
     private TransactionFinalMapSigns transactionFinalMapSigns;
-    private TransactionTab transactionTab;
+    private TransactionTabImpl transactionTab;
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
@@ -1139,7 +1139,7 @@ public class DCSet extends DBASet {
      *
      * ++ seek by TIMESTAMP
      */
-    public TransactionTab getTransactionTab() {
+    public TransactionTabImpl getTransactionTab() {
         return this.transactionTab;
     }
 
@@ -1695,51 +1695,20 @@ public class DCSet extends DBASet {
 
         this.addUses();
 
-        int maxPoolSize = BlockChain.MAX_BLOCK_SIZE_GEN << 2;
-        boolean needFlush = System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 2;
+        boolean needRepopulateUTX = hardFlush
+                || System.currentTimeMillis() - poinClear - 1000 >
+                    BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 1;
         // try repopulate UTX table
-        if (needFlush) {
-            LOGGER.debug("try CLEAR UTXs");
-            poinClear = System.currentTimeMillis();
-            int height = blocksHeadsMap.size();
-            TransactionTab utxMap = getTransactionTab();
-            int sizeUTX = utxMap.size();
-            LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
-            // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
-            // так .values() выдает не отдельный массив а объект базы данных!
-            Transaction[] items = utxMap.values().toArray(new Transaction[]{});
-            utxMap.clear();
-            long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
-            int countDeleted = 0;
-            if (sizeUTX < maxPoolSize) {
-                for (Transaction item: items) {
-                    if (timestamp > item.getDeadline()) {
-                        countDeleted++;
-                        continue;
-                    }
-                    utxMap.add(item);
-                }
-            } else {
-                // переполненение - удалим все старые
-                int i = sizeUTX;
-                Transaction item;
-                do {
-                    item = items[--i];
-                    if (timestamp > item.getDeadline())
-                        continue;
-                    utxMap.add(item);
-                } while(sizeUTX - i < maxPoolSize);
-                countDeleted = sizeUTX - i;
-            }
-
-            this.actions += countDeleted;
+        if (needRepopulateUTX) {
+            Controller.getInstance().transactionsPool.needClear();
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
                 this.database.getEngine().clearCache();
             }
 
-            LOGGER.debug("reADDEDed UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear) + " ms");
+            poinClear = System.currentTimeMillis();
+
         }
 
         this.actions += size;
@@ -1749,7 +1718,7 @@ public class DCSet extends DBASet {
 
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
                 || diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB
-                || needFlush) {
+                || needRepopulateUTX) {
             long start = poinFlush = System.currentTimeMillis();
             LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
                 + (this.actions > ACTIONS_BEFORE_COMMIT? "by Actions:" + this.actions : "")

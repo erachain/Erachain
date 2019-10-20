@@ -683,8 +683,10 @@ public class Synchronizer extends Thread {
                 }
 
                 byte[] sign = transaction.getSignature();
-                if (!map.contains(sign))
-                    map.set(sign, transaction);
+                if (!map.contains(sign)) {
+                    // добавляем через Очередь - чтобы не налететь на очистку таблицы
+                    cnt.transactionsPool.offerMessage(transaction);
+                }
             }
         }
 
@@ -955,12 +957,6 @@ public class Synchronizer extends Thread {
                 if (cnt.isOnStopping())
                     return;
 
-                // образать список только по максимальному размеру
-                dcSet.getTransactionTab().clearByDeadTimeAndLimit(block.getTimestamp(), false);
-
-                if (cnt.isOnStopping())
-                    return;
-
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);
                 error = new Exception(e);
@@ -1070,9 +1066,6 @@ public class Synchronizer extends Thread {
                 // FLUSH not use in each case - only after accumulate size
                 int blockSize = 3 + block.getTransactionCount();
                 dcSet.flush(blockSize, false);
-
-                // образать список и по времени протухания
-                dcSet.getTransactionTab().clearByDeadTimeAndLimit(block.getTimestamp(), true);
 
                 if (cnt.isOnStopping())
                     return;

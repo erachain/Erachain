@@ -2282,11 +2282,6 @@ public class Controller extends Observable {
         this.wallet.synchronize(false);
     }
 
-    public void clearUnconfirmedRecords(boolean cutDeadTime) {
-        this.blockChain.clearUnconfirmedRecords(this.dcSet, cutDeadTime);
-
-    }
-
     /**
      * Check if wallet is unlocked
      *
@@ -2843,7 +2838,9 @@ public class Controller extends Observable {
 
     public void onTransactionCreate(Transaction transaction) {
         // ADD TO UNCONFIRMED TRANSACTIONS
-        this.dcSet.getTransactionTab().add(transaction);
+        //////this.dcSet.getTransactionTab().add(transaction);
+        /// чтобы не налететь на очситку таблицы - туда передадим
+        this.transactionsPool.offerMessage(transaction);
 
         // BROADCAST
         this.broadcastTransaction(transaction);

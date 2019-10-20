@@ -451,7 +451,7 @@ public class WebResource {
 
         for (Transaction transaction : values) {
             if (privateKeyAccounts.contains(transaction.getCreator())) {
-                dcSet.getTransactionTab().delete(transaction);
+                dcSet.getTransactionTab().remove(transaction);
             }
         }
 
