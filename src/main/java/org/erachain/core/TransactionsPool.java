@@ -167,7 +167,7 @@ public class TransactionsPool extends MonitoredThread {
 
                 clearCount = 0;
                 pointClear = System.currentTimeMillis();
-                needClear(!controller.isStatusOK());
+                needClear(!isStatusOk);
             }
 
             // BROADCAST
