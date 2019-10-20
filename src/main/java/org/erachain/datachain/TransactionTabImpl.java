@@ -174,7 +174,7 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         if (isClearProcessedAndSet())
             return 0;
 
-        long keepTime = BlockChain.VERS_30SEC_TIME < timestamp? 600000 : 240000;
+        long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
 
         try {
             long realTime = System.currentTimeMillis();
@@ -219,10 +219,10 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
                 long deadline = transaction.getDeadline();
                 if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
                         || ((Controller.HARD_WORK > 3
-                        || cutDeadTime)
-                        && deadline < timestamp)
+                            || cutDeadTime)
+                                && deadline < timestamp)
                         || Controller.HARD_WORK <= 3
-                        && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
+                            && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                         || size - deletions > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                     this.remove(key);
                     deletions++;
@@ -232,7 +232,7 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
             }
 
             long ticker = System.currentTimeMillis() - realTime;
-            if (ticker > 1000 || deletions > 0) {
+            if (ticker > 100 || deletions > 0) {
                 LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + deletions);
             }
 
