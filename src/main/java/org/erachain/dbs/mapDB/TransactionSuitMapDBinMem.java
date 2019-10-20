@@ -78,7 +78,13 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
 
     @Override
     public void close() {
-        database.close();
+        try {
+            // может быть ошибка
+            database.getEngine().clearCache();
+            database.close();
+        } catch (Exception e) {
+
+        }
     }
 
     @Override
