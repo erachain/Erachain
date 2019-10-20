@@ -104,13 +104,13 @@ public class UpdateUtil {
             if (b.getHeight() % 1000 == 0) {
                 LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight());
             }
-            dcSet.flush(3 + b.getTransactionCount(), false);
+            dcSet.flush(3 + b.getTransactionCount(), false, false);
 
             b = b.getChild(dcSet);
 
         } while (b != null);
 
-        dcSet.flush(0, true);
+        dcSet.flush(0, true, true);
 
     }
 
@@ -134,7 +134,7 @@ public class UpdateUtil {
             }
             if (b.getHeight() % 1000 == 0) {
                 LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight());
-                DCSet.getInstance().flush(3 + b.getTransactionCount(), false);
+                DCSet.getInstance().flush(3 + b.getTransactionCount(), false, false);
             }
             b = b.getChild(DCSet.getInstance());
         } while (b != null);

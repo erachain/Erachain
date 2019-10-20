@@ -189,7 +189,7 @@ public class TransactionsPool extends MonitoredThread {
                     needClearMap = false;
 
                     int height = dcSet.getBlocksHeadsMap().size();
-                    boolean needReset = clearedUTXs > 10000 << (Controller.HARD_WORK >> 1)
+                    boolean needReset = clearedUTXs > (controller.isStatusOK()? 10000 : 1000) << (Controller.HARD_WORK >> 1)
                             //|| System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 3
                             ;
                     // reset Map & repopulate UTX table
@@ -235,7 +235,7 @@ public class TransactionsPool extends MonitoredThread {
                         if (controller.isStatusOK()) {
                             if (utxMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
                                 long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
-                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, true);
+                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, false);
                             }
                         } else {
                             // если идет синхронизация, то удаляем все что есть не на текущее время

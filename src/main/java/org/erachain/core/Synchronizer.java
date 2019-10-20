@@ -952,7 +952,7 @@ public class Synchronizer extends Thread {
                 //dcSet.updateTxCounter(-block.getTransactionCount());
                 // FARDFLUSH not use in each case - only after accumulate size
                 int blockSize = 3 + block.getTransactionCount();
-                dcSet.flush(blockSize, false);
+                dcSet.flush(blockSize, false, doOrphan);
 
                 if (cnt.isOnStopping())
                     return;
@@ -1065,7 +1065,7 @@ public class Synchronizer extends Thread {
 
                 // FLUSH not use in each case - only after accumulate size
                 int blockSize = 3 + block.getTransactionCount();
-                dcSet.flush(blockSize, false);
+                dcSet.flush(blockSize, false, doOrphan);
 
                 if (cnt.isOnStopping())
                     return;

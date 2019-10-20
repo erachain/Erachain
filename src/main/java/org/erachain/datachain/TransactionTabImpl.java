@@ -218,9 +218,9 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
 
                 long deadline = transaction.getDeadline();
                 if (realTime - deadline > 86400000 // позде на день удаляем в любом случае
-                        || ((Controller.HARD_WORK > 3
+                        || (Controller.HARD_WORK > 3
                             || cutDeadTime)
-                                && deadline < timestamp)
+                                && deadline < timestamp
                         || Controller.HARD_WORK <= 3
                             && deadline + MAX_DEADTIME < timestamp // через сутки удалять в любом случае
                         || size - deletions > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
