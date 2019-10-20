@@ -69,6 +69,7 @@ public class TransactionsPool extends MonitoredThread {
         if (item instanceof Transaction) {
             // ADD TO UNCONFIRMED TRANSACTIONS
             utxMap.add((Transaction) item);
+            clearCount++;
 
         } else if (item instanceof TransactionMessage) {
 
@@ -140,6 +141,7 @@ public class TransactionsPool extends MonitoredThread {
 
             // ADD TO UNCONFIRMED TRANSACTIONS
             utxMap.add(transaction);
+            clearCount++;
 
             if (LOG_UNCONFIRMED_PROCESS) {
                 timeCheck = System.currentTimeMillis() - timeCheck;
@@ -158,17 +160,17 @@ public class TransactionsPool extends MonitoredThread {
                         + onMessageProcessTiming - this.controller.unconfigmedMessageTimingAverage) >> 8;
             }
 
-            // проверяем на переполнение пула чтобы лишние очистить
-            boolean isStatusOk = controller.isStatusOK();
-            if (++clearCount > (isStatusOk? 2000 : 500) << (Controller.HARD_WORK >> 2)) {
-                clearCount = 0;
-                pointClear = System.currentTimeMillis();
-                needClearMap = true;
-                this.cutDeadTime = !isStatusOk;
-            }
-
             // BROADCAST
             controller.network.broadcast(transactionMessage, false);
+        }
+
+        // проверяем на переполнение пула чтобы лишние очистить
+        boolean isStatusOk = controller.isStatusOK();
+        if (clearCount > (isStatusOk? 2000 : 500) << (Controller.HARD_WORK >> 2)) {
+            clearCount = 0;
+            pointClear = System.currentTimeMillis();
+            needClearMap = true;
+            this.cutDeadTime = !isStatusOk;
         }
 
     }

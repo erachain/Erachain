@@ -174,69 +174,75 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
         if (isClearProcessedAndSet())
             return 0;
 
-        try {
+        try { // для освобождения ресурса
+
             long realTime = System.currentTimeMillis();
 
             if (realTime - pointClear < 10000) {
                 return 0;
             }
 
-            long tickerIter = realTime;
-            int deletions = 0;
-            long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
+            try { // для запоминания времени точки
 
-            timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
+                long tickerIter = realTime;
+                int deletions = 0;
+                long keepTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(timestamp) << 3;
 
-            /**
-             * по несколько секунд итератор берется - при том что таблица пустая -
-             * - дале COMPACT не помогает
-             */
-            //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-            //Iterator<Tuple2<?, Long>> iterator = map.getIterator(TIMESTAMP_INDEX, false);
-            Iterator<Long> iterator = ((TransactionSuit)map).getTimestampIterator(false);
-            tickerIter = System.currentTimeMillis() - tickerIter;
-            if (tickerIter > 10) {
-                LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-            }
+                timestamp -= (keepTime >> 1) + (keepTime << (5 - Controller.HARD_WORK >> 1));
 
-            Transaction transaction;
-
-            tickerIter = System.currentTimeMillis();
-            long size = this.map.size();
-            tickerIter = System.currentTimeMillis() - tickerIter;
-            if (tickerIter > 10) {
-                LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
-            }
-            while (iterator.hasNext()) {
-                Long key = iterator.next();
-                transaction = this.map.get(key);
-                if (transaction == null) {
-                    // такая ошибка уже было
-                    break;
+                /**
+                 * по несколько секунд итератор берется - при том что таблица пустая -
+                 * - дале COMPACT не помогает
+                 */
+                //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
+                //Iterator<Tuple2<?, Long>> iterator = map.getIterator(TIMESTAMP_INDEX, false);
+                Iterator<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false);
+                tickerIter = System.currentTimeMillis() - tickerIter;
+                if (tickerIter > 10) {
+                    LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
                 }
 
-                long deadline = transaction.getDeadline();
-                if (deadline < timestamp
-                        || size - deletions >
-                                (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 4
-                                        : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
-                    this.delete(key);
-                    deletions++;
-                } else {
-                    break;
+                Transaction transaction;
+
+                tickerIter = System.currentTimeMillis();
+                long size = this.map.size();
+                tickerIter = System.currentTimeMillis() - tickerIter;
+                if (tickerIter > 10) {
+                    LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
                 }
+                while (iterator.hasNext()) {
+                    Long key = iterator.next();
+                    transaction = this.map.get(key);
+                    if (transaction == null) {
+                        // такая ошибка уже было
+                        break;
+                    }
+
+                    long deadline = transaction.getDeadline();
+                    if (deadline < timestamp
+                            || size - deletions >
+                            (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 4
+                                    : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
+                        this.delete(key);
+                        deletions++;
+                    } else {
+                        break;
+                    }
+                }
+
+                long ticker = System.currentTimeMillis() - realTime;
+                if (ticker > 100 || deletions > 0) {
+                    LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + deletions);
+                }
+
+                return deletions;
+
+            } finally {
+                // учтем новое время в точке
+                pointClear = System.currentTimeMillis();
             }
-
-            long ticker = System.currentTimeMillis() - realTime;
-            if (ticker > 100 || deletions > 0) {
-                LOGGER.debug("------ CLEAR DEAD UTXs: " + ticker + " ms, for deleted: " + deletions);
-            }
-
-            return deletions;
-
         } finally {
             // освободим процесс
-            pointClear = System.currentTimeMillis();
             clearProcessed = false;
         }
     }
