@@ -1145,6 +1145,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             if (System.currentTimeMillis() - pointLogGoUpdate > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2 ) {
                                 pointLogGoUpdate = System.currentTimeMillis();
                                 LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
+                                // обнулим - чтобы потом сработало новое создание
+                                this.solvingReference = null;
                             }
                         }
 
