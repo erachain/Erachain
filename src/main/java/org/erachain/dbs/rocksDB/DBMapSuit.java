@@ -149,6 +149,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
+    public boolean isClosed() {
+        return map.dbSource.isAlive();
+    }
+
+    @Override
     public void writeTo(DBTab targetMap) {
         Iterator<T> iterator = this.map.getIterator(false);
         while (iterator.hasNext()) {

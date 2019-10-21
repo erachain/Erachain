@@ -532,6 +532,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     public void close() {}
 
     @Override
+    public boolean isClosed() {
+        return database.getEngine().isClosed();
+    }
+
+    @Override
     public String toString() {
         if (parent == null)  {
             return getClass().getName();

@@ -1653,12 +1653,18 @@ import java.util.*;
                     boolean isSignatureValid = false;
                     // TRY QUCK check SIGNATURE by FIND in POOL
                     try {
-                        if (unconfirmedMap.contains(transactionSignature)) {
+                        if (!unconfirmedMap.isClosed() && unconfirmedMap.contains(transactionSignature)) {
                             isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature));
+                        } else {
+                            unconfirmedMap = dcSetPlace.getTransactionTab();
                         }
-                    } catch (java.lang.IllegalAccessError e) {
-                        // налетели на закрытую таблицу
-                        unconfirmedMap = dcSetPlace.getTransactionTab();
+                    } catch (java.lang.Throwable e) {
+                        if (e instanceof java.lang.IllegalAccessError) {
+                            // налетели на закрытую таблицу
+                            unconfirmedMap = dcSetPlace.getTransactionTab();
+                        } else {
+                            LOGGER.error(e.getMessage(), e);
+                        }
                     }
 
                     if (!isSignatureValid) {
@@ -1740,10 +1746,18 @@ import java.util.*;
                         ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
                         try {
-                            unconfirmedMap.remove(transactionSignature);
-                        } catch (java.lang.IllegalAccessError e) {
-                            // налетели на закрытую таблицу
-                            unconfirmedMap = dcSetPlace.getTransactionTab();
+                            if (!unconfirmedMap.isClosed()) {
+                                unconfirmedMap.remove(transactionSignature);
+                            } else {
+                                unconfirmedMap = dcSetPlace.getTransactionTab();
+                            }
+                        } catch (java.lang.Throwable e) {
+                            if (e instanceof java.lang.IllegalAccessError) {
+                                // налетели на закрытую таблицу
+                                unconfirmedMap = dcSetPlace.getTransactionTab();
+                            } else {
+                                LOGGER.error(e.getMessage(), e);
+                            }
                         }
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                         if (processTimingLocalDiff < 999999999999l)
@@ -2184,10 +2198,18 @@ import java.util.*;
                 ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
                 try {
-                    unconfirmedMap.remove(transactionSignature);
-                } catch (java.lang.IllegalAccessError e) {
-                    // налетели на закрытую таблицу
-                    unconfirmedMap = dcSet.getTransactionTab();
+                    if (!unconfirmedMap.isClosed()) {
+                        unconfirmedMap.remove(transactionSignature);
+                    } else {
+                        unconfirmedMap = dcSet.getTransactionTab();
+                    }
+                } catch (java.lang.Throwable e) {
+                    if (e instanceof java.lang.IllegalAccessError) {
+                        // налетели на закрытую таблицу
+                        unconfirmedMap = dcSet.getTransactionTab();
+                    } else {
+                        throw new Exception(e);
+                    }
                 }
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
@@ -2357,10 +2379,18 @@ import java.util.*;
                 if (!notStoreTXs) {
                     //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
                     try {
-                        unconfirmedMap.add(transaction);
-                    } catch (java.lang.IllegalAccessError e) {
-                        // налетели на закрытую таблицу
-                        unconfirmedMap = dcSet.getTransactionTab();
+                        if (!unconfirmedMap.isClosed()) {
+                            unconfirmedMap.add(transaction);
+                        } else {
+                            unconfirmedMap = dcSet.getTransactionTab();
+                        }
+                    } catch (java.lang.Throwable e) {
+                        if (e instanceof java.lang.IllegalAccessError) {
+                            // налетели на закрытую таблицу
+                            unconfirmedMap = dcSet.getTransactionTab();
+                        } else {
+                            throw new Exception(e);
+                        }
                     }
                 }
 

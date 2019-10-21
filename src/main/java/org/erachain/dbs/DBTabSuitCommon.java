@@ -88,4 +88,6 @@ public interface DBTabSuitCommon<T, U> {
 
     void close();
 
+    boolean isClosed();
+
 }

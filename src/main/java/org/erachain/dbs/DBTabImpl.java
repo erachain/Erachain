@@ -230,6 +230,11 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
     public void close() { map.close(); }
 
     @Override
+    public boolean isClosed() {
+        return map.isClosed();
+    }
+
+    @Override
     public void commit() { map.commit(); }
 
     @Override

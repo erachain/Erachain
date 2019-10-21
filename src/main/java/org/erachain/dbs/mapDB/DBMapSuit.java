@@ -341,6 +341,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public void close() {}
 
     @Override
+    public boolean isClosed() {
+        return database.getEngine().isClosed();
+    }
+
+    @Override
     public void commit() {}
 
     @Override

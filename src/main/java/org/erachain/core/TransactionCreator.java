@@ -1,6 +1,7 @@
 package org.erachain.core;
 
 import com.google.common.primitives.Bytes;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -45,6 +46,7 @@ import java.util.*;
  *
  * TODO: - поидее его надо перенести в модуль Кошелек - ибо без кошелька он не будет пахать.
  */
+@Slf4j
 public class TransactionCreator {
     private DCSet fork;
     DB database;
@@ -93,11 +95,19 @@ public class TransactionCreator {
         if (false) {
             // У форка нет вторичных индексов поэтому этот вариант не покатит
             for (Account account: Controller.getInstance().getAccounts()) {
-                Iterator<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
-                        0, false, 0, 0, 0L);
-                while (iterator.hasNext()) {
-                    transaction = transactionTab.get(iterator.next());
+                try {
+                    Iterator<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
+                            0, false, 0, 0, 0L);
+                    while (iterator.hasNext()) {
+                        transaction = transactionTab.get(iterator.next());
                         accountTransactions.add(transaction);
+                    }
+                } catch (java.lang.Throwable e) {
+                    if (e instanceof java.lang.IllegalAccessError) {
+                        // налетели на закрытую таблицу
+                    } else {
+                        logger.error(e.getMessage(), e);
+                    }
                 }
             }
 
@@ -120,19 +130,27 @@ public class TransactionCreator {
         //VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
         for (Transaction transactionAccount : accountTransactions) {
 
-            transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-            if (!transactionAccount.isSignatureValid(this.fork)) {
-                //THE TRANSACTION BECAME INVALID LET
-                this.fork.getTransactionTab().remove(transactionAccount);
-            } else {
-                if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0l) == Transaction.VALIDATE_OK) {
-                    transactionAccount.process(null, Transaction.FOR_NETWORK);
-                } else {
+            try {
+                transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
+                if (!transactionAccount.isSignatureValid(this.fork)) {
                     //THE TRANSACTION BECAME INVALID LET
                     this.fork.getTransactionTab().remove(transactionAccount);
+                } else {
+                    if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0l) == Transaction.VALIDATE_OK) {
+                        transactionAccount.process(null, Transaction.FOR_NETWORK);
+                    } else {
+                        //THE TRANSACTION BECAME INVALID LET
+                        this.fork.getTransactionTab().remove(transactionAccount);
+                    }
+                    // CLEAR for HEAP
+                    transactionAccount.setDC(null);
                 }
-                // CLEAR for HEAP
-                transactionAccount.setDC(null);
+            } catch (java.lang.Throwable e) {
+                if (e instanceof java.lang.IllegalAccessError) {
+                    // налетели на закрытую таблицу
+                } else {
+                    logger.error(e.getMessage(), e);
+                }
             }
         }
     }
@@ -431,14 +449,22 @@ public class TransactionCreator {
 
             // IF has not DUPLICATE in UNCONFIRMED RECORDS
             TransactionTab unconfirmedMap = DCSet.getInstance().getTransactionTab();
-            for (Transaction record : unconfirmedMap.values()) {
-                if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
-                    if (record instanceof IssuePersonRecord) {
-                        IssuePersonRecord issuePerson = (IssuePersonRecord) record;
-                        if (issuePerson.getItem().getName().equals(fullName)) {
-                            return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+            try {
+                for (Transaction record : unconfirmedMap.values()) {
+                    if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
+                        if (record instanceof IssuePersonRecord) {
+                            IssuePersonRecord issuePerson = (IssuePersonRecord) record;
+                            if (issuePerson.getItem().getName().equals(fullName)) {
+                                return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+                            }
                         }
                     }
+                }
+            } catch (java.lang.Throwable e) {
+                if (e instanceof java.lang.IllegalAccessError) {
+                    // налетели на закрытую таблицу
+                } else {
+                    logger.error(e.getMessage(), e);
                 }
             }
         }
@@ -486,14 +512,22 @@ public class TransactionCreator {
 
         // IF has not DUPLICATE in UNCONFIRMED RECORDS
         TransactionTab unconfirmedMap = DCSet.getInstance().getTransactionTab();
-        for (Transaction record : unconfirmedMap.values()) {
-            if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
-                if (record instanceof IssuePersonRecord) {
-                    IssuePersonRecord issuePerson = (IssuePersonRecord) record;
-                    if (issuePerson.getItem().getName().equals(human.getName())) {
-                        return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+        try {
+            for (Transaction record : unconfirmedMap.values()) {
+                if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
+                    if (record instanceof IssuePersonRecord) {
+                        IssuePersonRecord issuePerson = (IssuePersonRecord) record;
+                        if (issuePerson.getItem().getName().equals(human.getName())) {
+                            return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+                        }
                     }
                 }
+            }
+        } catch (java.lang.Throwable e) {
+            if (e instanceof java.lang.IllegalAccessError) {
+                // налетели на закрытую таблицу
+            } else {
+                logger.error(e.getMessage(), e);
             }
         }
 

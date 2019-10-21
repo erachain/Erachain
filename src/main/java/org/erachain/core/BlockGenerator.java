@@ -266,7 +266,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
 
-            map.add(messageTx);
+            ctrl.transactionsPool.offerMessage(messageTx);
 
         }
 
@@ -284,7 +284,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
 
-            map.add(messageTx);
+            ctrl.transactionsPool.offerMessage(messageTx);
 
         }
 
@@ -434,8 +434,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
             this.setMonitorStatusAfter();
 
-        } catch (java.lang.IllegalAccessError e) {
-            // налетели на закрытие базы данных
+        } catch (java.lang.Throwable e) {
+            if (e instanceof java.lang.IllegalAccessError) {
+                // налетели на закрытую таблицу
+            } else {
+                LOGGER.error(e.getMessage(), e);
+            }
             LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
                     + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size()
                     + " before CLEARED event!");
@@ -449,12 +453,21 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         if (needRemoveInvalids != null && !needRemoveInvalids.isEmpty()) {
             long start = System.currentTimeMillis();
             TransactionTab transactionsMap = dcSet.getTransactionTab();
+
             for (byte[] signature : needRemoveInvalids) {
                 if (ctrl.isOnStopping()) {
                     return;
                 }
-                if (transactionsMap.contains(signature))
-                    transactionsMap.remove(signature);
+                try {
+                    if (!transactionsMap.isClosed() && transactionsMap.contains(signature))
+                        transactionsMap.remove(signature);
+                } catch (java.lang.Throwable e) {
+                    if (e instanceof java.lang.IllegalAccessError) {
+                        // налетели на закрытую таблицу
+                    } else {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
             }
             LOGGER.debug("clear INVALID Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size()
                     + " LEFT: " + transactionsMap.size());
@@ -479,73 +492,82 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             long start = System.currentTimeMillis();
 
             TransactionTab map = dcSet.getTransactionTab();
-            Iterator<Long> iterator = map.getTimestampIterator(false);
-            LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 
-            needRemoveInvalids = new ArrayList<byte[]>();
+            try {
+                Iterator<Long> iterator = map.getTimestampIterator(false);
+                LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 
-            this.setMonitorStatusBefore("checkForRemove");
+                needRemoveInvalids = new ArrayList<byte[]>();
 
-            while (iterator.hasNext()) {
+                this.setMonitorStatusBefore("checkForRemove");
 
-                if (ctrl.isOnStopping()) {
-                    return;
-                }
-
-                Transaction transaction = map.get(iterator.next());
-
-                if (transaction.getTimestamp() > timestamp)
-                    break;
-
-                transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
-
-                if (false // тут уже все проверено внутри нашей базы
-                        && !transaction.isSignatureValid(newBlockDC)) {
-                    needRemoveInvalids.add(transaction.getSignature());
-                    continue;
-                }
-
-                try {
-
-                    if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                        needRemoveInvalids.add(transaction.getSignature());
-                        continue;
-                    }
-
-                    //CHECK IF ENOUGH ROOM
-                    if (++counter > (BlockChain.MAX_BLOCK_SIZE << 2)) {
-                        break;
-                    }
-
-                    totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-                    if (totalBytes > (BlockChain.MAX_BLOCK_SIZE_BYTES_GEN << 2)) {
-                        break;
-                    }
-
-                    //PROCESS IN NEWBLOCKDB
-                    transaction.process(null, Transaction.FOR_NETWORK);
-
-                    // GO TO NEXT TRANSACTION
-                    continue;
-
-                } catch (Exception e) {
+                while (iterator.hasNext()) {
 
                     if (ctrl.isOnStopping()) {
                         return;
                     }
 
-                    //     transactionProcessed = true;
+                    Transaction transaction = map.get(iterator.next());
 
-                    LOGGER.error(e.getMessage(), e);
-                    //REMOVE FROM LIST
-                    needRemoveInvalids.add(transaction.getSignature());
+                    if (transaction.getTimestamp() > timestamp)
+                        break;
 
-                    continue;
+                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
+                    if (false // тут уже все проверено внутри нашей базы
+                            && !transaction.isSignatureValid(newBlockDC)) {
+                        needRemoveInvalids.add(transaction.getSignature());
+                        continue;
+                    }
+
+                    try {
+
+                        if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                            needRemoveInvalids.add(transaction.getSignature());
+                            continue;
+                        }
+
+                        //CHECK IF ENOUGH ROOM
+                        if (++counter > (BlockChain.MAX_BLOCK_SIZE << 2)) {
+                            break;
+                        }
+
+                        totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                        if (totalBytes > (BlockChain.MAX_BLOCK_SIZE_BYTES_GEN << 2)) {
+                            break;
+                        }
+
+                        //PROCESS IN NEWBLOCKDB
+                        transaction.process(null, Transaction.FOR_NETWORK);
+
+                        // GO TO NEXT TRANSACTION
+                        continue;
+
+                    } catch (Exception e) {
+
+                        if (ctrl.isOnStopping()) {
+                            return;
+                        }
+
+                        //     transactionProcessed = true;
+
+                        LOGGER.error(e.getMessage(), e);
+                        //REMOVE FROM LIST
+                        needRemoveInvalids.add(transaction.getSignature());
+
+                        continue;
+
+                    }
 
                 }
 
+            } catch (java.lang.Throwable e) {
+                if (e instanceof java.lang.IllegalAccessError) {
+                    // налетели на закрытую таблицу
+                } else {
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
-
             this.setMonitorStatusAfter();
 
             LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + map.size()

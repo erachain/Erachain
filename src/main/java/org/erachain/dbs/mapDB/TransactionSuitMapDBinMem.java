@@ -1,15 +1,21 @@
 package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.SerializerBase;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Slf4j
 public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
@@ -77,7 +83,107 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     }
 
     @Override
-    public void close() {
+    public int size() {
+        if (database.getEngine().isClosed())
+            return -1;
+
+        return super.size();
+    }
+
+    @Override
+    public Transaction get(Long key) {
+        if (database.getEngine().isClosed())
+            return defaultValue;
+
+        return super.get(key);
+    }
+
+    @Override
+    public Set<Long> keySet() {
+        if (database.getEngine().isClosed())
+            return new TreeSet<>();
+        return super.keySet();
+    }
+
+    @Override
+    public Collection<Transaction> values() {
+        if (database.getEngine().isClosed())
+            return new TreeSet<>();
+        return super.values();
+    }
+
+    @Override
+    public boolean set(Long key, Transaction value) {
+        if (database.getEngine().isClosed())
+            return false;
+        return super.set(key, value);
+    }
+
+    @Override
+    public void put(Long key, Transaction value) {
+        if (database.getEngine().isClosed())
+            return;
+        super.put(key, value);
+    }
+
+    @Override
+    public Transaction remove(Long key) {
+        if (database.getEngine().isClosed())
+            return defaultValue;
+        return super.remove(key);
+    }
+
+    @Override
+    public void delete(Long key) {
+        if (database.getEngine().isClosed())
+            return;
+        super.delete(key);
+    }
+
+    @Override
+    public Transaction removeValue(Long key) {
+        if (database.getEngine().isClosed())
+            return defaultValue;
+        return super.removeValue(key);
+    }
+
+    @Override
+    public void deleteValue(Long key) {
+        if (database.getEngine().isClosed())
+            return;
+        super.deleteValue(key);
+    }
+
+    @Override
+    public boolean contains(Long key) {
+        if (database.getEngine().isClosed())
+            return false;
+        return super.contains(key);
+    }
+
+    @Override
+    public Iterator<Long> getIterator(int index, boolean descending) {
+        if (database.getEngine().isClosed())
+            return new TreeSet<Long>().iterator();
+        return super.getIterator(index, descending);
+    }
+
+    @Override
+    public Iterator<Long> getIterator() {
+        if (database.getEngine().isClosed())
+            return new TreeSet<Long>().iterator();
+        return super.getIterator();
+    }
+
+    @Override
+    public void writeTo(DBTab targetMap) {
+        if (database.getEngine().isClosed())
+            return;
+        super.writeTo(targetMap);
+    }
+
+    @Override
+    public synchronized void close() {
         try {
             // может быть ошибка
             database.getEngine().clearCache();
@@ -88,7 +194,7 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     }
 
     @Override
-    public void clear() {
+    public synchronized void clear() {
         if (this.database.getEngine().isClosed())
             return;
         close();
