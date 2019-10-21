@@ -1,6 +1,5 @@
 package org.erachain.dbs.rocksDB;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
@@ -8,7 +7,6 @@ import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
@@ -31,7 +29,6 @@ import org.spongycastle.util.Arrays;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
 
 @Slf4j
 public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit
@@ -212,105 +209,6 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         Iterator<Long> mergedIterator = Iterators.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
         return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
 
-    }
-
-    /**
-     * Пока это не используется - на верхнем уровне своя сборка общая от получаемых Итераторов с этого класса.
-     * Возможно потом с более конкретным проходом по DESCENDING + OFFSET & LIMIT буджет реализация у каждой СУБД своя?
-     * Хотя нет - просто в Iterator перебор по индексаю таблицы у СУБД уже свой реализован
-     * @param address
-     * @param sender
-     * @param recipient
-     * @param minHeight
-     * @param maxHeight
-     * @param type
-     * @param service
-     * @param desc
-     * @param offset
-     * @param limit
-     * @return
-     */
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterator findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
-                                         final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
-        Iterator senderKeys = null;
-        Iterator recipientKeys = null;
-        Iterator iterator = new TreeSet<>().iterator();
-
-        if (address != null) {
-            sender = address;
-            recipient = address;
-        }
-
-        if (sender == null && recipient == null) {
-            return iterator;
-        }
-
-        if (sender != null) {
-            if (type != 0) {
-                //senderKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(sender, type)).iterator();
-                senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(sender.getBytes(), Ints.toByteArray(type))
-                        , false);
-            } else {
-                senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
-            }
-        }
-
-        if (recipient != null) {
-            if (type != 0) {
-                //recipientKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(recipient, type)).iterator();
-                senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(recipient.getBytes(), Ints.toByteArray(type))
-                        , false);
-            } else {
-                recipientKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false);
-            }
-        }
-
-        if (address != null) {
-            iterator = Iterators.concat(senderKeys, recipientKeys);
-        } else if (sender != null && recipient != null) {
-            iterator = senderKeys;
-            Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
-        } else if (sender != null) {
-            iterator = senderKeys;
-        } else if (recipient != null) {
-            iterator = recipientKeys;
-        }
-
-        if (minHeight != 0 || maxHeight != 0) {
-            iterator = Iterators.filter(iterator, new Predicate<Long>() {
-                @Override
-                public boolean apply(Long key) {
-                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                    return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
-                }
-            });
-        }
-
-        if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
-            iterator = Iterators.filter(iterator, new Predicate<Long>() {
-                @Override
-                public boolean apply(Long key) {
-                    ArbitraryTransaction tx = (ArbitraryTransaction) map.get(key);
-                    return tx.getService() == service;
-                }
-            });
-        }
-
-        if (desc) {
-            //keys = ((TreeSet) iterator).descendingSet();
-            iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
-        }
-
-        //limit = (limit == 0) ? Iterables.size(keys) : limit;
-        limit = (limit == 0) ? Iterators.size(iterator) : limit;
-
-        Iterators.advance(iterator, offset);
-        iterator = Iterators.limit(iterator, limit);
-
-
-        return iterator;
     }
 
 }

@@ -70,10 +70,4 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
         return null;
     }
 
-    @Override
-    public Iterator findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
-                                         final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
-        return null;
-    }
-
 }

@@ -2,12 +2,10 @@ package org.erachain.dbs.mapDB;
 
 //04/01 +- 
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.*;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
@@ -252,101 +250,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
 
         }
-    }
-
-    /**
-     * Пока это не используется - на верхнем уровне своя сборка общая от получаемых Итераторов с этого класса.
-     * Возможно потом с более конкретным проходом по DESCENDING + OFFSET & LIMIT буджет реализация у каждой СУБД своя?
-     * Хотя нет - просто в Iterator перебор по индексаю таблицы у СУБД уже свой реализован
-     * @param address
-     * @param sender
-     * @param recipient
-     * @param minHeight
-     * @param maxHeight
-     * @param type
-     * @param service
-     * @param desc
-     * @param offset
-     * @param limit
-     * @return
-     */
-    @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterator findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
-                                         final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
-        Iterator senderKeys = null;
-        Iterator recipientKeys = null;
-        Iterator iterator = new TreeSet<>().iterator();
-
-        if (address != null) {
-            sender = address;
-            recipient = address;
-        }
-
-        if (sender == null && recipient == null) {
-            return iterator;
-        }
-
-        if (sender != null) {
-            if (type != 0) {
-                senderKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(sender, type)).iterator();
-            } else {
-                senderKeys = Fun.filter(this.senderKey, sender).iterator();
-            }
-        }
-
-        if (recipient != null) {
-            if (type != 0) {
-                recipientKeys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(recipient, type)).iterator();
-            } else {
-                recipientKeys = Fun.filter(this.recipientKey, recipient).iterator();
-            }
-        }
-
-        if (address != null) {
-            iterator = Iterators.concat(senderKeys, recipientKeys);
-        } else if (sender != null && recipient != null) {
-            iterator = senderKeys;
-            Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
-        } else if (sender != null) {
-            iterator = senderKeys;
-        } else if (recipient != null) {
-            iterator = recipientKeys;
-        }
-
-        if (minHeight != 0 || maxHeight != 0) {
-            iterator = Iterators.filter(iterator, new Predicate<Long>() {
-                @Override
-                public boolean apply(Long key) {
-                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                    return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
-                }
-            });
-        }
-
-        if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
-            iterator = Iterators.filter(iterator, new Predicate<Long>() {
-                @Override
-                public boolean apply(Long key) {
-                    ArbitraryTransaction tx = (ArbitraryTransaction) map.get(key);
-                    return tx.getService() == service;
-                }
-            });
-        }
-
-        if (desc) {
-            //keys = ((TreeSet) iterator).descendingSet();
-            iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
-        }
-
-        //limit = (limit == 0) ? Iterables.size(keys) : limit;
-        limit = (limit == 0) ? Iterators.size(iterator) : limit;
-
-        Iterators.advance(iterator, offset);
-        iterator = Iterators.limit(iterator, limit);
-
-
-        return iterator;
     }
 
 }

@@ -19,6 +19,4 @@ public interface TransactionFinalSuit {
 
     Iterator<Long> getIteratorByAddress(String address);
 
-    Iterator findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
-                                  final int maxHeight, int type, final int service, boolean desc, int offset, int limit);
 }
