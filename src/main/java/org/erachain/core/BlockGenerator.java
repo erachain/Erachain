@@ -423,11 +423,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 }
 
-            } catch (java.lang.IllegalAccessError e) {
-                // могли закрыть таблицу с неподтвержденными транзакциями
-                // тогда вызовет ошибку
-                LOGGER.error(e.getMessage(), e);
-
             } finally {
                 if (newBlockDC != null)
                     newBlockDC.close();
