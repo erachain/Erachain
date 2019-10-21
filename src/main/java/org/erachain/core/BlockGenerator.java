@@ -310,133 +310,142 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int check_time = 0;
         int max_time_gen = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) >> 3;
 
-        TransactionTab map = dcSet.getTransactionTab();
-        Iterator<Long> iterator = map.getTimestampIterator(false);
-
-        needRemoveInvalids = new ArrayList<byte[]>();
-
-        this.setMonitorStatusBefore("getUnconfirmedTransactions");
-
         try {
-            long testTime = 0;
-            while (iterator.hasNext()) {
+            TransactionTab map = dcSet.getTransactionTab();
+            Iterator<Long> iterator = map.getTimestampIterator(false);
 
-                // проверим иногда - вдруг уже слишком долго собираем - останов сборки транзакций
-                // так как иначе такой блок и сеткой остальной не успеет обработаться
-                if (check_time++ > 300) {
-                    if (System.currentTimeMillis() - start > max_time_gen) {
-                        break;
-                    }
-                    check_time = 0;
-                }
-                if (ctrl.isOnStopping()) {
-                    break;
-                }
+            needRemoveInvalids = new ArrayList<byte[]>();
 
-                if (bchain != null) {
-                    waitWin = bchain.getWaitWinBuffer();
-                    if (betterPeer != null || waitWin != null && waitWin.getWinValue() > max_winned_value) {
-                        break;
-                    }
-                }
+            this.setMonitorStatusBefore("getUnconfirmedTransactions");
 
-                Transaction transaction = map.get(iterator.next());
-                if (transaction == null)
-                    break;
+            try {
+                long testTime = 0;
+                while (iterator.hasNext()) {
 
-                if (BlockChain.CHECK_BUGS > 7) {
-                    LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
-                    if (testTime > transaction.getTimestamp()) {
-                        LOGGER.error(" ERROR testTIME " + new Timestamp(testTime));
-                        testTime = transaction.getTimestamp();
-                    }
-                }
-
-                if (transaction.getTimestamp() > timestamp)
-                    break;
-
-                // делать форк только если есть трнзакции - так как это сильно кушает память
-                if (newBlockDC == null) {
-                    //CREATE FORK OF GIVEN DATABASE
-                    // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-                    DB database = DCSet.makeDBinMemory();
-                    newBlockDC = dcSet.fork(database);
-                }
-
-                transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
-
-                if (false // вообще-то все внутренние транзакции уже провверены на подпись!
-                        && !transaction.isSignatureValid(newBlockDC)) {
-                    needRemoveInvalids.add(transaction.getSignature());
-                    continue;
-                }
-
-                if (false && // тут нельзя пока удалять - может она будет включена
-                        // и пусть удаляется только если невалидная будет
-                        timestamp > transaction.getDeadline()) {
-                    needRemoveInvalids.add(transaction.getSignature());
-                    continue;
-                }
-
-                try {
-
-                    if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                        needRemoveInvalids.add(transaction.getSignature());
-                        if (BlockChain.CHECK_BUGS > 1) {
-                            LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0l));
+                    // проверим иногда - вдруг уже слишком долго собираем - останов сборки транзакций
+                    // так как иначе такой блок и сеткой остальной не успеет обработаться
+                    if (check_time++ > 300) {
+                        if (System.currentTimeMillis() - start > max_time_gen) {
+                            break;
                         }
-                        continue;
+                        check_time = 0;
                     }
-
-                    //CHECK IF ENOUGH ROOM
-                    if (++counter > BlockChain.MAX_BLOCK_SIZE_GEN) {
-                        counter--;
-                        break;
-                    }
-
-                    totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-                    if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN) {
-                        counter--;
-                        break;
-                    }
-
-                    ////ADD INTO LIST
-                    transactionsList.add(transaction);
-
-                    //PROCESS IN NEWBLOCKDB
-                    transaction.process(null, Transaction.FOR_NETWORK);
-
-                } catch (Exception e) {
-
                     if (ctrl.isOnStopping()) {
                         break;
                     }
 
-                    //     transactionProcessed = true;
+                    if (bchain != null) {
+                        waitWin = bchain.getWaitWinBuffer();
+                        if (betterPeer != null || waitWin != null && waitWin.getWinValue() > max_winned_value) {
+                            break;
+                        }
+                    }
 
-                    LOGGER.error(e.getMessage(), e);
-                    //REMOVE FROM LIST
-                    needRemoveInvalids.add(transaction.getSignature());
+                    Transaction transaction = map.get(iterator.next());
+                    if (transaction == null)
+                        break;
+
+                    if (BlockChain.CHECK_BUGS > 7) {
+                        LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
+                        if (testTime > transaction.getTimestamp()) {
+                            LOGGER.error(" ERROR testTIME " + new Timestamp(testTime));
+                            testTime = transaction.getTimestamp();
+                        }
+                    }
+
+                    if (transaction.getTimestamp() > timestamp)
+                        break;
+
+                    // делать форк только если есть трнзакции - так как это сильно кушает память
+                    if (newBlockDC == null) {
+                        //CREATE FORK OF GIVEN DATABASE
+                        // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+                        DB database = DCSet.makeDBinMemory();
+                        newBlockDC = dcSet.fork(database);
+                    }
+
+                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
+                    if (false // вообще-то все внутренние транзакции уже провверены на подпись!
+                            && !transaction.isSignatureValid(newBlockDC)) {
+                        needRemoveInvalids.add(transaction.getSignature());
+                        continue;
+                    }
+
+                    if (false && // тут нельзя пока удалять - может она будет включена
+                            // и пусть удаляется только если невалидная будет
+                            timestamp > transaction.getDeadline()) {
+                        needRemoveInvalids.add(transaction.getSignature());
+                        continue;
+                    }
+
+                    try {
+
+                        if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                            needRemoveInvalids.add(transaction.getSignature());
+                            if (BlockChain.CHECK_BUGS > 1) {
+                                LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0l));
+                            }
+                            continue;
+                        }
+
+                        //CHECK IF ENOUGH ROOM
+                        if (++counter > BlockChain.MAX_BLOCK_SIZE_GEN) {
+                            counter--;
+                            break;
+                        }
+
+                        totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                        if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN) {
+                            counter--;
+                            break;
+                        }
+
+                        ////ADD INTO LIST
+                        transactionsList.add(transaction);
+
+                        //PROCESS IN NEWBLOCKDB
+                        transaction.process(null, Transaction.FOR_NETWORK);
+
+                    } catch (Exception e) {
+
+                        if (ctrl.isOnStopping()) {
+                            break;
+                        }
+
+                        //     transactionProcessed = true;
+
+                        LOGGER.error(e.getMessage(), e);
+                        //REMOVE FROM LIST
+                        needRemoveInvalids.add(transaction.getSignature());
+
+                    }
 
                 }
 
+            } catch (java.lang.IllegalAccessError e) {
+                // могли закрыть таблицу с неподтвержденными транзакциями
+                // тогда вызовет ошибку
+                LOGGER.error(e.getMessage(), e);
+
+            } finally {
+                if (newBlockDC != null)
+                    newBlockDC.close();
             }
 
+            LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
+                    + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size()
+                    + " from Poll: " + map.size());
+
+            this.setMonitorStatusAfter();
+
         } catch (java.lang.IllegalAccessError e) {
-            // могли закрыть таблицу с неподтвержденными транзакциями
-            // тогда вызовет ошибку
-            LOGGER.error(e.getMessage(), e);
+            // налетели на закрытие базы данных
+            LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
+                    + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size()
+                    + " before CLEARED event!");
 
-        } finally {
-            if (newBlockDC != null)
-                newBlockDC.close();
         }
-
-        LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
-                + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size()
-                + " from Poll: " + map.size());
-
-        this.setMonitorStatusAfter();
 
         return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
     }

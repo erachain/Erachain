@@ -1652,8 +1652,13 @@ import java.util.*;
 
                     boolean isSignatureValid = false;
                     // TRY QUCK check SIGNATURE by FIND in POOL
-                    if (unconfirmedMap.contains(transactionSignature)) {
-                        isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature));
+                    try {
+                        if (unconfirmedMap.contains(transactionSignature)) {
+                            isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature));
+                        }
+                    } catch (java.lang.IllegalAccessError e) {
+                        // налетели на закрытую таблицу
+                        unconfirmedMap = dcSetPlace.getTransactionTab();
                     }
 
                     if (!isSignatureValid) {
@@ -1734,7 +1739,12 @@ import java.util.*;
                         //REMOVE FROM UNCONFIRMED DATABASE
                         ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
-                        unconfirmedMap.remove(transactionSignature);
+                        try {
+                            unconfirmedMap.remove(transactionSignature);
+                        } catch (java.lang.IllegalAccessError e) {
+                            // налетели на закрытую таблицу
+                            unconfirmedMap = dcSetPlace.getTransactionTab();
+                        }
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                         if (processTimingLocalDiff < 999999999999l)
                             timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
@@ -2173,7 +2183,12 @@ import java.util.*;
                 //REMOVE FROM UNCONFIRMED DATABASE
                 ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
-                unconfirmedMap.remove(transactionSignature);
+                try {
+                    unconfirmedMap.remove(transactionSignature);
+                } catch (java.lang.IllegalAccessError e) {
+                    // налетели на закрытую таблицу
+                    unconfirmedMap = dcSet.getTransactionTab();
+                }
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
                 Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
@@ -2341,7 +2356,12 @@ import java.util.*;
             if (notFork) {
                 if (!notStoreTXs) {
                     //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-                    unconfirmedMap.add(transaction);
+                    try {
+                        unconfirmedMap.add(transaction);
+                    } catch (java.lang.IllegalAccessError e) {
+                        // налетели на закрытую таблицу
+                        unconfirmedMap = dcSet.getTransactionTab();
+                    }
                 }
 
                 Long key = Transaction.makeDBRef(height, seqNo);
