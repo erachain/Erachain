@@ -430,8 +430,16 @@ public class Synchronizer extends Thread {
                 throw new Exception("on stopping");
 
             // CHECK IF DEADLINE PASSED
-            if (!map.contains(transaction.getSignature())) {
-                orphanedTransactionsList.add(transaction);
+            try {
+                if (!map.isClosed() && !map.contains(transaction.getSignature())) {
+                    orphanedTransactionsList.add(transaction);
+                }
+            } catch (java.lang.Throwable e) {
+                if (e instanceof java.lang.IllegalAccessError) {
+                    // налетели на закрытую таблицу
+                } else {
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
         }
 
@@ -683,9 +691,17 @@ public class Synchronizer extends Thread {
                 }
 
                 byte[] sign = transaction.getSignature();
-                if (!map.contains(sign)) {
-                    // добавляем через Очередь - чтобы не налететь на очистку таблицы
-                    cnt.transactionsPool.offerMessage(transaction);
+                try {
+                    if (!map.isClosed() && !map.contains(sign)) {
+                        // добавляем через Очередь - чтобы не налететь на очистку таблицы
+                        cnt.transactionsPool.offerMessage(transaction);
+                    }
+                } catch (java.lang.Throwable e) {
+                    if (e instanceof java.lang.IllegalAccessError) {
+                        // налетели на закрытую таблицу
+                    } else {
+                        LOGGER.error(e.getMessage(), e);
+                    }
                 }
             }
         }

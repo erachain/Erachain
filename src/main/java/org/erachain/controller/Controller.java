@@ -1262,9 +1262,11 @@ public class Controller extends Observable {
         if (this.isStopping)
             return false;
 
-        try {
+        TransactionTab map = this.dcSet.getTransactionTab();
+        if (map.isClosed())
+            return false;
 
-            TransactionTab map = this.dcSet.getTransactionTab();
+        try {
             Iterator<Long> iterator = map.getIterator(TransactionSuit.TIMESTAMP_INDEX, false);
             long ping = 0;
             int counter = 0;
@@ -1283,6 +1285,8 @@ public class Controller extends Observable {
                     return false;
                 }
 
+                if (map.isClosed())
+                    return false;
                 Transaction transaction = map.get(iterator.next());
                 if (transaction == null)
                     continue;
@@ -1353,12 +1357,17 @@ public class Controller extends Observable {
                 }
             }
 
-        } catch (java.lang.IllegalAccessError e) {
-            // могли закрыть таблицу с неподтвержденными транзакциями
-        }
+            // logger.info(peer + " sended UNCONFIRMED counter: " +
+            // counter);
 
-        // logger.info(peer + " sended UNCONFIRMED counter: " +
-        // counter);
+        } catch (java.lang.Throwable e) {
+            if (e instanceof java.lang.IllegalAccessError) {
+                // налетели на закрытую таблицу
+            } else {
+                LOGGER.error(e.getMessage(), e);
+            }
+
+        }
 
         //NOTIFY OBSERVERS
         this.setChanged();
