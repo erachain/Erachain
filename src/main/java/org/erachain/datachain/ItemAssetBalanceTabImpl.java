@@ -27,9 +27,6 @@ import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 /**
- * Hasher работает неверно! и вообще там 32 битное число 0 INTEGER - чего нифига не хватает!
- *
- * (пока не используется - по идее для бухгалтерских единиц отдельная таблица)
  * Балансы для заданного адреса на данный актив. balances for all account in blockchain<br>
  * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
  * Каждый баланс: Всего Пришло и Остаток<br><br>

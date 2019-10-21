@@ -47,7 +47,9 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * ++ typeKey
  * <hr>
  * (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
- * <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
+ * Потому что там создавался "руками" вторичный индекс и биндился, а тут встроенной MapDB штучкой с реверсными индексами
+ * и там внутри цепляется Основной Ключ -
+ * в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 @Slf4j
 public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implements TransactionFinalMap {

@@ -13,7 +13,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
- * Храним выбор голосующего по Сущности Голования
+ * Храним выбор голосующего по Сущности Голосования
  * POLL KEY + OPTION KEY + ACCOUNT SHORT = result Transaction reference (BlockNo + SeqNo)
  * byte[] - un CORAMPABLE
  *

@@ -13,6 +13,8 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 
 
 /**
+ * Используется для хранения последней ссылки на трнзакцию со счета либо истории трнзакций по счету
+ * Для ускорения работы протокола сохранение Истории выключено с 4.20+ .
  * seek reference to tx_Parent by address+timestamp
  * account.address -> LAST[TX.timestamp + TX.dbRef]
  * account.address + TX.timestamp -> PARENT[TX.timestamp + TX.dbRef]
