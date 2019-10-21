@@ -1355,9 +1355,6 @@ public class Controller extends Observable {
 
         } catch (java.lang.IllegalAccessError e) {
             // могли закрыть таблицу с неподтвержденными транзакциями
-            // тогда вызовет ошибку
-            LOGGER.error(e.getMessage(), e);
-
         }
 
         // logger.info(peer + " sended UNCONFIRMED counter: " +
