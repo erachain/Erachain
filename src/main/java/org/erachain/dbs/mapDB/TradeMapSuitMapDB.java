@@ -58,6 +58,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
                 .makeOrGet();
 
         this.map = map;
+
         ///////////////////////////// HERE PROTOCOL INDEXES
 
         if (Controller.getInstance().onlyProtocolIndexing)
