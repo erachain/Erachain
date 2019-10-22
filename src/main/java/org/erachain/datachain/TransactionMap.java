@@ -25,7 +25,7 @@ import java.util.Observer;
  *  (!!!) для создания уникальных ключей НЕ нужно добавлять + val.viewTimestamp(), и так работант, а почему в Ордерах не работало?
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
-public interface TransactionTab extends DBTab<Long, Transaction> {
+public interface TransactionMap extends DBTab<Long, Transaction> {
 
     Integer deleteObservableData(int index);
 

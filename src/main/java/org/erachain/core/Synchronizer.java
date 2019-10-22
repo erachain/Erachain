@@ -7,7 +7,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ReferenceMapImpl;
-import org.erachain.datachain.TransactionTab;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
@@ -423,7 +423,7 @@ public class Synchronizer extends Thread {
         }
 
         // CLEAR for DEADs
-        TransactionTab map = dcSet.getTransactionTab();
+        TransactionMap map = dcSet.getTransactionTab();
         List<Transaction> orphanedTransactionsList = new ArrayList<Transaction>();
         for (Transaction transaction : orphanedTransactions.values()) {
             if (cnt.isOnStopping())
@@ -684,7 +684,7 @@ public class Synchronizer extends Thread {
             }
 
             // SEND ORPHANED TRANSACTIONS TO PEER
-            TransactionTab map = dcSet.getTransactionTab();
+            TransactionMap map = dcSet.getTransactionTab();
             for (Transaction transaction : orphanedTransactions) {
                 if (cnt.isOnStopping()) {
                     throw new Exception("on stopping");

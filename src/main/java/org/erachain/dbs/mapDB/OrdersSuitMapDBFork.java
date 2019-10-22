@@ -10,7 +10,7 @@ import org.erachain.core.item.assets.OrderComparatorForTradeReverse;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.datachain.OrderMap;
-import org.erachain.datachain.OrderMapSuit;
+import org.erachain.datachain.OrderSuit;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.Fun;
@@ -32,7 +32,7 @@ import java.util.*;
  */
 
 @Slf4j
-public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements OrderMapSuit {
+public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements OrderSuit {
 
     @SuppressWarnings("rawtypes")
     private BTreeMap haveWantKeyMap;

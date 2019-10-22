@@ -2,10 +2,10 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.TransactionTab;
-import org.erachain.dbs.DBTabImpl;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionMap;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
@@ -143,7 +143,7 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
 
     @Override
     public void getIntervalThis(long startBack, long endBack) {
-        listSorted = new SortableList<Long, Transaction>(map, ((TransactionTab)map).getFromToKeys(startBack, endBack));
+        listSorted = new SortableList<Long, Transaction>(map, ((TransactionMap) map).getFromToKeys(startBack, endBack));
 
         DCSet dcSet = DCSet.getInstance();
         for (Pair<Long, Transaction> item: listSorted) {

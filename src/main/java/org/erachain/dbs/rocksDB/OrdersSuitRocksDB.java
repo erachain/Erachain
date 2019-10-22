@@ -7,7 +7,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.OrderComparatorForTrade;
 import org.erachain.core.item.assets.OrderComparatorForTradeReverse;
 import org.erachain.database.DBASet;
-import org.erachain.datachain.OrderMapSuit;
+import org.erachain.datachain.OrderSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderMapSuit {
+public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSuit {
 
     private final String NAME_TABLE = "ORDERS_TABLE";
 

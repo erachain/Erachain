@@ -1807,16 +1807,16 @@ public class BlockExplorer {
 
         List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
-        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         Collection<byte[]> addrs = map.keySet();
         //BigDecimal total = BigDecimal.ZERO;
         //BigDecimal totalNeg = BigDecimal.ZERO;
         for (byte[] addrKey : addrs) {
-            if (ItemAssetBalanceTab.getAssetKeyFromKey(addrKey) == key) {
+            if (ItemAssetBalanceMap.getAssetKeyFromKey(addrKey) == key) {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
                         map.get(addrKey);
                 // all = all.add(ball.a);
-                Account account = new Account(ItemAssetBalanceTab.getShortAccountFromKey(addrKey));
+                Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(addrKey));
                 BigDecimal ballans = account.getBalanceUSE(key);
                 //if (ball.a.b.signum() > 0) {
                 //total = total.add(ball.a.b);
@@ -1945,7 +1945,7 @@ public class BlockExplorer {
 
                 Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
 
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(item.getA());
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.getA());
                 if (assetKey == AssetCls.LIA_KEY) {
                     continue;
                 }
@@ -2358,7 +2358,7 @@ public class BlockExplorer {
             return output;
         }
 
-        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
                 = map.getBalancesSortableList(new Account(address));
 
@@ -2378,7 +2378,7 @@ public class BlockExplorer {
     assetBalance(String address) {
         Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> output = new LinkedHashMap();
 
-        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
                 = map.getBalancesSortableList(new Account(address));
 

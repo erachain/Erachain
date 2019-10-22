@@ -5,7 +5,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.gui.Gui;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -48,7 +48,7 @@ public class AssetsFavorites implements Observer {
     public void reload() {
         List<Long> favoritesUpadate = new ArrayList<Long>();
 
-        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         for (Account account : Controller.getInstance().getAccounts()) {
             SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balancesList
                     = map.getBalancesSortableList(account);
@@ -61,8 +61,8 @@ public class AssetsFavorites implements Observer {
                         || balance.getB().c.b.compareTo(BigDecimal.ZERO) != 0
                         || balance.getB().d.b.compareTo(BigDecimal.ZERO) != 0
                         || balance.getB().e.b.compareTo(BigDecimal.ZERO) != 0) {
-                    if (!favoritesUpadate.contains(ItemAssetBalanceTab.getAssetKeyFromKey(balance.getA()))) {
-                        favoritesUpadate.add(ItemAssetBalanceTab.getAssetKeyFromKey(balance.getA()));
+                    if (!favoritesUpadate.contains(ItemAssetBalanceMap.getAssetKeyFromKey(balance.getA()))) {
+                        favoritesUpadate.add(ItemAssetBalanceMap.getAssetKeyFromKey(balance.getA()));
                     }
                 }
             }

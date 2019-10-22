@@ -38,13 +38,13 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  */
 // TODO SOFT HARD TRUE
 @Slf4j
-public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
+public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK
         Tuple2<BigDecimal, BigDecimal>, // it DO
         Tuple2<BigDecimal, BigDecimal>  // on HOLD
-        >> implements ItemAssetBalanceTab {
+        >> implements ItemAssetBalanceMap {
 
     public final static
     Fun.Tuple5<
@@ -59,7 +59,7 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
                     new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                     new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
 
-    public ItemAssetBalanceTabImpl(int dbsUsed, DCSet databaseSet, DB database) {
+    public ItemAssetBalanceMapImpl(int dbsUsed, DCSet databaseSet, DB database) {
         super(dbsUsed, databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
@@ -70,7 +70,7 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         }
     }
 
-    public ItemAssetBalanceTabImpl(int dbsUsed, ItemAssetBalanceTab parent, DCSet databaseSet) {
+    public ItemAssetBalanceMapImpl(int dbsUsed, ItemAssetBalanceMap parent, DCSet databaseSet) {
         super(dbsUsed, parent, databaseSet);
     }
 
@@ -91,7 +91,7 @@ public class ItemAssetBalanceTabImpl extends DBTabImpl<byte[], Tuple5<
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceTab) parent, databaseSet);
+                    map = new ItemAssetBalanceSuitMapDBFork((ItemAssetBalanceMap) parent, databaseSet);
                     break;
                 //case DBS_ROCK_DB:
                 //    map = new ItemAssetBalanceSuitRocksDB(databaseSet, database, DEFAULT_VALUE);

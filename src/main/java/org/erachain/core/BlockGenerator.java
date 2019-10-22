@@ -11,7 +11,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ReferenceMapImpl;
-import org.erachain.datachain.TransactionTab;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.network.message.MessageFactory;
@@ -235,7 +235,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         byte[] isText = new byte[]{1};
         byte[] encryptMessage = new byte[]{0};
 
-        TransactionTab map = dcSet.getTransactionTab();
+        TransactionMap map = dcSet.getTransactionTab();
 
         Random random = new Random();
 
@@ -311,7 +311,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int max_time_gen = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) >> 3;
 
         try {
-            TransactionTab map = dcSet.getTransactionTab();
+            TransactionMap map = dcSet.getTransactionTab();
             Iterator<Long> iterator = map.getTimestampIterator(false);
 
             needRemoveInvalids = new ArrayList<byte[]>();
@@ -452,7 +452,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private void clearInvalids() {
         if (needRemoveInvalids != null && !needRemoveInvalids.isEmpty()) {
             long start = System.currentTimeMillis();
-            TransactionTab transactionsMap = dcSet.getTransactionTab();
+            TransactionMap transactionsMap = dcSet.getTransactionTab();
 
             for (byte[] signature : needRemoveInvalids) {
                 if (ctrl.isOnStopping()) {
@@ -491,7 +491,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
             long start = System.currentTimeMillis();
 
-            TransactionTab map = dcSet.getTransactionTab();
+            TransactionMap map = dcSet.getTransactionTab();
 
             try {
                 Iterator<Long> iterator = map.getTimestampIterator(false);

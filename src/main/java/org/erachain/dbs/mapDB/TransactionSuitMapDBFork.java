@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.datachain.TransactionSuit;
-import org.erachain.datachain.TransactionTab;
 import org.mapdb.SerializerBase;
 
 import java.util.Iterator;
@@ -14,7 +14,7 @@ import java.util.Iterator;
 public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionSuit
 {
 
-    public TransactionSuitMapDBFork(TransactionTab parent, DBASet databaseSet) {
+    public TransactionSuitMapDBFork(TransactionMap parent, DBASet databaseSet) {
         super(parent, databaseSet, logger, null);
     }
 

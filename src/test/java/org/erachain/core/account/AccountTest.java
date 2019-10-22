@@ -5,7 +5,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.junit.Test;
 import org.mapdb.Fun;
 
@@ -68,7 +68,7 @@ public class AccountTest {
         assertEquals(((BigDecimal)balance2.a).intValue(), 323980);
         assertEquals(((BigDecimal)balance2.b).intValue(), 331417);
 
-        ItemAssetBalanceTab map = db.getAssetBalanceMap();
+        ItemAssetBalanceMap map = db.getAssetBalanceMap();
         map.clear();
 
         Fun.Tuple2 balance3 = account.getBalance(db, Transaction.RIGHTS_KEY, 1);

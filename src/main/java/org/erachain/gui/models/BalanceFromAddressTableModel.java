@@ -5,8 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -55,12 +54,12 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
                             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance : this.balances) {
 
-                if (Controller.getInstance().getAsset(ItemAssetBalanceTab.getAssetKeyFromKey(balance.getA())) == null) {
+                if (Controller.getInstance().getAsset(ItemAssetBalanceMap.getAssetKeyFromKey(balance.getA())) == null) {
                     // SKIP LIA etc.
                     continue;
                 }
 
-                Long assetKey =  ItemAssetBalanceTab.getAssetKeyFromKey(balance.getA());
+                Long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(balance.getA());
                 tableBalance1.add(new Pair(account, new Pair(assetKey, balance.getB())));
                 assetKeys.add(assetKey);
             }

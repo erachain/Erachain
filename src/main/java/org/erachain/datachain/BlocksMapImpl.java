@@ -72,10 +72,10 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    //map = new BlocksSuitMapDBFork((TransactionTab) parent, databaseSet);
+                    //map = new BlocksSuitMapDBFork((TransactionMap) parent, databaseSet);
                     //break;
                 case DBS_ROCK_DB:
-                    //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
+                    //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
                     //break;
                 default:
                     map = new NativeMapHashMapFork(parent, databaseSet, null);

@@ -1035,7 +1035,7 @@ public class API {
         }
 
         Account account = new Account(address);
-        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
                 = map.getBalancesSortableList(account);
 
@@ -1044,7 +1044,7 @@ public class API {
         for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                 assetsBalance : assetsBalances) {
             JSONArray array = new JSONArray();
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(assetsBalance.getA());
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.getA());
 
             if (BlockChain.ERA_COMPU_ALL_UP) {
                 array.add(setJSONArray(account.balAaddDEVAmount(assetKey, assetsBalance.getB().a)));

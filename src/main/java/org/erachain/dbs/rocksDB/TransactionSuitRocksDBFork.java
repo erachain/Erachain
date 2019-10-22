@@ -3,8 +3,8 @@ package org.erachain.dbs.rocksDB;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.datachain.TransactionSuit;
-import org.erachain.datachain.TransactionTab;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDB;
@@ -21,7 +21,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
 
     private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE_FORK";
 
-    public TransactionSuitRocksDBFork(TransactionTab parent, DBRocksDBTable parentMap, DBASet databaseSet) {
+    public TransactionSuitRocksDBFork(TransactionMap parent, DBRocksDBTable parentMap, DBASet databaseSet) {
         super(parent, databaseSet, logger, null);
     }
 

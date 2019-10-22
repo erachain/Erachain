@@ -42,7 +42,7 @@ public class DCSetTest {
     BigDecimal balC = new BigDecimal("3.0001");
     BigDecimal balD = new BigDecimal("0.005");
 
-    TransactionTab map;
+    TransactionMap map;
 
     private synchronized void init(int dbs) {
 

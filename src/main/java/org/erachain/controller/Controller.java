@@ -1262,7 +1262,7 @@ public class Controller extends Observable {
         if (this.isStopping)
             return false;
 
-        TransactionTab map = this.dcSet.getTransactionTab();
+        TransactionMap map = this.dcSet.getTransactionTab();
         if (map.isClosed())
             return false;
 

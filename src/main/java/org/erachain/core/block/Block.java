@@ -1625,7 +1625,7 @@ import java.util.*;
             long processTimingLocal;
             long processTimingLocalDiff;
 
-            TransactionTab unconfirmedMap = dcSetPlace.getTransactionTab();
+            TransactionMap unconfirmedMap = dcSetPlace.getTransactionTab();
             TransactionFinalMapImpl finalMap = dcSetPlace.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSigns = dcSetPlace.getTransactionFinalMapSigns();
 
@@ -1983,13 +1983,13 @@ import java.util.*;
         Collection<byte[]> keys = dcSet.getAssetBalanceMap().keySet();
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalNeg = BigDecimal.ZERO;
-        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
         for (byte[] key : keys) {
-            if (ItemAssetBalanceTab.getAssetKeyFromKey(key) == 2l) {
+            if (ItemAssetBalanceMap.getAssetKeyFromKey(key) == 2l) {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
                     map.get(key);
 
-                bals.put(ItemAssetBalanceTab.getShortAccountFromKey(key), ball.a.b);
+                bals.put(ItemAssetBalanceMap.getShortAccountFromKey(key), ball.a.b);
             }
         }
         totalCOMPUtest.put(height, bals);
@@ -2003,16 +2003,16 @@ import java.util.*;
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
             BigDecimal ballParent;
             Collection<byte[]> keys = dcSet.getAssetBalanceMap().keySet();
-            ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+            ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
             boolean error = false;
             for (byte[] key : keys) {
-                if (ItemAssetBalanceTab.getAssetKeyFromKey(key) == 2l) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(key) == 2l) {
                     ball = dcSet.getAssetBalanceMap().get(key);
 
-                    ballParent = (BigDecimal) parentBalanses.get(ItemAssetBalanceTab.getShortAccountFromKey(key));
+                    ballParent = (BigDecimal) parentBalanses.get(ItemAssetBalanceMap.getShortAccountFromKey(key));
                     if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
                             || ballParent == null && ball.a.b.signum() != 0) {
-                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + ItemAssetBalanceTab.getShortAccountFromKey(key)
+                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + ItemAssetBalanceMap.getShortAccountFromKey(key)
                                 + " balParent : " + (ballParent == null ? "NULL" : ballParent.toPlainString())
                                 + " ---> " + (ball == null ? "NULL" : ball.a.b.toPlainString())
                                 + " == " + ball.a.b.subtract(ballParent == null ? BigDecimal.ZERO : ballParent));
@@ -2152,7 +2152,7 @@ import java.util.*;
             }
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
-            TransactionTab unconfirmedMap = dcSet.getTransactionTab();
+            TransactionMap unconfirmedMap = dcSet.getTransactionTab();
             TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
@@ -2350,7 +2350,7 @@ import java.util.*;
 
         boolean notFork = !dcSet.isFork();
 
-        TransactionTab unconfirmedMap = dcSet.getTransactionTab();
+        TransactionMap unconfirmedMap = dcSet.getTransactionTab();
         TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 

@@ -4,8 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -82,7 +81,7 @@ public class BalancesTableModel extends AbstractTableModel implements Observer {
         
         Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow
                 = this.balances.get(row);
-        Account account = new Account(ItemAssetBalanceTab.getShortAccountFromKey(aRow.getA()));
+        Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(aRow.getA()));
         
         switch (column) {
             case COLUMN_ADDRESS:

@@ -5,7 +5,7 @@ import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -141,8 +141,8 @@ public class DBRocksDBTableTest {
             byte[] keyIter = iteratorFilteredNative.key();
             byte[] valueIter = iteratorFilteredNative.value();
             iteratorSize++;
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(valueIter);
-            byte[] addressKey = ItemAssetBalanceTab.getShortAccountFromKey(valueIter);
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(valueIter);
+            byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(valueIter);
             assertEquals(account1.equals(addressKey), true);
 
             balanceTmp = tab.get(valueIter);
@@ -167,8 +167,8 @@ public class DBRocksDBTableTest {
         iteratorSize = 0;
         for (byte[] key: keysFiltered) {
             iteratorSize++;
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
-            byte[] addressKey = ItemAssetBalanceTab.getShortAccountFromKey(key);
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+            byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(key);
             assertEquals(account1.equals(addressKey), true);
 
             balanceTmp = tab.get(key);
@@ -192,8 +192,8 @@ public class DBRocksDBTableTest {
         iteratorSize = 0;
         for (byte[] key: keysFiltered) {
             iteratorSize++;
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
-            byte[] addressKey = ItemAssetBalanceTab.getShortAccountFromKey(key);
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+            byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(key);
             assertEquals(account1.equals(addressKey), true);
 
             balanceTmp = tab.get(key);
@@ -234,7 +234,7 @@ public class DBRocksDBTableTest {
         while (assetKeys.hasNext()) {
             iteratorSize1++;
             byte[] key = assetKeys.next();
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
             assertEquals(assetKey, assetKey2);
 
         }
@@ -285,9 +285,9 @@ public class DBRocksDBTableTest {
             iteratorSize++;
 
             byte[] key = assetKeys.next();
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
             assertEquals(assetKey, assetKey1);
-            byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
+            byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
             BigDecimal balanceTMP = tab.get(key).a.b;
 
@@ -315,14 +315,14 @@ public class DBRocksDBTableTest {
             iteratorSize++;
 
             byte[] key = assetKeys.next();
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
             assertEquals(assetKey, assetKey2);
 
-            if (account1.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+            if (account1.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                 found1++;
-            } else if (account2.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+            } else if (account2.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                 found2++;
-            } else if (account3.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+            } else if (account3.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                 found3++;
             }
         }
@@ -344,14 +344,14 @@ public class DBRocksDBTableTest {
             iteratorSize++;
 
             byte[] key = assetKeys.next();
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
             assertEquals(assetKey, assetKey1);
 
-            if (account1.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+            if (account1.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                 found1++;
-            } else if (account2.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+            } else if (account2.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                 found2++;
-            } else if (account3.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+            } else if (account3.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                 found3++;
             }
         }

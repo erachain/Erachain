@@ -15,7 +15,7 @@ import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.OrderMapImpl;
 import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.lang.Lang;
@@ -202,16 +202,16 @@ public class Account {
 
     public static Map<byte[], BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
                                                                   Map<byte[], BigDecimal> values) {
-        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ballance;
 
         if (true) {
             // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
             for (byte[] mapKey: map.keySet()) {
-                if (ItemAssetBalanceTab.getAssetKeyFromKey(mapKey) == key) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == key) {
                     ballance = map.get(mapKey);
-                    values.put(ItemAssetBalanceTab.getShortAccountFromKey(mapKey), ballance.a.b);
+                    values.put(ItemAssetBalanceMap.getShortAccountFromKey(mapKey), ballance.a.b);
                 }
             }
 
@@ -223,9 +223,9 @@ public class Account {
             byte[] iteratorKey;
             while (iterator.hasNext()) {
                 iteratorKey = iterator.next();
-                if (ItemAssetBalanceTab.getAssetKeyFromKey(iteratorKey) == key) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(iteratorKey) == key) {
                     ballance = map.get(iteratorKey);
-                    values.put(ItemAssetBalanceTab.getShortAccountFromKey(iteratorKey), ballance.a.b);
+                    values.put(ItemAssetBalanceMap.getShortAccountFromKey(iteratorKey), ballance.a.b);
                 }
             }
 
@@ -605,7 +605,7 @@ public class Account {
 
         int actionType = actionType(key, amount_in);
 
-        ItemAssetBalanceTab map = db.getAssetBalanceMap();
+        ItemAssetBalanceMap map = db.getAssetBalanceMap();
 
         BigDecimal amount = amount_in.abs();
         long absKey;
@@ -675,7 +675,7 @@ public class Account {
             Collection<byte[]> addrs = db.getAssetBalanceMap().keySet();
             BigDecimal total = BigDecimal.ZERO;
             for (byte[] mapKey : addrs) {
-                if (ItemAssetBalanceTab.getAssetKeyFromKey(mapKey) == 2l) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == 2l) {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
                             map.get(mapKey);
 

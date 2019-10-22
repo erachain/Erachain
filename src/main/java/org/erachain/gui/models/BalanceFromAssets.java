@@ -5,8 +5,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -56,7 +55,7 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
             balances = Controller.getInstance().getBalances(account); //.getBalances(key);
             for (int ib = 0; this.balances.size() > ib; ib++) {
                 Pair item = this.balances.get(ib);
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey((byte[])item.getA());
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey((byte[]) item.getA());
                 Tuple5 balance = (Tuple5)item.getB();
                 if (BlockChain.ERA_COMPU_ALL_UP) {
                     balance = account.balanceAddDEVAmount(assetKey, balance);

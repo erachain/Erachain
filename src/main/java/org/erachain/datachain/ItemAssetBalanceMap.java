@@ -16,7 +16,7 @@ import java.util.Set;
  * Interface for MAP + static methods
  * addressShort[20] + assetKey[8] - > balance
  */
-public interface ItemAssetBalanceTab extends DBTab<byte[], Tuple5<
+public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
         Tuple2<BigDecimal, BigDecimal>, // in DEBT
         Tuple2<BigDecimal, BigDecimal>, // in STOCK

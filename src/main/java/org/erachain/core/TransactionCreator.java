@@ -29,7 +29,7 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionTab;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
@@ -88,7 +88,7 @@ public class TransactionCreator {
 
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
         ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
-        TransactionTab transactionTab = this.fork.getTransactionTab();
+        TransactionMap transactionTab = this.fork.getTransactionTab();
         List<Transaction> accountTransactions = new ArrayList<Transaction>();
         Transaction transaction;
 
@@ -448,7 +448,7 @@ public class TransactionCreator {
         if (forIssue) {
 
             // IF has not DUPLICATE in UNCONFIRMED RECORDS
-            TransactionTab unconfirmedMap = DCSet.getInstance().getTransactionTab();
+            TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionTab();
             try {
                 for (Transaction record : unconfirmedMap.values()) {
                     if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
@@ -511,7 +511,7 @@ public class TransactionCreator {
         this.checkUpdate();
 
         // IF has not DUPLICATE in UNCONFIRMED RECORDS
-        TransactionTab unconfirmedMap = DCSet.getInstance().getTransactionTab();
+        TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionTab();
         try {
             for (Transaction record : unconfirmedMap.values()) {
                 if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {

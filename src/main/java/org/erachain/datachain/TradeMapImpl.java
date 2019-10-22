@@ -61,7 +61,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
+                    //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
                     map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
                     break;
                 default:
@@ -82,13 +82,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
      */
     @Override
     public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
-        return ((TradeMapSuit) this.map).getIterator(order);
+        return ((TradeSuit) this.map).getIterator(order);
     }
 
     @Override
     public List<Trade> getInitiatedTrades(Order order) {
         //FILTER ALL TRADES
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeMapSuit) this.map).getIterator(order);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIterator(order);
 
         //GET ALL TRADES FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();
@@ -103,7 +103,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     @Override
     public List<Trade> getTradesByOrderID(Long orderID) {
         //ADD REVERSE KEYS
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeMapSuit) this.map).getReverseIterator(orderID);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getReverseIterator(orderID);
 
         //GET ALL ORDERS FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();
@@ -120,12 +120,12 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     // get trades for order as HAVE and as WANT
     {
 
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeMapSuit) this.map).getHaveIterator(haveWant);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getHaveIterator(haveWant);
         if (iterator == null)
             return new ArrayList<Trade>();
 
         Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator,
-                ((TradeMapSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
+                ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
         iterator = mergedIterable.iterator();
 
         //GET ALL ORDERS FOR KEYS
@@ -141,7 +141,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     @Override
     public List<Trade> getTrades(long have, long want, int offset, int limit) {
 
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeMapSuit) this.map).getPairIterator(have, want);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairIterator(have, want);
         if (iterator == null)
             return new ArrayList<Trade>();
 
@@ -162,7 +162,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     @SuppressWarnings("unchecked")
     public Trade getLastTrade(long have, long want) {
 
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeMapSuit) this.map).getPairIterator(have, want);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairIterator(have, want);
         if (iterator == null)
             return null;
 
@@ -184,7 +184,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     @Override
     public List<Trade> getTradesByTimestamp(long have, long want, long timestamp, int limit) {
 
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeMapSuit) this.map).getPairTimestampIterator(have, want, timestamp);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, timestamp);
         if (iterator == null)
             return null;
 
@@ -206,7 +206,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
         // тут индекс не по времени а по номерам блоков как лонг
         int heightStart = Controller.getInstance().getMyHeight();
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeMapSuit) this.map).getPairHeightIterator(have, want, heightStart);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairHeightIterator(have, want, heightStart);
         if (iterator == null)
             return null;
 

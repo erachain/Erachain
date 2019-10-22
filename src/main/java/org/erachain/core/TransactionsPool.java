@@ -3,7 +3,7 @@ package org.erachain.core;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionTabImpl;
+import org.erachain.datachain.TransactionMapImpl;
 import org.erachain.network.message.TransactionMessage;
 import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class TransactionsPool extends MonitoredThread {
     private Controller controller;
     private BlockChain blockChain;
     private DCSet dcSet;
-    private TransactionTabImpl utxMap;
+    private TransactionMapImpl utxMap;
     private boolean needClearMap;
 
     public TransactionsPool(Controller controller, BlockChain blockChain, DCSet dcSet) {

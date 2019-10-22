@@ -4,8 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
@@ -67,7 +66,7 @@ public class BalancesComboBoxModel extends DefaultComboBoxModel<Pair<Tuple2<Stri
             Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
                     item = this.balances.get(i);
 
-            long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(item.getA());
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.getA());
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = item.getB();
             if (BlockChain.ERA_COMPU_ALL_UP) {
                 balance = account.balanceAddDEVAmount(assetKey, balance);

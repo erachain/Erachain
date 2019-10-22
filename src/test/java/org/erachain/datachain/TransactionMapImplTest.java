@@ -20,7 +20,7 @@ import java.util.*;
 import static org.junit.Assert.assertEquals;
 
 @Slf4j
-public class TransactionTabImplTest {
+public class TransactionMapImplTest {
     int[] TESTED_DBS = new int[]{DCSet.DBS_ROCK_DB, DCSet.DBS_MAP_DB, DCSet.DBS_NATIVE_MAP
             ,DCSet.DBS_ROCK_DB};
 
@@ -37,7 +37,7 @@ public class TransactionTabImplTest {
     BigDecimal balC = new BigDecimal("3.0001");
     BigDecimal balD = new BigDecimal("0.005");
 
-    TransactionTab map;
+    TransactionMap map;
 
     private synchronized void init(int dbs) {
 

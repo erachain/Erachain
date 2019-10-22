@@ -8,7 +8,7 @@ import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
-import org.erachain.datachain.ItemAssetBalanceTab;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.ItemMap;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ByteArrayUtils;
@@ -194,7 +194,7 @@ public abstract class PersonCls extends ItemCls {
 
         Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();
 
-        ItemAssetBalanceTab map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         // тут переключение внутри цикла идет - так же слишком ресурсно
         BigDecimal sum = addresses.stream()

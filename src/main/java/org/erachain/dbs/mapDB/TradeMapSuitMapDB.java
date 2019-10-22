@@ -8,7 +8,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
-import org.erachain.datachain.TradeMapSuit;
+import org.erachain.datachain.TradeSuit;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -26,7 +26,7 @@ import java.util.Map;
 Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeMapSuit {
+public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
     private BTreeMap pairKeyMap;
     private BTreeMap wantKeyMap;

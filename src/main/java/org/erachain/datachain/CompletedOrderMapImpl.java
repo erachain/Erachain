@@ -48,7 +48,7 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
+                    //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
                     //break;
                 default:
                     map = new CompletedOrdersSuitMapDBFork((CompletedOrderMap) parent, databaseSet);

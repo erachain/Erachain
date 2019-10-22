@@ -5,7 +5,7 @@ import org.mapdb.Fun;
 
 import java.util.Iterator;
 
-public interface TradeMapSuit {
+public interface TradeSuit {
 
     Iterator<Fun.Tuple2<Long, Long>> getIterator(Order order);
     Iterator<Fun.Tuple2<Long, Long>> getReverseIterator(Long orderID);

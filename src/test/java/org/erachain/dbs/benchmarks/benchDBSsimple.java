@@ -5,8 +5,8 @@ import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.ItemAssetBalanceSuit;
-import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -37,7 +37,7 @@ public class benchDBSsimple {
     Fun.Tuple2<BigDecimal, BigDecimal> balAA = new Fun.Tuple2<>(balA, balA);
     Fun.Tuple2<BigDecimal, BigDecimal> balBB = new Fun.Tuple2<>(balB, balB);
 
-    ItemAssetBalanceTab map;
+    ItemAssetBalanceMap map;
 
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance1;
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance2;
@@ -75,9 +75,9 @@ public class benchDBSsimple {
 
             balance2 = map.get(account1.getShortAddressBytes(), 2L);
 
-            assertEquals(Arrays.equals(account1.getShortAddressBytes(), ItemAssetBalanceTab.getShortAccountFromKey(account1.getShortAddressBytes())), true);
+            assertEquals(Arrays.equals(account1.getShortAddressBytes(), ItemAssetBalanceMap.getShortAccountFromKey(account1.getShortAddressBytes())), true);
 
-            Account account = new Account(ItemAssetBalanceTab.getShortAccountFromKey(account1.getShortAddressBytes()));
+            Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(account1.getShortAddressBytes()));
 
             assertEquals(Arrays.equals(account.getAddressBytes(), account1.getAddressBytes()), true);
             assertEquals(Arrays.equals(account.getShortAddressBytes(), account1.getShortAddressBytes()), true);
@@ -101,7 +101,7 @@ public class benchDBSsimple {
             while (assetKeys.hasNext()) {
                 iteratorSize1++;
                 byte[] key = assetKeys.next();
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
                 assertEquals(assetKey, assetKey2);
 
             }
@@ -146,9 +146,9 @@ public class benchDBSsimple {
                 iteratorSize++;
 
                 byte[] key = assetKeys.next();
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
                 assertEquals(assetKey, assetKey1);
-                byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
+                byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
                 if (account1.equals(shortAddress)) {
                     found1++;
@@ -174,14 +174,14 @@ public class benchDBSsimple {
                 iteratorSize++;
 
                 byte[] key = assetKeys.next();
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
                 assertEquals(assetKey, assetKey2);
 
-                if (account1.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                if (account1.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                     found1++;
-                } else if (account2.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                } else if (account2.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                     found2++;
-                } else if (account3.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                } else if (account3.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                     found3++;
                 }
             }
@@ -203,14 +203,14 @@ public class benchDBSsimple {
                 iteratorSize++;
 
                 byte[] key = assetKeys.next();
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
                 assertEquals(assetKey, assetKey1);
 
-                if (account1.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                if (account1.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                     found1++;
-                } else if (account2.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                } else if (account2.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                     found2++;
-                } else if (account3.equals(ItemAssetBalanceTab.getShortAccountFromKey(key))) {
+                } else if (account3.equals(ItemAssetBalanceMap.getShortAccountFromKey(key))) {
                     found3++;
                 }
             }
@@ -264,8 +264,8 @@ public class benchDBSsimple {
                 iteratorSize++;
 
                 byte[] key = accountKeys.next();
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
-                byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+                byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
                 assertEquals(true, account1.equals(shortAddress));
 
@@ -289,8 +289,8 @@ public class benchDBSsimple {
                 iteratorSize++;
 
                 byte[] key = accountKeys.next();
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
-                byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+                byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
                 assertEquals(true, account2.equals(shortAddress));
 
@@ -316,8 +316,8 @@ public class benchDBSsimple {
                 iteratorSize++;
 
                 byte[] key = accountKeys.next();
-                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(key);
-                byte[] shortAddress = ItemAssetBalanceTab.getShortAccountFromKey(key);
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+                byte[] shortAddress = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
                 assertEquals(true, account3.equals(shortAddress));
 

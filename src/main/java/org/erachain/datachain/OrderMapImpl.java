@@ -72,17 +72,17 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public long getCount(long have, long want) {
-        return Iterators.size(((OrderMapSuit) map).getHaveWantIterator(have, want));
+        return Iterators.size(((OrderSuit) map).getHaveWantIterator(have, want));
     }
 
     @Override
     public long getCountHave(long have) {
-        return Iterators.size(((OrderMapSuit) map).getHaveWantIterator(have));
+        return Iterators.size(((OrderSuit) map).getHaveWantIterator(have));
     }
 
     @Override
     public long getCountWant(long want) {
-        return Iterators.size(((OrderMapSuit) map).getWantHaveIterator(want));
+        return Iterators.size(((OrderSuit) map).getWantHaveIterator(want));
     }
 
     @Override
@@ -91,13 +91,13 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
-        Iterator<Long> iterator = ((OrderMapSuit) map).getHaveWantIterator(haveWant);
+        Iterator<Long> iterator = ((OrderSuit) map).getHaveWantIterator(haveWant);
 
         while (iterator.hasNext()) {
             orders.add(map.get(iterator.next()));
         }
 
-        iterator = ((OrderMapSuit) map).getWantHaveIterator(haveWant);
+        iterator = ((OrderSuit) map).getWantHaveIterator(haveWant);
 
         while (iterator.hasNext()) {
             orders.add(map.get(iterator.next()));
@@ -114,18 +114,18 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public List<Long> getSubKeysWithParent(long have, long want) {
-        return ((OrderMapSuit) map).getSubKeysWithParent(have, want);
+        return ((OrderSuit) map).getSubKeysWithParent(have, want);
     }
 
     @Override
     public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
-        return ((OrderMapSuit) map).getOrdersForTradeWithFork(have, want, reverse);
+        return ((OrderSuit) map).getOrdersForTradeWithFork(have, want, reverse);
     }
 
     @Override
     public List<Order> getOrders(long have, long want, int limit) {
 
-        Iterator<Long> iterator = ((OrderMapSuit) map).getHaveWantIterator(have, want);
+        Iterator<Long> iterator = ((OrderSuit) map).getHaveWantIterator(have, want);
 
         iterator = Iterators.limit(iterator, limit);
 
@@ -141,7 +141,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     public List<Order> getOrdersForAddress(
             String address, Long have, Long want) {
 
-        Iterator<Long> iterator = ((OrderMapSuit) map).getAddressHaveWantIterator(address, have, want);
+        Iterator<Long> iterator = ((OrderSuit) map).getAddressHaveWantIterator(address, have, want);
 
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();

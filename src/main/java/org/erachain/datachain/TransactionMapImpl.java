@@ -43,15 +43,15 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  *  <br>в БИНДЕ внутри уникальные ключи создаются добавлением основного ключа
  */
 @Slf4j
-public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
-        implements TransactionTab
+public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
+        implements TransactionMap
 {
 
     //public int TIMESTAMP_INDEX = 1;
 
     public int totalDeleted = 0;
 
-    public TransactionTabImpl(int dbsUsed, DCSet databaseSet, DB database) {
+    public TransactionMapImpl(int dbsUsed, DCSet databaseSet, DB database) {
         super(dbsUsed, databaseSet, database);
 
         DEFAULT_INDEX = TransactionSuit.TIMESTAMP_INDEX;
@@ -65,7 +65,7 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
 
     }
 
-    public TransactionTabImpl(int dbsUsed, TransactionTab parent, DCSet databaseSet) {
+    public TransactionMapImpl(int dbsUsed, TransactionMap parent, DCSet databaseSet) {
         super(dbsUsed, parent, databaseSet);
     }
 
@@ -87,14 +87,14 @@ public class TransactionTabImpl extends DBTabImpl<Long, Transaction>
             switch (dbsUsed) {
                 //case DBS_MAP_DB:
                 case DBS_MAP_DB_IN_MEM:
-                    map = new TransactionSuitMapDBFork((TransactionTab) parent, databaseSet);
+                    map = new TransactionSuitMapDBFork((TransactionMap) parent, databaseSet);
                     break;
                 case DBS_ROCK_DB:
-                    //map = new TransactionSuitRocksDBFork((TransactionTab) parent, ((TransactionSuitRocksDB) parent).map, databaseSet);
+                    //map = new TransactionSuitRocksDBFork((TransactionMap) parent, ((TransactionSuitRocksDB) parent).map, databaseSet);
                     //break;
                 default:
                     //map = new NativeMapHashMapFork(parent, databaseSet, null);
-                    map = new TransactionSuitMapDBFork((TransactionTab) parent, databaseSet);
+                    map = new TransactionSuitMapDBFork((TransactionMap) parent, databaseSet);
             }
         }
     }

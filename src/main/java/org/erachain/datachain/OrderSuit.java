@@ -5,7 +5,7 @@ import org.erachain.core.item.assets.Order;
 import java.util.Iterator;
 import java.util.List;
 
-public interface OrderMapSuit {
+public interface OrderSuit {
 
     Iterator<Long> getHaveWantIterator(long have, long want);
 

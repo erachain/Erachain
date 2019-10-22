@@ -7,7 +7,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.database.DBASet;
-import org.erachain.datachain.TradeMapSuit;
+import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 @Slf4j
-public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeMapSuit {
+public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
     private final String NAME_TABLE = "TRADES_TABLE";
     private final String tradesKeyPairIndexName = "tradesKeyPair";

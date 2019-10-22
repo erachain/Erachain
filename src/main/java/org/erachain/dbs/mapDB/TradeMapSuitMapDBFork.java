@@ -6,7 +6,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.TradeMap;
-import org.erachain.datachain.TradeMapSuit;
+import org.erachain.datachain.TradeSuit;
 import org.mapdb.BTreeMap;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -21,7 +21,7 @@ import java.util.Map;
 Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> implements TradeMapSuit {
+public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
     public TradeMapSuitMapDBFork(TradeMap parent, DBASet databaseSet) {
         super(parent, databaseSet, logger, null);

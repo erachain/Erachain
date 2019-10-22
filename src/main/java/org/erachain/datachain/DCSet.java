@@ -107,7 +107,7 @@ public class DCSet extends DBASet {
 
     private AddressForging addressForging;
     private CreditAddressesMap credit_AddressesMap;
-    private ItemAssetBalanceTab assetBalanceMap;
+    private ItemAssetBalanceMap assetBalanceMap;
     private AddressStatementRefs addressStatement_Refs;
     private KKAssetStatusMap kKAssetStatusMap;
     private KKPersonStatusMap kKPersonStatusMap;
@@ -169,7 +169,7 @@ public class DCSet extends DBASet {
     private TransactionFinalMapImpl transactionFinalMap;
     private TransactionFinalCalculatedMap transactionFinalCalculatedMap;
     private TransactionFinalMapSigns transactionFinalMapSigns;
-    private TransactionTabImpl transactionTab;
+    private TransactionMapImpl transactionTab;
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
@@ -197,7 +197,7 @@ public class DCSet extends DBASet {
 
         try {
             // переделанные таблицы
-            this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0 ? defaultDBS :
+            this.assetBalanceMap = new ItemAssetBalanceMapImpl(defaultDBS > 0 ? defaultDBS :
                     ACCOUNT_BALANCES
                     , this, database);
 
@@ -205,7 +205,7 @@ public class DCSet extends DBASet {
                     FINAL_TX_MAP
                     , this, database);
 
-            this.transactionTab = new TransactionTabImpl(UNCONF_TX_MAP, this, database);
+            this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
 
             this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
                     ACCOUNTS_REFERENCES
@@ -357,10 +357,10 @@ public class DCSet extends DBASet {
         this.bchain = parent.bchain;
 
         // переделанные поновой таблицы
-        this.assetBalanceMap = new ItemAssetBalanceTabImpl(
+        this.assetBalanceMap = new ItemAssetBalanceMapImpl(
                 ACCOUNT_BALANCES_FORK
                 , parent.assetBalanceMap, this);
-        this.transactionTab = new TransactionTabImpl(
+        this.transactionTab = new TransactionMapImpl(
                 UNCONF_TX_MAP_FORK
                 , parent.transactionTab, this);
         this.transactionFinalMap = new TransactionFinalMapImpl(
@@ -860,7 +860,7 @@ public class DCSet extends DBASet {
      *
      */
 // TODO SOFT HARD TRUE
-    public ItemAssetBalanceTab getAssetBalanceMap() {
+    public ItemAssetBalanceMap getAssetBalanceMap() {
         return this.assetBalanceMap;
     }
 
@@ -1147,7 +1147,7 @@ public class DCSet extends DBASet {
      *
      * ++ seek by TIMESTAMP
      */
-    public TransactionTabImpl getTransactionTab() {
+    public TransactionMapImpl getTransactionTab() {
         return this.transactionTab;
     }
 

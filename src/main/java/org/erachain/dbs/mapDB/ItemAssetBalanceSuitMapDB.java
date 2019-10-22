@@ -6,8 +6,8 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.ItemAssetBalanceMapImpl;
 import org.erachain.datachain.ItemAssetBalanceSuit;
-import org.erachain.datachain.ItemAssetBalanceTabImpl;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -29,7 +29,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     protected BTreeMap addressKeyMap;
 
     public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, ItemAssetBalanceTabImpl.DEFAULT_VALUE);
+        super(databaseSet, database, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE);
 
     }
 
