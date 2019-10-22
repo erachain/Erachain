@@ -1,10 +1,9 @@
 package org.erachain.dbs.rocksDB.transformation;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.rocksDB.exceptions.WrongParseException;
+import org.mapdb.Fun.Tuple2;
 
 import java.util.Arrays;
 @Slf4j
@@ -43,8 +42,8 @@ public class ByteableLongItem implements Byteable<Tuple2<Long, ItemCls>> {
     @Override
     public byte[] toBytesObject(Tuple2<Long, ItemCls> value) {
         Tuple2<Long, ItemCls> tuple = value;
-        Long aLong = tuple.f0;
-        ItemCls itemCls = tuple.f1;
+        Long aLong = tuple.a;
+        ItemCls itemCls = tuple.b;
         byte[] bytesLong = byteableLong.toBytesObject(aLong);
         byte[] bytesItem = byteableItem.toBytesObject(itemCls);
         return org.bouncycastle.util.Arrays.concatenate(bytesLong, bytesItem);

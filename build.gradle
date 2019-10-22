@@ -95,7 +95,7 @@ dependencies {
 
     //compile "org.springframework.boot:spring-boot-starter-web:${springbootVersion}"
     //compile "org.springframework.boot:spring-boot:${springbootVersion}"
-    compile group: 'org.apache.flink', name: 'flink-core', version: '1.8.0'
+    ////compile group: 'org.apache.flink', name: 'flink-core', version: '1.8.0'
 }
 
 jar {

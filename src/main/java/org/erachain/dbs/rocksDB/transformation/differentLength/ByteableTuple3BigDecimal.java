@@ -1,9 +1,9 @@
 package org.erachain.dbs.rocksDB.transformation.differentLength;
 
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.erachain.core.BlockChain;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
+import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -27,7 +27,7 @@ public class ByteableTuple3BigDecimal implements Byteable<Tuple3<BigDecimal, Big
         byte[] sizeArray3 = Arrays.copyOfRange(bytes, newZero2, newZero2 + Integer.BYTES);
         Integer size3 = byteableInteger.receiveObjectFromBytes(sizeArray3);
         byte[] f2 = Arrays.copyOfRange(bytes, newZero2 + Integer.BYTES, newZero2 + Integer.BYTES + size3);
-        return Tuple3.of(new BigDecimal(new BigInteger(f0)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN),
+        return new Tuple3(new BigDecimal(new BigInteger(f0)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN),
                 new BigDecimal(new BigInteger(f1)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN),
                 new BigDecimal(new BigInteger(f2)).setScale(BlockChain.AMOUNT_DEDAULT_SCALE, RoundingMode.HALF_DOWN));
     }
@@ -35,8 +35,8 @@ public class ByteableTuple3BigDecimal implements Byteable<Tuple3<BigDecimal, Big
     @Override
     public byte[] toBytesObject(Tuple3<BigDecimal, BigDecimal, BigDecimal> value) {
         return org.bouncycastle.util.Arrays.concatenate(
-                byteableBigDecimal.toBytesObject(value.f0),
-                byteableBigDecimal.toBytesObject(value.f1),
-                byteableBigDecimal.toBytesObject(value.f2));
+                byteableBigDecimal.toBytesObject(value.a),
+                byteableBigDecimal.toBytesObject(value.b),
+                byteableBigDecimal.toBytesObject(value.c));
     }
 }

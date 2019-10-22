@@ -1,9 +1,9 @@
 package org.erachain.dbs.rocksDB.transformation.differentLength;
 
-import org.apache.flink.api.java.tuple.Tuple5;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
+import org.mapdb.Fun.Tuple5;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ public class ByteableStackTuple5DifferentLength implements Byteable<Stack<Tuple5
             Integer f2 = receiveInteger(bytes);
             Integer f3 = receiveInteger(bytes);
             byte[] data = receiveByteDifferentLength(bytes);
-            result.push(Tuple5.of(f0, f1, f2, f3, data));
+            result.push(new Tuple5(f0, f1, f2, f3, data));
         }
         return result;
     }
@@ -54,11 +54,11 @@ public class ByteableStackTuple5DifferentLength implements Byteable<Stack<Tuple5
     public byte[] toBytesObject(Stack<Tuple5<Long, Long, Integer, Integer, byte[]>> value) {
         List<byte[]> tempResult = new ArrayList<>();
         for (Tuple5<Long, Long, Integer, Integer, byte[]> tuple5 : value) {
-            tempResult.add(byteableLong.toBytesObject(tuple5.f0));
-            tempResult.add(byteableLong.toBytesObject(tuple5.f1));
-            tempResult.add(byteableInteger.toBytesObject(tuple5.f2));
-            tempResult.add(byteableInteger.toBytesObject(tuple5.f3));
-            byte[] data = tuple5.f4;
+            tempResult.add(byteableLong.toBytesObject(tuple5.a));
+            tempResult.add(byteableLong.toBytesObject(tuple5.b));
+            tempResult.add(byteableInteger.toBytesObject(tuple5.c));
+            tempResult.add(byteableInteger.toBytesObject(tuple5.d));
+            byte[] data = tuple5.e;
             tempResult.add(byteableInteger.toBytesObject(data.length));
             tempResult.add(data);
         }

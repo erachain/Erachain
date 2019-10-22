@@ -1,9 +1,9 @@
 package org.erachain.dbs.rocksDB.transformation.differentLength;
 
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
+import org.mapdb.Fun.Tuple2;
 
 import java.util.Arrays;
 
@@ -20,13 +20,13 @@ public class ByteableTuple2StringString implements Byteable<Tuple2<String, Strin
         byte[] sizeArray2 = Arrays.copyOfRange(bytes, newZero, newZero + Integer.BYTES);
         Integer size2 = byteableInteger.receiveObjectFromBytes(sizeArray2);
         byte[] f1 = Arrays.copyOfRange(bytes, newZero + Integer.BYTES, newZero + Integer.BYTES + size2);
-        return Tuple2.of(byteableString.receiveObjectFromBytes(f0), byteableString.receiveObjectFromBytes(f1));
+        return new Tuple2(byteableString.receiveObjectFromBytes(f0), byteableString.receiveObjectFromBytes(f1));
     }
 
     @Override
     public byte[] toBytesObject(Tuple2<String, String> value) {
-        byte[] bytesValueF0 = byteableString.toBytesObject(value.f0);
-        byte[] bytesValueF1 = byteableString.toBytesObject(value.f1);
+        byte[] bytesValueF0 = byteableString.toBytesObject(value.a);
+        byte[] bytesValueF1 = byteableString.toBytesObject(value.b);
         return org.bouncycastle.util.Arrays.concatenate(
                 byteableInteger.toBytesObject(bytesValueF0.length),
                 bytesValueF0,

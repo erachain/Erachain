@@ -1,11 +1,11 @@
 package org.erachain.dbs.rocksDB.transformation.lists;
 
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.transformation.tuples.ByteableTuple3;
+import org.mapdb.Fun;
 
-public class ByteableStackTuple3 extends ByteableStack<Tuple3<Integer, Integer, Integer>> {
+public class ByteableStackTuple3 extends ByteableStack<Fun.Tuple3<Integer, Integer, Integer>> {
 
     public ByteableStackTuple3() {
         ByteableTuple3<Integer, Integer, Integer> byteableElement = new ByteableTuple3<Integer, Integer, Integer>() {

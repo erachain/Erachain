@@ -1,10 +1,10 @@
 package org.erachain.dbs.rocksDB.transformation.differentLength;
 
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.lists.ByteableList;
+import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -33,11 +33,11 @@ public class ByteableTuple2BigDecimalListLong implements Byteable<Tuple2<BigDeci
         byte[] f0 = Arrays.copyOfRange(bytes, Integer.BYTES, Integer.BYTES + size);
         int newZero = Integer.BYTES + size;
         byte[] f1 = Arrays.copyOfRange(bytes, newZero, bytes.length);
-        return Tuple2.of(new BigDecimal(new BigInteger(f0)), byteableListLong.receiveObjectFromBytes(f1));
+        return new Tuple2(new BigDecimal(new BigInteger(f0)), byteableListLong.receiveObjectFromBytes(f1));
     }
 
     @Override
     public byte[] toBytesObject(Tuple2<BigDecimal, List<Long>> value) {
-        return org.bouncycastle.util.Arrays.concatenate(byteableBigDecimal.toBytesObject(value.f0), byteableListLong.toBytesObject(value.f1));
+        return org.bouncycastle.util.Arrays.concatenate(byteableBigDecimal.toBytesObject(value.a), byteableListLong.toBytesObject(value.b));
     }
 }
