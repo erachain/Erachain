@@ -55,7 +55,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
             if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
                 System.gc();
                 if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
-                    Controller.getInstance().stopAll(97);
+                    Controller.getInstance().stopAll(195);
             }
         }
 

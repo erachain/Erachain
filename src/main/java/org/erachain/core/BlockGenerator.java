@@ -1045,7 +1045,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                     } catch (java.lang.OutOfMemoryError e) {
                                         local_status = -1;
                                         LOGGER.error(e.getMessage(), e);
-                                        ctrl.stopAll(94);
+                                        ctrl.stopAll(234);
                                         return;
                                     }
                                     LOGGER.info("GENERATE done");
@@ -1086,7 +1086,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         } catch (java.lang.OutOfMemoryError e) {
                                             local_status = -1;
                                             LOGGER.error(e.getMessage(), e);
-                                            ctrl.stopAll(94);
+                                            ctrl.stopAll(235);
                                             return;
                                         }
                                     }
@@ -1231,7 +1231,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             } catch (java.lang.OutOfMemoryError e) {
                                 local_status = -1;
                                 LOGGER.error(e.getMessage(), e);
-                                ctrl.stopAll(94);
+                                ctrl.stopAll(235);
                                 return;
                             }
 
