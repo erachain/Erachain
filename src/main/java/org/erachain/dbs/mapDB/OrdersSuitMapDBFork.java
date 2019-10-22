@@ -93,7 +93,7 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
         if (this.deleted != null) {
             //DELETE DELETED
             for (Object deleted : this.deleted.keySet()) {
-                parentKeys.remove((Long) deleted);
+                parentKeys.remove(deleted);
             }
         }
 
