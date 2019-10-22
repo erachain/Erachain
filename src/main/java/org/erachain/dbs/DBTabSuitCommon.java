@@ -86,6 +86,8 @@ public interface DBTabSuitCommon<T, U> {
 
     void rollback();
 
+    void clearCache();
+
     void close();
 
     boolean isClosed();

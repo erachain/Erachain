@@ -253,6 +253,10 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public void clearCache() {
+    }
+
+    @Override
     public void close() {
         resetDbLock.writeLock().lock();
         try {

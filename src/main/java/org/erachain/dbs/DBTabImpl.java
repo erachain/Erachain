@@ -227,6 +227,9 @@ public abstract class DBTabImpl<T, U> extends DBTabCommonImpl<T, U> implements D
     }
 
     @Override
+    public void clearCache() { map.clearCache(); }
+
+    @Override
     public void close() { map.close(); }
 
     @Override

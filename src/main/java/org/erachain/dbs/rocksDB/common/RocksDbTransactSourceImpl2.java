@@ -921,6 +921,10 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
+    public void clearCache() {
+    }
+
+    @Override
     public void close() {
         resetDbLock.writeLock().lock();
         try {

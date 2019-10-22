@@ -178,6 +178,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
+    public void clearCache() {
+        map.clearCache();
+    }
+
+    @Override
     public void clear() {
         map.clear();
     }

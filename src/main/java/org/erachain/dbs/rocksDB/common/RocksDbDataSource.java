@@ -12,6 +12,8 @@ public interface RocksDbDataSource {
 
     boolean isAlive();
 
+    void clearCache();
+
     void close();
 
     Set<byte[]> keySet() throws RuntimeException;

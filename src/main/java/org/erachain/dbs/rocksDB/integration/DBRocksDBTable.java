@@ -363,6 +363,11 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
+    public void clearCache() {
+        dbSource.clearCache();
+    }
+
+    @Override
     public Set<K> keySet() {
         Set<byte[]> set = dbSource.keySet();
         return set.stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());

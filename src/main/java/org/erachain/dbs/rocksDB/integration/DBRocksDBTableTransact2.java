@@ -331,6 +331,10 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         return dbSource.values().stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
+    @Override
+    public void clearCache() {
+    }
+
     public List<K> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB)
                 .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());

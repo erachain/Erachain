@@ -38,6 +38,8 @@ public interface InnerDBTable<K, V> {
 
     Collection<V> values();
 
+    void clearCache();
+
     void close();
 
     //NavigableSet<Fun.Tuple2<?, K>> getIndex(int index, boolean descending);

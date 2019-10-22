@@ -301,6 +301,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public void clearCache() {
+        //dbCore.maxMemCompactionLevel();
+
+    }
+
+    @Override
     public void close() {
         resetDbLock.writeLock().lock();
         try {

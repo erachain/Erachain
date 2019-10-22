@@ -1688,6 +1688,13 @@ public class DCSet extends DBASet {
         this.outUses();
     }
 
+    public void clearCache() {
+        for (DBTab tab : tables) {
+            tab.clearCache();
+        }
+        super.clearCache();
+    }
+
     private long poinFlush = System.currentTimeMillis();
     private long poinCompact = poinFlush;
     private long engineSize;
@@ -1709,7 +1716,7 @@ public class DCSet extends DBASet {
 
             if (needClearCache || clearGC) {
                 LOGGER.debug("CLEAR ENGINE CACHE...");
-                this.database.getEngine().clearCache();
+                clearCache();
             }
 
             poinClear = System.currentTimeMillis();
