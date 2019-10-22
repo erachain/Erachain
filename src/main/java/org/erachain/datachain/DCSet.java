@@ -41,10 +41,10 @@ import java.util.Random;
 public class DCSet extends DBASet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN >> 1;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 3;
     private static final long MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 8;
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
-    private static final long DELETIONS_BEFORE_COMPACT = BlockChain.MAX_BLOCK_SIZE_GEN << 6;
+    public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT << 4;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
@@ -1709,7 +1709,7 @@ public class DCSet extends DBASet {
 
         boolean needRepopulateUTX = hardFlush
                 || System.currentTimeMillis() - poinClear - 1000 >
-                    BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 1;
+                BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 3;
         // try repopulate UTX table
         if (needRepopulateUTX) {
             Controller.getInstance().transactionsPool.needClear(doOrphan);
@@ -1730,11 +1730,14 @@ public class DCSet extends DBASet {
 
         if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
                 || diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB
-                || needRepopulateUTX) {
-            long start = poinFlush = System.currentTimeMillis();
+                || System.currentTimeMillis() - poinFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 8
+        ) {
+
+            long start = System.currentTimeMillis();
+
             LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
-                + (this.actions > ACTIONS_BEFORE_COMMIT? "by Actions:" + this.actions : "")
-                + (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB? "by diff Size Engine:" + diffSizeEngine : "")
+                    + (this.actions > ACTIONS_BEFORE_COMMIT ? "by Actions: " + this.actions :
+                    (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB ? "by diff Size Engine: " + diffSizeEngine : "by time"))
                 );
 
             for (DBTab tab : tables) {
@@ -1777,6 +1780,7 @@ public class DCSet extends DBASet {
                 } catch (Throwable e) {
                     ///LOGGER.error(e.getMessage(), e);
                 }
+
             }
 
             clearGC = !clearGC;
@@ -1788,6 +1792,7 @@ public class DCSet extends DBASet {
             LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
                     + (System.currentTimeMillis() - start) + " ms");
 
+            poinFlush = System.currentTimeMillis();
             this.actions = 0l;
             this.engineSize = getEngineSize();
 

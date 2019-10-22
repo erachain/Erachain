@@ -190,7 +190,8 @@ public class TransactionsPool extends MonitoredThread {
                     needClearMap = false;
 
                     int height = dcSet.getBlocksHeadsMap().size();
-                    boolean needReset = clearedUTXs > (controller.isStatusOK() ? 100000 : 10000) << (Controller.HARD_WORK >> 1)
+                    ;
+                    boolean needReset = clearedUTXs > DCSet.DELETIONS_BEFORE_COMPACT >> (controller.isStatusOK() ? 0 : 7)
                             //|| System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 3
                             ;
                     // reset Map & repopulate UTX table
