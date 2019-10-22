@@ -21,10 +21,10 @@ public class UpdateUtil {
     static Logger LOGGER = LoggerFactory.getLogger(UpdateUtil.class.getName());
 
     public static void repopulateNameStorage(int height) {
-        DCSet.getInstance().getNameStorageMap().reset();
-        DCSet.getInstance().getOrphanNameStorageHelperMap().reset();
-        DCSet.getInstance().getOrphanNameStorageMap().reset();
-        DCSet.getInstance().getHashtagPostMap().reset();
+        DCSet.getInstance().getNameStorageMap().clear();
+        DCSet.getInstance().getOrphanNameStorageHelperMap().clear();
+        DCSet.getInstance().getOrphanNameStorageMap().clear();
+        DCSet.getInstance().getHashtagPostMap().clear();
 
         SortableList<Integer, Block> blocks = DCSet.getInstance().getBlockMap().getList();
         blocks.sort(BlockMap.HEIGHT_INDEX);
@@ -89,33 +89,36 @@ public class UpdateUtil {
     }
 
 
-    public static void repopulateTransactionFinalMap() {
-        DCSet.getInstance().getTransactionFinalMap().reset();
+    public static void repopulateTransactionFinalMap(DCSet dcSet) {
+
+        dcSet.getTransactionFinalMap().clear();
 
         Block b = new GenesisBlock();
-        DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
         do {
             List<Transaction> txs = b.getTransactions();
             int counter = 1;
             for (Transaction tx : txs) {
-                DCSet.getInstance().getTransactionFinalMap().add(b.getHeight(), counter, tx);
+                dcSet.getTransactionFinalMap().add(b.getHeight(), counter, tx);
                 counter++;
             }
-            if (b.getHeight() % 2000 == 0) {
+            if (b.getHeight() % 1000 == 0) {
                 LOGGER.info("UpdateUtil - Repopulating TransactionMap : " + b.getHeight());
-                DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
             }
-            b = b.getChild(DCSet.getInstance());
+            dcSet.flush(3 + b.getTransactionCount(), false, false);
+
+            b = b.getChild(dcSet);
+
         } while (b != null);
+
+        dcSet.flush(0, true, true);
 
     }
 
     public static void repopulateCommentPostMap() {
-        DCSet.getInstance().getPostCommentMap().reset();
+        DCSet.getInstance().getPostCommentMap().clear();
 
         Block b = new GenesisBlock();
         int height = b.getHeight();
-        DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
         do {
             List<Transaction> txs = b.getTransactions();
             int seqNo = 0;
@@ -129,9 +132,9 @@ public class UpdateUtil {
                     }
                 }
             }
-            if (b.getHeight() % 2000 == 0) {
+            if (b.getHeight() % 1000 == 0) {
                 LOGGER.info("UpdateUtil - Repopulating CommentPostMap : " + b.getHeight());
-                DCSet.getInstance().flush(b.getDataLength(false) >> 7, false);
+                DCSet.getInstance().flush(3 + b.getTransactionCount(), false, false);
             }
             b = b.getChild(DCSet.getInstance());
         } while (b != null);

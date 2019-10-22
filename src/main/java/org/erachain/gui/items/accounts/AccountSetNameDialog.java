@@ -105,7 +105,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
                 // account in db?
 
                 if (name.length() == 0 && desc.length() == 0) {
-                    db.delete(account);
+                    db.remove(account);
                     setVisible(false);
                     return;
                 } else if (name.length() == 0) {

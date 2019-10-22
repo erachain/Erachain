@@ -128,7 +128,7 @@ public class WebResource {
         }
 
         NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
-        Set<String> keys = nameStorageMap.getKeys();
+        Set<String> keys = nameStorageMap.keySet();
 
         for (String name : keys) {
             Profile profileOpt = Profile.getProfileOpt(name);
@@ -445,13 +445,13 @@ public class WebResource {
     public Response doDeleteUnconfirmedTxs() {
 
         DCSet dcSet = DCSet.getInstance();
-        Collection<Transaction> values = dcSet.getTransactionMap().getValues();
+        Collection<Transaction> values = dcSet.getTransactionTab().values();
 
         List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
 
         for (Transaction transaction : values) {
             if (privateKeyAccounts.contains(transaction.getCreator())) {
-                dcSet.getTransactionMap().delete(transaction);
+                dcSet.getTransactionTab().remove(transaction);
             }
         }
 

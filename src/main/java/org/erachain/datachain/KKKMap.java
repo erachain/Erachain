@@ -1,13 +1,11 @@
 package org.erachain.datachain;
 
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
 import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -21,7 +19,7 @@ import java.util.TreeMap;
  *
  * TODO: передлать подпись на Long
  */
-public class KKKMap extends DCMap<
+public class KKKMap extends DCUMap<
         Tuple2<Long, Long>, // item1 Key + item2 Key
         TreeMap<Long, // item3 Key
                 Stack<Tuple3<
@@ -41,10 +39,10 @@ public class KKKMap extends DCMap<
         this.name = name;
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, observerMessage_reset);
-            this.observableData.put(DBMap.NOTIFY_LIST, observerMessage_list);
-            this.observableData.put(DBMap.NOTIFY_ADD, observerMessage_add);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, observerMessage_remove);
+            this.observableData.put(DBTab.NOTIFY_RESET, observerMessage_reset);
+            this.observableData.put(DBTab.NOTIFY_LIST, observerMessage_list);
+            this.observableData.put(DBTab.NOTIFY_ADD, observerMessage_add);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, observerMessage_remove);
         }
 
     }
@@ -54,25 +52,23 @@ public class KKKMap extends DCMap<
     }
 
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        BTreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> map = database.createTreeMap(name)
+        map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .counterEnable()
                 .makeOrGet();
 
-        //RETURN
-        return map;
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMemoryMap() {
+    protected void getMemoryMap() {
         // HashMap ?
-        return new TreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>>();
+        map = new TreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>>();
     }
 
     @Override

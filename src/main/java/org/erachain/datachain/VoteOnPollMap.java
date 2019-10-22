@@ -5,12 +5,10 @@ import org.erachain.core.transaction.Transaction;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 @Deprecated
-public class VoteOnPollMap extends DCMap<byte[], Integer> {
+public class VoteOnPollMap extends DCUMap<byte[], Integer> {
 
     public VoteOnPollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -20,21 +18,21 @@ public class VoteOnPollMap extends DCMap<byte[], Integer> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<byte[], Integer> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("voteOnPollOrphanData")
+        map = database.createTreeMap("voteOnPollOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], Integer> getMemoryMap() {
-        return new TreeMap<byte[], Integer>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Integer>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override
@@ -51,6 +49,6 @@ public class VoteOnPollMap extends DCMap<byte[], Integer> {
     }
 
     public void delete(Transaction transaction) {
-        this.delete(transaction.getSignature());
+        this.remove(transaction.getSignature());
     }
 }

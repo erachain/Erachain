@@ -555,18 +555,16 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         //UPDATE SENDER
         super.process(block, asDeal);
 
-        DCSet db = this.dcSet;
-
         int transactionIndex = -1;
         int blockIndex = -1;
         //Block block = this.getBlock(db);// == null (((
         if (block == null) {
-            blockIndex = db.getBlockMap().last().getHeight();
+            blockIndex = dcSet.getBlockMap().last().getHeight();
         } else {
             blockIndex = block.getHeight();
             if (blockIndex < 1) {
                 // if block not is confirmed - get last block + 1
-                blockIndex = db.getBlockMap().last().getHeight() + 1;
+                blockIndex = dcSet.getBlockMap().last().getHeight() + 1;
             }
             //transactionIndex = this.getSeqNo(db);
             transactionIndex = block.getTransactionSeq(signature);
@@ -590,9 +588,9 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
             //////////// FIND Issuer (registrator) this PERSON
             // FIND person
-            ItemCls person = db.getItemPersonMap().get(this.key);
+            ItemCls person = dcSet.getItemPersonMap().get(this.key);
             // FIND issue record
-            Transaction transPersonIssue = db.getTransactionFinalMap().get(person.getReference());
+            Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
             // GIVE GIFT for ISSUER
             Account issuer = transPersonIssue.getCreator();
 
@@ -615,7 +613,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             // GIVE GIFT for this PUB_KEY - to PERSON
             BigDecimal personBonus = height < BlockChain.VERS_4_11 ? BONUS_FOR_PERSON_4_11.add(BONUS_FOR_PERSON_4_11)
                     : BONUS_FOR_PERSON_4_11;
-            pkAccount.changeBalance(db, false, FEE_KEY, personBonus, false);
+            pkAccount.changeBalance(dcSet, false, FEE_KEY, personBonus, false);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,
                         "enter bonus", this.dbRef));
@@ -623,7 +621,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
-            issuer.changeBalance(db, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
+            issuer.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
                     false);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
@@ -632,7 +630,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
 
             // TO EMITTE FEE (with minus)
-            GenesisBlock.CREATOR.changeBalance(db, true, FEE_KEY, issued_FEE_BD_total, true);
+            GenesisBlock.CREATOR.changeBalance(dcSet, true, FEE_KEY, issued_FEE_BD_total, true);
 
         }
 
@@ -647,11 +645,11 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                 blockIndex, transactionIndex);
 
 		/*
-		Tuple5<Long, Long, byte[], Integer, Integer> psItem = db.getPersonStatusMap().getItem(this.key, StatusCls.ALIVE_KEY);
+		Tuple5<Long, Long, byte[], Integer, Integer> psItem = dcSet.getPersonStatusMap().getItem(this.key, StatusCls.ALIVE_KEY);
 		if (psItem == null) {
 			// ADD ALIVE STATUS to PERSON for permanent TO_DATE
-			PersonCls person = (PersonCls)db.getItemPersonMap().get(this.key);
-			db.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY,
+			PersonCls person = (PersonCls)dcSet.getItemPersonMap().get(this.key);
+			dcSet.getPersonStatusMap().addItem(this.key, StatusCls.ALIVE_KEY,
 					new Tuple5<Long, Long, byte[], Integer, Integer>(
 							person.getBirthday(), Long.MAX_VALUE,
 							new byte[0],
@@ -663,13 +661,15 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         String address;
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             address = publicAccount.getAddress();
-            db.getAddressPersonMap().addItem(address, itemA);
-            db.getPersonAddressMap().addItem(this.key, address, itemP);
+            dcSet.getAddressPersonMap().addItem(address, itemA);
+            dcSet.getPersonAddressMap().addItem(this.key, address, itemP);
 
-            if (!db.getAddressTime_SignatureMap().contains(address)) {
+
+            if (!dcSet.getReferenceMap().contains(publicAccount.getShortAddressBytes())) {
                 // for quick search public keys by address - use PUB_KEY from Person DATA owner
                 // used in - controller.Controller.getPublicKeyByAddress
-                db.getAddressTime_SignatureMap().set(address, this.signature);
+                dcSet.getReferenceMap().set(
+                        publicAccount.getShortAddressBytes(), new long[]{timestamp, dbRef});
             }
 
         }
@@ -682,13 +682,12 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         //UPDATE SENDER
         super.orphan(block, asDeal);
 
-        DCSet db = this.dcSet;
         //UPDATE RECIPIENT
         String address;
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             address = publicAccount.getAddress();
-            db.getAddressPersonMap().removeItem(address);
-            db.getPersonAddressMap().removeItem(this.key, address);
+            dcSet.getAddressPersonMap().removeItem(address);
+            dcSet.getPersonAddressMap().removeItem(this.key, address);
         }
 
         boolean personalized = false;
@@ -709,9 +708,9 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
             //////////// FIND Issuer (registrator) this PERSON
             // FIND person
-            ItemCls person = db.getItemPersonMap().get(this.key);
+            ItemCls person = dcSet.getItemPersonMap().get(this.key);
             // FIND issue record
-            Transaction transPersonIssue = db.getTransactionFinalMap().get(person.getReference());
+            Transaction transPersonIssue = dcSet.getTransactionFinalMap().get(person.getReference());
             Account issuer = transPersonIssue.getCreator();
 
             // EMITTE LIA
@@ -730,16 +729,16 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             // GIVE GIFT for this PUB_KEY - to PERSON
             BigDecimal personBonus = height < BlockChain.VERS_4_11 ? BONUS_FOR_PERSON_4_11.add(BONUS_FOR_PERSON_4_11)
                     : BONUS_FOR_PERSON_4_11;
-            pkAccount.changeBalance(db, true, FEE_KEY, personBonus, false);
+            pkAccount.changeBalance(dcSet, true, FEE_KEY, personBonus, false);
             BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
-            issuer.changeBalance(db, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRATOR_4_11,
+            issuer.changeBalance(dcSet, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRATOR_4_11,
                     false);
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
 
             // ADD to EMISSION (with minus)
-            GenesisBlock.CREATOR.changeBalance(db, false, FEE_KEY, issued_FEE_BD_total, true);
+            GenesisBlock.CREATOR.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD_total, true);
 
         }
     }

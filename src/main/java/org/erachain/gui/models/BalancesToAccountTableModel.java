@@ -3,6 +3,8 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -23,7 +25,7 @@ public class BalancesToAccountTableModel extends AbstractTableModel implements O
     private long key;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Balance"});
     private Boolean[] column_AutuHeight = new Boolean[]{true, false};
-    private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
 
     public BalancesToAccountTableModel(long key) {
         this.key = key;
@@ -71,8 +73,8 @@ public class BalancesToAccountTableModel extends AbstractTableModel implements O
             return null;
         }
 
-        Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances.get(row);
-        Account account = new Account(aRow.getA().a);
+        Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances.get(row);
+        Account account = new Account(ItemAssetBalanceTab.getShortAccountFromKey(aRow.getA()));
 
         switch (column) {
             case COLUMN_ADDRESS:

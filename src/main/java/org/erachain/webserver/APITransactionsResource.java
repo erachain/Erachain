@@ -216,7 +216,7 @@ public class APITransactionsResource {
 
         result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address, 1000, true);
         if (unconfirmed)
-            result.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address));
+            result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
         JSONArray array = new JSONArray();
         for (Transaction transaction : result) {
@@ -260,7 +260,7 @@ public class APITransactionsResource {
 
         List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address, 1000, true);
         if (unconfirmed)
-            trans.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address));
+            trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
         Collections.sort(trans, new TransactionTimestampComparator().reversed());
         for (Transaction tr : trans) {
@@ -305,7 +305,7 @@ public class APITransactionsResource {
         Integer type;
         try {
             type = Integer.valueOf(type1);
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, type, 1000);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, type, 1000);
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
@@ -379,7 +379,7 @@ public class APITransactionsResource {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
-        List<Transaction> transaction = dcSet.getTransactionMap().getIncomedTransactions(address, type,
+        List<Transaction> transaction = dcSet.getTransactionTab().getIncomedTransactions(address, type,
                 timestamp, count, descending);
 
         for (Transaction record : transaction) {
@@ -445,7 +445,7 @@ public class APITransactionsResource {
         }
 
         if (unconfirmed) {
-            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionMap().findTransactions(address, sender,
+            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender,
                     recipient, type, false, 0, limit, 0);
             for (Transaction trans : resultUnconfirmed) {
                 array.add(trans.toJson());

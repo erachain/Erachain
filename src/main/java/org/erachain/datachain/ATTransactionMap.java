@@ -2,17 +2,20 @@ package org.erachain.datachain;
 
 import org.erachain.at.ATTransaction;
 import org.erachain.controller.Controller;
-import org.erachain.database.DBMap;
 import org.erachain.database.serializer.ATTransactionSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
 
 
-public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransaction> {
+public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransaction> {
 
     @SuppressWarnings("rawtypes")
     private NavigableSet senderKey;
@@ -23,10 +26,10 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransact
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_AT_TX_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_AT_TXS);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TX_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TX);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_AT_TX_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_AT_TXS);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_AT_TX_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TX);
         }
     }
 
@@ -35,21 +38,19 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransact
 
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple2<Integer, Integer>, ATTransaction> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<Integer, Integer>, ATTransaction> getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
-        //OPEN MAP
-        return this.openMap(database);
+    protected void getMemoryMap() {
+        database = DCSet.makeDBinMemory();
+        openMap();
     }
 
     @SuppressWarnings("unchecked")
@@ -103,7 +104,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransact
         return this.set(new Tuple2<Integer, Integer>(blockHeight, seq), atTx);
     }
 
-    public DCMap<Tuple2<Integer, Integer>, ATTransaction> getParent() {
+    public DBTab<Tuple2<Integer, Integer>, ATTransaction> getParent() {
         return this.parent;
     }
 
@@ -119,7 +120,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransact
 
         //DELETE
         for (Tuple2 key : keys) {
-            this.delete(key);
+            this.remove(key);
         }
 
         if (this.parent != null)
@@ -138,7 +139,7 @@ public class ATTransactionMap extends DCMap<Tuple2<Integer, Integer>, ATTransact
 
         //DELETE
         for (Tuple2 key : keys) {
-            this.delete(key);
+            this.remove(key);
         }
 
         if (this.parent != null)

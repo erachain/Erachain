@@ -52,11 +52,11 @@ public class GeneratorTests {
     byte[] transactionsHash = new byte[Crypto.HASH_LENGTH];
 
     //CREATE EMPTY MEMORY DATABASE
-    DCSet dcSet = DCSet.createEmptyDatabaseSet();
+    DCSet dcSet = DCSet.createEmptyDatabaseSet(0);
 
     @Before
     public void init() {
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
     }
 
 
@@ -114,7 +114,7 @@ public class GeneratorTests {
         Block lastBlock = genesisBlock;
         for (int i = 0; i < 200; i++) {
 
-            if (NTP.getTime() - lastBlock.getTimestamp() < BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+            if (NTP.getTime() - lastBlock.getTimestamp() < BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height)) {
                 break;
             }
 
@@ -371,7 +371,7 @@ public class GeneratorTests {
         Block lastBlock = genesisBlock;
         for (int i = 2; i < 120; i++) {
 
-            if (NTP.getTime() - lastBlock.getTimestamp() < BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
+            if (NTP.getTime() - lastBlock.getTimestamp() < BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height)) {
                 break;
             }
 
@@ -578,7 +578,7 @@ public class GeneratorTests {
         //PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
-        generator.setLastTimestamp(genesisBlock.getTimestamp(), dcSet);
+        generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
         generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false);
         generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(10000), false);
 
@@ -588,8 +588,11 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
+
+        int height = 2;
+
         // get timestamp for block
-        long timestamp = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
+        long timestamp = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
 
         //ADD 10 UNCONFIRMED VALID TRANSACTIONS
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
@@ -597,14 +600,14 @@ public class GeneratorTests {
         for (int i = 0; i < 10; i++) {
 
             //CREATE VALID PAYMENT
-            Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01), timestamp++, generator.getLastTimestamp(snapshot));
+            Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.01), timestamp++, generator.getLastTimestamp(snapshot)[0]);
             payment.sign(generator, Transaction.FOR_NETWORK);
 
             //PROCESS IN DB
             payment.process(genesisBlock, Transaction.FOR_NETWORK);
 
             //ADD TO UNCONFIRMED TRANSACTIONS
-            dcSet.getTransactionMap().add(payment);
+            dcSet.getTransactionTab().add(payment);
 
         }
 
@@ -647,7 +650,7 @@ public class GeneratorTests {
         //PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(100000), NTP.getTime());
         //transaction.process(databaseSet, false);
-        generator.setLastTimestamp(genesisBlock.getTimestamp(), dcSet);
+        generator.setLastTimestamp(new long[]{genesisBlock.getTimestamp(), 0}, dcSet);
         generator.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000), false);
         generator.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(100000), false);
 
@@ -658,8 +661,9 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
+        int height = 2;
         // get timestamp for block
-        long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
+        long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
         long timestamp = timestampStart;
 
         //ADD 10000 UNCONFIRMED VALID TRANSACTIONS
@@ -671,7 +675,7 @@ public class GeneratorTests {
             //CREATE VALID PAYMENT
             Transaction payment = new RSend(generator, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.001),
                     "sss", new byte[3000], new byte[]{1}, new byte[]{0},
-                    timestamp++, generator.getLastTimestamp(snapshot));
+                    timestamp++, generator.getLastTimestamp(snapshot)[0]);
 
             payment.setDC(db, Transaction.FOR_NETWORK, 1, 1);
             payment.sign(generator, Transaction.FOR_NETWORK);
@@ -681,7 +685,7 @@ public class GeneratorTests {
             payment.process(genesisBlock, Transaction.FOR_NETWORK);
 
             //ADD TO UNCONFIRMED TRANSACTIONS
-            dcSet.getTransactionMap().add(payment);
+            dcSet.getTransactionTab().add(payment);
 
         }
 
@@ -741,18 +745,19 @@ public class GeneratorTests {
                 genesisBlock, orderedTransactions,
                 2,  1000, 1000l, 1000l);
 
+        int height = 2;
         // get timestamp for block
-        long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS / 2;
+        long timestampStart = newBlock.getTimestamp() - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) / 2;
         long timestamp = timestampStart;
 
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
         Transaction payment = new RSend(userAccount1, FEE_POWER, recipient, ERM_KEY, BigDecimal.valueOf(2000),
-                timestamp++, userAccount1.getLastTimestamp(dcSet));
+                timestamp++, userAccount1.getLastTimestamp(dcSet)[0]);
         payment.sign(userAccount1, Transaction.FOR_NETWORK);
         assertEquals(payment.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
         //ADD TO UNCONFIRMED TRANSACTIONS
-        dcSet.getTransactionMap().add(payment);
+        dcSet.getTransactionTab().add(payment);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         transactions = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l).a;
@@ -772,7 +777,7 @@ public class GeneratorTests {
             e.printStackTrace();
         }
 
-        int height = newBlock.getHeight();
+        height = newBlock.getHeight();
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
         Tuple2<Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
         assertEquals((int) forgingData.a, 2);

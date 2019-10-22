@@ -436,10 +436,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     //@Override // - fee + balance - calculate here
     private static long pointLogg;
     public int isValid(int asDeal, boolean isPerson, long flags) {
-        
-        for (byte[] valid_item : VALID_REC) {
-            if (Arrays.equals(this.signature, valid_item)) {
-                return VALIDATE_OK;
+
+        if (false) {
+            for (byte[] valid_item : VALID_REC) {
+                if (Arrays.equals(this.signature, valid_item)) {
+                    return VALIDATE_OK;
+                }
             }
         }
 
@@ -465,20 +467,22 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         // CHECK IF REFERENCE IS OK
         if (asDeal > Transaction.FOR_PACK) {
-            Long reference = this.creator.getLastTimestamp(dcSet);
-            if (reference.compareTo(this.timestamp) >= 0
+            long[] reference = this.creator.getLastTimestamp(dcSet);
+            if (reference != null && reference[0] >= this.timestamp
                     // при откатах для нового счета который первый раз сделал транзакцию
                     // из нулевого баланса - Референс будеть ошибочный
                     // поэтому отключим эту проверку тут
                     && !BlockChain.DEVELOP_USE
                     ) {
 
-                if (height > 0 && (BlockChain.CHECK_BUGS > 7
-                        || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000)) {
-                    pointLogg = System.currentTimeMillis();
-                    LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference)
-                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference)
-                            + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                if (height > 0 || BlockChain.CHECK_BUGS > 7
+                        || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
+                    if (BlockChain.TEST_DB == 0) {
+                        pointLogg = System.currentTimeMillis();
+                        LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
+                                + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                    }
                 }
 
                 return INVALID_TIMESTAMP;

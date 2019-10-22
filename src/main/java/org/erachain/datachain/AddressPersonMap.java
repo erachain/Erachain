@@ -4,7 +4,6 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple4;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -23,7 +22,7 @@ import java.util.TreeMap;
  ))
  */
 // TODO укротить до 20 байт адрес и ссылку на Long
-public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
+public class AddressPersonMap extends DCUMap<String, Stack<Tuple4<
         Long, // person key
         Integer, // end_date day
         Integer, // block height
@@ -37,22 +36,22 @@ public class AddressPersonMap extends DCMap<String, Stack<Tuple4<
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<String, Stack<Tuple4<Long, Integer, Integer, Integer>>> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("address_person")
+        map = database.createTreeMap("address_person")
                 .keySerializer(BTreeKeySerializer.STRING)
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<String, Stack<Tuple4<Long, Integer, Integer, Integer>>> getMemoryMap() {
+    protected void getMemoryMap() {
         // HashMap ?
-        return new TreeMap<String, Stack<Tuple4<Long, Integer, Integer, Integer>>>();
+        map = new TreeMap<String, Stack<Tuple4<Long, Integer, Integer, Integer>>>();
     }
 
     @Override

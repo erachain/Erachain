@@ -5,11 +5,9 @@ import org.erachain.core.transaction.Transaction;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
-public class DeployATMap extends DCMap<byte[], Long> {
+public class DeployATMap extends DCUMap<byte[], Long> {
 
     public DeployATMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -19,21 +17,21 @@ public class DeployATMap extends DCMap<byte[], Long> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<byte[], Long> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("DeployATOrphanData")
+        map = database.createTreeMap("DeployATOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], Long> getMemoryMap() {
-        return new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override
@@ -50,6 +48,6 @@ public class DeployATMap extends DCMap<byte[], Long> {
     }
 
     public void delete(Transaction transaction) {
-        this.delete(transaction.getSignature());
+        this.remove(transaction.getSignature());
     }
 }

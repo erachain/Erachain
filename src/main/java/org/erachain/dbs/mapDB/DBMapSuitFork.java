@@ -1,0 +1,278 @@
+package org.erachain.dbs.mapDB;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
+import lombok.Getter;
+import org.erachain.controller.Controller;
+import org.erachain.database.DBASet;
+import org.erachain.datachain.DCSet;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.ForkedMap;
+import org.mapdb.Fun;
+import org.slf4j.Logger;
+
+import java.util.*;
+
+/**
+ * Оболочка для Карты от конкретной СУБД чтобы эту оболочку вставлять в Таблицу, которая форкнута (см. fork()).
+ * Тут всегда должен быть задан Родитель. Здесь другой порядок обработки данных в СУБД
+ * @param <T>
+ * @param <U>
+<br><br>
+ВНИМАНИЕ !!! Вторичные ключи не хранят дубли - тоесть запись во втричном ключе не будет учтена иперезапишется если такой же ключ прийдет
+Поэтому нужно добавлять униальность
+
+ */
+public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements ForkedMap {
+
+    @Getter
+    protected DBTab<T, U> parent;
+
+    //ConcurrentHashMap deleted;
+    ///////// - если ключи набор байт или других примитивов - то неверный поиск в этом виде таблиц HashMap deleted;
+    /// поэтому берем медленный но правильный TreeMap
+    TreeMap<T, Boolean> deleted;
+    int shiftSize;
+
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+        assert (parent != null);
+
+        this.databaseSet = dcSet;
+        this.database = dcSet.database;
+        this.logger = logger;
+        this.defaultValue = defaultValue;
+
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                // у родителя чистим - у себя нет, так как только создали
+                ((DCSet)parent.getDBSet()).clearCache();
+                System.gc();
+                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                    logger.error("Heap Memory Overflow");
+                    Controller.getInstance().stopAll(1291);
+                }
+            }
+        }
+
+        this.parent = parent;
+
+        this.openMap();
+
+    }
+
+
+    // ERROR if key is not unique for each value:
+    // After removing the key from the fork, which is in the parent, an incorrect post occurs
+    //since from.deleted the key is removed and there is no parent in the parent and that
+    // the deleted ones are smaller and the size is increased by 1
+    @Override
+    public int size() {
+
+        int u = this.map.size();
+
+        if (this.deleted != null)
+            u -= this.deleted.size();
+
+        u -= this.shiftSize;
+        u += this.parent.size();
+
+        return u;
+    }
+
+    @Override
+    public U get(T key) {
+
+        try {
+            U u = this.map.get(key);
+            if (u != null) {
+                return u;
+            }
+
+            if (this.deleted == null || !this.deleted.containsKey(key)) {
+                u = this.parent.get(key);
+                return u;
+            }
+
+            u = this.getDefaultValue();
+            return u;
+        } catch (Exception e) {
+
+            logger.error(e.getMessage(), e);
+
+            U u = this.getDefaultValue();
+            return u;
+        }
+    }
+
+    @Override
+    public Set<T> keySet() {
+        Set<T> u = this.map.keySet();
+
+        u.addAll(this.parent.keySet());
+
+        return u;
+    }
+
+    @Override
+    public Collection<U> values() {
+        Collection<U> u = this.map.values();
+
+        u.addAll(this.parent.values());
+
+        return u;
+    }
+
+    @Override
+    public boolean set(T key, U value) {
+
+        try {
+
+            U old = this.map.put(key, value);
+
+            if (this.deleted != null) {
+                if (this.deleted.remove(key) != null)
+                    ++this.shiftSize;
+            }
+
+            return old != null;
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    @Override
+    public void put(T key, U value) {
+        set(key, value);
+    }
+
+    @Override
+    public U remove(T key) {
+
+        U value = this.map.remove(key);
+
+        if (this.deleted == null) {
+            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
+        }
+
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
+
+        if (value == null) {
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
+        }
+
+        return value;
+
+    }
+
+    @Override
+    public U removeValue(T key) {
+        return remove(key);
+    }
+
+    @Override
+    public void delete(T key) {
+        remove(key);
+    }
+
+    @Override
+    public void deleteValue(T key) {
+        remove(key);
+    }
+
+    @Override
+    public boolean contains(T key) {
+
+        if (this.map.containsKey(key)) {
+            return true;
+        } else {
+            if (this.deleted == null || !this.deleted.containsKey(key)) {
+                boolean u = this.parent.contains(key);
+
+                return u;
+            }
+        }
+
+        return false;
+    }
+
+    // TODO надо рекурсию к Родителю по итератору делать
+    @Override
+    public Iterator<T> getIterator(int index, boolean descending) {
+        this.addUses();
+
+        Iterator<T> iterator;
+
+        if (index > 0) {
+            // 0 - это главный индекс - он не в списке indexes
+            NavigableSet<Fun.Tuple2<?, T>> indexSet = getIndex(index, descending);
+            if (indexSet != null) {
+                iterator = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
+            } else {
+                if (descending) {
+                    iterator = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                } else {
+                    iterator = this.map.keySet().iterator();
+                }
+            }
+        } else {
+            if (descending) {
+                iterator = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+            } else {
+                iterator = this.map.keySet().iterator();
+            }
+        }
+
+        iterator = Iterators.mergeSorted(ImmutableList.of(parent.getIterator(index, descending), iterator), Fun.COMPARATOR);
+
+        this.outUses();
+        return iterator;
+
+    }
+
+    @Override
+    public Iterator<T> getIterator() {
+        this.addUses();
+
+        //Map uncastedMap = this.map;
+        Iterator<T> iterator = Iterators.mergeSorted(ImmutableList.of(parent.getIterator(), map.keySet().iterator()), Fun.COMPARATOR);
+
+        this.outUses();
+        return iterator;
+
+    }
+
+
+    @Override
+    public void writeToParent() {
+        Iterator<T> iterator = this.map.keySet().iterator();
+        while (iterator.hasNext()) {
+            T key = iterator.next();
+            parent.put(key, this.map.get(key));
+        }
+
+        if (deleted != null) {
+            iterator = this.deleted.keySet().iterator();
+            while (iterator.hasNext()) {
+                parent.delete(iterator.next());
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + ".FORK";
+    }
+
+}

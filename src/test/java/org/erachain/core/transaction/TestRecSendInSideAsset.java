@@ -72,7 +72,7 @@ public class TestRecSendInSideAsset {
     // INIT ASSETS
     private void init(boolean withIssue) {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         cntrl = Controller.getInstance();
         cntrl.initBlockChain(db);
         bchain = cntrl.getBlockChain();
@@ -80,10 +80,10 @@ public class TestRecSendInSideAsset {
         //gb.process(db);
 
         // FEE FUND
-        creditor.setLastTimestamp(gb.getTimestamp(), db);
+        creditor.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         creditor.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
-        emitter.setLastTimestamp(gb.getTimestamp(), db);
+        emitter.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         emitter.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
 
         asset = new AssetVenture(creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);

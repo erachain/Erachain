@@ -82,7 +82,7 @@ public class TestRecPerson {
     // INIT PERSONS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         dbPA = db.getPersonAddressMap();
         dbAP = db.getAddressPersonMap();
         dbPS = db.getPersonStatusMap();
@@ -115,7 +115,7 @@ public class TestRecPerson {
         genesis_certify.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
-        certifier.setLastTimestamp(last_ref, db);
+        certifier.setLastTimestamp(new long[]{last_ref, 0}, db);
         certifier.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
@@ -125,7 +125,7 @@ public class TestRecPerson {
 
         //person.setKey(genesisPersonKey + 1);
         //CREATE ISSUE PERSON TRANSACTION
-        issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastTimestamp(db));
+        issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);
 
         sertifiedPrivateKeys.add(userAccount1);
         sertifiedPrivateKeys.add(userAccount2);
@@ -156,7 +156,7 @@ public class TestRecPerson {
         timestamp += 100;
         r_SertifyPubKeys = new RSertifyPubKeys(version, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
-                timestamp, certifier.getLastTimestamp(db));
+                timestamp, certifier.getLastTimestamp(db)[0]);
 
     }
 
@@ -173,7 +173,7 @@ public class TestRecPerson {
         assertEquals(true, issuePersonTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastTimestamp(db), new byte[64]);
+        issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0], new byte[64]);
         //CHECK IF ISSUE PERSON IS INVALID
         assertEquals(false, issuePersonTransaction.isSignatureValid(db));
 
@@ -191,7 +191,7 @@ public class TestRecPerson {
         assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ISSUE PERSON - INVALID PERSONALIZE
-        issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);
+        issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db)[0], new byte[64]);
         assertEquals(Transaction.NOT_ENOUGH_FEE, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
         userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
@@ -376,19 +376,19 @@ public class TestRecPerson {
         //CREATE INVALID PERSONALIZE RECORD NOT ENOUGH ERM BALANCE
         RSertifyPubKeys personalizeRecord_0 = new RSertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
                 sertifiedPublicKeys,
-                356, timestamp, userAccount1.getLastTimestamp(db));
+                356, timestamp, userAccount1.getLastTimestamp(db)[0]);
         assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
         personalizeRecord_0 = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey + 10,
                 sertifiedPublicKeys,
-                356, timestamp, certifier.getLastTimestamp(db));
+                356, timestamp, certifier.getLastTimestamp(db)[0]);
         assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ISSUE PERSON FOR INVALID PERSONALIZE
         personalizeRecord_0 = new RSertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
                 sertifiedPublicKeys,
-                356, timestamp, userAccount1.getLastTimestamp(db));
+                356, timestamp, userAccount1.getLastTimestamp(db)[0]);
         //CREATE INVALID ISSUE PERSON - NOT FEE
         personalizeRecord_0.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
@@ -406,7 +406,7 @@ public class TestRecPerson {
         sertifiedPublicKeys011.add(new PublicKeyAccount(userAccount3.getPublicKey()));
         personalizeRecord_0 = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys011,
-                356, timestamp, certifier.getLastTimestamp(db));
+                356, timestamp, certifier.getLastTimestamp(db)[0]);
         assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
     }
@@ -427,7 +427,7 @@ public class TestRecPerson {
         version = 1;
         r_SertifyPubKeys = new RSertifyPubKeys(version, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
-                timestamp, certifier.getLastTimestamp(db));
+                timestamp, certifier.getLastTimestamp(db)[0]);
 
         r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
         // + sign by user
@@ -693,7 +693,7 @@ public class TestRecPerson {
         int end_date = 222;
         r_SertifyPubKeys = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
-                end_date, timestamp, certifier.getLastTimestamp(db));
+                end_date, timestamp, certifier.getLastTimestamp(db)[0]);
         r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
         r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
         r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
@@ -710,7 +710,7 @@ public class TestRecPerson {
         int end_date2 = -12;
         r_SertifyPubKeys = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
-                end_date2, timestamp, certifier.getLastTimestamp(db));
+                end_date2, timestamp, certifier.getLastTimestamp(db)[0]);
         r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
         r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
         r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
@@ -773,7 +773,7 @@ public class TestRecPerson {
         BigDecimal erm_amount_user = userAccount1.getBalanceUSE(ERM_KEY, db);
         BigDecimal oil_amount_user = userAccount1.getBalanceUSE(FEE_KEY, db);
 
-        last_ref = certifier.getLastTimestamp(db);
+        last_ref = certifier.getLastTimestamp(db)[0];
 
         //// PROCESS /////
         r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);

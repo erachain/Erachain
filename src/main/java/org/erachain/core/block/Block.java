@@ -3,6 +3,7 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
+import lombok.Getter;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
@@ -15,13 +16,9 @@ import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RCalculated;
-import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.datachain.TransactionFinalMapSigns;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.*;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
@@ -35,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -62,7 +60,7 @@ import java.util.*;
             + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
     public static final int DATA_SIGN_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TRANSACTIONS_HASH_LENGTH;
-    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getSimpleName());
     /// HEAD of BLOCK ///
     // FACE
     protected int version;
@@ -93,12 +91,15 @@ import java.util.*;
     //protected Long atFees;
     protected byte[] atBytes;
 
+    private boolean fromTrustedPeer = false;
     // FORGING INFO
     // при обработке трнзакций используем для запоминания что данные менялись
     protected List<Account> forgingInfoUpdate;
 
     // was validated
     protected boolean wasValidated;
+    @Getter
+    protected DCSet validatedForkDB;
 
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
     public static class BlockHead implements ExplorerJsonLine {
@@ -721,6 +722,13 @@ import java.util.*;
         return false;
     }
 
+    public void setFromTrustedPeer() {
+        this.fromTrustedPeer = true;
+    }
+    public boolean isFromTrustedPeer() {
+        return this.fromTrustedPeer;
+    }
+
     public byte[] getSignature() {
         return this.signature;
     }
@@ -938,7 +946,8 @@ import java.util.*;
             return BigDecimal.ZERO;
         }
 
-        int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;
+        // in OLD protocol it USED - and heightBlock get AS 1
+        int inDay30 = BlockChain.BLOCKS_PER_DAY(1) * 30;
 
         BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
 
@@ -950,10 +959,8 @@ import java.util.*;
                 return BigDecimal.valueOf(60000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
                 return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
-                return BigDecimal.valueOf(40000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (false && this.heightBlock < inDay30 << 6) //  256 mounth
-                return BigDecimal.valueOf(30000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+            else if (this.heightBlock > BlockChain.VERS_30SEC)
+                return BigDecimal.valueOf(2000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else
                 return BigDecimal.valueOf(20000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
         } else {
@@ -1431,9 +1438,13 @@ import java.util.*;
         long thisTimestamp = NTP.getTime();
         //logger.debug("*** Block[" + height + "] " + new Timestamp(myTime));
 
-        if (blockTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > thisTimestamp) {
+        // необходимо разрешить более ранюю сборку - так чтобы мой собственный блок можно было собрать заранее
+        // и потом его провалидировать и послать куда подальше
+        // свой блок собирается аккурат мо моему NTP.getTime() и поэтому нет смысла вносить большие задержки от смещения мирового
+        // однако если блок прилетел из-вне то мещения мировые могут его сделать невалидными и норм
+        if (blockTime - 100 > thisTimestamp) {
             LOGGER.debug("*** Block[" + this.heightBlock + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
-                    + " \n " + " diff sec: " + (blockTime - thisTimestamp) / 1000);
+                    + " \n Block time: " + new Timestamp(blockTime) + " -- NTP: " + new Timestamp(thisTimestamp));
             return false;
         }
 
@@ -1472,14 +1483,17 @@ import java.util.*;
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
 
-            LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
-            LOGGER.debug("*** forgingValue: " + this.forgingValue);
+            LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue
+                + " Creator: " + this.creator.getAddress());
+            LOGGER.debug("*** forging Value: " + this.forgingValue
+                + " creator Data: " + creator.getForgingData(dcSet, heightBlock)
+                + " creator LAST Data: " + creator.getLastForgingData(dcSet));
             return false;
         }
 
         this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
         if (parentBlockHead == null) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "] not form broken CHAIN - not found Parent Block");
+            LOGGER.debug("*** Block[" + this.heightBlock + "] not found Parent HEAD OR my BlocksHeadsMap was broken");
             return false;
         }
 
@@ -1517,17 +1531,29 @@ import java.util.*;
         return true;
     }
 
-    public boolean isValid(DCSet dcSet, boolean andProcess) {
+    /**
+     * проверка блока с возможностью исполнения. При этом с заданной базой где делать форк.
+     * Если проверка одного блока то в памяти можно делать форк
+     *
+     * @param dcSetPlace DB place - make it outside
+     * @param andProcess and process it
+     * @return
+     */
+    public boolean isValid(DCSet dcSetPlace, boolean andProcess) {
+
+        if (validatedForkDB != null) {
+            try {
+                validatedForkDB.close();
+            } catch (Exception e) {
+            }
+        }
+        validatedForkDB = null;
+        wasValidated = false;
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
-        if (heightBlock > 11482) {
-            // rro
-            Long test = null;
-        }
-
         // TRY CHECK HEAD
-        if (!this.isValidHead(dcSet))
+        if (!this.isValidHead(dcSetPlace))
             return false;
 
         Controller cnt = Controller.getInstance();
@@ -1563,7 +1589,7 @@ import java.util.*;
 
             this.getTransactions();
 
-            boolean isPrimarySet = !dcSet.isFork();
+            boolean isPrimarySet = !dcSetPlace.isFork();
 
             long timerProcess = 0;
             long timerRefsMap_set = 0;
@@ -1571,29 +1597,22 @@ import java.util.*;
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
-            long timestampEnd = this.getTimestamp()
-                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS : BlockChain.FLUSH_TIMEPOINT)
-                    - BlockChain.UNCONFIRMED_SORT_WAIT_MS
-                    + 10;
-            // because time filter used by parent block timestamp on core.BlockGenerator.run()
-            //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
+            long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
 
-            DCSet validatingDC;
-
-            // RESET forginf Info Updates
+            // RESET forging Info Updates
             this.forgingInfoUpdate = null;
 
             if (andProcess) {
-                validatingDC = dcSet;
-                if (dcSet.isFork() || cnt.noCalculated) {
+                if (cnt.noCalculated) {
                     this.txCalculated = null;
                 } else {
+                    // даже если это в Форке - если Полный Расчет то Калкулатед нужно вычислять
+                    // для последующего слива в цепочку
                     // make pool for calculated
                     this.txCalculated = new ArrayList<RCalculated>();
                 }
             } else {
                 long processTiming = System.nanoTime();
-                validatingDC = dcSet.fork();
                 processTiming = (System.nanoTime() - processTiming) / 1000;
                 if (processTiming < 999999999999l) {
                     LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
@@ -1606,34 +1625,50 @@ import java.util.*;
             long processTimingLocal;
             long processTimingLocalDiff;
 
-            //DLSet dbSet = Controller.getInstance().getDBSet();
-            TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
-            TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
-            TransactionFinalMapSigns transFinalMapSigns = validatingDC.getTransactionFinalMapSigns();
+            TransactionTab unconfirmedMap = dcSetPlace.getTransactionTab();
+            TransactionFinalMapImpl finalMap = dcSetPlace.getTransactionFinalMap();
+            TransactionFinalMapSigns transFinalMapSigns = dcSetPlace.getTransactionFinalMapSigns();
 
             int seqNo = 0;
-            // need for CLOSE DBFork
-            try {
-                for (Transaction transaction : this.transactions) {
-                    if (cnt.isOnStopping())
+            for (Transaction transaction : this.transactions) {
+                if (cnt.isOnStopping())
+                    return false;
+
+                seqNo++;
+                transactionSignature = transaction.getSignature();
+
+                if (!transaction.isWiped()) {
+
+                    //CHECK IF NOT GENESIS TRANSACTION
+                    if (transaction.getCreator() == null) {
+                        // ALL GENESIS transaction
+                        LOGGER.debug("*** Block[" + this.heightBlock
+                                + "].Tx[" + seqNo + " : " ///this.getTransactionSeq(transaction.getSignature()) + " : "
+                                + transaction.viewFullTypeName() + "]"
+                                + "creator is Null!"
+                        );
                         return false;
+                    }
 
-                    seqNo++;
-
-                    if (!transaction.isWiped()) {
-
-                        //CHECK IF NOT GENESIS TRANSACTION
-                        if (transaction.getCreator() == null) {
-                            // ALL GENESIS transaction
-                            LOGGER.debug("*** Block[" + this.heightBlock
-                                    + "].Tx[" + seqNo + " : " ///this.getTransactionSeq(transaction.getSignature()) + " : "
-                                    + transaction.viewFullTypeName() + "]"
-                                    + "creator is Null!"
-                            );
-                            return false;
+                    boolean isSignatureValid = false;
+                    // TRY QUCK check SIGNATURE by FIND in POOL
+                    try {
+                        if (!unconfirmedMap.isClosed() && unconfirmedMap.contains(transactionSignature)) {
+                            isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature));
+                        } else {
+                            unconfirmedMap = dcSetPlace.getTransactionTab();
                         }
+                    } catch (java.lang.Throwable e) {
+                        if (e instanceof java.lang.IllegalAccessError) {
+                            // налетели на закрытую таблицу
+                            unconfirmedMap = dcSetPlace.getTransactionTab();
+                        } else {
+                            LOGGER.error(e.getMessage(), e);
+                        }
+                    }
 
-                        if (!transaction.isSignatureValid(validatingDC)) {
+                    if (!isSignatureValid) {
+                        if (!transaction.isSignatureValid(dcSetPlace)) {
                             //
                             LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                     + ":" + transaction.viewFullTypeName()
@@ -1641,152 +1676,149 @@ import java.util.*;
                                     + " " + Base58.encode(transaction.getSignature()));
                             return false;
                         }
-
-                        //CHECK TIMESTAMP AND DEADLINE
-                        if (this.heightBlock > 105999
-                                && transaction.getTimestamp() > timestampEnd
-                            //|| transaction.getDeadline() <= timestampBeg // не нужно так как при слиянии цепочек
-                            // могут и должны страрые транзакции заноситься
-                        ) {
-                            LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                    + ":" + transaction.viewFullTypeName()
-                                    + " timestampEnd invalid"
-                                    + " " + Base58.encode(transaction.getSignature()));
-                            return false;
-                        }
-
-                        transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
-
-                        //CHECK IF VALID
-                        // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
-                        // все равно их потом удалим - иначе при откатах может случиться оказия - что и в блоке она есть и в неподтвержденных
-                        if (transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION)
-                                != Transaction.VALIDATE_OK) {
-                            LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                    + ":" + transaction.viewFullTypeName()
-                                    + " invalid code: " + transaction.isValid(Transaction.FOR_NETWORK, 0l)
-                                    + " " + Base58.encode(transaction.getSignature()));
-                            return false;
-                        }
-
-                        processTimingLocal = System.nanoTime();
-                        try {
-                            transaction.process(this, Transaction.FOR_NETWORK);
-                        } catch (Exception e) {
-                            if (cnt.isOnStopping())
-                                return false;
-
-                            LOGGER.error("*** " + this.heightBlock + "-" + seqNo
-                                    + ":" + transaction.viewFullTypeName() + e.getMessage(), e);
-                            return false;
-                        }
-
-                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                        if (processTimingLocalDiff < 999999999999l)
-                            timerProcess += processTimingLocalDiff / 1000;
-
-                    } else {
-
-                        transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
-
-                        //UPDATE REFERENCE OF SENDER
-                        if (transaction.isReferenced())
-                            // IT IS REFERENCED RECORD?
-                            transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), validatingDC);
                     }
 
-                    transactionSignature = transaction.getSignature();
+                    //CHECK TIMESTAMP AND DEADLINE
+                    if (BlockChain.DEVELOP_USE && heightBlock > 494000
+                            && transaction.getTimestamp() > timestampEnd
+                            || !BlockChain.DEVELOP_USE
+                            && (heightBlock > BlockChain.VERS_30SEC && transaction.getTimestamp() > timestampEnd)
+                            || heightBlock > 278989
+                            && transaction.getTimestamp()
+                            > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
+                    ) {
+                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction.viewFullTypeName()
+                                + " timestamp Overhead"
+                                + " for diff: " + (transaction.getTimestamp() - timestampEnd)
+                                + " " + Base58.encode(transaction.getSignature())
+                        );
+                        return false;
+                    }
 
-                    if (andProcess) {
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
-                        //SET PARENT
-                        ///logger.debug("[" + seqNo + "] try refsMap.set" );
-                        if (isPrimarySet) {
-                            //REMOVE FROM UNCONFIRMED DATABASE
-                            ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
-                            processTimingLocal = System.nanoTime();
-                            unconfirmedMap.delete(transactionSignature);
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
-                        }
+                    //CHECK IF VALID
+                    // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
+                    // все равно их потом удалим - иначе при откатах может случиться оказия - что и в блоке она есть и в неподтвержденных
+                    if (transaction.isValid(Transaction.FOR_NETWORK, Transaction.NOT_VALIDATE_KEY_COLLISION)
+                            != Transaction.VALIDATE_OK) {
+                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction.viewFullTypeName()
+                                + " invalid code: " + transaction.isValid(Transaction.FOR_NETWORK, 0l)
+                                + " " + Base58.encode(transaction.getSignature()));
+                        return false;
+                    }
 
+                    processTimingLocal = System.nanoTime();
+                    try {
+                        transaction.process(this, Transaction.FOR_NETWORK);
+                    } catch (Exception e) {
                         if (cnt.isOnStopping())
                             return false;
 
-                        if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                                && ((RSend) transaction).getAssetKey() != 1) {
-                            ;
-                        } else {
-
-                            ///logger.debug("[" + seqNo + "] try finalMap.set" );
-                            processTimingLocal = System.nanoTime();
-                            Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                            finalMap.set(key, transaction);
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerFinalMap_set += processTimingLocalDiff / 1000;
-
-                            processTimingLocal = System.nanoTime();
-                            transFinalMapSigns.set(transactionSignature, key);
-                            List<byte[]> signatures = transaction.getOtherSignatures();
-                            if (signatures != null) {
-                                for (byte[] itemSignature : signatures) {
-                                    transFinalMapSigns.set(itemSignature, key);
-                                }
-                            }
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
-
-                        }
-
-                    } else {
-
-                        if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                                && ((RSend) transaction).getAssetKey() != 1) {
-                            ;
-                        } else {
-
-                            // for some TRANSACTIONs need add to FINAM MAP etc.
-                            // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
-
-                            processTimingLocal = System.nanoTime();
-                            Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                            finalMap.set(key, transaction);
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerFinalMap_set += processTimingLocalDiff / 1000;
-
-                            processTimingLocal = System.nanoTime();
-                            transFinalMapSigns.set(transactionSignature, key);
-                            List<byte[]> signatures = transaction.getOtherSignatures();
-                            if (signatures != null) {
-                                for (byte[] itemSignature : signatures) {
-                                    transFinalMapSigns.set(itemSignature, key);
-                                }
-                            }
-                            processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                            if (processTimingLocalDiff < 999999999999l)
-                                timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
-                        }
+                        LOGGER.error("*** " + this.heightBlock + "-" + seqNo
+                                + ":" + transaction.viewFullTypeName() + e.getMessage(), e);
+                        return false;
                     }
 
-                    System.arraycopy(transactionSignature, 0, transactionsSignatures, transactionsSignaturesPos, SIGNATURE_LENGTH);
-                    transactionsSignaturesPos += SIGNATURE_LENGTH;
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerProcess += processTimingLocalDiff / 1000;
 
+                } else {
+
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
+
+                    //UPDATE REFERENCE OF SENDER
+                    transaction.getCreator().setLastTimestamp(
+                            new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSetPlace);
                 }
 
-            } finally {
-                if (!andProcess) {
-                    // тут точно былл Фор базы данных для проверки
-                    // закроем ее
-                    validatingDC.close();
+                if (andProcess) {
+
+                    //SET PARENT
+                    ///logger.debug("[" + seqNo + "] try refsMap.set" );
+                    if (true // в любом случае нужно просчитывать если Полный Просчет
+                            // - чтобы потом слить в основную цепочку
+                                || isPrimarySet) {
+                        //REMOVE FROM UNCONFIRMED DATABASE
+                        ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
+                        processTimingLocal = System.nanoTime();
+                        try {
+                            if (!unconfirmedMap.isClosed()) {
+                                unconfirmedMap.remove(transactionSignature);
+                            } else {
+                                unconfirmedMap = dcSetPlace.getTransactionTab();
+                            }
+                        } catch (java.lang.Throwable e) {
+                            if (e instanceof java.lang.IllegalAccessError) {
+                                // налетели на закрытую таблицу
+                                unconfirmedMap = dcSetPlace.getTransactionTab();
+                            } else {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
+                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                        if (processTimingLocalDiff < 999999999999l)
+                            timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
+                    }
+
+                    if (cnt.isOnStopping())
+                        return false;
+
+                    ///logger.debug("[" + seqNo + "] try finalMap.set" );
+                    processTimingLocal = System.nanoTime();
+                    Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
+                    finalMap.set(key, transaction);
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerFinalMap_set += processTimingLocalDiff / 1000;
+
+                    processTimingLocal = System.nanoTime();
+                    transFinalMapSigns.set(transactionSignature, key);
+                    List<byte[]> signatures = transaction.getOtherSignatures();
+                    if (signatures != null) {
+                        for (byte[] itemSignature : signatures) {
+                            transFinalMapSigns.set(itemSignature, key);
+                        }
+                    }
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
+
+                } else {
+
+                    // for some TRANSACTIONs need add to FINAM MAP etc.
+                    // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
+
+                    processTimingLocal = System.nanoTime();
+                    Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
+                    finalMap.set(key, transaction);
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerFinalMap_set += processTimingLocalDiff / 1000;
+
+                    processTimingLocal = System.nanoTime();
+                    transFinalMapSigns.set(transactionSignature, key);
+                    List<byte[]> signatures = transaction.getOtherSignatures();
+                    if (signatures != null) {
+                        for (byte[] itemSignature : signatures) {
+                            transFinalMapSigns.set(itemSignature, key);
+                        }
+                    }
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                 }
+
+                System.arraycopy(transactionSignature, 0, transactionsSignatures, transactionsSignaturesPos, SIGNATURE_LENGTH);
+                transactionsSignaturesPos += SIGNATURE_LENGTH;
+
             }
 
-            if (!dcSet.isFork()) {
-                // если это просчет уже для записи в нашу базу данных а не при выборе Цепочки для синхронизации
+            if (andProcess) {
+                // если это просчет уже для записи в нашу базу данных
                 processTiming = System.nanoTime() - processTiming;
                 if (processTiming < 999999999999l) {
                     // при переполнении может быть минус
@@ -1800,7 +1832,7 @@ import java.util.*;
             }
 
             long tickets = System.currentTimeMillis() - timerStart;
-            if (!dcSet.isFork() || tickets > 1000) {
+            if (isPrimarySet || tickets / (transactionCount + 1) > 1) {
                 LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
                         + this.transactionCount + " " + tickets + "[ms] " + tickets / this.transactionCount + "[ms/tx]"
                         + " Proc[us]: " + timerProcess
@@ -1811,7 +1843,6 @@ import java.util.*;
                         + " FinalSet[us]: " + timerFinalMap_set
                 );
             }
-
 
             /**
              * Только если есть транзакции тогда имеет смысл проверять их общий ХЭШ
@@ -1830,7 +1861,7 @@ import java.util.*;
             if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
                 LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
                         + " transactionCount: " + transactionCount
-                        + (atBytesLength > 0? " atBytes: " + atBytesLength: ""));
+                        + (atBytesLength > 0 ? " atBytes: " + atBytesLength : ""));
                 return false;
             }
 
@@ -1839,14 +1870,14 @@ import java.util.*;
         //BLOCK IS VALID
         if (andProcess) {
             try {
-                this.process_after(cnt, dcSet);
+                this.process_after(cnt, dcSetPlace);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 return false;
             }
 
             timerStart = System.nanoTime();
-            dcSet.getBlockMap().add(this);
+            dcSetPlace.getBlockMap().add(this);
             timerStart = System.nanoTime() - timerStart;
             if (timerStart < 999999999999l)
                 LOGGER.debug("BlockMap add timer [us]: " + timerStart / 1000 + " [" + this.heightBlock + "]");
@@ -1854,7 +1885,39 @@ import java.util.*;
         }
 
         this.wasValidated = true;
+        if (andProcess) {
+            validatedForkDB = dcSetPlace;
+        }
         return true;
+    }
+
+    /**
+     * Скорее всего база уже закрыта выше - очистим
+     */
+    public void clearValidatedForkDB() {
+        validatedForkDB = null;
+    }
+
+    /**
+     * Закрывает базу в котрой производилась проверка блока
+     */
+    public void close() {
+        if (validatedForkDB != null) {
+            try {
+                validatedForkDB.close();
+                LOGGER.debug("validatedForkDB closed ");
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public void saveToChainFromvalidatedForkDB() {
+        validatedForkDB.writeToParent();
+        try {
+            validatedForkDB.close();
+        } catch (Exception e) {
+        }
+        validatedForkDB = null;
     }
 
     //PROCESS/ORPHAN
@@ -1871,9 +1934,9 @@ import java.util.*;
 
         if (BlockChain.ROBINHOOD_USE) {
             // find rich account
-            String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
+            byte[] rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
-            if (!rich.equals(this.creator.getAddress())) {
+            if (!this.creator.equals(rich)) {
                 emittedFee = this.blockHead.totalFee >> 1;
 
                 Account richAccount = new Account(rich);
@@ -1917,15 +1980,16 @@ import java.util.*;
 
         // TEST COMPU ORPHANs
         HashMap bals = new HashMap();
-        Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+        Collection<byte[]> keys = dcSet.getAssetBalanceMap().keySet();
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalNeg = BigDecimal.ZERO;
-        for (Tuple2<String, Long> key : keys) {
-            if (key.b == 2l) {
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
-                        .getAssetBalanceMap().get(key);
+        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        for (byte[] key : keys) {
+            if (ItemAssetBalanceTab.getAssetKeyFromKey(key) == 2l) {
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
+                    map.get(key);
 
-                bals.put(key.a, ball.a.b);
+                bals.put(ItemAssetBalanceTab.getShortAccountFromKey(key), ball.a.b);
             }
         }
         totalCOMPUtest.put(height, bals);
@@ -1938,16 +2002,17 @@ import java.util.*;
         if (parentBalanses != null) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
             BigDecimal ballParent;
-            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            Collection<byte[]> keys = dcSet.getAssetBalanceMap().keySet();
+            ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
             boolean error = false;
-            for (Tuple2<String, Long> key : keys) {
-                if (key.b == 2l) {
+            for (byte[] key : keys) {
+                if (ItemAssetBalanceTab.getAssetKeyFromKey(key) == 2l) {
                     ball = dcSet.getAssetBalanceMap().get(key);
 
-                    ballParent = (BigDecimal) parentBalanses.get(key.a);
+                    ballParent = (BigDecimal) parentBalanses.get(ItemAssetBalanceTab.getShortAccountFromKey(key));
                     if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
                             || ballParent == null && ball.a.b.signum() != 0) {
-                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + key.a
+                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + ItemAssetBalanceTab.getShortAccountFromKey(key)
                                 + " balParent : " + (ballParent == null ? "NULL" : ballParent.toPlainString())
                                 + " ---> " + (ball == null ? "NULL" : ball.a.b.toPlainString())
                                 + " == " + ball.a.b.subtract(ballParent == null ? BigDecimal.ZERO : ballParent));
@@ -1986,7 +2051,7 @@ import java.util.*;
                 int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
                 if (privousForgingPoint == null) {
                     if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                        if (BlockChain.DEVELOP_USE) {
+                        if (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) {
                             // запоминаем чтобы не было отказов в сборке блоков
                             account.setForgingData(dcSet, this.heightBlock - BlockChain.DEVELOP_FORGING_START,
                                     currentForgingBalance);
@@ -2070,7 +2135,7 @@ import java.util.*;
         }
 
         //PROCESS TRANSACTIONS
-        byte[] blockSignature = this.getSignature();
+        //byte[] blockSignature = this.getSignature();
         byte[] transactionSignature;
 
         // RESET forginf Info Updates
@@ -2087,8 +2152,8 @@ import java.util.*;
             }
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
-            TransactionMap unconfirmedMap = dcSet.getTransactionMap();
-            TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+            TransactionTab unconfirmedMap = dcSet.getTransactionTab();
+            TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
             long timerProcess = 0;
@@ -2111,15 +2176,17 @@ import java.util.*;
                 transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                 //PROCESS
-                if (!transaction.isWiped()) {
+                if (transaction.isWiped()
+                        || BlockChain.DEVELOP_USE && heightBlock > 473600 && heightBlock < 493700
+                                && transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION
+                        ) {
+                    //UPDATE REFERENCE OF SENDER
+                    transaction.getCreator().setLastTimestamp(
+                            new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
+                } else {
                     timerStart = System.currentTimeMillis();
                     transaction.process(this, Transaction.FOR_NETWORK);
                     timerProcess += System.currentTimeMillis() - timerStart;
-                } else {
-                    //UPDATE REFERENCE OF SENDER
-                    if (transaction.isReferenced())
-                        // IT IS REFERENCED RECORD?
-                        transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), dcSet);
                 }
 
                 transactionSignature = transaction.getSignature();
@@ -2130,34 +2197,41 @@ import java.util.*;
                 //REMOVE FROM UNCONFIRMED DATABASE
                 ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
-                unconfirmedMap.delete(transactionSignature);
+                try {
+                    if (!unconfirmedMap.isClosed()) {
+                        unconfirmedMap.remove(transactionSignature);
+                    } else {
+                        unconfirmedMap = dcSet.getTransactionTab();
+                    }
+                } catch (java.lang.Throwable e) {
+                    if (e instanceof java.lang.IllegalAccessError) {
+                        // налетели на закрытую таблицу
+                        unconfirmedMap = dcSet.getTransactionTab();
+                    } else {
+                        throw new Exception(e);
+                    }
+                }
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
-                if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                        && ((RSend) transaction).getAssetKey() != 1) {
+                Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
 
-                } else {
+                if (cnt.isOnStopping())
+                    throw new Exception("on stoping");
 
-                    Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-
-                    if (cnt.isOnStopping())
-                        throw new Exception("on stoping");
-
-                    ///logger.debug("[" + seqNo + "] try finalMap.set" );
-                    timerStart = System.currentTimeMillis();
-                    finalMap.set(key, transaction);
-                    timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                    //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
-                    timerStart = System.currentTimeMillis();
-                    transFinalMapSinds.set(transactionSignature, key);
-                    List<byte[]> signatures = transaction.getOtherSignatures();
-                    if (signatures != null) {
-                        for (byte[] itemSignature : signatures) {
-                            transFinalMapSinds.set(itemSignature, key);
-                        }
+                ///logger.debug("[" + seqNo + "] try finalMap.set" );
+                timerStart = System.currentTimeMillis();
+                finalMap.set(key, transaction);
+                timerFinalMap_set += System.currentTimeMillis() - timerStart;
+                //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
+                timerStart = System.currentTimeMillis();
+                transFinalMapSinds.set(transactionSignature, key);
+                List<byte[]> signatures = transaction.getOtherSignatures();
+                if (signatures != null) {
+                    for (byte[] itemSignature : signatures) {
+                        transFinalMapSinds.set(itemSignature, key);
                     }
-                    timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
                 }
+                timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 
             }
 
@@ -2177,8 +2251,8 @@ import java.util.*;
 
         long tickets = System.currentTimeMillis() - start;
         if (transactionCount > 0 && tickets > 10 || tickets > 10) {
-            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets * 0.001
-                    + ", TXs= " + this.transactionCount
+            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets
+                    + " ms, TXs= " + this.transactionCount
                     + (transactionCount == 0? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
         }
 
@@ -2230,7 +2304,8 @@ import java.util.*;
                 if (!this.getCreator().equals(account)) {
                     // если этот блок не собирался этим человеком
                     Tuple2<Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
-                    if (lastForgingPoint != null && lastForgingPoint.a == heightBlock
+                    if (true // теперь можно удалять полностью - внутри идет проверка
+                            || lastForgingPoint != null && lastForgingPoint.a == heightBlock
                             && !this.getCreator().equals(account)) {
                         account.delForgingData(dcSet, heightBlock);
                     }
@@ -2275,8 +2350,8 @@ import java.util.*;
 
         boolean notFork = !dcSet.isFork();
 
-        TransactionMap unconfirmedMap = dcSet.getTransactionMap();
-        TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+        TransactionTab unconfirmedMap = dcSet.getTransactionTab();
+        TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
         this.getTransactions();
@@ -2297,21 +2372,31 @@ import java.util.*;
                 transaction.orphan(this, Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
-                if (transaction.isReferenced()) {
-                    //UPDATE REFERENCE OF SENDER
-                    transaction.getCreator().removeLastTimestamp(dcSet);
-                }
+                transaction.getCreator().removeLastTimestamp(dcSet);
             }
 
             if (notFork) {
                 if (!notStoreTXs) {
                     //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-                    unconfirmedMap.add(transaction);
+                    try {
+                        if (!unconfirmedMap.isClosed()) {
+                            unconfirmedMap.add(transaction);
+                        } else {
+                            unconfirmedMap = dcSet.getTransactionTab();
+                        }
+                    } catch (java.lang.Throwable e) {
+                        if (e instanceof java.lang.IllegalAccessError) {
+                            // налетели на закрытую таблицу
+                            unconfirmedMap = dcSet.getTransactionTab();
+                        } else {
+                            throw new Exception(e);
+                        }
+                    }
                 }
 
                 Long key = Transaction.makeDBRef(height, seqNo);
 
-                finalMap.delete(key);
+                finalMap.remove(key);
                 transFinalMapSinds.delete(transaction.getSignature());
                 List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {

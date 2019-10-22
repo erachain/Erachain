@@ -55,7 +55,7 @@ public class Wallet extends Observable implements Observer {
 
 	private static final long RIGHTS_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
-	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getName());
+	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getSimpleName());
 	public DWSet database;
 	AssetsFavorites assetsFavorites;
 	TemplatesFavorites templatesFavorites;
@@ -82,7 +82,7 @@ public class Wallet extends Observable implements Observer {
 			if (withObserver) {
 				// ADD OBSERVER
 				// Controller.getInstance().addObserver(this);
-				DCSet.getInstance().getTransactionMap().addObserver(this);
+				DCSet.getInstance().getTransactionTab().addObserver(this);
 				DCSet.getInstance().getBlockMap().addObserver(this);
 				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 			}
@@ -470,7 +470,7 @@ public class Wallet extends Observable implements Observer {
 
 		// ADD OBSERVER
 		Controller.getInstance().addObserver(this);
-		DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+		////DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 
 		// SOME
 		// Account initAccount = this.getAccounts().get(0);
@@ -619,18 +619,18 @@ public class Wallet extends Observable implements Observer {
             this.database.hardFlush();
 
             // RESET MAPS
-			this.database.getTransactionMap().reset();
-			this.database.getBlocksHeadMap().reset();
-			this.database.getNameMap().reset();
-			this.database.getNameSaleMap().reset();
-            this.database.getPollMap_old().reset();
-			this.database.getAssetMap().reset();
-			this.database.getImprintMap().reset();
-			this.database.getTemplateMap().reset();
-			this.database.getPersonMap().reset();
-			this.database.getStatusMap().reset();
-			this.database.getUnionMap().reset();
-			this.database.getOrderMap().reset();
+			this.database.getTransactionMap().clear();
+			this.database.getBlocksHeadMap().clear();
+			this.database.getNameMap().clear();
+			this.database.getNameSaleMap().clear();
+            this.database.getPollMap_old().clear();
+			this.database.getAssetMap().clear();
+			this.database.getImprintMap().clear();
+			this.database.getTemplateMap().clear();
+			this.database.getPersonMap().clear();
+			this.database.getStatusMap().clear();
+			this.database.getUnionMap().clear();
+			this.database.getOrderMap().clear();
 
             LOGGER.info("   >>>>  Maps was Resetted");
 
@@ -1665,7 +1665,7 @@ public class Wallet extends Observable implements Observer {
 			// DELETE ORDER
 			if (false) {
 				// order STATUS is ORPHANED
-				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
+				this.database.getOrderMap().remove(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
 						Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
 			}
 		}
@@ -1684,7 +1684,7 @@ public class Wallet extends Observable implements Observer {
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			if (false) {
 				// DELETE ORDER
-				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
+				this.database.getOrderMap().remove(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
 						Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
 			}
 		}

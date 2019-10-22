@@ -5,8 +5,6 @@ import org.erachain.core.block.Block;
 import org.mapdb.DB;
 import org.mapdb.SerializerBase;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -16,7 +14,7 @@ import java.util.TreeMap;
  * ключ: подпись блока<br>
  * занчение: номер блока (высота, height)<br>
  */
-public class BlockSignsMap extends DCMap<Long, Integer> {
+public class BlockSignsMap extends DCUMap<Long, Integer> {
 
     public BlockSignsMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -28,14 +26,14 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Long, Integer> getMap(DB database) {
+    protected void openMap() {
         //OPEN HASH MAP
         //
-        return database.createHashMap("height")
+        map = database.createHashMap("height")
                 .keySerializer(SerializerBase.LONG)
                 .valueSerializer(SerializerBase.INTEGER)
 
@@ -46,10 +44,9 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
                 .makeOrGet();
     }
 
-    @Override
-    protected Map<Long, Integer> getMemoryMap() {
+    protected void getMemoryMap() {
         //return new TreeMap<long[], Integer>(UnsignedBytes.lexicographicalComparator()); // for byte[] KEYS
-        return new TreeMap<Long, Integer>();
+        map = new TreeMap<Long, Integer>();
     }
 
     @Override
@@ -79,7 +76,7 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
     public void delete(byte[] signature) {
         Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
                 signature[4], signature[5], signature[6], signature[7]);
-        this.delete(key);
+        this.remove(key);
     }
 
     public Block getBlock(byte[] signature) {

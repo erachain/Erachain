@@ -235,7 +235,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
         // REGISTER ON WALLET TRANSACTIONS
         Controller.getInstance().getWallet().database.getTelegramsMap().addObserver(this);
         // for UNCONFIRMEDs
-        DCSet.getInstance().getTransactionMap().addObserver(this);
+        DCSet.getInstance().getTransactionTab().addObserver(this);
         // for ??
         /// Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
@@ -244,7 +244,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
     public void removeObservers() {
 
         Controller.getInstance().getWallet().database.getTelegramsMap().deleteObserver(this);
-        DCSet.getInstance().getTransactionMap().addObserver(this);
+        DCSet.getInstance().getTransactionTab().addObserver(this);
         /// ???
         /// Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }

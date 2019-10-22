@@ -82,9 +82,9 @@ public class TelegramStore extends Observable implements Observer {
 
                 if (Settings.getInstance().getTelegramStoreUse() && Settings.getInstance().getTelegramStorePeriod() > 0) {
                     int aliveTime = Settings.getInstance().getTelegramStorePeriod() * 60 * 60 * 24 * 1000;
-                    for (Transaction transaction : database.getTelegramsMap().getValues()) {
+                    for (Transaction transaction : database.getTelegramsMap().values()) {
                         if (transaction.getTimestamp() < (System.currentTimeMillis() - aliveTime))
-                            database.getTelegramsMap().delete(transaction.viewSignature());
+                            database.getTelegramsMap().remove(transaction.viewSignature());
                     }
                 }
 
@@ -102,7 +102,7 @@ public class TelegramStore extends Observable implements Observer {
      public ArrayList<Transaction> getFromCreator(String address) {
 
          ArrayList<Transaction> list = new ArrayList<Transaction>();
-         for (Transaction transaction : this.database.getTelegramsMap().getValues()) {
+         for (Transaction transaction : this.database.getTelegramsMap().values()) {
              if (transaction.getCreator().getAddress().equals(address)) list.add(transaction);
          }
          return list;
@@ -115,9 +115,9 @@ public class TelegramStore extends Observable implements Observer {
 	 * @param address
 	 */
 	public void deleteFromCreator(String address){
-        for (Transaction transaction : database.getTelegramsMap().getValues()) {
+        for (Transaction transaction : database.getTelegramsMap().values()) {
              if ( transaction.getCreator().getAddress().equals(address)) 
-                 database.getTelegramsMap().delete(transaction.viewSignature());
+                 database.getTelegramsMap().remove(transaction.viewSignature());
             }
         
      }
@@ -129,10 +129,10 @@ public class TelegramStore extends Observable implements Observer {
     public ArrayList<Transaction> getAndDeleteFromCreator(String address) {
 
         ArrayList<Transaction> list = new ArrayList<Transaction>();
-        for (Transaction transaction : this.database.getTelegramsMap().getValues()) {
+        for (Transaction transaction : this.database.getTelegramsMap().values()) {
             if (transaction.getCreator().getAddress().equals(address)) {
                 list.add(transaction);
-                database.getTelegramsMap().delete(transaction.viewSignature());
+                database.getTelegramsMap().remove(transaction.viewSignature());
             }
         }
         return list;

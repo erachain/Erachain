@@ -173,7 +173,7 @@ public class PollsDialog extends JDialog {
 
         // CBX ACCOUNT
         detailGBC.gridy = 5;
-        this.cbxOptions = new JComboBox<String>(new OptionsComboBoxModel(poll.getOptions()));
+        this.cbxOptions = new JComboBox<String>(new OptionsComboBoxModel(poll.viewOptions()));
         if (this.cbxOptions.getItemCount() > option)
             this.cbxOptions.setSelectedIndex(option);
 		/*		

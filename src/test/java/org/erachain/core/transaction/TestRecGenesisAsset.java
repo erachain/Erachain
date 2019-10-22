@@ -44,7 +44,7 @@ public class TestRecGenesisAsset {
     private void initIssue(boolean toProcess) {
 
         //CREATE EMPTY MEMORY DATABASE
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
 
         //CREATE ASSET
         asset = GenesisBlock.makeAsset(0);
@@ -227,7 +227,7 @@ public class TestRecGenesisAsset {
         assertEquals(false, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.longValue());
+        assertEquals(0, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.longValue());
 
         //CHECK REFERENCE SENDER
         // it for not genesis - assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), maker.getLastReference(db)));

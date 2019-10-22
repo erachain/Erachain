@@ -21,7 +21,7 @@ public class TransactionsList extends AbstractList<Transaction> {
     @Override
     public Transaction get(int index) {
         if (!this.transactions.containsKey(this.transactionSignatures.get(index))) {
-            this.transactions.put(this.transactionSignatures.get(index), DCSet.getInstance().getTransactionMap()
+            this.transactions.put(this.transactionSignatures.get(index), DCSet.getInstance().getTransactionTab()
                     .get(this.transactionSignatures.get(index)));
         }
 

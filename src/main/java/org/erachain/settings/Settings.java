@@ -45,27 +45,27 @@ public class Settings {
     public static final String DEFAULT_TELEGRAM_DIR = "telegram";
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
     //NETWORK
-    private static final int DEFAULT_MIN_CONNECTIONS = 10; // for OWN maked connections
+    private static final int DEFAULT_MIN_CONNECTIONS = 10; // for OWN connections
     private static final int DEFAULT_MAX_CONNECTIONS = 100;
+    private static final boolean DEFAULT_LOCAL_PEER_SCANNER = false;
     // EACH known PEER may send that whit peers to me - not white peer may be white peer for me
     private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
     private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
     // BLOCK
     //public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
     private static final int DEFAULT_CONNECTION_TIMEOUT = 20000;
-    private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
     private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
     private static final Integer DEFAULT_FONT_SIZE = 11;
     private static final String DEFAULT_FONT_NAME = "Arial";
     //RPC
     private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
-    private static final boolean DEFAULT_RPC_ENABLED = false;
+    private static final boolean DEFAULT_RPC_ENABLED = false; //
     private static final boolean DEFAULT_BACUP_ENABLED = false;
     private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
     //WEB
-    private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
+    private static final String DEFAULT_WEB_ALLOWED = BlockChain.DEVELOP_USE? ";" : "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
     // 19 03
     //GUI
@@ -348,6 +348,36 @@ public class Settings {
     }
 
     @SuppressWarnings("unchecked")
+    /**
+     * полностью доверныые пиры от которых данные не проверяются - ни блоки ни транзакции
+     */
+    public List<String> getTrustedPeers() {
+
+        try {
+
+            File file = new File(this.userPath
+                    + (BlockChain.DEVELOP_USE ? "peers-trusted-dev.json" : "peers-trusted.json"));
+
+            //CREATE FILE IF IT DOESNT EXIST
+            if (file.exists()) {
+                //READ PEERS FILE
+                List<String> lines = Files.readLines(file, Charsets.UTF_8);
+
+                String jsonString = "";
+                for (String line : lines) {
+                    jsonString += line;
+                }
+
+                //CREATE JSON OBJECT
+                return new ArrayList<String>((JSONArray) JSONValue.parse(jsonString));
+            }
+        } catch (Exception e) {
+            LOGGER.debug(e.getMessage(), e);
+        }
+
+        return new ArrayList<>();
+    }
+
     public List<Peer> getKnownPeers() {
         try {
             boolean loadPeersFromInternet = (
@@ -419,7 +449,7 @@ public class Settings {
 
             if (this.cacheInternetPeers.isEmpty() || NTP.getTime() - this.timeLoadInternetPeers > 24 * 60 * 60 * 1000) {
                 this.timeLoadInternetPeers = NTP.getTime();
-                URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase_public/master/peers.json");
+                URL u = new URL("https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json");
                 InputStream in = u.openStream();
                 String stringInternetSettings = IOUtils.toString(in);
                 JSONObject internetSettingsJSON = (JSONObject) JSONValue.parse(stringInternetSettings);
@@ -557,6 +587,14 @@ public class Settings {
         }
 
         return DEFAULT_CONNECTION_TIMEOUT;
+    }
+
+    public boolean isLocalPeersScannerEnabled() {
+        if (this.settingsJSON.containsKey("localpeerscanner")) {
+            return ((Boolean) this.settingsJSON.get("localpeerscanner")).booleanValue();
+        }
+
+        return DEFAULT_LOCAL_PEER_SCANNER;
     }
 
     public boolean isTryingConnectToBadPeers() {
@@ -732,14 +770,6 @@ public class Settings {
         }
 
         return DEFAULT_FORGING_ENABLED;
-    }
-
-    public int getPingInterval() {
-        if (this.settingsJSON.containsKey("pinginterval")) {
-            return ((Long) this.settingsJSON.get("pinginterval")).intValue();
-        }
-
-        return DEFAULT_PING_INTERVAL;
     }
 
     public boolean isGeneratorKeyCachingEnabled() {

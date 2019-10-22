@@ -1,5 +1,8 @@
 package org.erachain.gui.items;
 
+import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.gui.items.persons.PersonInfo002;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -8,10 +11,11 @@ import javax.swing.table.TableColumn;
 
 import org.erachain.gui.library.MDecimalFormatedTextField;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class SearchItemSplitPanel extends ItemSplitPanel {
+public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
@@ -115,4 +119,5 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
         });
 
     }
+
 }

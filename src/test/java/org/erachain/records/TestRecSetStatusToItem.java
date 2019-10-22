@@ -66,7 +66,7 @@ public class TestRecSetStatusToItem {
     // INIT STATUSS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
             gb.process(db);
@@ -76,7 +76,7 @@ public class TestRecSetStatusToItem {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         //statusMap = db.getItemStatusMap();
@@ -88,7 +88,7 @@ public class TestRecSetStatusToItem {
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
         //CREATE ISSUE PERSON TRANSACTION
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issuePersonTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
         person = (PersonCls) issuePersonTransaction.getItem();
@@ -103,7 +103,7 @@ public class TestRecSetStatusToItem {
                 "teasdskkj kjh kj EST".getBytes(Charset.forName("UTF-8")),
                 0l,
                 "DESCRIPTION".getBytes(Charset.forName("UTF-8")),
-                timestamp, maker.getLastTimestamp(db));
+                timestamp, maker.getLastTimestamp(db)[0]);
         timestamp += 100;
 
     }
@@ -126,7 +126,7 @@ public class TestRecSetStatusToItem {
         setStatusTransaction = new RSetStatusToItem(maker, FEE_POWER, status_key,
                 person.getItemType(), person.getKey(db), to_date, null,
                 323234, 2342342, null, "test TEST 11".getBytes(Charset.forName("UTF-8")), 0l, null,
-                timestamp, maker.getLastTimestamp(db), new byte[64]);
+                timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE STATUS IS INVALID
         assertEquals(false, setStatusTransaction.isSignatureValid(db));
@@ -230,7 +230,7 @@ public class TestRecSetStatusToItem {
                 "test TEST".getBytes(Charset.forName("UTF-8")),
                 0l,
                 "tasasdasdasfsdfsfdsdfest TEST".getBytes(Charset.forName("UTF-8")),
-                timestamp + 10, maker.getLastTimestamp(db));
+                timestamp + 10, maker.getLastTimestamp(db)[0]);
         setStatusTransaction_2.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         setStatusTransaction_2.sign(maker, Transaction.FOR_NETWORK);
         setStatusTransaction_2.process(gb, Transaction.FOR_NETWORK);
@@ -248,7 +248,7 @@ public class TestRecSetStatusToItem {
         assertEquals((long) endDate, Long.MIN_VALUE);
 
         //CHECK REFERENCE SENDER
-        assertEquals(setStatusTransaction.getTimestamp(), maker.getLastTimestamp(db));
+        assertEquals((long)setStatusTransaction.getTimestamp(), maker.getLastTimestamp(db)[0]);
 
         ////// ORPHAN ///////
         setStatusTransaction.orphan(gb, Transaction.FOR_NETWORK);

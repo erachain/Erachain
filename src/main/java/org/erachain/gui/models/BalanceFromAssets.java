@@ -1,9 +1,12 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceTab;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
@@ -28,13 +31,13 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
     public static final int COLUMN_ACCOUNT = 0;
     List<Account> accounts;
     Account account;
-    Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
+    //Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balance;
     Object tab_Balances;
     Tuple2<Long, String> asset;
     private long key;
     private String[] columnNames = Lang.getInstance().translate(new String[]{"Account", "Asset", "key Asset", "Balance"});
     // balances;
-    private SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
+    private SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances;
     private ArrayList<Pair<Account, Pair<Long, Tuple3<BigDecimal, BigDecimal, BigDecimal>>>> table_balance;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -47,13 +50,18 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
         //	 table_balance = new List();
         table_balance = new ArrayList<>();//Pair();
 
+        //ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
         for (int ia = 0; accounts.size() > ia; ia++) {
             account = accounts.get(ia);
             balances = Controller.getInstance().getBalances(account); //.getBalances(key);
             for (int ib = 0; this.balances.size() > ib; ib++) {
-                balance = this.balances.get(ib);
-                table_balance.add(new Pair(account, new Pair(balance.getA().b, balance.getB())));
-
+                Pair item = this.balances.get(ib);
+                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey((byte[])item.getA());
+                Tuple5 balance = (Tuple5)item.getB();
+                if (BlockChain.ERA_COMPU_ALL_UP) {
+                    balance = account.balanceAddDEVAmount(assetKey, balance);
+                }
+                table_balance.add(new Pair(account, new Pair(assetKey, balance)));
             }
         }
 

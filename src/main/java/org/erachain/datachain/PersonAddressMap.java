@@ -1,12 +1,11 @@
 package org.erachain.datachain;
 
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.ObserverMessage;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -28,7 +27,7 @@ import java.util.TreeMap;
  ))
  */
 // TODO: ссылку на ЛОНГ
-public class PersonAddressMap extends DCMap<
+public class PersonAddressMap extends DCUMap<
         Long, // personKey
         TreeMap<
                 String, // address
@@ -41,10 +40,10 @@ public class PersonAddressMap extends DCMap<
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_ALL_ACCOUNT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ALL_ACCOUNT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_ALL_ACCOUNT_TYPE);
         }
     }
 
@@ -52,21 +51,21 @@ public class PersonAddressMap extends DCMap<
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("person_address")
+        map = database.createTreeMap("person_address")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>> getMemoryMap() {
-        return new TreeMap<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>>();
+    protected void getMemoryMap() {
+        map = new TreeMap<Long, TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>>>();
     }
 
     @Override

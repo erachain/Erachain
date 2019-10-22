@@ -2,8 +2,9 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
-import org.erachain.database.DBMap;
 import org.erachain.database.serializer.BlockHeadSerializer;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
@@ -27,7 +28,7 @@ import java.util.*;
  * maker
  */
 
-public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead> {
+public class BlocksHeadMap extends DCUMapImpl<Tuple2<String, String>, Block.BlockHead> {
     // нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int GENERATOR_INDEX = 2;
@@ -52,19 +53,20 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         DEFAULT_INDEX = TIMESTAMP_INDEX;
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
         }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
 
         //TIMESTAMP INDEX
         NavigableSet<Tuple2<Long, Tuple2<String, String>>> timestampIndex = database.createTreeSet("blocks_index_timestamp")
                 .comparator(Fun.COMPARATOR)
+                .counterEnable()
                 .makeOrGet();
 
         NavigableSet<Tuple2<Long, Tuple2<String, String>>> descendingTimestampIndex = database.createTreeSet("blocks_index_timestamp_descending")
@@ -145,9 +147,9 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Block.BlockHead> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("blocks")
+        map = database.createTreeMap("blocks")
                 .keySerializer(BTreeKeySerializer.TUPLE2) /// ТУТ тоже переделать на стандартный серилиазотор
                 .valueSerializer(new BlockHeadSerializer())
                 .valuesOutsideNodesEnable()
@@ -156,8 +158,8 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Block.BlockHead> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, Block.BlockHead>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<String, String>, Block.BlockHead>(Fun.TUPLE2_COMPARATOR);
     }
 
     @Override
@@ -169,7 +171,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
 
         List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<Pair<Account, Block.BlockHead>>();
 
-        Iterator<Tuple2<String, String>> iterator = this.getIterator(1, true);
+        Iterator<Tuple2<String, String>> iterator = this.getIterator(TIMESTAMP_INDEX, true);
         if (!iterator.hasNext())
             return null;
 
@@ -231,12 +233,12 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
 
         //DELETE TRANSACTIONS
         for (Tuple2<String, String> key : accountBlocks.keySet()) {
-            delete(key);
+            remove(key);
         }
     }
 
     public void delete(Block.BlockHead block) {
-        delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
+        remove(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
     }
 
     public void deleteAll(List<Account> accounts) {

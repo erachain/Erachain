@@ -55,7 +55,7 @@ public class TestRecImprint {
         name_total = Imprint.hashNameToBase58(name_total);
         digest = Base58.decode(name_total);
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
             gb.process(db);
@@ -65,7 +65,7 @@ public class TestRecImprint {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         imprint = new Imprint(maker, name_total, icon, image, "");

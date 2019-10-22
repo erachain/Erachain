@@ -1,17 +1,16 @@
 package org.erachain.datachain;
 
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.core.block.Block;
 import org.erachain.database.serializer.BlockHeadSerializer;
 import org.mapdb.Atomic;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 /**
  *  Block Height -> Block.BlockHead:
@@ -20,14 +19,14 @@ import java.util.Map;
  *  + Forging Data - Forging Value, Win Value, Target Value
  *
  */
-public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
+public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     static final String NAME = "blocks_heads";
     static Logger LOGGER = LoggerFactory.getLogger(BlocksHeadsMap.class.getName());
     // for saving in DB
     private Atomic.Long fullWeightVar;
     private Long fullWeight = 0L;
-    private int startedInForkHeight = 0;
+    //private int startedInForkHeight = 0;
 
 
     public BlocksHeadsMap(DCSet databaseSet, DB database) {
@@ -48,9 +47,9 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
     }
 
     @Override
-    protected Map<Integer, Block.BlockHead> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap(NAME)
+        map = database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockHeadSerializer())
                 .counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
@@ -67,12 +66,12 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
 	 */
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Integer, Block.BlockHead> getMemoryMap() {
-        return new HashMap<Integer, Block.BlockHead>();
+    protected void getMemoryMap() {
+        map = new HashMap<Integer, Block.BlockHead>();
     }
 
     @Override
@@ -84,14 +83,14 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
         return this.fullWeight;
     }
 
-    public int getStartedInForkHeight() {
-        return this.startedInForkHeight;
-    }
+    //public int getStartedInForkHeight() {
+    //    return this.startedInForkHeight;
+    //}
 
     public void recalcWeightFull(DCSet dcSet) {
 
         long weightFull = 0l;
-        Iterator<Integer> iterator = this.getIterator(0, true);
+        Iterator<Integer> iterator = this.getIterator(DEFAULT_INDEX, true);
         while (iterator.hasNext()) {
             Integer key = iterator.next();
             Block.BlockHead item = this.get(key);
@@ -113,9 +112,9 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
         // get Win Value of block
         long weight = item.winValue;
 
-        if (startedInForkHeight == 0 && this.parent != null) {
-            startedInForkHeight = height;
-        }
+        //if (startedInForkHeight == 0 && this.parent != null) {
+        //    startedInForkHeight = height;
+        //}
 
         fullWeight += weight;
 
@@ -160,11 +159,17 @@ public class BlocksHeadsMap extends DCMap<Integer, Block.BlockHead> {
             if (this.fullWeightVar != null) {
                 this.fullWeightVar.set(fullWeight);
             }
-            return super.delete(key);
+            return super.remove(key);
         }
 
         return null;
     }
 
+    @Override
+    public void writeToParent() {
+        super.writeToParent();
+        ((BlocksHeadsMap) parent).fullWeightVar.set(this.fullWeight);
+        ((BlocksHeadsMap) parent).fullWeight = this.fullWeight;
+    }
 
 }

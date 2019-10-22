@@ -4,12 +4,11 @@ import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * я так понял - это отслеживание версии базы данных - и если она новая то все удаляем и заново закачиваем
  */
-public class LocalDataMap extends DCMap<String, String> {
+public class LocalDataMap extends DCUMap<String, String> {
 
     public static final String LOCAL_DATA_VERSION_KEY = "dataversion";
 
@@ -17,26 +16,26 @@ public class LocalDataMap extends DCMap<String, String> {
         super(databaseSet, database);
     }
 
-    public LocalDataMap(DCMap<String, String> parent) {
+    public LocalDataMap(DCUMap<String, String> parent) {
         super(parent, null);
     }
 
 
     @Override
-    protected Map<String, String> getMap(DB database) {
+    protected void openMap() {
         /// OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("LocalDataMap");
-        return createTreeMap.makeOrGet();
+        map = createTreeMap.makeOrGet();
     }
 
     @Override
-    protected Map<String, String> getMemoryMap() {
-        return new HashMap<String, String>();
+    protected void getMemoryMap() {
+        map = new HashMap<String, String>();
     }
 
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

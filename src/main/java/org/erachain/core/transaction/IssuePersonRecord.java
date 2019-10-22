@@ -7,7 +7,6 @@ import org.erachain.core.block.Block;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
-import org.erachain.datachain.AddressTimeSignatureMap;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -292,10 +291,9 @@ public class IssuePersonRecord extends IssueItemRecord {
         if (person.isMustBeSigned()) {
             // for quick search public keys by address - use PUB_KEY from Person DATA owner
             // used in - controller.Controller.getPublicKeyByAddress
-            AddressTimeSignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
-            String creatorAddress = maker.getAddress();
-            if (!dbASmap.contains(creatorAddress)) {
-                dbASmap.set(creatorAddress, this.signature);
+            long[] makerLastTimestamp = maker.getLastTimestamp(this.dcSet);
+            if (makerLastTimestamp == null) {
+                maker.setLastTimestamp(new long[]{timestamp, dbRef}, this.dcSet);
             }
         }
 
@@ -309,7 +307,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         PersonHuman person = (PersonHuman) this.item;
         PublicKeyAccount maker = person.getOwner();
         byte[] makerBytes = maker.getPublicKey();
-        this.dcSet.getIssuePersonMap().delete(makerBytes);
+        this.dcSet.getIssuePersonMap().remove(makerBytes);
 
     }
 

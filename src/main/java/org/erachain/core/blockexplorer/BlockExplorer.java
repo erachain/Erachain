@@ -20,9 +20,10 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
-import org.erachain.database.SortableList;
 import org.erachain.database.FilteredByStringArray;
+import org.erachain.database.SortableList;
 import org.erachain.datachain.*;
+import org.erachain.dbs.DBTab;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.gui.models.PersonAccountsModel;
 import org.erachain.lang.Lang;
@@ -96,7 +97,7 @@ public class BlockExplorer {
     public void makePage(Class type, int start, int pageSize,
                          Map output, JSONObject langObj) {
 
-        DCMap map = dcSet.getMap(type);
+        DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
         int size = map.size();
 
@@ -125,7 +126,7 @@ public class BlockExplorer {
     public void makePage(Class type, long start, int pageSize,
                          Map output, JSONObject langObj) {
 
-        DCMap map = dcSet.getMap(type);
+        DBTab map = dcSet.getMap(type);
         ExplorerJsonLine element;
         long size = map.size();
 
@@ -166,7 +167,7 @@ public class BlockExplorer {
         JSONArray array = new JSONArray();
 
         if (size > 0) {
-            DCMap map = dcSet.getMap(type);
+            DBTab map = dcSet.getMap(type);
             ExplorerJsonLine element;
 
             while (index > start - pageSize && index > 0) {
@@ -205,7 +206,7 @@ public class BlockExplorer {
         //В зависимости от выбранного языка(ru,en)
         AdderHeadInfo.addHeadInfoCap(type, result, dcSet, langObj);
 
-        DCMap map = dcSet.getMap(type);
+        DBTab map = dcSet.getMap(type);
 
         try {
             //Если в строке ввели число
@@ -580,33 +581,10 @@ public class BlockExplorer {
 
                 address = account.getAddress();
                 // get reference to parent record for this account
-                Long timestampRef = account.getLastTimestamp();
+                long[] timestampRef = account.getLastTimestamp();
                 // get signature for account + time
-                byte[] signatureBytes = dcSet.getAddressTime_SignatureMap().get(address, timestampRef);
 
                 Controller cntr = Controller.getInstance();
-                do {
-                    // Transaction transaction =
-                    // Controller.getInstance().get(signatureBytes);
-                    Transaction transaction = cntr.getTransaction(signatureBytes);
-                    if (transaction == null) {
-                        break;
-                    }
-                    if (transaction.getCreator() == null && !transaction.getCreator().getAddress().equals(address)) {
-                        break;
-                    }
-
-                    if (transaction.getType() == Transaction.ARBITRARY_TRANSACTION
-                            && ((ArbitraryTransaction) transaction).getService() == 777) {
-                        transactions.add(transaction);
-                    }
-                    // get reference to parent record for this account
-                    // timestampRef = transaction.getReference();
-                    timestampRef = account.getLastTimestamp();
-                    // get signature for account + time
-                    signatureBytes = dcSet.getAddressTime_SignatureMap().get(address, timestampRef);
-
-                } while (true);
 
                 int count = transactions.size();
 
@@ -904,7 +882,7 @@ public class BlockExplorer {
         } else {
             // OLD
             List<Transaction> transactions = dcSet.getTransactionFinalMap()
-                    .getTransactionsByTypeAndAddress(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
+                    .getTransactionsByAddressAndType(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
             for (Transaction transaction : transactions) {
                 IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
                 if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
@@ -1210,7 +1188,7 @@ public class BlockExplorer {
         BigDecimal sumSellingAmount = BigDecimal.ZERO;
         BigDecimal sumSellingAmountGood = BigDecimal.ZERO;
 
-        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
         Transaction createOrder;
 
         BigDecimal vol;
@@ -1665,7 +1643,7 @@ public class BlockExplorer {
 
                     String acc = personModel.getValueAt(i, 0).toString();
 
-                    myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(acc,
+                    myIssuePersons.addAll(transactionsMap.getTransactionsByAddressAndType(acc,
                             Transaction.ISSUE_PERSON_TRANSACTION, 200));
 
                     Account account = new Account(acc);
@@ -1730,7 +1708,7 @@ public class BlockExplorer {
 
                     accountsJSON.put(i++, accountJSON);
 
-                    myIssuePersons.addAll(transactionsMap.getTransactionsByTypeAndAddress(address,
+                    myIssuePersons.addAll(transactionsMap.getTransactionsByAddressAndType(address,
                             Transaction.ISSUE_PERSON_TRANSACTION, 200));
 
                     Account account = new Account(address);
@@ -1829,15 +1807,16 @@ public class BlockExplorer {
 
         List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
-        Collection<Tuple2<String, Long>> addrs = dcSet.getAssetBalanceMap().getKeys();
+        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        Collection<byte[]> addrs = map.keySet();
         //BigDecimal total = BigDecimal.ZERO;
         //BigDecimal totalNeg = BigDecimal.ZERO;
-        for (Tuple2<String, Long> addr : addrs) {
-            if (addr.b == key) {
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
-                        .getAssetBalanceMap().get(addr);
+        for (byte[] addrKey : addrs) {
+            if (ItemAssetBalanceTab.getAssetKeyFromKey(addrKey) == key) {
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
+                        map.get(addrKey);
                 // all = all.add(ball.a);
-                Account account = new Account(addr.a);
+                Account account = new Account(ItemAssetBalanceTab.getShortAccountFromKey(addrKey));
                 BigDecimal ballans = account.getBalanceUSE(key);
                 //if (ball.a.b.signum() > 0) {
                 //total = total.add(ball.a.b);
@@ -1845,13 +1824,13 @@ public class BlockExplorer {
                 //    totalNeg = totalNeg.add(ball.a.b);
                 //}
 
-                top100s.add(Fun.t3(addr.a, ballans, ball.a.b));
+                top100s.add(Fun.t3(account.getAddress(), ballans, ball.a.b));
             }
         }
 
         //totalNeg = total.add(totalNeg);
 
-        Collection<Order> orders = dcSet.getOrderMap().getValues();
+        Collection<Order> orders = dcSet.getOrderMap().values();
 
         for (Order order : orders) {
             if (order.getHaveAssetKey() == key) {
@@ -1954,36 +1933,42 @@ public class BlockExplorer {
 
         // balance assets from
         LinkedHashMap output = new LinkedHashMap();
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(account);
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(account);
 
         ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
+        //ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         TreeMap balAssets = new TreeMap();
         if (balances != null && !balances.isEmpty()) {
-            Iterator<Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> iterator = balances.iterator();
+            Iterator<Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> iterator = balances.iterator();
             while (iterator.hasNext()) {
-                Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
-                if (item.getA().b.equals(AssetCls.LIA_KEY)) {
+
+                Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
+
+                long assetKey = ItemAssetBalanceTab.getAssetKeyFromKey(item.getA());
+                if (assetKey == AssetCls.LIA_KEY) {
                     continue;
                 }
 
-                AssetCls asset = assetsMap.get(item.getA().b);
+                AssetCls asset = assetsMap.get(assetKey);
                 if (asset == null)
                     continue;
 
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> itemBals = item.getB();
-                if (true || itemBals.a.b.signum() != 0
-                        && itemBals.b.b.signum() != 0
-                        && itemBals.c.b.signum() != 0) {
-                    Map bal = new LinkedHashMap();
-                    bal.put("asset_key", item.getA().b);
-                    bal.put("asset_name", asset.viewName());
+                Map bal = new LinkedHashMap();
+                bal.put("asset_key", assetKey);
+                bal.put("asset_name", asset.viewName());
+
+                if (BlockChain.ERA_COMPU_ALL_UP) {
+                    bal.put("balance_1", itemBals.a.b.add(account.addDEVAmount(assetKey)));
+                } else {
                     bal.put("balance_1", itemBals.a.b);
-                    bal.put("balance_2", itemBals.b.b);
-                    bal.put("balance_3", itemBals.c.b);
-                    bal.put("balance_4", itemBals.d.b);
-                    balAssets.put(item.getA().b.toString(), bal);
                 }
+
+                bal.put("balance_2", itemBals.b.b);
+                bal.put("balance_3", itemBals.c.b);
+                bal.put("balance_4", itemBals.d.b);
+                balAssets.put("" + assetKey, bal);
             }
         }
 
@@ -2130,7 +2115,7 @@ public class BlockExplorer {
                     if (dcSet.getTransactionFinalMapSigns().contains(orderSignature)) {
                         createOrder = (CreateOrderTransaction) dcSet.getTransactionFinalMap().get(orderSignature);
                     } else {
-                        createOrder = (CreateOrderTransaction) dcSet.getTransactionMap().get(orderSignature);
+                        createOrder = (CreateOrderTransaction) dcSet.getTransactionTab().get(orderSignature);
                     }
                     if (createOrder != null) {
                         Map orderJSON = new LinkedHashMap();
@@ -2295,11 +2280,12 @@ public class BlockExplorer {
             Block block = (Block) unit;
 
             transactionDataJSON = new LinkedHashMap();
-            transactionDataJSON.put("timestamp", block.getTimestamp());
 
             int height = block.getHeight();
             transactionDataJSON.put("confirmations", getHeight() - height + 1);
             transactionDataJSON.put("height", height);
+            // height
+            transactionDataJSON.put("timestamp", block.getTimestamp(height));
 
             transactionDataJSON.put("generator", block.getCreator().getAddress());
             transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
@@ -2363,6 +2349,7 @@ public class BlockExplorer {
         }
     }
 
+    /*
     public Map jsonQueryBalance(String address) {
         Map output = new LinkedHashMap();
 
@@ -2371,34 +2358,38 @@ public class BlockExplorer {
             return output;
         }
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = dcSet.getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(new Account(address));
 
-        for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
             Map assetBalance = new LinkedHashMap();
 
-            assetBalance.put("assetName", Controller.getInstance().getAsset(assetsBalance.getA().b).getName());
+            assetBalance.put("assetName", Controller.getInstance().getAsset(map.getAssetKeyFromKey(assetsBalance.getA())).getName());
             assetBalance.put("amount", assetsBalance.getB().toString());
 
-            output.put(assetsBalance.getA().b, assetBalance);
+            output.put(map.getAssetKeyFromKey(assetsBalance.getA()), assetBalance);
         }
 
         return output;
     }
 
-    public Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetBalance(
-            String address) {
+    public Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+    assetBalance(String address) {
         Map<Long, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> output = new LinkedHashMap();
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances = dcSet
-                .getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        ItemAssetBalanceTab map = dcSet.getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(new Account(address));
 
-        for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
-            output.put(assetsBalance.getA().b, assetsBalance.getB());
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+            output.put(map.getAssetKeyFromKey(assetsBalance.getA()), assetsBalance.getB());
         }
 
         return output;
     }
+
+     */
 
     @SuppressWarnings({"serial", "static-access"})
     public void jsonQueryExchange(String filterStr, int start) {
@@ -2506,19 +2497,19 @@ public class BlockExplorer {
         output.put("type", "transactions");
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or signature or BlockNo-SeqNo", langObj));
 
-        TransactionFinalMap map = dcSet.getTransactionFinalMap();
+        TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
         int size = 200;
         List<Transaction> transactions;
         if (filterStr != null) {
             //transactions = map.getTransactionsByTitleAndType(filterStr, null, size, true);
-            Pair<String, Iterable> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
+            Pair<String, Iterator> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
             if (pair.getA() != null) {
                 output.put("error", pair.getA());
                 return;
             }
 
             transactions = new ArrayList<>();
-            Iterator iterator = pair.getB().iterator();
+            Iterator iterator = pair.getB();
             while (iterator.hasNext()) {
                 transactions.add(map.get((Long) iterator.next()));
             }
@@ -2552,7 +2543,11 @@ public class BlockExplorer {
             int counter = size;
             transactions = new ArrayList<>();
             while (iterator.hasNext() && counter > 0 ) {
+
                 Transaction transaction = map.get(iterator.next());
+                if (transaction == null)
+                    continue;
+
                 if (transaction.getType() == Transaction.CALCULATED_TRANSACTION
                         && ((RCalculated)transaction).getMessage().equals("forging"))
                     continue;
@@ -3301,11 +3296,10 @@ public class BlockExplorer {
             Map transactionJSON = new LinkedHashMap();
             Map transactionDataJSON = new LinkedHashMap();
 
-            transactionDataJSON.put("timestamp", block.getTimestamp());
-
             int height = block.getHeight();
             transactionDataJSON.put("confirmations", getHeight() - height + 1);
             transactionDataJSON.put("height", height);
+            transactionDataJSON.put("timestamp", block.getTimestamp(height));
 
             transactionDataJSON.put("generator", block.getCreator().getAddress());
             transactionDataJSON.put("signature", Base58.encode(block.getSignature()));
@@ -3353,7 +3347,7 @@ public class BlockExplorer {
         //AssetNames assetNames = new AssetNames();
 
         List<Transaction> all = new ArrayList<>(
-                Controller.getInstance().getUnconfirmedTransactions(0, 100, true));
+                Controller.getInstance().getUnconfirmedTransactions(100, true));
 
         int size = all.size();
 

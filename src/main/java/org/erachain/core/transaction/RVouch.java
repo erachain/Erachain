@@ -226,12 +226,8 @@ public class RVouch extends Transaction {
 
     }
 
-    //@Override
     @Override
     public int isValid(int asDeal, long flags) {
-
-        if (BlockChain.TEST_DB_TXS_OFF)
-            return VALIDATE_OK;
 
         if (this.vouchHeight < 2) {
             //CHECK HEIGHT - not 0 and NOT GENESIS

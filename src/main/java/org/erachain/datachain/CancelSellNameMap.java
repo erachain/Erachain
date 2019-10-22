@@ -2,26 +2,24 @@ package org.erachain.datachain;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.transaction.CancelSellNameTransaction;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
-import org.erachain.utils.ObserverMessage;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
-public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
+public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
 
     public CancelSellNameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
         }
     }
 
@@ -29,21 +27,20 @@ public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
-    @Override
-    protected Map<byte[], BigDecimal> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("cancelNameOrphanData")
+        map = database.createTreeMap("cancelNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], BigDecimal> getMemoryMap() {
-        return new TreeMap<byte[], BigDecimal>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], BigDecimal>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override
@@ -52,7 +49,7 @@ public class CancelSellNameMap extends DCMap<byte[], BigDecimal> {
     }
 
     public void delete(CancelSellNameTransaction transaction) {
-        this.delete(transaction.getSignature());
+        this.remove(transaction.getSignature());
     }
 
     public BigDecimal get(CancelSellNameTransaction transaction) {

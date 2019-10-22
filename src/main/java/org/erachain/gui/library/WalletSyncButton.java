@@ -46,7 +46,7 @@ public class WalletSyncButton extends JButton implements Observer {
                     }
                 }
 
-                Controller.getInstance().wallet.database.getAccountMap().reset();
+                Controller.getInstance().wallet.database.getAccountMap().clear();
 
                 int number = 0;
                 for (PrivateKeyAccount privateAccount : Controller.getInstance().getPrivateKeyAccounts()) {

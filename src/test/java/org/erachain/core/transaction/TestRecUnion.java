@@ -77,7 +77,7 @@ public class TestRecUnion {
     // INIT UNIONS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
 
         gb = new GenesisBlock();
         try {
@@ -99,7 +99,7 @@ public class TestRecUnion {
         //GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(certifier, 0L);
         //genesis_certify.process(db, false);
 
-        certifier.setLastTimestamp(gb.getTimestamp(), db);
+        certifier.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         certifier.changeBalance(db, false, ERM_KEY, BlockChain.MAJOR_ERA_BALANCE_BD, false);
         certifier.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
@@ -108,7 +108,7 @@ public class TestRecUnion {
 
 
         //CREATE ISSUE UNION TRANSACTION
-        issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db));
+        issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0]);
 
         sertifiedPrivateKeys.add(userAccount1);
         sertifiedPrivateKeys.add(userAccount2);
@@ -148,7 +148,7 @@ public class TestRecUnion {
         assertEquals(true, issueUnionTransaction.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db), new byte[64]);
+        issueUnionTransaction = new IssueUnionRecord(certifier, union, FEE_POWER, timestamp, certifier.getLastTimestamp(db)[0], new byte[64]);
         //CHECK IF ISSUE UNION IS INVALID
         assertEquals(false, issueUnionTransaction.isSignatureValid(db));
 
@@ -167,7 +167,7 @@ public class TestRecUnion {
         assertEquals(Transaction.VALIDATE_OK, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID ISSUE UNION - INVALID UNIONALIZE
-        issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db), new byte[64]);
+        issueUnionTransaction = new IssueUnionRecord(userAccount1, union, FEE_POWER, timestamp, userAccount1.getLastTimestamp(db)[0], new byte[64]);
         assertEquals(Transaction.NOT_ENOUGH_FEE, issueUnionTransaction.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
         userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);

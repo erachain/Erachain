@@ -5,8 +5,6 @@ import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
-import java.util.Map;
-
 
 /**
  * Хранение активов.<br>
@@ -33,9 +31,9 @@ public class ItemImprintMap extends ItemMap {
     }
 
     // type+name not initialized yet! - it call as Super in New
-    protected Map<Long, ItemCls> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap(NAME)
+        map = database.createTreeMap(NAME)
                 .valueSerializer(new ItemSerializer(TYPE))
                 .makeOrGet();
     }

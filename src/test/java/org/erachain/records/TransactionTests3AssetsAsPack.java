@@ -46,7 +46,7 @@ public class TransactionTests3AssetsAsPack {
     // INIT ASSETS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
             gb.process(db);
@@ -56,7 +56,7 @@ public class TransactionTests3AssetsAsPack {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         asset = new AssetVenture(maker, "a", icon, image, "a", 0, 8, 50000l);
@@ -212,7 +212,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);
+        assertEquals(true, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);
 
         //CHECK REFERENCE SENDER
         assertEquals(issueAssetTransaction.getSignature(), Transaction.FOR_NETWORK);
@@ -245,7 +245,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(false, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.longValue());
+        assertEquals(0, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.longValue());
 
         //CHECK REFERENCE SENDER
         //assertEquals(issueAssetTransaction.getReference(), Transaction.FOR_NETWORK);
@@ -419,7 +419,7 @@ public class TransactionTests3AssetsAsPack {
         //CREATE SIGNATURE
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
         //Long maker_LastReference = Transaction.FOR_NETWORK;
-        Long recipient_LastReference = recipient.getLastTimestamp(db);
+        Long recipient_LastReference = recipient.getLastTimestamp(db)[0];
 
         //CREATE ASSET TRANSFER
         long key = 221;
@@ -451,7 +451,7 @@ public class TransactionTests3AssetsAsPack {
         //CREATE SIGNATURE
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
         //Long maker_LastReference = Transaction.FOR_NETWORK;
-        Long recipient_LastReference = recipient.getLastTimestamp(db);
+        Long recipient_LastReference = recipient.getLastTimestamp(db)[0];
 
         //CREATE ASSET TRANSFER
         long key = 1l;
@@ -731,7 +731,7 @@ public class TransactionTests3AssetsAsPack {
                 "headdd", data,
                 new byte[]{1},
                 new byte[]{0},
-                maker.getLastTimestamp()
+                maker.getLastTimestamp()[0]
         );
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         r_Send.sign(creator, asPack);

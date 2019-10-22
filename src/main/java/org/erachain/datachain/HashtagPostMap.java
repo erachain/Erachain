@@ -1,35 +1,34 @@
 package org.erachain.datachain;
 
+import org.erachain.utils.ByteArrayUtils;
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
-import org.erachain.utils.ByteArrayUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class HashtagPostMap extends DCMap<String, List<byte[]>> {
+public class HashtagPostMap extends DCUMap<String, List<byte[]>> {
 
     public HashtagPostMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public HashtagPostMap(DCMap<String, List<byte[]>> parent) {
+    public HashtagPostMap(DCUMap<String, List<byte[]>> parent) {
         super(parent, null);
     }
 
 
     @Override
-    protected Map<String, List<byte[]>> getMap(DB database) {
+    protected void openMap() {
         // / OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("HashtagPostMap");
-        return createTreeMap.makeOrGet();
+        map = createTreeMap.makeOrGet();
     }
 
     @Override
-    protected Map<String, List<byte[]>> getMemoryMap() {
-        return new HashMap<>();
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     @Override
@@ -38,7 +37,7 @@ public class HashtagPostMap extends DCMap<String, List<byte[]>> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
 

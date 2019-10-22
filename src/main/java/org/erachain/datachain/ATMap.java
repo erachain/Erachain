@@ -6,19 +6,26 @@ import org.erachain.at.AT;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
-import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.ATSerializer;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.NavigableSet;
 
-//import org.erachain.database.DBMap;
+//import org.erachain.dbs.DBMap;
 //import database.SortableList;
 
 @SuppressWarnings("rawtypes")
-public class ATMap extends DCMap<String, AT> {
+public class ATMap extends DCUMapImpl<String, AT> {
 
     private NavigableSet typeATs;
     private NavigableSet creatorATs;
@@ -29,40 +36,37 @@ public class ATMap extends DCMap<String, AT> {
     private Map<String, String> hashCodes;
     private BTreeMap<String, Integer> atToNextHeight;
 
-    private ATMap parentATMap;
+    //private ATMap parentATMap;
 
     public ATMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_AT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ATS);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_AT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_AT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_ATS);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_AT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_AT_TYPE);
         }
     }
 
     public ATMap(ATMap parent, DCSet dcSet) {
         super(parent, dcSet);
-        this.parentATMap = parent;
+        //this.parentATMap = parent;
 
     }
 
-    protected void createIndexes(DB database) {
-    }
-
-    @Override
-    protected Map<String, AT> getMap(DB database) {
-        //OPEN MAP
-        return this.openMap(database);
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<String, AT> getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
+    protected void openMap() {
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
+    }
+
+    @Override
+    protected void getMemoryMap() {
+        openMap();
     }
 
     @SuppressWarnings("unchecked")
@@ -166,7 +170,7 @@ public class ATMap extends DCMap<String, AT> {
     public boolean validTypeHash(byte[] hash, String type, Integer forkHeight) {
         String hashString = Base58.encode(hash);
         if ((!this.hashCodes.containsValue(hashString) && !Fun.filter(this.typeATs, type).iterator().hasNext())) {
-            return (this.parentATMap != null) ? this.parentATMap.validTypeHash(hash, type, forkHeight) : true;
+            return (this.parent != null) ? ((ATMap) this.parent).validTypeHash(hash, type, forkHeight) : true;
         }
         if (this.hashCodes.containsValue(hashString) && Fun.filter(this.typeATs, type).iterator().hasNext()) {
             Iterable<String> ats = getTypeATs(type);
@@ -232,7 +236,7 @@ public class ATMap extends DCMap<String, AT> {
 
     public void delete(AT at) {
         // USE parents
-        this.delete(Base58.encode(at.getId()));
+        this.remove(Base58.encode(at.getId()));
 
     }
 
@@ -263,7 +267,7 @@ public class ATMap extends DCMap<String, AT> {
         Iterable<String> ids = Fun.filter(this.creationHeightATs, blockHeight + 1, true, Integer.MAX_VALUE, true);
         Iterator<String> iter = ids.iterator();
         while (iter.hasNext()) {
-            delete(iter.next());
+            remove(iter.next());
         }
     }
 
@@ -284,7 +288,7 @@ public class ATMap extends DCMap<String, AT> {
         return Fun.filter(this.orderedATs, null, true, height, true).iterator();
     }
 
-    public DCMap<String, AT> getParent() {
+    public DBTab<String, AT> getParent() {
         return this.parent;
     }
 

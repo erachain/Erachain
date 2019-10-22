@@ -1,37 +1,36 @@
 package org.erachain.core.web;
 
 import com.google.common.primitives.SignedBytes;
-import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.DCUMap;
 import org.mapdb.DB;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class SharedPostsMap extends DCMap<byte[], List<String>> {
+public class SharedPostsMap extends DCUMap<byte[], List<String>> {
 
     public SharedPostsMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
 
-    public SharedPostsMap(DCMap<byte[], List<String>> parent) {
+    public SharedPostsMap(DCUMap<byte[], List<String>> parent) {
         super(parent, null);
     }
 
     @Override
-    protected Map<byte[], List<String>> getMap(DB database) {
+    protected void openMap() {
 
-        return database.createTreeMap("SharedPostsMap")
+        map = database.createTreeMap("SharedPostsMap")
                 .comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
     }
 
     @Override
-    protected Map<byte[], List<String>> getMemoryMap() {
-        return new HashMap<>();
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     public void add(byte[] postSignature, String name) {
@@ -56,7 +55,7 @@ public class SharedPostsMap extends DCMap<byte[], List<String>> {
         list.remove(name);
 
         if (list.isEmpty()) {
-            delete(postSignature);
+            remove(postSignature);
             return;
         }
 
@@ -64,7 +63,7 @@ public class SharedPostsMap extends DCMap<byte[], List<String>> {
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

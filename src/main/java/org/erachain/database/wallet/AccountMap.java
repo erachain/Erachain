@@ -4,9 +4,9 @@ import com.google.common.primitives.UnsignedBytes;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.block.Block;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 // UNCONFIRMED balances for accounts in owner wallet only
-public class AccountMap extends DBMap <String, Integer> {
+public class AccountMap extends DCUMapImpl<String, Integer> {
 
     private static final String ADDRESS_ASSETS = "address_assets";
     private static final String ADDRESSES = "addresses";
@@ -32,32 +32,32 @@ public class AccountMap extends DBMap <String, Integer> {
         super(dWSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_ALL_ACCOUNT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_ACCOUNT_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_ACCOUNT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_ALL_ACCOUNT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_ACCOUNT_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_ACCOUNT_TYPE);
         }
 
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<String, Integer> getMap(DB database) {
+    protected void openMap() {
         this.publickKeys = database.createTreeSet(ADDRESSES)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .serializer(BTreeKeySerializer.BASIC)
                 .makeOrGet();
 
         this.assetsBalanceMap = database.getTreeMap(ADDRESS_ASSETS);
-        return database.getTreeMap(ADDRESSES_NO);
+        map = database.getTreeMap(ADDRESSES_NO);
     }
 
     @Override
-    protected Map<String, Integer> getMemoryMap() {
-        return new TreeMap<String, Integer>();
+    protected void getMemoryMap() {
+        map = new TreeMap<String, Integer>();
     }
 
     @Override
@@ -263,12 +263,12 @@ public class AccountMap extends DBMap <String, Integer> {
             this.publickKeys.remove(account.getPublicKey());
 
             // USE NOTIFY
-            super.delete(account.getAddress());
+            super.remove(account.getAddress());
 
         }
     }
 
-    public void reset() {
+    public void clear() {
         synchronized (this.publickKeys) {
             this.publickKeys.clear();
             this.assetsBalanceMap.clear();

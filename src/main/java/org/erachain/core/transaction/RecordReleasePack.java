@@ -233,23 +233,26 @@ public class RecordReleasePack extends Transaction {
         }
 
         DCSet fork = this.dcSet.fork();
+        try {
 
-        int counter = 0;
-        int result = 0;
-        //CHECK PAYMENTS
+            int counter = 0;
+            int result = 0;
+            //CHECK PAYMENTS
 
-        Block block = this.dcSet.getBlockMap().get(this.height);
-        for (Transaction transaction : this.transactions) {
+            Block block = this.dcSet.getBlockMap().get(this.height);
+            for (Transaction transaction : this.transactions) {
 
-            result = transaction.isValid(asDeal, flags);
-            if (result != Transaction.VALIDATE_OK)
-                // transaction counter x100
-                return result + counter * 100;
-            //PROCESS PAYMENT IN FORK AS PACK
-            transaction.process(block, asDeal);
-            counter++;
+                result = transaction.isValid(asDeal, flags);
+                if (result != Transaction.VALIDATE_OK)
+                    // transaction counter x100
+                    return result + counter * 100;
+                //PROCESS PAYMENT IN FORK AS PACK
+                transaction.process(block, asDeal);
+                counter++;
+            }
+        } finally {
+            fork.close();
         }
-
         // IN FORK
         return super.isValid(asDeal, flags);
 

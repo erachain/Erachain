@@ -112,7 +112,7 @@ public class OrderTestsMy {
 
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
 
         try {
@@ -130,11 +130,11 @@ public class OrderTestsMy {
         accountB = new PrivateKeyAccount(privateKey);
 
         // FEE FUND
-        accountA.setLastTimestamp(gb.getTimestamp(), db);
+        accountA.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         accountA.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
         accountA.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
-        accountB.setLastTimestamp(gb.getTimestamp(), db);
+        accountB.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         accountB.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
         accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
@@ -149,7 +149,7 @@ public class OrderTestsMy {
 
         assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db), new byte[64]);
+                accountB.getLastTimestamp(db)[0], new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(db);
@@ -176,8 +176,8 @@ public class OrderTestsMy {
 
     private void removeOrder(Long orderId) {
 
-        db.getCompletedOrderMap().delete(orderId);
-        db.getOrderMap().delete(orderId);
+        db.getCompletedOrderMap().remove(orderId);
+        db.getOrderMap().remove(orderId);
 
     }
 
@@ -1684,7 +1684,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db), new byte[64]);
+                accountB.getLastTimestamp(db)[0], new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -1703,7 +1703,7 @@ public class OrderTestsMy {
         // CREATE ORDER TWO (SELLING 99.9 B FOR A AT A PRICE OF 5)
         // GENERATES TRADE 99,9 B FOR 495 A
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(99.9),
-                BigDecimal.valueOf(495), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(495), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -1824,7 +1824,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db), new byte[64]);
+                accountB.getLastTimestamp(db)[0], new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -1843,7 +1843,7 @@ public class OrderTestsMy {
         // CREATE ORDER TWO (SELLING 200 B FOR PRICE OF 5)
         // GENERATES TRADE 100 B FOR 1000 A
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(200),
-                BigDecimal.valueOf(1000), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(1000), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -1971,7 +1971,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db));
+                accountB.getLastTimestamp(db)[0]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, 1);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -2010,7 +2010,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER _D (BUY) 30000 x 2 = 60000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(60000),
-                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2093,7 +2093,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER _E - buy 23000 x 2 = 46000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(56000),
-                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountB, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2182,7 +2182,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db));
+                accountB.getLastTimestamp(db)[0]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -2218,7 +2218,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER _D (BUY) 30000 x 2 = 60000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(60003),
-                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2297,7 +2297,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER _E - buy 23000 x 2 = 46000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(46000),
-                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountB, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2374,7 +2374,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db));
+                accountB.getLastTimestamp(db)[0]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -2385,7 +2385,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER _A SELL 2A for 15000 = 30000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(30000),
-                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2394,7 +2394,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER _B SELL 2A x 20000 = 40000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(40000),
-                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(2), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2403,7 +2403,7 @@ public class OrderTestsMy {
 
         // CREATE ORDER _C SELL 4A x 25000 = 100000
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(100000),
-                BigDecimal.valueOf(4), (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                BigDecimal.valueOf(4), (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountA, Transaction.FOR_NETWORK);
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2537,7 +2537,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db), new byte[64]);
+                accountB.getLastTimestamp(db)[0], new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -2559,7 +2559,7 @@ public class OrderTestsMy {
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
                 BigDecimal.valueOf(1000).setScale(assetB.getScale()),
                 BigDecimal.valueOf(5000).setScale(assetA.getScale()), (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db));
+                accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountB, Transaction.FOR_NETWORK); // need for Order.getID()
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2745,7 +2745,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db), new byte[64]);
+                accountB.getLastTimestamp(db)[0], new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -2766,7 +2766,7 @@ public class OrderTestsMy {
         // GENERATES TRADE 100 B FOR 1000 A
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA,
                 BigDecimal.valueOf(20).setScale(assetA.getScale()), BigDecimal.valueOf(100).setScale(assetA.getScale()),
-                (byte) 0, timestamp++, accountB.getLastTimestamp(db));
+                (byte) 0, timestamp++, accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountB, Transaction.FOR_NETWORK); // need for Order.getID()
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2837,7 +2837,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db), new byte[64]);
+                accountB.getLastTimestamp(db)[0], new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -2858,7 +2858,7 @@ public class OrderTestsMy {
         BigDecimal amoB2 = BigDecimal.valueOf(0.38).setScale(assetB.getScale());
 
         orderCreation = new CreateOrderTransaction(accountB, keyB, keyA, amoB2, amoA2, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db));
+                accountB.getLastTimestamp(db)[0]);
         orderCreation.sign(accountB, Transaction.FOR_NETWORK); // need for Order.getID()
         orderCreation.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         assertEquals(Transaction.VALIDATE_OK, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -2930,7 +2930,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db), new byte[64]);
+                accountB.getLastTimestamp(db)[0], new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -3028,7 +3028,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db), new byte[64]);
+                accountB.getLastTimestamp(db)[0], new byte[64]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -3179,7 +3179,7 @@ public class OrderTestsMy {
 
         // CREATE ISSUE ASSET TRANSACTION
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(db));
+                accountB.getLastTimestamp(db)[0]);
         issueAssetTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
@@ -3190,7 +3190,7 @@ public class OrderTestsMy {
         DCSet fork1 = db.fork();
         CreateOrderTransaction createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB,
                 BigDecimal.valueOf(1000), BigDecimal.valueOf(100), (byte) 0, timestamp++,
-                accountA.getLastTimestamp(fork1), new byte[] { 5, 6 });
+                accountA.getLastTimestamp(fork1)[0], new byte[] { 5, 6 });
         createOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
         createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         createOrderTransaction.process(null,Transaction.FOR_NETWORK);
@@ -3199,7 +3199,7 @@ public class OrderTestsMy {
         // CREATE ORDER TWO (SELLING 1000 A FOR B AT A PRICE FOR 0.20)
         DCSet fork2 = fork1.fork();
         createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2), new byte[] { 1, 2 });
+                BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2)[0], new byte[] { 1, 2 });
         createOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
         createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         createOrderTransaction.process(null,Transaction.FOR_NETWORK);
@@ -3208,7 +3208,7 @@ public class OrderTestsMy {
         // CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
         DCSet fork3 = fork2.fork();
         createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(150),
-                BigDecimal.valueOf(750), (byte) 0, timestamp++, accountA.getLastTimestamp(fork3), new byte[] { 3, 4 });
+                BigDecimal.valueOf(750), (byte) 0, timestamp++, accountA.getLastTimestamp(fork3)[0], new byte[] { 3, 4 });
         createOrderTransaction.sign(accountB, Transaction.FOR_NETWORK);
         createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         createOrderTransaction.process(null,Transaction.FOR_NETWORK);
@@ -3255,7 +3255,7 @@ public class OrderTestsMy {
 
         // ORPHAN ORDER TWO
         createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
-                BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2), new byte[] { 1, 2 });
+                BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2)[0], new byte[] { 1, 2 });
         createOrderTransaction.setDC(db, Transaction.FOR_NETWORK, 2, ++seqNo);
         createOrderTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
@@ -3463,7 +3463,7 @@ public class OrderTestsMy {
                 accountA.getBalanceUSE(keyA, db));
 
         // CHECK REFERENCE SENDER
-        assertEquals(cancelOrderTransaction.getTimestamp(), orderCreation.getCreator().getLastTimestamp(db));
+        assertEquals((long)cancelOrderTransaction.getTimestamp(), orderCreation.getCreator().getLastTimestamp(db)[0]);
 
         // CHECK ORDER EXISTS
         assertEquals(false, db.getOrderMap().contains(123L));
@@ -3479,7 +3479,7 @@ public class OrderTestsMy {
                 accountA.getBalanceUSE(keyA, db));
 
         // CHECK REFERENCE SENDER
-        assertEquals(orderCreation.getTimestamp(), orderCreation.getCreator().getLastTimestamp(db));
+        assertEquals((long)orderCreation.getTimestamp(), orderCreation.getCreator().getLastTimestamp(db)[0]);
 
         // CHECK ORDER EXISTS
         assertEquals(true, db.getOrderMap().contains(orderID));
@@ -3629,7 +3629,7 @@ public class OrderTestsMy {
         order_AB_2_ID = order_AB_2.getId();
 
         ///////// DELETE in FORK
-        fork.getOrderMap().delete(deletedID);
+        fork.getOrderMap().remove(deletedID);
         
         int compare;
         int index = 0;

@@ -394,7 +394,7 @@ public class DeployATTransaction extends Transaction {
 
         //UPDATE REFERENCE OF RECIPIENT
         if (true || atAccount.getLastTimestamp(this.dcSet) == null) {
-            atAccount.setLastTimestamp(this.timestamp, this.dcSet);
+            atAccount.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
         }
 
         //CREATE AT - public key or address? Is that the correct height?
@@ -456,7 +456,7 @@ public class DeployATTransaction extends Transaction {
         atAccount.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, false);
 
         //UPDATE REFERENCE OF SENDER
-        this.creator.setLastTimestamp(this.reference, this.dcSet);
+        this.creator.setLastTimestamp(new long[]{this.reference, dbRef}, this.dcSet);
 
     }
 

@@ -12,7 +12,7 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.gui.Gui;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
@@ -617,7 +617,7 @@ public class WebTransactionsHTML {
         if (vouchesItem == null || vouchesItem.b.isEmpty())
             return "";
 
-        TransactionFinalMap map = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
 
         String out = "<b>" + Lang.getInstance().translateFromLangObj("Certified", langObj) + ":</b> ";
 
@@ -708,7 +708,7 @@ public class WebTransactionsHTML {
         }
 
 
-        TransactionFinalMap map = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
         String out;
 
         if (vouchesItem.b.size() == 1) {

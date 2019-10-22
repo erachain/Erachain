@@ -4,7 +4,6 @@ import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.transaction.Transaction;
 import org.mapdb.DB;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -14,11 +13,11 @@ import java.util.TreeMap;
  * Значение - номер сущности
  *
  * Используется в org.erachain.core.transaction.IssueItemRecord#orphan(int)
- * TODO: поменять ссылку на запись с подписи на ссылку по номерам - и в таблицах ключ тоже на Лонг поменять
+ * TODO: поменять ссылку на запись с подписи на ссылку по номерам - и в таблицах ключ тоже на Лонг поменять - но проверку подписи хотябы 8 байт оставить
  * https://lab.erachain.org/erachain/Erachain/issues/465
  *
  */
-public abstract class IssueItemMap extends DCMap<byte[], Long> {
+public abstract class IssueItemMap extends DCUMap<byte[], Long> {
 
     public IssueItemMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -28,12 +27,12 @@ public abstract class IssueItemMap extends DCMap<byte[], Long> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<byte[], Long> getMemoryMap() {
-        return new TreeMap<>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override
@@ -50,6 +49,6 @@ public abstract class IssueItemMap extends DCMap<byte[], Long> {
     }
 
     public void delete(Transaction transaction) {
-        delete(transaction.getSignature());
+        remove(transaction.getSignature());
     }
 }

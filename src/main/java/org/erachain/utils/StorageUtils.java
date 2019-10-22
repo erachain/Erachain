@@ -365,7 +365,7 @@ public class StorageUtils {
                     }
 
                     db.getOrphanNameStorageMap()
-                            .delete(signature);
+                            .remove(signature);
 
                     db
                             .getOrphanNameStorageHelperMap().remove(name, signature);

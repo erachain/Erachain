@@ -1,42 +1,40 @@
 package org.erachain.core.web;
 
-import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
-import org.mapdb.DB;
+import org.erachain.datachain.DCUMap;
 import org.erachain.utils.ByteArrayUtils;
+import org.mapdb.DB;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class OrphanNameStorageHelperMap extends DCMap<String, List<byte[]>> {
+public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
 
     public OrphanNameStorageHelperMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
 
-    public OrphanNameStorageHelperMap(DCMap<String, List<byte[]>> parent) {
+    public OrphanNameStorageHelperMap(DCUMap<String, List<byte[]>> parent) {
         super(parent, null);
     }
 
 
     @Override
-    protected Map<String, List<byte[]>> getMap(DB database) {
+    protected void openMap() {
 
-
-        return database.createTreeMap("OrphanNameStorageHelperMap")
+        map = database.createTreeMap("OrphanNameStorageHelperMap")
                 .makeOrGet();
 
     }
 
     @Override
-    protected Map<String, List<byte[]>> getMemoryMap() {
-        return new HashMap<>();
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     public void add(String name, byte[] signatureOfTx) {

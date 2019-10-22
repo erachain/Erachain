@@ -2,6 +2,7 @@ package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.MTable;
@@ -19,8 +20,11 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Timer;
+import java.util.TimerTask;
+//import java.util.TimerTask;
 
-public class ItemSplitPanel extends SplitPanel {
+public abstract class ItemSplitPanel extends SplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected TimerTableModelCls tableModel;
@@ -73,24 +77,31 @@ public class ItemSplitPanel extends SplitPanel {
                 jScrollPaneJPanelRightPanel.setViewportView(null);
                 return;
             }
+
             try {
                 itemTableSelected = getItem(jTableJScrollPanelLeftPanel.getSelectedRow());
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
+                logger.error(e.getMessage(), e);
                 return;
             }
-            if (itemTableSelected == null)  {
+            if (itemTableSelected == null) {
                 return;
             }
             try {
                 // TODO почемуто при выборе персоны сюда 2 раза прилетает и перерисовка дважды идет
+                jScrollPaneJPanelRightPanel.setViewportView(null);
                 jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
             } catch (Exception e) {
-                logger.error(e.getMessage(),e);
-                jScrollPaneJPanelRightPanel.setViewportView(null);
+                logger.error(e.getMessage(), e);
+                try {
+                    jScrollPaneJPanelRightPanel.setViewportView(null);
+                    jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
+                } catch (Exception e1) {
+                    jScrollPaneJPanelRightPanel.setViewportView(null);
+                    jScrollPaneJPanelRightPanel.setViewportView(getShow(itemTableSelected));
+                }
 
             }
-            //	itemTableSelected = null;
 
         });
 
@@ -100,21 +111,28 @@ public class ItemSplitPanel extends SplitPanel {
         jTableJScrollPanelLeftPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+
                 Point point = e.getPoint();
-                int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
-                jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
 
-                itemTableSelected = getItem(row);
+                    int row = jTableJScrollPanelLeftPanel.rowAtPoint(point);
+                    jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
-                if (e.getClickCount() == 2) {
-                    tableMouse2Click(itemTableSelected);
-                }
+                    itemTableSelected = getItem(row);
 
-                if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
-                    if (jTableJScrollPanelLeftPanel.getSelectedColumn() == ItemSplitPanel.this.tableModel.COLUMN_FAVORITE) {
-                        favoriteSet(itemTableSelected);
+                    if (e.getClickCount() == 2) {
+                        tableMouse2Click(itemTableSelected);
                     }
-                }
+
+                    if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
+                        if (jTableJScrollPanelLeftPanel.getSelectedColumn() == ItemSplitPanel.this.tableModel.COLUMN_FAVORITE) {
+                            favoriteSet(itemTableSelected);
+                        }
+                    }
+                }}, 10);
             }
         });
 
@@ -124,9 +142,7 @@ public class ItemSplitPanel extends SplitPanel {
         favoriteMenuItems.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 int row = jTableJScrollPanelLeftPanel.getSelectedRow();
-                row = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 favoriteSet(getItem(row));
-
             }
         });
 
@@ -182,20 +198,23 @@ public class ItemSplitPanel extends SplitPanel {
 
     }
 
-    protected Component getShow(ItemCls item) {
-        return null;
-    }
+    abstract protected Component getShow(ItemCls item);
 
-    protected ItemCls getItem(int row) {
-        Object item = ItemSplitPanel.this.tableModel.getItem(jTableJScrollPanelLeftPanel.convertRowIndexToModel(row));
+
+    private ItemCls getItem(int row) {
+        int crow = jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
+        Object item = tableModel.getItem(crow);
+        ItemCls itemCls;
         if (item instanceof Fun.Tuple2) {
-            return (ItemCls) ((Fun.Tuple2)item).b;
+            itemCls = (ItemCls) ((Fun.Tuple2)item).b;
         } else {
-            return (ItemCls)item;
+            itemCls =(ItemCls)item;
         }
+
+        itemCls.getKey(DCSet.getInstance());
+        return  itemCls;
+
     }
-
-
 
     protected void tableMouse2Click(ItemCls item) {
     }

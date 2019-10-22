@@ -27,7 +27,7 @@ public class Network extends Observable {
     private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = 1024 << (3 + Controller.HARD_WORK);
     private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = 1024 << (1 + Controller.HARD_WORK >> 1);
     private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = 128 >> (Controller.HARD_WORK >> 1);
-    private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Network.class.getSimpleName());
 
     private Controller controller;
     private static InetAddress myselfAddress;
@@ -36,6 +36,7 @@ public class Network extends Observable {
     private MessagesProcessor messagesProcessor;
     PeerManager peerManager;
     public TelegramManager telegramer;
+    private LocalPeerScanner localPeerScanner;
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
@@ -125,7 +126,12 @@ public class Network extends Observable {
                 DCSet.getInstance(),
                 this);
 
-        this.messagesProcessor = new MessagesProcessor(this);
+        messagesProcessor = new MessagesProcessor(this);
+
+        if (Settings.getInstance().isLocalPeersScannerEnabled()){
+            localPeerScanner = new LocalPeerScanner(this);
+            localPeerScanner.start();
+        }
 
     }
 
@@ -220,7 +226,7 @@ public class Network extends Observable {
     // IF PEER in exist in NETWORK - get it
     public Peer getKnownPeer(Peer peer, int type) {
 
-        Peer knowmPeer = null;
+        //Peer knowmPeer = null;
         try {
             byte[] address = peer.getAddress().getAddress();
             //FOR ALL connectedPeers
@@ -228,7 +234,7 @@ public class Network extends Observable {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(address, knownPeer.getAddress().getAddress())
                         && (type == ANY_TYPE || type == WHITE_TYPE && knownPeer.isWhite()
-                        || !knowmPeer.isWhite())
+                        || !knownPeer.isWhite())
                 ) {
                     // иначе тут не сработате правильно org.erachain.network.Network.onConnect
                     // поэтому сразу выдаем первый что нашли без каких либо условий
@@ -329,7 +335,7 @@ public class Network extends Observable {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
         if (!controller.isOnStopping()) {
-            knownPeers = controller.getDBSet().getPeerMap().getBestPeers(
+            knownPeers = controller.getDLSet().getPeerMap().getBestPeers(
                     0, true);
         }
 
@@ -729,6 +735,9 @@ public class Network extends Observable {
     public void stop() {
 
         this.run = false;
+        if (localPeerScanner != null) {
+            localPeerScanner.interrupt();
+        }
 
         // STOP MESSAGES PROCESSOR
         messagesProcessor.halt();

@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 // upd 09/03
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
@@ -18,15 +19,17 @@ import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.core.web.SharedPostsMap;
 import org.erachain.database.DBASet;
+import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Observable;
-import java.util.Observer;
+import java.io.IOError;
+import java.nio.file.Files;
 import java.util.Random;
 
 /**
@@ -34,11 +37,60 @@ import java.util.Random;
  * Но почемуто парент хранится в каждой таблице - хотя там сразу ссылка на форкнутую таблицу есть
  * а в ней уже хранится объект набора DCSet
  */
-public class DCSet extends DBASet implements Observer {
+@Slf4j
+public class DCSet extends DBASet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
-    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE << 3;
-    private static final int CASH_SIZE = 1024 << Controller.HARD_WORK;
+    private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 3;
+    private static final long MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 8;
+    private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
+    public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT << 4;
+
+    /**
+     * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
+     */
+    public static final int BLOCKS_MAP = DBS_ROCK_DB;
+    public static final int BLOCKS_MAP_FORK = DBS_NATIVE_MAP;
+    /**
+     * DBS_MAP_DB - slow then DBS_ROCK_DB
+     */
+    public static final int FINAL_TX_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_MAP_FORK = DBS_NATIVE_MAP;
+
+    /**
+     * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
+     */
+    public static final int FINAL_TX_SIGNS_MAP = DBS_ROCK_DB;
+    public static final int FINAL_TX_SIGNS_MAP_FORK = DBS_NATIVE_MAP;
+
+    /**
+     * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
+     * нельзя делать DBS_NATIVE_MAP !!! - так как он не удаляет транзакции по вторичному индексу
+     * И трнзакции копятся пока полностью не будут удалены скопом при FLUSH что тормозит время
+     * блока на проверке и исполнении
+     */
+    public static final int UNCONF_TX_MAP = DBS_MAP_DB_IN_MEM;;
+    public static final int UNCONF_TX_MAP_FORK = DBS_MAP_DB_IN_MEM;
+
+    /**
+     * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
+     */
+    public static final int ACCOUNT_BALANCES = DBS_ROCK_DB;
+    public static final int ACCOUNT_BALANCES_FORK = DBS_NATIVE_MAP;
+
+    /**
+     * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
+     */
+    public static final int ACCOUNTS_REFERENCES = DBS_ROCK_DB;
+
+    public static final int ORDERS_MAP = DBS_MAP_DB;
+    public static final int COMPLETED_ORDERS_MAP = DBS_MAP_DB;
+    public static final int TRADES_MAP = DBS_MAP_DB;
+
+    /**
+     * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
+     */
+    private static final boolean needClearCache = false;
 
     private static boolean isStoped = false;
     private volatile static DCSet instance;
@@ -55,9 +107,8 @@ public class DCSet extends DBASet implements Observer {
 
     private AddressForging addressForging;
     private CreditAddressesMap credit_AddressesMap;
-    private ItemAssetBalanceMap assetBalanceMap;
+    private ItemAssetBalanceTab assetBalanceMap;
     private AddressStatementRefs addressStatement_Refs;
-    private ItemAssetBalanceMap assetBalanceAccountingMap;
     private KKAssetStatusMap kKAssetStatusMap;
     private KKPersonStatusMap kKPersonStatusMap;
     //private KKPollStatusMap kKPollStatusMap;
@@ -73,12 +124,10 @@ public class DCSet extends DBASet implements Observer {
     private HashesMap hashesMap;
     private HashesSignsMap hashesSignsMap;
 
-    private AddressTimeSignatureMap addressTime_SignatureMap;
-    private BlockMap blockMap;
-    //private BlockCreatorMap blockCreatorMap;
+    private BlocksMapImpl blockMap;
     private BlockSignsMap blockSignsMap;
     private BlocksHeadsMap blocksHeadsMap;
-    private ReferenceMap referenceMap;
+    private ReferenceMapImpl referenceMap;
     private NameMap nameMap;
     private NameStorageMap nameStorageMap;
     private OrphanNameStorageMap orphanNameStorageMap;
@@ -97,9 +146,9 @@ public class DCSet extends DBASet implements Observer {
     private VoteOnItemPollMap voteOnItemPollMap;
     private ItemAssetMap itemAssetMap;
     private IssueAssetMap issueAssetMap;
-    private OrderMap orderMap;
+    private OrderMapImpl orderMap;
     private CompletedOrderMap completedOrderMap;
-    private TradeMap tradeMap;
+    private TradeMapImpl tradeMap;
     private ItemStatusMap itemStatusMap;
     private IssueStatusMap issueStatusMap;
     private ItemImprintMap itemImprintMap;
@@ -117,31 +166,76 @@ public class DCSet extends DBASet implements Observer {
     private ATMap atMap;
     private ATStateMap atStateMap;
     private ATTransactionMap atTransactionMap;
-    private TransactionFinalMap transactionFinalMap;
+    private TransactionFinalMapImpl transactionFinalMap;
     private TransactionFinalCalculatedMap transactionFinalCalculatedMap;
     private TransactionFinalMapSigns transactionFinalMapSigns;
-    private TransactionMap transactionMap;
+    private TransactionTabImpl transactionTab;
 
     private long actions = (long) (Math.random() * (ACTIONS_BEFORE_COMMIT >> 1));
 
-    public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory) {
+    /**
+     *
+     * @param dbFile
+     * @param database общая база данных для данного набора - вообще надо ее в набор свтавить и все.
+     *               У каждой таблицы внутри может своя база данных открытьваться.
+     *               А команды базы данных типа close commit должны из таблицы передаваться в свою.
+     *               Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
+     * @param withObserver
+     * @param dynamicGUI
+     * @param inMemory
+     * @param defaultDBS
+     */
+    public DCSet(File dbFile, DB database, boolean withObserver, boolean dynamicGUI, boolean inMemory, int defaultDBS) {
         super(dbFile, database, withObserver, dynamicGUI);
 
+        LOGGER.info("UP SIZE BEFORE COMMIT [KB]: " + MAX_ENGINE_BEFORE_COMMIT_KB
+                + ", ACTIONS BEFORE COMMIT: " + ACTIONS_BEFORE_COMMIT
+                + ", DELETIONS BEFORE COMPACT: " + DELETIONS_BEFORE_COMPACT);
+
+        this.engineSize = getEngineSize();
         this.inMemory = inMemory;
 
         try {
+            // переделанные таблицы
+            this.assetBalanceMap = new ItemAssetBalanceTabImpl(defaultDBS > 0 ? defaultDBS :
+                    ACCOUNT_BALANCES
+                    , this, database);
+
+            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0 ? defaultDBS :
+                    FINAL_TX_MAP
+                    , this, database);
+
+            this.transactionTab = new TransactionTabImpl(UNCONF_TX_MAP, this, database);
+
+            this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
+                    ACCOUNTS_REFERENCES
+                    , this, database);
+
+            this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
+                    BLOCKS_MAP
+                    , this, database);
+
+            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
+                    FINAL_TX_SIGNS_MAP
+                    , this, database);
+            this.orderMap = new OrderMapImpl(defaultDBS > 0 ? defaultDBS :
+                    ORDERS_MAP
+                    , this, database);
+            this.completedOrderMap = new CompletedOrderMapImpl(defaultDBS > 0 ? defaultDBS :
+                    COMPLETED_ORDERS_MAP
+                    , this, database);
+            this.tradeMap = new TradeMapImpl(defaultDBS > 0 ? defaultDBS :
+                    TRADES_MAP
+                    , this, database);
+
+
             this.actions = 0L;
 
-            this.blockMap = new BlockMap(this, database);
-            //this.blockCreatorMap = new BlockCreatorMap(this, database);
             this.blockSignsMap = new BlockSignsMap(this, database);
             this.blocksHeadsMap = new BlocksHeadsMap(this, database);
-            this.referenceMap = new ReferenceMap(this, database);
             this.addressForging = new AddressForging(this, database);
             this.credit_AddressesMap = new CreditAddressesMap(this, database);
-            this.assetBalanceMap = new ItemAssetBalanceMap(this, database);
             this.addressStatement_Refs = new AddressStatementRefs(this, database);
-            this.assetBalanceAccountingMap = new ItemAssetBalanceMap(this, database);
 
             this.kKAssetStatusMap = new KKAssetStatusMap(this, database);
             this.kKPersonStatusMap = new KKPersonStatusMap(this, database);
@@ -154,15 +248,11 @@ public class DCSet extends DBASet implements Observer {
             this.addressPersonMap = new AddressPersonMap(this, database);
             this.personAddressMap = new PersonAddressMap(this, database);
             this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(this, database);
-            this.transactionFinalMap = new TransactionFinalMap(this, database);
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
 
-            this.transactionFinalMapSigns = new TransactionFinalMapSigns(this, database);
-            this.transactionMap = new TransactionMap(this, database);
             this.vouchRecordMap = new VouchRecordMap(this, database);
             this.hashesMap = new HashesMap(this, database);
             this.hashesSignsMap = new HashesSignsMap(this, database);
-            this.addressTime_SignatureMap = new AddressTimeSignatureMap(this, database);
             this.nameMap = new NameMap(this, database);
             this.nameStorageMap = new NameStorageMap(this, database);
             this.orphanNameStorageMap = new OrphanNameStorageMap(this, database);
@@ -183,9 +273,6 @@ public class DCSet extends DBASet implements Observer {
 
             this.itemAssetMap = new ItemAssetMap(this, database);
             this.issueAssetMap = new IssueAssetMap(this, database);
-            this.orderMap = new OrderMap(this, database);
-            this.completedOrderMap = new CompletedOrderMap(this, database);
-            this.tradeMap = new TradeMap(this, database);
 
             this.itemImprintMap = new ItemImprintMap(this, database);
             this.issueImprintMap = new IssueImprintMap(this, database);
@@ -214,6 +301,7 @@ public class DCSet extends DBASet implements Observer {
             this.atTransactionMap = new ATTransactionMap(this, database);
 
         } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
             this.close();
             throw e;
         }
@@ -221,7 +309,8 @@ public class DCSet extends DBASet implements Observer {
         if (this.blockMap.size() != this.blocksHeadsMap.size()
                 || this.blockSignsMap.size() != this.blocksHeadsMap.size()) {
             LOGGER.info("reset DATACHAIN on height error (blockMap, blockSignsMap, blocksHeadsMap: "
-                    + this.blockMap.size() + " == " + this.blocksHeadsMap.size());
+                    + this.blockMap.size() + " != "
+                    + this.blockSignsMap.size() + " != " + this.blocksHeadsMap.size());
 
             this.close();
             this.actions = -1;
@@ -234,10 +323,27 @@ public class DCSet extends DBASet implements Observer {
     /**
      * Make data set as Fork
      *
-     * @param parent parent DCSet
+     * @param parent     parent DCSet
      * @param idDatabase
      */
     protected DCSet(DCSet parent, DB idDatabase) {
+
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                // у родителя чистим - у себя нет, так как только создали
+                parent.clearCache();
+                System.gc();
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                    logger.error("Heap Memory Overflow");
+                    Controller.getInstance().stopAll(1091);
+                    return;
+                }
+            }
+        }
 
         this.addUses();
 
@@ -247,11 +353,48 @@ public class DCSet extends DBASet implements Observer {
         ///this.database = parent.database.snapshot();
         this.bchain = parent.bchain;
 
+        // переделанные поновой таблицы
+        this.assetBalanceMap = new ItemAssetBalanceTabImpl(
+                ACCOUNT_BALANCES_FORK
+                , parent.assetBalanceMap, this);
+        this.transactionTab = new TransactionTabImpl(
+                UNCONF_TX_MAP_FORK
+                , parent.transactionTab, this);
+        this.transactionFinalMap = new TransactionFinalMapImpl(
+                FINAL_TX_MAP_FORK
+                , parent.transactionFinalMap, this);
+        this.referenceMap = new ReferenceMapImpl(
+                DBS_NATIVE_MAP
+                , parent.referenceMap, this);
+
+        this.blockMap = new BlocksMapImpl(
+                BLOCKS_MAP_FORK
+                , parent.blockMap, this);
+
+        this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
+                FINAL_TX_SIGNS_MAP_FORK
+                , parent.transactionFinalMapSigns, this);
+
+        this.orderMap = new OrderMapImpl(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.orderMap, this);
+        this.completedOrderMap = new CompletedOrderMapImpl(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.completedOrderMap, this);
+        this.tradeMap = new TradeMapImpl(
+                DBS_MAP_DB
+                //DBS_ROCK_DB
+                //DBS_NATIVE_MAP
+                , parent.tradeMap, this);
+
+
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
-        this.assetBalanceMap = new ItemAssetBalanceMap(parent.assetBalanceMap, this);
         this.addressStatement_Refs = new AddressStatementRefs(parent.addressStatement_Refs, this);
-        this.assetBalanceAccountingMap = new ItemAssetBalanceMap(parent.assetBalanceAccountingMap, this);
         this.kKAssetStatusMap = new KKAssetStatusMap(parent.kKAssetStatusMap, this);
         this.kKPersonStatusMap = new KKPersonStatusMap(parent.kKPersonStatusMap, this);
         this.kKUnionStatusMap = new KKUnionStatusMap(parent.kKUnionStatusMap, this);
@@ -263,19 +406,13 @@ public class DCSet extends DBASet implements Observer {
         this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap, this);
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap, this);
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable, this);
-        this.transactionFinalMap = new TransactionFinalMap(parent.transactionFinalMap, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
-        this.transactionFinalMapSigns = new TransactionFinalMapSigns(parent.transactionFinalMapSigns, this);
-        this.transactionMap = new TransactionMap(parent.transactionMap, this);
         this.vouchRecordMap = new VouchRecordMap(parent.vouchRecordMap, this);
         this.hashesMap = new HashesMap(parent.hashesMap, this);
         this.hashesSignsMap = new HashesSignsMap(parent.hashesSignsMap, this);
 
-        this.addressTime_SignatureMap = new AddressTimeSignatureMap(parent.addressTime_SignatureMap, this);
-        this.blockMap = new BlockMap(parent.blockMap, this);
         this.blockSignsMap = new BlockSignsMap(parent.blockSignsMap, this);
         this.blocksHeadsMap = new BlocksHeadsMap(parent.blocksHeadsMap, this);
-        this.referenceMap = new ReferenceMap(parent.referenceMap, this);
         //this.nameMap = new NameMap(parent.nameMap);
         //this.nameStorageMap = new NameStorageMap(parent.nameStorageMap);
         //this.orphanNameStorageMap = new OrphanNameStorageMap(parent.orphanNameStorageMap);
@@ -298,9 +435,6 @@ public class DCSet extends DBASet implements Observer {
 
         this.itemAssetMap = new ItemAssetMap(parent.itemAssetMap, this);
         this.issueAssetMap = new IssueAssetMap(parent.getIssueAssetMap(), this);
-        this.orderMap = new OrderMap(parent.orderMap, this);
-        this.completedOrderMap = new CompletedOrderMap(parent.completedOrderMap, this);
-        this.tradeMap = new TradeMap(parent.tradeMap, this);
 
         this.itemImprintMap = new ItemImprintMap(parent.itemImprintMap, this);
         this.issueImprintMap = new IssueImprintMap(parent.issueImprintMap, this);
@@ -335,10 +469,8 @@ public class DCSet extends DBASet implements Observer {
      * Get instance of DCSet or create new
      *
      * @param withObserver [true] - for switch on GUI observers
-     * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
-
+     * @param dynamicGUI   [true] - for switch on GUI observers fir dynamic interface
      * @return
-
      * @throws Exception
      */
 
@@ -355,7 +487,6 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
-     *
      * @return
      */
     public static DCSet getInstance() {
@@ -363,10 +494,126 @@ public class DCSet extends DBASet implements Observer {
     }
 
     /**
+     * Создание файла для основной базы данных
+     *
+     * @param dbFile
+     * @return
+     */
+    public static DB makeFileDB(File dbFile) {
+
+        /// https://jankotek.gitbooks.io/mapdb/performance/
+        DBMaker databaseStruc = DBMaker.newFileDB(dbFile)
+                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
+
+                .checksumEnable()
+                .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
+
+                // тормозит сильно но возможно когда файл большеой не падает скорость сильно
+                // вдобавок не сохраняет на диск даже Транзакционный файл и КРАХ теряет данные
+                // НЕ ВКЛЮЧАТЬ!
+                // .mmapFileEnablePartial()
+
+                // Если этот отключить (закомментировать) то файлы на лету не обновляются на диске а только в момент Флуша
+                // типа быстрее работают но по факту с Флушем нет и в описании предупрежджение - что
+                // при крахе системы в момент флуша можно потерять данные - так как в Транзакционный фал изменения
+                // катаются так же в момент флуша - а не при изменении данных
+                // так что этот ключ тут полезный
+                .commitFileSyncDisable() // ++
+
+                //.snapshotEnable()
+                //.asyncWriteEnable() - крах при коммитах и откатах тразакций - возможно надо asyncWriteFlushDelay больше задавать
+                .asyncWriteFlushDelay(2)
+
+                // если при записи на диск блока процессор сильно нагружается - то уменьшить это
+                .freeSpaceReclaimQ(7)// не нагружать процессор для поиска свободного места в базе данных
+
+                //.compressionEnable()
+                ;
+
+        /**
+         * если не задавать вид КЭШа то берется стандартный - и его размер 10 очень мал и скорость
+         * решения боков в 2-5 раза меньше. Однако если разделить таблицы по разным базам так чтобы блоки особо не кэшировать.
+         * Тогда возможно этот вид КЭШа будет приемлем для дранзакций
+         * == количество точек в таблице которые хранятся в HashMap как в КЭШе
+         * - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
+         * WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
+         */
+
+        if (true) {
+            // USE CACHE
+            if (BLOCKS_MAP != DBS_MAP_DB) {
+                // если блоки не сохраняются в общей базе данных
+                databaseStruc
+                        .cacheSize(1024 << (5 + Controller.HARD_WORK));
+            } else {
+                if (needClearCache) {
+                    //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
+                    ///// добавил dcSet.clearCache(); --
+                    databaseStruc
+                            .cacheSize(32 + 32 << Controller.HARD_WORK)
+                    ;
+
+                } else {
+                    databaseStruc
+
+                            // при норм размере и досточной памяти скорость не хуже чем у остальных
+                            //.cacheLRUEnable() // скорость зависит от памяти и настроек -
+                            //.cacheSize(2048 + 64 << Controller.HARD_WORK)
+
+                            // это чистит сама память если соталось 25% от кучи - так что она безопасная
+                            // у другого типа КЭША происходит утечка памяти
+                            .cacheHardRefEnable()
+
+                    ///.cacheSoftRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
+
+                    ///.cacheWeakRefEnable()
+                    ///.cacheSize(32 << Controller.HARD_WORK)
+                    ;
+
+                }
+            }
+        } else {
+            databaseStruc.cacheDisable();
+        }
+
+        return databaseStruc.make();
+
+    }
+
+    /**
+     * Для проверкт одного блока в памяти - при добавлении в цепочку или в буфер ожидания
+     *
+     * @return
+     */
+    public static DB makeDBinMemory() {
+        return DBMaker
+                .newMemoryDB()
+                .transactionDisable()
+                .deleteFilesAfterClose()
+                .asyncWriteEnable() // улучшает чуток и не падает так как нет транзакционности
+
+                // это время добавляется к ожиданию конца - и если больше 100 то тормоз лишний
+                // но 1..10 - увеличивает скорость валидации трнзакций!
+                .asyncWriteFlushDelay(2)
+                // тут не влияет .commitFileSyncDisable()
+
+                .cacheHardRefEnable()
+                //.cacheDisable()
+
+                .freeSpaceReclaimQ(0) // как-то слабо влияет в памяти
+                //.compressionEnable() // как-то не влияет в памяти
+
+                //
+                //.newMemoryDirectDB()
+                .make();
+    }
+
+    /**
      * remake data set
      *
      * @param withObserver [true] - for switch on GUI observers
-     * @param dynamicGUI [true] - for switch on GUI observers fir dynamic interface
+     * @param dynamicGUI   [true] - for switch on GUI observers fir dynamic interface
      * @throws Exception
      */
     public static void reCreateDB(boolean withObserver, boolean dynamicGUI) throws Exception {
@@ -375,77 +622,34 @@ public class DCSet extends DBASet implements Observer {
         File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
         dbFile.getParentFile().mkdirs();
 
-        /// https://jankotek.gitbooks.io/mapdb/performance/
-        //CREATE DATABASE
-        DB database = DBMaker.newFileDB(dbFile)
-                // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing
+        DB database = makeFileDB(dbFile);
 
-                //// иначе кеширует блок и если в нем удалить трнзакции или еще что то выдаст тут же такой блок с пустыми полями
-                ///// добавил dcSet.clearCache(); --
-                ///.cacheDisable()
+        //CREATE INSTANCE
+        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false, Controller.getInstance().databaseSystem);
+        if (instance.actions < 0) {
+            for (DBTab tab : instance.tables) {
+                tab.clear();
+            }
+            database.close();
+            dbFile.delete();
+            throw new Exception("error in DATACHAIN:" + instance.actions);
+        }
 
-                ////// ТУТ вряд ли нужно КЭШИРОВАТь при чтении что-либо
-                //////
-                // это чистит сама память если соталось 25% от кучи - так что она безопасная
-                // у другого типа КЭША происходит утечка памяти
-                //.cacheHardRefEnable()
-                //.cacheLRUEnable()
-                .cacheSoftRefEnable()
-                ///.cacheWeakRefEnable()
-
-                // количество точек в таблице которые хранятся в HashMap как в КЭШе
-                // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
-                // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
-                .cacheSize(10)
-
-                .checksumEnable()
-                .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
-                .commitFileSyncDisable() // ++
-
-                //.snapshotEnable()
-                //.asyncWriteEnable()
-                //.asyncWriteFlushDelay(100)
-                //.cacheHardRefEnable()
-
-                // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
-
-                //.compressionEnable()
-
-                /*
-                .cacheSize(CASH_SIZE)
-                //.checksumEnable()
-                .cacheHardRefEnable()
-                .commitFileSyncDisable()
-                //////.transactionDisable()
-                //.asyncWriteEnable() ///
-                //.asyncWriteFlushDelay(1000) //
-                //.mmapFileEnableIfSupported()
-                 */
-                .make();
-
+        // очистим полностью перед компактом
         if (Controller.getInstance().compactDConStart) {
+            instance.getTransactionTab().clear();
+            instance.database.commit();
             LOGGER.debug("try COMPACT");
             database.compact();
             LOGGER.debug("COMPACTED");
         }
 
-        //CREATE INSTANCE
-        instance = new DCSet(dbFile, database, withObserver, dynamicGUI, false);
-        if (instance.actions < 0) {
-            dbFile.delete();
-            throw new Exception("error in DATACHAIN:" + instance.actions);
-        }
-
     }
 
     public static void reCreateDBinMEmory(boolean withObserver, boolean dynamicGUI) {
-        DB database = DBMaker
-                .newMemoryDB()
-                //.newMemoryDirectDB()
-                .make();
+        DB database = makeDBinMemory();
 
-        instance = new DCSet(null, database, withObserver, dynamicGUI, true);
+        instance = new DCSet(null, database, withObserver, dynamicGUI, true, Controller.getInstance().databaseSystem);
 
     }
 
@@ -453,25 +657,31 @@ public class DCSet extends DBASet implements Observer {
          * make data set in memory. For tests
          *
          * @return
+         * @param defaultDBS
          */
-    public static DCSet createEmptyDatabaseSet() {
-        DB database = DBMaker
-                .newMemoryDB()
-                //.newMemoryDirectDB()
-                .make();
+    public static DCSet createEmptyDatabaseSet(int defaultDBS) {
+        DB database = DCSet.makeDBinMemory();
 
-        instance = new DCSet(null, database, false, false, true);
+        instance = new DCSet(null, database, false, false, true, defaultDBS);
         return instance;
     }
 
-    /**
-     * create FORK of DB
-     *
-     * @return
-     */
-    public static DB createForkbase() {
+    public static DCSet createEmptyHardDatabaseSet(int defaultDBS) {
+        instance = new DCSet(null, getHardBaseForFork(), false, false, true, defaultDBS);
+        return instance;
+    }
 
-        return getHardBase();
+    public static DCSet createEmptyHardDatabaseSetWithFlush(String path, int defaultDBS) {
+        // найдем новый не созданный уже файл
+        File dbFile;
+        do {
+            dbFile = new File(path == null? Settings.getInstance().getDataTempDir() : path, "fork" + randFork.nextInt() + ".dat");
+        } while (dbFile.exists());
+
+        dbFile.getParentFile().mkdirs();
+
+        instance = new DCSet(dbFile, makeFileDB(dbFile), false, false, true, defaultDBS);
+        return instance;
     }
 
     public static boolean isStoped() {
@@ -505,77 +715,76 @@ public class DCSet extends DBASet implements Observer {
 
         this.addUses();
 
-        this.addressForging.reset();
-        this.credit_AddressesMap.reset();
-        this.assetBalanceMap.reset();
-        this.addressStatement_Refs.reset();
-        this.assetBalanceAccountingMap.reset();
-        this.kKAssetStatusMap.reset();
-        this.kKPersonStatusMap.reset();
-        this.kKUnionStatusMap.reset();
-        this.kKAssetUnionMap.reset();
-        this.kKPersonUnionMap.reset();
-        this.kKPollUnionMap.reset();
+        this.addressForging.clear();
+        this.credit_AddressesMap.clear();
+        this.assetBalanceMap.clear();
+        this.addressStatement_Refs.clear();
+        //this.assetBalanceAccountingMap.clear();
+        this.kKAssetStatusMap.clear();
+        this.kKPersonStatusMap.clear();
+        this.kKUnionStatusMap.clear();
+        this.kKAssetUnionMap.clear();
+        this.kKPersonUnionMap.clear();
+        this.kKPollUnionMap.clear();
 
-        this.kKStatusUnionMap.reset();
-        this.addressPersonMap.reset();
-        this.personAddressMap.reset();
-        this.kK_KPersonStatusUnionMapPersonStatusUnionTable.reset();
-        this.vouchRecordMap.reset();
-        this.hashesMap.reset();
-        this.hashesSignsMap.reset();
-        this.blockMap.reset();
-        this.blockSignsMap.reset();
-        this.blocksHeadsMap.reset();
+        this.kKStatusUnionMap.clear();
+        this.addressPersonMap.clear();
+        this.personAddressMap.clear();
+        this.kK_KPersonStatusUnionMapPersonStatusUnionTable.clear();
+        this.vouchRecordMap.clear();
+        this.hashesMap.clear();
+        this.hashesSignsMap.clear();
+        this.blockMap.clear();
+        this.blockSignsMap.clear();
+        this.blocksHeadsMap.clear();
 
-        this.referenceMap.reset();
-        this.transactionFinalMap.reset();
-        this.transactionFinalCalculatedMap.reset();        
-        this.transactionFinalMapSigns.reset();
-        this.transactionMap.reset();
-        this.nameMap.reset();
-        this.nameStorageMap.reset();
-        this.orphanNameStorageMap.reset();
-        this.orphanNameStorageHelperMap.reset();
-        this.sharedPostsMap.reset();
-        this.commentPostMap.reset();
+        this.referenceMap.clear();
+        this.transactionFinalMap.clear();
+        this.transactionFinalCalculatedMap.clear();
+        this.transactionFinalMapSigns.clear();
+        this.transactionTab.clear();
+        this.nameMap.clear();
+        this.nameStorageMap.clear();
+        this.orphanNameStorageMap.clear();
+        this.orphanNameStorageHelperMap.clear();
+        this.sharedPostsMap.clear();
+        this.commentPostMap.clear();
 
-        this.postCommentMap.reset();
-        this.localDataMap.reset();
-        this.blogPostMap.reset();
-        this.hashtagPostMap.reset();
-        this.nameExchangeMap.reset();
-        this.updateNameMap.reset();
-        this.cancelSellNameMap.reset();
-        this.pollMap.reset();
-        this.voteOnPollMap.reset();
-        this.voteOnItemPollMap.reset();
+        this.postCommentMap.clear();
+        this.localDataMap.clear();
+        this.blogPostMap.clear();
+        this.hashtagPostMap.clear();
+        this.nameExchangeMap.clear();
+        this.updateNameMap.clear();
+        this.cancelSellNameMap.clear();
+        this.pollMap.clear();
+        this.voteOnPollMap.clear();
+        this.voteOnItemPollMap.clear();
 
-        this.tradeMap.reset();
+        this.tradeMap.clear();
 
-        this.orderMap.reset();
-        this.completedOrderMap.reset();
-        this.issueAssetMap.reset();
-        this.itemAssetMap.reset();
-        this.issueImprintMap.reset();
-        this.itemImprintMap.reset();
-        this.issueTemplateMap.reset();
-        this.itemStatementMap.reset();
-        this.issueStatementMap.reset();
-        this.itemTemplateMap.reset();
+        this.orderMap.clear();
+        this.completedOrderMap.clear();
+        this.issueAssetMap.clear();
+        this.itemAssetMap.clear();
+        this.issueImprintMap.clear();
+        this.itemImprintMap.clear();
+        this.issueTemplateMap.clear();
+        this.itemStatementMap.clear();
+        this.issueStatementMap.clear();
+        this.itemTemplateMap.clear();
 
-        this.issuePersonMap.reset();
-        this.itemPersonMap.reset();
-        this.issuePollMap.reset();
-        this.itemPollMap.reset();
-        this.issueStatusMap.reset();
-        this.itemStatusMap.reset();
-        this.issueUnionMap.reset();
-        this.itemUnionMap.reset();
-        this.atMap.reset();
-        this.atStateMap.reset();
-        this.atTransactionMap.reset();
-        //this.blockCreatorMap.reset();
+        this.issuePersonMap.clear();
+        this.itemPersonMap.clear();
+        this.issuePollMap.clear();
+        this.itemPollMap.clear();
+        this.issueStatusMap.clear();
+        this.itemStatusMap.clear();
+        this.issueUnionMap.clear();
+        this.itemUnionMap.clear();
+        this.atMap.clear();
+        this.atStateMap.clear();
+        this.atTransactionMap.clear();
 
         this.outUses();
     }
@@ -648,7 +857,7 @@ public class DCSet extends DBASet implements Observer {
      *
      */
 // TODO SOFT HARD TRUE
-    public ItemAssetBalanceMap getAssetBalanceMap() {
+    public ItemAssetBalanceTab getAssetBalanceMap() {
         return this.assetBalanceMap;
     }
 
@@ -658,21 +867,6 @@ public class DCSet extends DBASet implements Observer {
      */
     public AddressStatementRefs getAddressStatement_Refs() {
         return this.addressStatement_Refs;
-    }
-
-    /** (пока не используется - по идее для бухгалтерских единиц отдельная таблица)
-     * Балансы для заданного адреса на данный актив. balances for all account in blockchain<br>
-     * <b>Список балансов:</b> имущество, займы, хранение, производство, резерв<br>
-     * Каждый баланс: Всего Пришло и Остаток<br><br>
-     *
-     * <b>Ключ:</b> account.address + asset key<br>
-     *
-     * <b>Значение:</b> Балансы. in_OWN, in_RENT, on_HOLD = in_USE (TOTAL on HAND)
-     *
-     */
-    // TODO SOFT HARD TRUE
-    public ItemAssetBalanceMap getAssetBalanceAccountingMap() {
-        return this.assetBalanceAccountingMap;
     }
 
     /**
@@ -863,7 +1057,7 @@ public class DCSet extends DBASet implements Observer {
      *
      * @return
      */
-    public BlockMap getBlockMap() {
+    public BlocksMapImpl getBlockMap() {
         return this.blockMap;
     }
 
@@ -898,28 +1092,9 @@ public class DCSet extends DBASet implements Observer {
      * account.address -> <tx2.parentTimestamp>
      *
      */
-    public ReferenceMap getReferenceMap() {
+    public ReferenceMapImpl getReferenceMap() {
         return this.referenceMap;
     }
-
-    /**
-     * По адресу и времени найти подпись транзакции
-     * seek reference to tx_Parent by address
-     * // account.addres + tx1.timestamp -> <tx2.signature>
-     *     Ключ: адрес создателя + время создания или только адрес
-     *
-     *     Значение: подпись транзакции или подпись последней транзакции
-     *
-     *     Используется для поиска публичного ключа для данного создателя и для поиска записей в отчетах
-     *
-     *     TODO: заменить подпись на ссылку
-     *
-     * @return
-     */
-    public AddressTimeSignatureMap getAddressTime_SignatureMap() {
-        return this.addressTime_SignatureMap;
-    }
-
 
     /**
      * Транзакции занесенные в цепочку
@@ -931,7 +1106,7 @@ public class DCSet extends DBASet implements Observer {
      * ++ recipient_txs
      * ++ address_type_txs
      */
-    public TransactionFinalMap getTransactionFinalMap() {
+    public TransactionFinalMapImpl getTransactionFinalMap() {
         return this.transactionFinalMap;
     }
 
@@ -969,8 +1144,8 @@ public class DCSet extends DBASet implements Observer {
      *
      * ++ seek by TIMESTAMP
      */
-    public TransactionMap getTransactionMap() {
-        return this.transactionMap;
+    public TransactionTabImpl getTransactionTab() {
+        return this.transactionTab;
     }
 
     public NameMap getNameMap() {
@@ -1091,7 +1266,7 @@ public class DCSet extends DBASet implements Observer {
      *
      * @return
      */
-    public OrderMap getOrderMap() {
+    public OrderMapImpl getOrderMap() {
         return this.orderMap;
     }
 
@@ -1111,7 +1286,7 @@ public class DCSet extends DBASet implements Observer {
      * Значение - Сделка
      Initiator DBRef (Long) + Target DBRef (Long) -> Trade
      */
-    public TradeMap getTradeMap() {
+    public TradeMapImpl getTradeMap() {
         return this.tradeMap;
     }
 
@@ -1264,7 +1439,7 @@ public class DCSet extends DBASet implements Observer {
         return null;
     }
 
-    public DCMap getMap(Class type) {
+    public DBTab getMap(Class type) {
 
         if(type == Transaction.class) {
             return this.getTransactionFinalMap();
@@ -1312,14 +1487,14 @@ public class DCSet extends DBASet implements Observer {
     }
 
     static Random randFork = new Random();
-    private static DB getHardBase() {
-        //OPEN DB
 
-        // найдем новый не созданный уже файл
-        File dbFile;
-        do {
-            dbFile = new File(Settings.getInstance().getDataTempDir(), "fork" + randFork.nextInt() + ".dat");
-        } while (dbFile.exists());
+    /**
+     * Эта база используется для откатов, возможно глубоких
+     *
+     * @param dbFile
+     * @return
+     */
+    public static DB getHardBaseForFork(File dbFile) {
 
         dbFile.getParentFile().mkdirs();
 
@@ -1327,6 +1502,7 @@ public class DCSet extends DBASet implements Observer {
         //CREATE DATABASE
         DB database = DBMaker.newFileDB(dbFile)
 
+                // включим самоудаление после закрытия
                 .deleteFilesAfterClose()
                 .transactionDisable()
 
@@ -1342,45 +1518,53 @@ public class DCSet extends DBASet implements Observer {
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
                 // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
-                .cacheSize(10)
+                /////.cacheSize(1024)
 
-                .checksumEnable()
+                //.checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
+
+                // тормозит сильно но возможно когда файл большеой не падает скорость сильно
+                // вдобавок не сохраняет на диск даже Транзакционный файл и КРАХ теряет данные
+                // НЕ ВКЛЮЧАТЬ!
+                // .mmapFileEnablePartial()
+
                 .commitFileSyncDisable() // ++
 
                 //.snapshotEnable()
-                //.asyncWriteEnable()
-                //.asyncWriteFlushDelay(100)
-                //.cacheHardRefEnable()
+                .asyncWriteEnable() // тут нет Коммитов поэтому должно работать
+                .asyncWriteFlushDelay(2)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(7) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(5) // не нагружать процессор для поиска свободного места в базе данных
 
-                //.compressionEnable()
-
-                /*
-                .cacheSize(CASH_SIZE)
-                //.checksumEnable()
-                .cacheHardRefEnable()
-                .commitFileSyncDisable()
-                //.asyncWriteEnable() ///
-                //.asyncWriteFlushDelay(1000) //
-                //.mmapFileEnableIfSupported()
-                 */
                 .make();
 
         return database;
+    }
+
+    public static DB getHardBaseForFork() {
+        //OPEN DB
+
+        // найдем новый не созданный уже файл
+        File dbFile;
+        do {
+            dbFile = new File(Settings.getInstance().getDataTempDir(), "fork" + randFork.nextInt() + ".dat");
+        } while (dbFile.exists());
+
+        dbFile.getParentFile().mkdirs();
+
+        return getHardBaseForFork(dbFile);
     }
 
     /**
      * создать форк
      * @return
      */
-    public DCSet fork() {
+    public DCSet fork(DB database) {
         this.addUses();
 
         try {
-            DCSet fork = new DCSet(this, getHardBase());
+            DCSet fork = new DCSet(this, database);
 
             this.outUses();
             return fork;
@@ -1396,24 +1580,95 @@ public class DCSet extends DBASet implements Observer {
 
     }
 
+    /**
+     * USe inMemory MapDB Database
+     *
+     * @return
+     */
+    public DCSet fork() {
+        return fork(makeDBinMemory());
+    }
+
+    /**
+     * Нужно незабыть переменные внктри каждой таблицы тоже в Родителя скинуть
+     */
     @Override
-    public void close() {
+    public void writeToParent() {
+
+        // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
+        // иначе размер больше будет в форке и не то значение
+        ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
+
+        for (DBTab table : tables) {
+            table.writeToParent();
+        }
+        // теперь нужно все общие переменные переопределить
+
+    }
+
+    @Override
+    public synchronized void close() {
+
         if (this.database != null) {
             // THIS IS not FORK
             if (!this.database.isClosed()) {
                 this.addUses();
 
-                if (this.getBlockMap().isProcessing()) {
-                    this.database.rollback();
-                } else {
-                    this.database.commit();
+                // если основная база то с откатом
+                if (parent == null) {
+                    if (this.getBlockMap().isProcessing()) {
+                        for (DBTab tab : tables) {
+                            try {
+                                tab.rollback();
+                            } catch (IOError e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
+
+                        try {
+                            this.database.rollback();
+                        } catch (IOError e) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
+
+                        // not need on close!
+                        // getBlockMap().resetLastBlockSignature();
+                    } else {
+                        for (DBTab tab : tables) {
+                            try {
+                                tab.commit();
+                            } catch (IOError e) {
+                                LOGGER.error(tab.toString() + ": " + e.getMessage(), e);
+                            }
+                        }
+
+                        try {
+                            this.database.commit();
+                        } catch (IOError e) {
+                            LOGGER.error(e.getMessage(), e);
+                        }
+                    }
                 }
 
-                this.database.close();
+                for (DBTab tab : tables) {
+                    try {
+                        tab.close();
+                    } catch (IOError e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
+                try {
+                    this.database.close();
+                } catch (IOError e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
 
                 this.uses = 0;
             }
+
+            logger.info("closed");
         }
+
     }
 
     @Override
@@ -1423,57 +1678,135 @@ public class DCSet extends DBASet implements Observer {
 
     public void rollback() {
         this.addUses();
+        for (DBTab tab : tables) {
+            tab.rollback();
+        }
+
         this.database.rollback();
+        getBlockMap().resetLastBlockSignature();
         this.actions = 0l;
         this.outUses();
     }
 
-    private long poinCompact;
-    public void flush(int size, boolean hardFlush) {
+    public void clearCache() {
+        for (DBTab tab : tables) {
+            tab.clearCache();
+        }
+        super.clearCache();
+    }
+
+    private long poinFlush = System.currentTimeMillis();
+    private long poinCompact = poinFlush;
+    private long engineSize;
+    private long poinClear;
+    private boolean clearGC = false;
+    public void flush(int size, boolean hardFlush, boolean doOrphan) {
 
         if (parent != null)
             return;
 
         this.addUses();
 
-        this.database.getEngine().clearCache();
+        boolean needRepopulateUTX = hardFlush
+                || System.currentTimeMillis() - poinClear - 1000 >
+                BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 3;
+        // try repopulate UTX table
+        if (needRepopulateUTX) {
+            Controller.getInstance().transactionsPool.needClear(doOrphan);
+
+            if (needClearCache || clearGC) {
+                LOGGER.debug("CLEAR ENGINE CACHE...");
+                clearCache();
+            }
+
+            poinClear = System.currentTimeMillis();
+
+        }
 
         this.actions += size;
-        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT) {
+        long diffSizeEngine = getEngineSize() - engineSize;
+        if (diffSizeEngine < 0)
+            diffSizeEngine = -diffSizeEngine;
+
+        if (hardFlush || this.actions > ACTIONS_BEFORE_COMMIT
+                || diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB
+                || System.currentTimeMillis() - poinFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 8
+        ) {
+
             long start = System.currentTimeMillis();
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%% actions:" + actions);
+
+            LOGGER.debug("%%%%%%%%%%%%%%%  UP SIZE: " + (getEngineSize() - engineSize) + "   %%%%% actions: " + actions
+                    + (this.actions > ACTIONS_BEFORE_COMMIT ? "by Actions: " + this.actions :
+                    (diffSizeEngine > MAX_ENGINE_BEFORE_COMMIT_KB ? "by diff Size Engine: " + diffSizeEngine : "by time"))
+                );
+
+            for (DBTab tab : tables) {
+                tab.commit();
+            }
 
             this.database.commit();
 
-            if (false && System.currentTimeMillis() - poinCompact > 9999999) {
+            if (false && Controller.getInstance().compactDConStart && System.currentTimeMillis() - poinCompact > 9999999) {
                 // очень долго делает - лучше ключем при старте
                 poinCompact = System.currentTimeMillis();
+
                 LOGGER.debug("try COMPACT");
-                this.database.compact();
-                LOGGER.debug("COMPACTED");
+                // очень долго делает - лучше ключем при старте
+                try {
+                    this.database.compact();
+                    transactionTab.setTotalDeleted(0);
+                    LOGGER.debug("COMPACTED");
+                } catch (Exception e) {
+                    transactionTab.setTotalDeleted(transactionTab.getTotalDeleted() >> 1);
+                    LOGGER.error(e.getMessage(), e);
+                }
             }
 
-            LOGGER.debug("%%%%%%%%%%%%%%%   size:" + DCSet.getInstance().getEngineeSize() + "   %%%%%%  commit time: " + new Double((System.currentTimeMillis() - start)) * 0.001);
+            if (true) {
+                // нельзя папку с базами форков чистить между записями блоков
+                // так как еще другие процессы с форками есть - например создание своих трнзакций или своего блока
+                // они же тоже тут создаются
+                // а хотя тогда они и не удалятся - так как они не закрытые и сотанутся в папке... значит можно тут удалять - нужные не удлятся
+                try {
+
+                    // там же лежит и он
+                    ///transactionTab.close();
+
+                    // удалим все в папке Temp
+                    File tempDir = new File(Settings.getInstance().getDataTempDir());
+                    if (tempDir.exists()) {
+                        Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+                    }
+                } catch (Throwable e) {
+                    ///LOGGER.error(e.getMessage(), e);
+                }
+
+            }
+
+            clearGC = !clearGC;
+            if (clearGC) {
+                LOGGER.debug("CLEAR GC");
+                System.gc();
+            }
+
+            LOGGER.debug("%%%%%%%%%%%%%%%%%% TOTAL: " + getEngineSize() + "   %%%%%%  commit time: "
+                    + (System.currentTimeMillis() - start) + " ms");
+
+            poinFlush = System.currentTimeMillis();
             this.actions = 0l;
+            this.engineSize = getEngineSize();
 
         }
 
         this.outUses();
     }
 
-    @Override
-    public void update(Observable o, Object arg) {
-    }
-
-    public long getEngineeSize() {
-
+    public long getEngineSize() {
         return this.database.getEngine().preallocate();
-
     }
     
     public String toString() {
         return (this.isFork()? "forked " : "")  + super.toString();
     }
-
 
 }

@@ -1,21 +1,20 @@
 package org.erachain.datachain;
 
 
-import org.erachain.database.DBMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.dbs.DBTab;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.Map;
 
 // Block Height -> creator
 
 /**
  * Главный класс для инкриментов - не используется
  */
-public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
+public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
     static Logger LOGGER = LoggerFactory.getLogger(AutoIntegerByte.class.getName());
 
     // protected int type;
@@ -36,13 +35,13 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
 
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
-                this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+                this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
             if (observeList > 0)
-                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+                this.observableData.put(DBTab.NOTIFY_LIST, observeList);
             if (observeAdd > 0)
-                this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                this.observableData.put(DBTab.NOTIFY_ADD, observeAdd);
             if (observeRemove > 0)
-                this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+                this.observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
         }
     }
 
@@ -50,6 +49,11 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
         super(parent, dcSet);
 
         this.key = parent.size();
+    }
+
+    @Override
+    protected void getMemoryMap() {
+        map = new HashMap<Integer, byte[]>();
     }
 
     @Override
@@ -65,12 +69,7 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
         this.key = size;
     }
 
-    protected void createIndexes(DB database) {
-    }
-
-    @Override
-    protected Map<Integer, byte[]> getMemoryMap() {
-        return new HashMap<Integer, byte[]>();
+    protected void createIndexes() {
     }
 
     @Override
@@ -99,7 +98,7 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
     }
 
     public void remove() {
-        super.delete(key);
+        super.remove(key);
 
         if (this.atomicKey != null) {
             this.atomicKey.decrementAndGet();
@@ -108,6 +107,13 @@ public abstract class AutoIntegerByte extends DCMap<Integer, byte[]> {
         // DECREMENT KEY
         --this.key;
 
+    }
+
+    @Override
+    public void writeToParent() {
+        super.writeToParent();
+        ((AutoIntegerByte) parent).atomicKey.set(this.key);
+        ((AutoIntegerByte) parent).key = this.key;
     }
 
 }

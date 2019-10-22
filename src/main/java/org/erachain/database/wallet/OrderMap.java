@@ -3,10 +3,10 @@ package org.erachain.database.wallet;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
-import org.erachain.database.IDB;
+import org.erachain.database.DBASet;
 import org.erachain.database.serializer.LongAndOrderSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -37,33 +37,29 @@ Tuple3
  */
 public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Order>> {
 
-    public OrderMap(IDB databaseSet, DB database) {
+    public OrderMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_LIST_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
         }
     }
 
     @Override
-    protected void createIndexes(DB database) {
-    }
-
-    @Override
-    protected Map<Tuple2<String, Long>, Tuple2<Long, Order>> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<String, Long>, Tuple2<Long, Order>> getMemoryMap() {
+    protected void getMemoryMap() {
         DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        return this.openMap(database);
+        map = this.openMap(database);
     }
 
     private Map<Tuple2<String, Long>, Tuple2<Long, Order>> openMap(DB database) {
@@ -92,12 +88,12 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
 
         //DELETE NAMES
         for (Tuple2<String, Long> key : accountOrders.keySet()) {
-            this.delete(key);
+            this.remove(key);
         }
     }
 
     public void delete(Order order) {
-        this.delete(new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId()));
+        this.remove(new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId()));
     }
 
     public void deleteAll(List<Account> accounts) {

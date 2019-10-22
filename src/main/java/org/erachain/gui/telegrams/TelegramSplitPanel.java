@@ -400,7 +400,7 @@ public class TelegramSplitPanel extends SplitPanel {
             try {
                 row = tableFavoriteAccounts.convertRowIndexToModel(row);
                 Pair<String, Tuple2<String, String>> ac = accountModel.getPairItem(row);
-                Controller.getInstance().wallet.database.getAccountsPropertisMap().delete(ac.getA());
+                Controller.getInstance().wallet.database.getAccountsPropertisMap().remove(ac.getA());
             } catch (Exception e1) {
                 logger.error(e1.getMessage(), e1);
             }

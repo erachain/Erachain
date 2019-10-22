@@ -268,7 +268,7 @@ public class CancelOrderTransaction extends Transaction {
         order.getCreator().changeBalance(db, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
 
         //DELETE FROM DATABASE
-        db.getOrderMap().delete(order.getId());
+        db.getOrderMap().remove(order.getId());
     }
 
     //@Override
@@ -301,7 +301,7 @@ public class CancelOrderTransaction extends Transaction {
         order.getCreator().changeBalance(db, true, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
 
         //DELETE ORPHAN DATA
-        db.getCompletedOrderMap().delete(order.getId());
+        db.getCompletedOrderMap().remove(order.getId());
     }
 
     //@Override

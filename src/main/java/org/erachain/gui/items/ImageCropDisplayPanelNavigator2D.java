@@ -5,32 +5,43 @@ import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RasterFormatException;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class ImageCropDisplayPanelNavigator2D extends JPanel {
-    private final int cropY;
+    private int cropY;
     private final int cropHeight;
     private int cropX;
     private int cropWidth;
     private BufferedImage image;
 
+    private java.util.List<ChangeListener> zoomListeners = new ArrayList<>();
+
+    private double zoom = 1;
+    private final int originalCropWidth;
 
     private AffineTransform currentTransform = new AffineTransform();
     private Point currentPoint = new Point();
 
 
     private Logger logger = LoggerFactory.getLogger(ImageCropDisplayPanelNavigator2D.class);
+    private boolean flag = false;
 
-    public ImageCropDisplayPanelNavigator2D(File imageFile, int cropWidth, int cropHeight) {
+    public ImageCropDisplayPanelNavigator2D(ImageCropPanelNavigator2D parent, File imageFile, int cropWidth, int cropHeight) {
+
         setPreferredSize(new Dimension(600, 500));
         this.cropWidth = cropWidth;
+        this.originalCropWidth = cropWidth;
         this.cropHeight = cropHeight;
         cropX = getPreferredSize().width / 2 - cropWidth / 2;
         cropY = getPreferredSize().height / 2 - cropHeight / 2;
@@ -39,20 +50,32 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         } catch (IOException e) {
             logger.error("Error read image File in crop component", e);
         }
+        AffineTransform newTransformBegin = new AffineTransform();
+        newTransformBegin.concatenate(AffineTransform.getTranslateInstance(
+                -image.getWidth() / 2 + cropX + cropWidth / 2,
+                -image.getHeight() / 2 + cropY + cropHeight / 2));
+        newTransformBegin.concatenate(currentTransform);
+        currentTransform = newTransformBegin;
         addMouseListener(new MouseAdapter() {
+
             @Override
             public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    flag = true;
+                    return;
+                }
                 currentPoint = e.getPoint();
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    flag = false;
+                    return;
+                }
                 int button = e.getButton();
                 Point newPoint = e.getPoint();
                 currentPoint = newPoint;
-                // сброс всего в исходное положение по правой кнопке мыши
-                if (button == MouseEvent.BUTTON3) {
-                    currentTransform = new AffineTransform();
-                }
                 // сброс только масштаба по средней кнопке мыши
                 if (button == MouseEvent.BUTTON2) {
                     AffineTransform newTransform = new AffineTransform();
@@ -67,6 +90,9 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                if (flag) {
+                    return;
+                }
                 Point newPoint = e.getPoint();
                 Point2D deltaPoint = new Point2D.Double(newPoint.getX() - currentPoint.getX(), newPoint.getY() - currentPoint.getY());
                 currentPoint = newPoint;
@@ -75,8 +101,12 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 newTransform.concatenate(currentTransform);
                 currentTransform = newTransform;
             }
+
             @Override
             public void mouseMoved(MouseEvent e) {
+                if (flag) {
+                    return;
+                }
                 try {
                     currentPoint = e.getPoint();
                 } catch (Throwable exception) {
@@ -95,6 +125,13 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
                 } else {
                     scale = 1d;
                 }
+                if (zoom < 0.05 && wheelRotation > 0) {
+                    return;
+                }
+                zoom *= scale;
+                parent.zoomSlider.setValue((int) (zoom * 100d));
+
+                // тут смещаем из центра - мышка это центр
                 AffineTransform newTransform = new AffineTransform();
                 newTransform.concatenate(AffineTransform.getTranslateInstance(currentPoint.getX(), currentPoint.getY()));
                 newTransform.concatenate(AffineTransform.getScaleInstance(scale, scale));
@@ -163,9 +200,12 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
         Point2D.Double cropPointRightBottom = new Point2D.Double(cropX + cropWidth, cropY + cropHeight);
         Point2D.Double pointCropDstRightBottom = new Point2D.Double();
         currentTransform.transform(cropPointRightBottom, pointCropDstRightBottom);
-
+        int shift = 2;
         try {
-
+            cropX += shift;
+            cropY += shift;
+            pointZeroDst.x += shift;
+            pointZeroDst.y += shift;
             if (pointZeroDst.x > cropPointRightBottom.x
                     || pointZeroDst.y > cropPointRightBottom.y
                     || pointDstRightBottomImage.x < cropX
@@ -175,7 +215,7 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             if (pointZeroDst.x < cropX && pointZeroDst.y > cropY
                     && pointDstRightBottomImage.x > cropPointRightBottom.x
                     && pointDstRightBottomImage.y < cropPointRightBottom.y) {
-                return snapshot.getSubimage(cropX, (int) pointZeroDst.y, cropWidth, (int) (cropPointRightBottom.y - pointZeroDst.y));
+                return snapshot.getSubimage(cropX, (int) pointZeroDst.y, cropWidth, (int) (pointDstRightBottomImage.y - pointZeroDst.y));
             } else if (pointZeroDst.x < cropX && pointZeroDst.y > cropY
                     && pointDstRightBottomImage.x < cropPointRightBottom.x
                     && pointDstRightBottomImage.y < cropPointRightBottom.y) {
@@ -226,11 +266,45 @@ public class ImageCropDisplayPanelNavigator2D extends JPanel {
             }
             return snapshot.getSubimage(cropX, cropY, cropWidth, cropHeight);
         } catch (RasterFormatException e) {
-            logger.info("Error size of sub image");
-            return snapshot.getSubimage((int) pointZeroDst.x, (int) pointZeroDst.y,
-                    snapshot.getWidth() - (int) pointZeroDst.x, snapshot.getHeight() - (int) pointZeroDst.y);
+            logger.error("Error size of sub image", e);
+            return snapshot.getSubimage((int) pointZeroDst.x + shift, (int) pointZeroDst.y + shift,
+                    snapshot.getWidth() - (int) pointZeroDst.x - shift,
+                    snapshot.getHeight() - (int) pointZeroDst.y - shift);
         }
 
+    }
+
+    public void setFrameRate(int value) {
+        cropWidth = originalCropWidth - originalCropWidth * value / 100;
+        cropX = getPreferredSize().width / 2 - cropWidth / 2;
+        //moveImageBy(0, 0);
+    }
+
+
+    public double getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(double new_zoom) {
+        if (new_zoom < 0.05) {
+            new_zoom = 0.05;
+        }
+
+        double scale = new_zoom / this.zoom;
+        this.zoom = new_zoom;
+
+        // тут не смещаем из центра
+        AffineTransform newTransform = new AffineTransform();
+        newTransform.concatenate(AffineTransform.getTranslateInstance(getPreferredSize().width / 2, getPreferredSize().height / 2));
+        newTransform.concatenate(AffineTransform.getScaleInstance(scale, scale));
+        newTransform.concatenate(AffineTransform.getTranslateInstance(-getPreferredSize().width / 2, -getPreferredSize().height / 2));
+        newTransform.concatenate(currentTransform);
+        currentTransform = newTransform;
+        repaint();
+    }
+
+    public void addZoomListener(ChangeListener listener) {
+        zoomListeners.add(listener);
     }
 
 }

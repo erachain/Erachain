@@ -1,8 +1,8 @@
-
+﻿
 develop
 21 accs: 878GpNkvbMS5mdS1VQxZvit2rZQebucvNkc58dpjvBwV
 
-AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy
+AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy - trader
 E8YTf9gZPJbEfeS5GpisMms1w8z9TpMjgjbczRehvRmW
 
 7NhZBb8Ce1H2S2MkPerrMnKLZNf9ryNYtP
@@ -20,5 +20,17 @@ era-61 CNToKWgxZ9VD3Z8MgQodGJz8ZPexQg4iyAkyq1veDG7R
 era-62 8Rkm3AdRVqkR3FKC76QPBb9fW9K9nzxugtCB3ZzS2yGt
 
 
-CVQrqFEE8x3UuYpxQQJXGWgwbdxZL2CCHL1NMtWSEGsm - ЯЭнергетик (на era-62)
+Develop SEEDs:
+
+CVQrqFEE8x3UuYpxQQJXGWgwbdxZL2CCHL1NMtWSEGsm - ЯЭнергетик
+
+ErachainDS  (на era-62):
+FPNw4XXpfZC1Nb6rbL8WkqDNReHm9eDxWkQ8QyqeHALv
+acc: 79n769ZnxMiBxXwJMu1r9bSKwmYE1JZvG7
+PubK: 95ZmQZPPYxzziXi65iCzQ8pB85dYED5apWZGaxy8H3kR
+
+МойДом:
+Av2P49WYdRh6MA4wM36a3h8SPxKNLGASNbx7KaHJjC2K
+acc: 7Nv5UaDubU222yynbNQTsUCZUYr1qW6dx9
+PubK: B9QCMXdDwyD98S2k1GSJMuxJPzvYBJ9Sr5fDPB1zYDV6
 

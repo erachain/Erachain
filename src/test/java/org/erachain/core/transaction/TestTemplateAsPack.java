@@ -52,7 +52,7 @@ public class TestTemplateAsPack {
     // INIT TEMPLATES
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
             gb.process(db);
@@ -62,7 +62,7 @@ public class TestTemplateAsPack {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
     }
@@ -159,7 +159,7 @@ public class TestTemplateAsPack {
         issueTemplateRecord.sign(maker, asPack);
 
         assertEquals(Transaction.VALIDATE_OK, issueTemplateRecord.isValid(Transaction.FOR_PACK, flags));
-        Long makerReference = maker.getLastTimestamp(db);
+        Long makerReference = maker.getLastTimestamp(db)[0];
         issueTemplateRecord.process(gb, asPack);
 
         LOGGER.info("template KEY: " + template.getKey(db));
@@ -182,7 +182,7 @@ public class TestTemplateAsPack {
         assertEquals(true, Arrays.equals(db.getItemTemplateMap().get(key).toBytes(includeReference, false), template.toBytes(includeReference, false)));
 
         //CHECK REFERENCE SENDER
-        assertEquals((long) makerReference, (long) maker.getLastTimestamp(db));
+        assertEquals((long) makerReference, (long) maker.getLastTimestamp(db)[0]);
     }
 
 
@@ -192,7 +192,7 @@ public class TestTemplateAsPack {
         init();
 
         Template template = new Template(maker, "test", icon, image, "strontje");
-        Long makerReference = maker.getLastTimestamp(db);
+        Long makerReference = maker.getLastTimestamp(db)[0];
 
         //CREATE ISSUE PLATE TRANSACTION
         IssueTemplateRecord issueTemplateRecord = new IssueTemplateRecord(maker, template);
@@ -200,7 +200,7 @@ public class TestTemplateAsPack {
         issueTemplateRecord.sign(maker, asPack);
         issueTemplateRecord.process(gb, asPack);
         long key = db.getIssueTemplateMap().get(issueTemplateRecord);
-        assertEquals((long) makerReference, (long) maker.getLastTimestamp(db));
+        assertEquals((long) makerReference, (long) maker.getLastTimestamp(db)[0]);
 
         issueTemplateRecord.orphan(gb, asPack);
 
@@ -208,7 +208,7 @@ public class TestTemplateAsPack {
         assertEquals(false, db.getItemTemplateMap().contains(key));
 
         //CHECK REFERENCE SENDER
-        assertEquals((long) makerReference, (long) maker.getLastTimestamp(db));
+        assertEquals((long) makerReference, (long) maker.getLastTimestamp(db)[0]);
     }
 
 

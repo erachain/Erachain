@@ -385,7 +385,7 @@ public class DWSet extends DBASet {
         this.personMap.delete(account);
         this.statusMap.delete(account);
         this.orderMap.delete(account);
-        this.accountsPropertisMap.delete(account.getAddress());
+        this.accountsPropertisMap.remove(account.getAddress());
         this.telegramsMap.deleteFromAccount(account);
         this.uses--;
 

@@ -3,8 +3,8 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.database.DBMap;
 import org.erachain.database.FilteredByStringArray;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 
@@ -16,7 +16,7 @@ import java.util.*;
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredByStringArray<Long> {
+public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<Long> {
 
     //private static Logger logger;
 
@@ -51,14 +51,14 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
         this(databaseSet, database, name);
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
-                this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+                this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
             if (observeList > 0)
-                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+                this.observableData.put(DBTab.NOTIFY_LIST, observeList);
             if (observeAdd > 0) {
-                observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                observableData.put(DBTab.NOTIFY_ADD, observeAdd);
             }
             if (observeRemove > 0) {
-                observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+                observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
             }
         }
     }
@@ -132,7 +132,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
 
 
     @SuppressWarnings("unchecked")
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         if (Controller.getInstance().onlyProtocolIndexing){
             // NOT USE SECONDARY INDEXES
             return;
@@ -156,8 +156,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
     }
 
     @Override
-    protected Map<Long, ItemCls> getMemoryMap() {
-        return new TreeMap<Long, ItemCls>();
+    protected void getMemoryMap() {
+        map = new TreeMap<Long, ItemCls>();
     }
 
     @Override
@@ -193,7 +193,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
     }
 
     public void remove(long key) {
-        super.delete(key);
+        super.remove(key);
 
         if (this.key != key) {
             // it is not top of STACK (for UNIQUE items with short NUM)
@@ -380,6 +380,13 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
 
     public NavigableMap<Long, ItemCls> getOwnerItems(String ownerPublicKey) {
         return this.ownerKeyMap.subMap(ownerPublicKey, ownerPublicKey);
+    }
+
+    @Override
+    public void writeToParent() {
+        super.writeToParent();
+        ((ItemMap) parent).atomicKey.set(this.key);
+        ((ItemMap) parent).key = this.key;
     }
 
 }

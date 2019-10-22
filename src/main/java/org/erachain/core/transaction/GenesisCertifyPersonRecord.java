@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
@@ -160,7 +159,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         this.dcSet.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 
         //UPDATE REFERENCE OF RECIPIENT
-        this.recipient.setLastTimestamp(this.timestamp, this.dcSet);
+        this.recipient.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
     }
 
     @Override

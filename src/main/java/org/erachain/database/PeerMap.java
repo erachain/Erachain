@@ -3,6 +3,7 @@ package org.erachain.database;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedBytes;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.util.*;
 
-public class PeerMap extends DBMap<byte[], byte[]> {
+public class PeerMap extends DCUMapImpl<byte[], byte[]> {
     private static final byte[] BYTE_WHITELISTED = new byte[]{0, 0};
     //private static final byte[] BYTE_BLACKLISTED = new byte[]{1, 1};
     private static final byte[] BYTE_NOTFOUND = new byte[]{2, 2};
@@ -26,21 +27,21 @@ public class PeerMap extends DBMap<byte[], byte[]> {
         super(databaseSet, database);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<byte[], byte[]> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("peers")
+        map = database.createTreeMap("peers")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], byte[]> getMemoryMap() {
-        return new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override
@@ -51,7 +52,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
     public List<Peer> getAllPeers(int amount) {
         try {
             //GET ITERATOR
-            Iterator<byte[]> iterator = this.getKeys().iterator();
+            Iterator<byte[]> iterator = this.keySet().iterator();
 
             //PEERS
             List<Peer> peers = new ArrayList<Peer>();
@@ -103,7 +104,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
             //////// GET first all WHITE PEERS
             try {
                 //GET ITERATOR
-                Iterator<byte[]> iterator = this.getKeys().iterator();
+                Iterator<byte[]> iterator = this.keySet().iterator();
 
                 //ITERATE AS LONG AS:
 
@@ -125,6 +126,9 @@ public class PeerMap extends DBMap<byte[], byte[]> {
                         InetAddress address = InetAddress.getByAddress(peerInfo.getAddress());
                         //CHECK IF SOCKET IS NOT LOCALHOST
                         if (Settings.getInstance().isLocalAddress(address))
+                            continue;
+                        //CHECK IF SOCKET IS NOT LOCALNET
+                        if (address.isSiteLocalAddress())
                             continue;
 
                         if ( //use all peers an new and not known Arrays.equals(peerInfo.getStatus(), BYTE_WHITELISTED) &&
@@ -202,7 +206,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
 
             cnt = peers.size();
             //GET ITERATOR
-            Iterator<byte[]> iterator = this.getKeys().iterator();
+            Iterator<byte[]> iterator = this.keySet().iterator();
 
             //ITERATE AS LONG AS:
 
@@ -255,7 +259,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
     public List<String> getAllPeersAddresses(int amount) {
         try {
             List<String> addresses = new ArrayList<String>();
-            Iterator<byte[]> iterator = this.getKeys().iterator();
+            Iterator<byte[]> iterator = this.keySet().iterator();
             while (iterator.hasNext() && (amount == -1 || addresses.size() < amount)) {
                 byte[] addressBI = iterator.next();
                 addresses.add(InetAddress.getByAddress(addressBI).getHostAddress());
@@ -271,7 +275,7 @@ public class PeerMap extends DBMap<byte[], byte[]> {
     public List<PeerInfo> getAllInfoPeers(int amount) {
         try {
             //GET ITERATOR
-            Iterator<byte[]> iterator = this.getKeys().iterator();
+            Iterator<byte[]> iterator = this.keySet().iterator();
 
             //PEERS
             List<PeerInfo> peers = new ArrayList<PeerInfo>();

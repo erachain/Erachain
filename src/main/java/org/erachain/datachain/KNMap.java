@@ -1,12 +1,10 @@
 package org.erachain.datachain;
 
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
 import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -19,7 +17,7 @@ import java.util.TreeMap;
  // key to Name_Stack End_Date Map
  // in days
  */
-public class KNMap extends DCMap<
+public class KNMap extends DCUMap<
         Long, // item1 Key
         TreeMap<String, // item2 Key
                 Stack<Tuple3<
@@ -39,10 +37,10 @@ public class KNMap extends DCMap<
         this.name = name;
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, observerMessage_reset);
-            this.observableData.put(DBMap.NOTIFY_LIST, observerMessage_list);
-            this.observableData.put(DBMap.NOTIFY_ADD, observerMessage_add);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, observerMessage_remove);
+            this.observableData.put(DBTab.NOTIFY_RESET, observerMessage_reset);
+            this.observableData.put(DBTab.NOTIFY_LIST, observerMessage_list);
+            this.observableData.put(DBTab.NOTIFY_ADD, observerMessage_add);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, observerMessage_remove);
         }
 
     }
@@ -52,25 +50,23 @@ public class KNMap extends DCMap<
     }
 
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Long, TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        BTreeMap<Long, TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>> map = database.createTreeMap(name)
+        map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .counterEnable()
                 .makeOrGet();
 
-        //RETURN
-        return map;
     }
 
     @Override
-    protected Map<Long, TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>> getMemoryMap() {
+    protected void getMemoryMap() {
         // HashMap ?
-        return new TreeMap<Long, TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>>();
+        map = new TreeMap<Long, TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>>();
     }
 
     @Override

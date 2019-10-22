@@ -2,10 +2,8 @@ package org.erachain.network.message;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
-import org.erachain.network.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +16,8 @@ public class SignaturesMessage extends Message {
     private static final int SIGNATURE_LENGTH = Block.SIGNATURE_LENGTH;
     private static final int DATA_LENGTH = 4;
 
-    static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
-    private static boolean loggerOn = BlockChain.CHECK_BUGS > 3;
+    static Logger LOGGER = LoggerFactory.getLogger(SignaturesMessage.class.getName());
+    private static boolean loggerOn = BlockChain.CHECK_BUGS > 5;
 
     private List<byte[]> signatures;
 

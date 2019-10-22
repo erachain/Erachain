@@ -5,7 +5,6 @@ import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple3;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -24,7 +23,7 @@ import java.util.TreeMap;
 
  */
 
-public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
+public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
         Long, // person key
         Integer, // block height
         Integer>>> // transaction index
@@ -38,21 +37,21 @@ public class HashesSignsMap extends DCMap<byte[], Stack<Tuple3<
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("hashes_signs")
+        map = database.createTreeMap("hashes_signs")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], Stack<Tuple3<Long, Integer, Integer>>> getMemoryMap() {
-        return new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Stack<Tuple3<Long, Integer, Integer>>>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override

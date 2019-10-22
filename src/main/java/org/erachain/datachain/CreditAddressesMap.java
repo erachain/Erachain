@@ -9,7 +9,10 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeMap;
 
 /** Общая сумма переданных средств в кредит на другой счет
  * Используется для проверки сумм которые отдаются или забираются у заемщика<br><br>
@@ -20,7 +23,7 @@ import java.util.*;
  *
  */
 
-public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigDecimal> {
+public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, BigDecimal> {
 
 
     public CreditAddressesMap(DCSet databaseSet, DB database) {
@@ -31,13 +34,13 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple3<String, Long, String>, BigDecimal> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("credit_debt")
+        map = database.createTreeMap("credit_debt")
                 .keySerializer(BTreeKeySerializer.TUPLE3)
                 //.comparator(UnsignedBytes.lexicographicalComparator())
                 //.comparator(Fun.COMPARATOR)
@@ -47,8 +50,8 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
     }
 
     @Override
-    protected Map<Tuple3<String, Long, String>, BigDecimal> getMemoryMap() {
-        return new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
     }
 
     @Override
@@ -98,6 +101,6 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
     }
 
     public void delete(String creditorAddress, long key, String debtorAddress) {
-        this.delete(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
+        this.remove(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
     }
 }

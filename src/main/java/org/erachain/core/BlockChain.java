@@ -2,6 +2,7 @@ package org.erachain.core;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
@@ -13,6 +14,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
+import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
@@ -34,10 +36,23 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
 
     public static final int BLOCK_COUNT = 0; ////
-    static final public boolean TEST_DB_TXS_OFF = false;
+    // сколько транзакции в блоке - если больше 0 то запускает тест на старте
+    public static final int TEST_DB = 10000;
+    // запрет сборки своих блоков в ТЕСТЕ
+    public static final boolean STOP_GENERATE_BLOCKS = false;
+
+    public static final boolean NOT_STORE_REFFS_HISTORY = BLOCK_COUNT > 0;
+
+    // размер балансового поля - чем больше тем сложнее
+    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[1000];
+
+    /**
+     * set uo all balances ERA to 10000 and COMPU to 100
+     */
+    public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || TEST_DB > 0 || false;
 
     static final public int CHECK_BUGS = 1;
 
@@ -49,11 +64,16 @@ public class BlockChain {
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
-    public static final int TESTNET_PORT = DEVELOP_USE ? 9065 : 9045;
-    public static final int MAINNET_PORT = DEVELOP_USE ? 9066 : 9046;
+    public static final int TESTNET_PORT = TEST_DB > 0? 9005 : DEVELOP_USE ? 9065 : 9045;
+    public static final int MAINNET_PORT = TEST_DB > 0? 9006 : DEVELOP_USE ? 9066 : 9046;
 
-    public static final int DEFAULT_WEB_PORT = DEVELOP_USE ? 9067 : 9047;
-    public static final int DEFAULT_RPC_PORT = DEVELOP_USE ? 9068 : 9048;
+    public static final int DEFAULT_WEB_PORT = TEST_DB > 0? 9007 : DEVELOP_USE ? 9067 : 9047;
+    public static final int DEFAULT_RPC_PORT = TEST_DB > 0? 9008 : DEVELOP_USE ? 9068 : 9048;
+
+    //TESTNET
+    //   1486444444444l
+    //	 1487844444444   1509434273     1509434273
+    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
 
     public static final String DEFAULT_EXPLORER = "explorer.erachain.org";
 
@@ -67,7 +87,7 @@ public class BlockChain {
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
     public static final int BASE_TARGET = 100000;///1 << 15;
-    public static final int REPEAT_WIN = DEVELOP_USE ? 4 : 40; // GENESIS START TOP ACCOUNTS
+    public static final int REPEAT_WIN = DEVELOP_USE ? 4 : ERA_COMPU_ALL_UP? 15 : 40; // GENESIS START TOP ACCOUNTS
 
     // RIGHTs
     public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -77,52 +97,55 @@ public class BlockChain {
     public static final int MIN_GENERATING_BALANCE = 100;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
     //public static final int GENERATING_RETARGET = 10;
-    public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
-    public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
-    public static final int FLUSH_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS - (GENERATING_MIN_BLOCK_TIME_MS >> 4);
-    static final int WIN_TIMEPOINT = GENERATING_MIN_BLOCK_TIME_MS >> 2;
+    //public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
+    //public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
-    public static final int UNCONFIRMED_SORT_WAIT_MS = DEVELOP_USE? 5000: 15000;
-    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = Controller.HARD_WORK > 3 ? 1 : DEVELOP_USE? 2 : 1; // проверить наше цепочку по силе с окружающими
+    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = 1; // проверить наше цепочку по силе с окружающими
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
-    public static final int UNCONFIRMED_DEADTIME_MS = DEVELOP_USE? GENERATING_MIN_BLOCK_TIME_MS << 4 : GENERATING_MIN_BLOCK_TIME_MS << 3;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
 
-    public static final int BLOCKS_PER_DAY = 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME; // 300 PER DAY
     //public static final int GENERATING_MAX_BLOCK_TIME = 1000;
     public static final int MAX_BLOCK_SIZE_BYTES = 1 << 25; //4 * 1048576;
     public static final int MAX_BLOCK_SIZE = MAX_BLOCK_SIZE_BYTES >> 8;
-    public static final int MAX_REC_DATA_BYTES = 1 << 20; // MAX_BLOCK_SIZE_BYTES >>1;
+    public static final int MAX_REC_DATA_BYTES = MAX_BLOCK_SIZE_BYTES >> 2;
 
     // переопределим размеры по HARD
-    static private final int MAX_BLOCK_SIZE_GEN_TEMP = MAX_BLOCK_SIZE_BYTES / 100 * (5 * Controller.HARD_WORK + 10) ;
+    static private final int MAX_BLOCK_SIZE_GEN_TEMP = MAX_BLOCK_SIZE_BYTES / 100 * (10 * Controller.HARD_WORK + 10) ;
     public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN_TEMP > MAX_BLOCK_SIZE_BYTES? MAX_BLOCK_SIZE_BYTES : MAX_BLOCK_SIZE_GEN_TEMP;
     public static final int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE_BYTES_GEN >> 8;
 
-    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN << 3;
+    public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN << 2;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;
 
-    public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : 22000;
+    public static final int GENESIS_WIN_VALUE = DEVELOP_USE ? 3000 : ERA_COMPU_ALL_UP? 10000 : 22000;
 
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
     public static final long BONUS_STOP_PERSON_KEY = 13l;
 
-    public static final int VERS_4_11 = DEVELOP_USE ? 230000 : 194400;
+    public static final int VERS_4_11 = TEST_DB > 0? 0 : DEVELOP_USE ? 230000 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int CANCEL_ORDERS_ALL_VALID = DEVELOP_USE ? 430000 : 260120;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0? 0 : DEVELOP_USE ? 430000 : 260120;
     public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 425555 : 260120;
 
-    public static final int VERS_4_12 = DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
+    public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0? 0 : DEVELOP_USE? 0 : 44666;
+
+    public static final int VERS_4_12 = TEST_DB > 0? 0 : DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
+
+    public static final int VERS_30SEC = TEST_DB > 0? 0 : DEVELOP_USE ? 471000 : 280785; //	2019-09-17 12:01:13
+    public static final long VERS_30SEC_TIME = DEFAULT_MAINNET_STAMP + (long)VERS_30SEC * (DEVELOP_USE? 120L :288L);
 
     public static final int DEVELOP_FORGING_START = 100;
 
-    public static final byte[][] WIPED_RECORDS = DEVELOP_USE ?
+    public HashSet<String> trustedPeers = new HashSet<>();
+
+    public static final byte[][] WIPED_RECORDS = TEST_DB > 0? new byte[][]{}
+        : DEVELOP_USE ?
             new byte[][]{
                     // ORDER on ERG
                     Base58.decode("4ycpev6jq5dagkCz49LHoMmo6MM7cQEyC36A7tHKLz6ex25NjjKMkd7hdfPnd8yEmuy3biYVSezQXUuEH8f3HZFv"),
@@ -174,11 +197,36 @@ public class BlockChain {
      * };
      */
 
-    public static final byte[][] VALID_ADDRESSES = new byte[][]{
+    public static final byte[][] VALID_ADDRESSES = TEST_DB > 0? new byte[][]{} : new byte[][]{
             Base58.decode("1A3P7u56G4NgYfsWMms1BuctZfnCeqrYk3")
     };
 
-    public static final byte[][] VALID_BAL = DEVELOP_USE ? new byte[][]{} :
+    public static final byte[][] DISCREDIR_ADDRESSES = TEST_DB > 0? new byte[][]{} : new byte[][]{
+            Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
+            Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
+    };
+    public static final byte[][] VALID_SIGN = TEST_DB > 0? new byte[][]{} : new byte[][]{
+            Base58.decode("5DnTfBxw2y8fDshzkdqppB24y5P98vnc873z4cofQZ31JskfJbnpRPjU5uZMQwfSYJYkJZzMxMYq6EeNCys18sEq"),
+            Base58.decode("4CqzJSD9j4GNGcYVtNvMic98Zq9aQALLdkFkuXMLGnGqUTgdHqHcoSU7wJ24wvaAAukg2g1Kw1SA6UFQo7h3VasN"),
+            Base58.decode("E4pUUdCqQt6HWCJ1pUeEtCDngow7pEJjyRtLZTLEDWFEFwicvxVXAgJbUPyASueZVUobZ28xtX6ZgDLb5cxeXy2"),
+            Base58.decode("4UPo6sAF63fkqhgkAXh94tcF43XYz8d7f6PqBGSX13eo3UWCENptrk72qkLxtXYEEsHs1wS2eH6VnZEVctnPdUkb"),
+            Base58.decode("3aYMNRUVYxVaozihhGkxU8JTeAFT73Ua7JDqUfvrDUpDNPs7mS4pxHUaaDiZsGYi91fK5c2yVLWVQW9tqqDGCK2a"),
+            Base58.decode("KhVG9kHf4nttWSEvM6Rd99wuTtRtFAQvSwwo9ae4WFJ2fWaidY4jF33WTRDvYEtaWWu2cmh6x4tEX7ded6QDSGt"),
+            Base58.decode("2KW1mywfP99GcEo5hV8mdHxgPDkFJj5ABcVjNa7vQd1GPC13HRqBERUPKfLZ5HrQ3Dyp42u8PWrzBKUP3cUHG3N4"),
+            Base58.decode("2SsSCv8EuMnZrGYq4jFhvJ3gRdbdEU92Unp6u4JNwrw4D7SHHaRpH2b9VuLtTA3zuUVx1EqTB5wJQWxeuJbwxYvs"),
+            Base58.decode("4iM1HvHgSV3WTXJ3M4XVMZ4AcfrDaA3bdyFmZcX5BJJkacNTjVURWuhp2gLyhxCJok7eAHkd94nM4q3VcDAc2zCJ"),
+            Base58.decode("3THvTzHcyEDPGisprZAN955RMEhye84ygnBMPxrFRT6bCocQ84xt1jaSaNyD9px9dxq3zCNbebXnmL251JZhfCHm"),
+            Base58.decode("M7jNQ8w2fCjD3Mvo8cH2G5JYFTnGfLYSQv7xCCso7BsmMKJ7Ruc3pnr1rbpFwVrBkQG3auB5SGCmoWbCq9pw8hU"),
+            Base58.decode("m1ryu4QMHLaoALYwx35ugNtQec1QAS1KZe8kkx8bQ8UKcesGGbCbqRYhJrtrPDy3gsxVp4hTQGr7qY3NsndBebr"),
+            Base58.decode("3Lzamim6R4khdsVfpdsCzyuhqbguCM6yQTyJPJmvPC7agsaBk7UhYuRxZ8tduLpRhZEMpJwAVd5ucRAiXY8cX6ZE"),
+            Base58.decode("44chQvtt3NKgRjphBwKTgRfz4rD7YvpHs4k17w1Xvt6drmjBwJWXsFXBfHV97LbMx4kMkzpHCXgN7mNjDUZeTL6M"),
+            Base58.decode("xckfcdNWJN1uoGGTe5nXg5JmGUEyzoJQYkt3bUB6vGUGs8p9j8uhVKeYsY5g2sj67w4pz6CcxdhrVFPzGZnkba2"),
+            Base58.decode("2x8QSztNRFDKmMjotzfTvbAkDo7s7Uqh9HpyFVQTiDqYpfweV4z1wzcMjn6GtVHszqBZp6ynuUr4JP9PAEBPLtiy"),
+            Base58.decode("9UBPJ4XJzRkw7kQAdFvXbEZuroUszFPomH25UAmMkYyTFPfnbyo9qKKTMZffoSjoMHzMssszaTPiFVhxaxEwBrY"),
+            Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
+    };
+
+    public static final byte[][] VALID_BAL = TEST_DB > 0? new byte[][]{} : DEVELOP_USE ? new byte[][]{} :
             new byte[][]{
                     //Base58.decode("5sAJS3HeLQARZJia6Yzh7n18XfDp6msuaw8J5FPA8xZoinW4FtijNru1pcjqGjDqA3aP8HY2MQUxfdvk8GPC5kjh"),
                     //Base58.decode("3K3QXeohM3V8beSBVKSZauSiREGtDoEqNYWLYHxdCREV7bxqE4v2VfBqSh9492dNG7ZiEcwuhhk6Y5EEt16b6sVe"),
@@ -210,13 +258,13 @@ public class BlockChain {
     final public static BigDecimal TRADE_PRICE_DIFF_LIMIT =         new BigDecimal("0.001");
 
 
-    public static final int ITEM_POLL_FROM = DEVELOP_USE ? 77000 : VERS_4_11;
+    public static final int ITEM_POLL_FROM = TEST_DB > 0? 0 : DEVELOP_USE ? 77000 : VERS_4_11;
 
-    public static final int AMOUNT_SCALE_FROM = DEVELOP_USE ? 1034 : 1033;
+    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0? 0 : DEVELOP_USE ? 1034 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
-    public static final int FREEZE_FROM = DEVELOP_USE ? 12980 : 249222;
+    public static final int FREEZE_FROM = TEST_DB > 0? 0 : DEVELOP_USE ? 12980 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
-    public static final String[] TRUE_ADDRESSES = new String[]{
+    public static final String[] TRUE_ADDRESSES = TEST_DB > 0? new String[]{} : new String[]{
             "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"
             //"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             // "7S8qgSTdzDiBmyw7j3xgvXbVWdKSJVFyZv",
@@ -225,10 +273,6 @@ public class BlockChain {
     public static final int CONFIRMS_HARD = 3; // for reference by signature
     // MAX orphan CHAIN
     public static final int CONFIRMS_TRUE = MAX_ORPHAN; // for reference by ITEM_KEY
-    //TESTNET
-    //   1486444444444l
-    //	 1487844444444   1509434273     1509434273
-    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
     //public static final int FEE_MIN_BYTES = 200;
     public static final int FEE_PER_BYTE_4_10 = 64;
     public static final int FEE_PER_BYTE = 100;
@@ -295,7 +339,7 @@ public class BlockChain {
     public static HashMap<String, String> LOCKED__ADDRESSES = new HashMap<String, String>();
     public static HashMap<String, Tuple3<String, Integer, Integer>> LOCKED__ADDRESSES_PERIOD = new HashMap<String, Tuple3<String, Integer, Integer>>();
     public static HashMap<Long, PublicKeyAccount> ASSET_OWNERS = new HashMap<Long, PublicKeyAccount>();
-    static Logger LOGGER = LoggerFactory.getLogger(BlockChain.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(BlockChain.class.getSimpleName());
     private GenesisBlock genesisBlock;
     private long genesisTimestamp;
     private Block waitWinBuffer;
@@ -310,6 +354,10 @@ public class BlockChain {
     public long transactionValidateTimingAverage;
     public long transactionValidateTimingCounter;
 
+    /**
+     * Учитывает время очистки очереди неподтвержденных трнзакций и сброса на жесткий диск их памяти
+     * И поэтому это число хуже чем в Логе по подстчету обработки транзакций в блоке
+     */
     public long transactionProcessTimingAverage;
     public long transactionProcessTimingCounter;
 
@@ -322,13 +370,18 @@ public class BlockChain {
         genesisBlock = new GenesisBlock();
         genesisTimestamp = genesisBlock.getTimestamp();
 
-        // GENERAL TRUST
-        TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
-        TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
-        //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+        trustedPeers.addAll(Settings.getInstance().getTrustedPeers());
 
 
-        if (DEVELOP_USE) {
+        if (TEST_DB > 0) {
+            ;
+        } else if (DEVELOP_USE) {
+
+            // GENERAL TRUST
+            TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+            TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
+            //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+
             // права для Кибальникова
             ASSET_OWNERS.put(7L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
             ASSET_OWNERS.put(8L, new PublicKeyAccount("FgdfKGEQkP1RobtbGqVSQN61AZYGy6W1WSAJvE9weYMe"));
@@ -346,6 +399,12 @@ public class BlockChain {
 
             ANONYMASERS.add("7KC2LXsD6h29XQqqEa7EpwRhfv89i8imGK"); // face2face
         } else {
+
+            // GENERAL TRUST
+            TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
+            TRUSTED_ANONYMOUS.add("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh");
+            //TRUSTED_ANONYMOUS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
+
             // ANOMIMASER for incomes from PERSONALIZED
             ANONYMASERS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
             ANONYMASERS.add("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
@@ -358,6 +417,11 @@ public class BlockChain {
                     new Pair<Integer, byte[]>(12, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("ETH",
                     new Pair<Integer, byte[]>(14, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("GOLD",
+                    new Pair<Integer, byte[]>(22, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+            NOVA_ASSETS.put("BREND",
+                    new Pair<Integer, byte[]>(24, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
+
             NOVA_ASSETS.put("USD",
                     new Pair<Integer, byte[]>(95, new Account("7PvUGfFTYPjYi5tcoKHL4UWcf417C8B3oh").getShortAddressBytes()));
             NOVA_ASSETS.put("EUR",
@@ -409,14 +473,14 @@ public class BlockChain {
             LOCKED__ADDRESSES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6", "79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u");
 
             // TEAM 0 LOCKS
-            LOCKED__ADDRESSES_PERIOD.put("79kXsWXHRYEb7ESMohm9DXYjXBzPfi1seE", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Vasya
-            LOCKED__ADDRESSES_PERIOD.put("787H1wwYPwu33BEm2KbNeksAgVaRf41b2H", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Natasha
-            LOCKED__ADDRESSES_PERIOD.put("7CT5k4Qqhb53ciHfrxXaR3bGyribLgSoyZ", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Lena
-            LOCKED__ADDRESSES_PERIOD.put("74g61DcTa8qdfvWxzcbTjTf6PhMfAB77HK", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Ivan
-            LOCKED__ADDRESSES_PERIOD.put("7BfB66DpkEx7KJaMN9bzphTJcZR29wprMU", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Ruslan
-            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Sergey
-            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Vladimir
-            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Roman
+/// end            LOCKED__ADDRESSES_PERIOD.put("79kXsWXHRYEb7ESMohm9DXYjXBzPfi1seE", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Vasya
+/// end            LOCKED__ADDRESSES_PERIOD.put("787H1wwYPwu33BEm2KbNeksAgVaRf41b2H", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Natasha
+/// end            LOCKED__ADDRESSES_PERIOD.put("7CT5k4Qqhb53ciHfrxXaR3bGyribLgSoyZ", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Lena
+/// end            LOCKED__ADDRESSES_PERIOD.put("74g61DcTa8qdfvWxzcbTjTf6PhMfAB77HK", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Ivan
+/// end            LOCKED__ADDRESSES_PERIOD.put("7BfB66DpkEx7KJaMN9bzphTJcZR29wprMU", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Ruslan
+/// end            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Sergey
+/// end            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Vladimir
+/// end            LOCKED__ADDRESSES_PERIOD.put("1", new Tuple3("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5", 137000, 240000)); // Roman
 
             // TEST
             //FOUNDATION_ADDRESSES.add("7F9cZPE1hbzMT21g96U8E1EfMimovJyyJ7");
@@ -441,43 +505,43 @@ public class BlockChain {
             //		new int[][]{{9000, 110000}, {3200, 90000}, {138000, 7000}, {547500, 5000}});
 
             // TEAM 2
-            FREEZED_BALANCES.put("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP",
-                    new int[][]{{225655, 90000}, {333655, 60000}});
-            FREEZED_BALANCES.put("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs",
-                    new int[][]{{225655, 80000}, {333655, 53000}});
-            FREEZED_BALANCES.put("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G",
-                    new int[][]{{225655, 97000}, {333655, 65000}});
+/// end             FREEZED_BALANCES.put("77QMFKSdY4ZsG8bFHynYdFNCmis9fNw5yP",
+/// end                     new int[][]{{225655, 90000}, {333655, 60000}});
+/// end             FREEZED_BALANCES.put("7N7d8juuSSeEd92rkcEsfXhdi9WXE8zYXs",
+/// end                     new int[][]{{225655, 80000}, {333655, 53000}});
+/// end             FREEZED_BALANCES.put("7LETj4cW4rLWBCN52CaXmzQDnhwkEcrv9G",
+/// end                     new int[][]{{225655, 97000}, {333655, 65000}});
 
             // TEAM 3
-            FREEZED_BALANCES.put("7GMENsugxjV8PToyUyHNUQF7yr9Gy6tJou",
-                    new int[][]{{225655, 197000}, {333655, 131000}});
-            FREEZED_BALANCES.put("7DMJcs8kw7EXUSeEFfNwznRKRLHLrcXJFm",
-                    new int[][]{{225655, 150000}, {333655, 100000}});
-            FREEZED_BALANCES.put("7QUeuMiWQjoQ3MZiriwhKfEG558RJWUUis",
-                    new int[][]{{225655, 150000}, {333655, 100000}});
-            FREEZED_BALANCES.put("7MxscS3mS6VWim8B9K3wEzFAUWYbsMkVon",
-                    new int[][]{{225655, 140000}, {333655, 90000}});
-            FREEZED_BALANCES.put("79NMuuW7thad2JodQ5mKxbMoyf1DjNT9Ap",
-                    new int[][]{{225655, 130000}, {333655, 90000}});
-            FREEZED_BALANCES.put("7MhifBHaZsUcjgckwFN57bAE9fPJVDLDQq",
-                    new int[][]{{225655, 110000}, {333655, 80000}});
-            FREEZED_BALANCES.put("7FRWJ4ww3VstdyAyKFwYfZnucJBK7Y4zmT",
-                    new int[][]{{225655, 100000}, {333655, 70000}});
-            FREEZED_BALANCES.put("7FNAphtSYXtP5ycn88B2KEywuHXzM3XNLK",
-                    new int[][]{{225655, 90000}, {333655, 60000}});
-            FREEZED_BALANCES.put("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u",
-                    new int[][]{{225655, 80000}, {333655, 60000}});
+/// end             FREEZED_BALANCES.put("7GMENsugxjV8PToyUyHNUQF7yr9Gy6tJou",
+/// end                    new int[][]{{225655, 197000}, {333655, 131000}});
+/// end            FREEZED_BALANCES.put("7DMJcs8kw7EXUSeEFfNwznRKRLHLrcXJFm",
+/// end                    new int[][]{{225655, 150000}, {333655, 100000}});
+/// end            FREEZED_BALANCES.put("7QUeuMiWQjoQ3MZiriwhKfEG558RJWUUis",
+/// end                    new int[][]{{225655, 150000}, {333655, 100000}});
+/// end            FREEZED_BALANCES.put("7MxscS3mS6VWim8B9K3wEzFAUWYbsMkVon",
+/// end                    new int[][]{{225655, 140000}, {333655, 90000}});
+/// end            FREEZED_BALANCES.put("79NMuuW7thad2JodQ5mKxbMoyf1DjNT9Ap",
+/// end                    new int[][]{{225655, 130000}, {333655, 90000}});
+/// end            FREEZED_BALANCES.put("7MhifBHaZsUcjgckwFN57bAE9fPJVDLDQq",
+/// end                    new int[][]{{225655, 110000}, {333655, 80000}});
+/// end            FREEZED_BALANCES.put("7FRWJ4ww3VstdyAyKFwYfZnucJBK7Y4zmT",
+/// end                    new int[][]{{225655, 100000}, {333655, 70000}});
+/// end            FREEZED_BALANCES.put("7FNAphtSYXtP5ycn88B2KEywuHXzM3XNLK",
+/// end                    new int[][]{{225655, 90000}, {333655, 60000}});
+/// end            FREEZED_BALANCES.put("79ZVGgCFrQPoVTsFm6qCNTZNkRbYNsTY4u",
+/// end                    new int[][]{{225655, 80000}, {333655, 60000}});
 
             // TEAM 1
-            FREEZED_BALANCES.put("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y",
-                    new int[][]{{225655, 20000}, {333655, 10000}});
-            FREEZED_BALANCES.put("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV",
-                    new int[][]{{225655, 60000}, {333655, 40000}});
+/// end            FREEZED_BALANCES.put("74rRXsxoKtVKJqN8z6t1zHfufBXsELF94y",
+/// end                    new int[][]{{225655, 20000}, {333655, 10000}});
+/// end            FREEZED_BALANCES.put("7PChKkoASF1eLtCnAMx8ynU2sMYdSPwkGV",
+/// end                    new int[][]{{225655, 60000}, {333655, 40000}});
 
-            FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
-                    new int[][]{{225655, 150000}, {333655, 100000}});
-            FREEZED_BALANCES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6",
-                    new int[][]{{115000, 656000}, {225655, 441000}});
+/// end            FREEZED_BALANCES.put("7Jhh3TPmfoLag8FxnJRBRYYfqnUduvFDbv",
+/// end                    new int[][]{{225655, 150000}, {333655, 100000}});
+/// end            FREEZED_BALANCES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6",
+/// end                    new int[][]{{115000, 656000}, {225655, 441000}});
         }
 
         DCSet dcSet = dcSet_in;
@@ -530,7 +594,53 @@ public class BlockChain {
         //GET LAST BLOCK
         ///byte[] lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
         ///return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
-        return dcSet.getBlockMap().size();
+        return dcSet.getBlocksHeadsMap().size();
+    }
+
+    public static int GENERATING_MIN_BLOCK_TIME(int height) {
+
+        if (height <= VERS_30SEC) {
+            return DEVELOP_USE? 120 : 288;
+        }
+
+        return 30;
+    }
+
+    public static int GENERATING_MIN_BLOCK_TIME_MS(int height) {
+        return GENERATING_MIN_BLOCK_TIME(height) * 1000;
+    }
+
+    public static int GENERATING_MIN_BLOCK_TIME_MS(long timestamp) {
+        int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
+        return GENERATING_MIN_BLOCK_TIME(height) * 1000;
+    }
+
+    public static int FLUSH_TIMEPOINT(int height) {
+        return GENERATING_MIN_BLOCK_TIME_MS(height) - (GENERATING_MIN_BLOCK_TIME_MS(height) >> 3);
+    }
+
+    public static int UNCONFIRMED_SORT_WAIT_MS(int height) {
+        if (height <= VERS_30SEC) {
+            return -GENERATING_MIN_BLOCK_TIME_MS(height);
+        }
+        return DEVELOP_USE? 5000 : 5000;
+    }
+
+    public static int WIN_TIMEPOINT(int height) {
+        return GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
+    }
+
+    public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
+        int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
+        if (TEST_DB > 0) {
+            return GENERATING_MIN_BLOCK_TIME_MS(height);
+        } else {
+            return DEVELOP_USE ? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
+        }
+    }
+
+    public static int BLOCKS_PER_DAY(int height) {
+        return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
     }
 
     public static int getCheckPoint(DCSet dcSet) {
@@ -555,6 +665,10 @@ public class BlockChain {
         }
     }
 
+    public boolean isPeerTrusted(Peer peer) {
+        return trustedPeers.contains(peer.getAddress().getHostAddress());
+    }
+
     /**
      * Calculate Target (Average Win Value for 1024 last blocks) for this block
      * @param height - height of blockchain
@@ -577,7 +691,7 @@ public class BlockChain {
         //return targetPrevios - (targetPrevios>>TARGET_COUNT_SHIFT) + (winValue>>TARGET_COUNT_SHIFT);
         // better accuracy
         long target = (((targetPrevious << TARGET_COUNT_SHIFT) - targetPrevious) + winValue) >> TARGET_COUNT_SHIFT;
-        if (target < 1000 && DEVELOP_USE)
+        if (target < 1000 && (DEVELOP_USE || ERA_COMPU_ALL_UP))
             target = 1000;
 
         return target;
@@ -592,7 +706,7 @@ public class BlockChain {
             // FOR not repeated WINS - not need check BASE_TARGET
             /////base = BlockChain.BASE_TARGET>>1;
             base = BlockChain.BASE_TARGET - (BlockChain.BASE_TARGET >> 2); // ONLY UP
-        else if (DEVELOP_USE)
+        else if (DEVELOP_USE || ERA_COMPU_ALL_UP)
             base = 1; //BlockChain.BASE_TARGET >>5;
         else if (height < 110000)
             base = (BlockChain.BASE_TARGET >> 3); // + (BlockChain.BASE_TARGET>>4);
@@ -634,15 +748,10 @@ public class BlockChain {
             return 0l;
         }
 
-        Tuple2<Integer, Integer> previousForgingPoint = creator.getForgingData(dcSet, height);
+        Tuple2<Integer, Integer> previousForgingPoint = creator.getLastForgingData(dcSet);
 
-        if (DEVELOP_USE) {
+        if (DEVELOP_USE || ERA_COMPU_ALL_UP) {
             if (previousForgingPoint == null) {
-                // IF BLOCK not inserted in MAP
-                previousForgingPoint = creator.getLastForgingData(dcSet);
-            }
-
-            if (previousForgingPoint == null || previousForgingPoint.a.equals(height)) {
                 // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
                 previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
                 }
@@ -659,16 +768,23 @@ public class BlockChain {
         }
 
         if (forgingBalance < BlockChain.MIN_GENERATING_BALANCE) {
-            if (!Controller.getInstance().isTestNet() && !DEVELOP_USE)
+            if (!DEVELOP_USE && !ERA_COMPU_ALL_UP && !Controller.getInstance().isTestNet())
                 return 0l;
             forgingBalance = BlockChain.MIN_GENERATING_BALANCE;
         }
 
         int difference = height - previousForgingHeight;
-        if (Controller.getInstance().isTestNet() || BlockChain.DEVELOP_USE) {
-            if (difference < 10)
+
+        if (DEVELOP_USE || Controller.getInstance().isTestNet()) {
+            if (difference < 10) {
                 difference = 10;
-            ;
+            }
+        } else if (ERA_COMPU_ALL_UP) {
+            if (height < 5650 && difference < REPEAT_WIN) {
+                difference = REPEAT_WIN;
+            } else if (difference < REPEAT_WIN) {
+                return difference - REPEAT_WIN;
+            }
         } else {
 
             int repeatsMin;
@@ -679,24 +795,28 @@ public class BlockChain {
                 repeatsMin = BlockChain.GENESIS_ERA_TOTAL / forgingBalance;
                 repeatsMin = (repeatsMin >> 2);
 
-                if (height < 40000) {
-                    if (repeatsMin > 4)
-                        repeatsMin = 4;
-                } else if (height < 100000) {
-                    if (repeatsMin > 6)
-                        repeatsMin = 6;
-                } else if (height < 110000) {
-                    if (repeatsMin > 10) {
+                if (!DEVELOP_USE) {
+                    if (height < 40000) {
+                        if (repeatsMin > 4)
+                            repeatsMin = 4;
+                    } else if (height < 100000) {
+                        if (repeatsMin > 6)
+                            repeatsMin = 6;
+                    } else if (height < 110000) {
+                        if (repeatsMin > 10) {
+                            repeatsMin = 10;
+                        }
+                    } else if (height < 120000) {
+                        if (repeatsMin > 40)
+                            repeatsMin = 40;
+                    } else if (height < VERS_4_11) {
+                        if (repeatsMin > 200)
+                            repeatsMin = 200;
+                    } else if (repeatsMin < 10) {
                         repeatsMin = 10;
                     }
-                } else if (height < 120000) {
-                    if (repeatsMin > 40)
-                        repeatsMin = 40;
-                } else if (height < VERS_4_11) {
-                    if (repeatsMin > 200)
-                        repeatsMin = 200;
-                } else if (repeatsMin < 10) {
-                    repeatsMin = 10;
+                } else if (repeatsMin > DEVELOP_FORGING_START) {
+                    repeatsMin = DEVELOP_FORGING_START;
                 }
             }
 
@@ -712,7 +832,7 @@ public class BlockChain {
         else
             win_value = forgingBalance;
 
-        if (Controller.getInstance().isTestNet() || DEVELOP_USE)
+        if (DEVELOP_USE || ERA_COMPU_ALL_UP || Controller.getInstance().isTestNet())
             return win_value;
 
         if (false) {
@@ -759,7 +879,7 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (!DEVELOP_USE && !Controller.getInstance().isTestNet()
+        if (!DEVELOP_USE && !ERA_COMPU_ALL_UP && !Controller.getInstance().isTestNet()
                 && height > VERS_4_11
                 && base > targetedWinValue) {
             return -targetedWinValue;
@@ -812,16 +932,34 @@ public class BlockChain {
 	 */
 
     public long getTimestamp(int height) {
-        return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS;
+        if (height <= VERS_30SEC) {
+            return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
+        }
+
+        return this.genesisTimestamp
+                + (long) VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
+                + (long) (height - VERS_30SEC) * GENERATING_MIN_BLOCK_TIME_MS(height);
+
     }
 
     public long getTimestamp(DCSet dcSet) {
-        return this.genesisTimestamp + (long) getHeight(dcSet) * GENERATING_MIN_BLOCK_TIME_MS;
+        int height = getHeight(dcSet);
+        return getTimestamp(height);
     }
 
     public int getBlockOnTimestamp(long timestamp) {
-        long diff = timestamp = genesisTimestamp;
-        return (int) (diff / GENERATING_MIN_BLOCK_TIME_MS);
+        long diff = timestamp - genesisTimestamp;
+        int height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(1));
+        if (height <= VERS_30SEC)
+            return height;
+
+        // новый шаг между блоками
+        diff -= VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(1);
+
+        height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC + 1));
+
+        return VERS_30SEC + height;
+
     }
 
     // BUFFER of BLOCK for WIN solving
@@ -837,7 +975,14 @@ public class BlockChain {
 	}
 	 */
 
+    public int compareNewWin(DCSet dcSet, Block block) {
+        return this.waitWinBuffer == null ? -1 : this.waitWinBuffer.compareWin(block);
+    }
+
     public void clearWaitWinBuffer() {
+        if (this.waitWinBuffer != null) {
+            waitWinBuffer.close();
+        }
         this.waitWinBuffer = null;
     }
 
@@ -845,10 +990,6 @@ public class BlockChain {
         Block block = this.waitWinBuffer;
         this.waitWinBuffer = null;
         return block;
-    }
-
-    public int compareNewWin(DCSet dcSet, Block block) {
-        return this.waitWinBuffer == null ? -1 : this.waitWinBuffer.compareWin(block);
     }
 
     // SOLVE WON BLOCK
@@ -865,19 +1006,30 @@ public class BlockChain {
 
         }
 
-        // FULL VALIDATE because before was only HEAD validating
-        if (!block.isValid(dcSet, false)) {
+        // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+        DB database = DCSet.makeDBinMemory();
+        boolean noValid = true;
+        try {
+            noValid = !block.isValid(dcSet.fork(database), true);
+            // FULL VALIDATE because before was only HEAD validating
+            if (noValid) {
 
-            LOGGER.info("new winBlock is BAD!");
-            if (peer != null)
-                Controller.getInstance().banPeerOnError(peer, "invalid block", 10);
-            else
-                LOGGER.error("MY WinBlock is INVALID! ignore...");
+                LOGGER.info("new winBlock is BAD!");
+                if (peer != null)
+                    Controller.getInstance().banPeerOnError(peer, "invalid block", 10);
+                else
+                    LOGGER.error("MY WinBlock is INVALID! ignore...");
 
-            return false;
+                return false;
+            }
+        } finally {
+            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
+            if (noValid)
+                database.close();
         }
 
-        this.waitWinBuffer = block;
+        // set and close OLD
+        setWaitWinBufferUnchecked(block);
 
         LOGGER.info("new winBlock setted!!!" + block.toString());
         return true;
@@ -891,6 +1043,9 @@ public class BlockChain {
      */
     public void setWaitWinBufferUnchecked(Block block) {
         if (this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
+            if (this.waitWinBuffer != null) {
+                waitWinBuffer.close();
+            }
             this.waitWinBuffer = block;
         }
     }
@@ -971,30 +1126,45 @@ public class BlockChain {
                     + processTiming - transactionWinnedTimingAverage) >> 5;
     }
 
+    private long pointValidateAverage;
     public void updateTXValidateTimingAverage(long processTiming, int counter) {
         // тут всегда Количество больше 0 приходит
         processTiming = processTiming / 1000 / counter;
-        if (transactionValidateTimingCounter < 1 << 5) {
+        if (transactionValidateTimingCounter < 1 << 3) {
             transactionValidateTimingCounter++;
             transactionValidateTimingAverage = ((transactionValidateTimingAverage * transactionValidateTimingCounter)
                     + processTiming - transactionValidateTimingAverage) / transactionValidateTimingCounter;
         } else
-            transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
-                    + processTiming - transactionValidateTimingAverage) >> 5;
+            if (System.currentTimeMillis() - pointValidateAverage > 10000) {
+                pointValidateAverage = System.currentTimeMillis();
+                transactionValidateTimingAverage = ((transactionValidateTimingAverage << 1)
+                        + processTiming - transactionValidateTimingAverage) >> 1;
+            } else {
+                transactionValidateTimingAverage = ((transactionValidateTimingAverage << 5)
+                        + processTiming - transactionValidateTimingAverage) >> 5;
+            }
     }
 
+    private long pointProcessAverage;
     public void updateTXProcessTimingAverage(long processTiming, int counter) {
         if (processTiming < 999999999999l) {
             // при переполнении может быть минус
             // в микросекундах подсчет делаем
             processTiming = processTiming / 1000 / (Controller.BLOCK_AS_TX_COUNT + counter);
-            if (transactionProcessTimingCounter < 1 << 5) {
+            if (transactionProcessTimingCounter < 1 << 3) {
                 transactionProcessTimingCounter++;
                 transactionProcessTimingAverage = ((transactionProcessTimingAverage * transactionProcessTimingCounter)
                         + processTiming - transactionProcessTimingAverage) / transactionProcessTimingCounter;
             } else
-                transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
-                        + processTiming - transactionProcessTimingAverage) >> 5;
+                if (System.currentTimeMillis() - pointProcessAverage > 10000) {
+                    pointProcessAverage = System.currentTimeMillis();
+                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 1)
+                            + processTiming - transactionProcessTimingAverage) >> 1;
+
+                } else {
+                    transactionProcessTimingAverage = ((transactionProcessTimingAverage << 5)
+                            + processTiming - transactionProcessTimingAverage) >> 5;
+                }
         }
     }
 
@@ -1103,7 +1273,7 @@ public class BlockChain {
     // CLEAR UNCONFIRMED TRANSACTION from Invalid and DEAD
     public void clearUnconfirmedRecords(DCSet dcSet, boolean cutDeadTime) {
 
-        dcSet.getTransactionMap().clearByDeadTimeAndLimit(this.getTimestamp(dcSet), cutDeadTime);
+        dcSet.getTransactionTab().clearByDeadTimeAndLimit(this.getTimestamp(dcSet), cutDeadTime);
 
     }
 }

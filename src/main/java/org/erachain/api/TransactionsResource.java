@@ -10,7 +10,6 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
@@ -161,7 +160,7 @@ public class TransactionsResource {
     @Path("/network")
     public String getNetworkTransactions() {
         LOGGER.debug("try get");
-        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 100, true);
+        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(100, true);
         JSONArray array = new JSONArray();
 
         LOGGER.debug("get: " + transactions.size());
@@ -179,7 +178,7 @@ public class TransactionsResource {
     public String getNetworkTransactions(@PathParam("address") String address) {
         // TODO ошибку выдает
         //List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactionsByAddressFast100(address);
-        List<Transaction> transactions = DCSet.getInstance().getTransactionMap().getTransactionsByAddress(address);
+        List<Transaction> transactions = DCSet.getInstance().getTransactionTab().getTransactionsByAddress(address);
 
         JSONArray array = new JSONArray();
 
@@ -202,7 +201,7 @@ public class TransactionsResource {
 
         DCSet dcSet = DCSet.getInstance();
 
-        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, type, from, count, descending)) {
+        for (Transaction record : dcSet.getTransactionTab().getIncomedTransactions(address, type, from, count, descending)) {
             record.setDC(dcSet);
             array.add(record.toJson());
         }
@@ -494,7 +493,7 @@ public class TransactionsResource {
                                                   @PathParam("limit") int limit) {
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address,
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address,
                 type, limit);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());

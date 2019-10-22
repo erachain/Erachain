@@ -40,8 +40,8 @@ public class TransactionTests {
     byte FEE_POWER = (byte) 1;
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
-    Long last_ref;
-    Long new_ref;
+    long last_ref;
+    long new_ref;
 
     long flags = 0l;
     //CREATE KNOWN ACCOUNT
@@ -70,7 +70,7 @@ public class TransactionTests {
             //PropertyConfigurator.configure(log4j.getAbsolutePath());
         }
 
-        databaseSet = db = DCSet.createEmptyDatabaseSet();
+        databaseSet = db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         block = gb;
 
@@ -84,11 +84,11 @@ public class TransactionTests {
         last_ref = gb.getTimestamp();
 
         // FEE FUND
-        maker.setLastTimestamp(last_ref, db);
+        maker.setLastTimestamp(new long[]{last_ref, 0}, db);
         maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        new_ref = maker.getLastTimestamp(db);
+        new_ref = maker.getLastTimestamp(db)[0];
 
-        buyer.setLastTimestamp(last_ref, db);
+        buyer.setLastTimestamp(new long[]{last_ref, 0}, db);
         buyer.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
         buyer.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(2000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false); // for bye
 
@@ -123,15 +123,15 @@ String  s= "";
 
 
         //CREATE VALID PAYMENT
-        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
+        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(0.5).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
         assertEquals(Transaction.VALIDATE_OK, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT INVALID RECIPIENT ADDRESS
-        payment = new RSend(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db) + 10);
+        payment = new RSend(maker, FEE_POWER, new Account("test"), FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0] + 10);
         assertEquals(Transaction.INVALID_ADDRESS, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT NEGATIVE AMOUNT
-        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
+        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(-100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
         assertEquals(Transaction.NEGATIVE_AMOUNT, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT WRONG REFERENCE
@@ -139,9 +139,9 @@ String  s= "";
         assertEquals(Transaction.INVALID_REFERENCE, payment.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID PAYMENT WRONG TIMESTAMP
-        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db), maker.getLastTimestamp(db));
+        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db)[0], maker.getLastTimestamp(db)[0]);
         assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, flags));
-        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db) - 10, maker.getLastTimestamp(db));
+        payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getLastTimestamp(db)[0] - 10, maker.getLastTimestamp(db)[0]);
         assertEquals(Transaction.INVALID_TIMESTAMP, payment.isValid(Transaction.FOR_NETWORK, flags));
 
     }
@@ -151,7 +151,7 @@ String  s= "";
         init();
 
         //CREATE VALID PAYMENT
-        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db));
+        Transaction payment = new RSend(maker, FEE_POWER, recipient, FEE_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), timestamp, maker.getLastTimestamp(db)[0]);
         payment.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -221,7 +221,7 @@ String  s= "";
         assertEquals(amount, recipient.getBalanceUSE(FEE_KEY, databaseSet));
 
         //CHECK REFERENCE SENDER
-        assertEquals((long) maker.getLastTimestamp(databaseSet), timestamp);
+        assertEquals((long) maker.getLastTimestamp(databaseSet)[0], timestamp);
 
         //CHECK REFERENCE RECIPIENT
         assertEquals(payment.getTimestamp(), recipient.getLastTimestamp(databaseSet));
@@ -255,10 +255,10 @@ String  s= "";
         assertEquals(amount2, recipient.getBalanceUSE(FEE_KEY, databaseSet));
 
         //CHECK REFERENCE SENDER
-        assertEquals(maker.getLastTimestamp(databaseSet), maker.getLastTimestamp(databaseSet));
+        assertEquals(maker.getLastTimestamp(databaseSet)[0], maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK REFERENCE RECIPIENT
-        assertEquals(null, recipient.getLastTimestamp(databaseSet));
+        assertEquals(null, recipient.getLastTimestamp(databaseSet)[0]);
 
     }
 
@@ -343,7 +343,7 @@ String  s= "";
         privateKey = Crypto.getInstance().createKeyPair(seed).getA();
         PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
         name = new Name(invalidOwner, "test2", "this is the value");
-        nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
+        nameRegistration = new RegisterNameTransaction(invalidOwner, name, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0]);
         nameRegistration.sign(invalidOwner, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME REGISTRATION IS INVALID
@@ -351,7 +351,7 @@ String  s= "";
 
         //CREATE NAME REGISTRATION INVALID REFERENCE
         name = new Name(maker, "test2", "this is the value");
-        nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
+        nameRegistration = new RegisterNameTransaction(maker, name, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0]);
 
         //CHECK IF NAME REGISTRATION IS INVALID
         assertEquals(Transaction.INVALID_REFERENCE, nameRegistration.isValid(Transaction.FOR_NETWORK, flags));
@@ -439,7 +439,7 @@ String  s= "";
         assertEquals(1, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(nameRegistration.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)nameRegistration.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME EXISTS
         assertEquals(true, databaseSet.getNameMap().contains(name));
@@ -652,7 +652,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(nameUpdate.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)nameUpdate.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME EXISTS
         assertEquals(true, databaseSet.getNameMap().contains(name));
@@ -693,7 +693,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(nameRegistration.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)nameRegistration.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME EXISTS
         assertEquals(true, databaseSet.getNameMap().contains(name));
@@ -896,7 +896,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(nameSaleTransaction.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)nameSaleTransaction.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME SALE EXISTS
         assertEquals(true, databaseSet.getNameExchangeMap().contains("test"));
@@ -933,7 +933,7 @@ String  s= "";
         assertEquals(0, bal.compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(nameRegistration.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)nameRegistration.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME SALE EXISTS
         assertEquals(false, databaseSet.getNameExchangeMap().contains("test"));
@@ -1137,7 +1137,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(cancelNameSaleTransaction.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)cancelNameSaleTransaction.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME SALE EXISTS
         assertEquals(false, databaseSet.getNameExchangeMap().contains("test"));
@@ -1175,7 +1175,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals((long) nameSaleTransaction.getTimestamp(), (long) maker.getLastTimestamp(databaseSet));
+        assertEquals((long) nameSaleTransaction.getTimestamp(), (long) maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME SALE EXISTS
         assertEquals(true, databaseSet.getNameExchangeMap().contains("test"));
@@ -1237,7 +1237,7 @@ String  s= "";
         nameSaleTransaction.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE NAME PURCHASE
-        BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
+        BuyNameTransaction namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet)[0]);
         namePurchaseTransaction.sign(buyer, Transaction.FOR_NETWORK);
 
         //CHECK IF NAME PURCHASE IS VALID
@@ -1254,14 +1254,14 @@ String  s= "";
         //logger.info("nameSaleLong " + nameSaleLong);
         //logger.info("nameSaleLong getOwner "  + nameSaleLong.getName(databaseSet).getOwner());
         //// nameSaleLong --- nameSale -> owner
-        namePurchaseTransaction = new BuyNameTransaction(buyer, nameSaleInvalid, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
+        namePurchaseTransaction = new BuyNameTransaction(buyer, nameSaleInvalid, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet)[0]);
 
         //CHECK IF NAME UPDATE IS INVALID
         assertEquals(Transaction.INVALID_NAME_LENGTH_MAX, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE INVALID NAME PURCHASE NAME DOES NOT EXIST
         nameSaleInvalid = new NameSale("test2", BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
-        namePurchaseTransaction = new BuyNameTransaction(buyer, nameSaleInvalid, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
+        namePurchaseTransaction = new BuyNameTransaction(buyer, nameSaleInvalid, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet)[0]);
 
         //CHECK IF NAME UPDATE IS INVALID
         assertEquals(Transaction.NAME_DOES_NOT_EXIST, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -1282,7 +1282,7 @@ String  s= "";
 
         //CREATE INVALID NAME UPDATE NO BALANCE
         buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
+        namePurchaseTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet)[0]);
 
         //CHECK IF NAME UPDATE IS INVALID
         assertEquals(Transaction.NO_BALANCE, namePurchaseTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -1392,7 +1392,7 @@ String  s= "";
         //CREATE SIGNATURE
 
         //CREATE NAME PURCHASE
-        Transaction purchaseNameTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
+        Transaction purchaseNameTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet)[0]);
         purchaseNameTransaction.sign(buyer, Transaction.FOR_NETWORK);
         purchaseNameTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -1404,7 +1404,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(1500).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE BUYER
-        assertEquals(purchaseNameTransaction.getTimestamp(), buyer.getLastTimestamp(databaseSet));
+        assertEquals((long)purchaseNameTransaction.getTimestamp(), buyer.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME OWNER
         name = databaseSet.getNameMap().get("test");
@@ -1437,7 +1437,7 @@ String  s= "";
         //CREATE SIGNATURE
 
         //CREATE NAME PURCHASE
-        Transaction purchaseNameTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet));
+        Transaction purchaseNameTransaction = new BuyNameTransaction(buyer, nameSale, nameSale.getName(databaseSet).getOwner(), FEE_POWER, timestamp, buyer.getLastTimestamp(databaseSet)[0]);
         purchaseNameTransaction.sign(buyer, Transaction.FOR_NETWORK);
         purchaseNameTransaction.process(gb, Transaction.FOR_NETWORK);
         purchaseNameTransaction.orphan(block, Transaction.FOR_NETWORK);
@@ -1449,7 +1449,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(9999).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE BUYER
-        assertEquals(last_ref, buyer.getLastTimestamp(databaseSet));
+        assertEquals((long)last_ref, buyer.getLastTimestamp(databaseSet)[0]);
 
         //CHECK NAME OWNER
         name = databaseSet.getNameMap().get("test");
@@ -1553,9 +1553,9 @@ String  s= "";
         seed = Crypto.getInstance().digest("invalid".getBytes());
         privateKey = Crypto.getInstance().createKeyPair(seed).getA();
         PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
-        invalidOwner.setLastTimestamp(last_ref, databaseSet);
+        invalidOwner.setLastTimestamp(new long[]{last_ref, 0}, databaseSet);
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test")));
-        pollCreation = new CreatePollTransaction(invalidOwner, poll, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
+        pollCreation = new CreatePollTransaction(invalidOwner, poll, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0]);
         // need for calc FEE
         pollCreation.sign(invalidOwner, Transaction.FOR_NETWORK);
 
@@ -1564,7 +1564,7 @@ String  s= "";
 
         //CREATE POLL CREATION INVALID REFERENCE
         poll = new Poll(maker, "test2", "this is the value", Arrays.asList(new PollOption("test")));
-        pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
+        pollCreation = new CreatePollTransaction(maker, poll, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0]);
         assertEquals(Transaction.INVALID_REFERENCE, pollCreation.isValid(Transaction.FOR_NETWORK, flags));
 
     }
@@ -1656,7 +1656,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(1).subtract(pollCreation.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(pollCreation.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)pollCreation.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK POLL EXISTS
         assertEquals(true, databaseSet.getPollMap().contains(poll));
@@ -1679,7 +1679,7 @@ String  s= "";
         assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));
 
         //CHECK REFERENCE SENDER
-        assertEquals(last_ref, maker.getLastTimestamp(databaseSet));
+        assertEquals((long)last_ref, maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK POLL EXISTS
         assertEquals(false, databaseSet.getPollMap().contains(poll));
@@ -1724,7 +1724,7 @@ String  s= "";
         pollCreation.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE POLL VOTE
-        Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp + 100, maker.getLastTimestamp(databaseSet));
+        Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp + 100, maker.getLastTimestamp(databaseSet)[0]);
         pollVote.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF POLL VOTE IS VALID
@@ -1771,7 +1771,7 @@ String  s= "";
         seed = Crypto.getInstance().digest("invalid".getBytes());
         privateKey = Crypto.getInstance().createKeyPair(seed).getA();
         PrivateKeyAccount invalidOwner = new PrivateKeyAccount(privateKey);
-        invalidOwner.setLastTimestamp(timestamp, databaseSet);
+        invalidOwner.setLastTimestamp(new long[]{timestamp, 0}, databaseSet);
         pollVote = new VoteOnPollTransaction(invalidOwner, "test", 0, FEE_POWER, timestamp, last_ref);
         pollVote.sign(invalidOwner, Transaction.FOR_NETWORK);
 
@@ -1781,7 +1781,7 @@ String  s= "";
         /// fee = 0 assertEquals(Transaction.NOT_ENOUGH_FEE, pollVote.isValid(databaseSet));
 
         //CREATE POLL CREATION INVALID REFERENCE
-        pollVote = new VoteOnPollTransaction(maker, "test", 1, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet) + 1);
+        pollVote = new VoteOnPollTransaction(maker, "test", 1, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0] + 1);
         assertEquals(Transaction.INVALID_REFERENCE, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
     }
@@ -1864,7 +1864,7 @@ String  s= "";
         BigDecimal bal = maker.getBalanceUSE(FEE_KEY, databaseSet);
 
         //CREATE POLL VOTE
-        Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp + 100, maker.getLastTimestamp(databaseSet));
+        Transaction pollVote = new VoteOnPollTransaction(maker, poll.getName(), 0, FEE_POWER, timestamp + 100, maker.getLastTimestamp(databaseSet)[0]);
         pollVote.sign(maker, Transaction.FOR_NETWORK);
         assertEquals(Transaction.VALIDATE_OK, pollVote.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -1922,7 +1922,7 @@ String  s= "";
         assertEquals(1, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(pollCreation.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)pollCreation.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
 
         //CHECK POLL VOTER
         assertEquals(false, databaseSet.getPollMap().get(poll.getName()).hasVotes());
@@ -1986,7 +1986,7 @@ String  s= "";
         assertEquals(Transaction.NO_BALANCE, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         //CREATE ARBITRARY TRANSACTION INVALID REFERENCE
-        arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet));
+        arbitraryTransaction = new ArbitraryTransactionV3(maker, null, 4776, data, FEE_POWER, timestamp, invalidOwner.getLastTimestamp(databaseSet)[0]);
 
         //CHECK IF ARBITRARY TRANSACTION IS INVALID
         assertEquals(Transaction.INVALID_REFERENCE, arbitraryTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -2069,7 +2069,7 @@ String  s= "";
         assertEquals(0, BigDecimal.valueOf(1).subtract(arbitraryTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE).compareTo(maker.getBalanceUSE(FEE_KEY, databaseSet)));
 
         //CHECK REFERENCE SENDER
-        assertEquals(arbitraryTransaction.getTimestamp(), maker.getLastTimestamp(databaseSet));
+        assertEquals((long)arbitraryTransaction.getTimestamp(), maker.getLastTimestamp(databaseSet)[0]);
     }
 
     @Test
@@ -2087,7 +2087,7 @@ String  s= "";
         assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, databaseSet));
 
         //CHECK REFERENCE SENDER
-        assertEquals(last_ref, maker.getLastTimestamp(databaseSet));
+        assertEquals((long)last_ref, maker.getLastTimestamp(databaseSet)[0]);
     }
 
 	/*@Test
@@ -2158,7 +2158,7 @@ String  s= "";
         long timestamp = NTP.getTime();
 
         //CREATE ISSUE ASSET TRANSACTION
-        Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE ASSET TRANSACTION IS VALID
@@ -2166,7 +2166,7 @@ String  s= "";
 
         //INVALID SIGNATURE
         issueAssetTransaction = new IssueAssetTransaction(
-                maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db), new byte[64]);
+                maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE ASSET IS INVALID
         assertEquals(false, issueAssetTransaction.isSignatureValid(db));
@@ -2183,7 +2183,7 @@ String  s= "";
         AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 0, 50000l);
 
         //CREATE ISSUE ASSET TRANSACTION
-        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -2262,7 +2262,7 @@ String  s= "";
 
 
         //CREATE ISSUE ASSET TRANSACTION
-        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
 
         assertEquals(Transaction.VALIDATE_OK, issueAssetTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -2282,7 +2282,7 @@ String  s= "";
         assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);
+        assertEquals(true, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);
 
         //CHECK REFERENCE SENDER
         assertEquals(issueAssetTransaction.getTimestamp(), maker.getLastTimestamp(db));
@@ -2299,7 +2299,7 @@ String  s= "";
         AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 0, 50000l);
 
         //CREATE ISSUE ASSET TRANSACTION
-        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db));
+        IssueAssetTransaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(db)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         long key = db.getIssueAssetMap().get(issueAssetTransaction);
@@ -2315,7 +2315,7 @@ String  s= "";
         assertEquals(false, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.longValue());
+        assertEquals(0, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.longValue());
 
         //CHECK REFERENCE SENDER
         //assertEquals(issueAssetTransaction.getReference(), maker.getLastReference(db));

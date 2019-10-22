@@ -1,15 +1,14 @@
 package org.erachain.datachain;
 
+import org.erachain.utils.ByteArrayUtils;
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
-import org.erachain.utils.ByteArrayUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class BlogPostMap extends DCMap<String, List<byte[]>> {
+public class BlogPostMap extends DCUMap<String, List<byte[]>> {
 
     public final static String MAINBLOG = "Erachain.org";
 
@@ -17,24 +16,24 @@ public class BlogPostMap extends DCMap<String, List<byte[]>> {
         super(databaseSet, database);
     }
 
-    public BlogPostMap(DCMap<String, List<byte[]>> parent) {
+    public BlogPostMap(DCUMap<String, List<byte[]>> parent) {
         super(parent, null);
     }
 
     @Override
-    protected Map<String, List<byte[]>> getMap(DB database) {
+    protected void openMap() {
         // / OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("BlogPostMap");
-        return createTreeMap.makeOrGet();
+        map = createTreeMap.makeOrGet();
     }
 
     @Override
-    protected Map<String, List<byte[]>> getMemoryMap() {
-        return new HashMap<>();
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override

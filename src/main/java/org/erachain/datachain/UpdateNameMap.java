@@ -7,12 +7,10 @@ import org.erachain.database.serializer.NameSerializer;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 @Deprecated
-public class UpdateNameMap extends DCMap<byte[], Name> {
+public class UpdateNameMap extends DCUMap<byte[], Name> {
 
     public UpdateNameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -22,13 +20,13 @@ public class UpdateNameMap extends DCMap<byte[], Name> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<byte[], Name> getMap(DB database) {
+    protected void openMap() {
         //OPEN MAP
-        return database.createTreeMap("updateNameOrphanData")
+        map = database.createTreeMap("updateNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .valueSerializer(new NameSerializer())
@@ -36,8 +34,8 @@ public class UpdateNameMap extends DCMap<byte[], Name> {
     }
 
     @Override
-    protected Map<byte[], Name> getMemoryMap() {
-        return new TreeMap<byte[], Name>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Name>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override
@@ -54,6 +52,6 @@ public class UpdateNameMap extends DCMap<byte[], Name> {
     }
 
     public void delete(Transaction transaction) {
-        this.delete(transaction.getSignature());
+        this.remove(transaction.getSignature());
     }
 }

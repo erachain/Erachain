@@ -366,10 +366,10 @@ public class IssuePersonPanel extends JPanel {
         jMenuItemCopy.setAccelerator(KeyStroke.getKeyStroke(
                 KeyEvent.VK_C, InputEvent.CTRL_MASK));
 
-        JMenuItem jMenuItemPaste = new JMenuItem(Lang.getInstance().translate("Вставить"), KeyEvent.VK_P);
-        jMenuItemPaste.setMnemonic(KeyEvent.VK_P);
+        JMenuItem jMenuItemPaste = new JMenuItem(Lang.getInstance().translate("Вставить"), KeyEvent.VK_V);
+        jMenuItemPaste.setMnemonic(KeyEvent.VK_V);
         jMenuItemPaste.setAccelerator(KeyStroke.getKeyStroke(
-                KeyEvent.VK_P, InputEvent.CTRL_MASK));
+                KeyEvent.VK_V, InputEvent.CTRL_MASK));
 
         popup.add(jMenuItemCopy);
         popup.add(jMenuItemPaste);

@@ -1,5 +1,6 @@
 package org.erachain.database;
 
+import org.erachain.dbs.DCUMapImpl;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -8,15 +9,15 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.Collection;
 
-public abstract class AutoKeyDBMap<T, U> extends DBMap<T, U> {
+public abstract class AutoKeyDBMap<T, U> extends DCUMapImpl<T, U> {
 
     protected BTreeMap AUTOKEY_INDEX;
 
-    public AutoKeyDBMap(IDB databaseSet) {
+    public AutoKeyDBMap(DBASet databaseSet) {
         super(databaseSet);
     }
 
-    public AutoKeyDBMap(IDB databaseSet, DB database) {
+    public AutoKeyDBMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
 
     }
@@ -73,7 +74,7 @@ public abstract class AutoKeyDBMap<T, U> extends DBMap<T, U> {
      * @param key
      * @return
      */
-    public U delete(T key) {
+    public U remove(T key) {
 
         U item = super.get(key);
         if (item == null) {
@@ -82,7 +83,7 @@ public abstract class AutoKeyDBMap<T, U> extends DBMap<T, U> {
 
         // отрицательны и со сдигом -1
         if (((Long)((Tuple2)item).a).equals(-size() - 1))
-            return super.delete(key);
+            return super.remove(key);
 
         return item;
     }

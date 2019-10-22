@@ -1,27 +1,18 @@
 package org.erachain.gui.items.statement;
 
-import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.RVouch;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.VouchRecordMap;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.ObserverMessage;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
 
@@ -34,7 +25,7 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
     private int blockNo;
     private int recNo;
 
-    TransactionFinalMap transactionMap;
+    TransactionFinalMapImpl transactionMap;
 
     public StatementsVouchTableModel(Transaction transaction) {
 

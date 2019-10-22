@@ -251,36 +251,40 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         // REMOVE FEE
         Transaction forkTransaction = this.copy();
         DCSet fork = this.dcSet.fork();
-        forkTransaction.setDC(fork, Transaction.FOR_NETWORK, this.height, this.seqNo);
-        Block block = fork.getBlockMap().get(this.height);
-        forkTransaction.process(block, Transaction.FOR_NETWORK);
-        // TODO process && orphan && isValid balances
+        try {
+            forkTransaction.setDC(fork, Transaction.FOR_NETWORK, this.height, this.seqNo);
+            Block block = fork.getBlockMap().get(this.height);
+            forkTransaction.process(block, Transaction.FOR_NETWORK);
+            // TODO process && orphan && isValid balances
 
-        // CHECK PAYMENTS
-        for (Payment payment : this.payments) {
-            // CHECK IF RECIPIENT IS VALID ADDRESS
-            if (!Crypto.getInstance().isValidAddress(
-                    payment.getRecipient().getAddressBytes())) {
-                return INVALID_ADDRESS;
+            // CHECK PAYMENTS
+            for (Payment payment : this.payments) {
+                // CHECK IF RECIPIENT IS VALID ADDRESS
+                if (!Crypto.getInstance().isValidAddress(
+                        payment.getRecipient().getAddressBytes())) {
+                    return INVALID_ADDRESS;
+                }
+
+                // CHECK IF AMOUNT IS POSITIVE
+                if (payment.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                    return NEGATIVE_AMOUNT;
+                }
+
+                // CHECK IF SENDER HAS ENOUGH ASSET BALANCE
+                if (this.creator.getBalance(fork, payment.getAsset()).a.b
+                        .compareTo(payment.getAmount()) == -1) {
+                    return NO_BALANCE;
+                }
+
+                // CHECK IF AMOUNT wrong SCALE
+                AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(payment.getAsset());
+                if (payment.getAmount().scale() != asset.getScale()) {
+                    return AMOUNT_SCALE_WRONG;
+                }
+
             }
-
-            // CHECK IF AMOUNT IS POSITIVE
-            if (payment.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-                return NEGATIVE_AMOUNT;
-            }
-
-            // CHECK IF SENDER HAS ENOUGH ASSET BALANCE
-            if (this.creator.getBalance(fork, payment.getAsset()).a.b
-                    .compareTo(payment.getAmount()) == -1) {
-                return NO_BALANCE;
-            }
-
-            // CHECK IF AMOUNT wrong SCALE
-            AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(payment.getAsset());
-            if (payment.getAmount().scale() != asset.getScale()) {
-                return AMOUNT_SCALE_WRONG;
-            }
-
+        } finally {
+            fork.close();
         }
 
         return VALIDATE_OK;
