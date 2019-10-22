@@ -42,7 +42,7 @@ public class Settings {
     private static final String DEFAULT_DATAWALET_DIR = "dataWallet";
     public static final String DEFAULT_BACKUP_DIR = "backup";
     public static final String DEFAULT_TEMP_DIR = "temp";
-    public static final String DEFAULT_TELEGRAM_DIR = "telegram";
+    public static final String DEFAULT_TELEGRAM_DIR = "datatele";
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
     //NETWORK
     private static final int DEFAULT_MIN_CONNECTIONS = 10; // for OWN connections

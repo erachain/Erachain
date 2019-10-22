@@ -218,12 +218,15 @@ public class DCSet extends DBASet {
             this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
                     FINAL_TX_SIGNS_MAP
                     , this, database);
+
             this.orderMap = new OrderMapImpl(defaultDBS > 0 ? defaultDBS :
                     ORDERS_MAP
                     , this, database);
+
             this.completedOrderMap = new CompletedOrderMapImpl(defaultDBS > 0 ? defaultDBS :
                     COMPLETED_ORDERS_MAP
                     , this, database);
+
             this.tradeMap = new TradeMapImpl(defaultDBS > 0 ? defaultDBS :
                     TRADES_MAP
                     , this, database);
