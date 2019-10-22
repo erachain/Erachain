@@ -331,10 +331,15 @@ public class DCSet extends DBASet {
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
-            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+            if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                // у родителя чистим - у себя нет, так как только создали
+                parent.clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1) {
-                    Controller.getInstance().stopAll(91);
+                if (Runtime.getRuntime().freeMemory() < (Runtime.getRuntime().totalMemory() >> 10)
+                        + (Controller.MIN_MEMORY_TAIL << 1)) {
+                    logger.error("Heap Memory Overflow");
+                    Controller.getInstance().stopAll(1091);
                     return;
                 }
             }

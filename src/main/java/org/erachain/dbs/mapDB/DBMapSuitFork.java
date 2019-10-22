@@ -5,6 +5,7 @@ import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
+import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.ForkedMap;
 import org.mapdb.Fun;
@@ -41,14 +42,16 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.logger = logger;
         this.defaultValue = defaultValue;
 
-        if (false) {
-            if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
-                // System.out.println("########################### Free Memory:"
-                // + Runtime.getRuntime().freeMemory());
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+            // System.out.println("########################### Free Memory:"
+            // + Runtime.getRuntime().freeMemory());
+            if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                // у родителя чистим - у себя нет, так как только создали
+                ((DCSet)parent.getDBSet()).clearCache();
+                System.gc();
                 if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
-                    System.gc();
-                    if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
-                        Controller.getInstance().stopAll(198);
+                    logger.error("Heap Memory Overflow");
+                    Controller.getInstance().stopAll(1291);
                 }
             }
         }

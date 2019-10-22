@@ -116,7 +116,7 @@ public class Controller extends Observable {
     public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
 
     public static final String APP_NAME = BlockChain.DEVELOP_USE ? "Erachain-dev" : "Erachain";
-    public final static long MIN_MEMORY_TAIL = 50000000;
+    public final static long MIN_MEMORY_TAIL = 1 << 23;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED

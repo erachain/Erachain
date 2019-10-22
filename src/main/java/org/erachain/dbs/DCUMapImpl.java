@@ -49,13 +49,17 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     public DCUMapImpl(DBTab<T, U> parent, DBASet dcSet) {
         super(parent, dcSet);
 
-        if (false && Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
+        if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                // у родителя чистим - у себя нет, так как только создали
+                ((DCSet)parent.getDBSet()).clearCache();
                 System.gc();
-                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
-                    Controller.getInstance().stopAll(195);
+                if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
+                    LOGGER.error("Heap Memory Overflow");
+                    Controller.getInstance().stopAll(1191);
+                }
             }
         }
 
