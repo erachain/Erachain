@@ -1,11 +1,11 @@
 package org.erachain.dbs.rocksDB.store.settings;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl;
 import org.erachain.dbs.rocksDB.transformation.Byteable;
 import org.erachain.dbs.rocksDB.transformation.ByteableAtomicLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
+import org.mapdb.Fun.Tuple2;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,7 +30,7 @@ public class SettingsDBRocksDBTable {
     public Object get(String name) {
         Tuple2<String, Byteable> nameByteable = receiveTuple2ByName(name);
         byte[] bytes = db.get(byteableString.toBytesObject(name));
-        return nameByteable.f1.receiveObjectFromBytes(bytes);
+        return nameByteable.b.receiveObjectFromBytes(bytes);
     }
 
     public AtomicLong getAtomicLong(String name) {
@@ -54,7 +54,7 @@ public class SettingsDBRocksDBTable {
     }
     public void put(String name, Object value) {
         Tuple2<String, Byteable> nameByteable = receiveTuple2ByName(name);
-        db.put(byteableString.toBytesObject(name), nameByteable.f1.toBytesObject(value));
+        db.put(byteableString.toBytesObject(name), nameByteable.b.toBytesObject(value));
     }
 
     public void putAtomicLong(String name, AtomicLong value) {
@@ -70,9 +70,8 @@ public class SettingsDBRocksDBTable {
 
     }
 
-
     private Tuple2<String, Byteable> receiveTuple2ByName(String name) {
-        return namesByteables.stream().filter((tuple2) -> (tuple2.f0.equals(name))).findFirst().get();
+        return namesByteables.stream().filter((tuple2) -> (tuple2.a.equals(name))).findFirst().get();
     }
 
     public void close(){

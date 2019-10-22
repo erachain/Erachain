@@ -83,9 +83,9 @@ public class DCSet extends DBASet {
      */
     public static final int ACCOUNTS_REFERENCES = DBS_ROCK_DB;
 
-    public static final int ORDERS_MAP = DBS_MAP_DB;
-    public static final int COMPLETED_ORDERS_MAP = DBS_MAP_DB;
-    public static final int TRADES_MAP = DBS_MAP_DB;
+    public static final int ORDERS_MAP = DBS_ROCK_DB;
+    public static final int COMPLETED_ORDERS_MAP = DBS_ROCK_DB;
+    public static final int TRADES_MAP = DBS_ROCK_DB;
 
     /**
      * если задано то выбран такой КЭШ который нужно самим чистить иначе реперолнение будет
