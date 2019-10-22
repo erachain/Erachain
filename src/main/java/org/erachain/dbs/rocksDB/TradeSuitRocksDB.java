@@ -9,9 +9,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TradeMapSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
@@ -40,7 +38,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> pairIndex;
     SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> wantIndex;
     SimpleIndexDB<Tuple2<Long, Long>, Trade, Tuple3<String, Long, Integer>> haveIndex;
-    ListIndexDB<Tuple2<Long, Long>, Trade, Tuple2<Long, Long>> reverseIndex;
+    SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> reverseIndex;
 
     public TradeSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger);
@@ -77,22 +75,17 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                 (key, value) -> {
                     long have = value.getHaveKey();
                     long want = value.getWantKey();
-                    byte[] buffer = receivePairKey(have, want).getBytes(StandardCharsets.UTF_8);
-                    buffer = Longs.toByteArray(Long.MAX_VALUE - value.getInitiator());
-                    buffer = Ints.toByteArray(Integer.MAX_VALUE - value.getSequence());
+                    byte[] buffer1 = receivePairKey(have, want).getBytes(StandardCharsets.US_ASCII);
+
+                    byte[] buffer = new byte[buffer1.length + 12];
+                    System.arraycopy(buffer1, 0, buffer, 0, buffer1.length);
+                    System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
+                            0, buffer, buffer1.length, 8);
+                    System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
+                            0, buffer, buffer1.length + 8, 4);
+
                     return buffer;
                 }, (result, key) -> result);
-
-        wantIndex = new SimpleIndexDB<>(
-                tradesKeyWantIndexName,
-                (key, value) -> {
-                    byte[] buffer = Longs.toByteArray(value.getWantKey());
-                    buffer = Longs.toByteArray(Long.MAX_VALUE - value.getInitiator());
-                    buffer = Ints.toByteArray(Integer.MAX_VALUE - value.getSequence());
-                    return buffer;
-                }
-                , (result, key) -> result);
-
 
         haveIndex = new SimpleIndexDB<>(
                 tradesKeyHaveIndexName,
@@ -110,20 +103,33 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                 new ByteableLong().toBytesObject(result.b),
                 new ByteableInteger().toBytesObject(result.c)));
 
-        reverseIndex = new ListIndexDB<>(
+        wantIndex = new SimpleIndexDB<>(
+                tradesKeyWantIndexName,
+                (key, value) -> {
+                    byte[] buffer = new byte[20];
+                    System.arraycopy(Longs.toByteArray(value.getWantKey()),
+                            0, buffer, 0, 8);
+                    System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
+                            0, buffer, 8, 8);
+                    System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
+                            0, buffer, 16, 4);
+                    return buffer;
+                }, (result, key) -> result);
+
+        reverseIndex = new SimpleIndexDB<>(
                 tradesKeyReverseIndexName,
-                (key, value) -> new ArrayList<Tuple2<Long, Long>>() {{
-                    add(new Tuple2<>(key.b, key.a));
-                    add(key);
-                }},
-                (result, key) -> new ByteableTuple2LongLong().toBytesObject(result));
-        indexes = new ArrayList<>();
+                (key, value) -> {
+                    byte[] buffer = new byte[16];
+                    System.arraycopy(Longs.toByteArray(key.b), 0, buffer, 0, 8);
+                    System.arraycopy(Longs.toByteArray(key.a), 0, buffer, 8, 8);
+                    return buffer;
+                }, (result, key) -> result);
+
         indexes.add(pairIndex);
         indexes.add(haveIndex);
         indexes.add(wantIndex);
         indexes.add(reverseIndex);
     }
-
 
     public void add(Trade trade) {
         this.put(new Tuple2<>(trade.getInitiator(), trade.getTarget()), trade);
@@ -139,35 +145,33 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         return pairKey;
     }
 
-
     public void delete(Trade trade) {
         delete(new Tuple2<>(trade.getInitiator(), trade.getTarget()));
     }
 
-
     @Override
-    public Iterator<Tuple2> getIterator(Order order) {
-        return null;
+    public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
+        return map.getIndexIteratorFilter(Longs.toByteArray(order.getId()), false);
     }
 
     @Override
     public Iterator<Tuple2<Long, Long>> getReverseIterator(Long orderID) {
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(reverseIndex.getColumnFamilyHandle(), Longs.toByteArray(orderID), false);
+        return map.getIndexIteratorFilter(reverseIndex.getColumnFamilyHandle(), Longs.toByteArray(orderID), false);
     }
 
     @Override
     public Iterator<Tuple2<Long, Long>> getHaveIterator(long have) {
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(haveIndex.getColumnFamilyHandle(), Longs.toByteArray(have), false);
+        return map.getIndexIteratorFilter(haveIndex.getColumnFamilyHandle(), Longs.toByteArray(have), false);
     }
 
     @Override
     public Iterator<Tuple2<Long, Long>> getWantIterator(long want) {
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(wantIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false);
+        return map.getIndexIteratorFilter(wantIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false);
     }
 
     @Override
     public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false);
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false);
     }
 
     @Override

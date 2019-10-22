@@ -157,10 +157,10 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
      * @return
      */
     @Override
-    public Iterator<Tuple2> getIterator(Order order) {
+    public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
         //FILTER ALL KEYS
         Map uncastedMap = map;
-        return  ((BTreeMap<Tuple2, Order>) uncastedMap).subMap(
+        return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
                 Fun.t2(order.getId(), null),
                 Fun.t2(order.getId(), Fun.HI())).keySet().iterator();
     }

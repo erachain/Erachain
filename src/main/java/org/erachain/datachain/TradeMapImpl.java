@@ -11,6 +11,8 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TradeMapSuitMapDB;
 import org.erachain.dbs.mapDB.TradeMapSuitMapDBFork;
+import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
+import org.erachain.dbs.rocksDB.TradeSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -51,8 +53,8 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new BlocksSuitRocksDB(databaseSet, database);
-                    //break;
+                    map = new TradeSuitRocksDB(databaseSet, database);
+                    break;
                 default:
                     map = new TradeMapSuitMapDB(databaseSet, database);
             }
@@ -60,7 +62,8 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
                     //map = new BlocksSuitMapDBFotk((TransactionTab) parent, databaseSet);
-                    //break;
+                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
+                    break;
                 default:
                     map = new TradeMapSuitMapDBFork((TradeMap)parent, databaseSet);
             }
@@ -78,14 +81,14 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
      * @return
      */
     @Override
-    public Iterator<Tuple2> getIterator(Order order) {
+    public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
         return ((TradeMapSuit) this.map).getIterator(order);
     }
 
     @Override
     public List<Trade> getInitiatedTrades(Order order) {
         //FILTER ALL TRADES
-        Iterator<Tuple2> iterator = ((TradeMapSuit) this.map).getIterator(order);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeMapSuit) this.map).getIterator(order);
 
         //GET ALL TRADES FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();

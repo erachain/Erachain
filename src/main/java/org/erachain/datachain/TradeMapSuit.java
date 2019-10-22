@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 public interface TradeMapSuit {
 
-    Iterator<Fun.Tuple2> getIterator(Order order);
+    Iterator<Fun.Tuple2<Long, Long>> getIterator(Order order);
     Iterator<Fun.Tuple2<Long, Long>> getReverseIterator(Long orderID);
     Iterator<Fun.Tuple2<Long, Long>> getHaveIterator(long have);
     Iterator<Fun.Tuple2<Long, Long>> getWantIterator(long want);
