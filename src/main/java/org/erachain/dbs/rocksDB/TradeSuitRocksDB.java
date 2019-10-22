@@ -171,7 +171,10 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
-        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false);
+        byte[] buffer = new byte[16];
+        System.arraycopy(Longs.toByteArray(have), 0, buffer, 0, 8);
+        System.arraycopy(Longs.toByteArray(want), 0, buffer, 8, 8);
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), buffer, false);
     }
 
     @Override
