@@ -18,9 +18,6 @@ import org.mapdb.Fun;
 import java.math.BigDecimal;
 import java.util.*;
 
-;
-
-//import com.sun.media.jfxmedia.logging.Logger;
 
 /**
  * Хранит блоки полностью - с транзакциями
@@ -79,42 +76,6 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
     }
 
-    //@Override
-    protected void getMemoryMap() {
-        openMap();
-    }
-
-    @Override
-    public Iterator<Long> getHaveWantIterator(long have, long want) {
-
-        return ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
-                Fun.t4(have, want, null, null),
-                Fun.t4(have, want, Fun.HI(), Fun.HI())).values().iterator();
-
-    }
-
-    @Override
-    public Iterator<Long> getHaveWantIterator(long have) {
-        return ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
-                Fun.t4(have, null, null, null),
-                Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values().iterator();
-    }
-
-    @Override
-    public Iterator<Long> getWantHaveIterator(long want, long have) {
-        return null;
-    }
-
-    @Override
-    public Iterator<Long> getWantHaveIterator(long want) {
-        return null;
-    }
-
-    @Override
-    public Iterator<Long> getAddressHaveWantIterator(String address, long have, long want) {
-        return null;
-    }
-
     // GET KEYs with FORKED rules
     @Override
     public List<Long> getSubKeysWithParent(long have, long want) {
@@ -167,6 +128,31 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
         //RETURN
         return orders;
+    }
+
+    @Override
+    public Iterator<Long> getHaveWantIterator(long have, long want) {
+        return null;
+    }
+
+    @Override
+    public Iterator<Long> getHaveWantIterator(long have) {
+        return null;
+    }
+
+    @Override
+    public Iterator<Long> getWantHaveIterator(long want, long have) {
+        return null;
+    }
+
+    @Override
+    public Iterator<Long> getWantHaveIterator(long want) {
+        return null;
+    }
+
+    @Override
+    public Iterator<Long> getAddressHaveWantIterator(String address, long have, long want) {
+        return null;
     }
 
 }
