@@ -779,14 +779,14 @@ public class Synchronizer extends Thread {
                 throw new Exception(mess);
             }
 
-            // null - not ned orphan my CHAIN
+            // null - not need orphan my CHAIN
             return new Tuple2<byte[], List<byte[]>>(null, headers);
 
         }
 
-        byte[] signCheck = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
+        byte[] checkPointSign = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
 
-        List<byte[]> headersCheck = this.getBlockSignatures(signCheck, peer);
+        List<byte[]> headersCheck = this.getBlockSignatures(checkPointSign, peer);
         if (headersCheck.isEmpty()) {
             String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> not found";
             peer.ban(BAN_BLOCK_TIMES, mess);
@@ -805,37 +805,6 @@ public class Synchronizer extends Thread {
 
         LOGGER.info("findHeaders maxChainHeight: " + myChainHeight + " to minHeight: " + checkPointHeight);
 
-        // try get check point block from peer
-        // GENESIS block nake ERROR in org.erachain.network.Peer.sendMessage(Message) ->
-        // this.out.write(message.toBytes());
-        // TODO fix it error
-        byte[] checkPointHeightSignature;
-        Block checkPointHeightCommonBlock = null;
-        checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
-
-        boolean checkByBlockorSingn = false;
-        try {
-            // try get common block from PEER
-            // not need CHECK peer on ping = false
-            if (checkByBlockorSingn) {
-                checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, false);
-            } else {
-                headers = this.getBlockSignatures(checkPointHeightSignature, peer);
-            }
-
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            String mess = "in getBlock:\n" + e.getMessage() + "\n *** in Peer: " + peer;
-            //// banned in getBlock -- peer.ban(BAN_BLOCK_TIMES>>3, mess);
-            throw new Exception(mess);
-        }
-
-        if (checkByBlockorSingn && checkPointHeightCommonBlock == null || headers == null) {
-            String mess = "Dishonest peer: my block[" + checkPointHeight + "\n -> common BLOCK not found";
-            peer.ban(BAN_BLOCK_TIMES, mess);
-            throw new Exception(mess);
-        }
-
         // GET HEADERS UNTIL COMMON BLOCK IS FOUND OR ALL BLOCKS HAVE BEEN
         // CHECKED
         // int step = BlockChain.SYNCHRONIZE_PACKET>>2;
@@ -851,7 +820,7 @@ public class Synchronizer extends Thread {
 
             if (currentCheckChainHeight < checkPointHeight) {
                 currentCheckChainHeight = checkPointHeight;
-                lastCommonBlockSignature = checkPointHeightCommonBlock.getSignature();
+                lastCommonBlockSignature = checkPointSign;
             } else {
                 lastCommonBlockSignature = dcSet.getBlocksHeadsMap().get(currentCheckChainHeight).signature;
             }
