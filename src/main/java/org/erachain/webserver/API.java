@@ -1174,17 +1174,11 @@ public class API {
     public Response asset(@PathParam("key") long key) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        // DOES ASSETID EXIST
-        if (!map.contains(key)) {
-            throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_ASSET_NOT_EXIST);
-        }
 
         AssetCls asset = (AssetCls) map.get(key);
         if (asset == null) {
-
-
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
         }
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -1199,14 +1193,12 @@ public class API {
     public Response assetData(@PathParam("key") long key) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        // DOES ASSETID EXIST
-        if (!map.contains(key)) {
-            throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_ASSET_NOT_EXIST);
-        }
 
         AssetCls asset = (AssetCls) map.get(key);
+        if (asset == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
