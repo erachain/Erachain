@@ -813,17 +813,24 @@ public class Synchronizer extends Thread {
         Block checkPointHeightCommonBlock = null;
         checkPointHeightSignature = dcSet.getBlocksHeadsMap().get(checkPointHeight).signature;
 
+        boolean checkByBlockorSingn = false;
         try {
             // try get common block from PEER
             // not need CHECK peer on ping = false
-            checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, false);
+            if (checkByBlockorSingn) {
+                checkPointHeightCommonBlock = getBlock(checkPointHeightSignature, peer, false);
+            } else {
+                headers = this.getBlockSignatures(checkPointHeightSignature, peer);
+            }
+
         } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
             String mess = "in getBlock:\n" + e.getMessage() + "\n *** in Peer: " + peer;
             //// banned in getBlock -- peer.ban(BAN_BLOCK_TIMES>>3, mess);
             throw new Exception(mess);
         }
 
-        if (checkPointHeightCommonBlock == null) {
+        if (checkByBlockorSingn && checkPointHeightCommonBlock == null || headers == null) {
             String mess = "Dishonest peer: my block[" + checkPointHeight + "\n -> common BLOCK not found";
             peer.ban(BAN_BLOCK_TIMES, mess);
             throw new Exception(mess);
