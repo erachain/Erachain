@@ -36,7 +36,7 @@ public class BlockChain {
     //public static final int START_LEVEL = 1;
 
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
 
     public static final int BLOCK_COUNT = 0; ////
     // сколько транзакции в блоке - если больше 0 то запускает тест на старте
@@ -662,8 +662,8 @@ public class BlockChain {
     public static int getCheckPoint(DCSet dcSet) {
 
         Integer item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
-        if (item == null || item == -1)
-            return 2;
+        if (item == null || item < 1)
+            return 1;
 
         int heightCheckPoint = item;
         int dynamicCheckPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
