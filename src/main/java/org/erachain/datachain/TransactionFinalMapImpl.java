@@ -8,6 +8,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.RCalculated;
@@ -139,7 +140,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByRecipient(String address, int limit) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -201,7 +202,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsBySender(String address, int limit) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -229,7 +230,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -257,7 +258,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -288,7 +289,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator getKeysByTitleAndType(String filter, Integer type, int offset, int limit) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -315,7 +316,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     public Pair<Integer, Iterator<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -399,7 +400,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Pair<String, Iterator> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -426,7 +427,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -458,7 +459,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getByFilterAsArray(String filter, int offset, int limit) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -487,7 +488,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator getIteratorByAddress(String address) {
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -498,7 +499,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge) {
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -531,7 +532,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public int getTransactionsByAddressCount(String address) {
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
 
@@ -542,7 +543,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, String address) {
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -571,7 +572,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     public List<Transaction> findTransactions(String address, String sender, String recipient, final int minHeight,
                                               final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
 
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
@@ -596,7 +597,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings("rawtypes")
     public int findTransactionsCount(String address, String sender, String recipient, final int minHeight,
                                      final int maxHeight, int type, int service, boolean desc, int offset, int limit) {
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
         Iterator keys = findTransactionsKeys(address, sender, recipient, minHeight, maxHeight, type, service, desc,
@@ -621,7 +622,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Iterator<Long> findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
                                                final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
-        if (parent != null) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
         Iterator<Long> senderKeys = null;

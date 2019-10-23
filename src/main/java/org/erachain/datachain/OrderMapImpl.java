@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.Iterators;
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.dbs.DBTab;
@@ -72,11 +73,17 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public long getCount(long have, long want) {
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return 0;
+        }
         return Iterators.size(((OrderSuit) map).getHaveWantIterator(have, want));
     }
 
     @Override
     public long getCountHave(long have) {
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return 0;
+        }
         return Iterators.size(((OrderSuit) map).getHaveWantIterator(have));
     }
 
@@ -87,6 +94,10 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public List<Order> getOrders(long haveWant) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return new ArrayList<>();
+        }
 
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
@@ -108,6 +119,9 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public long getCountOrders(long haveWant) {
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return 0;
+        }
 
         return this.getCountHave(haveWant) + this.getCountWant(haveWant);
     }
@@ -125,6 +139,9 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     @Override
     public List<Order> getOrders(long have, long want, int limit) {
 
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return new ArrayList<>();
+        }
         Iterator<Long> iterator = ((OrderSuit) map).getHaveWantIterator(have, want);
 
         iterator = Iterators.limit(iterator, limit);
@@ -141,6 +158,9 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     public List<Order> getOrdersForAddress(
             String address, Long have, Long want) {
 
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return new ArrayList<>();
+        }
         Iterator<Long> iterator = ((OrderSuit) map).getAddressHaveWantIterator(address, have, want);
 
         //GET ALL ORDERS FOR KEYS
@@ -184,12 +204,23 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
+    public void delete(Long id) {
+        if (BlockChain.CHECK_BUGS > 1) {
+            if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
+                // если он есть в уже завершенных
+                assert ("".equals("already in Completed"));
+            }
+        }
+        super.delete(id);
+    }
+
+    @Override
     public void add(Order order) {
-        this.set(order.getId(), order);
+        this.put(order.getId(), order);
     }
 
     @Override
     public void delete(Order order) {
-        this.remove(order.getId());
+        this.delete(order.getId());
     }
 }

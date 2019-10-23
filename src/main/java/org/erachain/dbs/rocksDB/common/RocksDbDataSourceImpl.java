@@ -224,20 +224,24 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 logger.info("database opened");
                             }
 
-                            if (indexes != null && !indexes.isEmpty()) {
-                                for (int i = 0; i < indexes.size(); i++) {
-                                    indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                            if (indexes != null) {
+                                if (!indexes.isEmpty()) {
+                                    for (int i = 0; i < indexes.size(); i++) {
+                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                    }
+
+                                }
+
+                                // INIT SIZE INDEX - только если заданы индексы вторичные вообще
+                                columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+
+                                if (create) {
+                                    // Нужно для того чтобы в базе даже у транзакционных был Размер уже
+                                    dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
                                 }
                             }
 
                             alive = true;
-
-                            // INIT SIZE INDEX
-                            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-
-                            if (create) {
-                                dbCore.put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
-                            }
 
                         } catch (RocksDBException e) {
                             logger.error(e.getMessage(), e);

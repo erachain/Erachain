@@ -103,6 +103,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     @Override
     public List<Trade> getTradesByOrderID(Long orderID) {
         //ADD REVERSE KEYS
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return new ArrayList<>();
+        }
         Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getReverseIterator(orderID);
 
         //GET ALL ORDERS FOR KEYS
@@ -119,6 +122,10 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     public List<Trade> getTrades(long haveWant)
     // get trades for order as HAVE and as WANT
     {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return new ArrayList<>();
+        }
 
         Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getHaveIterator(haveWant);
         if (iterator == null)
@@ -141,6 +148,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     @Override
     public List<Trade> getTrades(long have, long want, int offset, int limit) {
 
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return new ArrayList<>();
+        }
         Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairIterator(have, want);
         if (iterator == null)
             return new ArrayList<Trade>();
@@ -162,6 +172,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     @SuppressWarnings("unchecked")
     public Trade getLastTrade(long have, long want) {
 
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
         Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairIterator(have, want);
         if (iterator == null)
             return null;
@@ -184,6 +197,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     @Override
     public List<Trade> getTradesByTimestamp(long have, long want, long timestamp, int limit) {
 
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
         Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, timestamp);
         if (iterator == null)
             return null;
@@ -203,6 +219,10 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     public BigDecimal getVolume24(long have, long want) {
 
         BigDecimal volume = BigDecimal.ZERO;
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return volume;
+        }
 
         // тут индекс не по времени а по номерам блоков как лонг
         int heightStart = Controller.getInstance().getMyHeight();
