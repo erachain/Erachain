@@ -467,25 +467,39 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         // CHECK IF REFERENCE IS OK
         if (asDeal > Transaction.FOR_PACK) {
-            long[] reference = this.creator.getLastTimestamp(dcSet);
-            if (reference != null && reference[0] >= this.timestamp
-                    // при откатах для нового счета который первый раз сделал транзакцию
-                    // из нулевого баланса - Референс будеть ошибочный
-                    // поэтому отключим эту проверку тут
-                    && !BlockChain.DEVELOP_USE
-                    ) {
-
-                if (height > 0 || BlockChain.CHECK_BUGS > 7
-                        || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
-                    if (BlockChain.TEST_DB == 0) {
-                        pointLogg = System.currentTimeMillis();
-                        LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
-                                + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                                + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
-                    }
+            if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    return INVALID_TIMESTAMP;
+                }
+            } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    return INVALID_TIMESTAMP;
                 }
 
-                return INVALID_TIMESTAMP;
+            } else {
+                long[] reference = this.creator.getLastTimestamp(dcSet);
+                if (reference != null && reference[0] >= this.timestamp
+                        // при откатах для нового счета который первый раз сделал транзакцию
+                        // из нулевого баланса - Референс будеть ошибочный
+                        // поэтому отключим эту проверку тут
+                        && !BlockChain.DEVELOP_USE
+                ) {
+
+                    if (height > 0 || BlockChain.CHECK_BUGS > 7
+                            || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
+                        if (BlockChain.TEST_DB == 0) {
+                            pointLogg = System.currentTimeMillis();
+                            LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
+                                    + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                    + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                        }
+                    }
+                    return INVALID_TIMESTAMP;
+                }
             }
         }
 

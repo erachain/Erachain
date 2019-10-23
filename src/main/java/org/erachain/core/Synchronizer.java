@@ -201,7 +201,7 @@ public class Synchronizer extends Thread {
         LOGGER.debug("*** checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
 
         // VALIDATE THE NEW BLOCKS
-        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+        if (BlockChain.NOT_STORE_REFFS_HISTORY || BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0) {
             // TODO тут нужно обновить за последние 3-10 блоков значения в
             ReferenceMapImpl map = fork.getReferenceMap();
 

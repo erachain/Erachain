@@ -1227,17 +1227,32 @@ public abstract class Transaction implements ExplorerJsonLine {
         // CHECK IF REFERENCE IS OK
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
         if (asDeal > Transaction.FOR_MYPACK) {
-            long[] reference = this.creator.getLastTimestamp(dcSet);
-            if (reference != null && reference[0] >= this.timestamp
-                    && height > BlockChain.VERS_4_11
-                    && (!BlockChain.DEVELOP_USE || height < 495000)) {
-                if (BlockChain.TEST_DB == 0) {
-                    LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
-                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                            + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+            if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    LOGGER.debug(DateTimeFormat.timestamptoString(Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp));
+                    return INVALID_TIMESTAMP;
+                }
+            } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    LOGGER.debug(DateTimeFormat.timestamptoString(Controller.getInstance().getBlockChain().getTimestamp(BlockChain.CHECK_DOUBLE_SPEND_DEEP) - timestamp));
+                    return INVALID_TIMESTAMP;
                 }
 
-                return INVALID_TIMESTAMP;
+            } else {
+                long[] reference = this.creator.getLastTimestamp(dcSet);
+                if (reference != null && reference[0] >= this.timestamp
+                        && height > BlockChain.VERS_4_11
+                        && (!BlockChain.DEVELOP_USE || height < 495000)) {
+                    if (BlockChain.TEST_DB == 0) {
+                        LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
+                                + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                    }
+
+                    return INVALID_TIMESTAMP;
+                }
             }
         }
 

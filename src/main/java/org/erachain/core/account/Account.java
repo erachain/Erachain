@@ -744,14 +744,21 @@ public class Account {
     }
 
     public long[] getLastTimestamp() {
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0)
+            return null;
         return this.getLastTimestamp(DCSet.getInstance());
     }
 
     public long[] getLastTimestamp(DCSet dcSet) {
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0)
+            return null;
         return dcSet.getReferenceMap().get(shortBytes);
     }
 
     public void setLastTimestamp(long[] currentPoint, DCSet dcSet) {
+
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0)
+            return;
 
         ReferenceMapImpl map = dcSet.getReferenceMap();
 
@@ -778,6 +785,10 @@ public class Account {
     }
 
     public void removeLastTimestamp(DCSet dcSet) {
+
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0) {
+            return;
+        }
 
         ReferenceMapImpl map = dcSet.getReferenceMap();
 

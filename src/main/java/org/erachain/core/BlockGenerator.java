@@ -224,6 +224,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private void testTransactions(int blockHeight, long blockTimestamp) {
 
         SecureRandom randomSecure = new SecureRandom();
+        // сдвиг назад органиизуем
+        blockTimestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) - BlockChain.UNCONFIRMED_SORT_WAIT_MS(blockHeight) - 1;
 
         LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB);
 
@@ -270,22 +272,26 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         }
 
-        // добавить невалидных транзакций немного - по времени создания
-        timestamp = blockTimestamp - 10000000L * 1L;
-        PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
-        for (int index = 0; index < (BlockChain.TEST_DB >> 3); index++) {
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
+            //// только если включена проверка повторов - запускаем эту проверку на невалидные транзакции
 
-            recipient = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+            // добавить невалидных транзакций немного - по времени создания
+            timestamp = blockTimestamp - 10000000L * 1L;
+            PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
+            for (int index = 0; index < (BlockChain.TEST_DB >> 3); index++) {
 
-            PrivateKeyAccount creator = creators[random.nextInt(creators.length)];
+                recipient = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
 
-            messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
-                    amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage,
-                    timestamp, 0l);
-            messageTx.sign(creator, Transaction.FOR_NETWORK);
+                PrivateKeyAccount creator = creators[random.nextInt(creators.length)];
 
-            ctrl.transactionsPool.offerMessage(messageTx);
+                messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                        amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage,
+                        timestamp, 0l);
+                messageTx.sign(creator, Transaction.FOR_NETWORK);
 
+                ctrl.transactionsPool.offerMessage(messageTx);
+
+            }
         }
 
     }
@@ -768,7 +774,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.error(e.getMessage(), e);
                     }
 
-                    if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+                    if (BlockChain.NOT_STORE_REFFS_HISTORY || BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0) {
                         // TODO тут нужно обновить за последние 3-10 блоков значения в
                         ReferenceMapImpl map = dcSet.getReferenceMap();
 
@@ -793,7 +799,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     betterPeer = null;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
-                    LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
+                    LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit + " for UTX time: " + new Timestamp(timePointForValidTX));
                     this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoit);
 
                     flushPoint = timePoint + BlockChain.FLUSH_TIMEPOINT(height);
@@ -926,7 +932,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             /// тестовый аккаунт
                             acc_winner = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
                             /// закатем в очередь транзакции
-                            testTransactions(height, timePointForValidTX - BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height));
+                            testTransactions(height, timePointForValidTX);
                         }
 
                         if (!BlockChain.STOP_GENERATE_BLOCKS && acc_winner != null) {
