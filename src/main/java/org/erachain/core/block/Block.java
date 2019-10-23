@@ -1542,6 +1542,7 @@ import java.util.*;
     public boolean isValid(DCSet dcSetPlace, boolean andProcess) {
 
         if (validatedForkDB != null) {
+            LOGGER.error("is Valid validatedForkDB not NULL [" + heightBlock + "]");
             close();
         }
         wasValidated = false;
