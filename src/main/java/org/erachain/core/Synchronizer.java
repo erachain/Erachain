@@ -1,5 +1,6 @@
 package org.erachain.core;
 
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -26,7 +27,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * функционал скачки цепочки с других узлов - догоняние сети
@@ -39,7 +40,8 @@ public class Synchronizer extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(Synchronizer.class.getSimpleName());
     private static final byte[] PEER_TEST = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245}; // 185.195.26.245
     public static int BAN_BLOCK_TIMES = 16;
-    private static int MAX_ORPHAN_TRANSACTIONS = (BlockChain.MAX_BLOCK_SIZE << 5) << (Controller.HARD_WORK >> 1);
+    private static int MAX_ORPHAN_TRANSACTIONS = (BlockChain.MAX_BLOCK_SIZE_GEN << 6); // not used now
+    private static int MAX_ORPHAN_TRANSACTIONS_MY = (BlockChain.MAX_BLOCK_SIZE_GEN << 3);
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
@@ -156,7 +158,7 @@ public class Synchronizer extends Thread {
 
             int height = lastBlock.getHeight();
 
-            if (BlockChain.DEVELOP_USE) {
+            if (BlockChain.CHECK_BUGS > 7) {
                 // TEST CORRUPT base
                 int bbb = fork.getBlockMap().size();
                 int hhh = fork.getBlocksHeadsMap().size();
@@ -170,7 +172,7 @@ public class Synchronizer extends Thread {
             lastBlock.orphan(fork, true);
             DCSet.getInstance().clearCache();
 
-            if (BlockChain.DEVELOP_USE) {
+            if (BlockChain.CHECK_BUGS > 5) {
                 // TEST CORRUPT base
                 int height2 = lastBlock.getHeight();
                 int bbb2 = fork.getBlockMap().size();
@@ -320,7 +322,7 @@ public class Synchronizer extends Thread {
     // process new BLOCKS to DB and orphan DB
     public List<Transaction> synchronize_blocks(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
                                                 List<Block> newBlocks, Peer peer) throws Exception {
-        TreeMap<String, Transaction> orphanedTransactions = new TreeMap<String, Transaction>();
+        ConcurrentHashMap<Long, Transaction> orphanedTransactions = new ConcurrentHashMap<Long, Transaction>();
         Controller cnt = Controller.getInstance();
 
         Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
@@ -356,6 +358,7 @@ public class Synchronizer extends Thread {
         // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
         // ============ by EQUAL SIGNATURE !!!!!
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
+        int countOrphanedTransactions = 0;
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
             if (cnt.isOnStopping())
                 throw new Exception("on stopping");
@@ -368,7 +371,10 @@ public class Synchronizer extends Thread {
             for (Transaction transaction : lastBlock.getTransactions()) {
                 if (cnt.isOnStopping())
                     throw new Exception("on stopping");
-                orphanedTransactions.put(new BigInteger(1, transaction.getSignature()).toString(16), transaction);
+                if (countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
+                    countOrphanedTransactions++;
+                    orphanedTransactions.put(Longs.fromByteArray(transaction.getSignature()), transaction);
+                }
             }
 
             LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());

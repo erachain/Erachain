@@ -9,6 +9,7 @@ import org.erachain.at.ATController;
 import org.erachain.at.ATException;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -2348,6 +2349,7 @@ import java.util.*;
         TransactionMap unconfirmedMap = dcSet.getTransactionTab();
         TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
+        TransactionsPool pool = Controller.getInstance().transactionsPool;
 
         this.getTransactions();
         //ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
@@ -2372,19 +2374,24 @@ import java.util.*;
 
             if (notFork) {
                 if (!notStoreTXs) {
-                    //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-                    try {
-                        if (!unconfirmedMap.isClosed()) {
-                            unconfirmedMap.add(transaction);
-                        } else {
-                            unconfirmedMap = dcSet.getTransactionTab();
-                        }
-                    } catch (java.lang.Throwable e) {
-                        if (e instanceof java.lang.IllegalAccessError) {
-                            // налетели на закрытую таблицу
-                            unconfirmedMap = dcSet.getTransactionTab();
-                        } else {
-                            throw new Exception(e);
+                    if (true) {
+                        // тут учет сразу очистки базы происходит - что более правильно
+                        pool.offerMessage(transaction);
+                    } else {
+                        //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
+                        try {
+                            if (!unconfirmedMap.isClosed()) {
+                                unconfirmedMap.add(transaction);
+                            } else {
+                                unconfirmedMap = dcSet.getTransactionTab();
+                            }
+                        } catch (java.lang.Throwable e) {
+                            if (e instanceof java.lang.IllegalAccessError) {
+                                // налетели на закрытую таблицу
+                                unconfirmedMap = dcSet.getTransactionTab();
+                            } else {
+                                throw new Exception(e);
+                            }
                         }
                     }
                 }

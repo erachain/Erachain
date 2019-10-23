@@ -42,7 +42,8 @@ public class DCSet extends DBASet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN << 3;
-    private static final long MAX_ENGINE_BEFORE_COMMIT_KB = BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 8;
+    // если все на Рокс перевели то меньше надо ставить
+    private static final long MAX_ENGINE_BEFORE_COMMIT_KB = 999999999999999L; ///BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 5;
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
     public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT << 4;
 
