@@ -1542,12 +1542,8 @@ import java.util.*;
     public boolean isValid(DCSet dcSetPlace, boolean andProcess) {
 
         if (validatedForkDB != null) {
-            try {
-                validatedForkDB.close();
-            } catch (Exception e) {
-            }
+            close();
         }
-        validatedForkDB = null;
         wasValidated = false;
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
@@ -1901,23 +1897,21 @@ import java.util.*;
     /**
      * Закрывает базу в котрой производилась проверка блока
      */
-    public void close() {
+    public synchronized void close() {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
-                LOGGER.debug("validatedForkDB closed ");
+                LOGGER.debug("validatedForkDB [" + heightBlock + "] is closed");
             } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
+            validatedForkDB = null;
         }
     }
 
     public void saveToChainFromvalidatedForkDB() {
         validatedForkDB.writeToParent();
-        try {
-            validatedForkDB.close();
-        } catch (Exception e) {
-        }
-        validatedForkDB = null;
+        close();
     }
 
     //PROCESS/ORPHAN
