@@ -67,7 +67,9 @@ function poll(data) {
     output += ' [ <input id="key1" name="poll" size="4" type="text" value="' + data.poll.key + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch()"> ] ';
 
-    output += '<a href="?poll=' + data.poll.key + get_lang() + '">';
+    output += data.label_Key + ': ' +'<a href=?poll=' + data.poll.key + get_lang() + '><b>' + data.poll.key + '</b></a>, &nbsp&nbsp';
+    output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
+
     //output += getAssetName2(data.poll.key, data.poll.name) + '</a></h3>';
     output += data.poll.name + '</a></h3>';
 

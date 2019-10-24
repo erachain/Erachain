@@ -653,6 +653,10 @@ public class BlockExplorer {
         pollJSON.put("owner", poll.getOwner().getAddress());
         pollJSON.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
 
+        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
+        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(poll.getReference());
+        output.put("seqNo", Transaction.viewDBRef(txSeqNo));
+
         Tuple4<Integer, long[], BigDecimal, BigDecimal[]> votes = poll.votesWithPersons(dcSet, assetKey, 0);
 
         JSONArray array = new JSONArray();
@@ -1547,6 +1551,10 @@ public class BlockExplorer {
         output.put("img", a);
         output.put("key", person.getKey());
         output.put("creator", person.getOwner().getPersonAsString());
+
+        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
+        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(person.getReference());
+        output.put("seqNo", Transaction.viewDBRef(txSeqNo));
 
         if (person.getOwner().getPerson() != null) {
             output.put("creator_key", person.getOwner().getPerson().b.getKey());
@@ -2797,6 +2805,10 @@ public class BlockExplorer {
         templateJSON.put("description", template.getDescription());
         templateJSON.put("owner", template.getOwner().getAddress());
 
+        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
+        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(template.getReference());
+        output.put("seqNo", Transaction.viewDBRef(txSeqNo));
+
         output.put("template", templateJSON);
 
         output.put("label_Template", Lang.getInstance().translateFromLangObj("Template", langObj));
@@ -2821,6 +2833,10 @@ public class BlockExplorer {
         statusJSON.put("name", status.getName());
         statusJSON.put("description", status.getDescription());
         statusJSON.put("owner", status.getOwner().getAddress());
+
+        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
+        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(status.getReference());
+        output.put("seqNo", Transaction.viewDBRef(txSeqNo));
 
         statusJSON.put("unique", status.isUnique());
 

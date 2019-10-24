@@ -162,10 +162,14 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
             } else if (lastPoint.a > key.b) {
                 // тут ошибка
                 LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
+                //Tuple2<Integer, Integer> previous = super.remove(key);
+                //this.setLast(key.a, previous);
                 assert (lastPoint.a <= key.b);
+                Long iii = null;
+                iii++;
             } else {
                 // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
-                // ужа при первом разе все удалилось - тут ничего не делаем
+                // И при первом разе все уже удалилось - тут ничего не делаем
                 return lastPoint;
             }
         }

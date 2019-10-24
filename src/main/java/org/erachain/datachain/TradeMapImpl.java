@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
@@ -131,9 +130,8 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         if (iterator == null)
             return new ArrayList<Trade>();
 
-        Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator,
+        iterator = Iterators.mergeSorted(ImmutableList.of(iterator,
                 ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
-        iterator = mergedIterable.iterator();
 
         //GET ALL ORDERS FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();

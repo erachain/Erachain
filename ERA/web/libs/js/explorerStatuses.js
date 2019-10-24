@@ -69,7 +69,9 @@ function status(data) {
 
     output += '<br><br>';
 
-    output += '<b>' + data.label_Key + ':</b> ' + data.status.key;
+    //output += '<b>' + data.label_Key + ':</b> ' + data.status.key;
+    output += data.label_Key + ': ' +'<a href=?status=' + data.status.key + get_lang() + '><b>' + data.status.key + '</b></a>, &nbsp&nbsp';
+    output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
 
     output += '<br><br>';
 

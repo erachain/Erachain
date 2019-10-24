@@ -132,7 +132,9 @@ function person(data) {
 
 
     output += '<img src="data:image/gif;base64,' + data.img + '" width = "350" /></td><td style ="padding-left:20px">';
-    output += data.Label_key + ':  &nbsp&nbsp<b>' + data.key + '</b><br>';
+    output += data.Label_key + ': ' +'<a href=?person=' + data.key + get_lang() + '><b>' + data.key + '</b></a>, &nbsp&nbsp';
+    output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
+
     output += data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
     if (data.creator_key != "") {
         output += data.Label_creator + ': &nbsp&nbsp<a href ="?person=' + data.creator_key + get_lang() + '"><b> ' + data.creator + '</b></a><br>';

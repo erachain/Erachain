@@ -406,7 +406,7 @@ public class Peer extends MonitoredThread {
 
                 if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
                     //ERROR and BAN
-                    ban(3600, "parse - received message with wrong magic");
+                    ban(30, "parse - received message with wrong magic");
                     break;
                 }
 
