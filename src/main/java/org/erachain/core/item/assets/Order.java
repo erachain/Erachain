@@ -14,7 +14,6 @@ import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
@@ -865,7 +864,7 @@ public class Order implements Comparable<Order> {
                     ordersMap.delete(order);
 
                     //ADD TO COMPLETED ORDERS
-                    completedMap.add(order);
+                    completedMap.put(order);
                 } else {
                     //UPDATE ORDER
                     if (willUnResolvedFor) {
@@ -877,9 +876,9 @@ public class Order implements Comparable<Order> {
                         ordersMap.delete(order);
 
                         //ADD TO COMPLETED ORDERS
-                        completedMap.add(order);
+                        completedMap.put(order);
                     } else {
-                        ordersMap.add(order);
+                        ordersMap.put(order);
                     }
                 }
 
@@ -936,9 +935,9 @@ public class Order implements Comparable<Order> {
         }
 
         if (!completedOrder) {
-            ordersMap.add(this);
+            ordersMap.put(this);
         } else {
-            completedMap.add(this);
+            completedMap.put(this);
         }
 
         //TRANSFER FUNDS
@@ -957,11 +956,8 @@ public class Order implements Comparable<Order> {
         OrderMap ordersMap = this.dcSet.getOrderMap();
         TradeMap tradesMap = this.dcSet.getTradeMap();
 
-        //CHECK IF ORDER IS FULFILLED
-        if (this.isFulfilled()) {
-            //REMOVE FROM COMPLETED ORDERS
-            completedMap.delete(this);
-        }
+        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled - на всякий случай удалим его
+        completedMap.delete(this);
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
 
@@ -973,10 +969,8 @@ public class Order implements Comparable<Order> {
             BigDecimal tradeAmountHave = trade.getAmountHave();
             BigDecimal tradeAmountWant = trade.getAmountWant();
 
-            if (target.isFulfilled()) {
-                //DELETE FROM COMPLETED ORDERS
-                completedMap.delete(target);
-            }
+            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled  - на всякий случай удалим его
+            completedMap.delete(target);
 
             //REVERSE FULFILLED
             target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
@@ -990,7 +984,7 @@ public class Order implements Comparable<Order> {
             }
 
             //UPDATE ORDERS
-            ordersMap.add(target);
+            ordersMap.put(target);
 
             //REMOVE TRADE FROM DATABASE
             tradesMap.delete(trade);
