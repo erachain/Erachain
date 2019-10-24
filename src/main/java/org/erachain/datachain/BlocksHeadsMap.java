@@ -102,7 +102,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     }
 
-    public boolean set(int height, Block.BlockHead item) {
+    public boolean setAndProcess(int height, Block.BlockHead item) {
 
         //int key = this.size() + 1;
         if (height == 86549 || item.heightBlock <= 0) {
@@ -127,8 +127,8 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     }
 
-    public boolean set(Block.BlockHead item) {
-        return this.set(item.heightBlock, item);
+    public boolean setAndProcess(Block.BlockHead item) {
+        return this.setAndProcess(item.heightBlock, item);
     }
 
     /*
@@ -148,7 +148,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         return this.get(this.size());
     }
 
-    public Block.BlockHead remove() {
+    public void deleteAndProcess() {
 
         int key = this.size();
         if (this.contains(key)) {
@@ -159,10 +159,9 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
             if (this.fullWeightVar != null) {
                 this.fullWeightVar.set(fullWeight);
             }
-            return super.remove(key);
+            super.delete(key);
         }
 
-        return null;
     }
 
     @Override

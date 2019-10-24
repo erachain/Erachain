@@ -185,7 +185,9 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (BlockChain.CHECK_BUGS > 0) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
-                assert ("".equals("already in Completed"));
+                LOGGER.error("already in Completed");
+                Long err = null;
+                ++err;
             }
         }
 
@@ -193,11 +195,27 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
+    public void put(Long id, Order order) {
+        if (BlockChain.CHECK_BUGS > 0) {
+            if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
+                // если он есть в уже завершенных
+                LOGGER.error("already in Completed");
+                Long err = null;
+                ++err;
+            }
+        }
+
+        super.put(id, order);
+    }
+
+    @Override
     public Order remove(Long id) {
         if (BlockChain.CHECK_BUGS > 1) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
-                assert ("".equals("already in Completed"));
+                LOGGER.error("already in Completed");
+                Long err = null;
+                ++err;
             }
         }
         return super.remove(id);
@@ -208,7 +226,9 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (BlockChain.CHECK_BUGS > 1) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
-                assert ("".equals("already in Completed"));
+                LOGGER.error("already in Completed");
+                Long err = null;
+                ++err;
             }
         }
         super.delete(id);
@@ -216,7 +236,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void add(Order order) {
-        this.put(order.getId(), order);
+        this.set(order.getId(), order);
     }
 
     @Override

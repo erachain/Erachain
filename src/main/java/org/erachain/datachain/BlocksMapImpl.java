@@ -15,6 +15,7 @@ import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -163,32 +164,22 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     }
 
     @Override
-    public boolean add(Block block) {
+    public void putAndProcess(Block block) {
         DCSet dcSet = (DCSet) databaseSet;
         byte[] signature = block.getSignature();
         if (dcSet.getBlockSignsMap().contains(signature)) {
             logger.error("already EXIST : " + this.size()
                     + " SIGN: " + Base58.encode(signature));
-            return true;
+            return;
         }
         int height = block.getHeight();
 
-        if (block.getVersion() == 0) {
-            // GENESIS block
-        } else {
-
-            // PROCESS FORGING DATA
-        }
-
         PublicKeyAccount creator = block.getCreator();
-        if (BlockChain.DEVELOP_USE && creator.getLastForgingData(dcSet) == null) {
-            // так как унас новые счета сами стартуют без инициализации - надо тут учеть начало
+        if (BlockChain.ERA_COMPU_ALL_UP && creator.getLastForgingData(dcSet) == null) {
+            // так как у нас новые счета сами стартуют без инициализации - надо тут учеть начало
             creator.setForgingData(dcSet, height - BlockChain.DEVELOP_FORGING_START, block.getForgingValue());
         }
         creator.setForgingData(dcSet, height, block.getForgingValue());
-
-        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
-        // (System.currentTimeMillis() - start)*0.001);
 
         dcSet.getBlockSignsMap().set(signature, height);
         if (height < 1) {
@@ -196,30 +187,21 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             ++error;
         }
 
-        dcSet.getBlocksHeadsMap().set(block.blockHead);
+        if (BlockChain.CHECK_BUGS > 7 && Controller.getInstance().isMyAccountByAddress(block.getCreator().getAddress())) {
+            Block.BlockHead head = block.blockHead;
+            Fun.Tuple2<Integer, Integer> data = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
+            int a = data.b;
+        }
+
+        dcSet.getBlocksHeadsMap().setAndProcess(block.blockHead);
         this.setLastBlockSignature(signature);
 
-        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
-        // (System.currentTimeMillis() - start)*0.001);
-
-        // TODO feePool
-        // this.setFeePool(_feePool);
-        boolean sss = super.set(height, block);
-        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1600: " +
-        // (System.currentTimeMillis() - start)*0.001);
-        return sss;
+        super.put(height, block);
 
     }
 
-	/*
-	public boolean set(int height, Block block) {
-		return false;
-	}
-	 */
-
     // TODO make CHAIN deletes - only for LAST block!
-    @Override
-    public Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator) {
+    public Block removeAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator) {
         DCSet dcSet = (DCSet) databaseSet;
 
         int height = this.size();
@@ -230,15 +212,37 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         // ORPHAN FORGING DATA
         if (height > 1) {
 
-            dcSet.getBlocksHeadsMap().remove();
+            dcSet.getBlocksHeadsMap().deleteAndProcess();
 
             // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
             creator.delForgingData(dcSet, height);
 
         }
 
-        // use SUPER.class only!
         return super.remove(height);
+
+    }
+
+    // TODO make CHAIN deletes - only for LAST block!
+    public void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator) {
+        DCSet dcSet = (DCSet) databaseSet;
+
+        int height = this.size();
+
+        this.setLastBlockSignature(reference);
+        dcSet.getBlockSignsMap().delete(signature);
+
+        // ORPHAN FORGING DATA
+        if (height > 1) {
+
+            dcSet.getBlocksHeadsMap().deleteAndProcess();
+
+            // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
+            creator.delForgingData(dcSet, height);
+
+        }
+
+        super.delete(height);
 
     }
 

@@ -86,15 +86,23 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
 
     /**
      * заносит новую точку и обновляет Последнюю точку (height & ForgingValue)/
-     * При этом если последняя точка уже с той же высотой - то обновляем только ForgingValue
+     * При этом если последняя точка уже с той же высотой - то обновляем только ForgingValue/
+     * Отлдичие от set() то что нельзя напямую set() тут объявлять так как иначе будет двойная обработка при
+     * org.erachain.dbs.DCUMapImpl#writeToParent()
      * @param key
      * @param currentForgingValue
      * @return
      */
-    public boolean set(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
+    public boolean setAndProcess(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
 
-        // TODO поставить тут BUGS отлов ЕСЛИ
-        assert(key.b.equals(currentForgingValue.a));
+        if (key.b == 0) {
+            // это сохранение из writeToParent - там все значения сливаются из Форкнутой базы включая setLast с 0-м значением
+            return super.set(key, currentForgingValue);
+        } else if (!key.b.equals(currentForgingValue.a)) {
+            LOGGER.error("NOT VALID forging info " + key + " != " + currentForgingValue);
+            Long i = null;
+            i++;
+        }
 
         Tuple2<Integer, Integer> lastPoint = this.getLast(key.a);
         if (lastPoint == null) {
@@ -111,7 +119,9 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
             } else if (currentForgingValue.a < lastPoint.a) {
                 // тут ошибка
                 LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + key + " " + currentForgingValue);
-                assert(currentForgingValue.a >= lastPoint.a);
+                Long i = null;
+                i++;
+                //assert(currentForgingValue.a >= lastPoint.a);
             } else {
                 // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
                 // просто нужно обновить новое значение кующей величины
@@ -124,9 +134,9 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
     }
 
     // height
-    public void set(String address, Integer currentHeight, Integer currentForgingVolume) {
+    public void setAndProcess(String address, Integer currentHeight, Integer currentForgingVolume) {
 
-        this.set(new Tuple2<String, Integer>(address, currentHeight),
+        this.setAndProcess(new Tuple2<String, Integer>(address, currentHeight),
                 new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
 
     }
@@ -135,10 +145,12 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * Удаляет текущую точку и обновляет ссылку на Последнюю точку - если из высоты совпали
      * Так как если нет соапвдения - то удалять нельзя так как уже удалили ранее ее
      * - по несколько раз при откате может быть удаление текущей точки
+     * Отлдичие от remove() то что нельзя напямую remove() тут объявлять так как иначе будет двойная обработка при
+     * org.erachain.dbs.DCUMapImpl#writeToParent()
      * @param key
      * @return
      */
-    public Tuple2<Integer, Integer> remove(Tuple2<String, Integer> key) {
+    public Tuple2<Integer, Integer> removeAndProcess(Tuple2<String, Integer> key) {
 
         if (key.b < 3) {
             // not delete GENESIS forging data for all accounts
@@ -177,8 +189,8 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         return null;
     }
 
-    public void delete(String address, int height) {
-        this.remove(new Tuple2<String, Integer>(address, height));
+    public void removeAndProcess(String address, int height) {
+        this.removeAndProcess(new Tuple2<String, Integer>(address, height));
     }
 
     /**

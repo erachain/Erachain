@@ -215,7 +215,7 @@ public class DatabaseTests {
             //db.add(asset);
         }
 
-        dbMap.add(dbMap.get(1l));
+        dbMap.addAndProcess(dbMap.get(1l));
         LOGGER.info("keys " + dbMap.keySet());
 
         //Collection<Asset> issues = DLSet.getInstance().getIssueAssetMap.getValuesAll();

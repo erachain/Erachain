@@ -1,19 +1,10 @@
 package org.erachain.core.block;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.mapdb.Fun.Tuple2;
-
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -26,15 +17,17 @@ import org.erachain.core.item.statuses.Status;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.Template;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.core.transaction.GenesisCertifyPersonRecord;
-import org.erachain.core.transaction.GenesisIssueAssetTransaction;
-import org.erachain.core.transaction.GenesisIssueStatusRecord;
-import org.erachain.core.transaction.GenesisIssueTemplateRecord;
-import org.erachain.core.transaction.GenesisTransferAssetTransaction;
-import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 // import org.slf4j.LoggerFactory;
 
@@ -758,7 +751,7 @@ public class GenesisBlock extends Block {
     public void orphan(DCSet dcSet) throws Exception {
 
         if (false)
-            dcSet.getItemAssetMap().remove(AssetCls.LIA_KEY);
+            dcSet.getItemAssetMap().removeAndProcess(AssetCls.LIA_KEY);
 
         super.orphan(dcSet);
 

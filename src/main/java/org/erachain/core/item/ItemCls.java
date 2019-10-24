@@ -572,7 +572,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
                 // IF this not GENESIS issue - start from startKey
                 dbMap.setLastKey(startKey);
             }
-            newKey = dbMap.add(this);
+            newKey = dbMap.addAndProcess(this);
 
         }
 
@@ -589,9 +589,9 @@ public abstract class ItemCls implements ExplorerJsonLine {
         long thisKey = this.getKey(db);
 
         if (thisKey > startKey) {
-            this.getDBMap(db).remove(thisKey);
+            this.getDBMap(db).removeAndProcess(thisKey);
         } else {
-            this.getDBMap(db).remove(thisKey);
+            this.getDBMap(db).removeAndProcess(thisKey);
         }
 
         //DELETE ORPHAN DATA

@@ -97,8 +97,8 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
         return this.get(this.key);
     }
 
-    public void remove() {
-        super.remove(key);
+    public void deleteAndProcess() {
+        super.delete(key);
 
         if (this.atomicKey != null) {
             this.atomicKey.decrementAndGet();

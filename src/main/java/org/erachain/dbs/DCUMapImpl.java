@@ -505,6 +505,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
         }
     }
 
+    /**
+     * ВНИМАНИЕ!!! в связи с работой этого метода при сливе - нельяза в стандартных методах
+     * set и delete делать какую либо логику! иначе будут двойные срабатывания - в Форке и тут при сливе.
+     * Все имена set и delete дополнить AndProcess
+     */
     @Override
     public void writeToParent() {
         Iterator<T> iterator = this.map.keySet().iterator();
