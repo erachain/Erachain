@@ -182,7 +182,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public boolean set(Long id, Order order) {
-        if (BlockChain.CHECK_BUGS > 1) {
+        if (BlockChain.CHECK_BUGS > 3) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 LOGGER.error("already in Completed");
@@ -196,7 +196,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void put(Long id, Order order) {
-        if (BlockChain.CHECK_BUGS > 1) {
+        if (BlockChain.CHECK_BUGS > 3) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 LOGGER.error("already in Completed");
@@ -210,7 +210,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public Order remove(Long id) {
-        if (BlockChain.CHECK_BUGS > 1) {
+        if (BlockChain.CHECK_BUGS > 3) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 LOGGER.error("already in Completed");
@@ -223,7 +223,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void delete(Long id) {
-        if (BlockChain.CHECK_BUGS > 1) {
+        if (BlockChain.CHECK_BUGS > 3) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
                 LOGGER.error("already in Completed");
