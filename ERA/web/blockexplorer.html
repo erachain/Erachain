@@ -934,9 +934,11 @@ button.white-bgc[disabled]:focus,
 
             output += '<br><br>';
 
-            output += '<b>' + data.asset.label_Key + ':</b> ' + data.asset.this.key;
+            //output += '<b>' + data.asset.label_Key + ':</b> ' + data.asset.this.key;
+            output += data.asset.label_Key + ': ' +'<a href=?asset=' + data.asset.this.key + get_lang() + '><b>' + data.asset.this.key + '</b></a>, &nbsp&nbsp';
+            output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a><br>';
 
-            output += '<br><br>';
+            output += '<br>';
 
             if (data.asset.this.img.length > 0) output += '<img src="data:image/gif;base64,' + data.asset.this.img + '" style=" max-width: 100%;" />';
 

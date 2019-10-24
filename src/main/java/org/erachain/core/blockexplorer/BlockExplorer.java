@@ -877,25 +877,10 @@ public class BlockExplorer {
         assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
 
-        if (true) {
-            if (true) { //asset.getKey() > AssetCls.START_KEY ) {
-                Long blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
-                Transaction transactions = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
-                assetJSON.put("timestamp", transactions.getTimestamp());
-            }
-        } else {
-            // OLD
-            List<Transaction> transactions = dcSet.getTransactionFinalMap()
-                    .getTransactionsByAddressAndType(asset.getOwner().getAddress(), Transaction.ISSUE_ASSET_TRANSACTION, 0);
-            for (Transaction transaction : transactions) {
-                IssueAssetTransaction issueAssetTransaction = ((IssueAssetTransaction) transaction);
-                if (issueAssetTransaction.getItem().viewName().equals(asset.getName())) {
-                    assetJSON.put("timestamp", issueAssetTransaction.getTimestamp());
-                    break;
-                }
-            }
-        }
-
+        Long blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
+        Transaction transaction = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
+        assetJSON.put("seqNo", Transaction.viewDBRef(blocNoSeqNo));
+        assetJSON.put("timestamp", transaction.getTimestamp());
 
         output.put("this", assetJSON);
 
@@ -948,6 +933,7 @@ public class BlockExplorer {
         output.put("pairs", pairsJSON);
         output.put("label_Asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
         output.put("label_Key", Lang.getInstance().translateFromLangObj("Key", langObj));
+        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
         output.put("label_Creator", Lang.getInstance().translateFromLangObj("Creator", langObj));
         output.put("label_Description", Lang.getInstance().translateFromLangObj("Description", langObj));
         output.put("label_Scale", Lang.getInstance().translateFromLangObj("Accuracy", langObj));
