@@ -226,7 +226,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         if (BlockChain.CHECK_BUGS > 5) {
             Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
-            if (lastPoint.b > height) {
+            if (lastPoint.a > height) {
                 LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
                 Long i = null;
                 i++;

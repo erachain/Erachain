@@ -31,7 +31,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     protected DCUMapImpl<T, U> parent;
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
-    //ConcurrentHashMap deleted;
+    //protected ConcurrentHashMap deleted;
     protected HashMap deleted;
     protected Boolean EXIST = true;
     protected int shiftSize;
@@ -335,6 +335,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         return false;
     }
 
+    /**
+     * ВНИМАНИЕ !!! нельзя в подКлассе делать перенаправления set -> put так как будет зацклтвание через этот вызоа
+     * @param key
+     * @param value
+     */
     @Override
     public void put(T key, U value) {
         this.set(key, value);
@@ -404,6 +409,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         return remove(key);
     }
 
+    /**
+     * ВНИМАНИЕ !!! нельзя в подКлассе делать перенаправления set -> put так как будет зацклтвание через этот вызоа
+     * @param key
+     */
     @Override
     public void delete(T key) {
         this.remove(key);
