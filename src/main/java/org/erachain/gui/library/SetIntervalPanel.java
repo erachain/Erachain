@@ -23,7 +23,7 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
     Logger LOGGER;
 
     private static final long serialVersionUID = 1L;
-    DBTabCommonImpl map;
+    DBTabImpl map;
     private long size;
     private boolean needUpdate;
 

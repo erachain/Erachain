@@ -22,7 +22,7 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements ForkedMap {
+public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements ForkedMap {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
