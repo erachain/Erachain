@@ -270,14 +270,6 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         return this.set(Longs.fromByteArray(transaction.getSignature()), transaction);
     }
 
-    public Transaction remove(Transaction transaction) {
-        return this.remove(Longs.fromByteArray(transaction.getSignature()));
-    }
-
-    public Transaction remove(byte[] signature) {
-        return this.remove(Longs.fromByteArray(signature));
-    }
-
     @Override
     public void delete(Transaction transaction) {
         this.delete(Longs.fromByteArray(transaction.getSignature()));

@@ -1745,7 +1745,7 @@ import java.util.*;
                         processTimingLocal = System.nanoTime();
                         try {
                             if (!unconfirmedMap.isClosed()) {
-                                unconfirmedMap.remove(transactionSignature);
+                                unconfirmedMap.delete(transactionSignature);
                             } else {
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
                             }
@@ -2195,7 +2195,7 @@ import java.util.*;
                 timerStart = System.currentTimeMillis();
                 try {
                     if (!unconfirmedMap.isClosed()) {
-                        unconfirmedMap.remove(transactionSignature);
+                        unconfirmedMap.delete(transactionSignature);
                     } else {
                         unconfirmedMap = dcSet.getTransactionTab();
                     }

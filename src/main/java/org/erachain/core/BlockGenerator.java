@@ -466,7 +466,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
                 try {
                     if (!transactionsMap.isClosed() && transactionsMap.contains(signature))
-                        transactionsMap.remove(signature);
+                        transactionsMap.delete(signature);
                 } catch (java.lang.Throwable e) {
                     if (e instanceof java.lang.IllegalAccessError) {
                         // налетели на закрытую таблицу
