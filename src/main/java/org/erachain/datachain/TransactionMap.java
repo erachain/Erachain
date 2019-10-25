@@ -37,7 +37,7 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     //boolean set(byte[] signature, Transaction transaction);
 
-    boolean add(Transaction transaction);
+    void put(Transaction transaction);
 
     void delete(Transaction transaction);
     void delete(byte[] signature);

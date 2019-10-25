@@ -2381,7 +2381,7 @@ import java.util.*;
                         //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
                         try {
                             if (!unconfirmedMap.isClosed()) {
-                                unconfirmedMap.add(transaction);
+                                unconfirmedMap.put(transaction);
                             } else {
                                 unconfirmedMap = dcSet.getTransactionTab();
                             }

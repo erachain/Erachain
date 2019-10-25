@@ -253,6 +253,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      * @param transaction
      * @return
      */
+    @Override
     public boolean set(Long key, Transaction transaction) {
         try {
             return super.set(key, transaction);
@@ -266,8 +267,9 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
     }
 
-    public boolean add(Transaction transaction) {
-        return this.set(Longs.fromByteArray(transaction.getSignature()), transaction);
+    @Override
+    public void put(Transaction transaction) {
+        this.put(Longs.fromByteArray(transaction.getSignature()), transaction);
     }
 
     @Override
@@ -287,6 +289,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      * @param key
      * @return
      */
+    @Override
     public Transaction remove(Long key) {
         try {
             Transaction transaction = super.remove(key);
@@ -306,11 +309,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
     public void delete(Long key) {
         try {
-            Transaction transaction = super.remove(key);
-            if (transaction != null) {
-                // DELETE only if DELETED
-                totalDeleted++;
-            }
+            super.delete(key);
+            totalDeleted++;
         } catch (Exception e) {
 
         }
