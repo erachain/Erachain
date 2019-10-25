@@ -1,27 +1,21 @@
 package org.erachain.gui.telegrams;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.swing.JCheckBox;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.table.TableRowSorter;
-
-import org.mapdb.Fun.Tuple3;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.library.MTable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.mapdb.Fun.Tuple3;
+
+import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.TableRowSorter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
 *
@@ -244,7 +238,7 @@ public RightTelegramPanel() {
                
                
              Tuple3<Long, Long, Transaction> tt = (Tuple3<Long, Long, Transaction>) walletTelegramsFilterTableModel.getValueAt(row, 0);
-             Controller.getInstance().getWallet().database.getTelegramsMap().remove(tt.c.viewSignature()) ;
+               Controller.getInstance().getWallet().database.getTelegramsMap().delete(tt.c.viewSignature());
         //     System.out.println(row);
            }
        });

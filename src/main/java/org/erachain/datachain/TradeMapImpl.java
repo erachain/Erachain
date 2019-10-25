@@ -243,6 +243,6 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
     @Override
     public void delete(Trade trade) {
-        this.remove(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()));
+        this.delete(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()));
     }
 }

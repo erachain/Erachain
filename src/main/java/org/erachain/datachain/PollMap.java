@@ -84,10 +84,10 @@ public class PollMap extends DCUMap<String, Poll> {
     }
 
     public void add(Poll poll) {
-        this.set(poll.getName(), poll);
+        this.put(poll.getName(), poll);
     }
 
     public void delete(Poll poll) {
-        this.remove(poll.getName());
+        this.delete(poll.getName());
     }
 }

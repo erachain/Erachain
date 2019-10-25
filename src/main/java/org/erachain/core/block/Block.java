@@ -2398,7 +2398,7 @@ import java.util.*;
 
                 Long key = Transaction.makeDBRef(height, seqNo);
 
-                finalMap.remove(key);
+                finalMap.delete(key);
                 transFinalMapSinds.delete(transaction.getSignature());
                 List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {

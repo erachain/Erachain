@@ -40,8 +40,8 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
 import java.util.Timer;
+import java.util.*;
 
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
@@ -1665,7 +1665,7 @@ public class Wallet extends Observable implements Observer {
 			// DELETE ORDER
 			if (false) {
 				// order STATUS is ORPHANED
-				this.database.getOrderMap().remove(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
+				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
 						Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
 			}
 		}
@@ -1684,7 +1684,7 @@ public class Wallet extends Observable implements Observer {
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			if (false) {
 				// DELETE ORDER
-				this.database.getOrderMap().remove(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
+				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
 						Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
 			}
 		}

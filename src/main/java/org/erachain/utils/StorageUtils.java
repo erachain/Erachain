@@ -1,6 +1,7 @@
 package org.erachain.utils;
 
 import com.google.common.base.Charsets;
+import org.apache.commons.lang3.StringUtils;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.naming.Name;
@@ -10,11 +11,10 @@ import org.erachain.core.web.NameStorageMap;
 import org.erachain.core.web.OrphanNameStorageHelperMap;
 import org.erachain.core.web.OrphanNameStorageMap;
 import org.erachain.datachain.DCSet;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -365,10 +365,9 @@ public class StorageUtils {
                     }
 
                     db.getOrphanNameStorageMap()
-                            .remove(signature);
+                            .delete(signature);
 
-                    db
-                            .getOrphanNameStorageHelperMap().remove(name, signature);
+                    db.getOrphanNameStorageHelperMap().remove(name, signature);
 
                 }
 

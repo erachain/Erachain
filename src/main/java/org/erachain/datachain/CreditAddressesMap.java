@@ -61,7 +61,7 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
 
     public BigDecimal add(Tuple3<String, Long, String> key, BigDecimal amount) {
         BigDecimal summ = this.get(key).add(amount);
-        this.set(key, summ);
+        this.put(key, summ);
         return summ;
     }
 
@@ -71,7 +71,7 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
 
     public BigDecimal sub(Tuple3<String, Long, String> key, BigDecimal amount) {
         BigDecimal summ = this.get(key).subtract(amount);
-        this.set(key, summ);
+        this.put(key, summ);
         return summ;
     }
 
@@ -101,6 +101,6 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     }
 
     public void delete(String creditorAddress, long key, String debtorAddress) {
-        this.remove(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
+        this.delete(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
     }
 }

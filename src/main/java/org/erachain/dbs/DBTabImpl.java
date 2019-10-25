@@ -216,7 +216,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     @Override
     public void deleteValue(T key) {
-        remove(key);
+        delete(key);
     }
 
     @Override

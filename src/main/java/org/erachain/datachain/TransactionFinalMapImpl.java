@@ -118,7 +118,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     public void delete(Integer height, Integer seq) {
-        this.remove(Transaction.makeDBRef(height, seq));
+        this.delete(Transaction.makeDBRef(height, seq));
     }
 
     @Override

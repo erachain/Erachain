@@ -49,6 +49,6 @@ public class VoteOnPollMap extends DCUMap<byte[], Integer> {
     }
 
     public void delete(Transaction transaction) {
-        this.remove(transaction.getSignature());
+        this.delete(transaction.getSignature());
     }
 }

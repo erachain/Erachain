@@ -187,7 +187,13 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         return null;
     }
 
-    public void remove(String address, int height) {
+    public void delete(Tuple2<String, Integer> key) {
+        // Код почти не изменится если там (void)DELETE вставить так как при удалении всегда предыдущее значение выбирается
+        this.remove(key);
+    }
+
+    public void delete(String address, int height) {
+        // Код почти не изменится если там (void)DELETE вставить так как при удалении всегда предыдущее значение выбирается
         this.remove(new Tuple2<String, Integer>(address, height));
     }
 
@@ -203,10 +209,10 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
     private void setLast(String address, Tuple2<Integer, Integer> point) {
         if (point == null) {
             // вызываем супер-класс
-            super.remove(new Tuple2<String, Integer>(address, 0));
+            super.delete(new Tuple2<String, Integer>(address, 0));
         } else {
             // вызываем супер-класс
-            super.set(new Tuple2<String, Integer>(address, 0), point);
+            super.put(new Tuple2<String, Integer>(address, 0), point);
         }
     }
 }

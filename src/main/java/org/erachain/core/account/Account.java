@@ -1090,7 +1090,7 @@ public class Account {
     }
 
     public void delForgingData(DCSet db, int height) {
-        db.getAddressForging().remove(this.address, height);
+        db.getAddressForging().delete(this.address, height);
     }
 
     public Tuple2<Integer, Integer> getLastForgingData(DCSet db) {

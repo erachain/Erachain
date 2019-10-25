@@ -285,7 +285,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
                 try {
                     row = imprintsTable.convertRowIndexToModel(row);
                     Pair<String, Tuple2<String, String>> ac = tableModelImprints.getPairItem(row);
-                    db.remove(ac.getA());
+                    db.delete(ac.getA());
                 } catch (Exception e1) {
                     logger.error(e1.getMessage(), e1);
                 }

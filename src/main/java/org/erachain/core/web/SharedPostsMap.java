@@ -55,7 +55,7 @@ public class SharedPostsMap extends DCUMap<byte[], List<String>> {
         list.remove(name);
 
         if (list.isEmpty()) {
-            remove(postSignature);
+            delete(postSignature);
             return;
         }
 

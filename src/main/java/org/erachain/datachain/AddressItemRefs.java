@@ -70,11 +70,11 @@ public abstract class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[
         return this.get(new Tuple2<byte[], Long>(Base58.decode(address), key));
     }
 
-    public void set(String address, Long key, byte[] ref) {
-        this.set(new Tuple2<byte[], Long>(Base58.decode(address), key), ref);
+    public void put(String address, Long key, byte[] ref) {
+        this.put(new Tuple2<byte[], Long>(Base58.decode(address), key), ref);
     }
 
     public void delete(String address, Long key) {
-        this.remove(new Tuple2<byte[], Long>(Base58.decode(address), key));
+        this.delete(new Tuple2<byte[], Long>(Base58.decode(address), key));
     }
 }

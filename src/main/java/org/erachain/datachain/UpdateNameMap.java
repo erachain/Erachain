@@ -52,6 +52,6 @@ public class UpdateNameMap extends DCUMap<byte[], Name> {
     }
 
     public void delete(Transaction transaction) {
-        this.remove(transaction.getSignature());
+        this.delete(transaction.getSignature());
     }
 }

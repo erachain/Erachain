@@ -76,7 +76,7 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
     public void delete(byte[] signature) {
         Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
                 signature[4], signature[5], signature[6], signature[7]);
-        this.remove(key);
+        this.delete(key);
     }
 
     public Block getBlock(byte[] signature) {

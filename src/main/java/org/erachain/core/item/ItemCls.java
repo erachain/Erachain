@@ -583,22 +583,22 @@ public abstract class ItemCls implements ExplorerJsonLine {
         return key;
     }
 
-    public long removeFromMap(DCSet db, long startKey) {
+    public long deleteFromMap(DCSet db, long startKey) {
         //DELETE FROM DATABASE
 
         long thisKey = this.getKey(db);
 
         if (thisKey > startKey) {
-            this.getDBMap(db).remove(thisKey);
+            this.getDBMap(db).delete(thisKey);
         } else {
-            this.getDBMap(db).remove(thisKey);
+            this.getDBMap(db).delete(thisKey);
         }
 
         //DELETE ORPHAN DATA
-        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 2");
-        this.getDBIssueMap(db).remove(this.reference);
+        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 2");
+        this.getDBIssueMap(db).delete(this.reference);
 
-        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 3");
+        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 3");
 
         return thisKey;
 

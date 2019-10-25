@@ -74,7 +74,7 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
     public void delete(byte[] signature) {
         byte[] key = new byte[KEY_LEN];
         System.arraycopy(signature, 0, key, 0, KEY_LEN);
-        super.remove(key);
+        super.delete(key);
     }
 
     @Override
