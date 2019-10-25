@@ -26,9 +26,6 @@ public interface BlockMap extends DBTab<Integer, Block> {
 
     void put(Block block);
 
-    // TODO make CHAIN deletes - only for LAST block!
-    Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator);
-
     void delete(byte[] signature, byte[] reference, PublicKeyAccount creator);
 
     void notifyResetChain();

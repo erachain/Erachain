@@ -92,6 +92,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * @param currentForgingValue
      * @return
      */
+    @Override
     public boolean set(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
 
         if (key.b == 0) {
@@ -112,8 +113,9 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
                 // ONLY if not SAME HEIGHT !!! потому что в одном блоке может идти несколько
                 // транзакций на один счет инициализирующих - нужно результат в конце поймать
                 // и если одниковый блок и форжинговое значение - то обновлять только Последнее,
-                // то есть сюда приходит только если НАОБОРОТ - это не Первое значение и Не с темже блоком в Последнее
-                super.put(key, lastPoint);
+                // то есть сюда приходит только если НАОБОРОТ - это не Первое значение и Не с темже блоком в Последнее.
+                // ВНИИМАНИЕ !!! Делаем тут напрямую обязательно к Источнику иначе будет вызвано по кругу через put -> set сюда
+                this.put(key, lastPoint);
                 this.setLast(key.a, currentForgingValue);
             } else if (currentForgingValue.a < lastPoint.a) {
                 // тут ошибка
@@ -132,12 +134,9 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
 
     }
 
-    // height
     public void put(String address, Integer currentHeight, Integer currentForgingVolume) {
-
-        this.put(new Tuple2<String, Integer>(address, currentHeight),
+        this.set(new Tuple2<String, Integer>(address, currentHeight),
                 new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
-
     }
 
     /**
@@ -148,6 +147,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * @param key
      * @return
      */
+    @Override
     public Tuple2<Integer, Integer> remove(Tuple2<String, Integer> key) {
 
         if (key.b < 3) {
@@ -187,6 +187,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         return null;
     }
 
+    @Override
     public void delete(Tuple2<String, Integer> key) {
         // Код почти не изменится если там (void)DELETE вставить так как при удалении всегда предыдущее значение выбирается
         this.remove(key);

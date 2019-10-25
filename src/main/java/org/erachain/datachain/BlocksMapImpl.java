@@ -187,43 +187,25 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             ++error;
         }
 
-        if (BlockChain.CHECK_BUGS > 7 && Controller.getInstance().isMyAccountByAddress(block.getCreator().getAddress())) {
-            Block.BlockHead head = block.blockHead;
-            Fun.Tuple2<Integer, Integer> data = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
-            int a = data.b;
-        }
-
         dcSet.getBlocksHeadsMap().set(block.blockHead);
         this.setLastBlockSignature(signature);
+
+        if (BlockChain.CHECK_BUGS > 5) {
+            Block.BlockHead head = block.blockHead;
+            Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
+            if (lastPoint.a > head.heightBlock) {
+                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + head.heightBlock);
+                Long i = null;
+                i++;
+            }
+        }
 
         super.put(height, block);
 
     }
 
     // TODO make CHAIN deletes - only for LAST block!
-    public Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator) {
-        DCSet dcSet = (DCSet) databaseSet;
-
-        int height = this.size();
-
-        this.setLastBlockSignature(reference);
-        dcSet.getBlockSignsMap().delete(signature);
-
-        // ORPHAN FORGING DATA
-        if (height > 1) {
-
-            dcSet.getBlocksHeadsMap().delete();
-
-            // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
-            creator.delForgingData(dcSet, height);
-
-        }
-
-        return super.remove(height);
-
-    }
-
-    // TODO make CHAIN deletes - only for LAST block!
+    @Override
     public void delete(byte[] signature, byte[] reference, PublicKeyAccount creator) {
         DCSet dcSet = (DCSet) databaseSet;
 
@@ -240,6 +222,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
             creator.delForgingData(dcSet, height);
 
+        }
+
+        if (BlockChain.CHECK_BUGS > 5) {
+            Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
+            if (lastPoint.b > height) {
+                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
+                Long i = null;
+                i++;
+            }
         }
 
         super.delete(height);

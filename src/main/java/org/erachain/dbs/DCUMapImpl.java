@@ -337,7 +337,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     @Override
     public void put(T key, U value) {
-        set(key, value);
+        this.set(key, value);
     }
 
     @Override
@@ -406,7 +406,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     @Override
     public void delete(T key) {
-        remove(key);
+        this.remove(key);
     }
 
     @Override
