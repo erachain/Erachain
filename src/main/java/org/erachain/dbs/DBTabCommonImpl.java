@@ -30,6 +30,9 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
     public static int DEFAULT_INDEX = 0;
     protected DBASet databaseSet;
     protected DB database;
+
+    protected IMap<T, U> map;
+
     @Getter
     protected DBTab<T, U> parent;
 
@@ -92,6 +95,14 @@ public abstract class DBTabCommonImpl<T, U> extends Observable implements DBTab<
     }
 
     protected abstract void openMap();
+
+    // for TESTS etc.
+    public void setSource(IMap map) { this.map = map; }
+
+    @Override
+    public IMap getSource() {
+        return map;
+    }
 
     @Override
     public IDB getDBSet() {

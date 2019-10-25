@@ -10,7 +10,13 @@ import java.util.Map;
  * @param <T>
  * @param <U>
  */
-public interface DBTab<T, U> extends DBTabSuitCommon<T, U>, ForkedMap {
+public interface DBTab<T, U> extends IMap<T, U>, ForkedMap {
+
+    int NOTIFY_RESET = 1;
+    int NOTIFY_ADD = 2;
+    int NOTIFY_REMOVE = 3;
+    int NOTIFY_LIST = 4;
+    int NOTIFY_DELETE = 5; // in event args - KEY
 
     IDB getDBSet();
 

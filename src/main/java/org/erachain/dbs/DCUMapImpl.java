@@ -22,13 +22,13 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements DBTab<T, U>, ForkedMap {
+public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements ForkedMap {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
     protected Map<T, U> map;
     @Getter
-    protected DBTab<T, U> parent;
+    protected DCUMapImpl<T, U> parent;
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
     //ConcurrentHashMap deleted;
@@ -46,7 +46,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
         super(databaseSet, database);
     }
 
-    public DCUMapImpl(DBTab<T, U> parent, DBASet dcSet) {
+    public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet) {
         super(parent, dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
@@ -488,34 +488,16 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
         }
     }
 
-    @Override
-    public void writeTo(DBTab targetMap) {
-        Iterator<T> iterator = this.map.keySet().iterator();
-        while (iterator.hasNext()) {
-            T key = iterator.next();
-            targetMap.put(key, this.map.get(key));
-        }
-
-        if (parent != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                T key = iterator.next();
-                targetMap.delete(key);
-            }
-        }
-    }
-
     /**
      * ВНИМАНИЕ!!! в связи с работой этого метода при сливе - нельяза в стандартных методах
-     * set и delete делать какую либо логику! иначе будут двойные срабатывания - в Форке и тут при сливе.
-     * Все имена set и delete дополнить AndProcess
      */
     @Override
     public void writeToParent() {
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
-            parent.put(key, this.map.get(key));
+            // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
+            parent.map.put(key, this.map.get(key));
         }
 
         // нужно очистить сразу так как общий размер изменится иначе будет ++ больше
@@ -526,7 +508,8 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
                 T key = iterator.next();
-                parent.delete(key);
+                // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
+                parent.map.remove(key);
             }
         }
     }
