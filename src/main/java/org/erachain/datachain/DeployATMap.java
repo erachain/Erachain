@@ -48,6 +48,6 @@ public class DeployATMap extends DCUMap<byte[], Long> {
     }
 
     public void delete(Transaction transaction) {
-        this.remove(transaction.getSignature());
+        this.delete(transaction.getSignature());
     }
 }

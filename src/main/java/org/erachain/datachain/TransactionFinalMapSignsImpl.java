@@ -92,4 +92,12 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
 
     }
 
+    @Override
+    public void put(byte[] signature, Long refernce) {
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        super.put(key, refernce);
+
+    }
+
 }
