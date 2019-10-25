@@ -214,7 +214,7 @@ public class CancelSellNameTransaction extends Transaction {
 
         //SET ORPHAN DATA
         NameSale nameSale = this.dcSet.getNameExchangeMap().getNameSale(this.name);
-        this.dcSet.getCancelSellNameMap().set(this, nameSale.getAmount());
+        this.dcSet.getCancelSellNameMap().put(this, nameSale.getAmount());
 
         //DELETE FROM DATABASE
         this.dcSet.getNameExchangeMap().delete(this.name);

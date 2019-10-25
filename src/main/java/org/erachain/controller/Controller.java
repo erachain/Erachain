@@ -1027,7 +1027,7 @@ public class Controller extends Observable {
             }
             DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
 
-            this.dcSet.getLocalDataMap().set(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
+            this.dcSet.getLocalDataMap().put(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
 
         }
     }

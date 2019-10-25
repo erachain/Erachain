@@ -743,7 +743,7 @@ public class GenesisBlock extends Block {
         if (false) {
             AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
             item.setReference(this.signature);
-            dcSet.getItemAssetMap().set(AssetCls.LIA_KEY, item);
+            dcSet.getItemAssetMap().put(AssetCls.LIA_KEY, item);
         }
 
     }

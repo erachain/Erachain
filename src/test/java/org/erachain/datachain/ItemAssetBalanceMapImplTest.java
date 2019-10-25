@@ -87,7 +87,7 @@ public class ItemAssetBalanceMapImplTest {
 
             assertEquals(found, false);
 
-            map.set(account1.getShortAddressBytes(), 2L, balance1);
+            map.put(account1.getShortAddressBytes(), 2L, balance1);
 
             // make SAME KEY as NEW OBJECT
             found = map.contains(account1.getShortAddressBytes(), 2L);

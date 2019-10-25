@@ -48,7 +48,7 @@ public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
         }
 
 
-        set(name, list);
+        put(name, list);
 
 
     }
@@ -61,7 +61,7 @@ public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
 
         ByteArrayUtils.remove(list, signatureOfTx);
 
-        set(name, list);
+        put(name, list);
 
     }
 

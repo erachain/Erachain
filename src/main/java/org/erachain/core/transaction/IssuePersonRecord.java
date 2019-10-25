@@ -286,7 +286,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         // которая еще не удостоверена вообще
         // но надо понимать что тут будет только последняя запись создания персоны и номер на нее
         // used in org.erachain.webserver.API.getPersonKeyByOwnerPublicKey
-        this.dcSet.getIssuePersonMap().set(makerBytes, person.getKey());
+        this.dcSet.getIssuePersonMap().put(makerBytes, person.getKey());
 
         if (person.isMustBeSigned()) {
             // for quick search public keys by address - use PUB_KEY from Person DATA owner

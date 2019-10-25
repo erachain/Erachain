@@ -122,8 +122,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    public boolean add(Integer height, Integer seq, Transaction transaction) {
-        return this.set(Transaction.makeDBRef(height, seq), transaction);
+    public void add(Integer height, Integer seq, Transaction transaction) {
+        this.put(Transaction.makeDBRef(height, seq), transaction);
     }
 
     @Override
@@ -746,8 +746,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    public boolean set(Transaction transaction) {
-        return super.set(transaction.getDBRef(), transaction);
+    public void put(Transaction transaction) {
+        super.put(transaction.getDBRef(), transaction);
     }
 
 }

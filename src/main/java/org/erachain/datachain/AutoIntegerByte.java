@@ -87,7 +87,7 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
         this.key++;
 
         // INSERT WITH NEW KEY
-        super.set(this.key, item);
+        super.put(this.key, item);
 
         // RETURN KEY
         return this.key;

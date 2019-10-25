@@ -164,7 +164,7 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         }
 
         new_stack.push(value);
-        this.set(key, stack);
+        this.put(key, stack);
     }
 
     public Tuple2<Integer, Integer> getItem(long pollKey, int optionKey, BigInteger accountShort) {
@@ -191,7 +191,7 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
 
         Tuple2<Integer, Integer> itemRemoved = new_stack.pop();
 
-        this.set(key, new_stack);
+        this.put(key, new_stack);
 
         return itemRemoved;
 

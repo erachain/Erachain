@@ -132,7 +132,7 @@ public class DatabaseTests {
         //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).keySet().toString(), "");
 
         //SET BALANCE
-        dcSet.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        dcSet.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
@@ -147,7 +147,7 @@ public class DatabaseTests {
         assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get(seed, 1L));
 
         //SET BALANCE IN FORK
-        fork.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        fork.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
@@ -166,7 +166,7 @@ public class DatabaseTests {
         DCSet fork2 = fork.fork();
 
         //SET BALANCE IN FORK2
-        fork2.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        fork2.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),

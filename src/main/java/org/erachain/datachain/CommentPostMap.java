@@ -30,7 +30,7 @@ public class CommentPostMap extends DCUMap<byte[], byte[]> {
     }
 
     public void add(byte[] signatureOfComment, byte[] signatureOfBlogPost) {
-        set(signatureOfComment, signatureOfBlogPost);
+        put(signatureOfComment, signatureOfBlogPost);
     }
 
     public void delete(byte[] signatureOfComment) {

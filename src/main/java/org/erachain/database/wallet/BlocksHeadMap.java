@@ -248,9 +248,8 @@ public class BlocksHeadMap extends DCUMapImpl<Tuple2<String, String>, Block.Bloc
     }
 
     public boolean add(Block.BlockHead block) {
-        boolean result = this.set(new Tuple2<String, String>(block.creator.getAddress(),
+        return this.set(new Tuple2<String, String>(block.creator.getAddress(),
                 new String(block.signature)), block);
-        return result;
     }
 
     public void addAll(Map<Account, List<Block.BlockHead>> blocks) {

@@ -71,7 +71,7 @@ public class benchDBSsimple {
 
             init(dbs);
 
-            map.set(account1.getShortAddressBytes(), 2L, balance1);
+            map.put(account1.getShortAddressBytes(), 2L, balance1);
 
             balance2 = map.get(account1.getShortAddressBytes(), 2L);
 

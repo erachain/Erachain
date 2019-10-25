@@ -69,7 +69,7 @@ public class ATStateMap extends DCUMap<Tuple2<Integer, String>, byte[]> {
         //Height to store state
         int height = (int) ((Math.round(blockHeight) / ATConstants.STATE_STORE_DISTANCE) + 1) * ATConstants.STATE_STORE_DISTANCE;
 
-        this.set(new Tuple2<Integer, String>(height, Base58.encode(atId)), stateBytes);
+        this.put(new Tuple2<Integer, String>(height, Base58.encode(atId)), stateBytes);
     }
 
     //get the list of states stored at block height. use for roll back

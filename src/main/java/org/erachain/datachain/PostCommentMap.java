@@ -50,7 +50,7 @@ public class PostCommentMap extends DCUMap<byte[], List<byte[]>> {
             list.add(signatureOfComment);
         }
 
-        set(signatureOfPostToComment, list);
+        put(signatureOfPostToComment, list);
 
     }
 

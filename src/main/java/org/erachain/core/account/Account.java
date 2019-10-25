@@ -667,7 +667,7 @@ public class Account {
                     balance.e);
         }
 
-        map.set(getShortAddressBytes(), absKey, balance);
+        map.put(getShortAddressBytes(), absKey, balance);
 
         ////////////// DEBUG TOTAL COMPU
         // несотыковка из-за ордеров на бирже
@@ -764,7 +764,7 @@ public class Account {
 
         if (BlockChain.NOT_STORE_REFFS_HISTORY) {
             // SET NEW REFERENCE
-            map.set(shortBytes, currentPoint);
+            map.put(shortBytes, currentPoint);
             return;
         }
 
@@ -776,11 +776,11 @@ public class Account {
 
         if (reference != null) {
             // set NEW LAST TIMESTAMP as REFERENCE
-            map.set(keyCurrentPoint, reference);
+            map.put(keyCurrentPoint, reference);
         }
 
         // SET NEW REFERENCE
-        map.set(shortBytes, currentPoint);
+        map.put(shortBytes, currentPoint);
 
     }
 
@@ -1086,7 +1086,7 @@ public class Account {
      */
 
     public void setForgingData(DCSet db, int height, int forgingBalance) {
-        db.getAddressForging().set(this.address, height, forgingBalance);
+        db.getAddressForging().put(this.address, height, forgingBalance);
     }
 
     public void delForgingData(DCSet db, int height) {

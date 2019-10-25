@@ -125,8 +125,8 @@ public abstract class BalanceMap extends DCUMap<Tuple2<Long, Long>,
 	}
 	 */
 
-    public void set(Long essence, long key, Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
-        this.set(new Tuple2<Long, Long>(essence, key), value);
+    public void put(Long essence, long key, Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
+        this.put(new Tuple2<Long, Long>(essence, key), value);
     }
 
 	/*

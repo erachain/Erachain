@@ -1768,17 +1768,17 @@ import java.util.*;
                     ///logger.debug("[" + seqNo + "] try finalMap.set" );
                     processTimingLocal = System.nanoTime();
                     Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                    finalMap.set(key, transaction);
+                    finalMap.put(key, transaction);
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                     if (processTimingLocalDiff < 999999999999l)
                         timerFinalMap_set += processTimingLocalDiff / 1000;
 
                     processTimingLocal = System.nanoTime();
-                    transFinalMapSigns.set(transactionSignature, key);
+                    transFinalMapSigns.put(transactionSignature, key);
                     List<byte[]> signatures = transaction.getOtherSignatures();
                     if (signatures != null) {
                         for (byte[] itemSignature : signatures) {
-                            transFinalMapSigns.set(itemSignature, key);
+                            transFinalMapSigns.put(itemSignature, key);
                         }
                     }
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
@@ -1792,17 +1792,17 @@ import java.util.*;
 
                     processTimingLocal = System.nanoTime();
                     Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                    finalMap.set(key, transaction);
+                    finalMap.put(key, transaction);
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                     if (processTimingLocalDiff < 999999999999l)
                         timerFinalMap_set += processTimingLocalDiff / 1000;
 
                     processTimingLocal = System.nanoTime();
-                    transFinalMapSigns.set(transactionSignature, key);
+                    transFinalMapSigns.put(transactionSignature, key);
                     List<byte[]> signatures = transaction.getOtherSignatures();
                     if (signatures != null) {
                         for (byte[] itemSignature : signatures) {
-                            transFinalMapSigns.set(itemSignature, key);
+                            transFinalMapSigns.put(itemSignature, key);
                         }
                     }
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
@@ -2100,7 +2100,7 @@ import java.util.*;
                 index = i + indexStart;
                 txCalculated = this.txCalculated.get(i);
                 txCalculated.setHeightSeq(this.heightBlock, index);
-                finalMap.set(txCalculated);
+                finalMap.put(txCalculated);
 
             }
         }
@@ -2216,15 +2216,15 @@ import java.util.*;
 
                 ///logger.debug("[" + seqNo + "] try finalMap.set" );
                 timerStart = System.currentTimeMillis();
-                finalMap.set(key, transaction);
+                finalMap.put(key, transaction);
                 timerFinalMap_set += System.currentTimeMillis() - timerStart;
                 //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
                 timerStart = System.currentTimeMillis();
-                transFinalMapSinds.set(transactionSignature, key);
+                transFinalMapSinds.put(transactionSignature, key);
                 List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {
                     for (byte[] itemSignature : signatures) {
-                        transFinalMapSinds.set(itemSignature, key);
+                        transFinalMapSinds.put(itemSignature, key);
                     }
                 }
                 timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;

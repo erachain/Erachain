@@ -77,7 +77,7 @@ public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
 
         value_new.push(item);
 
-        this.set(hash, value_new);
+        this.put(hash, value_new);
 
     }
 
@@ -102,7 +102,7 @@ public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
 
         value_new.pop();
 
-        this.set(hash, value_new);
+        this.put(hash, value_new);
 
     }
 

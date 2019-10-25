@@ -15,7 +15,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     void delete(Integer height, Integer seq);
 
-    boolean add(Integer height, Integer seq, Transaction transaction);
+    void add(Integer height, Integer seq, Transaction transaction);
 
     Transaction get(Integer height, Integer seq);
 
@@ -89,5 +89,5 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     Transaction get(byte[] signature);
 
-    boolean set(Transaction transaction);
+    void put(Transaction transaction);
 }

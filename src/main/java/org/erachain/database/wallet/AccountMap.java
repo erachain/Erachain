@@ -227,7 +227,7 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
                 }
 
                 // USE NOTIFY
-                super.set(account.getAddress(), number);
+                super.put(account.getAddress(), number);
 
             }
         }

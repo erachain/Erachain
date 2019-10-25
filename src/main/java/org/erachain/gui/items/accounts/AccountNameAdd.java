@@ -101,7 +101,7 @@ public class AccountNameAdd extends javax.swing.JDialog {
                     String acc = th.jTextFieldAccount.getText();
                     if (acc.length() == 34) {
                         new Account(acc);
-                        db.set(acc, new Tuple2(name, StrJSonFine.convert(ans)));
+                        db.put(acc, new Tuple2(name, StrJSonFine.convert(ans)));
                         setVisible(false);
                     } else {
                         JOptionPane.showMessageDialog(null, Lang.getInstance().translate("invalid name length"), Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

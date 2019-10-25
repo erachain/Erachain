@@ -49,7 +49,7 @@ public class OrphanNameStorageMap extends DCUMap<byte[], Map<String, String>> {
 
         keyValueMap.put(key, value);
 
-        this.set(txAndName, keyValueMap);
+        this.put(txAndName, keyValueMap);
 
     }
 

@@ -562,7 +562,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
             // INSERT WITH NOVA KEY
             newKey = novaKey;
-            dbMap.set(newKey, this);
+            dbMap.put(newKey, this);
 
         } else {
 
@@ -578,7 +578,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         this.key = newKey;
         //SET ORPHAN DATA
-        this.getDBIssueMap(db).set(this.reference, newKey);
+        this.getDBIssueMap(db).put(this.reference, newKey);
 
         return key;
     }
