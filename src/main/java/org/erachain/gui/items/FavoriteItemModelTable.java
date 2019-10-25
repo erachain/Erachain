@@ -3,7 +3,7 @@ package org.erachain.gui.items;
 import org.erachain.controller.Controller;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
-import org.erachain.dbs.DBTabCommonImpl;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.utils.ObserverMessage;
@@ -23,7 +23,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
 
     protected FavoriteItemMap favoriteMap;
 
-    public FavoriteItemModelTable(DBTabCommonImpl map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
+    public FavoriteItemModelTable(DBTabImpl map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
         super(columnNames, columnAutoHeight, false);
 

@@ -853,7 +853,7 @@ public class Order implements Comparable<Order> {
                         haveAssetScale, wantAssetScale, index);
 
                 //ADD TRADE TO DATABASE
-                tradesMap.add(trade);
+                tradesMap.put(trade);
 
                 //UPDATE FULFILLED HAVE
                 order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // this.amountHave));

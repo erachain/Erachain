@@ -175,7 +175,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         return item;
     }
 
-    public long addAndProcess(ItemCls item) {
+    public long add(ItemCls item) {
         // INCREMENT ATOMIC KEY IF EXISTS
         if (atomicKey != null) {
             atomicKey.incrementAndGet();
@@ -192,7 +192,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         return key;
     }
 
-    public void removeAndProcess(long key) {
+    public void remove(long key) {
         super.delete(key);
 
         if (this.key != key) {

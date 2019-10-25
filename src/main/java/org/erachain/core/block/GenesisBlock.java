@@ -751,7 +751,7 @@ public class GenesisBlock extends Block {
     public void orphan(DCSet dcSet) throws Exception {
 
         if (false)
-            dcSet.getItemAssetMap().removeAndProcess(AssetCls.LIA_KEY);
+            dcSet.getItemAssetMap().remove(AssetCls.LIA_KEY);
 
         super.orphan(dcSet);
 

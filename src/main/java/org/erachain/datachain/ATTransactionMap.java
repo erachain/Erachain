@@ -104,10 +104,6 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
         return this.set(new Tuple2<Integer, Integer>(blockHeight, seq), atTx);
     }
 
-    public DBTab<Tuple2<Integer, Integer>, ATTransaction> getParent() {
-        return this.parent;
-    }
-
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {

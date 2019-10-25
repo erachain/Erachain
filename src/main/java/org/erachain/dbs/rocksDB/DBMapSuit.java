@@ -2,7 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
-import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IMap;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -55,8 +55,9 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         this(databaseSet, database, logger, null);
     }
 
-    public DBRocksDBTable getMap() {
-        return map;
+    @Override
+    public IMap getSource() {
+        return (IMap) map;
     }
 
     @Override

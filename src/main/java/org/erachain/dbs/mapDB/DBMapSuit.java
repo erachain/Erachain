@@ -2,6 +2,7 @@ package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.dbs.IMap;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -99,8 +100,9 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
-    public Map getMap() {
-        return map;
+    @Override
+    public IMap getSource() {
+        return (IMap) map;
     }
 
     //@Override

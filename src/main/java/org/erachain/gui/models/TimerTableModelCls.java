@@ -2,7 +2,6 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.dbs.DBTab;
-import org.erachain.dbs.DBTabCommonImpl;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
@@ -64,7 +63,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBTabCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+    public TimerTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -72,7 +71,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBTabCommonImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
+    public TimerTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;

@@ -80,10 +80,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     protected void createIndexes() {
     }
 
-    public Map getMap() {
-        return map;
-    }
-
     /**
      * Make SECODATY INDEX
      * INDEX ID = 0 - its is PRIMARY - not use it here

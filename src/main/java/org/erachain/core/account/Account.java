@@ -1086,11 +1086,11 @@ public class Account {
      */
 
     public void setForgingData(DCSet db, int height, int forgingBalance) {
-        db.getAddressForging().setAndProcess(this.address, height, forgingBalance);
+        db.getAddressForging().set(this.address, height, forgingBalance);
     }
 
     public void delForgingData(DCSet db, int height) {
-        db.getAddressForging().removeAndProcess(this.address, height);
+        db.getAddressForging().remove(this.address, height);
     }
 
     public Tuple2<Integer, Integer> getLastForgingData(DCSet db) {

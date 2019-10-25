@@ -264,7 +264,7 @@ public class Trade {
         Order target = this.getTargetOrder(db);
 
         //ADD TRADE TO DATABASE
-        db.getTradeMap().add(this);
+        db.getTradeMap().put(this);
         if (!db.getTradeMap().contains(new Tuple2<Long, Long>(this.initiator, this.target))) {
             int error = 0;
         }

@@ -24,12 +24,12 @@ public interface BlockMap extends DBTab<Integer, Block> {
 
     Block get(Integer height);
 
-    void putAndProcess(Block block);
+    void put(Block block);
 
     // TODO make CHAIN deletes - only for LAST block!
-    Block removeAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator);
+    Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator);
 
-    void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator);
+    void delete(byte[] signature, byte[] reference, PublicKeyAccount creator);
 
     void notifyResetChain();
 

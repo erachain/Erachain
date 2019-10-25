@@ -87,13 +87,12 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
     /**
      * заносит новую точку и обновляет Последнюю точку (height & ForgingValue)/
      * При этом если последняя точка уже с той же высотой - то обновляем только ForgingValue/
-     * Отлдичие от set() то что нельзя напямую set() тут объявлять так как иначе будет двойная обработка при
-     * org.erachain.dbs.DCUMapImpl#writeToParent()
+     * Внимание! нельзя в этот set() заносить при writeToParent иначе будет двойная обработка
      * @param key
      * @param currentForgingValue
      * @return
      */
-    public boolean setAndProcess(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
+    public boolean set(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
 
         if (key.b == 0) {
             // это сохранение из writeToParent - там все значения сливаются из Форкнутой базы включая setLast с 0-м значением
@@ -134,9 +133,9 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
     }
 
     // height
-    public void setAndProcess(String address, Integer currentHeight, Integer currentForgingVolume) {
+    public void set(String address, Integer currentHeight, Integer currentForgingVolume) {
 
-        this.setAndProcess(new Tuple2<String, Integer>(address, currentHeight),
+        this.set(new Tuple2<String, Integer>(address, currentHeight),
                 new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
 
     }
@@ -145,12 +144,11 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * Удаляет текущую точку и обновляет ссылку на Последнюю точку - если из высоты совпали
      * Так как если нет соапвдения - то удалять нельзя так как уже удалили ранее ее
      * - по несколько раз при откате может быть удаление текущей точки
-     * Отлдичие от remove() то что нельзя напямую remove() тут объявлять так как иначе будет двойная обработка при
-     * org.erachain.dbs.DCUMapImpl#writeToParent()
+     * Нельзя сюда послать в writeToParent так как иначе будет двойная обработка.
      * @param key
      * @return
      */
-    public Tuple2<Integer, Integer> removeAndProcess(Tuple2<String, Integer> key) {
+    public Tuple2<Integer, Integer> remove(Tuple2<String, Integer> key) {
 
         if (key.b < 3) {
             // not delete GENESIS forging data for all accounts
@@ -189,8 +187,8 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         return null;
     }
 
-    public void removeAndProcess(String address, int height) {
-        this.removeAndProcess(new Tuple2<String, Integer>(address, height));
+    public void remove(String address, int height) {
+        this.remove(new Tuple2<String, Integer>(address, height));
     }
 
     /**

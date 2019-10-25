@@ -164,7 +164,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     }
 
     @Override
-    public void putAndProcess(Block block) {
+    public void put(Block block) {
         DCSet dcSet = (DCSet) databaseSet;
         byte[] signature = block.getSignature();
         if (dcSet.getBlockSignsMap().contains(signature)) {
@@ -193,7 +193,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             int a = data.b;
         }
 
-        dcSet.getBlocksHeadsMap().setAndProcess(block.blockHead);
+        dcSet.getBlocksHeadsMap().set(block.blockHead);
         this.setLastBlockSignature(signature);
 
         super.put(height, block);
@@ -201,7 +201,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     }
 
     // TODO make CHAIN deletes - only for LAST block!
-    public Block removeAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator) {
+    public Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator) {
         DCSet dcSet = (DCSet) databaseSet;
 
         int height = this.size();
@@ -212,7 +212,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         // ORPHAN FORGING DATA
         if (height > 1) {
 
-            dcSet.getBlocksHeadsMap().deleteAndProcess();
+            dcSet.getBlocksHeadsMap().delete();
 
             // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
             creator.delForgingData(dcSet, height);
@@ -224,7 +224,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     }
 
     // TODO make CHAIN deletes - only for LAST block!
-    public void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator) {
+    public void delete(byte[] signature, byte[] reference, PublicKeyAccount creator) {
         DCSet dcSet = (DCSet) databaseSet;
 
         int height = this.size();
@@ -235,7 +235,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         // ORPHAN FORGING DATA
         if (height > 1) {
 
-            dcSet.getBlocksHeadsMap().deleteAndProcess();
+            dcSet.getBlocksHeadsMap().delete();
 
             // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
             creator.delForgingData(dcSet, height);

@@ -1875,7 +1875,7 @@ import java.util.*;
             }
 
             timerStart = System.nanoTime();
-            dcSetPlace.getBlockMap().putAndProcess(this);
+            dcSetPlace.getBlockMap().put(this);
             timerStart = System.nanoTime() - timerStart;
             if (timerStart < 999999999999l)
                 LOGGER.debug("BlockMap add timer [us]: " + timerStart / 1000 + " [" + this.heightBlock + "]");
@@ -2242,7 +2242,7 @@ import java.util.*;
         LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         timerStart = System.currentTimeMillis();
-        dcSet.getBlockMap().putAndProcess(this);
+        dcSet.getBlockMap().put(this);
         LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         long tickets = System.currentTimeMillis() - start;
@@ -2310,7 +2310,7 @@ import java.util.*;
         }
 
         //DELETE BLOCK FROM DB
-        dcSet.getBlockMap().deleteAndProcess(this.signature, this.reference, this.creator);
+        dcSet.getBlockMap().delete(this.signature, this.reference, this.creator);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #4");
 

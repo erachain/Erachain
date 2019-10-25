@@ -70,8 +70,8 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public void add(Trade trade) {
-        this.set(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()), trade);
+    public void put(Trade trade) {
+        this.put(new Tuple2<Long, Long>(trade.getInitiator(), trade.getTarget()), trade);
     }
 
     /**

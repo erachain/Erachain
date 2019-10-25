@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
-    void add(Trade trade);
+    void put(Trade trade);
 
     Iterator<Fun.Tuple2<Long, Long>> getIterator(Order order);
 
