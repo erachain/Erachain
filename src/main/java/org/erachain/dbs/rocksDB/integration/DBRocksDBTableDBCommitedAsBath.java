@@ -30,7 +30,7 @@ public class DBRocksDBTableDBCommitedAsBath<K, V> extends DBRocksDBTable<K, V>
 
     public DBRocksDBTableDBCommitedAsBath(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
                   RocksDbSettings settings, WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.readOptions = readOptions;
         openSource();
         afterOpen();
@@ -38,7 +38,7 @@ public class DBRocksDBTableDBCommitedAsBath<K, V> extends DBRocksDBTable<K, V>
 
     public DBRocksDBTableDBCommitedAsBath(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
                                           RocksDbSettings settings, WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, indexes, settings, writeOptions);
+        super(byteableKey, byteableValue, indexes, settings, writeOptions, enableSize);
         this.readOptions = readOptions;
         openSource();
         afterOpen();

@@ -32,7 +32,7 @@ public class DBRocksDBTableDBOptTransacted<K, V> extends DBRocksDBTable<K, V> {
                                          List<IndexDB> indexes, RocksDbSettings settings,
                                          TransactionDBOptions transactionDbOptions,
                                          WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.transactionDbOptions = transactionDbOptions;
         this.readOptions = readOptions;
         openSource();
@@ -56,7 +56,7 @@ public class DBRocksDBTableDBOptTransacted<K, V> extends DBRocksDBTable<K, V> {
     @Override
     public void openSource() {
         dbSource = new RocksDbDataSourceOptTransactedDB(this.root, NAME_TABLE, indexes, settings,
-                transactionDbOptions, writeOptions);
+                transactionDbOptions, writeOptions, enableSize);
     }
 
 }

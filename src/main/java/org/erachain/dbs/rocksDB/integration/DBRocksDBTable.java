@@ -58,6 +58,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     protected Byteable byteableValue;
     protected String NAME_TABLE;
     protected RocksDbSettings settings;
+    protected boolean enableSize;
     protected String root;
 
     //Для пересчета размеров таблицы
@@ -80,20 +81,21 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     /**
-     *
-     * @param byteableKey
+     *  @param byteableKey
      * @param byteableValue
      * @param NAME_TABLE
      * @param indexes is null - not use size Counter
      * @param settings
      * @param dbaSet
+     * @param enableSize
      */
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                          RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
+                          RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet, boolean enableSize) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.NAME_TABLE = NAME_TABLE;
         this.settings = settings;
+        this.enableSize = enableSize;
         this.writeOptions = writeOptions;
         this.root = (dbaSet == null // in TESTs
                 || dbaSet.getFile() == null ? // in Memory or in TESTs
@@ -104,17 +106,19 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     /**
      * Use random name for TMP Fork
-     *  @param byteableKey
+     * @param byteableKey
      * @param byteableValue
      * @param indexes
      * @param settings
      * @param writeOptions
+     * @param enableSize
      */
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
-                          RocksDbSettings settings, WriteOptions writeOptions) {
+                          RocksDbSettings settings, WriteOptions writeOptions, boolean enableSize) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.settings = settings;
+        this.enableSize = enableSize;
         this.writeOptions = writeOptions;
         this.root = Settings.getInstance().getDataTempDir();
         this.indexes = indexes;
@@ -128,19 +132,20 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     }
 
-    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
+    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet, boolean enableSize) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), dbaSet);
+                new WriteOptions().setSync(true).setDisableWAL(false), dbaSet, enableSize);
     }
 
     /**
      * for TESTs. new ArrayList<>() - size counter enable
      * @param NAME_TABLE
+     * @param enableSize
      */
-    public DBRocksDBTable(String NAME_TABLE) {
+    public DBRocksDBTable(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), null);
+                new WriteOptions().setSync(true).setDisableWAL(false), null, enableSize);
     }
 
     protected void afterOpen() {

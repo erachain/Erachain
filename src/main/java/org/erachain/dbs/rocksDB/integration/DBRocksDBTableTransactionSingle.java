@@ -30,7 +30,7 @@ public class DBRocksDBTableTransactionSingle<K, V> extends DBRocksDBTable<K, V> 
     public DBRocksDBTableTransactionSingle(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE,
                                            List<IndexDB> indexes, RocksDbSettings settings,
                                            WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.readOptions = readOptions;
         openSource();
         afterOpen();
@@ -50,7 +50,7 @@ public class DBRocksDBTableTransactionSingle<K, V> extends DBRocksDBTable<K, V> 
 
     @Override
     public void openSource() {
-        dbSource = new RocksDbDataSourceTransactionSingle(this.root, NAME_TABLE, indexes, settings, writeOptions, readOptions);
+        dbSource = new RocksDbDataSourceTransactionSingle(this.root, NAME_TABLE, indexes, settings, writeOptions, readOptions, enableSize);
     }
 
     public void commit() {

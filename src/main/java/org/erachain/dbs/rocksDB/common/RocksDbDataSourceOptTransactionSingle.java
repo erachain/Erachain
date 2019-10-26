@@ -19,7 +19,7 @@ public class RocksDbDataSourceOptTransactionSingle extends RocksDbDataSourceImpl
     WriteOptions writeOptions;
 
     public RocksDbDataSourceOptTransactionSingle(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
-                                                 WriteOptions writeOptions, ReadOptions readOptions) {
+                                                 WriteOptions writeOptions, ReadOptions readOptions, boolean enableSize) {
         super(pathName, name, indexes, settings, writeOptions, enableSize);
         // Создаем или открываем ДБ
         initDB();
@@ -32,10 +32,10 @@ public class RocksDbDataSourceOptTransactionSingle extends RocksDbDataSourceImpl
 
     }
 
-    public RocksDbDataSourceOptTransactionSingle(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
+    public RocksDbDataSourceOptTransactionSingle(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
         this(pathName, name, indexes, settings,
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions());
+                new ReadOptions(), enableSize);
     }
 
     @Override

@@ -32,10 +32,10 @@ public class DBRocksDBTableOptTransaction<K, V> extends DBRocksDBTable<K, V> imp
                                         List<IndexDB> indexes,
                                         DBRocksDBTableDBOptTransacted dbSoutceImpl, RocksDbSettings settings,
                                         WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.readOptions = readOptions;
         this.dbSource = new RocksDbDataSourceOptTransaction(this.root, NAME_TABLE, indexes,
-                (OptimisticTransactionDB) dbSoutceImpl.dbSource, dbSoutceImpl.dbSource.getColumnFamilyHandles(), writeOptions, readOptions);
+                (OptimisticTransactionDB) dbSoutceImpl.dbSource, dbSoutceImpl.dbSource.getColumnFamilyHandles(), writeOptions, readOptions, enableSize);
         //openSource();
         afterOpen();
     }

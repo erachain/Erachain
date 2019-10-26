@@ -25,14 +25,14 @@ public class DBRocksDBTableDB<K, V> extends DBRocksDBTable<K, V> {
 
     public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
                             RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         openSource();
         afterOpen();
     }
 
     public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
                             RocksDbSettings settings, WriteOptions writeOptions) {
-        super(byteableKey, byteableValue, indexes, settings, writeOptions);
+        super(byteableKey, byteableValue, indexes, settings, writeOptions, enableSize);
         openSource();
         afterOpen();
     }
@@ -45,6 +45,6 @@ public class DBRocksDBTableDB<K, V> extends DBRocksDBTable<K, V> {
 
     @Override
     public void openSource() {
-        dbSource = new RocksDbDataSourceDB(this.root, NAME_TABLE, indexes, settings, writeOptions);
+        dbSource = new RocksDbDataSourceDB(this.root, NAME_TABLE, indexes, settings, writeOptions, enableSize);
     }
 }

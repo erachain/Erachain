@@ -110,7 +110,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
 
     @Override
     public void openSource() {
-        dbSource = new RocksDbTransactSourceImpl(this.root, NAME_TABLE, indexes, settings);
+        dbSource = new RocksDbTransactSourceImpl(this.root, NAME_TABLE, indexes, settings, enableSize);
     }
 
     @Override

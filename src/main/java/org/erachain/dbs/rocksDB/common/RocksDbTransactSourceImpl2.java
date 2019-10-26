@@ -542,6 +542,21 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
+    public void deleteValue(byte[] key) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.delete(key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return;
@@ -557,7 +572,37 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
+    public void deleteValue(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.delete(columnFamilyHandle, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public void delete(byte[] key, WriteOptions writeOptions) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.delete(key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void deleteValue(byte[] key, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
         }
