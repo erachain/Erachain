@@ -489,7 +489,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         DB database = DCSet.makeDBinMemory();
         try {
             DCSet newBlockDC = dcSet.fork(database);
-            int blockHeight = newBlockDC.getBlockMap().size() + 1;
+            int blockHeight = newBlockDC.getBlockSignsMap().size() + 1;
 
             //Block waitWin;
             int counter = 0;

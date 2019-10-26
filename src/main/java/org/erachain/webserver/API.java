@@ -408,7 +408,7 @@ public class API {
                     out.put("end", 1);
                     break;
                 }
-                array.add(blockMap.get(i));
+                array.add(blockMap.getAndProcess(i));
             }
             out.put("blocks", array);
 

@@ -569,7 +569,7 @@ public class BlockChain {
             LOGGER.info(genesisBlock.getTestNetInfo());
         }
 
-        int height = dcSet.getBlockMap().size();
+        int height = dcSet.getBlockSignsMap().size();
         if (height == 0)
         // process genesis block
         {

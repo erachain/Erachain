@@ -670,7 +670,7 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-					Block block = blockMap.get(height);
+					Block block = blockMap.getAndProcess(height);
 
 					if (block == null) {
 						break;
