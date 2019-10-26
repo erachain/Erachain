@@ -89,7 +89,7 @@ public class RocksDbDataSourceOptTransactionTest {
 
             // теперь в транзакцию будем закатывать
             RocksDbDataSourceOptTransaction dbOptTrans = new RocksDbDataSourceOptTransaction(NAME_TABLE,
-                    (OptimisticTransactionDB) rocksDB.dbSource.getDbCore(), rocksDB.dbSource.getColumnFamilyHandles());
+                    (OptimisticTransactionDB) rocksDB.dbSource.getDbCore(), rocksDB.dbSource.getColumnFamilyHandles(), enableSize);
 
             for (int i = k; i < step; i++) {
 

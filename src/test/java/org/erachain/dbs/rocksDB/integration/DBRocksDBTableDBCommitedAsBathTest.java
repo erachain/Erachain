@@ -59,7 +59,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, enableSize);
 
             int k = 0;
 
@@ -146,7 +146,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, enableSize);
 
             int k = 0;
             int step = 10;
@@ -227,7 +227,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, enableSize);
 
         long timeMillisBefore = System.currentTimeMillis();
         for (Map.Entry<byte[], byte[]> entry : data) {
@@ -317,7 +317,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         do {
 
-            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, enableSize);
             logger.info("SIZE = " + rocksDB.size() + " columns: " + rocksDB.columnFamilyHandles.size());
 
             ColumnFamilyHandle columnFamilyHandleDef = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(0);
@@ -429,7 +429,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, enableSize);
 
         logger.info("pun in WriteBatch");
 
@@ -544,7 +544,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, enableSize);
 
         logger.info("pun in WriteBatch");
 

@@ -44,7 +44,7 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
                 new ReadOptions(), enableSize);
     }
 
-    public RocksDbDataSourceOptTransaction(String name, OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles) {
+    public RocksDbDataSourceOptTransaction(String name, OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles, boolean enableSize) {
         this(name, new ArrayList<>(), dbCore, columnFamilyHandles, enableSize);
     }
 

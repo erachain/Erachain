@@ -31,7 +31,7 @@ public class DBRocksDBTableDBOptTransacted<K, V> extends DBRocksDBTable<K, V> {
     public DBRocksDBTableDBOptTransacted(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE,
                                          List<IndexDB> indexes, RocksDbSettings settings,
                                          TransactionDBOptions transactionDbOptions,
-                                         WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
+                                         WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet, boolean enableSize) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.transactionDbOptions = transactionDbOptions;
         this.readOptions = readOptions;
@@ -43,14 +43,14 @@ public class DBRocksDBTableDBOptTransacted<K, V> extends DBRocksDBTable<K, V> {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
                 new TransactionDBOptions(),
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(), dbaSet);
+                new ReadOptions(), dbaSet, enableSize);
     }
 
     public DBRocksDBTableDBOptTransacted(String NAME_TABLE) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
                 new TransactionDBOptions(),
-                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null);
+                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null, enableSize);
     }
 
     @Override

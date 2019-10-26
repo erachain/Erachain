@@ -29,7 +29,7 @@ public class DBRocksDBTableDBCommitedAsBath<K, V> extends DBRocksDBTable<K, V>
     ReadOptions readOptions;
 
     public DBRocksDBTableDBCommitedAsBath(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                  RocksDbSettings settings, WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
+                                          RocksDbSettings settings, WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet, boolean enableSize) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.readOptions = readOptions;
         openSource();
@@ -37,18 +37,18 @@ public class DBRocksDBTableDBCommitedAsBath<K, V> extends DBRocksDBTable<K, V>
     }
 
     public DBRocksDBTableDBCommitedAsBath(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
-                                          RocksDbSettings settings, WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
+                                          RocksDbSettings settings, WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet, boolean enableSize) {
         super(byteableKey, byteableValue, indexes, settings, writeOptions, enableSize);
         this.readOptions = readOptions;
         openSource();
         afterOpen();
     }
 
-    public DBRocksDBTableDBCommitedAsBath(String NAME_TABLE) {
+    public DBRocksDBTableDBCommitedAsBath(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(), null);
+                new ReadOptions(), null, enableSize);
     }
 
     @Override

@@ -58,7 +58,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(),
-                databaseSet);
+                databaseSet, enableSize);
     }
 
     @Override
