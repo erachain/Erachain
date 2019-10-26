@@ -211,7 +211,7 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
     }
 
     @Override
-    public void remove(byte[] key) {
+    public void delete(byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -232,7 +232,7 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
     }
 
     @Override
-    public void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+    public void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }

@@ -85,7 +85,7 @@ public class RocksDbDataSourceDBTest {
                 found = rocksDB.contains(entry.getKey());
                 assertEquals(found, true);
 
-                rocksDB.remove(entry.getKey());
+                rocksDB.delete(entry.getKey());
 
                 found = rocksDB.contains(entry.getKey());
                 assertEquals(found, false);

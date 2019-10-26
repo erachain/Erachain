@@ -180,20 +180,22 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         if (logON) logger.info("put invoked");
         //counterFlush++;
         final byte[] keyBytes = byteableKey.toBytesObject(key);
+        byte[] old = null;
         if (logON) logger.info("keyBytes.length = " + keyBytes.length);
-        byte[] old = dbSource.get(keyBytes);
-        if (old == null || old.length == 0) {
-            if (columnFamilyFieldSize != null) {
+
+        if (columnFamilyFieldSize != null) {
+            old = dbSource.get(keyBytes);
+            if (old == null || old.length == 0) {
                 byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
-            }
-        } else {
-            // удалим вторичные ключи
-            if (indexes != null && !indexes.isEmpty()) {
-                removeIndexes(key, keyBytes, old);
+            } else {
+                // Значение старое было значит удалим вторичные ключи
+                if (indexes != null && !indexes.isEmpty()) {
+                    removeIndexes(key, keyBytes, old);
+                }
             }
         }
 
@@ -258,37 +260,24 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 }
             }
         }
-
-        //if (counterFlush % numberBeforeFlush == 0) {
-        //    db.flush();
-        //    counterFlush = 0;
-        //}
     }
 
     void removeIndexes(Object key, byte[] keyBytes, byte[] valueByte) {
+        Object value = byteableValue.receiveObjectFromBytes(valueByte);
         for (IndexDB indexDB : indexes) {
             if (indexDB instanceof SimpleIndexDB) {
                 SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
-                //byte[] valueByte = db.get(keyBytes);
-                if (valueByte == null) {
-                    continue;
-                }
-                Object value = byteableValue.receiveObjectFromBytes(valueByte);
+
                 byte[] bytes = indexDB.getIndexByteable().toBytes(simpleIndexDB.getBiFunction().apply(key, value), key);
                 if (bytes == null) {
                     continue;
                 }
                 byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                dbSource.remove(indexDB.getColumnFamilyHandle(),
+                dbSource.delete(indexDB.getColumnFamilyHandle(),
                         concatenateBiFunctionKey);
             } else if (indexDB instanceof ArrayIndexDB) {
                 ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
                 BiFunction biFunction = arrayIndexDB.getBiFunction();
-                //byte[] valueByte = db.get(keyBytes);
-                if (valueByte == null) {
-                    continue;
-                }
-                Object value = byteableValue.receiveObjectFromBytes(valueByte);
                 Object[] apply = (Object[]) biFunction.apply(key, value);
                 if (apply == null) {
                     continue;
@@ -299,7 +288,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                         continue;
                     }
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    dbSource.remove(indexDB.getColumnFamilyHandle(),
+                    dbSource.delete(indexDB.getColumnFamilyHandle(),
                             concatenateBiFunctionKey);
                 }
             } else if (indexDB instanceof ListIndexDB) {
@@ -309,7 +298,6 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 if (valueByte == null) {
                     continue;
                 }
-                Object value = byteableValue.receiveObjectFromBytes(valueByte);
                 List<Object> apply = (List<Object>) biFunction.apply(key, value);
                 if (apply == null) {
                     continue;
@@ -320,19 +308,41 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                         continue;
                     }
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    dbSource.remove(indexDB.getColumnFamilyHandle(),
+                    dbSource.delete(indexDB.getColumnFamilyHandle(),
                             concatenateBiFunctionKey);
                 }
             } else {
                 throw new UnsupportedTypeIndexException();
             }
-
-
         }
-
     }
+
+    // TODO переделать на REMOVE так как тут берется Значение
     @Override
-    public void remove(Object key) {
+    public void delete(Object key) {
+        final byte[] keyBytes = byteableKey.toBytesObject(key);
+
+        if (columnFamilyFieldSize != null) {
+            byte[] old = dbSource.get(keyBytes);
+            if (old != null && old.length != 0) {
+                // UPDATE SIZE
+                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+                size--;
+                dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
+
+                // Есть вторичные ключи и значение старое было
+                if (indexes != null && !indexes.isEmpty()) {
+                    removeIndexes(key, keyBytes, old);
+                }
+            }
+        }
+        dbSource.delete(keyBytes);
+    }
+
+    // TODO переделать на REMOVE так как тут берется Значение
+    @Override
+    public void deleteValue(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);
         byte[] old = dbSource.get(keyBytes);
         if (old != null && old.length != 0) {
@@ -346,9 +356,8 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 removeIndexes(key, keyBytes, old);
             }
         }
-        dbSource.remove(keyBytes);
+        dbSource.delete(keyBytes);
     }
-
 
     @Override
     public void clear() {

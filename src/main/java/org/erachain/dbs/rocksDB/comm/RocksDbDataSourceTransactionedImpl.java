@@ -92,7 +92,7 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
     final StringBuilder inCache = new StringBuilder();
 
     @Override
-    public void remove(byte[] key) {
+    public void delete(byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -107,7 +107,7 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
     }
 
     @Override
-    public void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+    public void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -122,7 +122,7 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
     }
 
     @Override
-    public void remove(byte[] key, WriteOptions writeOptions) {
+    public void delete(byte[] key, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
         }

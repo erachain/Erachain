@@ -336,18 +336,72 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     }
 
     /**
-     * ВНИМАНИЕ !!! нельзя в подКлассе делать перенаправления set -> put так как будет зацклтвание через этот вызоа
      * @param key
      * @param value
      */
     @Override
     public void put(T key, U value) {
-        this.set(key, value);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.set, так как
+        /// если в подклассе будет из SET вызов PUT то он придет сюда и при перевузове THIS.SET отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> set(key, value);
+        ///
+
+        if (DCSet.isStoped()) {
+            return;
+        }
+
+        this.addUses();
+
+        try {
+
+            this.map.put(key, value);
+
+            if (this.parent != null) {
+                //if (old != null)
+                //	++this.shiftSize;
+                if (this.deleted != null) {
+                    if (this.deleted.remove(key) != null)
+                        ++this.shiftSize;
+                }
+            } else {
+
+                // NOTIFY if not FORKED
+                if (this.observableData != null) {
+                    if (this.observableData.containsKey(DBTab.NOTIFY_ADD) && !DCSet.isStoped()) {
+                        this.setChanged();
+                        Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
+                        if (
+                                observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
+                                        || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                                        || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
+                                        || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
+                        ) {
+                            this.notifyObservers(new ObserverMessage(observeItem, new Pair<T, U>(key, value)));
+                        } else {
+                            this.notifyObservers(
+                                    new ObserverMessage(observeItem, value));
+                        }
+                    }
+                }
+            }
+
+            this.outUses();
+            return;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        this.outUses();
+
     }
 
-    @Override
-    public U remove(T key) {
-
+    /**
+     * чтобы не копировать код
+     * @param key
+     * @return
+     */
+    private U removeHere(T key) {
         if (DCSet.isStoped()) {
             return null;
         }
@@ -401,26 +455,96 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
         this.outUses();
         return value;
+    }
 
+    @Override
+    public U remove(T key) {
+        return removeHere(key);
     }
 
     @Override
     public U removeValue(T key) {
-        return remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+        return removeHere(key);
     }
 
     /**
-     * ВНИМАНИЕ !!! нельзя в подКлассе делать перенаправления set -> put так как будет зацклтвание через этот вызоа
+     * Чтобы не копировать вод из delete deleteValue
      * @param key
      */
+    private void deleteHere(T key) {
+        if (DCSet.isStoped()) {
+            return;
+        }
+
+        this.addUses();
+
+        this.map.remove(key);
+
+        if (this.parent != null) {
+            // это форкнутая таблица
+
+            if (this.deleted == null) {
+                this.deleted = new HashMap(1024 , 0.75f);
+            }
+
+            // добавляем в любом случае, так как
+            // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+            // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+            // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+            // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+            this.deleted.put(key, EXIST);
+
+            this.outUses();
+            return;
+
+        } else {
+
+            // NOTIFY
+            if (this.observableData != null) {
+                if (this.observableData.containsKey(DBTab.NOTIFY_REMOVE)) {
+                    this.setChanged();
+                    Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
+                    if (
+                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
+                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                                    || observItem.equals(ObserverMessage.REMOVE_AT_TX)
+                    ) {
+                        this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, null)));
+                    } else {
+                        this.notifyObservers(new ObserverMessage(observItem, null));
+                    }
+                }
+            }
+        }
+
+        this.outUses();
+
+    }
     @Override
     public void delete(T key) {
-        this.remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        deleteHere(key);
     }
 
     @Override
     public void deleteValue(T key) {
-        remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+        deleteHere(key);
+
     }
 
     @Override

@@ -529,7 +529,21 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public void remove(byte[] key) {
+    public void delete(byte[] key) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.delete(key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+    @Override
+    public void deleteValue(byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -544,7 +558,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+    public void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -559,7 +573,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public void remove(byte[] key, WriteOptions writeOptions) {
+    public void delete(byte[] key, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
         }

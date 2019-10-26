@@ -236,7 +236,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
                     continue;
                 }
                 byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                dbSource.remove(indexDB.getColumnFamilyHandle(),
+                dbSource.delete(indexDB.getColumnFamilyHandle(),
                         concatenateBiFunctionKey);
             } else if (indexDB instanceof ArrayIndexDB) {
                 ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
@@ -256,7 +256,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
                         continue;
                     }
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    dbSource.remove(indexDB.getColumnFamilyHandle(),
+                    dbSource.delete(indexDB.getColumnFamilyHandle(),
                             concatenateBiFunctionKey);
                 }
             } else if (indexDB instanceof ListIndexDB) {
@@ -277,7 +277,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
                         continue;
                     }
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    dbSource.remove(indexDB.getColumnFamilyHandle(),
+                    dbSource.delete(indexDB.getColumnFamilyHandle(),
                             concatenateBiFunctionKey);
                 }
             } else {
@@ -290,7 +290,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
     }
 
     @Override
-    public void remove(Object key) {
+    public void delete(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);
         byte[] old = dbSource.get(keyBytes);
         if (old != null && old.length != 0) {
@@ -304,7 +304,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
                 removeIndexes(key, keyBytes, old);
             }
         }
-        dbSource.remove(columnFamilyHandles.get(0), keyBytes);
+        dbSource.delete(columnFamilyHandles.get(0), keyBytes);
     }
 
 

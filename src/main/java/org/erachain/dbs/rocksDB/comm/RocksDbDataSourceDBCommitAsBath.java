@@ -146,7 +146,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
     }
 
     @Override
-    public void remove(byte[] key) {
+    public void delete(byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -161,7 +161,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
     }
 
     @Override
-    public void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+    public void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }

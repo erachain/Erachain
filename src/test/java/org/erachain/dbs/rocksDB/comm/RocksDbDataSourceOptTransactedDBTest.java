@@ -98,7 +98,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
                 // поиск в родительской базе
                 assertEquals(rocksDB.contains(entry.getKey()), true);
 
-                rocksDB.remove(entry.getKey());
+                rocksDB.delete(entry.getKey());
 
                 // поиск в родительской базе
                 assertEquals(rocksDB.contains(entry.getKey()), false);
@@ -174,7 +174,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            rocksDB.remove(entry.getKey());
+            rocksDB.delete(entry.getKey());
         }
 
         // теперь в транзакцию будем закатывать

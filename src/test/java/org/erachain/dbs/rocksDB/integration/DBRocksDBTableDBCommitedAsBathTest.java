@@ -102,7 +102,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
                 assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
 
-                rocksDB.remove(entry.getKey().clone());
+                rocksDB.delete(entry.getKey().clone());
 
                 found = rocksDB.containsKey(entry.getKey().clone());
                 assertEquals(found, false);
@@ -189,7 +189,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 value = (byte[]) rocksDB.get(entry.getKey().clone());
                 assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
 
-                rocksDB.remove(entry.getKey().clone());
+                rocksDB.delete(entry.getKey().clone());
 
                 // поиск в родительской базе
                 assertEquals(rocksDB.containsKey(entry.getKey().clone()), false);
@@ -266,7 +266,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            rocksDB.remove(entry.getKey().clone());
+            rocksDB.delete(entry.getKey().clone());
         }
 
         // теперь в транзакцию будем закатывать
@@ -600,7 +600,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             if (--k < 0)
                 break;
 
-            rocksDB.remove(entry.getKey().clone());
+            rocksDB.delete(entry.getKey().clone());
         }
 
         logger.info("uncommitted SIZE = " + rocksDB.size());

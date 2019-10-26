@@ -27,10 +27,9 @@ public interface InnerDBTable<K, V> {
 
     void put(K key, V value);
 
-    void remove(Object key);
+    void delete(Object key);
 
-    // TODO: нужно сделать это - у РоксДБ естьт акое
-    //void removeValue(Object key);
+    void deleteValue(Object key);
 
     void clear();
 

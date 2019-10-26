@@ -236,6 +236,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void put(T key, U value) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.set, так как
+        /// если в подклассе будет из SET вызов PUT то он придет сюда и при перевузове THIS.SET отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> set(key, value);
+        ///
         this.addUses();
 
         this.map.put(key, value);
@@ -262,7 +267,23 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public U removeValue(T key) {
-        return remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        this.addUses();
+
+        //REMOVE
+        if (this.map.containsKey(key)) {
+            U value = this.map.remove(key);
+            this.outUses();
+            return value;
+        }
+
+        this.outUses();
+        return null;
     }
 
     /**
@@ -272,6 +293,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
      */
     @Override
     public void delete(T key) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
 
         this.addUses();
         this.map.remove(key);
@@ -281,6 +307,12 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void deleteValue(T key) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
         this.addUses();
         this.map.remove(key);
         this.outUses();

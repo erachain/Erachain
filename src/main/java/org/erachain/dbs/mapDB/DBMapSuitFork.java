@@ -147,7 +147,26 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public void put(T key, U value) {
-        set(key, value);
+
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.set, так как
+        /// если в подклассе будет из SET вызов PUT то он придет сюда и при перевузове THIS.SET отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> set(key, value);
+        ///
+
+        try {
+
+            this.map.put(key, value);
+
+            if (this.deleted != null) {
+                if (this.deleted.remove(key) != null)
+                    ++this.shiftSize;
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
     }
 
     @Override
@@ -178,17 +197,81 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     @Override
     public U removeValue(T key) {
-        return remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        U value = this.map.remove(key);
+
+        if (this.deleted == null) {
+            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
+        }
+
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
+
+        if (value == null) {
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
+        }
+
+        return value;
+
     }
 
     @Override
     public void delete(T key) {
-        remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        this.map.remove(key);
+
+        if (this.deleted == null) {
+            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
+        }
+
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
+
     }
 
     @Override
     public void deleteValue(T key) {
-        remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        this.map.remove(key);
+
+        if (this.deleted == null) {
+            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
+        }
+
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
+
     }
 
     @Override

@@ -114,9 +114,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
                 // транзакций на один счет инициализирующих - нужно результат в конце поймать
                 // и если одниковый блок и форжинговое значение - то обновлять только Последнее,
                 // то есть сюда приходит только если НАОБОРОТ - это не Первое значение и Не с темже блоком в Последнее.
-                // ВНИИМАНИЕ !!! Делаем тут напрямую обязательно к Источнику иначе будет вызвано по кругу через put -> set сюда
-                // и получается закольцовка из супер-класса опять сюда
-                this.map.put(key, lastPoint);
+                super.put(key, lastPoint);
                 this.setLast(key.a, currentForgingValue);
             } else if (currentForgingValue.a < lastPoint.a) {
                 // тут ошибка

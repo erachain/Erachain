@@ -105,7 +105,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         U value = null;
         if (map.containsKey(key)) {
             value = map.get(key);
-            map.remove(key);
+            map.delete(key);
         }
         return value;
     }
@@ -113,19 +113,24 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     // TODO сделать это у РоксДБ есть
     @Override
     public U removeValue(T key) {
-        return remove(key);
+        U value = null;
+        if (map.containsKey(key)) {
+            value = map.get(key);
+            map.deleteValue(key);
+        }
+        return value;
     }
 
     @Override
     public void delete(T key) {
-        map.remove(key);
+        map.delete(key);
     }
 
 
     // TODO сделать это у РоксДБ есть
     @Override
     public void deleteValue(T key) {
-        map.remove(key);
+        map.deleteValue(key);
     }
 
     @Override

@@ -88,7 +88,7 @@ public class DBRocksDBTableTransactionSingleTest {
                 found = rocksDB.containsKey(entry.getKey());
                 assertEquals(found, true);
 
-                rocksDB.remove(entry.getKey());
+                rocksDB.delete(entry.getKey());
 
                 found = rocksDB.containsKey(entry.getKey());
                 assertEquals(found, false);
