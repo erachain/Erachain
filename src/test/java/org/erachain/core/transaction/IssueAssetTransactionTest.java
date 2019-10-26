@@ -15,11 +15,16 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
+import static org.junit.Assert.assertEquals;
+
 
 @Slf4j
 public class IssueAssetTransactionTest {
 
     long FEE_KEY = AssetCls.FEE_KEY;
+
+    int[] TESTED_DBS = new int[]{1,2,3};
+    DCSet dcSet;
 
     Controller cntrl;
 
@@ -37,77 +42,66 @@ public class IssueAssetTransactionTest {
             balance5;
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
     private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
-    //CREATE EMPTY MEMORY DATABASE
-    private DCSet db;
+
     private GenesisBlock gb;
     private BlockChain bchain;
     ItemAssetMap assetMap;
 
     // INIT ASSETS
-    private void init() {
+    private void init(int dbs) {
 
-        db = DCSet.createEmptyDatabaseSet(0);
+        dcSet = DCSet.createEmptyHardDatabaseSet(dbs);
         cntrl = Controller.getInstance();
-        cntrl.initBlockChain(db);
+        cntrl.initBlockChain(dcSet);
         bchain = cntrl.getBlockChain();
         gb = bchain.getGenesisBlock();
 
-        assetMap = db.getItemAssetMap();
-
-        // FEE FUND
-        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-
-        maker_1.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
+        assetMap = dcSet.getItemAssetMap();
 
     }
 
     @Test
     public void test1() {
 
-        init();
-
-        asset = new AssetVenture(maker, "aasdasd", icon, image, "asdasda", 1, 8, 50000l);
-        // set SCALABLE assets ++
-        asset.setReference(Crypto.getInstance().digest(asset.toBytes(false, false)));
-        asset.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM);
-        asset.insertToMap(db, 0l);
-        key = asset.getKey(db);
-
-
+        int START_KEY = 1000;
         boolean twice = false;
+        int size;
 
+        for (int dbs: TESTED_DBS) {
 
-        do {
-            long timeMillisBefore = System.currentTimeMillis();
-
-
-            int k = 0;
-            int step = 10;
-
-            // создадим в базе несколько записей
             do {
-                assetMovable = new AssetVenture(maker, "movable-" + key, icon, image, "...", 0, 8, 500l);
-                assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
-                key = assetMovable.insertToMap(db, 1000);
-            } while (k++ < 5);
 
-            db.flush(k, true, false);
-            logger.info("SIZE = " + assetMap.size());
+                init(dbs);
 
-            k = 0;
-            do {
-                int key = assetMap.size();
-                AssetCls item = (AssetCls)assetMap.remove(key);
-            } while(k++ < 1);
+                int k = 0;
+                int step = 3;
 
-            db.flush(k, true, false);
+                // создадим в базе несколько записей
+                do {
+                    assetMovable = new AssetVenture(maker, "movable-" + key, icon, image, "...", 0, 8, 500l);
+                    assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
+                    key = assetMovable.insertToMap(dcSet, START_KEY);
+                    size = assetMap.size();
+                    assertEquals(key, size);
+                } while (k++ < step);
 
-            db.close();
-            logger.info("End test " + (twice? "create DB" : "open DB"));
-            twice = !twice;
+                //dcSet.flush(k, true, false);
+                logger.info("SIZE = " + assetMap.size());
 
-        } while (twice);
+                k = 0;
+                do {
+                    key = assetMap.size();
+                    AssetCls item = (AssetCls) assetMap.remove(key);
+                } while (k++ < step);
+
+                dcSet.flush(k, true, false);
+
+                dcSet.close();
+                logger.info("End test " + (twice ? "create DB" : "open DB"));
+                twice = !twice;
+
+            } while (twice);
+        }
     }
 
     @Test
