@@ -8,11 +8,15 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
+import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
+import org.erachain.settings.Settings;
 import org.junit.Test;
+import org.mapdb.DB;
 import org.mapdb.Fun;
 
+import java.io.File;
 import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
@@ -23,7 +27,7 @@ public class IssueAssetTransactionTest {
 
     long FEE_KEY = AssetCls.FEE_KEY;
 
-    int[] TESTED_DBS = new int[]{1,2,3};
+    int[] TESTED_DBS = new int[]{IDB.DBS_MAP_DB, IDB.DBS_ROCK_DB, IDB.DBS_MAP_DB_IN_MEM};
     DCSet dcSet;
 
     Controller cntrl;
@@ -50,7 +54,12 @@ public class IssueAssetTransactionTest {
     // INIT ASSETS
     private void init(int dbs) {
 
-        dcSet = DCSet.createEmptyHardDatabaseSet(dbs);
+        File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
+        dbFile.getParentFile().mkdirs();
+
+        DB database = DCSet.makeFileDB(dbFile);
+
+        dcSet = DCSet.createEmptyHardDatabaseSet(database, dbs);
         cntrl = Controller.getInstance();
         cntrl.initBlockChain(dcSet);
         bchain = cntrl.getBlockChain();

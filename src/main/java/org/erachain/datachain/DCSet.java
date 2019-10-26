@@ -671,6 +671,11 @@ public class DCSet extends DBASet {
         return instance;
     }
 
+    public static DCSet createEmptyHardDatabaseSet(DB database, int defaultDBS) {
+        instance = new DCSet(null, database, false, false, true, defaultDBS);
+        return instance;
+    }
+
     public static DCSet createEmptyHardDatabaseSet(int defaultDBS) {
         instance = new DCSet(null, getHardBaseForFork(), false, false, true, defaultDBS);
         return instance;
