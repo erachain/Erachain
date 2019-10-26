@@ -31,26 +31,26 @@ public class DBRocksDBTableOptTransaction<K, V> extends DBRocksDBTable<K, V> imp
     public DBRocksDBTableOptTransaction(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE,
                                         List<IndexDB> indexes,
                                         DBRocksDBTableDBOptTransacted dbSoutceImpl, RocksDbSettings settings,
-                                        WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
+                                        WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet, boolean enableSize) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.readOptions = readOptions;
         this.dbSource = new RocksDbDataSourceOptTransaction(this.root, NAME_TABLE, indexes,
-                (OptimisticTransactionDB) dbSoutceImpl.dbSource, dbSoutceImpl.dbSource.getColumnFamilyHandles(), writeOptions, readOptions, enableSize);
+                (OptimisticTransactionDB) dbSoutceImpl.dbSource, dbSoutceImpl.dbSource.getColumnFamilyHandles(), writeOptions, readOptions, this.enableSize);
         //openSource();
         afterOpen();
     }
 
     public DBRocksDBTableOptTransaction(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                                        DBRocksDBTableDBOptTransacted dbSource, DBASet dbaSet) {
+                                        DBRocksDBTableDBOptTransacted dbSource, DBASet dbaSet, boolean enableSize) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, dbSource, RocksDbSettings.getDefaultSettings(),
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(), dbaSet);
+                new ReadOptions(), dbaSet, enableSize);
     }
 
-    public DBRocksDBTableOptTransaction(String NAME_TABLE, DBRocksDBTableDBOptTransacted dbSource) {
+    public DBRocksDBTableOptTransaction(String NAME_TABLE, DBRocksDBTableDBOptTransacted dbSource, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), dbSource, RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null);
+                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null, enableSize);
     }
 
     @Override

@@ -51,7 +51,7 @@ public class DBRocksDBTableTransactionSingleTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTable rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
+            DBRocksDBTable rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE, enableSize);
             logger.info("SIZE = " + rocksDB.size());
 
             int k = 0;
@@ -126,7 +126,7 @@ public class DBRocksDBTableTransactionSingleTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
+            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE, enableSize);
 
             int k = 0;
             int rollbacks = 0;
@@ -221,7 +221,7 @@ public class DBRocksDBTableTransactionSingleTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
+            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE, enableSize);
 
             int k = 0;
             int rollbacks = 0;

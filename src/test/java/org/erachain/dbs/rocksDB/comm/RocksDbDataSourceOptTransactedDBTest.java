@@ -135,7 +135,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE);
+        DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE, enableSize);
 
         long timeMillisBefore = System.currentTimeMillis();
         for (Map.Entry<byte[], byte[]> entry : data) {
@@ -179,7 +179,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
 
         // теперь в транзакцию будем закатывать
         DBRocksDBTableOptTransaction dbOptTrans = new DBRocksDBTableOptTransaction(NAME_TABLE,
-                (DBRocksDBTableDBOptTransacted) rocksDB);
+                (DBRocksDBTableDBOptTransacted) rocksDB, enableSize);
 
         countCommitTMP = 0;
         timeMillisBefore = System.currentTimeMillis();

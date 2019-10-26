@@ -39,7 +39,7 @@ public class RocksDBVsMapDB {
         logger.info("Start test RocksDB productivity simple close");
         String NAME_DATABASE = "TestRocksDB";
         long timeMillisBefore = System.currentTimeMillis();
-        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableDB(NAME_DATABASE);
+        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableDB(NAME_DATABASE, enableSize);
         for (Map.Entry<byte[], byte[]> entry : entrySet) {
             rocksDB.put(entry.getKey(), entry.getValue());
         }
@@ -55,7 +55,7 @@ public class RocksDBVsMapDB {
         logger.info("Start test RocksDB productivity simple");
         String NAME_DATABASE = "TestRocksDB";
         long timeMillisBefore = System.currentTimeMillis();
-        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableDB(NAME_DATABASE);
+        DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableDB(NAME_DATABASE, enableSize);
         for (Map.Entry<byte[], byte[]> entry : entrySet) {
             rocksDB.put(entry.getKey(), entry.getValue());
         }
@@ -88,7 +88,7 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_DATABASE, enableSize);
             int k = 0;
             int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {
@@ -139,7 +139,7 @@ public class RocksDBVsMapDB {
         boolean twice = false;
         do {
             long timeMillisBefore = System.currentTimeMillis();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_DATABASE, enableSize);
             int k = 0;
             int rollbacks = 0;
             for (Map.Entry<byte[], byte[]> entry : entrySet) {

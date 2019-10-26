@@ -31,28 +31,28 @@ public class DBRocksDBTableTransaction<K, V> extends DBRocksDBTable<K, V> implem
     public DBRocksDBTableTransaction(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE,
                                      List<IndexDB> indexes, DBRocksDBTableDBOptTransacted dbSoutceImpl,
                                      RocksDbSettings settings,
-                                     WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
+                                     WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet, boolean enableSize) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.readOptions = readOptions;
         dbSource = new RocksDbDataSourceTransaction(this.root, NAME_TABLE, indexes,
-                (TransactionDB) dbSoutceImpl.dbSource, dbSoutceImpl.dbSource.getColumnFamilyHandles(), writeOptions, readOptions, enableSize);
+                (TransactionDB) dbSoutceImpl.dbSource, dbSoutceImpl.dbSource.getColumnFamilyHandles(), writeOptions, readOptions, this.enableSize);
 
         //openSource();
         afterOpen();
     }
 
     public DBRocksDBTableTransaction(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                                     DBRocksDBTableDBOptTransacted dbSoutceImpl, DBASet dbaSet) {
+                                     DBRocksDBTableDBOptTransacted dbSoutceImpl, DBASet dbaSet, boolean enableSize) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes,
                 dbSoutceImpl, RocksDbSettings.getDefaultSettings(),
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(), dbaSet);
+                new ReadOptions(), dbaSet, enableSize);
     }
 
-    public DBRocksDBTableTransaction(String NAME_TABLE, DBRocksDBTableDBOptTransacted dbSoutceImpl) {
+    public DBRocksDBTableTransaction(String NAME_TABLE, DBRocksDBTableDBOptTransacted dbSoutceImpl, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), dbSoutceImpl, RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null);
+                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null, enableSize);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class DBRocksDBTableDB<K, V> extends DBRocksDBTable<K, V> {
         afterOpen();
     }
 
-    public DBRocksDBTableDB(String NAME_TABLE) {
+    public DBRocksDBTableDB(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
                 new WriteOptions().setSync(true).setDisableWAL(false), null, enableSize);

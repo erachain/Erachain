@@ -29,23 +29,23 @@ public class DBRocksDBTableTransactionSingle<K, V> extends DBRocksDBTable<K, V> 
 
     public DBRocksDBTableTransactionSingle(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE,
                                            List<IndexDB> indexes, RocksDbSettings settings,
-                                           WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
+                                           WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet, boolean enableSize) {
         super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.readOptions = readOptions;
         openSource();
         afterOpen();
     }
 
-    public DBRocksDBTableTransactionSingle(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
+    public DBRocksDBTableTransactionSingle(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet, boolean enableSize) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(), dbaSet);
+                new ReadOptions(), dbaSet, enableSize);
     }
 
-    public DBRocksDBTableTransactionSingle(String NAME_TABLE) {
+    public DBRocksDBTableTransactionSingle(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null);
+                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null, enableSize);
     }
 
     @Override

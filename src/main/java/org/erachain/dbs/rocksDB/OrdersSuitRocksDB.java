@@ -34,7 +34,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     SimpleIndexDB<Long, Order, Fun.Tuple5<String, Long, Long, BigDecimal, Long>> addressHaveWantKeyIndex;
 
     public OrdersSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, enableSize);
+        super(databaseSet, database, logger, true);
     }
 
     @Override

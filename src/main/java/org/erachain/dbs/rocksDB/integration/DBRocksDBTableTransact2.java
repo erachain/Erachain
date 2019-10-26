@@ -54,6 +54,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
     private Byteable byteableValue;
     private String NAME_TABLE;
     private RocksDbSettings settings;
+    protected boolean enableSize;
     private String root;
 
     //Для пересчета размеров таблицы
@@ -66,12 +67,14 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
      * @param indexes       is null - not use size Counter
      * @param settings
      * @param dbaSet
+     * @param enableSize
      */
-    public DBRocksDBTableTransact2(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, DBASet dbaSet) {
+    public DBRocksDBTableTransact2(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, RocksDbSettings settings, DBASet dbaSet, boolean enableSize) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.NAME_TABLE = NAME_TABLE;
         this.settings = settings;
+        this.enableSize = enableSize;
         this.root = (dbaSet == null // in TESTs
                 || dbaSet.getFile() == null ? // in Memory or in TESTs
                 Settings.getInstance().getDataDir()
@@ -89,18 +92,19 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         }
     }
 
-    public DBRocksDBTableTransact2(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
-        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet);
+    public DBRocksDBTableTransact2(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet, boolean enableSize) {
+        this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(), dbaSet, enableSize);
     }
 
     /**
      * for TESTs. new ArrayList<>() - size counter enable
      *
      * @param NAME_TABLE
+     * @param enableSize
      */
-    public DBRocksDBTableTransact2(String NAME_TABLE) {
+    public DBRocksDBTableTransact2(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
-                new ArrayList<>(), RocksDbSettings.getDefaultSettings(), null);
+                new ArrayList<>(), RocksDbSettings.getDefaultSettings(), null, enableSize);
     }
 
     @Override
@@ -307,6 +311,23 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         dbSource.delete(columnFamilyHandles.get(0), keyBytes);
     }
 
+    @Override
+    public void deleteValue(Object key) {
+        final byte[] keyBytes = byteableKey.toBytesObject(key);
+        byte[] old = dbSource.get(keyBytes);
+        if (old != null && old.length != 0) {
+            if (columnFamilyFieldSize != null) {
+                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+                size--;
+                dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
+            }
+            if (indexes != null && !indexes.isEmpty()) {
+                removeIndexes(key, keyBytes, old);
+            }
+        }
+        dbSource.delete(columnFamilyHandles.get(0), keyBytes);
+    }
 
     @Override
     public void clear() {

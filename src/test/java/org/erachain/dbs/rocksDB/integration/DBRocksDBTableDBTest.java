@@ -51,7 +51,7 @@ public class DBRocksDBTableDBTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTable rocksDB = new DBRocksDBTableDB(NAME_TABLE);
+            DBRocksDBTable rocksDB = new DBRocksDBTableDB(NAME_TABLE, enableSize);
 
             int k = 0;
 

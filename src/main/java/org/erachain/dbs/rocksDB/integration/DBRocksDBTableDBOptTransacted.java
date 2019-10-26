@@ -39,14 +39,14 @@ public class DBRocksDBTableDBOptTransacted<K, V> extends DBRocksDBTable<K, V> {
         afterOpen();
     }
 
-    public DBRocksDBTableDBOptTransacted(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
+    public DBRocksDBTableDBOptTransacted(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet, boolean enableSize) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
                 new TransactionDBOptions(),
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(), dbaSet, enableSize);
     }
 
-    public DBRocksDBTableDBOptTransacted(String NAME_TABLE) {
+    public DBRocksDBTableDBOptTransacted(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
                 new TransactionDBOptions(),

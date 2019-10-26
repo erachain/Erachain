@@ -43,7 +43,7 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
                             1, 256, 32, false),
                     new WriteOptions().setSync(true).setDisableWAL(false),
                     new ReadOptions(),
-                    databaseSet);
+                    databaseSet, enableSize);
         }
 
     }
