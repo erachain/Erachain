@@ -106,6 +106,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
 
+        // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
+
         if (map instanceof TransactionFinalSuit) {
             // если карта как NativeMapHashMapFork открыт то сюда не заходим
             Iterator<Long> iterator = ((TransactionFinalSuit) map).getBlockIterator(height);

@@ -610,7 +610,7 @@ public class BlockChain {
         //GET LAST BLOCK
         ///byte[] lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
         ///return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
-        return dcSet.getBlocksHeadsMap().size();
+        return dcSet.getBlockSignsMap().size();
     }
 
     public static int GENERATING_MIN_BLOCK_TIME(int height) {

@@ -92,8 +92,9 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * @param currentForgingValue
      * @return
      */
-    @Override
-    public boolean set(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
+    // TODO надо перенести логику эту наверх в BlockChain поидее
+    // иначе если бы set и put тут будут то они делают зацикливание
+    public boolean setAndProcess(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
 
         if (key.b == 0) {
             // это сохранение из writeToParent - там все значения сливаются из Форкнутой базы включая setLast с 0-м значением
@@ -133,8 +134,8 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
 
     }
 
-    public void put(String address, Integer currentHeight, Integer currentForgingVolume) {
-        this.set(new Tuple2<String, Integer>(address, currentHeight),
+    public void putAndProcess(String address, Integer currentHeight, Integer currentForgingVolume) {
+        this.setAndProcess(new Tuple2<String, Integer>(address, currentHeight),
                 new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
     }
 
@@ -146,8 +147,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * @param key
      * @return
      */
-    @Override
-    public Tuple2<Integer, Integer> remove(Tuple2<String, Integer> key) {
+    public Tuple2<Integer, Integer> removeAndProcess(Tuple2<String, Integer> key) {
 
         if (key.b < 3) {
             // not delete GENESIS forging data for all accounts
@@ -186,15 +186,14 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         return null;
     }
 
-    @Override
-    public void delete(Tuple2<String, Integer> key) {
+    public void deleteAndProcess(Tuple2<String, Integer> key) {
         // Код почти не изменится если там (void)DELETE вставить так как при удалении всегда предыдущее значение выбирается
-        this.remove(key);
+        this.removeAndProcess(key);
     }
 
-    public void delete(String address, int height) {
+    public void deleteAndProcess(String address, int height) {
         // Код почти не изменится если там (void)DELETE вставить так как при удалении всегда предыдущее значение выбирается
-        this.remove(new Tuple2<String, Integer>(address, height));
+        this.removeAndProcess(new Tuple2<String, Integer>(address, height));
     }
 
     /**

@@ -187,7 +187,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             ++error;
         }
 
-        dcSet.getBlocksHeadsMap().set(block.blockHead);
+        dcSet.getBlocksHeadsMap().setAndProcess(block.blockHead);
         this.setLastBlockSignature(signature);
 
         if (BlockChain.CHECK_BUGS > 5) {
@@ -217,7 +217,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         // ORPHAN FORGING DATA
         if (height > 1) {
 
-            dcSet.getBlocksHeadsMap().delete();
+            dcSet.getBlocksHeadsMap().deleteAndProcess();
 
             // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
             creator.delForgingData(dcSet, height);

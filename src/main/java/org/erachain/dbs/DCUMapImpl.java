@@ -346,6 +346,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
         /// -----> set(key, value);
         ///
+        if (true) {
+            set(key, value);
+            return;
+        }
 
         if (DCSet.isStoped()) {
             return;
