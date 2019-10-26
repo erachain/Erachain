@@ -40,7 +40,7 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
                 // .comparator(UnsignedBytes.lexicographicalComparator()) // for byte[] KEYS
                 // or from MapDB .comparator(Fun.BYTE_ARRAY_COMPARATOR)
 
-                .counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
+                .counterEnable() // used for count blocks in Chain
                 .makeOrGet();
     }
 
@@ -52,6 +52,17 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
     @Override
     protected Integer getDefaultValue() {
         return null;
+    }
+
+    public Block getBlock(byte[] signature) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        Integer value = this.get(key);
+        if (value == null)
+            return null;
+
+        return ((DCSet)this.databaseSet).getBlockMap().getAndProcess(value);
+
     }
 
     public boolean contains(byte[] signature) {
@@ -73,27 +84,29 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
         return this.get(key);
     }
 
+    public Integer remove(byte[] signature) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        return this.remove(key);
+    }
+
     public void delete(byte[] signature) {
         Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
                 signature[4], signature[5], signature[6], signature[7]);
         this.delete(key);
     }
 
-    public Block getBlock(byte[] signature) {
-        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
-                signature[4], signature[5], signature[6], signature[7]);
-        Integer value = this.get(key);
-        if (value == null)
-            return null;
-
-        return ((DCSet)this.databaseSet).getBlockMap().get(value);
-
-    }
-
     public boolean set(byte[] signature, Integer height) {
         Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
                 signature[4], signature[5], signature[6], signature[7]);
         return this.set(key, height);
+
+    }
+
+    public void put(byte[] signature, Integer height) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        this.put(key, height);
 
     }
 

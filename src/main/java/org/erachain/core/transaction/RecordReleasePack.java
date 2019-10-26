@@ -239,7 +239,7 @@ public class RecordReleasePack extends Transaction {
             int result = 0;
             //CHECK PAYMENTS
 
-            Block block = this.dcSet.getBlockMap().get(this.height);
+            Block block = this.dcSet.getBlockMap().getAndProcess(this.height);
             for (Transaction transaction : this.transactions) {
 
                 result = transaction.isValid(asDeal, flags);

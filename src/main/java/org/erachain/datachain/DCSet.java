@@ -310,7 +310,8 @@ public class DCSet extends DBASet {
             throw e;
         }
 
-        if (this.blockMap.size() != this.blocksHeadsMap.size()
+        if (false // теперь отклучаем счетчики для усклрения работы - отсвили только в Подписи
+                &&this.blockMap.size() != this.blocksHeadsMap.size()
                 || this.blockSignsMap.size() != this.blocksHeadsMap.size()) {
             LOGGER.info("reset DATACHAIN on height error (blockMap, blockSignsMap, blocksHeadsMap: "
                     + this.blockMap.size() + " != "

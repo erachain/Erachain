@@ -52,7 +52,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         map = database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockHeadSerializer())
-                .counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
+                /// in Signs ///.counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
                 .makeOrGet();
     }
 
@@ -79,6 +79,11 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         return null;
     }
 
+    @Override
+    public int size() {
+        return ((DCSet) databaseSet).getBlockSignsMap().size();
+    }
+
     public Long getFullWeight() {
         return this.fullWeight;
     }
@@ -102,19 +107,10 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
 
     }
 
-    public boolean setAndProcess(int height, Block.BlockHead item) {
-
-        //int key = this.size() + 1;
-        if (height == 86549 || item.heightBlock <= 0) {
-            int ttt = 1;
-        }
+    public void putAndProcess(int height, Block.BlockHead item) {
 
         // get Win Value of block
         long weight = item.winValue;
-
-        //if (startedInForkHeight == 0 && this.parent != null) {
-        //    startedInForkHeight = height;
-        //}
 
         fullWeight += weight;
 
@@ -123,26 +119,9 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         }
 
         // INSERT WITH NEW KEY
-        return super.set(height, item);
+        put(height, item);
 
     }
-
-    public boolean setAndProcess(Block.BlockHead item) {
-        return this.setAndProcess(item.heightBlock, item);
-    }
-
-    /*
-    public int add(Block.BlockHead item) {
-
-        int key = this.size() + 1;
-
-        // INSERT WITH NEW KEY
-        this.set(key, item);
-
-        // RETURN KEY
-        return key;
-    }
-    */
 
     public Block.BlockHead last() {
         return this.get(this.size());
@@ -159,7 +138,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
             if (this.fullWeightVar != null) {
                 this.fullWeightVar.set(fullWeight);
             }
-            super.delete(key);
+            delete(key);
         }
 
     }

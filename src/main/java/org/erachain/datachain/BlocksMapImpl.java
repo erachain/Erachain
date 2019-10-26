@@ -30,8 +30,6 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * ключ: номер блока (высота, height)<br>
  * занчение: Блок<br>
  * <p>
- * Есть вторичный индекс, для отчетов (blockexplorer) - generatorMap
- * TODO - убрать длинный индек и вставить INT
  *
  * @return
  */
@@ -84,10 +82,14 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         }
     }
 
+    @Override
+    public int size() {
+        return ((DCSet) databaseSet).getBlockSignsMap().size();
+    }
 
     @Override
     public Block last() {
-        return get(size());
+        return getAndProcess(size());
     }
 
     @Override
@@ -100,9 +102,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
     @Override
     public void resetLastBlockSignature() {
-
         // TODO: еще вопрос про org.erachain.datachain.BlocksHeadsMap.getFullWeight
-
         lastBlockSignature = ((DCSet) databaseSet).getBlocksHeadsMap().get(this.size()).signature;
     }
 
@@ -130,16 +130,9 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         this.processing = processing;
     }
 
-    @Override
-    public Block getWithMind(int height) {
-        return get(height);
-
-    }
-
     protected long cacheClearedTime;
-    @Override
-    public Block get(Integer height) {
-        Block block = super.get(height);
+    public Block getAndProcess(Integer height) {
+        Block block = get(height);
         if (block == null)
             return null;
 
@@ -164,15 +157,26 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     }
 
     @Override
-    public void put(Block block) {
+    public void putAndProcess(Block block) {
         DCSet dcSet = (DCSet) databaseSet;
         byte[] signature = block.getSignature();
+        int height = block.getHeight();
+        if (height < 1) {
+            Long error = null;
+            ++error;
+        }
+
         if (dcSet.getBlockSignsMap().contains(signature)) {
-            logger.error("already EXIST : " + this.size()
+            logger.error("already EXIST : " + height
                     + " SIGN: " + Base58.encode(signature));
             return;
         }
-        int height = block.getHeight();
+
+        dcSet.getBlockSignsMap().put(signature, height);
+        if (dcSet.getBlockSignsMap().size() != height) {
+            Long error = null;
+            ++error;
+        }
 
         PublicKeyAccount creator = block.getCreator();
         if (BlockChain.ERA_COMPU_ALL_UP && creator.getLastForgingData(dcSet) == null) {
@@ -181,13 +185,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         }
         creator.setForgingData(dcSet, height, block.getForgingValue());
 
-        dcSet.getBlockSignsMap().set(signature, height);
-        if (height < 1) {
-            Long error = null;
-            ++error;
-        }
-
-        dcSet.getBlocksHeadsMap().setAndProcess(block.blockHead);
+        dcSet.getBlocksHeadsMap().putAndProcess(height, block.blockHead);
         this.setLastBlockSignature(signature);
 
         if (BlockChain.CHECK_BUGS > 5) {
@@ -200,13 +198,13 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             }
         }
 
-        super.put(height, block);
+        put(height, block);
 
     }
 
     // TODO make CHAIN deletes - only for LAST block!
     @Override
-    public void delete(byte[] signature, byte[] reference, PublicKeyAccount creator) {
+    public void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator) {
         DCSet dcSet = (DCSet) databaseSet;
 
         int height = this.size();
@@ -233,7 +231,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             }
         }
 
-        super.delete(height);
+        delete(height);
 
     }
 

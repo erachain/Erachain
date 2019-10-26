@@ -395,7 +395,7 @@ public class APITransactionsResource {
     public Response getByBlock(@QueryParam("block") int blockNo) {
         JSONObject ff = new JSONObject();
 
-        Block block = DCSet.getInstance().getBlockMap().get(blockNo);
+        Block block = DCSet.getInstance().getBlockMap().getAndProcess(blockNo);
         if (block == null) {
             ff.put("error", "block not found");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")

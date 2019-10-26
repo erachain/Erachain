@@ -3338,7 +3338,7 @@ public class Controller extends Observable {
     }
 
     public Block getBlockByHeight(DCSet db, int parseInt) {
-        return db.getBlockMap().getWithMind(parseInt);
+        return db.getBlockMap().getAndProcess(parseInt);
     }
 
     public Block getBlockByHeight(int parseInt) {

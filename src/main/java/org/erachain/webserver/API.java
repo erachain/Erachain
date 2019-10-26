@@ -242,7 +242,7 @@ public class API {
             ++step;
             Integer heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
             if (heightWT != null && heightWT > 0) {
-                out = dcSet.getBlockMap().get(heightWT + 1).toJson();
+                out = dcSet.getBlockMap().getAndProcess(heightWT + 1).toJson();
             } else {
                 out.put("message", "signature not found");
             }

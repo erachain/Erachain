@@ -20,13 +20,11 @@ public interface BlockMap extends DBTab<Integer, Block> {
 
     void setProcessing(boolean processing);
 
-    Block getWithMind(int height);
+    Block getAndProcess(Integer height);
 
-    Block get(Integer height);
+    void putAndProcess(Block block);
 
-    void put(Block block);
-
-    void delete(byte[] signature, byte[] reference, PublicKeyAccount creator);
+    void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator);
 
     void notifyResetChain();
 

@@ -500,7 +500,7 @@ public class GeneratorTests {
 
 
             //GENERATE NEXT BLOCK
-            Block block = dcSet.getBlockMap().get(i_height);
+            Block block = dcSet.getBlockMap().getAndProcess(i_height);
             if (block == null) {
                 i_break++;
             }

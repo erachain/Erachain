@@ -793,7 +793,7 @@ import java.util.*;
         try {
             int parentHeight = dcSet.getBlockSignsMap().get(this.reference);
             //assert (parentHeight, this.heightBlock - 1);
-            return dcSet.getBlockMap().get(parentHeight);
+            return dcSet.getBlockMap().getAndProcess(parentHeight);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             return null;
@@ -838,7 +838,7 @@ import java.util.*;
     }
 
     public Block getChild(DCSet db) {
-        return db.getBlockMap().get(this.getHeight() + 1);
+        return db.getBlockMap().getAndProcess(this.getHeight() + 1);
     }
 
     public int compareWin(Block block) {
@@ -1875,7 +1875,7 @@ import java.util.*;
             }
 
             timerStart = System.nanoTime();
-            dcSetPlace.getBlockMap().put(this);
+            dcSetPlace.getBlockMap().putAndProcess(this);
             timerStart = System.nanoTime() - timerStart;
             if (timerStart < 999999999999l)
                 LOGGER.debug("BlockMap add timer [us]: " + timerStart / 1000 + " [" + this.heightBlock + "]");
@@ -2242,7 +2242,7 @@ import java.util.*;
         LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         timerStart = System.currentTimeMillis();
-        dcSet.getBlockMap().put(this);
+        dcSet.getBlockMap().putAndProcess(this);
         LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         long tickets = System.currentTimeMillis() - start;
@@ -2310,7 +2310,7 @@ import java.util.*;
         }
 
         //DELETE BLOCK FROM DB
-        dcSet.getBlockMap().delete(this.signature, this.reference, this.creator);
+        dcSet.getBlockMap().deleteAndProcess(this.signature, this.reference, this.creator);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #4");
 

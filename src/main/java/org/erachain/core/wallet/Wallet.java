@@ -792,7 +792,7 @@ public class Wallet extends Observable implements Observer {
         if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
             LOGGER.info("TEST CHAIN .... ");
             for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
-                Block block = dcSet.getBlockMap().get(i);
+                Block block = dcSet.getBlockMap().getAndProcess(i);
                 if (block.getHeight() != i) {
                     Long error = null;
                     ++error;
@@ -817,7 +817,7 @@ public class Wallet extends Observable implements Observer {
                         Long error = null;
                         ++error;
                     }
-                    parent = dcSet.getBlockMap().get(i - 1);
+                    parent = dcSet.getBlockMap().getAndProcess(i - 1);
                     if (!Arrays.equals(parent.getSignature(), reference)) {
                         Long error = null;
                         ++error;

@@ -591,7 +591,7 @@ public class BlockChain {
         } else {
 
             // TRY compare GENESIS BLOCK SIGNATURE
-            if (!Arrays.equals(dcSet.getBlockMap().get(1).getSignature(),
+            if (!Arrays.equals(dcSet.getBlockMap().getAndProcess(1).getSignature(),
                     genesisBlock.getSignature())) {
 
                 throw new Exception("wrong DB for GENESIS BLOCK");
@@ -1121,7 +1121,7 @@ public class BlockChain {
 
     public Block getBlock(DCSet dcSet, int height) {
 
-        return dcSet.getBlockMap().get(height);
+        return dcSet.getBlockMap().getAndProcess(height);
     }
 
     /**
