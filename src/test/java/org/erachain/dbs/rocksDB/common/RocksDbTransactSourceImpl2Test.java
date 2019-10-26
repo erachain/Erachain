@@ -51,7 +51,7 @@ public class RocksDbTransactSourceImpl2Test {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE, enableSize);
+            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE, true);
 
             int k = 0;
             int rollbacks = 0;
@@ -146,7 +146,7 @@ public class RocksDbTransactSourceImpl2Test {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableTransact2<byte[], byte[]> rocksDB = new DBRocksDBTableTransact2(NAME_TABLE, enableSize);
+            DBRocksDBTableTransact2<byte[], byte[]> rocksDB = new DBRocksDBTableTransact2(NAME_TABLE, true);
 
             int k = 0;
             int rollbacks = 0;

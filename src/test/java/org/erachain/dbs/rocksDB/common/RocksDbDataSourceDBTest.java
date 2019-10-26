@@ -50,7 +50,7 @@ public class RocksDbDataSourceDBTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            RocksDbDataSourceDB rocksDB = new RocksDbDataSourceDB(NAME_TABLE, indexes, dbSettings, enableSize);
+            RocksDbDataSourceDB rocksDB = new RocksDbDataSourceDB(NAME_TABLE, indexes, dbSettings, true);
 
             int k = 0;
 
