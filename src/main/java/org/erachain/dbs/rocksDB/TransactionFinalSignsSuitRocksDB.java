@@ -17,7 +17,7 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
     private final String NAME_TABLE = "TRANSACTION_FINAL_SIGNS_TABLE";
 
     public TransactionFinalSignsSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, enableSize);
     }
 
     @Override

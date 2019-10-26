@@ -317,7 +317,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         }
     }
 
-    // TODO переделать на REMOVE так как тут берется Значение
+    // TODO переделать на REMOVE так как тут берется Значение - сделаь еще REMOVE тдельно
     @Override
     public void delete(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);

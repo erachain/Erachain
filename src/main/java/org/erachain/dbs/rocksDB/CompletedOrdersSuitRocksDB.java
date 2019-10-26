@@ -17,7 +17,7 @@ public class CompletedOrdersSuitRocksDB extends DBMapSuit<Long, Order> {
     private final String NAME_TABLE = "COMPLETED_ORDERS_TABLE";
 
     public CompletedOrdersSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, false);
     }
 
     @Override

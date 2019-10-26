@@ -53,7 +53,7 @@ public class DBRocksDBTableDBCommitedAsBath<K, V> extends DBRocksDBTable<K, V>
 
     @Override
     public void openSource() {
-        dbSource = new RocksDbDataSourceDBCommitAsBath(this.root, NAME_TABLE, indexes, settings, writeOptions, readOptions);
+        dbSource = new RocksDbDataSourceDBCommitAsBath(this.root, NAME_TABLE, indexes, settings, writeOptions, readOptions, enableSize);
 
     }
 

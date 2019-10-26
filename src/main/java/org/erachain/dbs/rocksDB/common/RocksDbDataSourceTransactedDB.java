@@ -21,7 +21,7 @@ public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceImpl {
     public RocksDbDataSourceTransactedDB(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
                                          TransactionDBOptions transactionDbOptions,
                                          WriteOptions writeOptions) {
-        super(pathName, name, indexes, settings, writeOptions);
+        super(pathName, name, indexes, settings, writeOptions, enableSize);
 
         this.transactionDbOptions = transactionDbOptions;
 

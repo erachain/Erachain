@@ -35,18 +35,18 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
     protected WriteBatchWithIndex writeBatch;
 
     public RocksDbDataSourceDBCommitAsBathDelPuts(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
-                                                  WriteOptions writeOptions, ReadOptions readOptions) {
-        super(pathName, name, indexes, settings, writeOptions);
+                                                  WriteOptions writeOptions, ReadOptions readOptions, boolean enableSize) {
+        super(pathName, name, indexes, settings, writeOptions, enableSize);
         this.readOptions = readOptions;
 
         // Создаем или открываем ДБ
         initDB();
     }
 
-    public RocksDbDataSourceDBCommitAsBathDelPuts(String name, List<IndexDB> indexes, RocksDbSettings settings) {
+    public RocksDbDataSourceDBCommitAsBathDelPuts(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings,
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions());
+                new ReadOptions(), enableSize);
     }
 
     @Override

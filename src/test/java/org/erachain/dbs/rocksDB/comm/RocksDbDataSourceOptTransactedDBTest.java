@@ -60,7 +60,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            RocksDbDataSourceOptTransactedDB rocksDB = new RocksDbDataSourceOptTransactedDB(NAME_TABLE);
+            RocksDbDataSourceOptTransactedDB rocksDB = new RocksDbDataSourceOptTransactedDB(NAME_TABLE, enableSize);
             rocksDB.beginTransaction();
 
             int k = 0;

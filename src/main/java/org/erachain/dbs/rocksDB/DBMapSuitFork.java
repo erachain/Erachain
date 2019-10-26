@@ -31,13 +31,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue, boolean enableSize) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
         this.logger = logger;
         this.defaultValue = defaultValue;
+        this.enableSize = enableSize;
 
         this.parent = parent;
 

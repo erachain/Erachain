@@ -17,7 +17,7 @@ public class ReferenceSuitRocksDB extends DBMapSuit<byte[], long[]> implements R
     private final String NAME_TABLE = "REFERENCE_TABLE";
 
     public ReferenceSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, enableSize);
     }
 
     @Override

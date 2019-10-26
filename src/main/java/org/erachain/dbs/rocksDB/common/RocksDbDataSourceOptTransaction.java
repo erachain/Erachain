@@ -25,7 +25,7 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
     public RocksDbDataSourceOptTransaction(String pathName, String name, List<IndexDB> indexes,
                                            OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles,
                                            WriteOptions writeOptions, ReadOptions readOptions) {
-        super(pathName, name, indexes, null);
+        super(pathName, name, indexes, null, enableSize);
         this.alive = true;
         this.dbCore = dbCore;
         this.columnFamilyHandles = columnFamilyHandles;

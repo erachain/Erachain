@@ -43,6 +43,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     //protected boolean dbSync = true;
 
     public WriteOptions writeOptions;
+    protected boolean enableSize;
 
     /**
      * Base RocksDB
@@ -66,30 +67,32 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     public RocksDbDataSourceImpl(RocksDB dbCore,
                                  String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
-                                 WriteOptions writeOptions) {
+                                 WriteOptions writeOptions, boolean enableSize) {
         this.dataBaseName = name;
         this.pathName = pathName;
         this.indexes = indexes;
         this.settings = settings;
         this.writeOptions = writeOptions;
+        this.enableSize = enableSize;
         this.dbCore = dbCore;
     }
 
     public RocksDbDataSourceImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
-                                 WriteOptions writeOptions) {
+                                 WriteOptions writeOptions, boolean enableSize) {
         this.dataBaseName = name;
         this.pathName = pathName;
         this.indexes = indexes;
         this.settings = settings;
         this.writeOptions = writeOptions;
+        this.enableSize = enableSize;
     }
 
-    public RocksDbDataSourceImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
-        this(pathName, name, indexes, settings, new WriteOptions().setSync(true).setDisableWAL(false));
+    public RocksDbDataSourceImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
+        this(pathName, name, indexes, settings, new WriteOptions().setSync(true).setDisableWAL(false), enableSize);
     }
 
-    public RocksDbDataSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
+    public RocksDbDataSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
+        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
     }
 
     abstract protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException;
@@ -542,6 +545,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             resetDbLock.readLock().unlock();
         }
     }
+
     @Override
     public void deleteValue(byte[] key) {
         if (quitIfNotAlive()) {
@@ -573,7 +577,37 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public void deleteValue(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.delete(columnFamilyHandle, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public void delete(byte[] key, WriteOptions writeOptions) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.delete(writeOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void deleteValue(byte[] key, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
         }

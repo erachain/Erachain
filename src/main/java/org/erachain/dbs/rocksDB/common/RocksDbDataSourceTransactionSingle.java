@@ -22,7 +22,7 @@ public class RocksDbDataSourceTransactionSingle extends RocksDbDataSourceImpl im
 
     public RocksDbDataSourceTransactionSingle(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
                                               WriteOptions writeOptions, ReadOptions readOptions) {
-        super(pathName, name, indexes, settings, writeOptions);
+        super(pathName, name, indexes, settings, writeOptions, enableSize);
         // Создаем или открываем ДБ
         initDB();
 
