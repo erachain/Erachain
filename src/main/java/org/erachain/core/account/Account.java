@@ -560,8 +560,8 @@ public class Account {
         if (key < 0)
             key = -key;
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getShortAddressBytes(), key);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                balance = db.getAssetBalanceMap().get(getShortAddressBytes(), key);
         if (BlockChain.ERA_COMPU_ALL_UP) {
             return balanceAddDEVAmount(key, balance);
         }
