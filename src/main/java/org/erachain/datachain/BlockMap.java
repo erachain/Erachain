@@ -24,7 +24,7 @@ public interface BlockMap extends DBTab<Integer, Block> {
 
     void putAndProcess(Block block);
 
-    void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator);
+    void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator, int height);
 
     void notifyResetChain();
 

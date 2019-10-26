@@ -204,23 +204,22 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
     // TODO make CHAIN deletes - only for LAST block!
     @Override
-    public void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator) {
+    public void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator, int height) {
+
+        if (height < 2)
+            return;
+
         DCSet dcSet = (DCSet) databaseSet;
 
-        int height = this.size();
-
-        this.setLastBlockSignature(reference);
         dcSet.getBlockSignsMap().delete(signature);
 
+        this.setLastBlockSignature(reference);
+
         // ORPHAN FORGING DATA
-        if (height > 1) {
+        dcSet.getBlocksHeadsMap().deleteAndProcess(height);
 
-            dcSet.getBlocksHeadsMap().deleteAndProcess();
-
-            // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
-            creator.delForgingData(dcSet, height);
-
-        }
+        // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
+        creator.delForgingData(dcSet, height);
 
         if (BlockChain.CHECK_BUGS > 5) {
             Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
@@ -233,6 +232,10 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         delete(height);
 
+    }
+
+    public void deleteAndProcess(Block block) {
+        deleteAndProcess(block.getSignature(), block.getReference(), block.getCreator(), block.heightBlock);
     }
 
     @Override

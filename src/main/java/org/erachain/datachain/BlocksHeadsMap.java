@@ -127,9 +127,8 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         return this.get(this.size());
     }
 
-    public void deleteAndProcess() {
+    public void deleteAndProcess(Integer key) {
 
-        int key = this.size();
         if (this.contains(key)) {
             // sub old value from FULL
             Block.BlockHead value_old = this.get(key);

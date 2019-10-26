@@ -2261,8 +2261,8 @@ import java.util.*;
             throw new Exception("on stoping");
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #0");
-        if (this.heightBlock == 1) {
-            // GENESIS BLOCK cannot be orphanED
+        if (this.heightBlock < 2) {
+            // GENESIS BLOCK cannot be orphaned
             return;
         }
 
@@ -2276,9 +2276,6 @@ import java.util.*;
         }
 
         long start = System.currentTimeMillis();
-
-        // RESET forginf Info Updates
-        this.forgingInfoUpdate = null;
 
         //ORPHAN TRANSACTIONS
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
@@ -2309,8 +2306,11 @@ import java.util.*;
             }
         }
 
+        // RESET forging Info Updates
+        this.forgingInfoUpdate = null;
+
         //DELETE BLOCK FROM DB
-        dcSet.getBlockMap().deleteAndProcess(this.signature, this.reference, this.creator);
+        dcSet.getBlockMap().deleteAndProcess(this.signature, this.reference, this.creator, this.heightBlock);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #4");
 
