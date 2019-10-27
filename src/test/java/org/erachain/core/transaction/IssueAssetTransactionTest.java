@@ -11,12 +11,9 @@ import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
-import org.erachain.settings.Settings;
 import org.junit.Test;
-import org.mapdb.DB;
 import org.mapdb.Fun;
 
-import java.io.File;
 import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
@@ -54,12 +51,7 @@ public class IssueAssetTransactionTest {
     // INIT ASSETS
     private void init(int dbs) {
 
-        File dbFile = new File(Settings.getInstance().getDataDir(), "chain.dat");
-        dbFile.getParentFile().mkdirs();
-
-        DB database = DCSet.makeFileDB(dbFile);
-
-        dcSet = DCSet.createEmptyHardDatabaseSet(database, dbs);
+        dcSet = DCSet.createEmptyHardDatabaseSet(dbs);
         cntrl = Controller.getInstance();
         cntrl.initBlockChain(dcSet);
         bchain = cntrl.getBlockChain();
@@ -76,40 +68,104 @@ public class IssueAssetTransactionTest {
         boolean twice = false;
         int size;
 
+        int[] TESTED_DBS = new int[]{IDB.DBS_MAP_DB};
         for (int dbs: TESTED_DBS) {
 
+            init(dbs);
+
+            int k = 0;
+            int step = 2;
+            int nonce = 0;
+
+            // создадим в базе несколько записей
             do {
+                assetMovable = new AssetVenture(maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
+                key = assetMovable.insertToMap(dcSet, START_KEY);
+                size = assetMap.size();
+                assertEquals(key, size);
+                assertEquals(key, START_KEY + k + 1);
+            } while (++k < step);
 
-                init(dbs);
+            /// удаляет файл dcSet.flush(k, true, false);
+            dcSet.database.commit();
+            logger.info("SIZE = " + assetMap.size());
 
-                int k = 0;
-                int step = 3;
+            k = 0;
+            do {
+                key = assetMap.size();
+                AssetCls item = (AssetCls) assetMap.remove(key);
+            } while (++k < step >> 1);
 
-                // создадим в базе несколько записей
-                do {
-                    assetMovable = new AssetVenture(maker, "movable-" + key, icon, image, "...", 0, 8, 500l);
-                    assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
-                    key = assetMovable.insertToMap(dcSet, START_KEY);
-                    size = assetMap.size();
-                    assertEquals(key, size);
-                } while (k++ < step);
+            k = 0;
+            do {
+                assetMovable = new AssetVenture(maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
+                key = assetMovable.insertToMap(dcSet, START_KEY);
+                size = assetMap.size();
+                assertEquals(key, size);
+                assertEquals(key, START_KEY + (step >> 1) + k + 1);
+            } while (++k < step);
 
-                //dcSet.flush(k, true, false);
-                logger.info("SIZE = " + assetMap.size());
+            ///////////////// FORK
+            ///DB database = DCSet.makeDBinMemory();
+            DCSet forkDC = dcSet.fork(DCSet.getHardBaseForFork());
+            ItemAssetMap assetMapForked = forkDC.getItemAssetMap();
 
+            int key_base = START_KEY + step - (step >> 1) + step;
+
+            step = 2;
+
+            k = 0;
+            // создадим в базе несколько записей
+            do {
+                assetMovable = new AssetVenture(maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
+                key = assetMovable.insertToMap(forkDC, START_KEY);
+                size = assetMapForked.size();
+                assertEquals(key, size);
+                assertEquals(key, key_base + k + 1);
+            } while (++k < step);
+
+            logger.info("SIZE = " + assetMapForked.size());
+
+            k = 0;
+            do {
+                key = assetMapForked.size();
+                AssetCls item = (AssetCls) assetMapForked.remove(key);
+            } while (++k < step >> 1);
+
+            if (false) {
                 k = 0;
                 do {
-                    key = assetMap.size();
-                    AssetCls item = (AssetCls) assetMap.remove(key);
-                } while (k++ < step);
+                    assetMovable = new AssetVenture(maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                    assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
+                    key = assetMovable.insertToMap(forkDC, START_KEY);
+                    size = assetMapForked.size();
+                    assertEquals(key, size);
+                    assertEquals(key, key_base + (step >> 1) + k + 1);
+                } while (++k < step);
+            }
 
-                dcSet.flush(k, true, false);
+            //////////////////////// UPDATE
+            assertEquals(assetMap.size() < assetMapForked.size(), true);
+            forkDC.writeToParent();
+            assertEquals(assetMap.size(), assetMapForked.size());
 
-                dcSet.close();
-                logger.info("End test " + (twice ? "create DB" : "open DB"));
-                twice = !twice;
+            int updatedSize = key_base + step- (step >> 1);
+            assertEquals(assetMap.size(), updatedSize);
 
-            } while (twice);
+            k = 0;
+            // создадим в базе несколько записей
+            do {
+                assetMovable = new AssetVenture(maker, "movable-" + nonce++, icon, image, "...", 0, 8, 500l);
+                assetMovable.setReference(Crypto.getInstance().digest(assetMovable.toBytes(false, false)));
+                key = assetMovable.insertToMap(dcSet, START_KEY);
+                size = assetMap.size();
+                assertEquals(key, size);
+                assertEquals(key, updatedSize + k + 1);
+            } while (++k < step);
+
         }
     }
 
