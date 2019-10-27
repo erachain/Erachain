@@ -5,10 +5,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.BlockMap;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ReferenceMapImpl;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.*;
 import org.erachain.dbs.DBTab;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
@@ -112,7 +109,7 @@ public class Synchronizer extends Thread {
         return fromPeer;
     }
 
-    private void checkNewBlocks(Tuple2<Integer, Long> myHW, DCSet fork, Block lastCommonBlock, int checkPointHeight,
+    private ConcurrentHashMap<Long, Transaction> checkNewBlocks(Tuple2<Integer, Long> myHW, DCSet fork, Block lastCommonBlock, int checkPointHeight,
                                 List<Block> newBlocks, Peer peer) throws Exception {
 
         LOGGER.debug("*** core.Synchronizer.checkNewBlocks - START");
@@ -120,7 +117,7 @@ public class Synchronizer extends Thread {
         Controller cnt = Controller.getInstance();
         BlockMap blockMap = fork.getBlockMap();
 
-        // ORPHAN BLOCK IN FORK TO VALIDATE THE NEW BLOCKS
+        // ORPHAN MY BLOCKS IN FORK TO VALIDATE THE NEW BLOCKS
 
         // GET LAST BLOCK
         Block lastBlock = blockMap.last();
@@ -131,7 +128,12 @@ public class Synchronizer extends Thread {
                 + lastBlock.getHeight() + " in ForkDB: " + lastBlock.getHeight()
                 + "\n for last CommonBlock = " + lastCommonBlock.getHeight());
 
-        int countTransactionToOrphan = 0;
+        int countOrphanedTransactions = 0;
+        /**
+         * Ключ по Номер блока и порядка в нем
+         */
+        ConcurrentHashMap<Long, Transaction> orphanedTransactions = new ConcurrentHashMap<Long, Transaction>();
+
         // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in FORK DB
         // ============ by EQUAL SIGNATURE !!!!!
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
@@ -168,8 +170,16 @@ public class Synchronizer extends Thread {
                 assert (sss == hhh);
             }
 
-            // тут нам не нужно сохранять откаченные транзакции - так как это форкнутая проверка
+            if (++countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
+                // сохраним откаченные транзакции - может их потом включим в очередь
+                for (Transaction transaction: lastBlock.getTransactions()) {
+                    orphanedTransactions.put(transaction.getDBRef(), transaction);
+                }
+                countOrphanedTransactions += lastBlock.getTransactionCount();
+            }
+
             lastBlock.orphan(fork, true);
+
             DCSet.getInstance().clearCache();
 
             if (BlockChain.CHECK_BUGS > 5) {
@@ -186,28 +196,17 @@ public class Synchronizer extends Thread {
             LOGGER.debug("*** checkNewBlocks - orphaned! chain size: " + fork.getBlockMap().size());
             lastBlock = blockMap.last();
 
-            //fork.getTransactionMap().clearByDeadTimeAndLimit(
-            //        cnt.getBlockChain().getTimestamp(height), false);
-
-            // проверим на переполнение откаченных трнзакций
-            ////////countTransactionToOrphan += lastBlock.getTransactionCount();
-            if (countTransactionToOrphan > MAX_ORPHAN_TRANSACTIONS) {
-                String mess = "Dishonest peer by on lastCommonBlock[" + lastCommonBlock.getHeight()
-                        + "] - reached MAX_ORPHAN_TRANSACTIONS: " + MAX_ORPHAN_TRANSACTIONS;
-                peer.ban(mess);
-                throw new Exception(mess);
-            }
-
         }
 
         LOGGER.debug("*** checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
 
         // VALIDATE THE NEW BLOCKS
+
+        //////// здесь надо обновить для валидании ссылки счетов на поледние трнзакции за последние Х блоков\
         if (BlockChain.NOT_STORE_REFFS_HISTORY || BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0) {
             // TODO тут нужно обновить за последние 3-10 блоков значения в
             ReferenceMapImpl map = fork.getReferenceMap();
 
-            return;
         }
 
         // Height & Weight
@@ -313,14 +312,72 @@ public class Synchronizer extends Thread {
                     throw new Exception(mess);
                 }
             }
+
+            ///тут ключ по старому значению - просто так не получится найти orphanedTransactions.remove();
         }
 
         LOGGER.debug("*** END");
+        return orphanedTransactions;
 
     }
 
     // process new BLOCKS to DB and orphan DB
-    public List<Transaction> synchronize_blocks(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
+    public void synchronizeNewBlocks(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
+                                     List<Block> newBlocks, Peer peer) throws Exception {
+        Controller cnt = Controller.getInstance();
+
+        Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
+
+        /**
+         * если в конце взведено - значит в момент слива какие-то таблицы не залились
+         */
+        boolean broken = false;
+
+        DCSet fork;
+        // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
+        DB database = DCSet.getHardBaseForFork();
+        fork = dcSet.fork(database);
+        try {
+
+            ConcurrentHashMap<Long, Transaction> orphanedTransactions
+                    = checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
+
+            // сюда может прити только если проверка прошла успешно
+
+            // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
+            // если проверка прошла успешно то значит Форк базы готов для слива в оснонвую
+            // И без пересчета заново сделаем слив
+            // Но сначала откаченные транзакции сохраним
+            // соберем транзакции с блоков которые будут откачены в нашей цепочке
+
+            // теперь сливаем изменения
+            broken = true; // если останется взведенным значит что-то не залилось правильно
+            fork.writeToParent();
+            broken = false;
+
+            // теперь все транзакции в пул опять закидываем
+            for (Transaction transaction: orphanedTransactions.values()) {
+                if (cnt.isOnStopping())
+                    throw new Exception("on stopping");
+
+                Controller.getInstance().transactionsPool.offerMessage(transaction);
+            }
+
+        } finally {
+            // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
+            // и файл надо освободить
+            fork.close();
+
+        }
+
+        if (broken) {
+            // TODO: нужно откатить чтоли все или там и так атомарно - но у кадой таблицы своя атомарность ((
+        }
+
+    }
+
+    // process new BLOCKS to DB and orphan DB
+    public List<Transaction> synchronizeNewBlocks_old(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
                                                 List<Block> newBlocks, Peer peer) throws Exception {
         ConcurrentHashMap<Long, Transaction> orphanedTransactions = new ConcurrentHashMap<Long, Transaction>();
         Controller cnt = Controller.getInstance();
@@ -329,24 +386,16 @@ public class Synchronizer extends Thread {
 
         DCSet fork;
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-        if (BlockChain.TEST_DB > 0) {
-            DB database = DCSet.getHardBaseForFork();
-            fork = dcSet.fork(database);
-            try {
-                checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
-            } finally {
-                // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
-                fork.close();
-            }
-        } else {
-            DB database = DCSet.getHardBaseForFork();
-            fork = dcSet.fork(database);
-            try {
-                checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
-            } finally {
-                // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
-                fork.close();
-            }
+        DB database = DCSet.getHardBaseForFork();
+        fork = dcSet.fork(database);
+        boolean blocksChecked = false;
+        try {
+            checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
+            blocksChecked = true;
+        } finally {
+            //blocksChecked
+            // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
+            fork.close();
         }
 
         // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
@@ -682,33 +731,10 @@ public class Synchronizer extends Thread {
             // SYNCHRONIZE BLOCKS
             LOGGER.info("synchronize with OPRHAN from common block [" + lastCommonBlock.getHeight()
                     + "] for blocks: " + blocks.size());
-            List<Transaction> orphanedTransactions = this.synchronize_blocks(dcSet, lastCommonBlock, checkPointHeight,
-                    blocks, peer);
+            synchronizeNewBlocks(dcSet, lastCommonBlock, checkPointHeight, blocks, peer);
 
             if (cnt.isOnStopping()) {
                 throw new Exception("on stopping");
-            }
-
-            // SEND ORPHANED TRANSACTIONS TO PEER
-            TransactionMap map = dcSet.getTransactionTab();
-            for (Transaction transaction : orphanedTransactions) {
-                if (cnt.isOnStopping()) {
-                    throw new Exception("on stopping");
-                }
-
-                byte[] sign = transaction.getSignature();
-                try {
-                    if (!map.isClosed() && !map.contains(sign)) {
-                        // добавляем через Очередь - чтобы не налететь на очистку таблицы
-                        cnt.transactionsPool.offerMessage(transaction);
-                    }
-                } catch (java.lang.Throwable e) {
-                    if (e instanceof java.lang.IllegalAccessError) {
-                        // налетели на закрытую таблицу
-                    } else {
-                        LOGGER.error(e.getMessage(), e);
-                    }
-                }
             }
         }
 

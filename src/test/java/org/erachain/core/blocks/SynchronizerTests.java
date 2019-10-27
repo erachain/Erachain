@@ -138,7 +138,7 @@ public class SynchronizerTests {
         Synchronizer synchronizer = new Synchronizer(Controller.getInstance(), blockChain);
 
         try {
-            synchronizer.synchronize_blocks(databaseSet, null, 1, newBlocks, null);
+            synchronizer.synchronizeNewBlocks(databaseSet, null, 1, newBlocks, null);
 
             //CHECK LAST 5 BLOCKS
             lastBlock = databaseSet.getBlockMap().last();
@@ -285,7 +285,7 @@ public class SynchronizerTests {
         Synchronizer synchronizer = new Synchronizer(Controller.getInstance(), blockChain);
 
         try {
-            synchronizer.synchronize_blocks(databaseSet1, gb1, 1, newBlocks, null);
+            synchronizer.synchronizeNewBlocks(databaseSet1, gb1, 1, newBlocks, null);
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             e.printStackTrace();

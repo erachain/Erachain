@@ -2688,9 +2688,6 @@ public class Controller extends Observable {
 
             try {
                 this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
-                if (network != null) {
-                    this.network.clearHandledWinBlockMessages();
-                }
 
             } catch (Exception e) {
                 if (this.isOnStopping()) {
@@ -2699,6 +2696,9 @@ public class Controller extends Observable {
                     LOGGER.error(e.getMessage(), e);
                     return false;
                 }
+            }
+            if (network != null) {
+                this.network.clearHandledWinBlockMessages();
             }
         } finally {
             newBlock.close();
