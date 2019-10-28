@@ -221,11 +221,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-    private void testTransactions(int blockHeight, long blockTimestamp) {
+    private void testTransactions(int blockHeight) {
 
         SecureRandom randomSecure = new SecureRandom();
-        // сдвиг назад органиизуем
-        blockTimestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) - BlockChain.UNCONFIRMED_SORT_WAIT_MS(blockHeight);
+        // сдвиг назад организуем
+
+        long blockTimestamp = bchain.getTimestamp(blockHeight - 1) + 1;
 
         LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB);
 
@@ -265,6 +266,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
                     amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
+
+            if (false) {
+                messageTx.setDC(dcSet, Transaction.FOR_NETWORK, blockHeight, index + 1);
+                int valid = messageTx.isValid(Transaction.FOR_NETWORK, 0L);
+            }
 
             ctrl.transactionsPool.offerMessage(messageTx);
 
@@ -930,7 +936,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             /// тестовый аккаунт
                             acc_winner = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
                             /// закатем в очередь транзакции
-                            testTransactions(height, timePointForValidTX);
+                            testTransactions(height);
                         }
 
                         if (!BlockChain.STOP_GENERATE_BLOCKS && acc_winner != null) {
