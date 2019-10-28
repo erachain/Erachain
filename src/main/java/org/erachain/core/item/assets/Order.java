@@ -599,7 +599,8 @@ public class Order implements Comparable<Order> {
 
         boolean debug = false;
 
-        if (//this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
+        if (BlockChain.CHECK_BUGS > 3 &&
+                //this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
                 //this.id.equals(770667456757788l) // 174358 ---- 	255979-3	255992-1
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
@@ -952,7 +953,7 @@ public class Order implements Comparable<Order> {
 
     public void orphan(Block block) {
 
-        if (
+        if (BlockChain.CHECK_BUGS > 3 &&
                 Transaction.viewDBRef(id).equals("178617-18")
         ) {
             boolean debug = false;
