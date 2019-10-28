@@ -294,7 +294,7 @@ public class VoteOnPollTransaction extends Transaction {
         //CHECK IF WE HAD PREVIOUSLY VOTED
         if (previousOption != -1) {
             //ADD TO ORPHAN DATABASE
-            this.dcSet.getVoteOnPollMap().set(this, previousOption);
+            this.dcSet.getVoteOnPollMap().put(this, previousOption);
         }
     }
 

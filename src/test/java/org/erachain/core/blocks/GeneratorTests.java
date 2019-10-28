@@ -500,7 +500,7 @@ public class GeneratorTests {
 
 
             //GENERATE NEXT BLOCK
-            Block block = dcSet.getBlockMap().get(i_height);
+            Block block = dcSet.getBlockMap().getAndProcess(i_height);
             if (block == null) {
                 i_break++;
             }
@@ -607,7 +607,7 @@ public class GeneratorTests {
             payment.process(genesisBlock, Transaction.FOR_NETWORK);
 
             //ADD TO UNCONFIRMED TRANSACTIONS
-            dcSet.getTransactionTab().add(payment);
+            dcSet.getTransactionTab().put(payment);
 
         }
 
@@ -685,7 +685,7 @@ public class GeneratorTests {
             payment.process(genesisBlock, Transaction.FOR_NETWORK);
 
             //ADD TO UNCONFIRMED TRANSACTIONS
-            dcSet.getTransactionTab().add(payment);
+            dcSet.getTransactionTab().put(payment);
 
         }
 
@@ -757,7 +757,7 @@ public class GeneratorTests {
         assertEquals(payment.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK);
 
         //ADD TO UNCONFIRMED TRANSACTIONS
-        dcSet.getTransactionTab().add(payment);
+        dcSet.getTransactionTab().put(payment);
 
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         transactions = blockGenerator.getUnconfirmedTransactions(2, newBlock.getTimestamp(), null, 0l).a;

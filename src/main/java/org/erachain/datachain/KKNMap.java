@@ -106,7 +106,7 @@ public class KKNMap extends DCUMap<
             }
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
 
     }
 
@@ -143,7 +143,7 @@ public class KKNMap extends DCUMap<
             value_new.put(nameKey, stack_new);
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
 
     }
 

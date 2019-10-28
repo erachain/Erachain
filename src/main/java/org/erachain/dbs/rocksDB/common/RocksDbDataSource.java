@@ -48,11 +48,17 @@ public interface RocksDbDataSource {
 
     byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key);
 
-    void remove(byte[] key);
+    void delete(byte[] key);
 
-    void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key);
+    void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key);
 
-    void remove(byte[] key, WriteOptions writeOptions);
+    void delete(byte[] key, WriteOptions writeOptions);
+
+    void deleteValue(byte[] key);
+
+    void deleteValue(ColumnFamilyHandle columnFamilyHandle, byte[] key);
+
+    void deleteValue(byte[] key, WriteOptions writeOptions);
 
     RockStoreIterator iterator(boolean descending);
 

@@ -56,7 +56,7 @@ public class HashtagPostMap extends DCUMap<String, List<byte[]>> {
             list.add(signature);
         }
 
-        set(hashtag, list);
+        put(hashtag, list);
 
     }
 
@@ -67,7 +67,7 @@ public class HashtagPostMap extends DCUMap<String, List<byte[]>> {
         if (contains(hashtag)) {
             List<byte[]> list = get(hashtag);
             ByteArrayUtils.remove(list, signature);
-            set(hashtag, list);
+            put(hashtag, list);
         }
 
     }

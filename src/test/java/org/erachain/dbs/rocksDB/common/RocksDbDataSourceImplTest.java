@@ -43,7 +43,7 @@ public class RocksDbDataSourceImplTest {
 
             List<ColumnFamilyDescriptor> columnFamilyDescriptors = new ArrayList<>();
             List<ColumnFamilyHandle> columnFamilyHandles = new ArrayList<>();
-            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_DATABASE);
+            DBRocksDBTable<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_DATABASE, true);
             TransactionDB rocksDBTransact = RocksDbDataSourceImpl.initDB(
                     tempDir.toPath(), createOptions, openOptions, transactionDBOptions,
                     columnFamilyDescriptors, columnFamilyHandles);

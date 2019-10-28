@@ -20,8 +20,8 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl implemen
 
     public RocksDbDataSourceTransaction(String pathName, String name, List<IndexDB> indexes,
                                         TransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles,
-                                        WriteOptions writeOptions, ReadOptions readOptions) {
-        super(pathName, name, indexes, null);
+                                        WriteOptions writeOptions, ReadOptions readOptions, boolean enableSize) {
+        super(pathName, name, indexes, null, enableSize);
         this.alive = true;
         this.dbCore = dbCore;
         this.columnFamilyHandles = columnFamilyHandles;
@@ -34,10 +34,10 @@ public class RocksDbDataSourceTransaction extends RocksDbDataSourceImpl implemen
     }
 
     public RocksDbDataSourceTransaction(String pathName, String name, List<IndexDB> indexes,
-                                        TransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles) {
+                                        TransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles, boolean enableSize) {
         this(pathName, name, indexes, dbCore, columnFamilyHandles,
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions());
+                new ReadOptions(), enableSize);
     }
 
     @Override

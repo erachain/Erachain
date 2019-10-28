@@ -51,7 +51,7 @@ public class DBRocksDBTableTransactionSingleTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTable rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
+            DBRocksDBTable rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE, true);
             logger.info("SIZE = " + rocksDB.size());
 
             int k = 0;
@@ -88,7 +88,7 @@ public class DBRocksDBTableTransactionSingleTest {
                 found = rocksDB.containsKey(entry.getKey());
                 assertEquals(found, true);
 
-                rocksDB.remove(entry.getKey());
+                rocksDB.delete(entry.getKey());
 
                 found = rocksDB.containsKey(entry.getKey());
                 assertEquals(found, false);
@@ -126,7 +126,7 @@ public class DBRocksDBTableTransactionSingleTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
+            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE, true);
 
             int k = 0;
             int rollbacks = 0;
@@ -221,7 +221,7 @@ public class DBRocksDBTableTransactionSingleTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE);
+            DBRocksDBTableTransactionSingle<byte[], byte[]> rocksDB = new DBRocksDBTableTransactionSingle(NAME_TABLE, true);
 
             int k = 0;
             int rollbacks = 0;

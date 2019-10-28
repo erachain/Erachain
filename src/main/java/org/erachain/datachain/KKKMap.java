@@ -109,7 +109,7 @@ public class KKKMap extends DCUMap<
             }
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
 
     }
 
@@ -152,7 +152,7 @@ public class KKKMap extends DCUMap<
             value_new.put(itemKey, stack_new);
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
 
     }
 

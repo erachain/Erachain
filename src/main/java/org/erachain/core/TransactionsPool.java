@@ -68,7 +68,7 @@ public class TransactionsPool extends MonitoredThread {
 
         if (item instanceof Transaction) {
             // ADD TO UNCONFIRMED TRANSACTIONS
-            utxMap.add((Transaction) item);
+            utxMap.put((Transaction) item);
             clearCount++;
 
         } else if (item instanceof TransactionMessage) {
@@ -140,7 +140,7 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             // ADD TO UNCONFIRMED TRANSACTIONS
-            utxMap.add(transaction);
+            utxMap.put(transaction);
             clearCount++;
 
             if (LOG_UNCONFIRMED_PROCESS) {
@@ -213,7 +213,7 @@ public class TransactionsPool extends MonitoredThread {
                                     countDeleted++;
                                     continue;
                                 }
-                                utxMap.add(item);
+                                utxMap.put(item);
                             }
                             LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear)
                                     + " ms, DELETED by Deadlime:  " + countDeleted);
@@ -225,7 +225,7 @@ public class TransactionsPool extends MonitoredThread {
                                 item = items[--i];
                                 if (timestamp > item.getDeadline())
                                     continue;
-                                utxMap.add(item);
+                                utxMap.put(item);
                             } while (sizeUTX - i < BlockChain.MAX_UNCONFIGMED_MAP_SIZE);
                             countDeleted = sizeUTX - utxMap.size();
                             LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear)

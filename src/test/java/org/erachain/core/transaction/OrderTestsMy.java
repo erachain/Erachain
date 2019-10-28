@@ -174,10 +174,10 @@ public class OrderTestsMy {
 
     }
 
-    private void removeOrder(Long orderId) {
+    private void deleteOrder(Long orderId) {
 
-        db.getCompletedOrderMap().remove(orderId);
-        db.getOrderMap().remove(orderId);
+        db.getCompletedOrderMap().delete(orderId);
+        db.getOrderMap().delete(orderId);
 
     }
 
@@ -516,8 +516,8 @@ public class OrderTestsMy {
             assertEquals(true, order_BA_1.isFulfilled());
 
             // удалим их на всяк случай чтобы они не ыбли в стакане
-            removeOrder(order_AB_1_ID);
-            removeOrder(order_BA_1_ID);
+            deleteOrder(order_AB_1_ID);
+            deleteOrder(order_BA_1_ID);
 
         }
 
@@ -553,8 +553,8 @@ public class OrderTestsMy {
             assertEquals(true, order_BA_1.isFulfilled());
 
             // удалим их на всяк случай чтобы они не ыбли в стакане
-            removeOrder(order_AB_1_ID);
-            removeOrder(order_BA_1_ID);
+            deleteOrder(order_AB_1_ID);
+            deleteOrder(order_BA_1_ID);
 
         }
 
@@ -626,8 +626,8 @@ public class OrderTestsMy {
             assertEquals(false, order_BA_1.isFulfilled());
 
             // удалим их на всяк случай чтобы они не ыбли в стакане
-            removeOrder(order_AB_1_ID);
-            removeOrder(order_BA_1_ID);
+            deleteOrder(order_AB_1_ID);
+            deleteOrder(order_BA_1_ID);
 
         }
     }
@@ -707,8 +707,8 @@ public class OrderTestsMy {
             assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
 
             // удалим их на всяк случай чтобы они не ыбли в стакане
-            removeOrder(order_AB_1_ID);
-            removeOrder(order_BA_1_ID);
+            deleteOrder(order_AB_1_ID);
+            deleteOrder(order_BA_1_ID);
 
         }
 
@@ -796,8 +796,8 @@ public class OrderTestsMy {
             assertEquals(true, trade.getAmountHave().compareTo(order_AB_1.getAmountHave()) == 0);
 
             // удалим их на всяк случай чтобы они не ыбли в стакане
-            removeOrder(order_AB_1_ID);
-            removeOrder(order_BA_1_ID);
+            deleteOrder(order_AB_1_ID);
+            deleteOrder(order_BA_1_ID);
 
         }
 
@@ -3629,7 +3629,7 @@ public class OrderTestsMy {
         order_AB_2_ID = order_AB_2.getId();
 
         ///////// DELETE in FORK
-        fork.getOrderMap().remove(deletedID);
+        fork.getOrderMap().delete(deletedID);
         
         int compare;
         int index = 0;

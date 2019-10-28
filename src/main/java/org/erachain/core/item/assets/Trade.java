@@ -1,20 +1,19 @@
 package org.erachain.core.item.assets;
 // 16/03
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
-import org.erachain.datachain.DCSet;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
 
 public class Trade {
 
@@ -265,7 +264,7 @@ public class Trade {
         Order target = this.getTargetOrder(db);
 
         //ADD TRADE TO DATABASE
-        db.getTradeMap().add(this);
+        db.getTradeMap().put(this);
         if (!db.getTradeMap().contains(new Tuple2<Long, Long>(this.initiator, this.target))) {
             int error = 0;
         }
@@ -281,10 +280,10 @@ public class Trade {
 
             //ADD TO COMPLETED ORDERS
             //initiator.setFulfilledWant(initiator.getAmountWant());
-            db.getCompletedOrderMap().add(initiator);
+            db.getCompletedOrderMap().put(initiator);
         } else {
             //UPDATE ORDER
-            db.getOrderMap().add(initiator);
+            db.getOrderMap().put(initiator);
         }
 
         if (target.isFulfilled()) {
@@ -293,11 +292,11 @@ public class Trade {
 
             //ADD TO COMPLETED ORDERS
             //target.setFulfilledWant(target.getAmountWant());
-            db.getCompletedOrderMap().add(target);
+            db.getCompletedOrderMap().put(target);
         } else {
             //UPDATE ORDER
             //target.setFulfilledWant(target.getFulfilledWant().add(amountWant));
-            db.getOrderMap().add(target);
+            db.getOrderMap().put(target);
         }
 
         //TRANSFER FUNDS
@@ -332,8 +331,8 @@ public class Trade {
         target.setFulfilledHave(target.getFulfilledHave().subtract(this.amountHave));
 
         //UPDATE ORDERS
-        db.getOrderMap().add(initiator);
-        db.getOrderMap().add(target);
+        db.getOrderMap().put(initiator);
+        db.getOrderMap().put(target);
 
         //REMOVE FROM DATABASE
         db.getTradeMap().delete(this);

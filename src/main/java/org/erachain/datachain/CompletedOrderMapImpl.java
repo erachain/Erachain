@@ -57,14 +57,14 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     }
 
     @Override
-    public void add(Order order) {
+    public void put(Order order) {
 
-        this.set(order.getId(), order);
+        this.put(order.getId(), order);
     }
 
     @Override
     public void delete(Order order) {
 
-        this.remove(order.getId());
+        this.delete(order.getId());
     }
 }

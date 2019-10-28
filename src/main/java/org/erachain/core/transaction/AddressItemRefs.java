@@ -152,7 +152,7 @@ public abstract class AddressItemRefs extends Transaction {
         super.orphan(block, asDeal);
 
         //DELETE FROM DATABASE
-        long key = this.item.removeFromMap(this.dcSet, START_KEY);
+        long key = this.item.deleteFromMap(this.dcSet, START_KEY);
     }
 
     @Override

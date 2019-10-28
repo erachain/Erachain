@@ -84,7 +84,7 @@ public class TelegramStore extends Observable implements Observer {
                     int aliveTime = Settings.getInstance().getTelegramStorePeriod() * 60 * 60 * 24 * 1000;
                     for (Transaction transaction : database.getTelegramsMap().values()) {
                         if (transaction.getTimestamp() < (System.currentTimeMillis() - aliveTime))
-                            database.getTelegramsMap().remove(transaction.viewSignature());
+                            database.getTelegramsMap().delete(transaction.viewSignature());
                     }
                 }
 
@@ -116,8 +116,8 @@ public class TelegramStore extends Observable implements Observer {
 	 */
 	public void deleteFromCreator(String address){
         for (Transaction transaction : database.getTelegramsMap().values()) {
-             if ( transaction.getCreator().getAddress().equals(address)) 
-                 database.getTelegramsMap().remove(transaction.viewSignature());
+             if ( transaction.getCreator().getAddress().equals(address))
+                 database.getTelegramsMap().delete(transaction.viewSignature());
             }
         
      }
@@ -132,7 +132,7 @@ public class TelegramStore extends Observable implements Observer {
         for (Transaction transaction : this.database.getTelegramsMap().values()) {
             if (transaction.getCreator().getAddress().equals(address)) {
                 list.add(transaction);
-                database.getTelegramsMap().remove(transaction.viewSignature());
+                database.getTelegramsMap().delete(transaction.viewSignature());
             }
         }
         return list;

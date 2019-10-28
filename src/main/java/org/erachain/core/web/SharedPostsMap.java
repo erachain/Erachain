@@ -43,7 +43,7 @@ public class SharedPostsMap extends DCUMap<byte[], List<String>> {
             list.add(name);
         }
 
-        set(postSignature, list);
+        put(postSignature, list);
     }
 
     public void remove(byte[] postSignature, String name) {
@@ -55,11 +55,11 @@ public class SharedPostsMap extends DCUMap<byte[], List<String>> {
         list.remove(name);
 
         if (list.isEmpty()) {
-            remove(postSignature);
+            delete(postSignature);
             return;
         }
 
-        set(postSignature, list);
+        put(postSignature, list);
     }
 
     @Override

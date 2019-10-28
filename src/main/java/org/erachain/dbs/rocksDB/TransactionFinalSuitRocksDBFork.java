@@ -20,7 +20,7 @@ import java.util.Iterator;
 public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionFinalSuit {
 
     public TransactionFinalSuitRocksDBFork(TransactionFinalMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+        super(parent, databaseSet, logger, null, false);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
-                new WriteOptions().setSync(true).setDisableWAL(false));
+                new WriteOptions().setSync(true).setDisableWAL(false), enableSize);
     }
 
     @Override

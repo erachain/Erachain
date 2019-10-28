@@ -2,8 +2,6 @@ package org.erachain.datachain;
 
 import org.erachain.database.DBASet;
 import org.mapdb.DB;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork()
@@ -16,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
  */
 public abstract class DCUMap<T, U> extends org.erachain.dbs.DCUMapImpl<T, U> {
-
-    protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
     public DCUMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);

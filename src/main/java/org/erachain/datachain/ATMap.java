@@ -288,10 +288,6 @@ public class ATMap extends DCUMapImpl<String, AT> {
         return Fun.filter(this.orderedATs, null, true, height, true).iterator();
     }
 
-    public DBTab<String, AT> getParent() {
-        return this.parent;
-    }
-
     @SuppressWarnings({"unchecked"})
     public SortableList<String, AT> getAcctATs(String type, boolean initiators) {
         Collection<String> keys = Lists.newArrayList(Fun.filter(this.typeATs, type));

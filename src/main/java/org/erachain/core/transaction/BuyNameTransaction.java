@@ -259,7 +259,7 @@ public class BuyNameTransaction extends Transaction {
         this.dcSet.getNameMap().add(name);
 
         //DELETE NAME SALE FROM DATABASE
-        this.dcSet.getNameExchangeMap().remove(this.nameSale.getKey());
+        this.dcSet.getNameExchangeMap().delete(this.nameSale.getKey());
 
     }
 

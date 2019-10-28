@@ -46,7 +46,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
     ListIndexDB<Long, Transaction, Fun.Tuple3<String, Long, Integer>> addressTypeIndex;
 
     public TransactionSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, true);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(),
-                databaseSet);
+                databaseSet, enableSize);
     }
 
     @Override

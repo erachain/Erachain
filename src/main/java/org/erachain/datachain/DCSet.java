@@ -310,7 +310,8 @@ public class DCSet extends DBASet {
             throw e;
         }
 
-        if (this.blockMap.size() != this.blocksHeadsMap.size()
+        if (false // теперь отклучаем счетчики для усклрения работы - отсвили только в Подписи
+                &&this.blockMap.size() != this.blocksHeadsMap.size()
                 || this.blockSignsMap.size() != this.blocksHeadsMap.size()) {
             LOGGER.info("reset DATACHAIN on height error (blockMap, blockSignsMap, blocksHeadsMap: "
                     + this.blockMap.size() + " != "
@@ -666,6 +667,11 @@ public class DCSet extends DBASet {
     public static DCSet createEmptyDatabaseSet(int defaultDBS) {
         DB database = DCSet.makeDBinMemory();
 
+        instance = new DCSet(null, database, false, false, true, defaultDBS);
+        return instance;
+    }
+
+    public static DCSet createEmptyHardDatabaseSet(DB database, int defaultDBS) {
         instance = new DCSet(null, database, false, false, true, defaultDBS);
         return instance;
     }
@@ -1715,7 +1721,7 @@ public class DCSet extends DBASet {
                 || System.currentTimeMillis() - poinClear - 1000 >
                 BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) << 3;
         // try repopulate UTX table
-        if (needRepopulateUTX) {
+        if (needRepopulateUTX && Controller.getInstance().transactionsPool != null) {
             Controller.getInstance().transactionsPool.needClear(doOrphan);
 
             if (needClearCache || clearGC) {

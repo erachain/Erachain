@@ -27,21 +27,21 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
 
     public RocksDbDataSourceTransactionedImpl(RocksDB dbCore,
                                               String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
-                                              WriteOptions writeOptions) {
-        super(dbCore, pathName, name, indexes, settings, writeOptions);
+                                              WriteOptions writeOptions, boolean enableSize) {
+        super(dbCore, pathName, name, indexes, settings, writeOptions, enableSize);
     }
 
     public RocksDbDataSourceTransactionedImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
-                                              WriteOptions writeOptions) {
-        super(pathName, name, indexes, settings, writeOptions);
+                                              WriteOptions writeOptions, boolean enableSize) {
+        super(pathName, name, indexes, settings, writeOptions, enableSize);
     }
 
-    public RocksDbDataSourceTransactionedImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
-        this(pathName, name, indexes, settings, new WriteOptions().setSync(true).setDisableWAL(false));
+    public RocksDbDataSourceTransactionedImpl(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
+        this(pathName, name, indexes, settings, new WriteOptions().setSync(true).setDisableWAL(false), enableSize);
     }
 
-    public RocksDbDataSourceTransactionedImpl(String name, List<IndexDB> indexes, RocksDbSettings settings) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
+    public RocksDbDataSourceTransactionedImpl(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
+        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
     }
 
     @Override
@@ -92,7 +92,7 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
     final StringBuilder inCache = new StringBuilder();
 
     @Override
-    public void remove(byte[] key) {
+    public void delete(byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -107,7 +107,7 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
     }
 
     @Override
-    public void remove(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+    public void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return;
         }
@@ -122,7 +122,7 @@ public abstract class RocksDbDataSourceTransactionedImpl extends RocksDbDataSour
     }
 
     @Override
-    public void remove(byte[] key, WriteOptions writeOptions) {
+    public void delete(byte[] key, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
         }

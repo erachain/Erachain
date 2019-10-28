@@ -60,7 +60,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            RocksDbDataSourceOptTransactedDB rocksDB = new RocksDbDataSourceOptTransactedDB(NAME_TABLE);
+            RocksDbDataSourceOptTransactedDB rocksDB = new RocksDbDataSourceOptTransactedDB(NAME_TABLE, true);
             rocksDB.beginTransaction();
 
             int k = 0;
@@ -98,7 +98,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
                 // поиск в родительской базе
                 assertEquals(rocksDB.contains(entry.getKey()), true);
 
-                rocksDB.remove(entry.getKey());
+                rocksDB.delete(entry.getKey());
 
                 // поиск в родительской базе
                 assertEquals(rocksDB.contains(entry.getKey()), false);
@@ -135,7 +135,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE);
+        DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE, true);
 
         long timeMillisBefore = System.currentTimeMillis();
         for (Map.Entry<byte[], byte[]> entry : data) {
@@ -174,12 +174,12 @@ public class RocksDbDataSourceOptTransactedDBTest {
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            rocksDB.remove(entry.getKey());
+            rocksDB.delete(entry.getKey());
         }
 
         // теперь в транзакцию будем закатывать
         DBRocksDBTableOptTransaction dbOptTrans = new DBRocksDBTableOptTransaction(NAME_TABLE,
-                (DBRocksDBTableDBOptTransacted) rocksDB);
+                (DBRocksDBTableDBOptTransacted) rocksDB, true);
 
         countCommitTMP = 0;
         timeMillisBefore = System.currentTimeMillis();

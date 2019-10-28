@@ -186,14 +186,45 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         item.setKey(key);
 
         // INSERT WITH NEW KEY
-        set(key, item);
+        put(key, item);
 
         // RETURN KEY
         return key;
     }
 
-    public void remove(long key) {
-        super.remove(key);
+    public ItemCls remove(long key) {
+
+        if (key != this.key) {
+            Long error = null;
+            error++;
+        }
+
+        ItemCls old = super.remove(key);
+
+        if (this.key != key) {
+            // it is not top of STACK (for UNIQUE items with short NUM)
+            return old;
+        }
+        // delete on top STACK
+
+        if (atomicKey != null) {
+            atomicKey.decrementAndGet();
+        }
+
+        // DECREMENT KEY
+        --this.key;
+
+        return old;
+    }
+
+    public void delete(long key) {
+
+        if (key != this.key) {
+            Long error = null;
+            error++;
+        }
+
+        super.delete(key);
 
         if (this.key != key) {
             // it is not top of STACK (for UNIQUE items with short NUM)

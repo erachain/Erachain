@@ -140,12 +140,12 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
 
         //DELETE NAMES
         for (Tuple2<Long, Long> key : accountItems.keySet()) {
-            this.remove(key);
+            this.delete(key);
         }
     }
 
     public void delete(Account account, long refDB) {
-        this.remove(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
+        this.delete(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
                 refDB));
     }
 	
@@ -159,8 +159,8 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
 	}
 	*/
 
-    public boolean add(Account account, long refDB, ItemCls item) {
-        return this.set(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
+    public void add(Account account, long refDB, ItemCls item) {
+        this.put(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
                 refDB), new Tuple2<Long, ItemCls>(null, item));
     }
 	

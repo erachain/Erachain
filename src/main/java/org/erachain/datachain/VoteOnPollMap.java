@@ -44,11 +44,11 @@ public class VoteOnPollMap extends DCUMap<byte[], Integer> {
         return this.get(transaction.getSignature());
     }
 
-    public void set(Transaction transaction, Integer value) {
-        this.set(transaction.getSignature(), value);
+    public void put(Transaction transaction, Integer value) {
+        this.put(transaction.getSignature(), value);
     }
 
     public void delete(Transaction transaction) {
-        this.remove(transaction.getSignature());
+        this.delete(transaction.getSignature());
     }
 }

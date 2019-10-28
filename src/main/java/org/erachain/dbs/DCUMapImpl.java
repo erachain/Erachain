@@ -22,16 +22,16 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements DBTab<T, U>, ForkedMap {
+public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements ForkedMap {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
     protected Map<T, U> map;
     @Getter
-    protected DBTab<T, U> parent;
+    protected DCUMapImpl<T, U> parent;
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<Integer, NavigableSet<Fun.Tuple2<?, T>>>();
 
-    //ConcurrentHashMap deleted;
+    //protected ConcurrentHashMap deleted;
     protected HashMap deleted;
     protected Boolean EXIST = true;
     protected int shiftSize;
@@ -46,7 +46,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
         super(databaseSet, database);
     }
 
-    public DCUMapImpl(DBTab<T, U> parent, DBASet dcSet) {
+    public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet) {
         super(parent, dcSet);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
@@ -78,10 +78,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
     protected abstract U getDefaultValue();
 
     protected void createIndexes() {
-    }
-
-    public Map getMap() {
-        return map;
     }
 
     /**
@@ -339,14 +335,77 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
         return false;
     }
 
+    /**
+     * @param key
+     * @param value
+     */
     @Override
     public void put(T key, U value) {
-        set(key, value);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.set, так как
+        /// если в подклассе будет из SET вызов PUT то он придет сюда и при перевузове THIS.SET отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> set(key, value);
+        ///
+        if (true) {
+            set(key, value);
+            return;
+        }
+
+        if (DCSet.isStoped()) {
+            return;
+        }
+
+        this.addUses();
+
+        try {
+
+            this.map.put(key, value);
+
+            if (this.parent != null) {
+                //if (old != null)
+                //	++this.shiftSize;
+                if (this.deleted != null) {
+                    if (this.deleted.remove(key) != null)
+                        ++this.shiftSize;
+                }
+            } else {
+
+                // NOTIFY if not FORKED
+                if (this.observableData != null) {
+                    if (this.observableData.containsKey(DBTab.NOTIFY_ADD) && !DCSet.isStoped()) {
+                        this.setChanged();
+                        Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
+                        if (
+                                observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
+                                        || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                                        || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
+                                        || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
+                        ) {
+                            this.notifyObservers(new ObserverMessage(observeItem, new Pair<T, U>(key, value)));
+                        } else {
+                            this.notifyObservers(
+                                    new ObserverMessage(observeItem, value));
+                        }
+                    }
+                }
+            }
+
+            this.outUses();
+            return;
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        this.outUses();
+
     }
 
-    @Override
-    public U remove(T key) {
-
+    /**
+     * чтобы не копировать код
+     * @param key
+     * @return
+     */
+    private U removeHere(T key) {
         if (DCSet.isStoped()) {
             return null;
         }
@@ -400,22 +459,96 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
 
         this.outUses();
         return value;
+    }
 
+    @Override
+    public U remove(T key) {
+        return removeHere(key);
     }
 
     @Override
     public U removeValue(T key) {
-        return remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+        return removeHere(key);
     }
 
+    /**
+     * Чтобы не копировать вод из delete deleteValue
+     * @param key
+     */
+    private void deleteHere(T key) {
+        if (DCSet.isStoped()) {
+            return;
+        }
+
+        this.addUses();
+
+        this.map.remove(key);
+
+        if (this.parent != null) {
+            // это форкнутая таблица
+
+            if (this.deleted == null) {
+                this.deleted = new HashMap(1024 , 0.75f);
+            }
+
+            // добавляем в любом случае, так как
+            // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+            // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+            // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+            // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+            this.deleted.put(key, EXIST);
+
+            this.outUses();
+            return;
+
+        } else {
+
+            // NOTIFY
+            if (this.observableData != null) {
+                if (this.observableData.containsKey(DBTab.NOTIFY_REMOVE)) {
+                    this.setChanged();
+                    Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
+                    if (
+                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
+                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                                    || observItem.equals(ObserverMessage.REMOVE_AT_TX)
+                    ) {
+                        this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, null)));
+                    } else {
+                        this.notifyObservers(new ObserverMessage(observItem, null));
+                    }
+                }
+            }
+        }
+
+        this.outUses();
+
+    }
     @Override
     public void delete(T key) {
-        remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        deleteHere(key);
     }
 
     @Override
     public void deleteValue(T key) {
-        remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+        deleteHere(key);
+
     }
 
     @Override
@@ -488,29 +621,16 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
         }
     }
 
-    @Override
-    public void writeTo(DBTab targetMap) {
-        Iterator<T> iterator = this.map.keySet().iterator();
-        while (iterator.hasNext()) {
-            T key = iterator.next();
-            targetMap.put(key, this.map.get(key));
-        }
-
-        if (parent != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                T key = iterator.next();
-                targetMap.delete(key);
-            }
-        }
-    }
-
+    /**
+     * ВНИМАНИЕ!!! в связи с работой этого метода при сливе - нельяза в стандартных методах
+     */
     @Override
     public void writeToParent() {
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
-            parent.put(key, this.map.get(key));
+            // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
+            parent.map.put(key, this.map.get(key));
         }
 
         // нужно очистить сразу так как общий размер изменится иначе будет ++ больше
@@ -521,7 +641,8 @@ public abstract class DCUMapImpl<T, U> extends DBTabCommonImpl<T, U> implements 
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
                 T key = iterator.next();
-                parent.delete(key);
+                // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
+                parent.map.remove(key);
             }
         }
     }

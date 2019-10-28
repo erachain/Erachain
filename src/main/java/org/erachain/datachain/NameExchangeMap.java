@@ -108,7 +108,7 @@ public class NameExchangeMap extends DCUMap<String, BigDecimal> {
     }
 
     public void add(NameSale nameSale) {
-        this.set(nameSale.getKey(), nameSale.getAmount());
+        this.put(nameSale.getKey(), nameSale.getAmount());
     }
 
     public boolean contains(NameSale nameSale) {

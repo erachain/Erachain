@@ -23,11 +23,11 @@ public class RocksDbTransactSourceImpl extends RocksDbDataSourceImpl implements 
     TransactionDBOptions transactionDbOptions = new TransactionDBOptions()
             ;
 
-    public RocksDbTransactSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings) {
-        super(parentName, name, indexes, settings);
+    public RocksDbTransactSourceImpl(String parentName, String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
+        super(parentName, name, indexes, settings, enableSize);
     }
-    public RocksDbTransactSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings) {
-        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings);
+    public RocksDbTransactSourceImpl(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
+        this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings, enableSize);
     }
 
     @Override

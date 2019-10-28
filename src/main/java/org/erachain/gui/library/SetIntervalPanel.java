@@ -2,7 +2,7 @@ package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
 import org.erachain.dbs.DBTab;
-import org.erachain.dbs.DBTabCommonImpl;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
@@ -23,7 +23,7 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
     Logger LOGGER;
 
     private static final long serialVersionUID = 1L;
-    DBTabCommonImpl map;
+    DBTabImpl map;
     private long size;
     private boolean needUpdate;
 
@@ -32,7 +32,7 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
      * Без динамического режима перерисовывается по внешнему таймеру из
      * gui.GuiTimer - только если было обновление
      */
-    public SetIntervalPanel(DBTabCommonImpl map) {
+    public SetIntervalPanel(DBTabImpl map) {
         jLabelTotal = new JLabel();
         this.map = map;
         this.size = this.map.size();

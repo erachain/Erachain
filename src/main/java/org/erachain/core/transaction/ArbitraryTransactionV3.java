@@ -253,7 +253,7 @@ public class ArbitraryTransactionV3 extends ArbitraryTransaction {
         DCSet fork = this.dcSet.fork();
         try {
             forkTransaction.setDC(fork, Transaction.FOR_NETWORK, this.height, this.seqNo);
-            Block block = fork.getBlockMap().get(this.height);
+            Block block = fork.getBlockMap().getAndProcess(this.height);
             forkTransaction.process(block, Transaction.FOR_NETWORK);
             // TODO process && orphan && isValid balances
 

@@ -56,7 +56,7 @@ public class BlogPostMap extends DCUMap<String, List<byte[]>> {
             list.add(signature);
         }
 
-        set(blogname, list);
+        put(blogname, list);
 
     }
 
@@ -68,7 +68,7 @@ public class BlogPostMap extends DCUMap<String, List<byte[]>> {
         if (contains(blogname)) {
             List<byte[]> list = get(blogname);
             ByteArrayUtils.remove(list, signature);
-            set(blogname, list);
+            put(blogname, list);
         }
 
     }

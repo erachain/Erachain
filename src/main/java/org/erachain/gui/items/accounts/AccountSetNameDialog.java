@@ -5,10 +5,10 @@ import org.erachain.controller.Controller;
 import org.erachain.database.wallet.AccountsPropertisMap;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.StrJSonFine;
 
 import javax.swing.*;
 import java.awt.*;
@@ -105,13 +105,12 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
                 // account in db?
 
                 if (name.length() == 0 && desc.length() == 0) {
-                    db.remove(account);
+                    db.delete(account);
                     setVisible(false);
                     return;
                 } else if (name.length() == 0) {
                     name = "";
                 }
-                ;
 
 
                 if (desc.length() != 0) {
@@ -119,7 +118,7 @@ public class AccountSetNameDialog extends javax.swing.JDialog {
                     ans.put("description", desc);
 
                 }
-                db.set(account, new Tuple2(name, StrJSonFine.convert(ans)));
+                db.put(account, new Tuple2(name, StrJSonFine.convert(ans)));
                 setVisible(false);
                 //dispose();
             }

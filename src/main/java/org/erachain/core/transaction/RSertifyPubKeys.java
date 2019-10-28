@@ -668,7 +668,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             if (!dcSet.getReferenceMap().contains(publicAccount.getShortAddressBytes())) {
                 // for quick search public keys by address - use PUB_KEY from Person DATA owner
                 // used in - controller.Controller.getPublicKeyByAddress
-                dcSet.getReferenceMap().set(
+                dcSet.getReferenceMap().put(
                         publicAccount.getShortAddressBytes(), new long[]{timestamp, dbRef});
             }
 

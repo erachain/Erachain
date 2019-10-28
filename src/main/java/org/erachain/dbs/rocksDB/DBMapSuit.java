@@ -2,7 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
-import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IMap;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -27,6 +27,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     protected DBASet databaseSet;
     protected DB database;
 
+    protected boolean enableSize;
+
     public DBRocksDBTable<T, U> map;
     protected List<IndexDB> indexes;
 
@@ -34,13 +36,14 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue, boolean enableSize) {
 
         this.databaseSet = databaseSet;
         // database - is null
         this.database = database;
         this.logger = logger;
         this.defaultValue = defaultValue;
+        this.enableSize = enableSize;
 
         // create INDEXES before
         createIndexes();
@@ -51,12 +54,13 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         logger.info("USED");
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
-        this(databaseSet, database, logger, null);
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean enableSize) {
+        this(databaseSet, database, logger, null, enableSize);
     }
 
-    public DBRocksDBTable getMap() {
-        return map;
+    @Override
+    public IMap getSource() {
+        return (IMap) map;
     }
 
     @Override
@@ -104,7 +108,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         U value = null;
         if (map.containsKey(key)) {
             value = map.get(key);
-            map.remove(key);
+            map.delete(key);
         }
         return value;
     }
@@ -112,19 +116,24 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     // TODO сделать это у РоксДБ есть
     @Override
     public U removeValue(T key) {
-        return remove(key);
+        U value = null;
+        if (map.containsKey(key)) {
+            value = map.get(key);
+            map.deleteValue(key);
+        }
+        return value;
     }
 
     @Override
     public void delete(T key) {
-        map.remove(key);
+        map.delete(key);
     }
 
 
     // TODO сделать это у РоксДБ есть
     @Override
     public void deleteValue(T key) {
-        map.remove(key);
+        map.deleteValue(key);
     }
 
     @Override
@@ -151,20 +160,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     @Override
     public boolean isClosed() {
         return map.dbSource.isAlive();
-    }
-
-    @Override
-    public void writeTo(DBTab targetMap) {
-        Iterator<T> iterator = this.map.getIterator(false);
-        while (iterator.hasNext()) {
-            T key = iterator.next();
-            U item = this.map.get(key);
-            if (item == null) {
-                targetMap.delete(key);
-            } else {
-                targetMap.put(key, item);
-            }
-        }
     }
 
     @Override

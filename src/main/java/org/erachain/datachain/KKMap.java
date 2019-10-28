@@ -136,7 +136,7 @@ public class KKMap extends DCUMap<
         }
 
 
-        this.set(key, value_new);
+        this.put(key, value_new);
     }
 
     // NOT UPDATE UNIQUE STATUS FOR ITEM - ADD NEW STATUS FOR ITEM + DATA
@@ -171,7 +171,7 @@ public class KKMap extends DCUMap<
             }
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
     }
 
     public Tuple5<Long, Long, byte[], Integer, Integer> getItem(Long key, Long itemKey) {
@@ -211,6 +211,6 @@ public class KKMap extends DCUMap<
             value_new.put(itemKey, stack_new);
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
     }
 }

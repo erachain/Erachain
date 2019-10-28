@@ -41,7 +41,7 @@ public class PeerManager extends MonitoredThread {
                 LOGGER.error(e.getMessage(), e);
                 LOGGER.error("try delete error peer");
                 try {
-                    Controller.getInstance().getDLSet().getPeerMap().remove(peer.getAddress().getAddress());
+                    Controller.getInstance().getDLSet().getPeerMap().delete(peer.getAddress().getAddress());
                 } catch (Exception eIO) {
                     LOGGER.error(eIO.getMessage(), eIO);
                     LOGGER.error("try reCreateDB");

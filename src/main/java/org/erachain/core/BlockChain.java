@@ -38,14 +38,14 @@ public class BlockChain {
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
     public static final boolean DEVELOP_USE = true;
 
-    public static final int BLOCK_COUNT = 0; //108974; ////
+    public static final int BLOCK_COUNT = 000; //108974; ////
     // сколько транзакции в блоке - если больше 0 то запускает тест на старте
     public static final int TEST_DB = 0000;
     // запрет сборки своих блоков в ТЕСТЕ
     public static final boolean STOP_GENERATE_BLOCKS = false;
 
     /**
-     * для каждого счета по времени создания трнзакции сохраняется ссылка на транзакцию,
+     * для каждого счета по времени создания транзакции сохраняется ссылка на транзакцию,
      * что требует создания длинных ключей 20 + 8. Это используется при откатах для восстановления последего значения
      */
     public static final boolean NOT_STORE_REFFS_HISTORY = TEST_DB > 0;
@@ -57,7 +57,7 @@ public class BlockChain {
      * -1 - не проверяем вообще - возможно стоит уже запрет на транзакции с одного счета в одном блоке,
      * и при этом разрешены транзакции только по времени за 1 блок
      */
-    public static final int CHECK_DOUBLE_SPEND_DEEP = 0;
+    public static final int CHECK_DOUBLE_SPEND_DEEP = TEST_DB == 0? 0 : -1;
 
     /**
      * Число счетов для теста базы данных - чем больше тем болше нагрузка и сложнее считать.
@@ -68,9 +68,9 @@ public class BlockChain {
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
      */
-    public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || TEST_DB > 0 || false;
+    public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || TEST_DB > 0;
 
-    static final public int CHECK_BUGS = 1;
+    static final public int CHECK_BUGS = 10;
 
     /**
      * если задан - первое подключение к нему
@@ -569,7 +569,7 @@ public class BlockChain {
             LOGGER.info(genesisBlock.getTestNetInfo());
         }
 
-        int height = dcSet.getBlockMap().size();
+        int height = dcSet.getBlockSignsMap().size();
         if (height == 0)
         // process genesis block
         {
@@ -591,7 +591,7 @@ public class BlockChain {
         } else {
 
             // TRY compare GENESIS BLOCK SIGNATURE
-            if (!Arrays.equals(dcSet.getBlockMap().get(1).getSignature(),
+            if (!Arrays.equals(dcSet.getBlockMap().getAndProcess(1).getSignature(),
                     genesisBlock.getSignature())) {
 
                 throw new Exception("wrong DB for GENESIS BLOCK");
@@ -610,7 +610,7 @@ public class BlockChain {
         //GET LAST BLOCK
         ///byte[] lastBlockSignature = dcSet.getBlocksHeadMap().getLastBlockSignature();
         ///return dcSet.getBlockSignsMap().getHeight(lastBlockSignature);
-        return dcSet.getBlocksHeadsMap().size();
+        return dcSet.getBlockSignsMap().size();
     }
 
     public static int GENERATING_MIN_BLOCK_TIME(int height) {
@@ -1121,7 +1121,7 @@ public class BlockChain {
 
     public Block getBlock(DCSet dcSet, int height) {
 
-        return dcSet.getBlockMap().get(height);
+        return dcSet.getBlockMap().getAndProcess(height);
     }
 
     /**

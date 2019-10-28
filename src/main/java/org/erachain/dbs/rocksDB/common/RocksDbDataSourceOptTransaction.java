@@ -24,8 +24,8 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
 
     public RocksDbDataSourceOptTransaction(String pathName, String name, List<IndexDB> indexes,
                                            OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles,
-                                           WriteOptions writeOptions, ReadOptions readOptions) {
-        super(pathName, name, indexes, null);
+                                           WriteOptions writeOptions, ReadOptions readOptions, boolean enableSize) {
+        super(pathName, name, indexes, null, enableSize);
         this.alive = true;
         this.dbCore = dbCore;
         this.columnFamilyHandles = columnFamilyHandles;
@@ -38,14 +38,14 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
     }
 
     public RocksDbDataSourceOptTransaction(String name, List<IndexDB> indexes,
-                                           OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles) {
+                                           OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles, boolean enableSize) {
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, dbCore, columnFamilyHandles,
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions());
+                new ReadOptions(), enableSize);
     }
 
-    public RocksDbDataSourceOptTransaction(String name, OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles) {
-        this(name, new ArrayList<>(), dbCore, columnFamilyHandles);
+    public RocksDbDataSourceOptTransaction(String name, OptimisticTransactionDB dbCore, List<ColumnFamilyHandle> columnFamilyHandles, boolean enableSize) {
+        this(name, new ArrayList<>(), dbCore, columnFamilyHandles, enableSize);
     }
 
     //public RocksDbDataSourceOptTransaction(DBRocksDBTable dbSource) {

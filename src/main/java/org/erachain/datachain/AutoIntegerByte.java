@@ -87,7 +87,7 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
         this.key++;
 
         // INSERT WITH NEW KEY
-        this.set(this.key, item);
+        super.put(this.key, item);
 
         // RETURN KEY
         return this.key;
@@ -97,8 +97,8 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
         return this.get(this.key);
     }
 
-    public void remove() {
-        super.remove(key);
+    public void delete() {
+        super.delete(key);
 
         if (this.atomicKey != null) {
             this.atomicKey.decrementAndGet();
