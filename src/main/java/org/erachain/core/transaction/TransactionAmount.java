@@ -470,13 +470,15 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
                 if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    if (BlockChain.CHECK_BUGS > 1)
+                        LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
                     return INVALID_TIMESTAMP;
                 }
             } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
                 if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
-                    LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    if (BlockChain.CHECK_BUGS > 1)
+                        LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
                     return INVALID_TIMESTAMP;
                 }
 
@@ -493,7 +495,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
                         if (BlockChain.TEST_DB == 0) {
                             pointLogg = System.currentTimeMillis();
-                            LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
+                            if (BlockChain.CHECK_BUGS > 1)
+                                LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
                                     + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
                                     + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
                         }
