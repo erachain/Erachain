@@ -469,7 +469,10 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         }
         resetDbLock.readLock().lock();
         try {
-            return dbCoreParent.keyMayExist(key, inCache);
+            // быстрая проверка - потенциально он может содержаться в базе?
+            if (!dbCoreParent.keyMayExist(key, inCache)) return false;
+            // теперь ищем по настоящему
+            return dbCoreParent.get(key) != null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -485,7 +488,10 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         }
         resetDbLock.readLock().lock();
         try {
-            return dbCoreParent.keyMayExist(columnFamilyHandle, key, inCache);
+            // быстрая проверка - потенциально он может содержаться в базе?
+            if (!dbCoreParent.keyMayExist(columnFamilyHandle, key, inCache)) return false;
+            // теперь ищем по настоящему
+            return dbCoreParent.get(columnFamilyHandle, key) != null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {

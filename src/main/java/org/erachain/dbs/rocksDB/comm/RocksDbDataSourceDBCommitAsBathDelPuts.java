@@ -115,15 +115,18 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
             if (true) {
                 if (writeBatch.getFromBatch(dbOptions, key) != null)
                     return true;
-                return dbCore.keyMayExist(key, inCache);
             } else {
                 if (deleted.contains(key))
                     return false;
                 if (puts.containsKey(key))
                     return true;
 
-                return dbCore.keyMayExist(key, inCache);
             }
+            // быстрая проверка - потенциально он может содержаться в базе?
+            if (!dbCore.keyMayExist(key, inCache)) return false;
+            // теперь ищем по настоящему
+            return dbCore.get(key) != null;
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -142,15 +145,17 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
             if (true) {
                 if (writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null)
                     return true;
-                return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
             } else {
                 if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
                     return false;
                 if (puts.containsKey(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
                     return true;
-
-                return dbCore.keyMayExist(columnFamilyHandle, key, inCache);
             }
+            // быстрая проверка - потенциально он может содержаться в базе?
+            if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) return false;
+            // теперь ищем по настоящему
+            return dbCore.get(columnFamilyHandle, key) != null;
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -220,7 +225,7 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
             writeBatch.delete(key);
             puts.remove(key);
 
-            // запомним что это делали
+            // запомним что это делали - если есть вероятность что такой ключ есть
             if (dbCore.keyMayExist(key, inCache)) {
                 deleted.add(key);
             }
@@ -241,7 +246,7 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
             writeBatch.delete(columnFamilyHandle, key);
             puts.remove(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
 
-            // запомним что это делали
+            // запомним что это делали - если есть вероятность что такой ключ есть
             if (dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
                 deleted.add(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key));
             }

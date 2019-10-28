@@ -38,14 +38,26 @@ public class RocksDbComDB implements RocksDbCom {
     final StringBuilder inCache = new StringBuilder();
     @Override
     public boolean contains(byte[] key) {
-        return rocksDB.keyMayExist(key, inCache // NULL not worked
-        );
+        // быстрая проверка - потенциально он может содержаться в базе?
+        if (!rocksDB.keyMayExist(key, inCache)) return false;
+        // теперь ищем по настоящему
+        try {
+            return rocksDB.get(key) != null;
+        } catch (RocksDBException e) {
+            return false;
+        }
     }
 
     @Override
     public boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
-        return rocksDB.keyMayExist(columnFamilyHandle, key, inCache // NULL not worked
-        );
+        // быстрая проверка - потенциально он может содержаться в базе?
+        if (!rocksDB.keyMayExist(columnFamilyHandle, key, inCache)) return false;
+        // теперь ищем по настоящему
+        try {
+            return rocksDB.get(columnFamilyHandle, key) != null;
+        } catch (RocksDBException e) {
+            return false;
+        }
     }
 
     @Override
