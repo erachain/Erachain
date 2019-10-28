@@ -14,7 +14,6 @@ import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
@@ -606,7 +605,7 @@ public class Order implements Comparable<Order> {
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
-                Transaction.viewDBRef(id).equals("25-5836-7")
+                Transaction.viewDBRef(id).equals("178617-18")
                 //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
                 //|| height == 253841 // сработал NEW_FLOR 2-й
                 //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
@@ -698,8 +697,8 @@ public class Order implements Comparable<Order> {
 
             index++;
 
-            if (debug
-                || Transaction.viewDBRef(order.id).equals("255-836-7")
+            if (debug ||
+                    Transaction.viewDBRef(id).equals("178617-18")
                         ) {
                 debug = true;
             }
@@ -865,7 +864,7 @@ public class Order implements Comparable<Order> {
                     ordersMap.delete(order);
 
                     //ADD TO COMPLETED ORDERS
-                    completedMap.add(order);
+                    completedMap.put(order);
                 } else {
                     //UPDATE ORDER
                     if (willUnResolvedFor) {
@@ -877,9 +876,9 @@ public class Order implements Comparable<Order> {
                         ordersMap.delete(order);
 
                         //ADD TO COMPLETED ORDERS
-                        completedMap.add(order);
+                        completedMap.put(order);
                     } else {
-                        ordersMap.add(order);
+                        ordersMap.put(order);
                     }
                 }
 
@@ -936,9 +935,9 @@ public class Order implements Comparable<Order> {
         }
 
         if (!completedOrder) {
-            ordersMap.add(this);
+            ordersMap.put(this);
         } else {
-            completedMap.add(this);
+            completedMap.put(this);
         }
 
         //TRANSFER FUNDS
@@ -952,6 +951,12 @@ public class Order implements Comparable<Order> {
     }
 
     public void orphan(Block block) {
+
+        if (
+                Transaction.viewDBRef(id).equals("178617-18")
+        ) {
+            boolean debug = false;
+        }
 
         CompletedOrderMap completedMap = this.dcSet.getCompletedOrderMap();
         OrderMap ordersMap = this.dcSet.getOrderMap();
@@ -990,7 +995,7 @@ public class Order implements Comparable<Order> {
             }
 
             //UPDATE ORDERS
-            ordersMap.add(target);
+            ordersMap.put(target);
 
             //REMOVE TRADE FROM DATABASE
             tradesMap.delete(trade);
@@ -1038,7 +1043,7 @@ public class Order implements Comparable<Order> {
 
     @Override
     public String toString() {
-        return this.id.toString() + "-" + this.haveAssetKey + "/" + this.wantAssetKey;
+        return Transaction.viewDBRef(this.id) + "=" + this.haveAssetKey + "/" + this.wantAssetKey;
     }
 
     //COPY

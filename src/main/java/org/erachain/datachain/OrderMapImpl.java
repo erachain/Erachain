@@ -4,6 +4,7 @@ import com.google.common.collect.Iterators;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.OrdersSuitMapDB;
@@ -182,10 +183,12 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public boolean set(Long id, Order order) {
-        if (BlockChain.CHECK_BUGS > 0) {
+        if (BlockChain.CHECK_BUGS > 3) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
-                assert ("".equals("already in Completed"));
+                LOGGER.error("already in Completed");
+                Long err = null;
+                ++err;
             }
         }
 
@@ -193,11 +196,27 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public Order remove(Long id) {
-        if (BlockChain.CHECK_BUGS > 1) {
+    public void put(Long id, Order order) {
+        if (BlockChain.CHECK_BUGS > 3) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
-                assert ("".equals("already in Completed"));
+                LOGGER.error("already in Completed");
+                Long err = null;
+                ++err;
+            }
+        }
+
+        super.put(id, order);
+    }
+
+    @Override
+    public Order remove(Long id) {
+        if (BlockChain.CHECK_BUGS > 3) {
+            if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
+                // если он есть в уже завершенных
+                LOGGER.error("already in Completed");
+                Long err = null;
+                ++err;
             }
         }
         return super.remove(id);
@@ -205,22 +224,30 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void delete(Long id) {
-        if (BlockChain.CHECK_BUGS > 1) {
+        if (BlockChain.CHECK_BUGS > 3) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
-                assert ("".equals("already in Completed"));
+                LOGGER.error("Order [" + Transaction.viewDBRef(id) + "] already in Completed");
+                Long err = null;
+                ++err;
             }
         }
         super.delete(id);
     }
 
     @Override
-    public void add(Order order) {
+    public void put(Order order) {
+        if (Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+            boolean debug = true;
+        }
         this.put(order.getId(), order);
     }
 
     @Override
     public void delete(Order order) {
+        if (Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+            boolean debug = true;
+        }
         this.delete(order.getId());
     }
 }

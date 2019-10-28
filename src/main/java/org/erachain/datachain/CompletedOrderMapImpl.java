@@ -1,6 +1,7 @@
 package org.erachain.datachain;
 
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.CompletedOrdersSuitMapDB;
@@ -57,13 +58,21 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     }
 
     @Override
-    public void add(Order order) {
+    public void put(Order order) {
+
+        if (Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+            boolean debug = true;
+        }
 
         this.set(order.getId(), order);
     }
 
     @Override
     public void delete(Order order) {
+
+        if (Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+            boolean debug = true;
+        }
 
         this.remove(order.getId());
     }
