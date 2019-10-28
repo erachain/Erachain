@@ -225,7 +225,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         SecureRandom randomSecure = new SecureRandom();
         // сдвиг назад органиизуем
-        blockTimestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) - BlockChain.UNCONFIRMED_SORT_WAIT_MS(blockHeight) - 1;
+        blockTimestamp -= BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) - BlockChain.UNCONFIRMED_SORT_WAIT_MS(blockHeight);
 
         LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB);
 
@@ -236,8 +236,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         RSend messageTx;
         byte[] isText = new byte[]{1};
         byte[] encryptMessage = new byte[]{0};
-
-        TransactionMap map = dcSet.getTransactionTab();
 
         Random random = new Random();
 
@@ -774,8 +772,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         LOGGER.error(e.getMessage(), e);
                     }
 
-                    if (BlockChain.NOT_STORE_REFFS_HISTORY || BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0) {
-                        // TODO тут нужно обновить за последние 3-10 блоков значения в
+                    if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
+                        // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
                         ReferenceMapImpl map = dcSet.getReferenceMap();
 
                         return;

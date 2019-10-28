@@ -5,7 +5,10 @@ import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.*;
+import org.erachain.datachain.BlockMap;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ReferenceMapImpl;
+import org.erachain.datachain.TransactionMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
@@ -203,8 +206,8 @@ public class Synchronizer extends Thread {
         // VALIDATE THE NEW BLOCKS
 
         //////// здесь надо обновить для валидании ссылки счетов на поледние трнзакции за последние Х блоков\
-        if (BlockChain.NOT_STORE_REFFS_HISTORY || BlockChain.CHECK_DOUBLE_SPEND_DEEP != 0) {
-            // TODO тут нужно обновить за последние 3-10 блоков значения в
+        if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
+            // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
             ReferenceMapImpl map = fork.getReferenceMap();
 
         }
