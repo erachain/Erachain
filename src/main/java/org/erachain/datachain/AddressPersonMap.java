@@ -76,7 +76,7 @@ public class AddressPersonMap extends DCUMap<String, Stack<Tuple4<
 
         value_new.push(item);
 
-        this.set(address, value_new);
+        this.put(address, value_new);
 
     }
 
@@ -101,7 +101,7 @@ public class AddressPersonMap extends DCUMap<String, Stack<Tuple4<
 
         value_new.pop();
 
-        this.set(address, value_new);
+        this.put(address, value_new);
 
     }
 

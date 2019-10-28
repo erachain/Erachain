@@ -295,7 +295,7 @@ public class RVouch extends Transaction {
                         amount,
                         listNew
                 );
-        this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
+        this.dcSet.getVouchRecordMap().put(recordKey, valueNew);
 
     }
 
@@ -318,7 +318,7 @@ public class RVouch extends Transaction {
                         value.a.subtract(this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, this.dcSet)),
                         listNew
                 );
-        this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
+        this.dcSet.getVouchRecordMap().put(recordKey, valueNew);
 
     }
 

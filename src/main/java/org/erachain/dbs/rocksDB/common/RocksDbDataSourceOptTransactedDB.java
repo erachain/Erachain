@@ -20,8 +20,8 @@ public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceImpl {
 
     public RocksDbDataSourceOptTransactedDB(String pathName, String name, List<IndexDB> indexes, RocksDbSettings settings,
                                             TransactionDBOptions transactionDbOptions,
-                                            WriteOptions writeOptions) {
-        super(pathName, name, indexes, settings, writeOptions);
+                                            WriteOptions writeOptions, boolean enableSize) {
+        super(pathName, name, indexes, settings, writeOptions, enableSize);
 
         this.transactionDbOptions = transactionDbOptions;
 
@@ -31,10 +31,10 @@ public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceImpl {
         table = new RocksDbComDB(dbCore);
     }
 
-    public RocksDbDataSourceOptTransactedDB(String name, List<IndexDB> indexes, RocksDbSettings settings) {
+    public RocksDbDataSourceOptTransactedDB(String name, List<IndexDB> indexes, RocksDbSettings settings, boolean enableSize) {
         this(Settings.getInstance().getDataDir() + ROCKS_DB_FOLDER, name, indexes, settings,
                 new TransactionDBOptions(),
-                new WriteOptions().setSync(true).setDisableWAL(false));
+                new WriteOptions().setSync(true).setDisableWAL(false), enableSize);
     }
 
     @Override

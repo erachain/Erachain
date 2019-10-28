@@ -59,7 +59,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
             byte[]> balanceAddressIndex;
 
     public ItemAssetBalanceSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE);
+        super(databaseSet, database, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE, true);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(),
-                databaseSet);
+                databaseSet, enableSize);
 
     }
 

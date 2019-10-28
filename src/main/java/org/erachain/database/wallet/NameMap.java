@@ -142,7 +142,7 @@ public class NameMap extends DCUMapImpl<Tuple2<String, String>, Name> {
 
         //DELETE NAMES
         for (Tuple2<String, String> key : accountNames.keySet()) {
-            this.remove(key);
+            this.delete(key);
         }
     }
 
@@ -151,7 +151,7 @@ public class NameMap extends DCUMapImpl<Tuple2<String, String>, Name> {
     }
 
     public void delete(Account account, Name name) {
-        this.remove(new Tuple2<String, String>(account.getAddress(), name.getName()));
+        this.delete(new Tuple2<String, String>(account.getAddress(), name.getName()));
     }
 
     public void deleteAll(List<Account> accounts) {

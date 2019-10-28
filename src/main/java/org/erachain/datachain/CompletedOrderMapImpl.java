@@ -65,7 +65,7 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
             boolean debug = true;
         }
 
-        this.set(order.getId(), order);
+        this.put(order.getId(), order);
     }
 
     @Override
@@ -75,6 +75,6 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
             boolean debug = true;
         }
 
-        this.remove(order.getId());
+        this.delete(order.getId());
     }
 }

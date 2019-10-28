@@ -1027,7 +1027,7 @@ public class Controller extends Observable {
             }
             DCSet.reCreateDB(this.dcSetWithObserver, this.dynamicGUI);
 
-            this.dcSet.getLocalDataMap().set(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
+            this.dcSet.getLocalDataMap().put(LocalDataMap.LOCAL_DATA_VERSION_KEY, Controller.releaseVersion);
 
         }
     }
@@ -2688,9 +2688,6 @@ public class Controller extends Observable {
 
             try {
                 this.synchronizer.pipeProcessOrOrphan(this.dcSet, newBlock, false, true, false);
-                if (network != null) {
-                    this.network.clearHandledWinBlockMessages();
-                }
 
             } catch (Exception e) {
                 if (this.isOnStopping()) {
@@ -2699,6 +2696,9 @@ public class Controller extends Observable {
                     LOGGER.error(e.getMessage(), e);
                     return false;
                 }
+            }
+            if (network != null) {
+                this.network.clearHandledWinBlockMessages();
             }
         } finally {
             newBlock.close();
@@ -3338,7 +3338,7 @@ public class Controller extends Observable {
     }
 
     public Block getBlockByHeight(DCSet db, int parseInt) {
-        return db.getBlockMap().getWithMind(parseInt);
+        return db.getBlockMap().getAndProcess(parseInt);
     }
 
     public Block getBlockByHeight(int parseInt) {

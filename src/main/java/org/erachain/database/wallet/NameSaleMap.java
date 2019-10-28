@@ -157,7 +157,7 @@ public class NameSaleMap extends DCUMapImpl<Tuple2<String, String>, BigDecimal> 
 
         //DELETE NAMES
         for (Tuple2<String, String> key : accountNameSales.keySet()) {
-            this.remove(key);
+            this.delete(key);
         }
     }
 
@@ -166,7 +166,7 @@ public class NameSaleMap extends DCUMapImpl<Tuple2<String, String>, BigDecimal> 
     }
 
     public void delete(Account account, NameSale nameSale) {
-        this.remove(new Tuple2<String, String>(account.getAddress(), nameSale.getKey()));
+        this.delete(new Tuple2<String, String>(account.getAddress(), nameSale.getKey()));
     }
 
     public void deleteAll(List<Account> accounts) {

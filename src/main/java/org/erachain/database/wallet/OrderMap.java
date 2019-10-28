@@ -88,12 +88,12 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
 
         //DELETE NAMES
         for (Tuple2<String, Long> key : accountOrders.keySet()) {
-            this.remove(key);
+            this.delete(key);
         }
     }
 
     public void delete(Order order) {
-        this.remove(new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId()));
+        this.delete(new Tuple2<String, Long>(order.getCreator().getAddress(), order.getId()));
     }
 
     public void deleteAll(List<Account> accounts) {

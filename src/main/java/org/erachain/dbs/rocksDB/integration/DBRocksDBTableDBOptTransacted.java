@@ -31,32 +31,32 @@ public class DBRocksDBTableDBOptTransacted<K, V> extends DBRocksDBTable<K, V> {
     public DBRocksDBTableDBOptTransacted(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE,
                                          List<IndexDB> indexes, RocksDbSettings settings,
                                          TransactionDBOptions transactionDbOptions,
-                                         WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+                                         WriteOptions writeOptions, ReadOptions readOptions, DBASet dbaSet, boolean enableSize) {
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         this.transactionDbOptions = transactionDbOptions;
         this.readOptions = readOptions;
         openSource();
         afterOpen();
     }
 
-    public DBRocksDBTableDBOptTransacted(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
+    public DBRocksDBTableDBOptTransacted(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet, boolean enableSize) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
                 new TransactionDBOptions(),
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(), dbaSet);
+                new ReadOptions(), dbaSet, enableSize);
     }
 
-    public DBRocksDBTableDBOptTransacted(String NAME_TABLE) {
+    public DBRocksDBTableDBOptTransacted(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
                 new TransactionDBOptions(),
-                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null);
+                new WriteOptions().setSync(true).setDisableWAL(false), new ReadOptions(), null, enableSize);
     }
 
     @Override
     public void openSource() {
         dbSource = new RocksDbDataSourceOptTransactedDB(this.root, NAME_TABLE, indexes, settings,
-                transactionDbOptions, writeOptions);
+                transactionDbOptions, writeOptions, enableSize);
     }
 
 }

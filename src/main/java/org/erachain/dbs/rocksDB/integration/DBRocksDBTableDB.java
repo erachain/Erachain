@@ -24,27 +24,27 @@ import java.util.List;
 public class DBRocksDBTableDB<K, V> extends DBRocksDBTable<K, V> {
 
     public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                            RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
-        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet);
+                            RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet, boolean enableSize) {
+        super(byteableKey, byteableValue, NAME_TABLE, indexes, settings, writeOptions, dbaSet, enableSize);
         openSource();
         afterOpen();
     }
 
     public DBRocksDBTableDB(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
-                            RocksDbSettings settings, WriteOptions writeOptions) {
-        super(byteableKey, byteableValue, indexes, settings, writeOptions);
+                            RocksDbSettings settings, WriteOptions writeOptions, boolean enableSize) {
+        super(byteableKey, byteableValue, indexes, settings, writeOptions, enableSize);
         openSource();
         afterOpen();
     }
 
-    public DBRocksDBTableDB(String NAME_TABLE) {
+    public DBRocksDBTableDB(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), null);
+                new WriteOptions().setSync(true).setDisableWAL(false), null, enableSize);
     }
 
     @Override
     public void openSource() {
-        dbSource = new RocksDbDataSourceDB(this.root, NAME_TABLE, indexes, settings, writeOptions);
+        dbSource = new RocksDbDataSourceDB(this.root, NAME_TABLE, indexes, settings, writeOptions, enableSize);
     }
 }

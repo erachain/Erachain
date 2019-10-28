@@ -109,23 +109,13 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         return this.contains(Bytes.concat(address, Longs.toByteArray(key)));
     }
 
-    public void set(byte[] address, long key, Tuple5<
+    public void put(byte[] address, long key, Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
         if (key < 0)
             key = -key;
 
-        this.set(Bytes.concat(address, Longs.toByteArray(key)), value);
-    }
-
-    public boolean set(byte[] key, Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
-
-        boolean result = super.set(key, value);
-
-        return result;
-
+        this.put(Bytes.concat(address, Longs.toByteArray(key)), value);
     }
 
     public Tuple5<

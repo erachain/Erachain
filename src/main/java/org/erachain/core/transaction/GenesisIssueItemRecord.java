@@ -112,7 +112,7 @@ public class GenesisIssueItemRecord extends GenesisRecord {
     public void orphan(Block block, int asDeal) {
 
         //DELETE FROM DATABASE
-        this.item.removeFromMap(this.dcSet, 0l);
+        this.item.deleteFromMap(this.dcSet, 0l);
 
     }
 

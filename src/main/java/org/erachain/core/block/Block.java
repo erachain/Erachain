@@ -793,7 +793,7 @@ import java.util.*;
         try {
             int parentHeight = dcSet.getBlockSignsMap().get(this.reference);
             //assert (parentHeight, this.heightBlock - 1);
-            return dcSet.getBlockMap().get(parentHeight);
+            return dcSet.getBlockMap().getAndProcess(parentHeight);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             return null;
@@ -838,7 +838,7 @@ import java.util.*;
     }
 
     public Block getChild(DCSet db) {
-        return db.getBlockMap().get(this.getHeight() + 1);
+        return db.getBlockMap().getAndProcess(this.getHeight() + 1);
     }
 
     public int compareWin(Block block) {
@@ -1745,7 +1745,7 @@ import java.util.*;
                         processTimingLocal = System.nanoTime();
                         try {
                             if (!unconfirmedMap.isClosed()) {
-                                unconfirmedMap.remove(transactionSignature);
+                                unconfirmedMap.delete(transactionSignature);
                             } else {
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
                             }
@@ -1768,17 +1768,17 @@ import java.util.*;
                     ///logger.debug("[" + seqNo + "] try finalMap.set" );
                     processTimingLocal = System.nanoTime();
                     Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                    finalMap.set(key, transaction);
+                    finalMap.put(key, transaction);
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                     if (processTimingLocalDiff < 999999999999l)
                         timerFinalMap_set += processTimingLocalDiff / 1000;
 
                     processTimingLocal = System.nanoTime();
-                    transFinalMapSigns.set(transactionSignature, key);
+                    transFinalMapSigns.put(transactionSignature, key);
                     List<byte[]> signatures = transaction.getOtherSignatures();
                     if (signatures != null) {
                         for (byte[] itemSignature : signatures) {
-                            transFinalMapSigns.set(itemSignature, key);
+                            transFinalMapSigns.put(itemSignature, key);
                         }
                     }
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
@@ -1792,17 +1792,17 @@ import java.util.*;
 
                     processTimingLocal = System.nanoTime();
                     Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                    finalMap.set(key, transaction);
+                    finalMap.put(key, transaction);
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                     if (processTimingLocalDiff < 999999999999l)
                         timerFinalMap_set += processTimingLocalDiff / 1000;
 
                     processTimingLocal = System.nanoTime();
-                    transFinalMapSigns.set(transactionSignature, key);
+                    transFinalMapSigns.put(transactionSignature, key);
                     List<byte[]> signatures = transaction.getOtherSignatures();
                     if (signatures != null) {
                         for (byte[] itemSignature : signatures) {
-                            transFinalMapSigns.set(itemSignature, key);
+                            transFinalMapSigns.put(itemSignature, key);
                         }
                     }
                     processTimingLocalDiff = System.nanoTime() - processTimingLocal;
@@ -1875,7 +1875,7 @@ import java.util.*;
             }
 
             timerStart = System.nanoTime();
-            dcSetPlace.getBlockMap().add(this);
+            dcSetPlace.getBlockMap().putAndProcess(this);
             timerStart = System.nanoTime() - timerStart;
             if (timerStart < 999999999999l)
                 LOGGER.debug("BlockMap add timer [us]: " + timerStart / 1000 + " [" + this.heightBlock + "]");
@@ -2100,7 +2100,7 @@ import java.util.*;
                 index = i + indexStart;
                 txCalculated = this.txCalculated.get(i);
                 txCalculated.setHeightSeq(this.heightBlock, index);
-                finalMap.set(txCalculated);
+                finalMap.put(txCalculated);
 
             }
         }
@@ -2195,7 +2195,7 @@ import java.util.*;
                 timerStart = System.currentTimeMillis();
                 try {
                     if (!unconfirmedMap.isClosed()) {
-                        unconfirmedMap.remove(transactionSignature);
+                        unconfirmedMap.delete(transactionSignature);
                     } else {
                         unconfirmedMap = dcSet.getTransactionTab();
                     }
@@ -2216,15 +2216,15 @@ import java.util.*;
 
                 ///logger.debug("[" + seqNo + "] try finalMap.set" );
                 timerStart = System.currentTimeMillis();
-                finalMap.set(key, transaction);
+                finalMap.put(key, transaction);
                 timerFinalMap_set += System.currentTimeMillis() - timerStart;
                 //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
                 timerStart = System.currentTimeMillis();
-                transFinalMapSinds.set(transactionSignature, key);
+                transFinalMapSinds.put(transactionSignature, key);
                 List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {
                     for (byte[] itemSignature : signatures) {
-                        transFinalMapSinds.set(itemSignature, key);
+                        transFinalMapSinds.put(itemSignature, key);
                     }
                 }
                 timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
@@ -2242,7 +2242,7 @@ import java.util.*;
         LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         timerStart = System.currentTimeMillis();
-        dcSet.getBlockMap().add(this);
+        dcSet.getBlockMap().putAndProcess(this);
         LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         long tickets = System.currentTimeMillis() - start;
@@ -2261,8 +2261,8 @@ import java.util.*;
             throw new Exception("on stoping");
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #0");
-        if (this.heightBlock == 1) {
-            // GENESIS BLOCK cannot be orphanED
+        if (this.heightBlock < 2) {
+            // GENESIS BLOCK cannot be orphaned
             return;
         }
 
@@ -2276,9 +2276,6 @@ import java.util.*;
         }
 
         long start = System.currentTimeMillis();
-
-        // RESET forginf Info Updates
-        this.forgingInfoUpdate = null;
 
         //ORPHAN TRANSACTIONS
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
@@ -2309,8 +2306,11 @@ import java.util.*;
             }
         }
 
+        // RESET forging Info Updates
+        this.forgingInfoUpdate = null;
+
         //DELETE BLOCK FROM DB
-        dcSet.getBlockMap().remove(this.signature, this.reference, this.creator);
+        dcSet.getBlockMap().deleteAndProcess(this.signature, this.reference, this.creator, this.heightBlock);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #4");
 
@@ -2381,7 +2381,7 @@ import java.util.*;
                         //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
                         try {
                             if (!unconfirmedMap.isClosed()) {
-                                unconfirmedMap.add(transaction);
+                                unconfirmedMap.put(transaction);
                             } else {
                                 unconfirmedMap = dcSet.getTransactionTab();
                             }
@@ -2398,7 +2398,7 @@ import java.util.*;
 
                 Long key = Transaction.makeDBRef(height, seqNo);
 
-                finalMap.remove(key);
+                finalMap.delete(key);
                 transFinalMapSinds.delete(transaction.getSignature());
                 List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {

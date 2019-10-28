@@ -2,7 +2,7 @@ package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
-import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IMap;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -100,8 +100,9 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         this.indexes.put(index + DESCENDING_SHIFT_INDEX, (NavigableSet<Tuple2<?, T>>) descendingIndexSet);
     }
 
-    public Map getMap() {
-        return map;
+    @Override
+    public IMap getSource() {
+        return (IMap) map;
     }
 
     //@Override
@@ -235,6 +236,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void put(T key, U value) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.set, так как
+        /// если в подклассе будет из SET вызов PUT то он придет сюда и при перевузове THIS.SET отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> set(key, value);
+        ///
         this.addUses();
 
         this.map.put(key, value);
@@ -261,7 +267,23 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public U removeValue(T key) {
-        return remove(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        this.addUses();
+
+        //REMOVE
+        if (this.map.containsKey(key)) {
+            U value = this.map.remove(key);
+            this.outUses();
+            return value;
+        }
+
+        this.outUses();
+        return null;
     }
 
     /**
@@ -271,6 +293,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
      */
     @Override
     public void delete(T key) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
 
         this.addUses();
         this.map.remove(key);
@@ -280,6 +307,12 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public void deleteValue(T key) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
         this.addUses();
         this.map.remove(key);
         this.outUses();
@@ -328,6 +361,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         return defaultValue;
     }
 
+    /*
     @Override
     public void writeTo(DBTab targetMap) {
         Iterator<T> iterator = this.map.keySet().iterator();
@@ -336,6 +370,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
             targetMap.put(key, this.map.get(key));
         }
     }
+
+     */
 
     @Override
     public void clearCache() {}

@@ -47,11 +47,11 @@ public class UpdateNameMap extends DCUMap<byte[], Name> {
         return this.get(transaction.getSignature());
     }
 
-    public void set(Transaction transaction, Name name) {
-        this.set(transaction.getSignature(), name);
+    public void put(Transaction transaction, Name name) {
+        this.put(transaction.getSignature(), name);
     }
 
     public void delete(Transaction transaction) {
-        this.remove(transaction.getSignature());
+        this.delete(transaction.getSignature());
     }
 }

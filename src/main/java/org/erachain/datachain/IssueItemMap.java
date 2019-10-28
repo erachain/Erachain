@@ -44,11 +44,11 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
         return get(transaction.getSignature());
     }
 
-    public void set(Transaction transaction, Long key) {
-        set(transaction.getSignature(), key);
+    public void put(Transaction transaction, Long key) {
+        put(transaction.getSignature(), key);
     }
 
     public void delete(Transaction transaction) {
-        remove(transaction.getSignature());
+        delete(transaction.getSignature());
     }
 }

@@ -19,10 +19,10 @@ import java.util.Iterator;
 public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionSuit
 {
 
-    private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE_FORK";
+    ///private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE_FORK";
 
     public TransactionSuitRocksDBFork(TransactionMap parent, DBRocksDBTable parentMap, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+        super(parent, databaseSet, logger, null, true);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
-                new WriteOptions().setSync(true).setDisableWAL(false));
+                new WriteOptions().setSync(true).setDisableWAL(false), enableSize);
     }
 
     @Override

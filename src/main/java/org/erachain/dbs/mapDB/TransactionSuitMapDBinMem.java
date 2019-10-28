@@ -5,7 +5,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
-import org.erachain.dbs.DBTab;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -173,13 +172,6 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
         if (database.getEngine().isClosed())
             return new TreeSet<Long>().iterator();
         return super.getIterator();
-    }
-
-    @Override
-    public void writeTo(DBTab targetMap) {
-        if (database.getEngine().isClosed())
-            return;
-        super.writeTo(targetMap);
     }
 
     @Override

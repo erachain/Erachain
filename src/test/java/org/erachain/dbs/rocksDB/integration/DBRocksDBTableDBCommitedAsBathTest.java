@@ -59,7 +59,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, true);
 
             int k = 0;
 
@@ -102,7 +102,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 byte[] value = (byte[]) rocksDB.get(entry.getKey().clone());
                 assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
 
-                rocksDB.remove(entry.getKey().clone());
+                rocksDB.delete(entry.getKey().clone());
 
                 found = rocksDB.containsKey(entry.getKey().clone());
                 assertEquals(found, false);
@@ -146,7 +146,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, true);
 
             int k = 0;
             int step = 10;
@@ -189,7 +189,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 value = (byte[]) rocksDB.get(entry.getKey().clone());
                 assertEquals(value != null && Arrays.equals(value, entry.getValue().clone()), true);
 
-                rocksDB.remove(entry.getKey().clone());
+                rocksDB.delete(entry.getKey().clone());
 
                 // поиск в родительской базе
                 assertEquals(rocksDB.containsKey(entry.getKey().clone()), false);
@@ -227,7 +227,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, true);
 
         long timeMillisBefore = System.currentTimeMillis();
         for (Map.Entry<byte[], byte[]> entry : data) {
@@ -266,7 +266,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            rocksDB.remove(entry.getKey().clone());
+            rocksDB.delete(entry.getKey().clone());
         }
 
         // теперь в транзакцию будем закатывать
@@ -317,7 +317,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         do {
 
-            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+            DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, true);
             logger.info("SIZE = " + rocksDB.size() + " columns: " + rocksDB.columnFamilyHandles.size());
 
             ColumnFamilyHandle columnFamilyHandleDef = (ColumnFamilyHandle) rocksDB.columnFamilyHandles.get(0);
@@ -429,7 +429,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, true);
 
         logger.info("pun in WriteBatch");
 
@@ -544,7 +544,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE);
+        DBRocksDBTableDBCommitedAsBath rocksDB = new DBRocksDBTableDBCommitedAsBath(NAME_TABLE, true);
 
         logger.info("pun in WriteBatch");
 
@@ -600,7 +600,7 @@ public class DBRocksDBTableDBCommitedAsBathTest {
             if (--k < 0)
                 break;
 
-            rocksDB.remove(entry.getKey().clone());
+            rocksDB.delete(entry.getKey().clone());
         }
 
         logger.info("uncommitted SIZE = " + rocksDB.size());

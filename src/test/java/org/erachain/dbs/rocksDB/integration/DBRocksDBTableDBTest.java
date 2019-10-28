@@ -51,7 +51,7 @@ public class DBRocksDBTableDBTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTable rocksDB = new DBRocksDBTableDB(NAME_TABLE);
+            DBRocksDBTable rocksDB = new DBRocksDBTableDB(NAME_TABLE, true);
 
             int k = 0;
 
@@ -86,7 +86,7 @@ public class DBRocksDBTableDBTest {
                 found = rocksDB.containsKey(entry.getKey());
                 assertEquals(found, true);
 
-                rocksDB.remove(entry.getKey());
+                rocksDB.delete(entry.getKey());
 
                 found = rocksDB.containsKey(entry.getKey());
                 assertEquals(found, false);

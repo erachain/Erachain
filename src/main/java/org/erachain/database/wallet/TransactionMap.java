@@ -226,13 +226,13 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
 
         //DELETE TRANSACTIONS
         for (Tuple2<Long, Long> key: accountTransactions) {
-            this.remove(key);
+            this.delete(key);
         }
     }
 
     public void delete(Account account, Transaction transaction) {
         ////this.delete(new Tuple2<Long, Long>(account.getAddress(), new String(transaction.getSignature()).substring(KEY_LENGHT)));
-        this.remove(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()), transaction.getTimestamp()));
+        this.delete(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()), transaction.getTimestamp()));
     }
 
     public void deleteAll(List<Account> accounts) {

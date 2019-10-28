@@ -1,13 +1,13 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.dbs.DBTabCommonImpl;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.ObserverWaiter;
 
 @SuppressWarnings("serial")
 public abstract class WalletSortedTableModel<T, U> extends SortedListTableModelCls<T, U> implements ObserverWaiter {
 
-    public WalletSortedTableModel(DBTabCommonImpl map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
+    public WalletSortedTableModel(DBTabImpl map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
         super(map, columnNames, column_AutoHeight, descending);
 
         addObservers();

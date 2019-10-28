@@ -31,13 +31,14 @@ public abstract class DBMapSuitForkOld<T, U> extends DBMapSuit<T, U> implements 
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitForkOld(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+    public DBMapSuitForkOld(DBTab parent, DBASet dcSet, Logger logger, U defaultValue, boolean enableSize) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
         this.logger = logger;
         this.defaultValue = defaultValue;
+        this.enableSize = enableSize;
 
         this.parent = parent;
 
@@ -133,7 +134,34 @@ public abstract class DBMapSuitForkOld<T, U> extends DBMapSuit<T, U> implements 
     public U remove(T key) {
 
         U value = this.map.get(key);
-        this.map.remove(key);
+        this.map.delete(key);
+
+        if (this.deleted == null) {
+            //this.deleted = new HashMap<T, U>(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
+        }
+
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
+
+        if (value == null) {
+            // если тут нету то попобуем в Родителе найти
+            value = this.parent.get(key);
+        }
+
+        return value;
+
+    }
+
+    @Override
+    public U removeValue(T key) {
+
+        U value = this.map.get(key);
+        this.map.deleteValue(key);
 
         if (this.deleted == null) {
             //this.deleted = new HashMap<T, U>(1024 , 0.75f);
@@ -159,7 +187,26 @@ public abstract class DBMapSuitForkOld<T, U> extends DBMapSuit<T, U> implements 
     @Override
     public void delete(T key) {
 
-        this.map.remove(key);
+        this.map.delete(key);
+
+        if (this.deleted == null) {
+            //this.deleted = new HashMap(1024 , 0.75f);
+            this.deleted = new TreeMap<T, Boolean>();
+        }
+
+        // добавляем в любом случае, так как
+        // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
+        // и это есть в основной базе, то в воркнутую будет помещена так же запись.
+        // Получаем что запись есть и в Родителе и в Форкнутой таблице!
+        // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
+        this.deleted.put(key, EXIST);
+
+    }
+
+    @Override
+    public void deleteValue(T key) {
+
+        this.map.deleteValue(key);
 
         if (this.deleted == null) {
             //this.deleted = new HashMap(1024 , 0.75f);

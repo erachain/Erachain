@@ -157,6 +157,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         return null;
     }
 
+    // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
         BTreeMap map = (BTreeMap) this.map;
@@ -167,17 +168,8 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         // DELETE CalculatedS
         for (Tuple3<Integer, Integer, Long> key : keys) {
             if (this.contains(key))
-                this.remove(key);
+                this.delete(key);
         }
-        keys = null;
-    }
-
-    public void delete(Integer blockNo, Integer transNo, Long seq) {
-        this.remove(new Tuple3<Integer, Integer, Long>(blockNo, transNo, seq));
-    }
-
-    public boolean add(Integer blockNo, Integer transNo, Long seq, Calculated calculated) {
-        return this.set(new Tuple3<Integer, Integer, Long>(blockNo, transNo, seq), calculated);
     }
 
     public Calculated getCalculated(Integer blockNo, Integer transNo, Long seq) {

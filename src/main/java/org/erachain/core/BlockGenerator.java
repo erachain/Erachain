@@ -466,7 +466,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 }
                 try {
                     if (!transactionsMap.isClosed() && transactionsMap.contains(signature))
-                        transactionsMap.remove(signature);
+                        transactionsMap.delete(signature);
                 } catch (java.lang.Throwable e) {
                     if (e instanceof java.lang.IllegalAccessError) {
                         // налетели на закрытую таблицу
@@ -489,7 +489,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         DB database = DCSet.makeDBinMemory();
         try {
             DCSet newBlockDC = dcSet.fork(database);
-            int blockHeight = newBlockDC.getBlockMap().size() + 1;
+            int blockHeight = newBlockDC.getBlockSignsMap().size() + 1;
 
             //Block waitWin;
             int counter = 0;

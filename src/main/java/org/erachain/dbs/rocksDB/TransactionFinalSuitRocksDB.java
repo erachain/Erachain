@@ -48,7 +48,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     ArrayIndexDB<Long, Transaction, Fun.Tuple2<String, Integer>> titleTypeTxs;
 
     public TransactionFinalSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, null);
+        super(databaseSet, database, logger, null, false);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(),
-                databaseSet);
+                databaseSet, enableSize);
     }
 
     @Override

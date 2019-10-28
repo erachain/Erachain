@@ -106,7 +106,7 @@ public class KNMap extends DCUMap<
 
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
     }
 
     public Tuple3<Long, Integer, byte[]> getItem(Long key, String nameKey) {
@@ -142,7 +142,7 @@ public class KNMap extends DCUMap<
             value_new.put(nameKey, stack_new);
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
 
     }
 

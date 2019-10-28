@@ -260,15 +260,16 @@ public class CancelOrderTransaction extends Transaction {
 
     public static void process_it(DCSet db, Order order) {
 
+        //DELETE FROM DATABASE FIRST - иначе сработает проверка внутри
+        db.getOrderMap().delete(order.getId());
+
         //SET ORPHAN DATA
-        db.getCompletedOrderMap().put(order);
+        db.getCompletedOrderMap().put(order.getId(), order);
 
         //UPDATE BALANCE OF CREATOR
         //creator.setBalance(orderSignature.getHaveAssetKey(), creator.getBalance(db, orderSignature.getHaveAssetKey()).add(orderSignature.getAmountHaveLeft()), db);
         order.getCreator().changeBalance(db, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
 
-        //DELETE FROM DATABASE
-        db.getOrderMap().remove(order.getId());
     }
 
     //@Override
@@ -294,14 +295,15 @@ public class CancelOrderTransaction extends Transaction {
     }
 
     public static void orphan_it(DCSet db, Order order) {
-        db.getOrderMap().put(order);
+        //DELETE ORPHAN DATA FIRST - иначе ошибка будет при добавлении в таблицу ордеров
+        db.getCompletedOrderMap().delete(order.getId());
+
+        db.getOrderMap().put(order.getId(), order);
 
         //REMOVE BALANCE OF CREATOR
         //creator.setBalance(orderID.getHaveAssetKey(), creator.getBalance(db, orderID.getHaveAssetKey()).subtract(orderID.getAmountHaveLeft()), db);
         order.getCreator().changeBalance(db, true, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
 
-        //DELETE ORPHAN DATA
-        db.getCompletedOrderMap().remove(order.getId());
     }
 
     //@Override

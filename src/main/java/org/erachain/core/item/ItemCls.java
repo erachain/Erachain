@@ -562,7 +562,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
             // INSERT WITH NOVA KEY
             newKey = novaKey;
-            dbMap.set(newKey, this);
+            dbMap.put(newKey, this);
 
         } else {
 
@@ -578,27 +578,27 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         this.key = newKey;
         //SET ORPHAN DATA
-        this.getDBIssueMap(db).set(this.reference, newKey);
+        this.getDBIssueMap(db).put(this.reference, newKey);
 
         return key;
     }
 
-    public long removeFromMap(DCSet db, long startKey) {
+    public long deleteFromMap(DCSet db, long startKey) {
         //DELETE FROM DATABASE
 
         long thisKey = this.getKey(db);
 
         if (thisKey > startKey) {
-            this.getDBMap(db).remove(thisKey);
+            this.getDBMap(db).delete(thisKey);
         } else {
-            this.getDBMap(db).remove(thisKey);
+            this.getDBMap(db).delete(thisKey);
         }
 
         //DELETE ORPHAN DATA
-        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 2");
-        this.getDBIssueMap(db).remove(this.reference);
+        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 2");
+        this.getDBIssueMap(db).delete(this.reference);
 
-        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 3");
+        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 3");
 
         return thisKey;
 

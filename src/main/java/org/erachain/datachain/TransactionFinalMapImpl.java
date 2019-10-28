@@ -106,6 +106,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
 
+        // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
+
         if (map instanceof TransactionFinalSuit) {
             // если карта как NativeMapHashMapFork открыт то сюда не заходим
             Iterator<Long> iterator = ((TransactionFinalSuit) map).getBlockIterator(height);
@@ -118,12 +120,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     public void delete(Integer height, Integer seq) {
-        this.remove(Transaction.makeDBRef(height, seq));
+        this.delete(Transaction.makeDBRef(height, seq));
     }
 
     @Override
-    public boolean add(Integer height, Integer seq, Transaction transaction) {
-        return this.set(Transaction.makeDBRef(height, seq), transaction);
+    public void add(Integer height, Integer seq, Transaction transaction) {
+        this.put(Transaction.makeDBRef(height, seq), transaction);
     }
 
     @Override
@@ -746,8 +748,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    public boolean set(Transaction transaction) {
-        return super.set(transaction.getDBRef(), transaction);
+    public void put(Transaction transaction) {
+        super.put(transaction.getDBRef(), transaction);
     }
 
 }

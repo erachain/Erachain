@@ -106,7 +106,7 @@ public class PersonAddressMap extends DCUMap<
             }
         }
 
-        this.set(person, value_new);
+        this.put(person, value_new);
 
     }
 
@@ -148,7 +148,7 @@ public class PersonAddressMap extends DCUMap<
             value_new.put(address, stack_new);
         }
 
-        this.set(person, value_new);
+        this.put(person, value_new);
 
     }
 

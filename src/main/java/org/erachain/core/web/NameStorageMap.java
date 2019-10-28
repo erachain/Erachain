@@ -46,7 +46,7 @@ public class NameStorageMap extends DCUMap<String, Map<String, String>> {
 
         keyValueMap.put(key, value);
 
-        this.set(name, keyValueMap);
+        this.put(name, keyValueMap);
     }
 
     public void addListEntries(String name, String key,
@@ -72,7 +72,7 @@ public class NameStorageMap extends DCUMap<String, Map<String, String>> {
 
         keyValueMap.put(key, joinedResults);
 
-        this.set(name, keyValueMap);
+        this.put(name, keyValueMap);
     }
 
     public void removeListEntries(String name, String key,
@@ -101,7 +101,7 @@ public class NameStorageMap extends DCUMap<String, Map<String, String>> {
         }
 
 
-        this.set(name, keyValueMap);
+        this.put(name, keyValueMap);
     }
 
     public void remove(String name, String key) {
@@ -109,7 +109,7 @@ public class NameStorageMap extends DCUMap<String, Map<String, String>> {
         if (keyValueMap != null) {
             keyValueMap.remove(key);
         }
-        this.set(name, keyValueMap);
+        this.put(name, keyValueMap);
     }
 
     public String getOpt(String name, String key) {

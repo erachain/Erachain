@@ -15,6 +15,7 @@ import org.erachain.dbs.rocksDB.BlocksSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Atomic;
 import org.mapdb.DB;
+import org.mapdb.Fun;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -29,8 +30,6 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
  * ключ: номер блока (высота, height)<br>
  * занчение: Блок<br>
  * <p>
- * Есть вторичный индекс, для отчетов (blockexplorer) - generatorMap
- * TODO - убрать длинный индек и вставить INT
  *
  * @return
  */
@@ -83,10 +82,14 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         }
     }
 
+    @Override
+    public int size() {
+        return ((DCSet) databaseSet).getBlockSignsMap().size();
+    }
 
     @Override
     public Block last() {
-        return get(size());
+        return getAndProcess(size());
     }
 
     @Override
@@ -99,9 +102,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
     @Override
     public void resetLastBlockSignature() {
-
         // TODO: еще вопрос про org.erachain.datachain.BlocksHeadsMap.getFullWeight
-
         lastBlockSignature = ((DCSet) databaseSet).getBlocksHeadsMap().get(this.size()).signature;
     }
 
@@ -129,16 +130,9 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         this.processing = processing;
     }
 
-    @Override
-    public Block getWithMind(int height) {
-        return get(height);
-
-    }
-
     protected long cacheClearedTime;
-    @Override
-    public Block get(Integer height) {
-        Block block = super.get(height);
+    public Block getAndProcess(Integer height) {
+        Block block = get(height);
         if (block == null)
             return null;
 
@@ -163,83 +157,85 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     }
 
     @Override
-    public boolean add(Block block) {
+    public void putAndProcess(Block block) {
         DCSet dcSet = (DCSet) databaseSet;
         byte[] signature = block.getSignature();
-        if (dcSet.getBlockSignsMap().contains(signature)) {
-            logger.error("already EXIST : " + this.size()
-                    + " SIGN: " + Base58.encode(signature));
-            return true;
-        }
         int height = block.getHeight();
-
-        if (block.getVersion() == 0) {
-            // GENESIS block
-        } else {
-
-            // PROCESS FORGING DATA
-        }
-
-        PublicKeyAccount creator = block.getCreator();
-        if (BlockChain.DEVELOP_USE && creator.getLastForgingData(dcSet) == null) {
-            // так как унас новые счета сами стартуют без инициализации - надо тут учеть начало
-            creator.setForgingData(dcSet, height - BlockChain.DEVELOP_FORGING_START, block.getForgingValue());
-        }
-        creator.setForgingData(dcSet, height, block.getForgingValue());
-
-        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1200: " +
-        // (System.currentTimeMillis() - start)*0.001);
-
-        dcSet.getBlockSignsMap().set(signature, height);
         if (height < 1) {
             Long error = null;
             ++error;
         }
 
-        dcSet.getBlocksHeadsMap().set(block.blockHead);
+        if (dcSet.getBlockSignsMap().contains(signature)) {
+            logger.error("already EXIST : " + height
+                    + " SIGN: " + Base58.encode(signature));
+            return;
+        }
+
+        dcSet.getBlockSignsMap().put(signature, height);
+        if (dcSet.getBlockSignsMap().size() != height) {
+            Long error = null;
+            ++error;
+        }
+
+        PublicKeyAccount creator = block.getCreator();
+        if (BlockChain.ERA_COMPU_ALL_UP && creator.getLastForgingData(dcSet) == null) {
+            // так как у нас новые счета сами стартуют без инициализации - надо тут учеть начало
+            creator.setForgingData(dcSet, height - BlockChain.DEVELOP_FORGING_START, block.getForgingValue());
+        }
+        creator.setForgingData(dcSet, height, block.getForgingValue());
+
+        dcSet.getBlocksHeadsMap().putAndProcess(height, block.blockHead);
         this.setLastBlockSignature(signature);
 
-        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1500: " +
-        // (System.currentTimeMillis() - start)*0.001);
+        if (BlockChain.CHECK_BUGS > 5) {
+            Block.BlockHead head = block.blockHead;
+            Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
+            if (lastPoint.a > head.heightBlock) {
+                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + head.heightBlock);
+                Long i = null;
+                i++;
+            }
+        }
 
-        // TODO feePool
-        // this.setFeePool(_feePool);
-        boolean sss = super.set(height, block);
-        // logger.error("&&&&&&&&&&&&&&&&&&&&&&&&&&& 1600: " +
-        // (System.currentTimeMillis() - start)*0.001);
-        return sss;
+        put(height, block);
 
     }
 
-	/*
-	public boolean set(int height, Block block) {
-		return false;
-	}
-	 */
-
     // TODO make CHAIN deletes - only for LAST block!
     @Override
-    public Block remove(byte[] signature, byte[] reference, PublicKeyAccount creator) {
+    public void deleteAndProcess(byte[] signature, byte[] reference, PublicKeyAccount creator, int height) {
+
+        if (height < 2)
+            return;
+
         DCSet dcSet = (DCSet) databaseSet;
 
-        int height = this.size();
-
-        this.setLastBlockSignature(reference);
         dcSet.getBlockSignsMap().delete(signature);
 
+        this.setLastBlockSignature(reference);
+
         // ORPHAN FORGING DATA
-        if (height > 1) {
+        dcSet.getBlocksHeadsMap().deleteAndProcess(height);
 
-            dcSet.getBlocksHeadsMap().remove();
+        // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
+        creator.delForgingData(dcSet, height);
 
-            // удаляем данные форжинга - внутри уже идет проверка на повторное удаление
-            creator.delForgingData(dcSet, height);
-
+        if (BlockChain.CHECK_BUGS > 5) {
+            Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
+            if (lastPoint.a > height) {
+                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
+                Long i = null;
+                i++;
+            }
         }
 
-        // use SUPER.class only!
-        return super.remove(height);
+        delete(height);
 
+    }
+
+    public void deleteAndProcess(Block block) {
+        deleteAndProcess(block.getSignature(), block.getReference(), block.getCreator(), block.heightBlock);
     }
 
     @Override

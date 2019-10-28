@@ -63,7 +63,7 @@ public class RocksDbDataSourceOptTransactionTest {
         do {
             long timeMillisBefore = System.currentTimeMillis();
 
-            DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE);
+            DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE, true);
 
             int k = 0;
             int step = 10;
@@ -89,7 +89,7 @@ public class RocksDbDataSourceOptTransactionTest {
 
             // теперь в транзакцию будем закатывать
             RocksDbDataSourceOptTransaction dbOptTrans = new RocksDbDataSourceOptTransaction(NAME_TABLE,
-                    (OptimisticTransactionDB) rocksDB.dbSource.getDbCore(), rocksDB.dbSource.getColumnFamilyHandles());
+                    (OptimisticTransactionDB) rocksDB.dbSource.getDbCore(), rocksDB.dbSource.getColumnFamilyHandles(), true);
 
             for (int i = k; i < step; i++) {
 
@@ -103,7 +103,7 @@ public class RocksDbDataSourceOptTransactionTest {
                 // поиск в родительской базе
                 assertEquals(rocksDB.containsKey(entry.getKey()), true);
 
-                dbOptTrans.remove(entry.getKey());
+                dbOptTrans.delete(entry.getKey());
 
                 // поиск в родительской базе
                 assertEquals(rocksDB.containsKey(entry.getKey()), false);
@@ -140,7 +140,7 @@ public class RocksDbDataSourceOptTransactionTest {
 
         int countCommitTMP = 0;
 
-        DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE);
+        DBRocksDBTableDBOptTransacted rocksDB = new DBRocksDBTableDBOptTransacted(NAME_TABLE, true);
 
         long timeMillisBefore = System.currentTimeMillis();
         for (Map.Entry<byte[], byte[]> entry : data) {
@@ -179,12 +179,12 @@ public class RocksDbDataSourceOptTransactionTest {
                 timeMillisBefore = System.currentTimeMillis();
             }
 
-            rocksDB.remove(entry.getKey());
+            rocksDB.delete(entry.getKey());
         }
 
         // теперь в транзакцию будем закатывать
         DBRocksDBTableOptTransaction dbOptTrans = new DBRocksDBTableOptTransaction(NAME_TABLE,
-                (DBRocksDBTableDBOptTransacted) rocksDB);
+                (DBRocksDBTableDBOptTransacted) rocksDB, true);
 
         countCommitTMP = 0;
         timeMillisBefore = System.currentTimeMillis();

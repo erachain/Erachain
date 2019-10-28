@@ -44,10 +44,10 @@ public class NameMap extends DCUMap<String, Name> {
     }
 
     public void add(Name name) {
-        this.set(name.getName(), name);
+        this.put(name.getName(), name);
     }
 
     public void delete(Name name) {
-        this.remove(name.getName());
+        this.delete(name.getName());
     }
 }

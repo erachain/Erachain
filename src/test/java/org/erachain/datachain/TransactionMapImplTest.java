@@ -93,7 +93,7 @@ public class TransactionMapImplTest {
                         new byte[]{(byte) 0}, timestamp + random.nextInt(10000), 0l);
                 messageTx.sign(creator, Transaction.FOR_NETWORK);
 
-                map.add(messageTx);
+                map.put(messageTx);
 
             } catch (Exception e10) {
             }

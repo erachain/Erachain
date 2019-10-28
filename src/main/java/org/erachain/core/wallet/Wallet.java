@@ -40,8 +40,8 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
 import java.util.Timer;
+import java.util.*;
 
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
@@ -535,7 +535,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getAccountMap().add(account, -1);
 			// set name
 			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + (nonce + 1));
-			this.database.getAccountsPropertisMap().set(account.getAddress(), new Tuple2<String, String>(
+			this.database.getAccountsPropertisMap().put(account.getAddress(), new Tuple2<String, String>(
 					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
@@ -670,7 +670,7 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-					Block block = blockMap.get(height);
+					Block block = blockMap.getAndProcess(height);
 
 					if (block == null) {
 						break;
@@ -792,7 +792,7 @@ public class Wallet extends Observable implements Observer {
         if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
             LOGGER.info("TEST CHAIN .... ");
             for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
-                Block block = dcSet.getBlockMap().get(i);
+                Block block = dcSet.getBlockMap().getAndProcess(i);
                 if (block.getHeight() != i) {
                     Long error = null;
                     ++error;
@@ -817,7 +817,7 @@ public class Wallet extends Observable implements Observer {
                         Long error = null;
                         ++error;
                     }
-                    parent = dcSet.getBlockMap().get(i - 1);
+                    parent = dcSet.getBlockMap().getAndProcess(i - 1);
                     if (!Arrays.equals(parent.getSignature(), reference)) {
                         Long error = null;
                         ++error;
@@ -1665,7 +1665,7 @@ public class Wallet extends Observable implements Observer {
 			// DELETE ORDER
 			if (false) {
 				// order STATUS is ORPHANED
-				this.database.getOrderMap().remove(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
+				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCreation.getCreator().getAddress(),
 						Transaction.makeDBRef(orderCreation.getHeightSeqNo())));
 			}
 		}
@@ -1684,7 +1684,7 @@ public class Wallet extends Observable implements Observer {
 		if (this.accountExists(orderCancel.getCreator().getAddress())) {
 			if (false) {
 				// DELETE ORDER
-				this.database.getOrderMap().remove(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
+				this.database.getOrderMap().delete(new Tuple2<String, Long>(orderCancel.getCreator().getAddress(),
 						Transaction.makeDBRef(orderCancel.getHeightSeqNo())));
 			}
 		}

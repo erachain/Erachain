@@ -854,7 +854,7 @@ public class Order implements Comparable<Order> {
                         haveAssetScale, wantAssetScale, index);
 
                 //ADD TRADE TO DATABASE
-                tradesMap.add(trade);
+                tradesMap.put(trade);
 
                 //UPDATE FULFILLED HAVE
                 order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // this.amountHave));
@@ -963,11 +963,8 @@ public class Order implements Comparable<Order> {
         OrderMap ordersMap = this.dcSet.getOrderMap();
         TradeMap tradesMap = this.dcSet.getTradeMap();
 
-        //CHECK IF ORDER IS FULFILLED
-        if (this.isFulfilled()) {
-            //REMOVE FROM COMPLETED ORDERS
-            completedMap.delete(this);
-        }
+        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled - на всякий случай удалим его
+        completedMap.delete(this);
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
 
@@ -979,10 +976,8 @@ public class Order implements Comparable<Order> {
             BigDecimal tradeAmountHave = trade.getAmountHave();
             BigDecimal tradeAmountWant = trade.getAmountWant();
 
-            if (target.isFulfilled()) {
-                //DELETE FROM COMPLETED ORDERS
-                completedMap.delete(target);
-            }
+            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled  - на всякий случай удалим его
+            completedMap.delete(target);
 
             //REVERSE FULFILLED
             target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));

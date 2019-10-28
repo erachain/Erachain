@@ -526,7 +526,7 @@ public class TestRecPerson {
             //EXCEPTION IS THROWN OK
         }
     }
-    @Ignore
+    //@Ignore
     @Test
     public void process_orphan_PersonalizeRecord() {
 

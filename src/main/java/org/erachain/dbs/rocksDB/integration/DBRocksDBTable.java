@@ -58,6 +58,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     protected Byteable byteableValue;
     protected String NAME_TABLE;
     protected RocksDbSettings settings;
+    protected boolean enableSize;
     protected String root;
 
     //Для пересчета размеров таблицы
@@ -80,20 +81,21 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     /**
-     *
-     * @param byteableKey
+     *  @param byteableKey
      * @param byteableValue
      * @param NAME_TABLE
      * @param indexes is null - not use size Counter
      * @param settings
      * @param dbaSet
+     * @param enableSize
      */
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes,
-                          RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet) {
+                          RocksDbSettings settings, WriteOptions writeOptions, DBASet dbaSet, boolean enableSize) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.NAME_TABLE = NAME_TABLE;
         this.settings = settings;
+        this.enableSize = enableSize;
         this.writeOptions = writeOptions;
         this.root = (dbaSet == null // in TESTs
                 || dbaSet.getFile() == null ? // in Memory or in TESTs
@@ -104,17 +106,19 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     /**
      * Use random name for TMP Fork
-     *  @param byteableKey
+     * @param byteableKey
      * @param byteableValue
      * @param indexes
      * @param settings
      * @param writeOptions
+     * @param enableSize
      */
     public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, List<IndexDB> indexes,
-                          RocksDbSettings settings, WriteOptions writeOptions) {
+                          RocksDbSettings settings, WriteOptions writeOptions, boolean enableSize) {
         this.byteableKey = byteableKey;
         this.byteableValue = byteableValue;
         this.settings = settings;
+        this.enableSize = enableSize;
         this.writeOptions = writeOptions;
         this.root = Settings.getInstance().getDataTempDir();
         this.indexes = indexes;
@@ -128,19 +132,20 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     }
 
-    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet) {
+    public DBRocksDBTable(Byteable byteableKey, Byteable byteableValue, String NAME_TABLE, List<IndexDB> indexes, DBASet dbaSet, boolean enableSize) {
         this(byteableKey, byteableValue, NAME_TABLE, indexes, RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), dbaSet);
+                new WriteOptions().setSync(true).setDisableWAL(false), dbaSet, enableSize);
     }
 
     /**
      * for TESTs. new ArrayList<>() - size counter enable
      * @param NAME_TABLE
+     * @param enableSize
      */
-    public DBRocksDBTable(String NAME_TABLE) {
+    public DBRocksDBTable(String NAME_TABLE, boolean enableSize) {
         this(new ByteableTrivial(), new ByteableTrivial(), NAME_TABLE,
                 new ArrayList<>(), RocksDbSettings.getDefaultSettings(),
-                new WriteOptions().setSync(true).setDisableWAL(false), null);
+                new WriteOptions().setSync(true).setDisableWAL(false), null, enableSize);
     }
 
     protected void afterOpen() {
@@ -180,20 +185,22 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         if (logON) logger.info("put invoked");
         //counterFlush++;
         final byte[] keyBytes = byteableKey.toBytesObject(key);
+        byte[] old = null;
         if (logON) logger.info("keyBytes.length = " + keyBytes.length);
-        byte[] old = dbSource.get(keyBytes);
-        if (old == null || old.length == 0) {
-            if (columnFamilyFieldSize != null) {
+
+        if (columnFamilyFieldSize != null) {
+            old = dbSource.get(keyBytes);
+            if (old == null || old.length == 0) {
                 byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
-            }
-        } else {
-            // удалим вторичные ключи
-            if (indexes != null && !indexes.isEmpty()) {
-                removeIndexes(key, keyBytes, old);
+            } else {
+                // Значение старое было значит удалим вторичные ключи
+                if (indexes != null && !indexes.isEmpty()) {
+                    removeIndexes(key, keyBytes, old);
+                }
             }
         }
 
@@ -258,37 +265,24 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 }
             }
         }
-
-        //if (counterFlush % numberBeforeFlush == 0) {
-        //    db.flush();
-        //    counterFlush = 0;
-        //}
     }
 
     void removeIndexes(Object key, byte[] keyBytes, byte[] valueByte) {
+        Object value = byteableValue.receiveObjectFromBytes(valueByte);
         for (IndexDB indexDB : indexes) {
             if (indexDB instanceof SimpleIndexDB) {
                 SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
-                //byte[] valueByte = db.get(keyBytes);
-                if (valueByte == null) {
-                    continue;
-                }
-                Object value = byteableValue.receiveObjectFromBytes(valueByte);
+
                 byte[] bytes = indexDB.getIndexByteable().toBytes(simpleIndexDB.getBiFunction().apply(key, value), key);
                 if (bytes == null) {
                     continue;
                 }
                 byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                dbSource.remove(indexDB.getColumnFamilyHandle(),
+                dbSource.delete(indexDB.getColumnFamilyHandle(),
                         concatenateBiFunctionKey);
             } else if (indexDB instanceof ArrayIndexDB) {
                 ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
                 BiFunction biFunction = arrayIndexDB.getBiFunction();
-                //byte[] valueByte = db.get(keyBytes);
-                if (valueByte == null) {
-                    continue;
-                }
-                Object value = byteableValue.receiveObjectFromBytes(valueByte);
                 Object[] apply = (Object[]) biFunction.apply(key, value);
                 if (apply == null) {
                     continue;
@@ -299,7 +293,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                         continue;
                     }
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    dbSource.remove(indexDB.getColumnFamilyHandle(),
+                    dbSource.delete(indexDB.getColumnFamilyHandle(),
                             concatenateBiFunctionKey);
                 }
             } else if (indexDB instanceof ListIndexDB) {
@@ -309,7 +303,6 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 if (valueByte == null) {
                     continue;
                 }
-                Object value = byteableValue.receiveObjectFromBytes(valueByte);
                 List<Object> apply = (List<Object>) biFunction.apply(key, value);
                 if (apply == null) {
                     continue;
@@ -320,19 +313,41 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                         continue;
                     }
                     byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    dbSource.remove(indexDB.getColumnFamilyHandle(),
+                    dbSource.delete(indexDB.getColumnFamilyHandle(),
                             concatenateBiFunctionKey);
                 }
             } else {
                 throw new UnsupportedTypeIndexException();
             }
-
-
         }
-
     }
+
+    // TODO переделать на REMOVE так как тут берется Значение - сделаь еще REMOVE тдельно
     @Override
-    public void remove(Object key) {
+    public void delete(Object key) {
+        final byte[] keyBytes = byteableKey.toBytesObject(key);
+
+        if (columnFamilyFieldSize != null) {
+            byte[] old = dbSource.get(keyBytes);
+            if (old != null && old.length != 0) {
+                // UPDATE SIZE
+                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+                size--;
+                dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
+
+                // Есть вторичные ключи и значение старое было
+                if (indexes != null && !indexes.isEmpty()) {
+                    removeIndexes(key, keyBytes, old);
+                }
+            }
+        }
+        dbSource.delete(keyBytes);
+    }
+
+    // TODO переделать на REMOVE так как тут берется Значение
+    @Override
+    public void deleteValue(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);
         byte[] old = dbSource.get(keyBytes);
         if (old != null && old.length != 0) {
@@ -346,9 +361,8 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 removeIndexes(key, keyBytes, old);
             }
         }
-        dbSource.remove(keyBytes);
+        dbSource.delete(keyBytes);
     }
-
 
     @Override
     public void clear() {

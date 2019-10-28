@@ -35,12 +35,9 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     int clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
 
-    boolean set(byte[] signature, Transaction transaction);
+    //boolean set(byte[] signature, Transaction transaction);
 
-    boolean add(Transaction transaction);
-
-    Transaction remove(Transaction transaction);
-    Transaction remove(byte[] signature);
+    void put(Transaction transaction);
 
     void delete(Transaction transaction);
     void delete(byte[] signature);

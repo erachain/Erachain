@@ -7,7 +7,6 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.item.ItemCls;
-import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -220,7 +219,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
-        long key = this.item.removeFromMap(this.dcSet, START_KEY);
+        long key = this.item.deleteFromMap(this.dcSet, START_KEY);
         //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
     }
 
