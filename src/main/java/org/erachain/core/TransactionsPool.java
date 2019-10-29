@@ -219,7 +219,7 @@ public class TransactionsPool extends MonitoredThread {
                         }
                     }
 
-                    boolean needReset = clearedUTXs > DCSet.DELETIONS_BEFORE_COMPACT >> (isStatusOK ? 0 : 4)
+                    boolean needReset = clearedUTXs > DCSet.DELETIONS_BEFORE_COMPACT >> (isStatusOK ? 0 : 3)
                             //|| System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 3
                             ;
                     // reset Map & repopulate UTX table
