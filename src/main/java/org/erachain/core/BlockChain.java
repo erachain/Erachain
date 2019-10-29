@@ -1028,21 +1028,22 @@ public class BlockChain {
         boolean noValid = true;
         try {
             noValid = !block.isValid(dcSet.fork(database), true);
-            // FULL VALIDATE because before was only HEAD validating
-            if (noValid) {
-
-                LOGGER.info("new winBlock is BAD!");
-                if (peer != null)
-                    Controller.getInstance().banPeerOnError(peer, "invalid block", 10);
-                else
-                    LOGGER.error("MY WinBlock is INVALID! ignore...");
-
-                return false;
-            }
         } finally {
             // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
             if (noValid)
                 database.close();
+        }
+
+        // FULL VALIDATE because before was only HEAD validating
+        if (noValid) {
+
+            LOGGER.info("new winBlock is BAD!");
+            if (peer != null)
+                Controller.getInstance().banPeerOnError(peer, "invalid block", 10);
+            else
+                LOGGER.error("MY WinBlock is INVALID! ignore...");
+
+            return false;
         }
 
         // set and close OLD
