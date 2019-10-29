@@ -20,7 +20,7 @@ public class TransactionsPool extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionsPool.class.getSimpleName());
 
-    private static final int QUEUE_LENGTH = BlockChain.TEST_DB > 0 ? 5 + BlockChain.TEST_DB >> 2 : BlockChain.MAX_BLOCK_SIZE_GEN;
+    private static final int QUEUE_LENGTH = BlockChain.TEST_DB > 0 ? 5 + BlockChain.TEST_DB >> 1 : BlockChain.MAX_BLOCK_SIZE_GEN >> 1;
     BlockingQueue<Object> blockingQueue = new ArrayBlockingQueue<Object>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -164,47 +164,78 @@ public class TransactionsPool extends MonitoredThread {
             controller.network.broadcast(transactionMessage, false);
         }
 
-        // проверяем на переполнение пула чтобы лишние очистить
-        boolean isStatusOk = controller.isStatusOK();
-        if (clearCount > (isStatusOk? 2000 : 500) << (Controller.HARD_WORK >> 2)) {
-            clearCount = 0;
-            pointClear = System.currentTimeMillis();
-            needClearMap = true;
-            this.cutDeadTime = !isStatusOk;
-        }
-
     }
 
     public void run() {
 
         long poinClear = 0;
+        long poinCleared = 0;
         int clearedUTXs = 0;
 
         runned = true;
         //Message message;
         while (runned) {
 
-            if (needClearMap) {
+            if (System.currentTimeMillis() - poinClear > 60000 || clearCount - poinCleared > 10000) {
+
                 /////// CLEAR
                 try {
-                    needClearMap = false;
 
-                    int height = dcSet.getBlocksHeadsMap().size();
-                    ;
-                    boolean needReset = clearedUTXs > DCSet.DELETIONS_BEFORE_COMPACT >> (controller.isStatusOK() ? 0 : 7)
+                    poinClear = System.currentTimeMillis();
+
+                    // проверяем на переполнение пула чтобы лишние очистить
+                    boolean isStatusOK = controller.isStatusOK();
+                    needClearMap = clearCount > (BlockChain.TEST_DB > 0 ? BlockChain.TEST_DB << 2 : ((isStatusOK ? QUEUE_LENGTH << 2 : 500) << (Controller.HARD_WORK >> 2)));
+
+                    int sizeUTX = utxMap.size();
+                    if (needClearMap) {
+                        // очистим транзакции из очереди
+                        needClearMap = false;
+
+                        /// те транзакции что съела сборка блока тоже учтем
+                        clearedUTXs += clearCount - sizeUTX;
+
+                        poinCleared = clearCount = 0;
+
+                        if (isStatusOK) {
+                            if (sizeUTX > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
+                                int height = dcSet.getBlocksHeadsMap().size();
+                                long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
+                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, false);
+                            }
+                        } else {
+                            // если идет синхронизация, то удаляем все что есть не на текущее время
+                            // и так как даже если мы вот-вот засинхримся мы все равно блок не сможем сразу собрать
+                            // из-за мягкой синхронизации с сетью - а значит и нам не нужно заботиться об удаленных трнзакциях
+                            // у нас - они будут включены другими нодами которые полностью в синхре
+                            // мы выстыпаем лишь как ретрнслятор - при этом у нас запас по времени хранения все равно должен быть
+                            // чтобы помнить какие транзакции мы уже словили и ретранслировали
+                            if (sizeUTX > BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3) {
+                                int height = dcSet.getBlocksHeadsMap().size();
+                                long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
+                                //long timestamp = NTP.getTime();
+                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, true);
+                            }
+                        }
+                    }
+
+                    boolean needReset = clearedUTXs > DCSet.DELETIONS_BEFORE_COMPACT >> (isStatusOK ? 0 : 4)
                             //|| System.currentTimeMillis() - poinClear - 1000 > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 3
                             ;
                     // reset Map & repopulate UTX table
                     if (needReset) {
+
+                        int height = dcSet.getBlocksHeadsMap().size();
+
                         clearedUTXs = 0;
                         LOGGER.debug("try RESET POOL UTXs");
                         poinClear = System.currentTimeMillis();
-                        int sizeUTX = utxMap.size();
                         LOGGER.debug("try RESET POOL UTXs, size: " + sizeUTX);
                         // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
                         // так .values() выдает не отдельный массив а объект базы данных!
                         Transaction[] items = utxMap.values().toArray(new Transaction[]{});
                         utxMap.clear();
+                        clearCount = 0;
                         long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
                         int countDeleted = 0;
                         if (sizeUTX < BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
@@ -215,6 +246,7 @@ public class TransactionsPool extends MonitoredThread {
                                 }
                                 utxMap.put(item);
                             }
+                            clearCount += countDeleted;
                             LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear)
                                     + " ms, DELETED by Deadlime:  " + countDeleted);
                         } else {
@@ -228,29 +260,9 @@ public class TransactionsPool extends MonitoredThread {
                                 utxMap.put(item);
                             } while (sizeUTX - i < BlockChain.MAX_UNCONFIGMED_MAP_SIZE);
                             countDeleted = sizeUTX - utxMap.size();
+                            clearCount += countDeleted;
                             LOGGER.debug("ADDED UTXs: " + utxMap.size() + " for " + (System.currentTimeMillis() - poinClear)
                                     + " ms, DELETED by oversize:  " + countDeleted);
-                        }
-
-
-                    } else {
-                        if (controller.isStatusOK()) {
-                            if (utxMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE) {
-                                long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
-                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, false);
-                            }
-                        } else {
-                            // если идет синхронизация, то удаляем все что есть не на текущее время
-                            // и так как даже если мы вот-вот засинхримся мы все равно блок не сможем сразу собрать
-                            // из-за мягкой синхронизации с сетью - а значит и нам не нужно заботиться об удаленных трнзакциях
-                            // у нас - они будут включены другими нодами которые полностью в синхре
-                            // мы выстыпаем лишь как ретрнслятор - при этом у нас запас по времени хранения все равно должен быть
-                            // чтобы помнить какие транзакции мы уже словили и ретранслировали
-                            if (utxMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3) {
-                                long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
-                                //long timestamp = NTP.getTime();
-                                clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, true);
-                            }
                         }
                     }
                 } catch (OutOfMemoryError e) {
@@ -265,6 +277,7 @@ public class TransactionsPool extends MonitoredThread {
                     LOGGER.error(e.getMessage(), e);
                 }
             }
+
 
             // PROCESS
             try {

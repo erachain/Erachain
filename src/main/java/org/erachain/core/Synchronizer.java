@@ -1093,16 +1093,7 @@ public class Synchronizer extends Thread {
                 // FLUSH not use in each case - only after accumulate size
                 int blockSize = 3 + block.getTransactionCount();
 
-                if (false) {
-                    dcSet.flush(blockSize, false, doOrphan);
-                } else {
-                    dcSet.close();
-                    try {
-                        Controller.getInstance().reCreateDC(false);
-                    } catch (Exception e) {
-                    }
-                }
-
+                dcSet.flush(blockSize, false, doOrphan);
 
                 if (cnt.isOnStopping())
                     return;

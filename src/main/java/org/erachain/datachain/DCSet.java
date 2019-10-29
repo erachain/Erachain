@@ -45,7 +45,7 @@ public class DCSet extends DBASet {
     // если все на Рокс перевели то меньше надо ставить
     private static final long MAX_ENGINE_BEFORE_COMMIT_KB = 999999999999999L; ///BlockChain.MAX_BLOCK_SIZE_BYTES_GEN >> 5;
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
-    public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT << 4;
+    public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT << 2;
 
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
