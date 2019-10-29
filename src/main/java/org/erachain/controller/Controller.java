@@ -2678,7 +2678,7 @@ public class Controller extends Observable {
                 // или при добавлении моего сгнерированного блока т.к. он не проверился?
 
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
-                DB database = DCSet.makeDBinMemory();
+                DB database = DCSet.getHardBaseForFork(); //DCSet.makeDBinMemory();
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
                 if (!newBlock.isValid(dcSet.fork(database), true)) {
                     // тогда проверим заново полностью

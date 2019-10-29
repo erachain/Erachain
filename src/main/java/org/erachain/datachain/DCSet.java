@@ -1528,7 +1528,7 @@ public class DCSet extends DBASet {
                 // количество точек в таблице которые хранятся в HashMap как в КЭШе
                 // - начальное значени для всех UNBOUND и максимальное для КЭШ по умолчанию
                 // WAL в кэш на старте закатывает все значения - ограничим для быстрого старта
-                /////.cacheSize(1024)
+                .cacheSize(2048)
 
                 //.checksumEnable()
                 .mmapFileEnableIfSupported() // ++ but -- error on asyncWriteEnable
