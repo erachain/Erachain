@@ -38,8 +38,15 @@ public class BlockChain {
     public static final int TESTS_VERS = 0; // not use TESTs - or 411 (as version)
     public static final boolean DEVELOP_USE = false;
 
+    /**
+     * Задает потолок цепочки
+     */
     public static final int BLOCK_COUNT = 0; //108974; ////
-    // сколько транзакции в блоке - если больше 0 то запускает тест на старте
+    /**
+     * DATABASE benchmark test. use start options:<br>
+     * erachain.jar -pass=1 -seed=5:new:1 -opi -nodatawallet -nocalculated -hardwork=0 -dbschain=rocksdb <br>
+     * сколько транзакции в блоке - если больше 0 то запускает тест на старте
+     */
     public static final int TEST_DB = 10000;
     // запрет сборки своих блоков в ТЕСТЕ
     public static final boolean STOP_GENERATE_BLOCKS = false;
