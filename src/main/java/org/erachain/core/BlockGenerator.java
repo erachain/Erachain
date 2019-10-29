@@ -221,7 +221,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
+    long totalTest = 0;
     private void testTransactions(int blockHeight) {
+
+        if (totalTest > 100000)
+            return;
 
         SecureRandom randomSecure = new SecureRandom();
         // сдвиг назад организуем
@@ -284,6 +288,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             ctrl.transactionsPool.offerMessage(messageTx);
+            totalTest++;
 
         }
 

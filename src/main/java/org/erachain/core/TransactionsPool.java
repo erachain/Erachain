@@ -20,7 +20,7 @@ public class TransactionsPool extends MonitoredThread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionsPool.class.getSimpleName());
 
-    private static final int QUEUE_LENGTH = BlockChain.TEST_DB > 0 ? BlockChain.TEST_DB << 1 : BlockChain.MAX_BLOCK_SIZE_GEN;
+    private static final int QUEUE_LENGTH = BlockChain.TEST_DB > 0 ? BlockChain.TEST_DB >> 2 : BlockChain.MAX_BLOCK_SIZE_GEN;
     BlockingQueue<Object> blockingQueue = new ArrayBlockingQueue<Object>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -197,10 +197,10 @@ public class TransactionsPool extends MonitoredThread {
                     // reset Map & repopulate UTX table
                     if (needReset) {
                         clearedUTXs = 0;
-                        LOGGER.debug("try CLEAR UTXs");
+                        LOGGER.debug("try RESET POOL UTXs");
                         poinClear = System.currentTimeMillis();
                         int sizeUTX = utxMap.size();
-                        LOGGER.debug("try CLEAR UTXs, size: " + sizeUTX);
+                        LOGGER.debug("try RESET POOL UTXs, size: " + sizeUTX);
                         // нужно скопировать из таблици иначе после закрытия ее ошибка обращения
                         // так .values() выдает не отдельный массив а объект базы данных!
                         Transaction[] items = utxMap.values().toArray(new Transaction[]{});

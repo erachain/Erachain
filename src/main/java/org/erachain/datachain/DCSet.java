@@ -1724,11 +1724,6 @@ public class DCSet extends DBASet {
         if (needRepopulateUTX && Controller.getInstance().transactionsPool != null) {
             Controller.getInstance().transactionsPool.needClear(doOrphan);
 
-            if (needClearCache || clearGC) {
-                LOGGER.debug("CLEAR ENGINE CACHE...");
-                clearCache();
-            }
-
             poinClear = System.currentTimeMillis();
 
         }
@@ -1795,6 +1790,10 @@ public class DCSet extends DBASet {
 
             clearGC = !clearGC;
             if (clearGC) {
+                if (true || needClearCache || clearGC) {
+                    LOGGER.debug("CLEAR ENGINE CACHE...");
+                    clearCache();
+                }
                 LOGGER.debug("CLEAR GC");
                 System.gc();
             }

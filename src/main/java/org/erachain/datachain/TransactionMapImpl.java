@@ -242,6 +242,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                 pointClear = System.currentTimeMillis();
             }
         } finally {
+            databaseSet.clearCache();
             // освободим процесс
             clearProcessed = false;
         }
