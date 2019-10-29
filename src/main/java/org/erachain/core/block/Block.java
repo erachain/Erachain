@@ -1909,6 +1909,13 @@ import java.util.*;
             }
             validatedForkDB = null;
         }
+        transactions = null;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        close();
+        super.finalize();
     }
 
     public void saveToChainFromvalidatedForkDB() {

@@ -30,7 +30,7 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         // OPEN MAP
         if (parent == null) {
             switch (dbsUsed) {

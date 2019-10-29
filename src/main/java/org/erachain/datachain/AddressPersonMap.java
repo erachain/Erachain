@@ -40,7 +40,7 @@ public class AddressPersonMap extends DCUMap<String, Stack<Tuple4<
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("address_person")
                 .keySerializer(BTreeKeySerializer.STRING)

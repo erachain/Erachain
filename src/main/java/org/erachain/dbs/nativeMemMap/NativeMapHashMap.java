@@ -15,7 +15,7 @@ public class NativeMapHashMap<T, U> extends DBMapSuit<T, U> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
 
         // OPEN MAP
         map = new HashMap<T, U>();

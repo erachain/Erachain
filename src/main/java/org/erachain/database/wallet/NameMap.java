@@ -70,7 +70,7 @@ public class NameMap extends DCUMapImpl<Tuple2<String, String>, Name> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("names")
                 .keySerializer(BTreeKeySerializer.TUPLE2)

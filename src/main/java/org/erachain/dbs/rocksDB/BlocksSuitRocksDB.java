@@ -25,7 +25,7 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
 
         if (true) {
             map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableInteger(), new ByteableBlock(),

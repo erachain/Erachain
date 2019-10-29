@@ -114,7 +114,7 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         BTreeMap mapTree = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.TUPLE2)

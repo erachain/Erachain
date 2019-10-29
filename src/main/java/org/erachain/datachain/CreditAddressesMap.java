@@ -38,7 +38,7 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("credit_debt")
                 .keySerializer(BTreeKeySerializer.TUPLE3)

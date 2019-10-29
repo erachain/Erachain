@@ -52,7 +52,7 @@ public class KKNMap extends DCUMap<
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         BTreeMap<Long, TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>> map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.BASIC)

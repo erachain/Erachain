@@ -47,7 +47,7 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)

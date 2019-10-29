@@ -55,7 +55,7 @@ public abstract class BalanceMap extends DCUMap<Tuple2<Long, Long>,
 
     @SuppressWarnings({"unchecked"})
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("assets_balances_" + this.name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)

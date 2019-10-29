@@ -30,7 +30,7 @@ public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
     protected void createIndexes() {
     }
 
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("cancelNameOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

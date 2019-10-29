@@ -19,7 +19,7 @@ public class IssueUnionMap extends IssueItemMap {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("union_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

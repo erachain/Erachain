@@ -107,8 +107,6 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     }
 
-    protected abstract void openMap();
-
     // for TESTS etc.
     public void setSource(IMap map) { this.map = map; }
 

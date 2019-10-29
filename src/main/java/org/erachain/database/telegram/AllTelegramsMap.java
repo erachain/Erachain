@@ -25,7 +25,7 @@ public class AllTelegramsMap extends DCUMapImpl<String, Transaction> {
    
     @SuppressWarnings("unchecked")
     @Override
-    protected void openMap() {
+    public void openMap() {
       //OPEN MAP
        map = database.createTreeMap("telegrams")
                .keySerializer(BTreeKeySerializer.BASIC)

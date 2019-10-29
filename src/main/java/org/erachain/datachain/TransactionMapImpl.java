@@ -70,7 +70,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     }
 
     @Override
-    protected void openMap()
+    public void openMap()
     {
         if (parent == null) {
             switch (dbsUsed) {

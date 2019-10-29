@@ -41,7 +41,7 @@ public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("hashes_signs")
                 .keySerializer(BTreeKeySerializer.BASIC)

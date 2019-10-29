@@ -22,7 +22,7 @@ public class VoteOnPollMap extends DCUMap<byte[], Integer> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("voteOnPollOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

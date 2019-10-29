@@ -35,7 +35,7 @@ public class TransactionFinalSignsSuitMapDBFork extends DBMapSuitFork<byte[], Lo
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         if (database == null) {
             map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());

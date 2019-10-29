@@ -15,7 +15,7 @@ public class NativeMapHashMapFork<T, U> extends DBMapSuitFork<T, U> implements F
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
 
         // OPEN MAP
         map = new HashMap<T, U>();

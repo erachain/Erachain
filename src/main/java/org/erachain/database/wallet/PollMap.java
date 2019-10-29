@@ -70,7 +70,7 @@ public class PollMap extends DCUMapImpl<Tuple2<String, String>, Poll> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("polls")
                 .keySerializer(BTreeKeySerializer.TUPLE2)

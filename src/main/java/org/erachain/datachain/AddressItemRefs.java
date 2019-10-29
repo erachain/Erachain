@@ -45,7 +45,7 @@ public abstract class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("address_" + this.name + "_refs")
                 //.keySerializer(BTreeKeySerializer.TUPLE2)

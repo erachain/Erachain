@@ -50,7 +50,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         // OPEN MAP
         if (parent == null) {
             switch (dbsUsed) {

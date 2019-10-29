@@ -59,7 +59,7 @@ public class ATMap extends DCUMapImpl<String, AT> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = this.openMap(database);
     }

@@ -22,7 +22,7 @@ public class HashesMap extends DCUMap<byte[], byte[]> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("hashes_keys")
                 .keySerializer(BTreeKeySerializer.BASIC)

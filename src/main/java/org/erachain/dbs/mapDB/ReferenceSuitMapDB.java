@@ -22,7 +22,7 @@ public class ReferenceSuitMapDB extends DBMapSuit<byte[], long[]>
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createHashMap("references")
                 .keySerializer(SerializerBase.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работать не будет поиск с байтами

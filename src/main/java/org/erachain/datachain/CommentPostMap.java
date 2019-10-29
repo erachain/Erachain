@@ -21,7 +21,7 @@ public class CommentPostMap extends DCUMap<byte[], byte[]> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
 
         map = database.createTreeMap("CommentPostMapTree")
                 .comparator(SignedBytes.lexicographicalComparator())

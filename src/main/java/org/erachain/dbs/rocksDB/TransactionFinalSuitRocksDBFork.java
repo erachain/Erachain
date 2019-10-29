@@ -24,7 +24,7 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
 
         map = new DBRocksDBTableDB<>(new ByteableLong(), new ByteableTransaction(), indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,

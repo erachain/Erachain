@@ -37,7 +37,7 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         // OPEN MAP
         if (parent == null) {
             switch (dbsUsed) {

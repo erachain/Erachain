@@ -65,7 +65,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         if (this.name == null)
             return;

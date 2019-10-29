@@ -58,7 +58,7 @@ public class VouchRecordMap extends DCUMap<Long, Tuple2<BigDecimal, List<Long>>>
 
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = openMap(database);
     }

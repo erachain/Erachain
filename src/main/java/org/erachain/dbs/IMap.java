@@ -13,6 +13,8 @@ public interface IMap<T, U> {
 
     Boolean EXIST = true;
 
+    void openMap();
+
     IMap getSource();
 
     int size();

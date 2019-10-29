@@ -23,7 +23,7 @@ public class TelegramsMap extends DCUMapImpl<String, Transaction> {
     }
    
     @Override
-    protected void openMap() {
+    public void openMap() {
       //OPEN MAP
         map = database.createTreeMap("telegrams1")
                 .keySerializer(BTreeKeySerializer.STRING)

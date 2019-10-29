@@ -29,7 +29,7 @@ public class ATStateMap extends DCUMap<Tuple2<Integer, String>, byte[]> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         map = this.openMap(database);
     }
 

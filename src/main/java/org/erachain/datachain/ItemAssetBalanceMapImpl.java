@@ -76,7 +76,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     // TODO вставить настройки выбора СУБД
     @Override
-    protected void openMap()
+    public void openMap()
     {
 
 

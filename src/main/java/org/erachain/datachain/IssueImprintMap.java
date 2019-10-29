@@ -19,7 +19,7 @@ public class IssueImprintMap extends IssueItemMap {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("imprint_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)

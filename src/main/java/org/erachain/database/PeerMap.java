@@ -31,7 +31,7 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("peers")
                 .keySerializer(BTreeKeySerializer.BASIC)

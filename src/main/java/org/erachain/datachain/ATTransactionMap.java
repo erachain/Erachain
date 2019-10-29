@@ -42,7 +42,7 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         map = this.openMap(database);
     }

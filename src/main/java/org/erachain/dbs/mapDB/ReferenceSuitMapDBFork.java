@@ -25,7 +25,7 @@ public class ReferenceSuitMapDBFork extends DBMapSuitFork<byte[], long[]>
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         //OPEN MAP
         if (database == null) {
             map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());

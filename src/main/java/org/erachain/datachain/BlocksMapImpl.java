@@ -58,7 +58,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
     }
 
     @Override
-    protected void openMap() {
+    public void openMap() {
         // OPEN MAP
         if (parent == null) {
             switch (dbsUsed) {
