@@ -278,11 +278,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
             messageTx.sign(creator, Transaction.FOR_NETWORK);
 
-            if (false) {
-                messageTx.setDC(dcSet, Transaction.FOR_NETWORK, blockHeight, index + 1);
-                int valid = messageTx.isValid(Transaction.FOR_NETWORK, 0L);
-            }
-
             ctrl.transactionsPool.offerMessage(messageTx);
 
         }
