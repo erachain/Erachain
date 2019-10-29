@@ -1228,7 +1228,8 @@ public abstract class Transaction implements ExplorerJsonLine {
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
         if (asDeal > Transaction.FOR_MYPACK) {
             if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
-                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
+                /// вообще не проверяем в тесте
+                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
                     // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
                     if (BlockChain.CHECK_BUGS > 0)
                         LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);

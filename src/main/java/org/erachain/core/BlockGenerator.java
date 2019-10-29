@@ -226,7 +226,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         SecureRandom randomSecure = new SecureRandom();
         // сдвиг назад организуем
 
-        long blockTimestamp = bchain.getTimestamp(blockHeight - 1) + 1;
+        long blockTimestampBeg = bchain.getTimestamp(blockHeight - 1) + 10;
+        long blockTimestampEnd = bchain.getTimestamp(blockHeight) - 10;
+
 
         LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB);
 
@@ -240,9 +242,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         Random random = new Random();
 
+        long timestamp;
         PublicKeyAccount recipient;
         HashMap<PrivateKeyAccount, Long> creatorsReference = new HashMap<>();
-        long timestamp;
         for (int index = 0; index < BlockChain.TEST_DB; index++) {
 
             if (generateNewAccount) {
@@ -253,13 +255,22 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 recipient = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
             }
 
-            PrivateKeyAccount creator = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+            PrivateKeyAccount creator;
+            // ограничим выборку счетов как сверху так и снизу
+            int countSeek = 3 + (BlockChain.TEST_DB_ACCOUNTS.length >> 5);
+            do {
+                timestamp = 0;
+                creator = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+                if (creatorsReference.containsKey(creator)) {
+                    timestamp = creatorsReference.get(creator);
+                }
+            } while (timestamp > blockTimestampEnd && countSeek-- > 0);
 
             // определим время создания для каждого счета
-            if (creatorsReference.containsKey(creator)) {
-                timestamp = creatorsReference.get(creator) + 1;
+            if (timestamp == 0) {
+                timestamp = blockTimestampBeg;
             } else {
-                timestamp = blockTimestamp;
+                timestamp++;
             }
             creatorsReference.put(creator, timestamp);
 
@@ -280,7 +291,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             //// только если включена проверка повторов - запускаем эту проверку на невалидные транзакции
 
             // добавить невалидных транзакций немного - по времени создания
-            timestamp = blockTimestamp - 10000000L * 1L;
+            timestamp = blockTimestampBeg - 10000000L * 1L;
             PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
             for (int index = 0; index < (BlockChain.TEST_DB >> 3); index++) {
 

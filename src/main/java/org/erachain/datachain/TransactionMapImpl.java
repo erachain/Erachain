@@ -221,7 +221,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                     long deadline = transaction.getDeadline();
                     if (deadline < timestamp
                             || size - deletions >
-                            (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 4
+                            (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3
                                     : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
                         this.delete(key);
                         deletions++;

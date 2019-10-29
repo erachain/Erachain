@@ -63,7 +63,7 @@ public class BlockChain {
      * Число счетов для теста базы данных - чем больше тем болше нагрузка и сложнее считать.
      * Если меньше чем TEST_DB то улучшается скорость за счет схлопыания повторнных изменений балансов счетов.
      */
-    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[1000];
+    public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[TEST_DB >> 3];
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
@@ -128,8 +128,9 @@ public class BlockChain {
 
     // переопределим размеры по HARD
     static private final int MAX_BLOCK_SIZE_GEN_TEMP = MAX_BLOCK_SIZE_BYTES / 100 * (10 * Controller.HARD_WORK + 10) ;
-    public static final int MAX_BLOCK_SIZE_BYTES_GEN = MAX_BLOCK_SIZE_GEN_TEMP > MAX_BLOCK_SIZE_BYTES? MAX_BLOCK_SIZE_BYTES : MAX_BLOCK_SIZE_GEN_TEMP;
-    public static final int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE_BYTES_GEN >> 8;
+    public static final int MAX_BLOCK_SIZE_BYTES_GEN = TEST_DB > 0 ? TEST_DB << 9
+            : MAX_BLOCK_SIZE_GEN_TEMP > MAX_BLOCK_SIZE_BYTES ? MAX_BLOCK_SIZE_BYTES : MAX_BLOCK_SIZE_GEN_TEMP;
+    public static final int MAX_BLOCK_SIZE_GEN = TEST_DB > 0 ? TEST_DB << 1 : MAX_BLOCK_SIZE_BYTES_GEN >> 8;
 
     public static final int MAX_UNCONFIGMED_MAP_SIZE = MAX_BLOCK_SIZE_GEN << 2;
     public static final int ON_CONNECT_SEND_UNCONFIRMED_UNTIL = MAX_UNCONFIGMED_MAP_SIZE;

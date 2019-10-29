@@ -246,7 +246,7 @@ public class TransactionsPool extends MonitoredThread {
                             // у нас - они будут включены другими нодами которые полностью в синхре
                             // мы выстыпаем лишь как ретрнслятор - при этом у нас запас по времени хранения все равно должен быть
                             // чтобы помнить какие транзакции мы уже словили и ретранслировали
-                            if (utxMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 4) {
+                            if (utxMap.size() > BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3) {
                                 long timestamp = Controller.getInstance().getBlockChain().getTimestamp(height);
                                 //long timestamp = NTP.getTime();
                                 clearedUTXs += utxMap.clearByDeadTimeAndLimit(timestamp, true);
