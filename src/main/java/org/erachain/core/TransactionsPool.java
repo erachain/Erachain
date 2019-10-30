@@ -130,7 +130,8 @@ public class TransactionsPool extends MonitoredThread {
             if (LOG_UNCONFIRMED_PROCESS)
                 timeCheck = System.currentTimeMillis();
 
-            if (this.dcSet.getTransactionFinalMapSigns().contains(signature) || this.controller.isOnStopping()) {
+            if (this.controller.isOnStopping()
+                    || BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(signature)) {
                 return;
             }
 
