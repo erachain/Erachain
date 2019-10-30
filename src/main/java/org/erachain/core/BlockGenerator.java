@@ -221,16 +221,17 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
-    private void testTransactions(int blockHeight) {
+    private void testTransactions(int blockHeight, long timePointForValidTX) {
 
         SecureRandom randomSecure = new SecureRandom();
         // сдвиг назад организуем
 
         long blockTimestampBeg = bchain.getTimestamp(blockHeight - 1) + 10;
-        long blockTimestampEnd = bchain.getTimestamp(blockHeight) - 10;
+        long blockTimestampEnd = timePointForValidTX;
 
 
-        LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB);
+        LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB
+                + " period: " + new Timestamp(blockTimestampBeg) + " >>> " + new Timestamp(blockTimestampEnd));
 
         boolean generateNewAccount = false;
 
@@ -309,7 +310,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
 
-        LOGGER.debug("* * * * * COLLECT TRANSACTIONS");
+        LOGGER.debug("* * * * * COLLECT TRANSACTIONS to time: " + new Timestamp(timestamp));
 
         long start = System.currentTimeMillis();
 
@@ -324,7 +325,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long totalBytes = 0;
         int counter = 0;
         int check_time = 0;
-        int max_time_gen = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) >> 3;
+        int max_time_gen = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) >> 2;
 
         try {
             TransactionMap map = dcSet.getTransactionTab();
@@ -340,8 +341,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     // проверим иногда - вдруг уже слишком долго собираем - останов сборки транзакций
                     // так как иначе такой блок и сеткой остальной не успеет обработаться
-                    if (check_time++ > 300) {
+                    if (BlockChain.TEST_DB == 0 && check_time++ > 300) {
                         if (System.currentTimeMillis() - start > max_time_gen) {
+                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by SPEND TIME[ms]: " + (System.currentTimeMillis() - start));
                             break;
                         }
                         check_time = 0;
@@ -358,8 +360,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
 
                     Transaction transaction = map.get(iterator.next());
-                    if (transaction == null)
+                    if (transaction == null) {
+                        LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by NULL NEXT");
                         break;
+                    }
 
                     if (BlockChain.CHECK_BUGS > 7) {
                         LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
@@ -369,8 +373,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
                     }
 
-                    if (transaction.getTimestamp() > timestamp)
+                    if (transaction.getTimestamp() > timestamp) {
+                        LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by UTX TIMESTAMP: " + new Timestamp(transaction.getTimestamp()));
                         break;
+                    }
 
                     // делать форк только если есть трнзакции - так как это сильно кушает память
                     if (newBlockDC == null) {
@@ -408,12 +414,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         //CHECK IF ENOUGH ROOM
                         if (++counter > BlockChain.MAX_BLOCK_SIZE_GEN) {
                             counter--;
+                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by MAX COUNT: " + counter);
                             break;
                         }
 
                         totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
                         if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN) {
                             counter--;
+                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by MAX BYTES: " + totalBytes);
                             break;
                         }
 
@@ -942,7 +950,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             /// тестовый аккаунт
                             acc_winner = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
                             /// закатем в очередь транзакции
-                            testTransactions(height);
+                            testTransactions(height, timePointForValidTX);
                         }
 
                         if (!BlockChain.STOP_GENERATE_BLOCKS && acc_winner != null) {

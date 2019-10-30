@@ -44,7 +44,7 @@ public class BlockChain {
     public static final int BLOCK_COUNT = 0; //108974; ////
     /**
      * DATABASE benchmark test. use start options:<br>
-     * erachain.jar -pass=1 -seed=5:new:1 -opi -nodatawallet -nocalculated -hardwork=0 -dbschain=rocksdb <br>
+     * erachain.jar -pass=1 -seed=5:new:1 -nogui -opi -nodatawallet -nocalculated -hardwork=[0..10] -dbschain=[rocksdb|mapdb] <br>
      * сколько транзакции в блоке - если больше 0 то запускает тест на старте
      */
     public static final int TEST_DB = 10000;
