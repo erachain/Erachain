@@ -388,7 +388,7 @@ public class Controller extends Observable {
             jsonObj.put("network", "shutdown");
         }
 
-        jsonObj.put("missedTransactions", cnt.getInstance().transactionsPool.missedTransactions.get());
+        jsonObj.put("missedTransactions", cnt.getInstance().transactionsPool.missedTransactions);
 
         timing = cnt.getInstance().getUnconfigmedMessageTimingAverage();
         if (timing > 0) {
