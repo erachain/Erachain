@@ -1,5 +1,6 @@
 package org.erachain.dbs.mapDB;
 
+import org.erachain.datachain.DCSet;
 import org.junit.Test;
 
 public class DBMapSuitForkTest {
@@ -17,5 +18,9 @@ public class DBMapSuitForkTest {
     // мам Iterable<Long> mergedIterable = Iterables.mergeSorted - не сработал как надо - в списке окалаось 2 одинаковых ключа
     @Test
     public void getIterator() {
+
+        /// DBMapSuitFork.getIterator()
+        // нужно проверить
+        DCSet.getInstance().getOrderMap().getIteratorWithParent(1, 2);
     }
 }

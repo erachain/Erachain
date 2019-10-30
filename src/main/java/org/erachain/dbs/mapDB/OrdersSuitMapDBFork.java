@@ -2,6 +2,8 @@ package org.erachain.dbs.mapDB;
 
 // 30/03
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
@@ -104,6 +106,20 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
         keys.addAll(parentKeys);
 
         return keys;
+    }
+
+    // GET KEYs with FORKED rules
+    @Override
+    public Iterator<Long> getIteratorWithParent(long have, long want) {
+
+        Iterator<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, want, null, null),
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).values().iterator();
+
+        Iterator<Long> iterator = Iterators.mergeSorted(ImmutableList.of(
+                ((OrderMap) this.parent).getIteratorWithParent(have, want), keys), Fun.COMPARATOR);
+
+        return super.getIterator();
     }
 
 
