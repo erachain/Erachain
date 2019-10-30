@@ -5,8 +5,6 @@ package org.erachain.dbs.mapDB;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
-import org.erachain.core.item.assets.OrderComparatorForTrade;
-import org.erachain.core.item.assets.OrderComparatorForTradeReverse;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.datachain.OrderSuit;
@@ -16,7 +14,8 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
 
 ;
 
@@ -164,41 +163,23 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     }
 
     @Override
-    public HashSet<Long> getSubKeysWithParent(long have, long want) {
+    public HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit) {
 
         HashSet<Long> keys = new HashSet<>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
+                Fun.t4(have, want, limit, Fun.HI())).values());
 
         return keys;
     }
 
-
     @Override
-    public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
-        //FILTER ALL KEYS
-        Collection<Long> keys = this.getSubKeysWithParent(have, want);
+    public Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit) {
 
-        //GET ALL ORDERS FOR KEYS
-        List<Order> orders = new ArrayList<Order>();
+        Iterator<Long> iterator = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, want, null, null),
+                Fun.t4(have, want, limit, Fun.HI())).values().iterator();
 
-        for (Long key : keys) {
-            Order order = this.get(key);
-            if (order != null) {
-                orders.add(order);
-            } else {
-                // возможно произошло удаление в момент запроса??
-            }
-        }
-
-        if (reverse) {
-            Collections.sort(orders, new OrderComparatorForTradeReverse());
-        } else {
-            Collections.sort(orders, new OrderComparatorForTrade());
-        }
-
-        //RETURN
-        return orders;
+        return iterator;
     }
 
 }

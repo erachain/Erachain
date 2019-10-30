@@ -78,7 +78,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                 (aLong, transaction) -> {
                     Account account = transaction.getCreator();
                     return (account == null ? "genesis" : account.getAddress());
-                }, (result, key) -> result.getBytes());
+                }, (result) -> result.getBytes());
 
         recipientTxs = new ListIndexDB<>(recipientTransactionsIndexName,
                 (Long aLong, Transaction transaction) -> {
@@ -91,7 +91,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                         recipients.add(account.getAddress());
                     }
                     return recipients;
-                }, (result, key) -> result.getBytes());
+                }, (result) -> result.getBytes());
 
         addressTypeTxs = new ListIndexDB<>(addressTypeTransactionsIndexName,
                 (aLong, transaction) -> {
@@ -106,7 +106,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     }
                     return addressesTypes;
                 },
-                (result, key) -> {
+                (result) -> {
                     if (result == null) {
                         return null;
                     }
@@ -136,7 +136,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     }
 
                     return keys;
-                }, (result, key) -> {
+                }, (result) -> {
             if (result == null) {
                 return null;
             }

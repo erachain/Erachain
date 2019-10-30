@@ -91,7 +91,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                         Account account = transaction.getCreator();
                         return new Fun.Tuple2<>(account == null ? "genesis" : account.getAddress(), transaction.getTimestamp());
                     }
-                }, (result, key) -> org.bouncycastle.util.Arrays.concatenate(
+                }, (result) -> org.bouncycastle.util.Arrays.concatenate(
                 new ByteableString().toBytesObject(result.a),
                 new ByteableLong().toBytesObject(result.b)));
 
@@ -101,7 +101,7 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
                     transaction.setDC((DCSet) databaseSet);
                     return transaction.getRecipientAccounts().stream().map(Account::getAddress).toArray(String[]::new);
                 },
-                (result, key) -> new ByteableString().toBytesObject(result));
+                (result) -> new ByteableString().toBytesObject(result));
 
         //indexByteableTuple3StringLongInteger = new IndexByteableTuple3StringLongInteger();
         addressTypeIndex

@@ -4,20 +4,19 @@ import com.google.common.collect.Iterators;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.OrderComparatorForTrade;
+import org.erachain.core.item.assets.OrderComparatorForTradeReverse;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.OrdersSuitMapDB;
 import org.erachain.dbs.mapDB.OrdersSuitMapDBFork;
-import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
@@ -64,10 +63,10 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new NativeMapTreeMapFork(parent, databaseSet, null, null);
-                    break;
+                    //map = new NativeMapTreeMapFork(parent, databaseSet, null, null); - просто карту нельзя так как тут особые вызовы
+                    //break;
                 default:
-                    ///map = new nativeMapTreeMapFork(parent, databaseSet); - просто карту нельзя так как тут особые вызовы
+                    ///map = new nativeMapTreeMapFork(parent, databaseSet, null, null); - просто карту нельзя так как тут особые вызовы
                     map = new OrdersSuitMapDBFork((OrderMap) parent, databaseSet);
             }
         }
@@ -129,13 +128,63 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public HashSet<Long> getSubKeysWithParent(long have, long want) {
-        return ((OrderSuit) map).getSubKeysWithParent(have, want);
+    public HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit) {
+        return ((OrderSuit) map).getSubKeysWithParent(have, want, limit);
+    }
+
+    @Override
+    public Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit) {
+        return ((OrderSuit) map).getSubIteratorWithParent(have, want, limit);
+    }
+
+    @Override
+    public List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal limit) {
+        //FILTER ALL KEYS
+        Collection<Long> keys = this.getSubKeysWithParent(have, want, limit);
+
+        //GET ALL ORDERS FOR KEYS
+        List<Order> orders = new ArrayList<Order>();
+
+        for (Long key : keys) {
+            Order order = this.get(key);
+            if (order != null) {
+                orders.add(order);
+            } else {
+                // возможно произошло удаление в момент запроса??
+            }
+        }
+
+        Collections.sort(orders, new OrderComparatorForTrade());
+
+        //RETURN
+        return orders;
     }
 
     @Override
     public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
-        return ((OrderSuit) map).getOrdersForTradeWithFork(have, want, reverse);
+        //FILTER ALL KEYS
+        Collection<Long> keys = this.getSubKeysWithParent(have, want, null);
+
+        //GET ALL ORDERS FOR KEYS
+        List<Order> orders = new ArrayList<Order>();
+
+        for (Long key : keys) {
+            Order order = this.get(key);
+            if (order != null) {
+                orders.add(order);
+            } else {
+                // возможно произошло удаление в момент запроса??
+            }
+        }
+
+        if (reverse) {
+            Collections.sort(orders, new OrderComparatorForTradeReverse());
+        } else {
+            Collections.sort(orders, new OrderComparatorForTrade());
+        }
+
+        //RETURN
+        return orders;
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.mapdb.Fun;
 
 public class IndexByteableTuple3StringLongInteger implements IndexByteable<Fun.Tuple3<String, Long, Integer>, Long> {
     @Override
-    public byte[] toBytes(Fun.Tuple3<String, Long, Integer> result, Long key) {
+    public byte[] toBytes(Fun.Tuple3<String, Long, Integer> result) {
         return org.bouncycastle.util.Arrays.concatenate(
                 new ByteableString().toBytesObject(result.a),
                 new ByteableLong().toBytesObject(result.b),

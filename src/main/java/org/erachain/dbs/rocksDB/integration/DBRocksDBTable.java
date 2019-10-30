@@ -215,7 +215,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                     //// причем у Глеба тут опять передается ключ первичный - даже для серилиазации результат из вервого вызова
                     SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
                     Object apply = simpleIndexDB.getBiFunction().apply(key, value);
-                    byte[] bytes = indexDB.getIndexByteable().toBytes(apply, key);
+                    byte[] bytes = indexDB.getIndexByteable().toBytes(apply);
                     if (bytes == null) {
                         continue;
                     }
@@ -232,7 +232,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                     }
                     if (logON) logger.info("ArrayIndex.count.elements = " + apply.length);
                     for (Object valueIndex : apply) {
-                        byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
+                        byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex);
                         if (bytes == null) {
                             continue;
                         }
@@ -251,7 +251,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                     }
                     if (logON) logger.info("ListIndex.count.elements = " + apply.size());
                     for (Object valueIndex : apply) {
-                        byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
+                        byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex);
                         if (bytes == null) {
                             continue;
                         }
@@ -273,7 +273,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             if (indexDB instanceof SimpleIndexDB) {
                 SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
 
-                byte[] bytes = indexDB.getIndexByteable().toBytes(simpleIndexDB.getBiFunction().apply(key, value), key);
+                byte[] bytes = indexDB.getIndexByteable().toBytes(simpleIndexDB.getBiFunction().apply(key, value));
                 if (bytes == null) {
                     continue;
                 }
@@ -288,7 +288,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                     continue;
                 }
                 for (Object valueIndex : apply) {
-                    byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
+                    byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex);
                     if (bytes == null) {
                         continue;
                     }
@@ -308,7 +308,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                     continue;
                 }
                 for (Object valueIndex : apply) {
-                    byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex, key);
+                    byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex);
                     if (bytes == null) {
                         continue;
                     }

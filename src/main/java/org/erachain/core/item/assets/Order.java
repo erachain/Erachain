@@ -635,7 +635,7 @@ public class Order implements Comparable<Order> {
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
-        List<Order> orders = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, false);
+        List<Order> orders = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPrice);
 
         /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
         if (BlockChain.CHECK_BUGS > 3 && !orders.isEmpty()) {
@@ -645,7 +645,7 @@ public class Order implements Comparable<Order> {
             for (Order item: orders) {
                 if (item.getId().equals(id)) {
                     // RISE ERROR
-                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, false);
+                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPrice);
                     timestamp = null;
                     ++timestamp;
                 }

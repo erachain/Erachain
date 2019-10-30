@@ -102,7 +102,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                     System.arraycopy(key, 20, assetKeyBytes, 0, 8);
 
                     byte[] shiftForSortBuff;
-                    shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b.negate(), null);
+                    shiftForSortBuff = seralizerBigDecimal.toBytes(value.a.b.negate());
 
                     return org.bouncycastle.util.Arrays.concatenate(
                             assetKeyBytes,
@@ -110,7 +110,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                             //shortAddress - он уже есть в главном ключе
                     );
                 },
-                (result, key) -> result);
+                (result) -> result);
 
         balanceAddressIndex = new SimpleIndexDB<>(balanceAddressIndexName,
                 (key, value) -> {
@@ -125,7 +125,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                             shortAddress,
                             assetKeyBytes);
                 },
-                (result, key) -> result); // ByteableTrivial
+                (result) -> result); // ByteableTrivial
 
         indexes = new ArrayList<>();
         indexes.add(balanceKeyAssetIndex);

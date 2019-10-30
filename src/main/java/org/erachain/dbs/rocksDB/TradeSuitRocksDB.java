@@ -85,7 +85,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                             0, buffer, buffer1.length + 8, 4);
 
                     return buffer;
-                }, (result, key) -> result);
+                }, (result) -> result);
 
         haveIndex = new SimpleIndexDB<>(
                 tradesKeyHaveIndexName,
@@ -98,7 +98,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                             Long.MAX_VALUE - value.getInitiator(),
                             Integer.MAX_VALUE - value.getSequence());
                 }
-                , (result, key) -> org.bouncycastle.util.Arrays.concatenate(
+                , (result) -> org.bouncycastle.util.Arrays.concatenate(
                 new ByteableString().toBytesObject(result.a),
                 new ByteableLong().toBytesObject(result.b),
                 new ByteableInteger().toBytesObject(result.c)));
@@ -114,7 +114,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                     System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
                             0, buffer, 16, 4);
                     return buffer;
-                }, (result, key) -> result);
+                }, (result) -> result);
 
         reverseIndex = new SimpleIndexDB<>(
                 tradesKeyReverseIndexName,
@@ -123,7 +123,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                     System.arraycopy(Longs.toByteArray(key.b), 0, buffer, 0, 8);
                     System.arraycopy(Longs.toByteArray(key.a), 0, buffer, 8, 8);
                     return buffer;
-                }, (result, key) -> result);
+                }, (result) -> result);
 
         indexes.add(pairIndex);
         indexes.add(haveIndex);

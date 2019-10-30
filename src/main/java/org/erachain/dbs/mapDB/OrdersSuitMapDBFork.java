@@ -7,8 +7,6 @@ import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
-import org.erachain.core.item.assets.OrderComparatorForTrade;
-import org.erachain.core.item.assets.OrderComparatorForTradeReverse;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.datachain.OrderMap;
@@ -18,7 +16,8 @@ import org.mapdb.Bind;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
 
 
 /**
@@ -80,15 +79,15 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
     // GET KEYs with FORKED rules
     @Override
-    public HashSet<Long> getSubKeysWithParent(long have, long want) {
+    public HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit) {
 
         HashSet<Long> keys = new HashSet<Long>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
+                Fun.t4(have, want, limit, Fun.HI())).values());
 
         //USE THE FORK KEYS
         //GET ALL KEYS FOR FORK in PARENT - getOrdersForTradeWithFork
-        HashSet<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
+        HashSet<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want, limit);
 
         ////// Почемуто не получилось удалить дубли ключей при Мерже - по 2 раза один и тот же Ордер потом вылазил
         ////// вернее ключи Long одинаковые были в списке - зотя как объекты они разные но значения одинаковые (((
@@ -110,44 +109,16 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
     // GET KEYs with FORKED rules
     @Override
-    public Iterator<Long> getIteratorWithParent(long have, long want) {
+    public Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit) {
 
         Iterator<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, Fun.HI(), Fun.HI())).values().iterator();
+                Fun.t4(have, want, limit, Fun.HI())).values().iterator();
 
         Iterator<Long> iterator = Iterators.mergeSorted(ImmutableList.of(
-                ((OrderMap) this.parent).getIteratorWithParent(have, want), keys), Fun.COMPARATOR);
+                ((OrderMap) this.parent).getSubIteratorWithParent(have, want, limit), keys), Fun.COMPARATOR);
 
-        return super.getIterator();
-    }
-
-
-    @Override
-    public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
-        //FILTER ALL KEYS
-        Collection<Long> keys = this.getSubKeysWithParent(have, want);
-
-        //GET ALL ORDERS FOR KEYS
-        List<Order> orders = new ArrayList<Order>();
-
-        for (Long key : keys) {
-            Order order = this.get(key);
-            if (order != null) {
-                orders.add(order);
-            } else {
-                // возможно произошло удаление в момент запроса??
-            }
-        }
-
-        if (reverse) {
-            Collections.sort(orders, new OrderComparatorForTradeReverse());
-        } else {
-            Collections.sort(orders, new OrderComparatorForTrade());
-        }
-
-        //RETURN
-        return orders;
+        return iterator;
     }
 
     @Override

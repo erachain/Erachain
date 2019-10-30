@@ -4,14 +4,12 @@ import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
-import org.erachain.core.item.assets.OrderComparatorForTrade;
-import org.erachain.core.item.assets.OrderComparatorForTradeReverse;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.OrderSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
+import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
-import org.erachain.dbs.rocksDB.transformation.ByteableBigDecimal;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableOrder;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
@@ -21,7 +19,9 @@ import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 @Slf4j
 public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSuit {
@@ -32,6 +32,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     SimpleIndexDB<Long, Order, Fun.Tuple4<Long, Long, BigDecimal, Long>> wantHaveKeyIndex;
     SimpleIndexDB<Long, Order, Fun.Tuple5<String, Long, Long, BigDecimal, Long>> addressHaveWantKeyIndex;
 
+    IndexByteableBigDecimal bgToBytes = new IndexByteableBigDecimal();
     public OrdersSuitRocksDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger, true);
     }
@@ -61,13 +62,13 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                         order.getWantAssetKey(),
                         Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0),
                         order.getId()),
-                (result, key) ->
+                (result) ->
                 {
                     ByteableLong byteableLong = new ByteableLong();
                     return org.bouncycastle.util.Arrays.concatenate(
                             byteableLong.toBytesObject(result.a),
                             byteableLong.toBytesObject(result.b),
-                            new ByteableBigDecimal().toBytesObject(result.c),
+                            bgToBytes.toBytes(result.c),
                             byteableLong.toBytesObject(result.d));
                 });
 
@@ -86,7 +87,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                                 order.getWantAssetKey(),
                                 order.getPrice(),
                                 aLong),
-                (result, key) ->
+                (result) ->
                 {
                     ByteableLong byteableLong = new ByteableLong();
                     return org.bouncycastle.util.Arrays.concatenate(org.bouncycastle.util.Arrays.concatenate(
@@ -94,7 +95,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                             byteableLong.toBytesObject(result.b)),
                             org.bouncycastle.util.Arrays.concatenate(
                                     byteableLong.toBytesObject(result.c),
-                                    new ByteableBigDecimal().toBytesObject(result.d),
+                                    bgToBytes.toBytes(result.d),
                                     byteableLong.toBytesObject(result.e)));
                 });
 
@@ -104,13 +105,13 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                         order.getHaveAssetKey(),
                         Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0),
                         order.getId()),
-                (result, key) ->
+                (result) ->
                 {
                     ByteableLong byteableLong = new ByteableLong();
                     return org.bouncycastle.util.Arrays.concatenate(
                             byteableLong.toBytesObject(result.a),
                             byteableLong.toBytesObject(result.b),
-                            new ByteableBigDecimal().toBytesObject(result.c),
+                            bgToBytes.toBytes(result.c),
                             byteableLong.toBytesObject(result.d));
                 });
 
@@ -157,43 +158,23 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     }
 
     @Override
-    public HashSet<Long> getSubKeysWithParent(long have, long want) {
+    public HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit) {
 
-        HashSet<Long> keysByIndex = new HashSet(map.filterAppropriateValuesAsKeys(
+        return new HashSet(map.filterAppropriateValuesAsKeys(
                 org.bouncycastle.util.Arrays.concatenate(
                         Longs.toByteArray(have),
-                        Longs.toByteArray(want)),
+                        Longs.toByteArray(want),
+                        bgToBytes.toBytes(limit)),
                 haveWantKeyIndex.getColumnFamilyHandle()));
-        //return keysByIndex.stream().filter(Objects::nonNull).collect(Collectors.toList());
-        return keysByIndex;
     }
 
-
     @Override
-    public List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse) {
-        //FILTER ALL KEYS
-        Collection<Long> keys = this.getSubKeysWithParent(have, want);
+    public Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit) {
 
-        //GET ALL ORDERS FOR KEYS
-        List<Order> orders = new ArrayList<Order>();
-
-        for (Long key : keys) {
-            Order order = this.get(key);
-            if (order != null) {
-                orders.add(order);
-            } else {
-                // возможно произошло удаление в момент запроса??
-            }
-        }
-
-        if (reverse) {
-            Collections.sort(orders, new OrderComparatorForTradeReverse());
-        } else {
-            Collections.sort(orders, new OrderComparatorForTrade());
-        }
-
-        //RETURN
-        return orders;
+        return map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(), org.bouncycastle.util.Arrays.concatenate(
+                Longs.toByteArray(have),
+                Longs.toByteArray(want),
+                bgToBytes.toBytes(limit)), false);
     }
 
 }

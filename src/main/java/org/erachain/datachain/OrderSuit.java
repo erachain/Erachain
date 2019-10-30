@@ -1,10 +1,8 @@
 package org.erachain.datachain;
 
-import org.erachain.core.item.assets.Order;
-
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 
 public interface OrderSuit {
 
@@ -16,11 +14,9 @@ public interface OrderSuit {
 
     Iterator<Long> getWantHaveIterator(long want);
 
-    HashSet<Long> getSubKeysWithParent(long have, long want);
+    HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit);
 
-    Iterator<Long> getIteratorWithParent(long have, long want);
-
-    List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse);
+    Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit);
 
     Iterator<Long> getAddressHaveWantIterator(String address, long have, long want);
 }

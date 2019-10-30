@@ -16,7 +16,7 @@ public class IndexByteableLong implements IndexByteable<Long, Long> {
      * смотри org.erachain.dbs.rocksDB.integration.DBRocksDBTable#put(java.lang.Object, java.lang.Object)
      * key - первичный ключ
      */
-    public byte[] toBytes(Long result, Long key) {
+    public byte[] toBytes(Long result) {
         return byteableLong.toBytesObject(result);
     }
 }

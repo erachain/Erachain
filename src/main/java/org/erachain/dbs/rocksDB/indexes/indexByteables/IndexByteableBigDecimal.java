@@ -21,7 +21,7 @@ public class IndexByteableBigDecimal implements IndexByteable<BigDecimal, Long> 
      * key - первичный ключ
      */
     @Override
-    public byte[] toBytes(BigDecimal value, Long key) {
+    public byte[] toBytes(BigDecimal value) {
 
         int sign = value.signum();
         // берем абсолютное значение
