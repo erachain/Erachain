@@ -22,7 +22,6 @@ import org.rocksdb.WriteOptions;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSuit {
@@ -158,14 +157,15 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     }
 
     @Override
-    public List<Long> getSubKeysWithParent(long have, long want) {
+    public HashSet<Long> getSubKeysWithParent(long have, long want) {
 
-        List<Long> keysByIndex = map.filterAppropriateValuesAsKeys(
+        HashSet<Long> keysByIndex = new HashSet(map.filterAppropriateValuesAsKeys(
                 org.bouncycastle.util.Arrays.concatenate(
                         Longs.toByteArray(have),
                         Longs.toByteArray(want)),
-                haveWantKeyIndex.getColumnFamilyHandle());
-        return keysByIndex.stream().filter(Objects::nonNull).collect(Collectors.toList());
+                haveWantKeyIndex.getColumnFamilyHandle()));
+        //return keysByIndex.stream().filter(Objects::nonNull).collect(Collectors.toList());
+        return keysByIndex;
     }
 
 

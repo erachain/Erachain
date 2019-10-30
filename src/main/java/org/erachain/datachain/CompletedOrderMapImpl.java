@@ -61,7 +61,10 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     @Override
     public void put(Order order) {
 
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+        if (BlockChain.CHECK_BUGS > 3
+                && (Transaction.viewDBRef(order.getId()).equals("178617-18")
+                || Transaction.viewDBRef(order.getId()).equals("125300-1"))
+        ) {
             boolean debug = true;
         }
 
@@ -69,12 +72,41 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     }
 
     @Override
+    public void put(Long id, Order order) {
+
+        if (BlockChain.CHECK_BUGS > 3
+                && (Transaction.viewDBRef(id).equals("178617-18")
+                || Transaction.viewDBRef(id).equals("125300-1"))
+        ) {
+            boolean debug = true;
+        }
+
+        super.put(id, order);
+    }
+
+    @Override
     public void delete(Order order) {
 
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+        if (BlockChain.CHECK_BUGS > 3
+                && (Transaction.viewDBRef(order.getId()).equals("178617-18")
+                || Transaction.viewDBRef(order.getId()).equals("125300-1"))
+        ) {
             boolean debug = true;
         }
 
         this.delete(order.getId());
+    }
+
+    @Override
+    public void delete(Long id) {
+
+        if (BlockChain.CHECK_BUGS > 3
+                && (Transaction.viewDBRef(id).equals("178617-18")
+                || Transaction.viewDBRef(id).equals("125300-1"))
+        ) {
+            boolean debug = true;
+        }
+
+        super.delete(id);
     }
 }

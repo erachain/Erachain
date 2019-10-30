@@ -164,9 +164,9 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     }
 
     @Override
-    public List<Long> getSubKeysWithParent(long have, long want) {
+    public HashSet<Long> getSubKeysWithParent(long have, long want) {
 
-        List<Long> keys = new ArrayList<>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+        HashSet<Long> keys = new HashSet<>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
                 Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
 

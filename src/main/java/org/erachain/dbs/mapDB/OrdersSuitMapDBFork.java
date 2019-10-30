@@ -78,16 +78,15 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
     // GET KEYs with FORKED rules
     @Override
-    public List<Long> getSubKeysWithParent(long have, long want) {
+    public HashSet<Long> getSubKeysWithParent(long have, long want) {
 
-        List<Long> keys = new ArrayList<>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+        HashSet<Long> keys = new HashSet<Long>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
                 Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
 
         //USE THE FORK KEYS
-
         //GET ALL KEYS FOR FORK in PARENT - getOrdersForTradeWithFork
-        List<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
+        HashSet<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
 
         // REMOVE those who DELETED here
         if (this.deleted != null) {

@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.core.BlockChain;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -168,13 +169,19 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
                 LOGGER.debug("delete and set prev POINT as last: " + (previous == null? "null" : previous) + " for " + key);
                 return previous;
             } else if (lastPoint.a > key.b) {
-                // тут ошибка
-                LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
-                //Tuple2<Integer, Integer> previous = super.remove(key);
-                //this.setLast(key.a, previous);
-                assert (lastPoint.a <= key.b);
-                Long iii = null;
-                iii++;
+                // там могут быть накладки если новый счет с отступом 100 виртуальный форжинг поставил при первой сборке блока
+                // то игнорируем
+                if (BlockChain.ERA_COMPU_ALL_UP) {
+                    ;
+                } else {
+                    // тут ошибка
+                    LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
+                    //Tuple2<Integer, Integer> previous = super.remove(key);
+                    //this.setLast(key.a, previous);
+                    assert (lastPoint.a <= key.b);
+                    Long iii = null;
+                    iii++;
+                }
             } else {
                 // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
                 // И при первом разе все уже удалилось - тут ничего не делаем

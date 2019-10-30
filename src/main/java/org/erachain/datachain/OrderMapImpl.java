@@ -15,6 +15,7 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -128,7 +129,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public List<Long> getSubKeysWithParent(long have, long want) {
+    public HashSet<Long> getSubKeysWithParent(long have, long want) {
         return ((OrderSuit) map).getSubKeysWithParent(have, want);
     }
 

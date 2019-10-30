@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.dbs.DBTab;
@@ -220,8 +221,14 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     public void delete(long key) {
 
         if (key != this.key) {
-            Long error = null;
-            error++;
+            LOGGER.error("delete KEY: " + key + " != map.value.key: " + this.key);
+            if (key > this.key)
+                return;
+
+            if (BlockChain.CHECK_BUGS < 3) {
+                Long error = null;
+                error++;
+            }
         }
 
         super.delete(key);
