@@ -1494,6 +1494,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public abstract boolean isInvolved(Account account);
 
     // TODO перевести все на проверку height
+    // Это используется только в ГУУИ поэтому по высоте можно делать точно
     public boolean isConfirmed(DCSet db) {
         if (height > 0)
             return true;
