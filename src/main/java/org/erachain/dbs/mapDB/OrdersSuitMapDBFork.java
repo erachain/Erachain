@@ -88,6 +88,11 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
         //GET ALL KEYS FOR FORK in PARENT - getOrdersForTradeWithFork
         HashSet<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
 
+        ////// Почемуто не получилось удалить дубли ключей при Мерже - по 2 раза один и тот же Ордер потом вылазил
+        ////// вернее ключи Long одинаковые были в списке - зотя как объекты они разные но значения одинаковые (((
+        ///// Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+        ///// return Lists.newLinkedList(mergedIterable).descendingIterator();
+
         // REMOVE those who DELETED here
         if (this.deleted != null) {
             //DELETE DELETED
