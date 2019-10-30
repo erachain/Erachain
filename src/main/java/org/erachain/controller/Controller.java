@@ -371,7 +371,6 @@ public class Controller extends Observable {
 
         if (network != null) {
             jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
-            jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
             jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false));
             jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
             jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
@@ -388,6 +387,8 @@ public class Controller extends Observable {
         } else {
             jsonObj.put("network", "shutdown");
         }
+
+        jsonObj.put("missedTransactions", cnt.getInstance().transactionsPool.missedTransactions.get());
 
         timing = cnt.getInstance().getUnconfigmedMessageTimingAverage();
         if (timing > 0) {

@@ -46,7 +46,6 @@ public class Network extends Observable {
 
     public AtomicLong missedSendes = new AtomicLong(0);
     public AtomicLong missedTelegrams = new AtomicLong(0);
-    public AtomicLong missedTransactions = new AtomicLong(0);
     public AtomicLong missedWinBlocks = new AtomicLong(0);
     public AtomicLong missedMessages = new AtomicLong(0);
 

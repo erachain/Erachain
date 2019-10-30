@@ -29,6 +29,8 @@ public class TransactionsPool extends MonitoredThread {
     private TransactionMapImpl utxMap;
     private boolean needClearMap;
 
+    public long missedTransactions = 0L;
+
     public TransactionsPool(Controller controller, BlockChain blockChain, DCSet dcSet) {
         this.controller = controller;
         this.blockChain = blockChain;
@@ -46,7 +48,7 @@ public class TransactionsPool extends MonitoredThread {
     public boolean offerMessage(Object item) {
         boolean result = blockingQueue.offer(item);
         if (!result) {
-            this.controller.network.missedTransactions.incrementAndGet();
+            ++missedTransactions;
         }
         return result;
     }
