@@ -2149,8 +2149,8 @@ public class OrderTestsMy {
         Assert.assertEquals(0, trade.getTarget().compareTo(orderID_C));
         Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(2.24));
         Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(56000));
-        
-        assertEquals(0, db.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, false).size());
+
+        assertEquals(0, db.getOrderMap().getOrdersForTrade(keyB, keyA, false).size());
         /*
          * assertEquals(BigDecimal.valueOf(23000),
          * db.getOrderMap().getOrders(keyB, keyA).get(0).getPriceCalcReverse());
@@ -2350,9 +2350,9 @@ public class OrderTestsMy {
         Assert.assertEquals(0, trade.getTarget().compareTo(orderID_B));
         Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(1));
         Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20000.165));
-        
-        Order order_123 = db.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, false).get(0);
-        assertEquals(1, db.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, false).size());
+
+        Order order_123 = db.getOrderMap().getOrdersForTrade(keyB, keyA, false).get(0);
+        assertEquals(1, db.getOrderMap().getOrdersForTrade(keyB, keyA, false).size());
         assertEquals(BigDecimal.valueOf(23000), order_123.getPrice());
         assertEquals(BigDecimal.valueOf(25999.835), order_123.getAmountHaveLeft());
         assertEquals(BigDecimal.valueOf(1), order_123.getAmountWantLeft());
@@ -2480,8 +2480,8 @@ public class OrderTestsMy {
                                                                                       // FOR
                                                                                       // ACCOUNT
                                                                                       // B
-        
-        assertEquals(3, db.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, true).size());
+
+        assertEquals(3, db.getOrderMap().getOrdersForTrade(keyB, keyA, true).size());
         
         // CREATE ORDER _I SELL 3A for 24000 = 48000
         orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(3),
@@ -3640,7 +3640,7 @@ public class OrderTestsMy {
         BigDecimal tempPrice;
 
         List<Order> orders = fork
-                .getOrderMap().getOrdersForTradeWithFork(wantKey, haveKey, false);
+                .getOrderMap().getOrdersForTrade(wantKey, haveKey, false);
                 
         tempPrice = BigDecimal.ZERO;
         Long timestamp = 0L;

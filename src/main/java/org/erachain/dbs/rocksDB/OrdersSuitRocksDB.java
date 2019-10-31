@@ -168,13 +168,4 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                 haveWantKeyIndex.getColumnFamilyHandle()));
     }
 
-    @Override
-    public Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit) {
-
-        return map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(), org.bouncycastle.util.Arrays.concatenate(
-                Longs.toByteArray(have),
-                Longs.toByteArray(want),
-                bgToBytes.toBytes(limit)), false);
-    }
-
 }

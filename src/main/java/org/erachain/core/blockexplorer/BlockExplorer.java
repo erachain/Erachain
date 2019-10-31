@@ -1153,8 +1153,8 @@ public class BlockExplorer {
 
         Map output = new LinkedHashMap();
 
-        List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
-        List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, true);
+        List<Order> ordersHave = dcSet.getOrderMap().getOrdersForTrade(have, want, false);
+        List<Order> ordersWant = dcSet.getOrderMap().getOrdersForTrade(want, have, true);
 
         List<Trade> trades = dcSet.getTradeMap().getTrades(have, want, 0, 50);
 

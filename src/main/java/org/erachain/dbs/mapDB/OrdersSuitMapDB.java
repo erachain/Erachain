@@ -172,14 +172,4 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
         return keys;
     }
 
-    @Override
-    public Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit) {
-
-        Iterator<Long> iterator = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
-                Fun.t4(have, want, null, null),
-                Fun.t4(have, want, limit, Fun.HI())).values().iterator();
-
-        return iterator;
-    }
-
 }

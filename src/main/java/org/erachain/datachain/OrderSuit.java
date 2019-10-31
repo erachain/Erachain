@@ -16,7 +16,5 @@ public interface OrderSuit {
 
     HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit);
 
-    Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit);
-
     Iterator<Long> getAddressHaveWantIterator(String address, long have, long want);
 }

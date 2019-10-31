@@ -2785,7 +2785,7 @@ public class Controller extends Observable {
 
     public List<Order> getOrders(Long have, Long want) {
 
-        return dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        return dcSet.getOrderMap().getOrdersForTrade(have, want, false);
     }
 
     public List<Trade> getTradeByTimestmp(long have, long want, long timestamp, int limit) {

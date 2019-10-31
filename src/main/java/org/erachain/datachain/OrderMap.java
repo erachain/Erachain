@@ -5,7 +5,6 @@ import org.erachain.dbs.DBTab;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 public interface OrderMap extends DBTab<Long, Order> {
@@ -22,12 +21,9 @@ public interface OrderMap extends DBTab<Long, Order> {
     long getCountOrders(long haveWant);
 
     HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit);
-
-    Iterator<Long> getSubIteratorWithParent(long have, long want, BigDecimal limit);
-
     List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal limit);
 
-    List<Order> getOrdersForTradeWithFork(long have, long want, boolean reverse);
+    List<Order> getOrdersForTrade(long have, long want, boolean reverse);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     List<Order> getOrders(long have, long want, int limit);

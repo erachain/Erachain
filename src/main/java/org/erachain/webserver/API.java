@@ -1326,7 +1326,7 @@ public class API {
         */
 
         JSONArray arraySell = new JSONArray();
-        List<Order> orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        List<Order> orders = this.dcSet.getOrderMap().getOrdersForTrade(have, want, false);
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
@@ -1337,7 +1337,7 @@ public class API {
         }
 
         JSONArray arrayBuy = new JSONArray();
-        orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, false);
+        orders = this.dcSet.getOrderMap().getOrdersForTrade(want, have, false);
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
