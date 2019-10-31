@@ -295,6 +295,16 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();
 
+        List<T> list = new ArrayList<>();
+        Iterator<T> parentIterator = parent.getIterator(index, descending);
+        while (parentIterator.hasNext()) {
+            T key = parentIterator.next();
+            // пропустим если он есть в удаленных
+            if (deleted != null && deleted.containsKey(key))
+                continue;
+            list.add(key);
+        }
+
         Iterator<T> iterator;
 
         if (index > 0) {
@@ -317,7 +327,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
         }
 
-        iterator = Iterators.mergeSorted(ImmutableList.of(parent.getIterator(index, descending), iterator), Fun.COMPARATOR);
+        iterator = Iterators.mergeSorted(ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
 
         this.outUses();
         return iterator;
@@ -328,8 +338,18 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     public Iterator<T> getIterator() {
         this.addUses();
 
+        List<T> list = new ArrayList<>();
+        Iterator<T> parentIterator = parent.getIterator();
+        while (parentIterator.hasNext()) {
+            T key = parentIterator.next();
+            // пропустим если он есть в удаленных
+            if (deleted != null && deleted.containsKey(key))
+                continue;
+            list.add(key);
+        }
+
         //Map uncastedMap = this.map;
-        Iterator<T> iterator = Iterators.mergeSorted(ImmutableList.of(parent.getIterator(), map.keySet().iterator()), Fun.COMPARATOR);
+        Iterator<T> iterator = Iterators.mergeSorted(ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
 
         this.outUses();
         return iterator;
