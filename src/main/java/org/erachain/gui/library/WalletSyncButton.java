@@ -3,6 +3,7 @@ package org.erachain.gui.library;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockGenerator;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.database.wallet.AccountMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.PasswordPane;
 import org.erachain.lang.Lang;
@@ -49,8 +50,12 @@ public class WalletSyncButton extends JButton implements Observer {
                 Controller.getInstance().wallet.database.getAccountMap().clear();
 
                 int number = 0;
-                for (PrivateKeyAccount privateAccount : Controller.getInstance().getPrivateKeyAccounts()) {
-                    Controller.getInstance().wallet.database.getAccountMap().add(privateAccount, ++number);
+                /// deadlock org.erachain.database.wallet.AccountMap
+                AccountMap mapAccs = Controller.getInstance().wallet.database.getAccountMap();
+                synchronized (mapAccs) {
+                    for (PrivateKeyAccount privateAccount : Controller.getInstance().getPrivateKeyAccounts()) {
+                        mapAccs.add(privateAccount, ++number);
+                    }
                 }
 
                 Controller.getInstance().wallet.database.hardFlush();

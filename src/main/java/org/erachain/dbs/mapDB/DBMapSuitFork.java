@@ -327,7 +327,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
         }
 
-        iterator = Iterators.mergeSorted(ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
+        iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list, iterator), Fun.COMPARATOR);
 
         this.outUses();
         return iterator;
@@ -349,7 +349,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         //Map uncastedMap = this.map;
-        Iterator<T> iterator = Iterators.mergeSorted(ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+        Iterator<T> iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list, map.keySet()), Fun.COMPARATOR);
 
         this.outUses();
         return iterator;

@@ -18,6 +18,7 @@ import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
+import org.erachain.database.wallet.AccountMap;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
@@ -162,7 +163,11 @@ public class Wallet extends Observable implements Observer {
 		if (this.database == null)
 			return new ArrayList<>();
 
-		return this.database.getAccountMap().getPublicKeyAccounts();
+
+        AccountMap mapAccs = this.database.getAccountMap();
+        synchronized (mapAccs) { // else deadlock in org.erachain.database.wallet.AccountMap.add
+            return mapAccs.getPublicKeyAccounts();
+        }
 	}
 
 	public List<Tuple2<Account, Long>> getAccountsAssets() {
