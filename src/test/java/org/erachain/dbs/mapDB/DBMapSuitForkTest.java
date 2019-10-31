@@ -166,6 +166,6 @@ public class DBMapSuitForkTest {
 
         /// DBMapSuitFork.getIterator()
         // нужно проверить
-        DCSet.getInstance().getOrderMap().getSubIteratorWithParent(1, 2, null);
+        DCSet.getInstance().getOrderMap().getSubKeysWithParent(1, 2, null);
     }
 }
