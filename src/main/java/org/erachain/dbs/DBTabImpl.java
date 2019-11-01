@@ -5,6 +5,7 @@ import org.erachain.database.DBASet;
 import org.erachain.database.IDB;
 import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.mapdb.DB;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,8 +176,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         }
     }
 
-    @Override
-    public U remove(T key) {
+    private U removeHere(T key) {
 
         U value = this.map.remove(key);
 
@@ -185,7 +185,16 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
             if (this.observableData != null) {
                 if (this.observableData.containsKey(NOTIFY_REMOVE)) {
                     this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), value));
+                    Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
+                    if (
+                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
+                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                                    || observItem.equals(ObserverMessage.REMOVE_AT_TX)
+                    ) {
+                        this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, null)));
+                    } else {
+                        this.notifyObservers(new ObserverMessage(observItem, value));
+                    }
                 }
             }
         }
@@ -194,27 +203,67 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
-    public U removeValue(T key) {
-        return remove(key);
+    public U remove(T key) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+        return removeHere(key);
     }
 
     @Override
-    public void delete(T key) {
+    public U removeValue(T key) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+        return removeHere(key);
+    }
+
+    private void deleteHere(T key) {
         this.map.delete(key);
 
         //NOTIFY
         if (this.observableData != null) {
             if (this.observableData.containsKey(NOTIFY_DELETE)) {
                 this.setChanged();
-                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_DELETE), key));
+                Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
+                if (
+                        observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
+                                || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                                || observItem.equals(ObserverMessage.REMOVE_AT_TX)
+                ) {
+                    this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, null)));
+                } else {
+                    this.notifyObservers(new ObserverMessage(observItem, null));
+                }
             }
         }
 
     }
 
     @Override
+    public void delete(T key) {
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        deleteHere(key);
+    }
+
+    @Override
     public void deleteValue(T key) {
-        delete(key);
+        /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
+        /// если в подклассе будет из REMOVE вызов DELETE то он придет сюда и при перевузове THIS.REMOVE отсюда
+        /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
+        /// -----> remove(key, value);
+        ///
+
+        deleteHere(key);
     }
 
     @Override

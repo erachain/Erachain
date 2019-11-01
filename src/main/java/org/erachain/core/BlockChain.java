@@ -68,7 +68,7 @@ public class BlockChain {
      * Если меньше чем TEST_DB то улучшается скорость за счет схлопыания повторнных изменений балансов счетов.
      */
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[TEST_DB >> 3];
-    public static final boolean NOT_CHECK_SIGNS = TEST_DB == 0 ? true : false;
+    public static final boolean NOT_CHECK_SIGNS = TEST_DB == 0;
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100
