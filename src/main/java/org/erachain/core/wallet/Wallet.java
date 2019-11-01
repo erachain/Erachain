@@ -65,6 +65,7 @@ public class Wallet extends Observable implements Observer {
 	private int secondsToUnlock = 100;
 	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
+	private WalletUpdater walletUpdater;
 
 	private List<ObserverWaiter> waitingObservers = new ArrayList<>();
 	// CONSTRUCTORS
@@ -87,6 +88,9 @@ public class Wallet extends Observable implements Observer {
 				DCSet.getInstance().getBlockMap().addObserver(this);
 				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 			}
+
+			walletUpdater = new WalletUpdater(Controller.getInstance(),
+					Controller.getInstance().getBlockChain(), DCSet.getInstance(), this);
 
         }
 
@@ -1293,7 +1297,7 @@ public class Wallet extends Observable implements Observer {
 
 	private long processBlockLogged = 0;
 
-    private void processBlock(DCSet dcSet, Block block) {
+	void processBlock(DCSet dcSet, Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1374,17 +1378,11 @@ public class Wallet extends Observable implements Observer {
 
     }
 
-    private void orphanBlock(Block block) {
+	void orphanBlock(DCSet dcSet, Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
 		}
-
-		// long start = System.currentTimeMillis();
-
-		//List<Transaction> transactions = block.a.a;
-
-		DCSet dcSet = DCSet.getInstance();
 
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
 		if (block == null)
