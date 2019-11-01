@@ -445,8 +445,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                     this.setChanged();
                     Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
                     if (
-                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
-                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                            observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
                                     || observItem.equals(ObserverMessage.REMOVE_AT_TX)
                     ) {
                         this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, value)));
@@ -512,16 +511,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             if (this.observableData != null) {
                 if (this.observableData.containsKey(DBTab.NOTIFY_REMOVE)) {
                     this.setChanged();
-                    Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
-                    if (
-                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
-                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
-                                    || observItem.equals(ObserverMessage.REMOVE_AT_TX)
-                    ) {
-                        this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, null)));
-                    } else {
-                        this.notifyObservers(new ObserverMessage(observItem, null));
-                    }
+                    this.notifyObservers(new ObserverMessage(this.observableData.get(DBTab.NOTIFY_REMOVE), key));
                 }
             }
         }

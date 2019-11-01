@@ -290,6 +290,28 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         return false;
     }
 
+    @Override
+    public Iterator<T> getIterator() {
+        this.addUses();
+
+        List<T> list = new ArrayList<>();
+        Iterator<T> parentIterator = parent.getIterator();
+        while (parentIterator.hasNext()) {
+            T key = parentIterator.next();
+            // пропустим если он есть в удаленных
+            if (deleted != null && deleted.containsKey(key))
+                continue;
+            list.add(key);
+        }
+
+        //Map uncastedMap = this.map;
+        Iterator<T> iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+
+        this.outUses();
+        return iterator;
+
+    }
+
     // TODO надо рекурсию к Родителю по итератору делать
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
@@ -327,35 +349,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
         }
 
-        iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list, iterator), Fun.COMPARATOR);
+        iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
 
         this.outUses();
         return iterator;
 
     }
-
-    @Override
-    public Iterator<T> getIterator() {
-        this.addUses();
-
-        List<T> list = new ArrayList<>();
-        Iterator<T> parentIterator = parent.getIterator();
-        while (parentIterator.hasNext()) {
-            T key = parentIterator.next();
-            // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key))
-                continue;
-            list.add(key);
-        }
-
-        //Map uncastedMap = this.map;
-        Iterator<T> iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list, map.keySet()), Fun.COMPARATOR);
-
-        this.outUses();
-        return iterator;
-
-    }
-
 
     @Override
     public void writeToParent() {

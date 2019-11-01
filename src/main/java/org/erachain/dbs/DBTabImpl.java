@@ -185,13 +185,12 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
             if (this.observableData != null) {
                 if (this.observableData.containsKey(NOTIFY_REMOVE)) {
                     this.setChanged();
-                    Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
+                    Integer observItem = this.observableData.get(NOTIFY_REMOVE);
                     if (
-                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
-                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                            observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
                                     || observItem.equals(ObserverMessage.REMOVE_AT_TX)
                     ) {
-                        this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, null)));
+                        this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, value)));
                     } else {
                         this.notifyObservers(new ObserverMessage(observItem, value));
                     }
@@ -227,18 +226,9 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
         //NOTIFY
         if (this.observableData != null) {
-            if (this.observableData.containsKey(NOTIFY_DELETE)) {
+            if (this.observableData.containsKey(NOTIFY_REMOVE)) {
                 this.setChanged();
-                Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
-                if (
-                        observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
-                                || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
-                                || observItem.equals(ObserverMessage.REMOVE_AT_TX)
-                ) {
-                    this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, null)));
-                } else {
-                    this.notifyObservers(new ObserverMessage(observItem, null));
-                }
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_REMOVE), key));
             }
         }
 
