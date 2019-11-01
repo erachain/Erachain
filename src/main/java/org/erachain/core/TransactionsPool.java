@@ -71,9 +71,6 @@ public class TransactionsPool extends MonitoredThread {
 
         if (item instanceof Transaction) {
             // ADD TO UNCONFIRMED TRANSACTIONS
-            utxMap.put((Transaction) item);
-            clearCount++;
-            // ADD TO UNCONFIRMED TRANSACTIONS
             // нужно проверять существующие для правильного отображения числа их в статусе ГУИ
             // TODO посмотреть почему сюда двойные записи часто прилетают из sender.network.checkHandledTransactionMessages(data, sender, false)
             if (controller.useGui) {
