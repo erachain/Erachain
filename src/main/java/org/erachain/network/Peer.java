@@ -366,6 +366,8 @@ public class Peer extends MonitoredThread {
                 break;
             }
 
+            MessageFactory messageFactory = MessageFactory.getInstance();
+            byte[] messageMagicChain = Controller.getInstance().getMessageMagic();
             while (this.runed && this.network.run) {
 
                 //READ FIRST 4 BYTES
@@ -404,7 +406,7 @@ public class Peer extends MonitoredThread {
                     break;
                 }
 
-                if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
+                if (!Arrays.equals(messageMagic, messageMagicChain)) {
                     //ERROR and BAN
                     ban(30, "parse - received message with wrong magic");
                     break;
@@ -414,7 +416,7 @@ public class Peer extends MonitoredThread {
                 //PROCESS NEW MESSAGE
                 Message message;
                 try {
-                    message = MessageFactory.getInstance().parse(this, in);
+                    message = messageFactory.parse(this, in);
                 } catch (java.net.SocketTimeoutException timeOut) {
                     ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
                     break;

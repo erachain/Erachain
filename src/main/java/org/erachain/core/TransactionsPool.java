@@ -144,13 +144,23 @@ public class TransactionsPool extends MonitoredThread {
             }
 
             // ADD TO UNCONFIRMED TRANSACTIONS
-            utxMap.put(transaction);
-            clearCount++;
+            // нужно проверять существующие для правильного отображения числа их в статусе ГУИ
+            // TODO посмотреть почему сюда двойные записи часто прилетают из sender.network.checkHandledTransactionMessages(data, sender, false)
+            if (controller.useGui) {
+                // если GUI включено то только если нет в карте то событие пошлется тут
+                // возможно пока стояла в осереди другая уже добавилась - но опять же из Пира все дубли должны были убираться
+                if (!utxMap.set(transaction.getSignature(), transaction)) {
+                    clearCount++;
+                }
+            } else {
+                utxMap.put(transaction);
+                clearCount++;
+            }
 
             if (LOG_UNCONFIRMED_PROCESS) {
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 30) {
-                    LOGGER.debug("TRANSACTION_TYPE proccess ADD period: " + timeCheck);
+                    LOGGER.debug("TRANSACTION_TYPE process ADD period: " + timeCheck);
                 }
             }
 

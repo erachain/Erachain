@@ -121,7 +121,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
         String mess;
 
-        if (counter < 0 || System.currentTimeMillis() - resetPoint > 100000) {
+        if (counter < 0 || System.currentTimeMillis() - resetPoint > 300000) {
             counter = map.size();
             resetPoint = System.currentTimeMillis();
         }

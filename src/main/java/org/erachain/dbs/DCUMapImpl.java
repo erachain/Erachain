@@ -311,8 +311,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                         this.setChanged();
                         Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
                         if (
-                                observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
-                                        || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                                observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
                                         || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
                                         || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
                         ) {
@@ -376,8 +375,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                         this.setChanged();
                         Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
                         if (
-                                observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
-                                        || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                                observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
                                         || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
                                         || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
                         ) {
