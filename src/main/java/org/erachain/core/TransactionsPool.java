@@ -189,7 +189,9 @@ public class TransactionsPool extends MonitoredThread {
 
                     // проверяем на переполнение пула чтобы лишние очистить
                     boolean isStatusOK = controller.isStatusOK();
-                    needClearMap = clearCount > (BlockChain.TEST_DB > 0 ? BlockChain.TEST_DB << 2 : ((isStatusOK ? QUEUE_LENGTH << 2 : 500) << (Controller.HARD_WORK >> 2)));
+                    needClearMap = !DCSet.needResetUTXPoolMap
+                            && clearCount > (BlockChain.TEST_DB > 0 ? BlockChain.TEST_DB << 2 : ((isStatusOK ? QUEUE_LENGTH << 2 : 1000) << (Controller.HARD_WORK >> 2)))
+                            || DCSet.needResetUTXPoolMap && clearCount > QUEUE_LENGTH << (5 + (Controller.HARD_WORK >> 2));
 
                     int sizeUTX = utxMap.size();
                     if (needClearMap) {

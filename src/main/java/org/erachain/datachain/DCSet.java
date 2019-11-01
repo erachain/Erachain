@@ -592,7 +592,11 @@ public class DCSet extends DBASet {
      *
      * @return
      */
+    public static boolean needResetUTXPoolMap = false;
     public static DB makeDBinMemory() {
+
+        int freeSpaceReclaimQ = 3;
+        needResetUTXPoolMap = freeSpaceReclaimQ < 3;
         return DBMaker
                 .newMemoryDB()
                 .transactionDisable()
@@ -607,7 +611,10 @@ public class DCSet extends DBASet {
                 .cacheHardRefEnable()
                 //.cacheDisable()
 
-                .freeSpaceReclaimQ(0) // как-то слабо влияет в памяти
+
+                // если задано мене чем 3 то очитска записей при их удалении вобще не происходит - поэтому база раздувается в памяти без огрничений
+                // в этом случае нужно ее закрывать удалять и заново открывать
+                .freeSpaceReclaimQ(freeSpaceReclaimQ) // как-то слабо влияет в памяти
                 //.compressionEnable() // как-то не влияет в памяти
 
                 //
