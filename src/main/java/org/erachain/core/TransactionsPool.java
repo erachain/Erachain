@@ -73,6 +73,21 @@ public class TransactionsPool extends MonitoredThread {
             // ADD TO UNCONFIRMED TRANSACTIONS
             utxMap.put((Transaction) item);
             clearCount++;
+            // ADD TO UNCONFIRMED TRANSACTIONS
+            // нужно проверять существующие для правильного отображения числа их в статусе ГУИ
+            // TODO посмотреть почему сюда двойные записи часто прилетают из sender.network.checkHandledTransactionMessages(data, sender, false)
+            if (controller.useGui) {
+                // если GUI включено то только если нет в карте то событие пошлется тут
+                // возможно пока стояла в осереди другая уже добавилась - но опять же из Пира все дубли должны были убираться
+                Transaction utx = (Transaction) item;
+                if (!utxMap.set(utx.getSignature(), utx)) {
+                    clearCount++;
+                }
+            } else {
+                utxMap.put((Transaction) item);
+                clearCount++;
+            }
+
 
         } else if (item instanceof TransactionMessage) {
 
