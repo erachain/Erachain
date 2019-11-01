@@ -51,7 +51,15 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
                 case COLUMN_GB:
                     return blockHead.forgingValue + " ";
                 case COLUMN_dtWV:
-                    return (float) (100000 * (blockHead.forgingValue - blockHead.target) / blockHead.target) / 1000.0 + ""; //.movePointLeft(3);
+                    //return (float) (100000 * (blockHead.forgingValue - blockHead.target) / blockHead.target) / 1000.0 + ""; //.movePointLeft(3);
+                    if (blockHead.heightBlock == 1) {
+                        return "GENESIS";
+                    }
+                    if (blockHead.target == 0) {
+                        return "--";
+                    }
+                    return String.format("%10.3f%%", (100f * (blockHead.winValue - blockHead.target) / blockHead.target));
+
                 case COLUMN_TRANSACTIONS:
                     return blockHead.transactionsCount;
                 case COLUMN_FEE:
