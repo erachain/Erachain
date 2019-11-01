@@ -3,20 +3,17 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
-import org.erachain.database.SortableList;
 import org.erachain.database.wallet.BlocksHeadMap;
-import org.erachain.gui.ObserverWaiter;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun.Tuple2;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Observable;
 
 @SuppressWarnings("serial")
-public class WalletBlocksTableModel extends WalletSortedTableModel<Tuple2<Long, Long>, Block.BlockHead> {
+public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
     private int count;
     public static final int COLUMN_HEIGHT = 0;
     public static final int COLUMN_TIMESTAMP = 1;
@@ -35,33 +32,38 @@ public class WalletBlocksTableModel extends WalletSortedTableModel<Tuple2<Long, 
     @Override
     public Object getValueAt(int row, int column) {
         try {
-            if (listSorted == null || listSorted.size() - 1 < row) {
+            if (list == null || list.size() - 1 < row) {
                 return null;
             }
-            Pair<Tuple2<Long, Long>, Block.BlockHead> data = listSorted.get(row);
-            if (data == null) {
+            Block.BlockHead blockHead = list.get(row);
+            if (blockHead == null) {
                 return null;
             }
-            Block.BlockHead block = data.getB();
-            if (block == null) {
-                return null;
-            }
+
             switch (column) {
                 case COLUMN_HEIGHT:
-                    return block.heightBlock;
+                    return blockHead.heightBlock;
                 case COLUMN_TIMESTAMP:
                     BlockChain blockChain = Controller.getInstance().getBlockChain();
-                    return DateTimeFormat.timestamptoString(blockChain.getTimestamp(block.heightBlock));
+                    return DateTimeFormat.timestamptoString(blockChain.getTimestamp(blockHead.heightBlock));
                 case COLUMN_GENERATOR:
-                    return block.creator.getPersonAsString();
+                    return blockHead.creator.getPersonAsString();
                 case COLUMN_GB:
-                    return block.forgingValue + " ";
+                    return blockHead.forgingValue + " ";
                 case COLUMN_dtWV:
-                    return (float) (100000 * (block.forgingValue - block.target) / block.target) / 1000.0 + ""; //.movePointLeft(3);
+                    //return (float) (100000 * (blockHead.forgingValue - blockHead.target) / blockHead.target) / 1000.0 + ""; //.movePointLeft(3);
+                    if (blockHead.heightBlock == 1) {
+                        return "GENESIS";
+                    }
+                    if (blockHead.target == 0) {
+                        return "--";
+                    }
+                    return String.format("%10.3f%%", (100f * (blockHead.winValue - blockHead.target) / blockHead.target));
+
                 case COLUMN_TRANSACTIONS:
-                    return block.transactionsCount;
+                    return blockHead.transactionsCount;
                 case COLUMN_FEE:
-                    return BigDecimal.valueOf(block.totalFee, BlockChain.FEE_SCALE);
+                    return BigDecimal.valueOf(blockHead.totalFee, BlockChain.FEE_SCALE);
             }
         } catch (Exception e) {
             logger.error(e.getMessage() + " row:" + row, e);
@@ -78,8 +80,12 @@ public class WalletBlocksTableModel extends WalletSortedTableModel<Tuple2<Long, 
                 || message.getType() == ObserverMessage.WALLET_LIST_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE) {
             needUpdate = false;
-            listSorted = SortableList.makeSortableList(map, true, 50);
-            listSorted.sort();
+            list = new ArrayList<>();
+            Iterator iterator = map.getIterator(BlocksHeadMap.TIMESTAMP_INDEX, true);
+            int count = 50;
+            while (iterator.hasNext() && --count > 0) {
+                list.add((Block.BlockHead) map.get(iterator.next()));
+            }
             fireTableDataChanged();
         } else if (message.getType() == ObserverMessage.WALLET_ADD_BLOCK_TYPE
                 || message.getType() == ObserverMessage.WALLET_REMOVE_BLOCK_TYPE) {

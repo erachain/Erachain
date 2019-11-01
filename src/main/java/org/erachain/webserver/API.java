@@ -124,6 +124,7 @@ public class API {
 
         help.put("*** PERSON ***", "");
         help.put("GET Person Height", "personheight");
+        help.put("GET Person Key by PubKey of Owner", "personkeybyownerpublickey/{publickey}");
         help.put("GET Person", "person/{key}");
         help.put("GET Person Data", "persondata/{key}");
         help.put("GET Person Key by Address", "personkeybyaddress/{address}");
