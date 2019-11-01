@@ -77,10 +77,10 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
     // GET KEYs with FORKED rules
     @Override
-    public HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit) {
+    public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
 
         // GET FROM PARENT
-        HashSet<Long> parentKeys = ((OrderMap) parent).getSubKeysWithParent(have, want, limit);
+        HashSet<Long> parentKeys = ((OrderMap) parent).getProtocolKeys(have, want, limit);
 
         // DELETE ALL PARENT WAS DELETED HERE
         if (deleted != null && !deleted.isEmpty()) {

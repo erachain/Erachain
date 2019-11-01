@@ -129,15 +129,15 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
 
     @Override
-    public HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit) {
-        return ((OrderSuit) map).getSubKeysWithParent(have, want, limit);
+    public HashSet<Long> getProtocolKeys(long have, long want, BigDecimal limit) {
+        return ((OrderSuit) map).getUnsortedKeysWithParent(have, want, limit);
     }
 
     @Override
     public List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal limit) {
 
         //FILTER ALL KEYS
-        HashSet<Long> keys = ((OrderSuit) map).getSubKeysWithParent(have, want, limit);
+        HashSet<Long> keys = ((OrderSuit) map).getUnsortedKeysWithParent(have, want, limit);
 
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
@@ -160,7 +160,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     @Override
     public List<Order> getOrdersForTrade(long have, long want, boolean reverse) {
         //FILTER ALL KEYS
-        Collection<Long> keys = ((OrderSuit) map).getSubKeysWithParent(have, want, null);
+        Collection<Long> keys = ((OrderSuit) map).getUnsortedKeysWithParent(have, want, null);
 
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();

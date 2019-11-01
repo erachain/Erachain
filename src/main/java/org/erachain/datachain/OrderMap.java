@@ -20,7 +20,7 @@ public interface OrderMap extends DBTab<Long, Order> {
 
     long getCountOrders(long haveWant);
 
-    HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit);
+    HashSet<Long> getProtocolKeys(long have, long want, BigDecimal limit);
     List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal limit);
 
     List<Order> getOrdersForTrade(long have, long want, boolean reverse);

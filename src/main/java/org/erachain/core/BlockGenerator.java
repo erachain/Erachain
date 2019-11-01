@@ -1,6 +1,7 @@
 package org.erachain.core;
 
 
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -275,9 +276,18 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
             creatorsReference.put(creator, timestamp);
 
-            messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
-                    amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
-            messageTx.sign(creator, Transaction.FOR_NETWORK);
+            if (BlockChain.NOT_CHECK_SIGNS) {
+                byte[] sign = new byte[64];
+                System.arraycopy(Longs.toByteArray(timestamp), 0, sign, 0, 8);
+                System.arraycopy(creator.getPublicKey(), 0, sign, 8, 32);
+                System.arraycopy(recipient.getPublicKey(), 0, sign, 32, 32);
+                messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                        amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l, sign);
+            } else {
+                messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                        amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
+                messageTx.sign(creator, Transaction.FOR_NETWORK);
+            }
 
             ctrl.transactionsPool.offerMessage(messageTx);
 

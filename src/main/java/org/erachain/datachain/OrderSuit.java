@@ -14,7 +14,15 @@ public interface OrderSuit {
 
     Iterator<Long> getWantHaveIterator(long want);
 
-    HashSet<Long> getSubKeysWithParent(long have, long want, BigDecimal limit);
+    /**
+     * Unsorted if call from Forked DB
+     *
+     * @param have
+     * @param want
+     * @param limit
+     * @return
+     */
+    HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit);
 
     Iterator<Long> getAddressHaveWantIterator(String address, long have, long want);
 }
