@@ -208,7 +208,7 @@ public class OrderTest {
         OrderMap ordersMap = forkDC.getOrderMap();
         // тут в базе форкнутой должен быть ордер из стенки в измененном виде
         // а повторный расчет в форке не должен его дублировать
-        List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet), false);
+        List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet), null);
 
         assertEquals(orders.size(), len);
         assertEquals(ordersMap.size(), len);
@@ -229,12 +229,12 @@ public class OrderTest {
         assertEquals(ordersMap.size(), len-2);
 
         // добавим назад
-        ordersMap.add(orders.get(0));
+        ordersMap.put(orders.get(0));
 
         assertEquals(ordersMap.size(), len-1);
 
         // ПОВТОРНО добавим назад
-        ordersMap.add(orders.get(0));
+        ordersMap.put(orders.get(0));
 
         assertEquals(ordersMap.size(), len-1);
 
