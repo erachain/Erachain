@@ -156,11 +156,12 @@ public class OrderMap extends DCMap<Long, Order> {
         return size;
     }
 
-    // GET KEYs with FORKED rules
+    // GET KEYs with FORKED rules - unSORTED
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected List<Long> getSubKeysWithParent(long have, long want) {
+    protected HashSet<Long> getSubKeysWithParent(long have, long want) {
 
-        List<Long> keys = new ArrayList<>(((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
+        HashSet<Long> keys = new HashSet<Long>();
+        keys.addAll(((BTreeMap<Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
                 Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
 
@@ -168,7 +169,7 @@ public class OrderMap extends DCMap<Long, Order> {
         if (this.parent != null) {
 
             //GET ALL KEYS FOR FORK in PARENT
-            List<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
+            HashSet<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
 
             // REMOVE those who DELETED here
             if (this.deleted != null) {

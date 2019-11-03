@@ -6,13 +6,17 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.OrderMap;
 import org.erachain.ntp.NTP;
-import org.junit.Before;
 import org.junit.Test;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 public class OrderTest {
 
@@ -94,7 +98,7 @@ public class OrderTest {
     int haveAssetScale = 8;
     int wantAssetScale = 8;
 
-    @Before
+    //@Before
     private void init() {
 
         dcSet = DCSet.createEmptyDatabaseSet();
@@ -169,34 +173,44 @@ public class OrderTest {
     /**
      * Ситуация следующая - есть список ордеров которые подходят для текущего и один из них не поностью исполняется
      *  - он переписывается в форкнутую базу
-     *  Затем второй ордер к этому списку обрабатывается. И в сптске полявляется двойная запись
+     *  Затем второй ордер к этому списку обрабатывается. And в списке полявляется двойная запись
      *  ранее покусанного ордера и его родитель из родительской таблицы. Надо сэмулировать такой случай и проверять тут
      *
      */
     @Test
     public void processDoubleInFork() {
 
+        init();
+
         // создадим много ордеров
         int len = 10;
         for (int i = 0; i < len; i++) {
             BigDecimal amountSell = new BigDecimal("100");
-            BigDecimal amountBuy = new BigDecimal(100 - (len >> 1) + i);
+            BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
 
-            orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
-                    amountSell, (byte) 0, timestamp++, 0l);
+            orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
+                    amountSell, (byte) 0, timestamp++, 0L);
             orderCreation.sign(accountA, Transaction.FOR_NETWORK);
             orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
             orderCreation.process(null, Transaction.FOR_NETWORK);
 
         }
 
-        DCSet fork = dcSet
-        // создадим первый ордер который изменит
-        orderCreation = new CreateOrderTransaction(accountB, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
-                amountSell, (byte) 0, timestamp++, 0l);
-        orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-        orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+        DCSet forkDC = dcSet.fork();
+        // создадим первый ордер который изменит ордера стенки
+        orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                new BigDecimal("10"),
+                new BigDecimal("10"), (byte) 0, timestamp++, 0L);
+        orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+        orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, 2, ++seqNo);
         orderCreation.process(null, Transaction.FOR_NETWORK);
+
+        OrderMap ordersMap = forkDC.getOrderMap();
+        // тут в базе форкнутой должен быть ордер из стенки в измененном виде
+        // а повторный расчет в форке не должен его дублировать
+        List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet), false);
+
+        assertEquals(orders.size(), len);
 
     }
 
