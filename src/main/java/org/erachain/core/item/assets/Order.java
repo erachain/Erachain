@@ -638,10 +638,20 @@ public class Order implements Comparable<Order> {
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, false);
 
         /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
-        if (BlockChain.CHECK_BUGS > 7 && !orders.isEmpty()) {
+        /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
+        if (BlockChain.CHECK_BUGS > 3 && !orders.isEmpty()) {
             BigDecimal price = orders.get(0).getPrice();
             Long timestamp = orders.get(0).getId();
+            Long id = 0L;
             for (Order item: orders) {
+                if (item.getId().equals(id)) {
+                    // RISE ERROR
+                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPrice);
+                    timestamp = null;
+                    ++timestamp;
+                }
+                id = item.getId();
+
                 if (item.getHaveAssetKey() != this.wantAssetKey
                         || item.getWantAssetKey() != this.haveAssetKey) {
                     // RISE ERROR
