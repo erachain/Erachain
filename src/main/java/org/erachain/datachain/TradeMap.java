@@ -207,30 +207,28 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
                 Fun.t2(order.getId(), Fun.HI())).keySet();
 
         //IF THIS IS A FORK
-        if (this.parent != null) {
-            //GET ALL KEYS FOR FORK
-            Set<Tuple2> parentKeys = ((TradeMap) this.parent).getKeys(order);
-
-            if (this.deleted != null) {
-                //DELETE DELETED
-                parentKeys.removeAll(this.deleted.keySet());
-            }
-
-            //COMBINE SETS
-            combinedKeys.addAll(forkKeys);
-
-
-            //CONVERT SET BACK TO COLLECTION
-            keys = combinedKeys;
+        if (this.parent == null) {
+            return keys;
         }
 
-        return keys;
+        //GET ALL KEYS FOR FORK
+        Set<Tuple2> combinedKeys = ((TradeMap) this.parent).getKeys(order);
+
+        if (this.deleted != null) {
+            //DELETE DELETED
+            combinedKeys.removeAll(this.deleted.keySet());
+        }
+
+        //COMBINE SETS
+        combinedKeys.addAll(keys);
+
+        return combinedKeys;
     }
 
     @SuppressWarnings("unchecked")
     public List<Trade> getInitiatedTrades(Order order) {
         //FILTER ALL TRADES
-        Collection<Tuple2> keys = this.getKeys(order);
+        Set<Tuple2> keys = this.getKeys(order);
 
         //GET ALL TRADES FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();
@@ -282,6 +280,11 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
     }
 
 
+    /**
+     * Only for GUI
+     * @param haveWant
+     * @return
+     */
     @SuppressWarnings("unchecked")
     public List<Trade> getTrades(long haveWant)
     // get trades for order as HAVE and as WANT

@@ -165,25 +165,23 @@ public class OrderMap extends DCMap<Long, Order> {
                 Fun.t4(have, want, null, null),
                 Fun.t4(have, want, Fun.HI(), Fun.HI())).values());
 
+        if (this.parent == null) {
+            return keys;
+        }
         //IF THIS IS A FORK
-        if (this.parent != null) {
 
-            //GET ALL KEYS FOR FORK in PARENT
-            HashSet<Long> parentKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
+        //GET ALL KEYS FOR PARENT
+        HashSet<Long> combinedKeys = ((OrderMap) this.parent).getSubKeysWithParent(have, want);
 
-            // REMOVE those who DELETED here
-            if (this.deleted != null) {
-                //DELETE DELETED
-                for (Object deleted : this.deleted.keySet()) {
-                    parentKeys.remove((Long)deleted);
-                }
-            }
-
-            keys.addAll(parentKeys);
-
+        // REMOVE those who DELETED here
+        if (this.deleted != null) {
+            //DELETE DELETED
+            combinedKeys.removeAll(this.deleted.keySet());
         }
 
-        return keys;
+        combinedKeys.addAll(keys);
+
+        return combinedKeys;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

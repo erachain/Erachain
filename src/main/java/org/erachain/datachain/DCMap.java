@@ -127,20 +127,24 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         this.addUses();
         Set<T> u = this.map.keySet();
 
-        if (this.parent != null) {
-            Set<T> parentKeys = parent.getKeys();
+        try {
+            if (this.parent == null) {
+                return u;
+            }
+
+            Set<T> combinedKeys = parent.getKeys();
             if (deleted != null && !deleted.isEmpty()) {
-                for(T key: deleted.keySet()) {
-                    parentKeys.remove(key);
-                }
+                // что удалено тут удалим у родителя
+                combinedKeys.removeAll(deleted.keySet());
             }
 
             // тут просто добвим - в карте дублирующие ключ схлопнутся
-            u.addAll(parentKeys);
-        }
+            combinedKeys.addAll(u);
+            return combinedKeys;
 
-        this.outUses();
-        return u;
+        } finally {
+            this.outUses();
+        }
     }
 
     /**
