@@ -160,7 +160,7 @@ public class OrderTestsMy {
         keyB = issueAssetTransaction.getAssetKey(db);
 
         // CREATE ORDER TRANSACTION
-        orderCreation = new CreateOrderTransaction(accountA, keyA, 3l, BigDecimal.valueOf(10), BigDecimal.valueOf(100),
+        orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(10), BigDecimal.valueOf(100),
                 (byte) 0, timestamp, 0l);
 
     }
@@ -3396,38 +3396,40 @@ public class OrderTestsMy {
         // CHECK DATALENGTH
         assertEquals(rawCancelOrder.length, cancelOrderTransaction.getDataLength(Transaction.FOR_NETWORK, true));
 
+        CancelOrderTransaction parsedCancelOrder = null;
         try {
             // PARSE FROM BYTES
-            CancelOrderTransaction parsedCancelOrder = (CancelOrderTransaction) TransactionFactory.getInstance()
+            parsedCancelOrder = (CancelOrderTransaction) TransactionFactory.getInstance()
                     .parse(rawCancelOrder, Transaction.FOR_NETWORK);
 
-            // CHECK INSTANCE
-            assertEquals(true, parsedCancelOrder instanceof CancelOrderTransaction);
-
-            // CHECK SIGNATURE
-            assertEquals(true, Arrays.equals(cancelOrderTransaction.getSignature(), parsedCancelOrder.getSignature()));
-
-            // CHECK AMOUNT CREATOR
-            assertEquals(cancelOrderTransaction.getAmount(accountA), parsedCancelOrder.getAmount(accountA));
-
-            // CHECK OWNER
-            assertEquals(cancelOrderTransaction.getCreator().getAddress(), parsedCancelOrder.getCreator().getAddress());
-
-            // CHECK ORDER
-            assertEquals(0, cancelOrderTransaction.getOrderID().compareTo(parsedCancelOrder.getOrderID()));
-
-            // CHECK FEE
-            assertEquals(cancelOrderTransaction.getFee(), parsedCancelOrder.getFee());
-
-            // CHECK REFERENCE
-            // assertEquals(cancelOrderTransaction.getReference(),
-            // parsedCancelOrder.getReference());
-
-            // CHECK TIMESTAMP
-            assertEquals(cancelOrderTransaction.getTimestamp(), parsedCancelOrder.getTimestamp());
         } catch (Exception e) {
             fail("Exception while parsing transaction.");
         }
+
+        // CHECK INSTANCE
+        assertEquals(true, parsedCancelOrder instanceof CancelOrderTransaction);
+
+        // CHECK SIGNATURE
+        assertEquals(true, Arrays.equals(cancelOrderTransaction.getSignature(), parsedCancelOrder.getSignature()));
+
+        // CHECK AMOUNT CREATOR
+        assertEquals(cancelOrderTransaction.getAmount(accountA), parsedCancelOrder.getAmount(accountA));
+
+        // CHECK OWNER
+        assertEquals(cancelOrderTransaction.getCreator().getAddress(), parsedCancelOrder.getCreator().getAddress());
+
+        // CHECK ORDER
+        assertEquals(true, Arrays.equals(cancelOrderTransaction.getorderSignature(), parsedCancelOrder.getorderSignature()));
+
+        // CHECK FEE
+        assertEquals(cancelOrderTransaction.getFeePow(), parsedCancelOrder.getFeePow());
+
+        // CHECK REFERENCE
+        // assertEquals(cancelOrderTransaction.getReference(),
+        // parsedCancelOrder.getReference());
+
+        // CHECK TIMESTAMP
+        assertEquals(cancelOrderTransaction.getTimestamp(), parsedCancelOrder.getTimestamp());
 
         // PARSE TRANSACTION FROM WRONG BYTES
         rawCancelOrder = new byte[cancelOrderTransaction.getDataLength(Transaction.FOR_NETWORK, true)];
