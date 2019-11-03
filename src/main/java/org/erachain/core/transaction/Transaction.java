@@ -1274,7 +1274,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
-                && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
+                && this.signature != null && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;
         }

@@ -138,6 +138,11 @@ public class OrderTestsMy {
         accountB.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
         accountB.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(10), false);
 
+        assetA = new AssetVenture(new GenesisBlock().getCreator(), "START", icon, image, ".", 0, 8, 50000L);
+        // сразу зазадим чтобы все активы были уже в версии где учитывается точность
+        assetA.setReference(new byte[64]);
+        assetA.insertToMap(db, BlockChain.AMOUNT_SCALE_FROM + 1);
+
         assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
@@ -399,7 +404,9 @@ public class OrderTestsMy {
 
         int thisScale = 5;
         assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, thisScale, 0L);
-        assetA.insertToMap(db, 0l);
+        assetA.setReference(new byte[64]);
+        // Актив с учетом точности создадим
+        assetA.insertToMap(db, 0L);
 
         // IS VALID
         bal_A_keyA = amountForParse.scaleByPowerOfTen(-thisScale);
@@ -418,6 +425,7 @@ public class OrderTestsMy {
         assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
         assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, 30, 0L);
+        assetA.setReference(new byte[64]);
         assetA.insertToMap(db, 0l);
 
         // IS VALID
