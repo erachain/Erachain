@@ -330,9 +330,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
                 // NOTIFY if not FORKED
                 if (this.observableData != null && (old == null || !old.equals(value))) {
-                    if (this.observableData.containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
+                    if (this.observableData.containsKey(NOTIFY_ADD) && !DCSet.isStoped()) {
                         this.setChanged();
-                        Integer observeItem = this.observableData.get(DBMap.NOTIFY_ADD);
+                        Integer observeItem = this.observableData.get(NOTIFY_ADD);
                         if (
                                 observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
                                         || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
@@ -425,9 +425,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
             // NOTIFY
             if (this.observableData != null) {
-                if (this.observableData.containsKey(DBMap.NOTIFY_REMOVE)) {
+                if (this.observableData.containsKey(NOTIFY_REMOVE)) {
                     this.setChanged();
-                    Integer observItem = this.observableData.get(DBMap.NOTIFY_REMOVE);
+                    Integer observItem = this.observableData.get(NOTIFY_REMOVE);
                     if (
                             observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
                                     || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
