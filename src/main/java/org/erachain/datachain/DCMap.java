@@ -186,11 +186,15 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
             U old = this.map.put(key, value);
 
             if (this.parent != null) {
-                //if (old != null)
-                //	++this.shiftSize;
                 if (this.deleted != null) {
-                    if (this.deleted.remove(key) != null)
-                        ++this.shiftSize;
+                    if (this.deleted.remove(key) != null) {
+                    }
+                }
+                if (old == null // если еще не было тут значения
+                        && this.parent.contains(key) // и такой ключ есть в родителе
+                            ) {
+                    // нужно учесть сдвиг
+                    ++this.shiftSize;
                 }
             } else {
 
@@ -253,6 +257,11 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
             if (value == null) {
                 // если тут нету то создадим пометку что удалили
                 value = this.parent.get(key);
+            } else {
+                if (this.parent.contains(key)) {
+                    // в родителе есть такой ключ - и тут было значение, значит уменьшим сдвиг
+                    --this.shiftSize;
+                }
             }
 
             this.outUses();

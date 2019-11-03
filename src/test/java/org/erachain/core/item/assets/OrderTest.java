@@ -211,6 +211,32 @@ public class OrderTest {
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet), false);
 
         assertEquals(orders.size(), len);
+        assertEquals(ordersMap.size(), len);
+
+        // эмуляция отмены некотрого ордера
+        ordersMap.delete(orders.get(5).getId());
+
+        assertEquals(ordersMap.size(), len-1);
+
+        // эмуляция отмены измененого ордера, записанного в Форк
+        ordersMap.delete(orders.get(0));
+
+        assertEquals(ordersMap.size(), len-2);
+
+        // ПОВТОРНО отмены измененого ордера, записанного в Форк
+        ordersMap.delete(orders.get(0));
+
+        assertEquals(ordersMap.size(), len-2);
+
+        // добавим назад
+        ordersMap.add(orders.get(0));
+
+        assertEquals(ordersMap.size(), len-1);
+
+        // ПОВТОРНО добавим назад
+        ordersMap.add(orders.get(0));
+
+        assertEquals(ordersMap.size(), len-1);
 
     }
 

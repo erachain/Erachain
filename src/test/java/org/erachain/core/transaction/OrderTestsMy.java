@@ -1132,7 +1132,7 @@ public class OrderTestsMy {
         assertEquals(0, orderCreation.getAmountWant().compareTo(parsedOrderCreation.getAmountWant()));
 
         // CHECK FEE
-        assertEquals(orderCreation.getFee(), parsedOrderCreation.getFee());
+        assertEquals(orderCreation.getFeePow(), parsedOrderCreation.getFeePow());
 
         // CHECK REFERENCE
         // assertEquals((long)orderCreation.getReference(),
