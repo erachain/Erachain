@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.*;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
 import org.erachain.database.serializer.OrderSerializer;
@@ -417,22 +418,28 @@ public class OrderMap extends DCMap<Long, Order> {
     }
     */
 
+    @Override
     public boolean set(Long id, Order order) {
         if (BlockChain.CHECK_BUGS > 0) {
-            if (((DCSet)this.getDBSet()).getCompletedOrderMap().contains(id)) {
+            if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
-                assert("".equals("already in Completed"));
+                LOGGER.error("already in Completed");
+                Long err = null;
+                ++err;
             }
         }
 
         return super.set(id, order);
     }
 
+    @Override
     public Order delete(Long id) {
-        if (BlockChain.CHECK_BUGS > 1) {
-            if (((DCSet)this.getDBSet()).getCompletedOrderMap().contains(id)) {
+        if (BlockChain.CHECK_BUGS > 0) {
+            if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {
                 // если он есть в уже завершенных
-                assert("".equals("already in Completed"));
+                LOGGER.error("Order [" + Transaction.viewDBRef(id) + "] already in Completed");
+                Long err = null;
+                ++err;
             }
         }
         return super.delete(id);
