@@ -1,5 +1,7 @@
 package org.erachain.dbs;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
@@ -54,7 +56,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
                 // у родителя чистим - у себя нет, так как только создали
-                ((DCSet)parent.getDBSet()).clearCache();
+                ((DBASet)parent.getDBSet()).clearCache();
                 System.gc();
                 if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
                     LOGGER.error("Heap Memory Overflow");
@@ -139,6 +141,32 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         return null;
     }
 
+    @Override
+    public Iterator<T> getIterator() {
+        this.addUses();
+
+        try {
+            if (parent == null) {
+                return map.keySet().iterator();
+            }
+
+            List<T> list = new ArrayList<>();
+            Iterator<T> parentIterator = parent.getIterator();
+            while (parentIterator.hasNext()) {
+                T key = parentIterator.next();
+                // пропустим если он есть в удаленных
+                if (deleted != null && deleted.containsKey(key))
+                    continue;
+                list.add(key);
+            }
+
+            return Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+
+        } finally {
+            this.outUses();
+        }
+    }
+
     /**
      *
      * @param index <b>primary Index = 0</b>, secondary index = 1...10000
@@ -169,17 +197,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             return u;
 
         }
-    }
-
-    @Override
-    public Iterator<T> getIterator() {
-        this.addUses();
-
-        Iterator<T> u = this.map.keySet().iterator();
-
-        this.outUses();
-        return u;
-
     }
 
     @Override
