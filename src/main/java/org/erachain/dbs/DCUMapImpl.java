@@ -304,8 +304,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         }
     }
 
-    @Override
-    public boolean set(T key, U value) {
+    private boolean setLocal(T key, U value) {
         if (DCSet.isStoped()) {
             return false;
         }
@@ -314,31 +313,29 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
         try {
 
-            U old;
-            if (this.parent != null) {
-                // найдем и в Родительских тоже
-                old = get(key);
-                this.map.put(key, value);
-            } else {
-                old = this.map.put(key, value);
-            }
+            U old = this.map.put(key, value);
 
             if (this.parent != null) {
-                //if (old != null)
-                //	++this.shiftSize;
                 if (this.deleted != null) {
-                    if (this.deleted.remove(key) != null)
-                        ++this.shiftSize;
+                    if (this.deleted.remove(key) != null) {
+                    }
+                }
+                if (old == null // если еще не было тут значения
+                        && this.parent.contains(key) // и такой ключ есть в родителе
+                ) {
+                    // нужно учесть сдвиг
+                    ++this.shiftSize;
                 }
             } else {
 
                 // NOTIFY if not FORKED
                 if (this.observableData != null && (old == null || !old.equals(value))) {
-                    if (this.observableData.containsKey(DBTab.NOTIFY_ADD) && !DCSet.isStoped()) {
+                    if (this.observableData.containsKey(DBMap.NOTIFY_ADD) && !DCSet.isStoped()) {
                         this.setChanged();
-                        Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
+                        Integer observeItem = this.observableData.get(DBMap.NOTIFY_ADD);
                         if (
-                                observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                                observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
+                                        || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
                                         || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
                                         || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
                         ) {
@@ -359,6 +356,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
         this.outUses();
         return false;
+
+    }
+
+    @Override
+    public boolean set(T key, U value) {
+        return setLocal(key, value);
     }
 
     /**
@@ -372,56 +375,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
         /// -----> set(key, value);
         ///
-        if (true) {
-            set(key, value);
-            return;
-        }
-
-        if (DCSet.isStoped()) {
-            return;
-        }
-
-        this.addUses();
-
-        try {
-
-            this.map.put(key, value);
-
-            if (this.parent != null) {
-                //if (old != null)
-                //	++this.shiftSize;
-                if (this.deleted != null) {
-                    if (this.deleted.remove(key) != null)
-                        ++this.shiftSize;
-                }
-            } else {
-
-                // NOTIFY if not FORKED
-                if (this.observableData != null) {
-                    if (this.observableData.containsKey(DBTab.NOTIFY_ADD) && !DCSet.isStoped()) {
-                        this.setChanged();
-                        Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
-                        if (
-                                observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
-                                        || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
-                                        || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
-                        ) {
-                            this.notifyObservers(new ObserverMessage(observeItem, new Pair<T, U>(key, value)));
-                        } else {
-                            this.notifyObservers(
-                                    new ObserverMessage(observeItem, value));
-                        }
-                    }
-                }
-            }
-
-            this.outUses();
-            return;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-
-        this.outUses();
+        setLocal(key, value);
 
     }
 
@@ -457,6 +411,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             if (value == null) {
                 // если тут нету то создадим пометку что удалили
                 value = this.parent.get(key);
+            } else {
+                if (this.parent.contains(key)) {
+                    // в родителе есть такой ключ - и тут было значение, значит уменьшим сдвиг
+                    --this.shiftSize;
+                }
             }
 
             this.outUses();
@@ -466,11 +425,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
             // NOTIFY
             if (this.observableData != null) {
-                if (this.observableData.containsKey(DBTab.NOTIFY_REMOVE)) {
+                if (this.observableData.containsKey(DBMap.NOTIFY_REMOVE)) {
                     this.setChanged();
-                    Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
+                    Integer observItem = this.observableData.get(DBMap.NOTIFY_REMOVE);
                     if (
-                            observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
+                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
                                     || observItem.equals(ObserverMessage.REMOVE_AT_TX)
                     ) {
                         this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, value)));
@@ -505,45 +465,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
      * @param key
      */
     private void deleteHere(T key) {
-        if (DCSet.isStoped()) {
-            return;
-        }
-
-        this.addUses();
-
-        this.map.remove(key);
-
-        if (this.parent != null) {
-            // это форкнутая таблица
-
-            if (this.deleted == null) {
-                this.deleted = new HashMap(1024 , 0.75f);
-            }
-
-            // добавляем в любом случае, так как
-            // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
-            // и это есть в основной базе, то в воркнутую будет помещена так же запись.
-            // Получаем что запись есть и в Родителе и в Форкнутой таблице!
-            // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
-            this.deleted.put(key, EXIST);
-
-            this.outUses();
-            return;
-
-        } else {
-
-            // NOTIFY
-            if (this.observableData != null) {
-                if (this.observableData.containsKey(DBTab.NOTIFY_REMOVE)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.observableData.get(DBTab.NOTIFY_REMOVE), key));
-                }
-            }
-        }
-
-        this.outUses();
-
+        removeHere(key);
     }
+
     @Override
     public void delete(T key) {
         /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как
