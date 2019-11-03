@@ -44,7 +44,7 @@ public class BlockChain {
      */
     public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || false;
 
-    static final public int CHECK_BUGS = 1;
+    static final public int CHECK_BUGS = 10;
 
     /**
      * если задан - первое подключение к нему

@@ -260,6 +260,9 @@ public class CancelOrderTransaction extends Transaction {
 
     public static void process_it(DCSet db, Order order) {
 
+        //DELETE FROM DATABASE
+        db.getOrderMap().delete(order.getId());
+
         //SET ORPHAN DATA
         db.getCompletedOrderMap().add(order);
 
@@ -267,8 +270,6 @@ public class CancelOrderTransaction extends Transaction {
         //creator.setBalance(orderSignature.getHaveAssetKey(), creator.getBalance(db, orderSignature.getHaveAssetKey()).add(orderSignature.getAmountHaveLeft()), db);
         order.getCreator().changeBalance(db, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
 
-        //DELETE FROM DATABASE
-        db.getOrderMap().delete(order.getId());
     }
 
     //@Override

@@ -644,9 +644,12 @@ public class Order implements Comparable<Order> {
             Long timestamp = orders.get(0).getId();
             Long id = 0L;
             for (Order item: orders) {
-                if (item.getId().equals(id)) {
+                if (item.getId().equals(id)
+                        // в Девелопе один ордер проскочил плохой
+                        && !(BlockChain.DEVELOP_USE && Transaction.viewDBRef(id).equals("125300-1"))
+                ) {
                     // RISE ERROR
-                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPrice);
+                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, false);
                     timestamp = null;
                     ++timestamp;
                 }
