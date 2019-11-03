@@ -31,7 +31,7 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
     boolean OLD_USED_NOW = false;
 
     //ConcurrentHashMap deleted;
-    HashMap deleted;
+    HashMap <T, Boolean>deleted;
     Boolean EXIST = true;
     int shiftSize;
 
@@ -127,23 +127,46 @@ public abstract class DCMap<T, U> extends DBMap<T, U> {
         this.addUses();
         Set<T> u = this.map.keySet();
 
-        if (this.parent != null)
-            u.addAll(this.parent.getKeys());
+        if (this.parent != null) {
+            Set<T> parentKeys = parent.getKeys();
+            if (deleted != null && !deleted.isEmpty()) {
+                for(T key: deleted.keySet()) {
+                    parentKeys.remove(key);
+                }
+            }
+
+            // тут просто добвим - в карте дублирующие ключ схлопнутся
+            u.addAll(parentKeys);
+        }
 
         this.outUses();
         return u;
     }
 
+    /**
+     * Так как в форкнутой таблице могут быть измененые записи то их значения сдублируются тут.
+     * Поэтому чтобы такого не было делаем по ключам и сборке списка из значений - это дольше будет работать
+     *
+     * @return
+     */
     @Override
     public Collection<U> getValues() {
         this.addUses();
-        Collection<U> u = this.map.values();
 
-        if (this.parent != null)
-            u.addAll(this.parent.getValues());
+        try {
+            if (this.parent == null) {
+                return this.map.values();
+            } else {
+                Collection<U> u = new ArrayList<>();
+                for (T key: this.getKeys()) {
+                    u.add(get(key));
+                }
+                return u;
+            }
 
-        this.outUses();
-        return u;
+        } finally {
+            this.outUses();
+        }
     }
 
     @Override

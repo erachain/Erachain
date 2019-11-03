@@ -197,28 +197,28 @@ public class TradeMap extends DCMap<Tuple2<Long, Long>, Trade> {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private Collection<Tuple2> getKeys(Order order) {
+    private Set<Tuple2> getKeys(Order order) {
 
         Map uncastedMap = this.map;
 
         //FILTER ALL KEYS
-        Collection<Tuple2> keys = ((BTreeMap<Tuple2, Order>) uncastedMap).subMap(
+        Set<Tuple2> keys = ((BTreeMap<Tuple2, Order>) uncastedMap).subMap(
                 Fun.t2(order.getId(), null),
                 Fun.t2(order.getId(), Fun.HI())).keySet();
 
         //IF THIS IS A FORK
         if (this.parent != null) {
             //GET ALL KEYS FOR FORK
-            Collection<Tuple2> forkKeys = ((TradeMap) this.parent).getKeys(order);
-
-            //COMBINE LISTS
-            Set<Tuple2> combinedKeys = new TreeSet<Tuple2>(keys);
-            combinedKeys.addAll(forkKeys);
+            Set<Tuple2> parentKeys = ((TradeMap) this.parent).getKeys(order);
 
             if (this.deleted != null) {
                 //DELETE DELETED
-                combinedKeys.removeAll(this.deleted.keySet());
+                parentKeys.removeAll(this.deleted.keySet());
             }
+
+            //COMBINE SETS
+            combinedKeys.addAll(forkKeys);
+
 
             //CONVERT SET BACK TO COLLECTION
             keys = combinedKeys;

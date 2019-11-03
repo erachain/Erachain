@@ -437,7 +437,7 @@ public class OrderMap extends DCMap<Long, Order> {
     public Order delete(Long id) {
         if (BlockChain.CHECK_BUGS > 0) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)
-                    && !(BlockChain.DEVELOP_USE && Transaction.viewDBRef(id).equals("125300-1")) // это в Девелопе
+                    //&& !(BlockChain.DEVELOP_USE && Transaction.viewDBRef(id).equals("125300-1")) // это в Девелопе
             ) {
 
                 // если он есть в уже завершенных
