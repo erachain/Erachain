@@ -646,7 +646,8 @@ public class Order implements Comparable<Order> {
             for (Order item: orders) {
                 if (item.getId().equals(id)
                         // в Девелопе один ордер проскочил плохой
-                        && !(BlockChain.DEVELOP_USE && Transaction.viewDBRef(id).equals("125300-1"))
+                        && !(BlockChain.DEVELOP_USE && (Transaction.viewDBRef(id).equals("125300-1")
+                            || Transaction.viewDBRef(id).equals("62817-2")))
                 ) {
                     // RISE ERROR
                     List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, false);
