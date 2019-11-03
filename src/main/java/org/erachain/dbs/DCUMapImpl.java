@@ -258,23 +258,50 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         this.addUses();
         Set<T> u = this.map.keySet();
 
-        if (this.parent != null)
-            u.addAll(this.parent.keySet());
+        try {
+            if (this.parent == null) {
+                return u;
+            }
 
-        this.outUses();
-        return u;
+            Set<T> combinedKeys = parent.keySet();
+            if (deleted != null && !deleted.isEmpty()) {
+                // что удалено тут удалим у родителя
+                combinedKeys.removeAll(deleted.keySet());
+            }
+
+            // тут просто добвим - в карте дублирующие ключ схлопнутся
+            combinedKeys.addAll(u);
+            return combinedKeys;
+
+        } finally {
+            this.outUses();
+        }
     }
 
+    /**
+     * Так как в форкнутой таблице могут быть измененые записи то их значения сдублируются тут.
+     * Поэтому чтобы такого не было делаем по ключам и сборке списка из значений - это дольше будет работать
+     *
+     * @return
+     */
     @Override
     public Collection<U> values() {
         this.addUses();
-        Collection<U> u = this.map.values();
 
-        if (this.parent != null)
-            u.addAll(this.parent.values());
+        try {
+            if (this.parent == null) {
+                return this.map.values();
+            } else {
+                Collection<U> u = new ArrayList<>();
+                for (T key: this.keySet()) {
+                    u.add(get(key));
+                }
+                return u;
+            }
 
-        this.outUses();
-        return u;
+        } finally {
+            this.outUses();
+        }
     }
 
     @Override
