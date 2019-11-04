@@ -141,6 +141,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         return null;
     }
 
+    // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
     @Override
     public Iterator<T> getIterator() {
         this.addUses();
@@ -167,6 +168,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         }
     }
 
+    // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
     /**
      *
      * @param index <b>primary Index = 0</b>, secondary index = 1...10000
