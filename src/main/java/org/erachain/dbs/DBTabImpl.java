@@ -37,6 +37,8 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     @Getter
     protected DBTab<T, U> parent;
 
+    protected boolean sizeEnable;
+
     protected Map<Integer, Integer> observableData;
 
 
@@ -54,10 +56,11 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         }
     }
 
-    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database) {
+    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database, boolean sizeEnable) {
         this.dbsUsed = dbsUsed;
         this.databaseSet = databaseSet;
         this.database = database;
+        this.sizeEnable = sizeEnable;
         databaseSet.addTable(this);
 
         //OPEN MAP
@@ -69,8 +72,12 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     }
 
-    public DBTabImpl(DBASet databaseSet, DB database) {
-        this(IDB.DBS_MAP_DB, databaseSet, database);
+    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database) {
+        this(dbsUsed, databaseSet, database, false);
+    }
+
+    public DBTabImpl(DBASet databaseSet, DB database, boolean sizeEnable) {
+        this(IDB.DBS_MAP_DB, databaseSet, database, sizeEnable);
     }
 
     /**
@@ -78,11 +85,12 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
      * @param parent
      * @param databaseSet
      */
-    public DBTabImpl(int dbsUsed, DBTab parent, DBASet databaseSet) {
+    public DBTabImpl(int dbsUsed, DBTab parent, DBASet databaseSet, boolean sizeEnable) {
 
         this.dbsUsed = dbsUsed;
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;
+        this.sizeEnable = sizeEnable;
         this.parent = parent;
         databaseSet.addTable(this);
 
@@ -91,16 +99,21 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     }
 
+    public DBTabImpl(int dbsUsed, DBTab parent, DBASet databaseSet) {
+        this(dbsUsed, parent, databaseSet, false);
+    }
+
     /**
      * Это лоя форкеутой таблицы вызов - запомнить Родителя и все - индексы тут не нужны и обсерверы
      * @param parent
      * @param databaseSet
      */
-    public DBTabImpl(DBTab parent, DBASet databaseSet) {
+    public DBTabImpl(DBTab parent, DBASet databaseSet, boolean sizeEnable) {
 
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;
         this.parent = parent;
+        this.sizeEnable = sizeEnable;
         databaseSet.addTable(this);
 
         // OPEN MAP

@@ -44,12 +44,15 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         super(databaseSet);
     }
 
+    public DCUMapImpl(DBASet databaseSet, DB database, boolean sizeEnable) {
+        super(databaseSet, database, sizeEnable);
+    }
     public DCUMapImpl(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, false);
     }
 
-    public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet) {
-        super(parent, dcSet);
+    public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet, boolean sizeEnable) {
+        super(parent, dcSet, sizeEnable);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
@@ -73,6 +76,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         } else {
             this.openMap();
         }
+    }
+
+    public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet) {
+        this(parent, dcSet, false);
     }
 
     public abstract void openMap();

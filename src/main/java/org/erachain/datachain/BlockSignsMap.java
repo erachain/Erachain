@@ -16,13 +16,13 @@ import java.util.TreeMap;
  */
 public class BlockSignsMap extends DCUMap<Long, Integer> {
 
+    static final boolean SIZE_ENABLE = true;
     public BlockSignsMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
-
+        super(databaseSet, database, SIZE_ENABLE);
     }
 
     public BlockSignsMap(BlockSignsMap parent, DCSet dcSet) {
-        super(parent, dcSet);
+        super(parent, dcSet, SIZE_ENABLE);
     }
 
     @Override

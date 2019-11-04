@@ -20,13 +20,14 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implements TransactionFinalMapSigns {
 
     static int KEY_LEN = 12;
+    static final boolean SIZE_ENABLE = true;
 
     public TransactionFinalMapSignsImpl(int dbs, DCSet databaseSet, DB database) {
-        super(dbs, databaseSet, database);
+        super(dbs, databaseSet, database, SIZE_ENABLE);
     }
 
     public TransactionFinalMapSignsImpl(int dbs, TransactionFinalMapSigns parent, DCSet dcSet) {
-        super(dbs, parent, dcSet);
+        super(dbs, parent, dcSet, SIZE_ENABLE);
     }
 
     @Override

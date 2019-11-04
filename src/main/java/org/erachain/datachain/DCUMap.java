@@ -16,11 +16,18 @@ import org.mapdb.DB;
 public abstract class DCUMap<T, U> extends org.erachain.dbs.DCUMapImpl<T, U> {
 
     public DCUMap(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, false);
+    }
+    public DCUMap(DBASet databaseSet, DB database, boolean sizeEnable) {
+        super(databaseSet, database, sizeEnable);
     }
 
     public DCUMap(org.erachain.dbs.DCUMapImpl<T, U> parent, DBASet dcSet) {
-        super(parent, dcSet);
+        super(parent, dcSet, false);
+    }
+
+    public DCUMap(org.erachain.dbs.DCUMapImpl<T, U> parent, DBASet dcSet, boolean sizeEnable) {
+        super(parent, dcSet, sizeEnable);
     }
 
 }
