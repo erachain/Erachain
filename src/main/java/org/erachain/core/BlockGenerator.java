@@ -265,22 +265,22 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 creator = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
                 if (creatorsReference.containsKey(creator)) {
                     timestamp = creatorsReference.get(creator);
+                    timestamp++;
+                } else {
+                    // определим время создания для каждого счета
+                    timestamp = blockTimestampBeg;
                 }
             } while (timestamp > blockTimestampEnd && countSeek-- > 0);
 
-            // определим время создания для каждого счета
-            if (timestamp == 0) {
-                timestamp = blockTimestampBeg;
-            } else {
-                timestamp++;
-            }
             creatorsReference.put(creator, timestamp);
 
             if (BlockChain.NOT_CHECK_SIGNS) {
                 byte[] sign = new byte[64];
-                System.arraycopy(Longs.toByteArray(timestamp), 0, sign, 0, 8);
+                // первые 8 байт нужно уникальные
+                System.arraycopy(Longs.toByteArray(random.nextLong()), 0, sign, 0, 8);
                 System.arraycopy(creator.getPublicKey(), 0, sign, 8, 32);
                 System.arraycopy(recipient.getPublicKey(), 0, sign, 32, 32);
+
                 messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
                         amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l, sign);
             } else {
@@ -289,7 +289,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 messageTx.sign(creator, Transaction.FOR_NETWORK);
             }
 
-            ctrl.transactionsPool.offerMessage(messageTx);
+            // может переполниться очередь на добавление транзакций - подождем
+            while (!ctrl.transactionsPool.offerMessage(messageTx)) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
 
         }
 
