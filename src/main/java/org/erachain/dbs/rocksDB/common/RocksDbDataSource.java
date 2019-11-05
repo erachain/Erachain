@@ -28,9 +28,9 @@ public interface RocksDbDataSource {
 
     List<byte[]> filterApprropriateValues(byte[] filter) throws RuntimeException;
 
-    List<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException;
+    Set<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException;
 
-    List<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException;
+    Set<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException;
 
     String getDBName();
 
@@ -64,11 +64,11 @@ public interface RocksDbDataSource {
 
     RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle);
 
+    RockStoreIterator indexIterator(boolean descending, int indexDB);
+
     RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter);
 
     RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter);
-
-    RockStoreIterator indexIterator(boolean descending, int indexDB);
 
     void write(WriteBatch batch);
 

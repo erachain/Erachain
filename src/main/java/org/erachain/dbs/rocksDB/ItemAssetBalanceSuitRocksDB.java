@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
@@ -134,7 +135,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     // TODO - release it on Iterators
 
-    public List<byte[]> assetKeys(long assetKey) {
+    public Set<byte[]> assetKeys(long assetKey) {
         return ((DBRocksDBTable)map).filterAppropriateValuesAsByteKeys(
                 Longs.toByteArray(assetKey),
                 balanceKeyAssetIndex.getColumnFamilyHandle());

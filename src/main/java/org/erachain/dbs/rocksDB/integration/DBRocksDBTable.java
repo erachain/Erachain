@@ -150,9 +150,11 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     protected void afterOpen() {
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
-        if (columnFamilyHandles.size() > 1) {
-            // если indexes = null то размер не будем считать
-            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+        if (enableSize) {
+            if (columnFamilyHandles.size() > 1) {
+                // если indexes = null то размер не будем считать
+                columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
+            }
         }
     }
 
@@ -392,19 +394,21 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         return dbSource.values().stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
-    public List<K> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
+    public Set<K> filterAppropriateValuesAsKeys(byte[] filter, int indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB)
-                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
-    }
-    public List<K> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB) {
-        return dbSource.filterApprropriateValues(filter, indexDB)
-                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
+                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
     }
 
-    public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, int indexDB) {
+    public Set<K> filterAppropriateValuesAsKeys(byte[] filter, ColumnFamilyHandle indexDB) {
+        return dbSource.filterApprropriateValues(filter, indexDB)
+                .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toSet());
+    }
+
+    public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, int indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB);
     }
-    public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
+
+    public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB);
     }
 

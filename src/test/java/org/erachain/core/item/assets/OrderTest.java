@@ -10,6 +10,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.dbs.rocksDB.common.RockStoreIterator;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
@@ -153,8 +155,14 @@ public class OrderTest {
     @Test
     public void processDoubleInFork() {
 
+
         for (int dbs : TESTED_DBS) {
             init(dbs);
+
+            Iterator<Long> iterator;
+            int count = 0;
+
+            OrderMap ordersMap = dcSet.getOrderMap();
 
             // создадим много ордеров
             int len = 10;
@@ -168,21 +176,30 @@ public class OrderTest {
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
 
+                iterator = ordersMap.getIterator(1, false);
+                count = 0;
+                while (iterator.hasNext()) {
+                    Long key = iterator.next();
+                    Order value = ordersMap.get(key);
+                    String proce = value.viewPrice();
+                    count++;
+                }
+                assertEquals(count, i + 1);
+
             }
 
-            OrderMap ordersMap = dcSet.getOrderMap();
             OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
             DBRocksDBTable<Long, Order> mapRocks = source.map;
             RocksDbDataSource mapSource = mapRocks.dbSource;
             RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1);
-            int count = 0;
+            count = 0;
             while (iteratorRocks.hasNext()) {
                 byte[] key = iteratorRocks.next();
                 count++;
             }
             assertEquals(count, len);
 
-            Iterator<Long> iterator = ordersMap.getIterator();
+            iterator = ordersMap.getIterator(1, false);
             count = 0;
             while (iterator.hasNext()) {
                 Long key = iterator.next();
@@ -252,6 +269,97 @@ public class OrderTest {
             }
 
             dcSet.close();
+        }
+    }
+
+    /**
+     * Ошибка в первичном индексе - Итератор в 2 раза больше длинны чем индексов
+     * и получает какието первые значения кривые
+     */
+    @Test
+    public void iteratorDBMain() {
+
+
+        for (int dbs : TESTED_DBS) {
+            init(dbs);
+
+            Iterator iterator;
+            int count = 0;
+
+            TransactionFinalMapSigns transMap = dcSet.getTransactionFinalMapSigns();
+            iterator = transMap.getIterator();
+            count = 0;
+            while (iterator.hasNext()) {
+                byte[] key = (byte[]) iterator.next();
+                Long value = transMap.get(key);
+                count++;
+            }
+            assertEquals(count, 271);
+
+            TransactionFinalMapImpl transFinMap = dcSet.getTransactionFinalMap();
+            iterator = transFinMap.getIterator();
+            count = 0;
+            while (iterator.hasNext()) {
+                Long key = (Long) iterator.next();
+                Transaction value = transFinMap.get(key);
+                String seqNo = value.viewHeightSeq();
+                count++;
+            }
+            assertEquals(count, 271);
+
+
+            OrderMap ordersMap = dcSet.getOrderMap();
+
+            // создадим много ордеров
+            int len = 10;
+            for (int i = 0; i < len; i++) {
+                BigDecimal amountSell = new BigDecimal("100");
+                BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
+
+                orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
+                        amountSell, (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+
+                if (false) {
+                    iterator = ordersMap.getIterator();
+                    count = 0;
+                    while (iterator.hasNext()) {
+                        Long key = (Long) iterator.next();
+                        Order value = ordersMap.get(key);
+                        String price = value.viewPrice();
+                        count++;
+                    }
+                    assertEquals(count, i + 1);
+
+                    iterator = ordersMap.getIterator(0, false);
+                    count = 0;
+                    while (iterator.hasNext()) {
+                        Long key = (Long) iterator.next();
+                        Order value = ordersMap.get(key);
+                        String price = value.viewPrice();
+                        count++;
+                    }
+                    assertEquals(count, i + 1);
+                }
+
+            }
+
+            dcSet.flush(99999, true, false);
+            iterator = ordersMap.getIterator();
+            count = 0;
+            while (iterator.hasNext()) {
+                Long key = (Long) iterator.next();
+                Order value = ordersMap.get(key);
+                if (value != null) {
+                    String price = value.viewPrice();
+                }
+
+                count++;
+            }
+            assertEquals(count, len);
+
         }
     }
 
