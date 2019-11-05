@@ -47,7 +47,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(),
-                databaseSet, enableSize);
+                databaseSet, sizeEnable);
 
     }
 

@@ -35,7 +35,7 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
                             1, 256, 32, false),
                     new WriteOptions().setSync(true).setDisableWAL(false),
                     new ReadOptions(),
-                    databaseSet, enableSize);
+                    databaseSet, sizeEnable);
         } else {
             map = new DBRocksDBTableTransactionSingle<>(new ByteableInteger(), new ByteableBlock(), NAME_TABLE, indexes,
                     RocksDbSettings.initCustomSettings(7, 64, 32,
@@ -43,7 +43,7 @@ public class BlocksSuitRocksDB extends DBMapSuit<Integer, Block> implements Bloc
                             1, 256, 32, false),
                     new WriteOptions().setSync(true).setDisableWAL(false),
                     new ReadOptions(),
-                    databaseSet, enableSize);
+                    databaseSet, sizeEnable);
         }
 
     }

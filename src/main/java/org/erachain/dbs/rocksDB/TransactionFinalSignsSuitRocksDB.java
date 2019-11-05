@@ -29,7 +29,7 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(),
-                databaseSet, enableSize);
+                databaseSet, sizeEnable);
     }
 
     @Override

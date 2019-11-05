@@ -140,6 +140,11 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
+    public boolean isSizeEnable() {
+        return sizeEnable;
+    }
+
+    @Override
     public Set<T> keySet() {
         return this.map.keySet();
     }

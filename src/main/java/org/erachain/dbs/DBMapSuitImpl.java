@@ -7,7 +7,13 @@ public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
 
     protected U defaultValue;
 
+    protected boolean sizeEnable;
     //protected abstract void openMap();
+
+    @Override
+    public boolean isSizeEnable() {
+        return sizeEnable;
+    }
 
     @Override
     public int getDefaultIndex() {

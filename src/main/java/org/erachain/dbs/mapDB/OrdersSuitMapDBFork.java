@@ -80,20 +80,21 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
     public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
 
         // GET FROM PARENT
-        HashSet<Long> parentKeys = ((OrderMap) parent).getProtocolKeys(have, want, limit);
+        HashSet<Long> combinedKeys = ((OrderMap) parent).getProtocolKeys(have, want, limit);
 
         // DELETE ALL PARENT WAS DELETED HERE
         if (deleted != null && !deleted.isEmpty()) {
-            parentKeys.removeAll(deleted.keySet());
+            combinedKeys.removeAll(deleted.keySet());
         }
 
+        Object limitOrHI = limit == null ? Fun.HI() : limit; // надо тут делать выбор иначе ошибка преобразования в subMap
         HashSet<Long> keys = new HashSet<Long>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, limit, Fun.HI())).values());
+                Fun.t4(have, want, limitOrHI, Fun.HI())).values());
 
-        parentKeys.addAll(keys);
+        combinedKeys.addAll(keys);
 
-        return keys;
+        return combinedKeys;
     }
 
     @Override

@@ -19,6 +19,8 @@ public interface IMap<T, U> {
 
     int size();
 
+    boolean isSizeEnable();
+
     U get(T key);
 
     Set<T> keySet();

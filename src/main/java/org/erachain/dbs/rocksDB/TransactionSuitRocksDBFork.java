@@ -32,7 +32,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
-                new WriteOptions().setSync(true).setDisableWAL(false), enableSize);
+                new WriteOptions().setSync(true).setDisableWAL(false), sizeEnable);
     }
 
     @Override

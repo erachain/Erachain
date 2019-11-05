@@ -1,24 +1,33 @@
 package org.erachain.core.item.assets;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
+import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.ntp.NTP;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
+@Slf4j
 public class OrderTest {
+
+    int[] TESTED_DBS = new int[]{IDB.DBS_MAP_DB, IDB.DBS_ROCK_DB};
 
     Long releaserReference = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -99,9 +108,16 @@ public class OrderTest {
     int wantAssetScale = 8;
 
     //@Before
-    private void init() {
+    private void init(int dbs) {
 
-        dcSet = DCSet.createEmptyDatabaseSet();
+        logger.info(" ********** open DBS: " + dbs);
+        try {
+            File tempDir = new File(ConstantsRocksDB.ROCKS_DB_FOLDER);
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
+        dcSet = DCSet.createEmptyDatabaseSet(dbs);
         gb = new GenesisBlock();
 
         try {
@@ -138,7 +154,7 @@ public class OrderTest {
 
         assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(dcSet)[0], new byte[64]);
+                0L, new byte[64]);
         issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(dcSet);
@@ -156,6 +172,7 @@ public class OrderTest {
                 : dcSet.getOrderMap().get(order.getId());
 
     }
+
     private Order reloadOrder(Long orderId) {
 
         return dcSet.getCompletedOrderMap().contains(orderId) ? dcSet.getCompletedOrderMap().get(orderId)
@@ -180,64 +197,85 @@ public class OrderTest {
     @Test
     public void processDoubleInFork() {
 
-        init();
+        for (int dbs : TESTED_DBS) {
+            init(dbs);
 
-        // создадим много ордеров
-        int len = 10;
-        for (int i = 0; i < len; i++) {
-            BigDecimal amountSell = new BigDecimal("100");
-            BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
+            // создадим много ордеров
+            int len = 10;
+            for (int i = 0; i < len; i++) {
+                BigDecimal amountSell = new BigDecimal("100");
+                BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
 
-            orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
-                    amountSell, (byte) 0, timestamp++, 0L);
-            orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-            orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
+                        amountSell, (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+
+            }
+
+            OrderMap ordersMap = dcSet.getOrderMap();
+            // тут в базе форкнутой должен быть ордер из стенки в измененном виде
+            // а повторный расчет в форке не должен его дублировать
+            List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                    null);
+
+            DCSet forkDC = dcSet.fork();
+            // создадим первый ордер который изменит ордера стенки
+            orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                    new BigDecimal("10"),
+                    new BigDecimal("10"), (byte) 0, timestamp++, 0L);
+            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+            orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, 2, ++seqNo);
             orderCreation.process(null, Transaction.FOR_NETWORK);
 
+            ordersMap = forkDC.getOrderMap();
+            // тут в базе форкнутой должен быть ордер из стенки в измененном виде
+            // а повторный расчет в форке не должен его дублировать
+            orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(forkDC), assetA.getKey(forkDC), null);
+
+            assertEquals(orders.size(), len);
+            if (ordersMap.isSizeEnable()) {
+                assertEquals(ordersMap.size(), len);
+            }
+
+            // эмуляция отмены некотрого ордера
+            ordersMap.delete(orders.get(5).getId());
+
+            if (ordersMap.isSizeEnable()) {
+                assertEquals(ordersMap.size(), len - 1);
+            }
+
+            // эмуляция отмены измененого ордера, записанного в Форк
+            ordersMap.delete(orders.get(0));
+
+            if (ordersMap.isSizeEnable()) {
+                assertEquals(ordersMap.size(), len - 2);
+            }
+
+            // ПОВТОРНО отмены измененого ордера, записанного в Форк
+            ordersMap.delete(orders.get(0));
+
+            if (ordersMap.isSizeEnable()) {
+                assertEquals(ordersMap.size(), len - 2);
+            }
+
+            // добавим назад
+            ordersMap.put(orders.get(0));
+
+            if (ordersMap.isSizeEnable()) {
+                assertEquals(ordersMap.size(), len - 1);
+            }
+
+            // ПОВТОРНО добавим назад
+            ordersMap.put(orders.get(0));
+
+            if (ordersMap.isSizeEnable()) {
+                assertEquals(ordersMap.size(), len - 1);
+            }
+
+            dcSet.close();
         }
-
-        DCSet forkDC = dcSet.fork();
-        // создадим первый ордер который изменит ордера стенки
-        orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(dcSet), assetB.getKey(dcSet),
-                new BigDecimal("10"),
-                new BigDecimal("10"), (byte) 0, timestamp++, 0L);
-        orderCreation.sign(accountB, Transaction.FOR_NETWORK);
-        orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, 2, ++seqNo);
-        orderCreation.process(null, Transaction.FOR_NETWORK);
-
-        OrderMap ordersMap = forkDC.getOrderMap();
-        // тут в базе форкнутой должен быть ордер из стенки в измененном виде
-        // а повторный расчет в форке не должен его дублировать
-        List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet), null);
-
-        assertEquals(orders.size(), len);
-        assertEquals(ordersMap.size(), len);
-
-        // эмуляция отмены некотрого ордера
-        ordersMap.delete(orders.get(5).getId());
-
-        assertEquals(ordersMap.size(), len-1);
-
-        // эмуляция отмены измененого ордера, записанного в Форк
-        ordersMap.delete(orders.get(0));
-
-        assertEquals(ordersMap.size(), len-2);
-
-        // ПОВТОРНО отмены измененого ордера, записанного в Форк
-        ordersMap.delete(orders.get(0));
-
-        assertEquals(ordersMap.size(), len-2);
-
-        // добавим назад
-        ordersMap.put(orders.get(0));
-
-        assertEquals(ordersMap.size(), len-1);
-
-        // ПОВТОРНО добавим назад
-        ordersMap.put(orders.get(0));
-
-        assertEquals(ordersMap.size(), len-1);
-
     }
 
     @Test
