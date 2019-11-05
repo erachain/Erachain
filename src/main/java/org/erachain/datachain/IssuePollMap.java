@@ -20,11 +20,11 @@ public class IssuePollMap extends IssueItemMap {
 
     @Override
     public void openMap() {
+
         //OPEN MAP
         map = database.createTreeMap("poll_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
-                .counterEnable()
                 .makeOrGet();
     }
 

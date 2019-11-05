@@ -21,6 +21,8 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
     @Override
     public void openMap() {
 
+        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+
         // OPEN MAP
         map = database.createHashMap("transactions")
                 .keySerializer(SerializerBase.LONG)

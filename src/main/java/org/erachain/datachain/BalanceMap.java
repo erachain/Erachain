@@ -54,16 +54,18 @@ public abstract class BalanceMap extends DCUMap<Tuple2<Long, Long>,
     @SuppressWarnings({"unchecked"})
     @Override
     public void openMap() {
+
+        //sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+
         //OPEN MAP
         map = database.createTreeMap("assets_balances_" + this.name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
-                .counterEnable()
+                //.counterEnable()
                 .makeOrGet();
 
         //HAVE/WANT KEY
         this.assetKeyMap = database.createTreeMap("balances_key_asset_" + this.name)
                 .comparator(Fun.COMPARATOR)
-                .counterEnable()
                 .makeOrGet();
 
         if (Controller.getInstance().onlyProtocolIndexing)

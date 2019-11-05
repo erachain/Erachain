@@ -27,7 +27,6 @@ public class HashesMap extends DCUMap<byte[], byte[]> {
         map = database.createTreeMap("hashes_keys")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
-                .counterEnable()
                 .makeOrGet();
     }
 

@@ -227,6 +227,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     // the deleted ones are smaller and the size is increased by 1
     @Override
     public int size() {
+
+        if (!sizeEnable)
+            return -1;
+
         this.addUses();
 
         int u = this.map.size();
@@ -346,7 +350,8 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                     if (this.deleted.remove(key) != null) {
                     }
                 }
-                if (old == null // если еще не было тут значения
+                if (sizeEnable &&
+                        old == null // если еще не было тут значения
                         && this.parent.contains(key) // и такой ключ есть в родителе
                 ) {
                     // нужно учесть сдвиг
@@ -438,7 +443,8 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                 // если тут нету то создадим пометку что удалили
                 value = this.parent.get(key);
             } else {
-                if (this.parent.contains(key)) {
+                if (sizeEnable
+                        && this.parent.contains(key)) {
                     // в родителе есть такой ключ - и тут было значение, значит уменьшим сдвиг
                     --this.shiftSize;
                 }

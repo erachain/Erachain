@@ -45,6 +45,8 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     @Override
     public void openMap() {
 
+        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+
         // OPEN MAP
         map = database.createHashMap("transactions")
                 .keySerializer(SerializerBase.LONG)
@@ -58,6 +60,7 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
 
+
         //////////// HERE PROTOCOL INDEX - for GENERATE BLOCL
 
         // TIMESTAMP INDEX
@@ -67,13 +70,11 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         NavigableSet<Tuple2<Long, Long>> heightIndex = database
                 .createTreeSet("transactions_index_timestamp")
                 .comparator(comparator)
-                .counterEnable()
                 .makeOrGet();
 
         NavigableSet<Tuple2<Long, Long>> descendingHeightIndex = database
                 .createTreeSet("transactions_index_timestamp_descending")
                 .comparator(new ReverseComparator(comparator))
-                .counterEnable()
                 .makeOrGet();
 
         createIndex(TIMESTAMP_INDEX, heightIndex, descendingHeightIndex,
@@ -90,7 +91,6 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
             return;
 
         this.senderKey = database.createTreeSet("sender_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
                 .makeOrGet();
 
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.senderKey, new Fun.Function2<Tuple2<String, Long>, Long, Transaction>() {
@@ -102,7 +102,6 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
         });
 
         this.recipientKey = database.createTreeSet("recipient_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
                 .makeOrGet();
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.recipientKey,
                 new Fun.Function2<String[], Long, Transaction>() {
@@ -124,7 +123,6 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
                 });
 
         this.typeKey = database.createTreeSet("address_type_unc_txs").comparator(Fun.COMPARATOR)
-                .counterEnable()
                 .makeOrGet();
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.typeKey,
                 new Fun.Function2<Fun.Tuple3<String, Long, Integer>[], Long, Transaction>() {
@@ -150,7 +148,6 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
                         return ret;
                     }
                 });
-
 
     }
 

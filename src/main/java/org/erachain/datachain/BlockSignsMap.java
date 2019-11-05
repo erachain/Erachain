@@ -17,6 +17,7 @@ import java.util.TreeMap;
 public class BlockSignsMap extends DCUMap<Long, Integer> {
 
     static final boolean SIZE_ENABLE = true;
+
     public BlockSignsMap(DCSet databaseSet, DB database) {
         super(databaseSet, database, SIZE_ENABLE);
     }
@@ -31,6 +32,9 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
 
     @Override
     public void openMap() {
+
+        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+
         //OPEN HASH MAP
         //
         map = database.createHashMap("height")

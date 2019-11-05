@@ -73,7 +73,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
         BTreeMap<Tuple3<Integer, Integer, Long>, Calculated> map = database.createTreeMap("height_seq_calculated")
                 .keySerializer(BTreeKeySerializer.TUPLE3).valueSerializer(new CalculatedSerializer())
-                .counterEnable()
                 .makeOrGet();
 
         if (Controller.getInstance().onlyProtocolIndexing)

@@ -58,7 +58,6 @@ public class KNMap extends DCUMap<
         //OPEN MAP
         map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.BASIC)
-                .counterEnable()
                 .makeOrGet();
 
     }

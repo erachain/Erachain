@@ -20,11 +20,11 @@ public class IssueStatusMap extends IssueItemMap {
 
     @Override
     public void openMap() {
+
         //OPEN MAP
         map = database.createTreeMap("status_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
-                .counterEnable()
                 .makeOrGet();
     }
 

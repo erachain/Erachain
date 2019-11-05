@@ -59,7 +59,6 @@ public class PersonAddressMap extends DCUMap<
         //OPEN MAP
         map = database.createTreeMap("person_address")
                 .keySerializer(BTreeKeySerializer.BASIC)
-                .counterEnable()
                 .makeOrGet();
     }
 

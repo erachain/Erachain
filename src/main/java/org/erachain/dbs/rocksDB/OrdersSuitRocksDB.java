@@ -34,7 +34,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
 
     IndexByteableBigDecimal bgToBytes = new IndexByteableBigDecimal();
     public OrdersSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, true);
+        super(databaseSet, database, logger, false);
     }
 
     @Override
