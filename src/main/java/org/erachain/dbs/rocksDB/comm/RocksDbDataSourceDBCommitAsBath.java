@@ -2,6 +2,8 @@ package org.erachain.dbs.rocksDB.comm;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
+import org.erachain.dbs.rocksDB.common.RockStoreIterator;
+import org.erachain.dbs.rocksDB.common.RockStoreIteratorFilter;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.settings.Settings;
@@ -199,6 +201,31 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
 
         return writeBatch.newIteratorWithBase(indexDB, dbCore.newIterator(indexDB));
+    }
+
+    @Override
+    public RockStoreIterator iterator(boolean descending) {
+        return new RockStoreIterator(getIterator(), descending, false);
+    }
+
+    @Override
+    public RockStoreIterator indexIterator(boolean descending, int indexDB) {
+        return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, true);
+    }
+
+    @Override
+    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
+        return new RockStoreIterator(getIterator(columnFamilyHandle), descending, true);
+    }
+
+    @Override
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
+        return new RockStoreIteratorFilter(getIterator(), descending, true, filter);
+    }
+
+    @Override
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
+        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, true, filter);
     }
 
     @Override

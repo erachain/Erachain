@@ -10,6 +10,10 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
+import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
+import org.erachain.dbs.rocksDB.common.RockStoreIterator;
+import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
+import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -19,6 +23,7 @@ import org.mapdb.Fun;
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -166,6 +171,27 @@ public class OrderTest {
             }
 
             OrderMap ordersMap = dcSet.getOrderMap();
+            OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
+            DBRocksDBTable<Long, Order> mapRocks = source.map;
+            RocksDbDataSource mapSource = mapRocks.dbSource;
+            RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1);
+            int count = 0;
+            while (iteratorRocks.hasNext()) {
+                byte[] key = iteratorRocks.next();
+                count++;
+            }
+            assertEquals(count, len);
+
+            Iterator<Long> iterator = ((OrdersSuitRocksDB) ordersMap.getSource()).getIterator(0, false);
+            count = 0;
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                Order value = ((OrdersSuitRocksDB) ordersMap.getSource()).get(key);
+                String price = value.viewPrice();
+                count++;
+            }
+            assertEquals(count, len);
+
             // тут в базе форкнутой должен быть ордер из стенки в измененном виде
             // а повторный расчет в форке не должен его дублировать
             List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),

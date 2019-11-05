@@ -633,6 +633,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public RockStoreIterator indexIterator(boolean descending, int indexDB) {
+        return new RockStoreIterator(dbCore.newIterator(columnFamilyHandles.get(indexDB)), descending, true);
+    }
+
+    @Override
     public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
         return new RockStoreIterator(dbCore.newIterator(columnFamilyHandle), descending, true);
     }
@@ -645,11 +650,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
         return new RockStoreIteratorFilter(dbCore.newIterator(columnFamilyHandle), descending, true, filter);
-    }
-
-    @Override
-    public RockStoreIterator indexIterator(boolean descending, int indexDB) {
-        return new RockStoreIterator(dbCore.newIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
 
     @Override
