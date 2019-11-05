@@ -182,7 +182,7 @@ public class OrderTest {
             }
             assertEquals(count, len);
 
-            Iterator<Long> iterator = ((OrdersSuitRocksDB) ordersMap.getSource()).getIterator(0, false);
+            Iterator<Long> iterator = ((OrdersSuitRocksDB) ordersMap.getSource()).getIterator();
             count = 0;
             while (iterator.hasNext()) {
                 Long key = iterator.next();
