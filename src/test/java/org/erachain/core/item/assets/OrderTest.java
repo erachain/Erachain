@@ -16,8 +16,8 @@ import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.dbs.rocksDB.common.RockStoreIterator;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
-import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -69,13 +69,14 @@ public class OrderTest {
     private void init(int dbs) {
 
         logger.info(" ********** open DBS: " + dbs);
+
+        File tempDir = new File(Settings.getInstance().getDataTempDir());
         try {
-            File tempDir = new File(ConstantsRocksDB.ROCKS_DB_FOLDER);
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {
         }
 
-        dcSet = DCSet.createEmptyDatabaseSet(dbs);
+        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
         gb = new GenesisBlock();
 
         try {
@@ -157,118 +158,122 @@ public class OrderTest {
 
 
         for (int dbs : TESTED_DBS) {
-            init(dbs);
 
-            Iterator<Long> iterator;
-            int count = 0;
+            try {
+                init(dbs);
 
-            OrderMap ordersMap = dcSet.getOrderMap();
+                Iterator<Long> iterator;
+                int count = 0;
 
-            // создадим много ордеров
-            int len = 10;
-            for (int i = 0; i < len; i++) {
-                BigDecimal amountSell = new BigDecimal("100");
-                BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
+                OrderMap ordersMap = dcSet.getOrderMap();
 
-                orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
-                        amountSell, (byte) 0, timestamp++, 0L);
-                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-                orderCreation.process(null, Transaction.FOR_NETWORK);
+                // создадим много ордеров
+                int len = 10;
+                for (int i = 0; i < len; i++) {
+                    BigDecimal amountSell = new BigDecimal("100");
+                    BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
+
+                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
+                            amountSell, (byte) 0, timestamp++, 0L);
+                    orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                    orderCreation.process(null, Transaction.FOR_NETWORK);
+
+                    iterator = ordersMap.getIterator(1, false);
+                    count = 0;
+                    while (iterator.hasNext()) {
+                        Long key = iterator.next();
+                        Order value = ordersMap.get(key);
+                        String proce = value.viewPrice();
+                        count++;
+                    }
+                    assertEquals(count, i + 1);
+
+                }
+
+                OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
+                DBRocksDBTable<Long, Order> mapRocks = source.map;
+                RocksDbDataSource mapSource = mapRocks.dbSource;
+                RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1);
+                count = 0;
+                while (iteratorRocks.hasNext()) {
+                    byte[] key = iteratorRocks.next();
+                    count++;
+                }
+                assertEquals(count, len);
 
                 iterator = ordersMap.getIterator(1, false);
                 count = 0;
                 while (iterator.hasNext()) {
                     Long key = iterator.next();
-                    Order value = ordersMap.get(key);
-                    String proce = value.viewPrice();
+                    Order value = ((OrdersSuitRocksDB) ordersMap.getSource()).get(key);
+                    String price = value.viewPrice();
                     count++;
                 }
-                assertEquals(count, i + 1);
+                assertEquals(count, len);
 
+                // тут в базе форкнутой должен быть ордер из стенки в измененном виде
+                // а повторный расчет в форке не должен его дублировать
+                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                        null);
+
+                DCSet forkDC = dcSet.fork();
+                // создадим первый ордер который изменит ордера стенки
+                orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(dcSet), assetB.getKey(dcSet),
+                        new BigDecimal("10"),
+                        new BigDecimal("10"), (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountB, Transaction.FOR_NETWORK);
+                orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+
+                ordersMap = forkDC.getOrderMap();
+                // тут в базе форкнутой должен быть ордер из стенки в измененном виде
+                // а повторный расчет в форке не должен его дублировать
+                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(forkDC), assetA.getKey(forkDC), null);
+
+                assertEquals(orders.size(), len);
+                if (ordersMap.isSizeEnable()) {
+                    assertEquals(ordersMap.size(), len);
+                }
+
+                // эмуляция отмены некотрого ордера
+                ordersMap.delete(orders.get(5).getId());
+
+                if (ordersMap.isSizeEnable()) {
+                    assertEquals(ordersMap.size(), len - 1);
+                }
+
+                // эмуляция отмены измененого ордера, записанного в Форк
+                ordersMap.delete(orders.get(0));
+
+                if (ordersMap.isSizeEnable()) {
+                    assertEquals(ordersMap.size(), len - 2);
+                }
+
+                // ПОВТОРНО отмены измененого ордера, записанного в Форк
+                ordersMap.delete(orders.get(0));
+
+                if (ordersMap.isSizeEnable()) {
+                    assertEquals(ordersMap.size(), len - 2);
+                }
+
+                // добавим назад
+                ordersMap.put(orders.get(0));
+
+                if (ordersMap.isSizeEnable()) {
+                    assertEquals(ordersMap.size(), len - 1);
+                }
+
+                // ПОВТОРНО добавим назад
+                ordersMap.put(orders.get(0));
+
+                if (ordersMap.isSizeEnable()) {
+                    assertEquals(ordersMap.size(), len - 1);
+                }
+
+            } finally {
+                dcSet.close();
             }
-
-            OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
-            DBRocksDBTable<Long, Order> mapRocks = source.map;
-            RocksDbDataSource mapSource = mapRocks.dbSource;
-            RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1);
-            count = 0;
-            while (iteratorRocks.hasNext()) {
-                byte[] key = iteratorRocks.next();
-                count++;
-            }
-            assertEquals(count, len);
-
-            iterator = ordersMap.getIterator(1, false);
-            count = 0;
-            while (iterator.hasNext()) {
-                Long key = iterator.next();
-                Order value = ((OrdersSuitRocksDB) ordersMap.getSource()).get(key);
-                String price = value.viewPrice();
-                count++;
-            }
-            assertEquals(count, len);
-
-            // тут в базе форкнутой должен быть ордер из стенки в измененном виде
-            // а повторный расчет в форке не должен его дублировать
-            List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
-                    null);
-
-            DCSet forkDC = dcSet.fork();
-            // создадим первый ордер который изменит ордера стенки
-            orderCreation = new CreateOrderTransaction(accountB, assetA.getKey(dcSet), assetB.getKey(dcSet),
-                    new BigDecimal("10"),
-                    new BigDecimal("10"), (byte) 0, timestamp++, 0L);
-            orderCreation.sign(accountB, Transaction.FOR_NETWORK);
-            orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, 2, ++seqNo);
-            orderCreation.process(null, Transaction.FOR_NETWORK);
-
-            ordersMap = forkDC.getOrderMap();
-            // тут в базе форкнутой должен быть ордер из стенки в измененном виде
-            // а повторный расчет в форке не должен его дублировать
-            orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(forkDC), assetA.getKey(forkDC), null);
-
-            assertEquals(orders.size(), len);
-            if (ordersMap.isSizeEnable()) {
-                assertEquals(ordersMap.size(), len);
-            }
-
-            // эмуляция отмены некотрого ордера
-            ordersMap.delete(orders.get(5).getId());
-
-            if (ordersMap.isSizeEnable()) {
-                assertEquals(ordersMap.size(), len - 1);
-            }
-
-            // эмуляция отмены измененого ордера, записанного в Форк
-            ordersMap.delete(orders.get(0));
-
-            if (ordersMap.isSizeEnable()) {
-                assertEquals(ordersMap.size(), len - 2);
-            }
-
-            // ПОВТОРНО отмены измененого ордера, записанного в Форк
-            ordersMap.delete(orders.get(0));
-
-            if (ordersMap.isSizeEnable()) {
-                assertEquals(ordersMap.size(), len - 2);
-            }
-
-            // добавим назад
-            ordersMap.put(orders.get(0));
-
-            if (ordersMap.isSizeEnable()) {
-                assertEquals(ordersMap.size(), len - 1);
-            }
-
-            // ПОВТОРНО добавим назад
-            ordersMap.put(orders.get(0));
-
-            if (ordersMap.isSizeEnable()) {
-                assertEquals(ordersMap.size(), len - 1);
-            }
-
-            dcSet.close();
         }
     }
 
@@ -281,85 +286,95 @@ public class OrderTest {
 
 
         for (int dbs : TESTED_DBS) {
-            init(dbs);
+            try {
+                init(dbs);
 
-            Iterator iterator;
-            int count = 0;
+                Iterator iterator;
 
-            TransactionFinalMapSigns transMap = dcSet.getTransactionFinalMapSigns();
-            iterator = transMap.getIterator();
-            count = 0;
-            while (iterator.hasNext()) {
-                byte[] key = (byte[]) iterator.next();
-                Long value = transMap.get(key);
-                count++;
-            }
-            assertEquals(count, 271);
+                int count = 0;
 
-            TransactionFinalMapImpl transFinMap = dcSet.getTransactionFinalMap();
-            iterator = transFinMap.getIterator();
-            count = 0;
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                Transaction value = transFinMap.get(key);
-                String seqNo = value.viewHeightSeq();
-                count++;
-            }
-            assertEquals(count, 271);
-
-
-            OrderMap ordersMap = dcSet.getOrderMap();
-
-            // создадим много ордеров
-            int len = 10;
-            for (int i = 0; i < len; i++) {
-                BigDecimal amountSell = new BigDecimal("100");
-                BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
-
-                orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
-                        amountSell, (byte) 0, timestamp++, 0L);
-                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-                orderCreation.process(null, Transaction.FOR_NETWORK);
-
-                if (false) {
-                    iterator = ordersMap.getIterator();
-                    count = 0;
-                    while (iterator.hasNext()) {
-                        Long key = (Long) iterator.next();
-                        Order value = ordersMap.get(key);
-                        String price = value.viewPrice();
-                        count++;
+                TransactionFinalMapSigns transSignsMap = dcSet.getTransactionFinalMapSigns();
+                TransactionFinalMapImpl transFinMap = dcSet.getTransactionFinalMap();
+                iterator = transFinMap.getIterator();
+                count = 0;
+                while (iterator.hasNext()) {
+                    count++;
+                    Long key = (Long) iterator.next();
+                    Transaction value = transFinMap.get(key);
+                    String seqNo = value.viewHeightSeq();
+                    Long keyFromSign = transSignsMap.get(value.getSignature());
+                    if (value.getSeqNo() == 43) {
+                        // косяк в Генесизе - 2 одинаковых записи
+                        continue;
                     }
-                    assertEquals(count, i + 1);
+                    assertEquals(Transaction.viewDBRef(keyFromSign), value.viewHeightSeq());
+                }
+                assertEquals(count, 272);
 
-                    iterator = ordersMap.getIterator(0, false);
-                    count = 0;
-                    while (iterator.hasNext()) {
-                        Long key = (Long) iterator.next();
-                        Order value = ordersMap.get(key);
-                        String price = value.viewPrice();
-                        count++;
+                iterator = transSignsMap.getIterator();
+                count = 0;
+                while (iterator.hasNext()) {
+                    byte[] key = (byte[]) iterator.next();
+                    Long value = transSignsMap.get(key);
+                    count++;
+                }
+                assertEquals(count, 271); // косяк в Генесизе - 2 одинаковых записи
+
+                OrderMap ordersMap = dcSet.getOrderMap();
+
+                // создадим много ордеров
+                int len = 10;
+                for (int i = 0; i < len; i++) {
+                    BigDecimal amountSell = new BigDecimal("100");
+                    BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
+
+                    orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
+                            amountSell, (byte) 0, timestamp++, 0L);
+                    orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                    orderCreation.process(null, Transaction.FOR_NETWORK);
+
+                    if (false) {
+                        iterator = ordersMap.getIterator();
+                        count = 0;
+                        while (iterator.hasNext()) {
+                            Long key = (Long) iterator.next();
+                            Order value = ordersMap.get(key);
+                            String price = value.viewPrice();
+                            count++;
+                        }
+                        assertEquals(count, i + 1);
+
+                        iterator = ordersMap.getIterator(0, false);
+                        count = 0;
+                        while (iterator.hasNext()) {
+                            Long key = (Long) iterator.next();
+                            Order value = ordersMap.get(key);
+                            String price = value.viewPrice();
+                            count++;
+                        }
+                        assertEquals(count, i + 1);
                     }
-                    assertEquals(count, i + 1);
+
                 }
 
-            }
+                dcSet.flush(99999, true, false);
+                iterator = ordersMap.getIterator();
+                count = 0;
+                while (iterator.hasNext()) {
+                    Long key = (Long) iterator.next();
+                    Order value = ordersMap.get(key);
+                    if (value != null) {
+                        String price = value.viewPrice();
+                    }
 
-            dcSet.flush(99999, true, false);
-            iterator = ordersMap.getIterator();
-            count = 0;
-            while (iterator.hasNext()) {
-                Long key = (Long) iterator.next();
-                Order value = ordersMap.get(key);
-                if (value != null) {
-                    String price = value.viewPrice();
+                    count++;
                 }
+                assertEquals(count, len);
 
-                count++;
+            } finally {
+                dcSet.close();
             }
-            assertEquals(count, len);
-
         }
     }
 

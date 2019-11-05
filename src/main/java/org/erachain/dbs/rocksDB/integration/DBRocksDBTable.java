@@ -151,10 +151,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     protected void afterOpen() {
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
         if (enableSize) {
-            if (columnFamilyHandles.size() > 1) {
-                // если indexes = null то размер не будем считать
-                columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-            }
+            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
         }
     }
 
@@ -372,8 +369,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         FileUtil.recursiveDelete(dbSource.getDbPathAndFile().toString());
         openSource();
         columnFamilyHandles = dbSource.getColumnFamilyHandles();
-        if (columnFamilyHandles.size() > 1) {
-            // если indexes = null то размер не будем считать
+        if (enableSize) {
             columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
         }
     }

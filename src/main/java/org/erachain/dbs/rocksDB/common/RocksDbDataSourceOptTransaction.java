@@ -66,10 +66,8 @@ public class RocksDbDataSourceOptTransaction extends RocksDbDataSourceImpl imple
 
     @Override
     public void afterOpenTable() {
-        columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
-
-        if (create) {
-            // уже есть выше put(columnFamilyFieldSize, SIZE_BYTE_KEY, new byte[]{0, 0, 0, 0});
+        if (false && enableSize) {
+            columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
         }
     }
 
