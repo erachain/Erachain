@@ -1368,7 +1368,7 @@ public class DCSet extends DBASet implements Observer {
                 //.asyncWriteFlushDelay(100)
 
                 // если при записи на диск блока процессор сильно нагружается - то уменьшить это
-                .freeSpaceReclaimQ(2) // не нагружать процессор для поиска свободного места в базе данных
+                .freeSpaceReclaimQ(3) // не нагружать процессор для поиска свободного места в базе данных
 
                 .make();
 
