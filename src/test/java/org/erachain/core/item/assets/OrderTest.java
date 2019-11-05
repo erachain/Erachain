@@ -27,7 +27,9 @@ import static org.junit.Assert.assertEquals;
 @Slf4j
 public class OrderTest {
 
-    int[] TESTED_DBS = new int[]{IDB.DBS_MAP_DB, IDB.DBS_ROCK_DB};
+    int[] TESTED_DBS = new int[]{
+            //IDB.DBS_MAP_DB,
+            IDB.DBS_ROCK_DB};
 
     Long releaserReference = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -44,8 +46,6 @@ public class OrderTest {
     Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balanceB;
     DCSet dcSet;
     GenesisBlock gb;
-    Order orderREC;
-    Trade tradeREC;
     // CREATE KNOWN ACCOUNT
     PrivateKeyAccount accountA;
     PrivateKeyAccount accountB;
@@ -55,57 +55,8 @@ public class OrderTest {
     AssetCls assetB;
     long keyB;
     CreateOrderTransaction orderCreation;
-    BigDecimal bal_A_keyA;
-    BigDecimal bal_A_keyB;
-    BigDecimal bal_B_keyA;
-    BigDecimal bal_B_keyB;
-    Order order_AB_1;
-    Order order_AB_2;
-    Order order_AB_3;
-    Order order_AB_4;
-    Order order_AB_5;
-    Order order_AB_6;
-    Order order_AB_7;
-    Order order_AB_8;
-    Order order_BA_1;
-    Order order_BA_2;
-    Order order_BA_3;
-    Order order_BA_4;
-    Order order_BA_5;
-    Order order_BA_6;
-    Order order_BA_7;
-    Order order_BA_8;
-    Long order_AB_1_ID;
-    Long order_AB_2_ID;
-    Long order_AB_3_ID;
-    Long order_AB_4_ID;
-    Long order_AB_5_ID;
-    Long order_AB_6_ID;
-    Long order_AB_7_ID;
-    Long order_AB_8_ID;
-    Long order_BA_1_ID;
-    Long order_BA_2_ID;
-    Long order_BA_3_ID;
-    Long order_BA_4_ID;
-    Long order_BA_5_ID;
-    Long order_BA_6_ID;
-    Long order_BA_7_ID;
-    Long order_BA_8_ID;
-    BigDecimal trade_1_amoA;
-    BigDecimal trade_1_amoB;
-    BigDecimal trade_2_amoA;
-    BigDecimal trade_2_amoB;
-    BigDecimal trade_3_amoA;
-    BigDecimal trade_3_amoB;
-    BigDecimal trade_4_amoA;
-    BigDecimal trade_4_amoB;
-    BigDecimal trade_5_amoA;
-    BigDecimal trade_5_amoB;
     private byte[] icon = new byte[0]; // default value
     private byte[] image = new byte[0]; // default value
-
-    int haveAssetScale = 8;
-    int wantAssetScale = 8;
 
     //@Before
     private void init(int dbs) {
