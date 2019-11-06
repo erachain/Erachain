@@ -418,19 +418,6 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 .stream().map((bytes -> (V) byteableValue.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
-    public IndexDB getIndexByName(String name) {
-        return indexes.stream().filter(indexDB -> indexDB.getNameIndex().equals(name)).findFirst().get();
-    }
-
-    public IndexDB getIndex(int index) {
-        return indexes.get(index);
-    }
-
-
-    public void addIndex(IndexDB indexes) {
-        this.indexes.add(indexes);
-    }
-
     public List<V> getLatestValues(long limit) {
         return dbSource.getLatestValues(limit).stream().map((bytes) -> (V) byteableValue.receiveObjectFromBytes(bytes)).collect(Collectors.toList());
     }

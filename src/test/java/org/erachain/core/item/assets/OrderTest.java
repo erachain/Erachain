@@ -433,7 +433,7 @@ public class OrderTest {
                     Longs.toByteArray(have),
                     Longs.toByteArray(want));
 
-            IndexDB indexDB = ((DBMapSuit) ordersMap.getSource()).map.getIndex(0);
+            IndexDB indexDB = ((DBMapSuit) ordersMap.getSource()).getIndex(0);
             assertEquals(indexDB.getNameIndex(), "orders_key_have_want");
             Iterator iterator = ((DBMapSuit) ordersMap.getSource()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false);
 

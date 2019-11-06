@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.dbs.rocksDB.DBMapSuit;
 import org.erachain.dbs.rocksDB.ItemAssetBalanceSuitRocksDB;
 import org.erachain.dbs.rocksDB.utils.ConstantsRocksDB;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -131,7 +132,7 @@ public class DBRocksDBTableTest {
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
                 balanceTmp;
 
-        ColumnFamilyHandle indexDB = ((DBRocksDBTable) tab.map).getIndex(1).getColumnFamilyHandle();
+        ColumnFamilyHandle indexDB = ((DBMapSuit) tab).getIndex(1).getColumnFamilyHandle();
         RocksIterator iteratorFilteredNative = ((TransactionDB) ((DBRocksDBTable) tab.map).dbSource.getDbCore()).newIterator(indexDB);
         iteratorFilteredNative.seek(account1.getShortAddressBytes());
 

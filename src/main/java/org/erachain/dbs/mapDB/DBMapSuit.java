@@ -128,12 +128,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         return null;
     }
 
-    /**
-     *
-     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
-     * @param descending true if need descending sort
-     * @return
-     */
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();

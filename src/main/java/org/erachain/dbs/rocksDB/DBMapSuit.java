@@ -61,6 +61,22 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         return (IMap) map;
     }
 
+    public IndexDB getIndexByName(String name) {
+        return indexes.stream().filter(indexDB -> indexDB.getNameIndex().equals(name)).findFirst().get();
+    }
+
+    /**
+     * @param index only Secondary indexes [0...]
+     * @return
+     */
+    public IndexDB getIndex(int index) {
+        return indexes.get(index);
+    }
+
+    public void addIndex(IndexDB indexes) {
+        this.indexes.add(indexes);
+    }
+
     @Override
     public int size() {
         return map.size();
@@ -141,6 +157,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
+        if (index == 0) {
+            return map.getIterator(descending);
+        }
+
+        // там индексы без учета первичного
         return map.getIndexIterator(index, descending);
     }
 

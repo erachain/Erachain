@@ -74,8 +74,9 @@ public interface IMap<T, U> {
     boolean contains(T key);
 
     /**
-     * @param index      secondary index No
-     * @param descending
+     *
+     * @param index <b>primary Index = 0</b>, secondary index = 1...10000
+     * @param descending true if need descending sort
      * @return
      */
     Iterator<T> getIterator(int index, boolean descending);

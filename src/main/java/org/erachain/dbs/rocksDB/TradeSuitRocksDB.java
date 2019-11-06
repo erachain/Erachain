@@ -4,8 +4,10 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
@@ -171,10 +173,11 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
-        byte[] buffer = new byte[16];
-        System.arraycopy(Longs.toByteArray(have), 0, buffer, 0, 8);
-        System.arraycopy(Longs.toByteArray(want), 0, buffer, 8, 8);
-        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), buffer, false);
+        //byte[] filter = new byte[16];
+        //System.arraycopy(Longs.toByteArray(have), 0, buffer, 0, 8);
+        //System.arraycopy(Longs.toByteArray(want), 0, buffer, 8, 8);
+        byte[] filter = receivePairKey(have, want).getBytes(StandardCharsets.US_ASCII);
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false);
     }
 
     @Override
@@ -184,6 +187,19 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int heightStart) {
-        return null;
+        //byte[] buffer = new byte[20];
+        //System.arraycopy(Longs.toByteArray(have), 0, buffer, 0, 8);
+        //System.arraycopy(Longs.toByteArray(want), 0, buffer, 8, 8);
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        ///int heightStart = Controller.getInstance().getMyHeight();
+        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
+        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
+        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+
+        byte[] filter = receivePairKey(have, want).getBytes(StandardCharsets.US_ASCII);
+        byte[] buffer = new byte[filter.length + 8];
+        System.arraycopy(Longs.toByteArray(refDBend), 0, buffer, filter.length, 8);
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), buffer, false);
     }
 }
