@@ -214,11 +214,13 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                             if (indexes != null) {
                                 if (!indexes.isEmpty()) {
                                     for (int i = 0; i < indexes.size(); i++) {
-                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i));
+                                        // минуя Первичный индекс
+                                        indexes.get(i).setColumnFamilyHandle(columnFamilyHandles.get(i + 1));
                                     }
-
                                 }
+                            }
 
+                            if (enableSize) {
                                 // INIT SIZE INDEX - только если заданы индексы вторичные вообще
                                 columnFamilyFieldSize = columnFamilyHandles.get(columnFamilyHandles.size() - 1);
 
@@ -373,12 +375,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public List<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException {
+    public Set<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
         }
         resetDbLock.readLock().lock();
-        List<byte[]> result = new ArrayList<byte[]>();
+        Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = getIterator(indexDB)) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
@@ -390,7 +392,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public List<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException {
+    public Set<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException {
         return filterApprropriateValues(filter, columnFamilyHandles.get(indexDB));
     }
 
@@ -417,6 +419,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
             for (IndexDB index : indexes) {
                 columnFamilyDescriptors.add(new ColumnFamilyDescriptor(index.getNameIndex().getBytes(StandardCharsets.UTF_8), cfOpts));
             }
+        }
+        if (enableSize) {
             columnFamilyDescriptors.add(new ColumnFamilyDescriptor(sizeDescriptorName.getBytes(StandardCharsets.UTF_8), cfOpts));
         }
     }
@@ -923,8 +927,10 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     @Override
     public int size() {
-        byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
-        return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
+        if (enableSize) {
+            byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
+        } else return -1;
     }
 
     @Override

@@ -185,7 +185,14 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             return null;
         }
 
-        return writeBatch.newIteratorWithBase(dbCore.newIterator());
+        // TODO double ITERATOR
+        if (false) {
+            return null; // почемуто итератор с Пакетом создается с двойным наборотм ключей, первая половина которых
+            // не состоит в основном наборе
+            // TEST - org.erachain.core.item.assets.OrderTest.iteratorDBMain
+        } else {
+            return writeBatch.newIteratorWithBase(dbCore.newIterator());
+        }
     }
 
     /**

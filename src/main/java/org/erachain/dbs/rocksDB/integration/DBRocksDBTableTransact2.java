@@ -366,11 +366,11 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
                 .stream().map((bytes -> (K) byteableKey.receiveObjectFromBytes(bytes))).collect(Collectors.toList());
     }
 
-    public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, int indexDB) {
+    public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, int indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB);
     }
 
-    public List<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
+    public Set<byte[]> filterAppropriateValuesAsByteKeys(byte[] filter, ColumnFamilyHandle indexDB) {
         return dbSource.filterApprropriateValues(filter, indexDB);
     }
 
