@@ -41,7 +41,6 @@ public class BlocksSuitMapDB extends DBMapSuit<Integer, Block> implements Blocks
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockSerializer())
                 .valuesOutsideNodesEnable()
-                // NOT NEED now .counterEnable() // - auto increment atomicKey
                 .makeOrGet();
     }
 

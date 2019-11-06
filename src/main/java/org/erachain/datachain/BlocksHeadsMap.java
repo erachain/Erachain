@@ -52,18 +52,8 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         map = database.createTreeMap(NAME)
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .valueSerializer(new BlockHeadSerializer())
-                /// in Signs ///.counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
                 .makeOrGet();
     }
-
-	/*
-	 *  NEED .counterEnable in MAP(non-Javadoc)
-	 * @see datachain.DCMap#size()
-	@Override
-	public int size() {
-		return this.key;
-	}
-	 */
 
     @Override
     protected void createIndexes() {

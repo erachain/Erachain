@@ -79,6 +79,12 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
         return this.get(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
     }
 
+    /**
+     * For GUI only
+     * @param creditorAddress
+     * @param key
+     * @return
+     */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> getList(String creditorAddress, long key) {
         BTreeMap map = (BTreeMap) this.map;
@@ -93,9 +99,6 @@ public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, Big
         for (Tuple3<String, Long, String> keyMap : keys) {
             result.add(new Tuple2<Tuple3<String, Long, String>, BigDecimal>(keyMap, this.get(keyMap)));
         }
-
-        if (this.parent != null)
-            result.addAll(((DCSet)this.parent.getDBSet()).getCredit_AddressesMap().getList(creditorAddress, key));
 
         return result;
     }

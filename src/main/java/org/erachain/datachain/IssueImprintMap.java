@@ -20,11 +20,11 @@ public class IssueImprintMap extends IssueItemMap {
 
     @Override
     public void openMap() {
+
         //OPEN MAP
         map = database.createTreeMap("imprint_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
-                .counterEnable()
                 .makeOrGet();
     }
 

@@ -24,7 +24,6 @@ public class IssuePersonMap extends IssueItemMap {
         map = database.createTreeMap("person_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
-                .counterEnable()
                 .makeOrGet();
     }
 

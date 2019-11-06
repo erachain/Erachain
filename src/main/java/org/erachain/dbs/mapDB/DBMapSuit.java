@@ -30,6 +30,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     protected Map<T, U> map;
     protected Map<Integer, NavigableSet<Fun.Tuple2<?, T>>> indexes = new HashMap<>();
 
+    /**
+     * Если включено, то незабываем еще аключить при создании карты - .counterEnable()
+     */
+    protected boolean sizeEnable;
+
     // for DCMapSuit
     public DBMapSuit() {
     }
@@ -179,6 +184,10 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     public int size() {
+
+        if (!sizeEnable)
+            return -1;
+
         this.addUses();
         int u = this.map.size();
         this.outUses();

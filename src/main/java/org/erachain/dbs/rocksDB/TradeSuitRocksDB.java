@@ -41,7 +41,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> reverseIndex;
 
     public TradeSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, true);
+        super(databaseSet, database, logger, false);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                             1, 256, 32, false),
                     new WriteOptions().setSync(true).setDisableWAL(false),
                     new ReadOptions(),
-                    databaseSet, enableSize);
+                databaseSet, sizeEnable);
     }
 
     @Override

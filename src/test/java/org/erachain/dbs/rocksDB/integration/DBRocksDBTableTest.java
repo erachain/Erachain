@@ -20,8 +20,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -161,7 +161,7 @@ public class DBRocksDBTableTest {
         }
         logger.error(" NATIVE completed ");
 
-        List<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).dbSource.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
+        Set<byte[]> keysFiltered = ((DBRocksDBTable) tab.map).dbSource.filterApprropriateValues(account1.getShortAddressBytes(), indexDB);
 
         assetKeyTMP = 0;
         iteratorSize = 0;
@@ -186,11 +186,12 @@ public class DBRocksDBTableTest {
 
         logger.error(" Filter Apprropriate completed ");
 
-        keysFiltered = tab.accountKeys(account1);
+        Iterator<byte[]> iterator = tab.accountKeys(account1).iterator();
 
         assetKeyTMP = 0;
         iteratorSize = 0;
-        for (byte[] key: keysFiltered) {
+        while (iterator.hasNext()) {
+            byte[] key = iterator.next();
             iteratorSize++;
             long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
             byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(key);

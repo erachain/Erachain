@@ -24,7 +24,6 @@ public class IssueUnionMap extends IssueItemMap {
         map = database.createTreeMap("union_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
-                .counterEnable()
                 .makeOrGet();
     }
 

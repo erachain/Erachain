@@ -60,7 +60,6 @@ public class KKKMap extends DCUMap<
         //OPEN MAP
         map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
-                .counterEnable()
                 .makeOrGet();
 
     }

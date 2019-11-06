@@ -51,7 +51,6 @@ public abstract class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[
                 //.keySerializer(BTreeKeySerializer.TUPLE2)
                 //.comparator(UnsignedBytes.lexicographicalComparator())
                 .comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.COMPARATOR)) // - for Tuple2<byte[]m byte[]>
-                .counterEnable()
                 .makeOrGet();
     }
 

@@ -34,7 +34,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
 
     IndexByteableBigDecimal bgToBytes = new IndexByteableBigDecimal();
     public OrdersSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, true);
+        super(databaseSet, database, logger, false);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(),
-                databaseSet, enableSize);
+                databaseSet, sizeEnable);
 
     }
 
@@ -160,12 +160,22 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     @Override
     public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
 
-        return new HashSet(map.filterAppropriateValuesAsKeys(
-                org.bouncycastle.util.Arrays.concatenate(
-                        Longs.toByteArray(have),
-                        Longs.toByteArray(want),
-                        bgToBytes.toBytes(limit)),
-                haveWantKeyIndex.getColumnFamilyHandle()));
+        if (limit == null) {
+            // без учета максимума по значению
+            return new HashSet(map.filterAppropriateValuesAsKeys(
+                    org.bouncycastle.util.Arrays.concatenate(
+                            Longs.toByteArray(have),
+                            Longs.toByteArray(want)),
+                    haveWantKeyIndex.getColumnFamilyHandle()));
+        } else {
+            return new HashSet(map.filterAppropriateValuesAsKeys(
+                    org.bouncycastle.util.Arrays.concatenate(
+                            Longs.toByteArray(have),
+                            Longs.toByteArray(want),
+                            bgToBytes.toBytes(limit)),
+                    haveWantKeyIndex.getColumnFamilyHandle()));
+        }
+
     }
 
 }

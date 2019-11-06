@@ -267,7 +267,13 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
             return null;
         }
 
-        return writeBatch.newIteratorWithBase(dbCore.newIterator());
+        if (true) {
+            return null; // почемуто итератор с Пакетом создается с двойным наборотм ключей, первая половина которых
+            // не состоит в основном наборе
+            // TEST - org.erachain.core.item.assets.OrderTest.iteratorDBMain
+        } else {
+            return writeBatch.newIteratorWithBase(dbCore.newIterator());
+        }
     }
 
     /**

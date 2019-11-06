@@ -56,7 +56,6 @@ public class KKNMap extends DCUMap<
         //OPEN MAP
         BTreeMap<Long, TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>> map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.BASIC)
-                .counterEnable()
                 .makeOrGet();
 
         //RETURN

@@ -72,11 +72,13 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
                     .make();
         }
 
+        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+
         // OPEN MAP
         map = database.createHashMap("transactions")
                 .keySerializer(SerializerBase.LONG)
                 .valueSerializer(new TransactionSerializer())
-                .counterEnable()
+                .counterEnable() // разрешаем счет размера - это будет немного тормозить работу
                 .makeOrGet();
 
     }

@@ -65,7 +65,6 @@ public class PollMap extends DCUMap<String, Poll> {
         //OPEN MAP
         map = database.createTreeMap("polls")
                 .valueSerializer(new PollSerializer())
-                .counterEnable()
                 .makeOrGet();
     }
 

@@ -14,6 +14,7 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -165,11 +166,14 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     @Override
     public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
 
-        HashSet<Long> keys = new HashSet<>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+        Object limitOrHI = limit == null ? Fun.HI() : limit; // надо тут делать выбор иначе ошибка преобразования в subMap
+        Collection<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, limit, Fun.HI())).values());
+                Fun.t4(have, want, limitOrHI, Fun.HI()))
+                //Fun.t4(have, want, limit, Fun.HI()))
+                .values();
 
-        return keys;
+        return new HashSet<>(keys);
     }
 
 }

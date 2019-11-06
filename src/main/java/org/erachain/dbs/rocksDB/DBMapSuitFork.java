@@ -38,7 +38,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.database = dcSet.database;
         this.logger = logger;
         this.defaultValue = defaultValue;
-        this.enableSize = enableSize;
+        this.sizeEnable = enableSize;
 
         this.parent = parent;
 

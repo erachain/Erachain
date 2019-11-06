@@ -1,5 +1,7 @@
 package org.erachain.dbs;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
@@ -42,19 +44,22 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         super(databaseSet);
     }
 
+    public DCUMapImpl(DBASet databaseSet, DB database, boolean sizeEnable) {
+        super(databaseSet, database, sizeEnable);
+    }
     public DCUMapImpl(DBASet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, false);
     }
 
-    public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet) {
-        super(parent, dcSet);
+    public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet, boolean sizeEnable) {
+        super(parent, dcSet, sizeEnable);
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
             // + Runtime.getRuntime().freeMemory());
             if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
                 // у родителя чистим - у себя нет, так как только создали
-                ((DCSet)parent.getDBSet()).clearCache();
+                ((DBASet)parent.getDBSet()).clearCache();
                 System.gc();
                 if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL) {
                     LOGGER.error("Heap Memory Overflow");
@@ -71,6 +76,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         } else {
             this.openMap();
         }
+    }
+
+    public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet) {
+        this(parent, dcSet, false);
     }
 
     public abstract void openMap();
@@ -139,6 +148,34 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         return null;
     }
 
+    // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
+    @Override
+    public Iterator<T> getIterator() {
+        this.addUses();
+
+        try {
+            if (parent == null) {
+                return map.keySet().iterator();
+            }
+
+            List<T> list = new ArrayList<>();
+            Iterator<T> parentIterator = parent.getIterator();
+            while (parentIterator.hasNext()) {
+                T key = parentIterator.next();
+                // пропустим если он есть в удаленных
+                if (deleted != null && deleted.containsKey(key))
+                    continue;
+                list.add(key);
+            }
+
+            return Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+
+        } finally {
+            this.outUses();
+        }
+    }
+
+    // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
     /**
      *
      * @param index <b>primary Index = 0</b>, secondary index = 1...10000
@@ -172,17 +209,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     }
 
     @Override
-    public Iterator<T> getIterator() {
-        this.addUses();
-
-        Iterator<T> u = this.map.keySet().iterator();
-
-        this.outUses();
-        return u;
-
-    }
-
-    @Override
     public SortableList<T, U> getList() {
         SortableList<T, U> list;
         if (this.size() < 1000) {
@@ -201,6 +227,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
     // the deleted ones are smaller and the size is increased by 1
     @Override
     public int size() {
+
+        if (!sizeEnable)
+            return -1;
+
         this.addUses();
 
         int u = this.map.size();
@@ -258,27 +288,53 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         this.addUses();
         Set<T> u = this.map.keySet();
 
-        if (this.parent != null)
-            u.addAll(this.parent.keySet());
+        try {
+            if (this.parent == null) {
+                return u;
+            }
 
-        this.outUses();
-        return u;
+            Set<T> combinedKeys = parent.keySet();
+            if (deleted != null && !deleted.isEmpty()) {
+                // что удалено тут удалим у родителя
+                combinedKeys.removeAll(deleted.keySet());
+            }
+
+            // тут просто добвим - в карте дублирующие ключ схлопнутся
+            combinedKeys.addAll(u);
+            return combinedKeys;
+
+        } finally {
+            this.outUses();
+        }
     }
 
+    /**
+     * Так как в форкнутой таблице могут быть измененые записи то их значения сдублируются тут.
+     * Поэтому чтобы такого не было делаем по ключам и сборке списка из значений - это дольше будет работать
+     *
+     * @return
+     */
     @Override
     public Collection<U> values() {
         this.addUses();
-        Collection<U> u = this.map.values();
 
-        if (this.parent != null)
-            u.addAll(this.parent.values());
+        try {
+            if (this.parent == null) {
+                return this.map.values();
+            } else {
+                Collection<U> u = new ArrayList<>();
+                for (T key: this.keySet()) {
+                    u.add(get(key));
+                }
+                return u;
+            }
 
-        this.outUses();
-        return u;
+        } finally {
+            this.outUses();
+        }
     }
 
-    @Override
-    public boolean set(T key, U value) {
+    private boolean setLocal(T key, U value) {
         if (DCSet.isStoped()) {
             return false;
         }
@@ -287,31 +343,30 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
         try {
 
-            U old;
-            if (this.parent != null) {
-                // найдем и в Родительских тоже
-                old = get(key);
-                this.map.put(key, value);
-            } else {
-                old = this.map.put(key, value);
-            }
+            U old = this.map.put(key, value);
 
             if (this.parent != null) {
-                //if (old != null)
-                //	++this.shiftSize;
                 if (this.deleted != null) {
-                    if (this.deleted.remove(key) != null)
-                        ++this.shiftSize;
+                    if (this.deleted.remove(key) != null) {
+                    }
+                }
+                if (sizeEnable &&
+                        old == null // если еще не было тут значения
+                        && this.parent.contains(key) // и такой ключ есть в родителе
+                ) {
+                    // нужно учесть сдвиг
+                    ++this.shiftSize;
                 }
             } else {
 
                 // NOTIFY if not FORKED
                 if (this.observableData != null && (old == null || !old.equals(value))) {
-                    if (this.observableData.containsKey(DBTab.NOTIFY_ADD) && !DCSet.isStoped()) {
+                    if (this.observableData.containsKey(NOTIFY_ADD) && !DCSet.isStoped()) {
                         this.setChanged();
-                        Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
+                        Integer observeItem = this.observableData.get(NOTIFY_ADD);
                         if (
-                                observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
+                                observeItem.equals(ObserverMessage.ADD_UNC_TRANSACTION_TYPE)
+                                        || observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
                                         || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
                                         || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
                         ) {
@@ -332,6 +387,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
         this.outUses();
         return false;
+
+    }
+
+    @Override
+    public boolean set(T key, U value) {
+        return setLocal(key, value);
     }
 
     /**
@@ -345,56 +406,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         /// улетит опять в подкласс и получим зацикливание, поэто тут надо весь код повторить
         /// -----> set(key, value);
         ///
-        if (true) {
-            set(key, value);
-            return;
-        }
-
-        if (DCSet.isStoped()) {
-            return;
-        }
-
-        this.addUses();
-
-        try {
-
-            this.map.put(key, value);
-
-            if (this.parent != null) {
-                //if (old != null)
-                //	++this.shiftSize;
-                if (this.deleted != null) {
-                    if (this.deleted.remove(key) != null)
-                        ++this.shiftSize;
-                }
-            } else {
-
-                // NOTIFY if not FORKED
-                if (this.observableData != null) {
-                    if (this.observableData.containsKey(DBTab.NOTIFY_ADD) && !DCSet.isStoped()) {
-                        this.setChanged();
-                        Integer observeItem = this.observableData.get(DBTab.NOTIFY_ADD);
-                        if (
-                                observeItem.equals(ObserverMessage.WALLET_ADD_ORDER_TYPE)
-                                        || observeItem.equals(ObserverMessage.ADD_PERSON_STATUS_TYPE)
-                                        || observeItem.equals(ObserverMessage.REMOVE_PERSON_STATUS_TYPE)
-                        ) {
-                            this.notifyObservers(new ObserverMessage(observeItem, new Pair<T, U>(key, value)));
-                        } else {
-                            this.notifyObservers(
-                                    new ObserverMessage(observeItem, value));
-                        }
-                    }
-                }
-            }
-
-            this.outUses();
-            return;
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-
-        this.outUses();
+        setLocal(key, value);
 
     }
 
@@ -430,6 +442,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             if (value == null) {
                 // если тут нету то создадим пометку что удалили
                 value = this.parent.get(key);
+            } else {
+                if (sizeEnable
+                        && this.parent.contains(key)) {
+                    // в родителе есть такой ключ - и тут было значение, значит уменьшим сдвиг
+                    --this.shiftSize;
+                }
             }
 
             this.outUses();
@@ -439,11 +457,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
             // NOTIFY
             if (this.observableData != null) {
-                if (this.observableData.containsKey(DBTab.NOTIFY_REMOVE)) {
+                if (this.observableData.containsKey(NOTIFY_REMOVE)) {
                     this.setChanged();
-                    Integer observItem = this.observableData.get(DBTab.NOTIFY_REMOVE);
+                    Integer observItem = this.observableData.get(NOTIFY_REMOVE);
                     if (
-                            observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
+                            observItem.equals(ObserverMessage.REMOVE_UNC_TRANSACTION_TYPE)
+                                    || observItem.equals(ObserverMessage.WALLET_REMOVE_ORDER_TYPE)
                                     || observItem.equals(ObserverMessage.REMOVE_AT_TX)
                     ) {
                         this.notifyObservers(new ObserverMessage(observItem, new Pair<T, U>(key, value)));
@@ -478,45 +497,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
      * @param key
      */
     private void deleteHere(T key) {
-        if (DCSet.isStoped()) {
-            return;
-        }
-
-        this.addUses();
-
-        this.map.remove(key);
-
-        if (this.parent != null) {
-            // это форкнутая таблица
-
-            if (this.deleted == null) {
-                this.deleted = new HashMap(1024 , 0.75f);
-            }
-
-            // добавляем в любом случае, так как
-            // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе
-            // и это есть в основной базе, то в воркнутую будет помещена так же запись.
-            // Получаем что запись есть и в Родителе и в Форкнутой таблице!
-            // Поэтому если мы тут удалили то должны добавить что удалили - в deleted
-            this.deleted.put(key, EXIST);
-
-            this.outUses();
-            return;
-
-        } else {
-
-            // NOTIFY
-            if (this.observableData != null) {
-                if (this.observableData.containsKey(DBTab.NOTIFY_REMOVE)) {
-                    this.setChanged();
-                    this.notifyObservers(new ObserverMessage(this.observableData.get(DBTab.NOTIFY_REMOVE), key));
-                }
-            }
-        }
-
-        this.outUses();
-
+        removeHere(key);
     }
+
     @Override
     public void delete(T key) {
         /// ВНИМАНИЕ - нельзя тут так делать - перевызывать родственный метод this.remove, так как

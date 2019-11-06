@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.common;
 
 import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
@@ -185,12 +186,12 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
-    public List<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException {
+    public Set<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
         }
         resetDbLock.readLock().lock();
-        List<byte[]> result = new ArrayList<byte[]>();
+        Set<byte[]> result = new TreeSet<>();
         try (final RocksIterator iter = getIterator(indexDB)) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
@@ -202,7 +203,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
-    public List<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException {
+    public Set<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException {
         return filterApprropriateValues(filter, columnFamilyHandles.get(indexDB));
     }
 
@@ -909,7 +910,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     @Override
     public int size() {
         byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
-        return byteableInteger.receiveObjectFromBytes(sizeBytes);
+        return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
     }
 
     @Override

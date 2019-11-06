@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
-import org.erachain.database.SortableList;
 import org.erachain.dbs.DBTab;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
@@ -9,7 +8,6 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.TreeMap;
 
 /**
@@ -56,16 +54,18 @@ public abstract class BalanceMap extends DCUMap<Tuple2<Long, Long>,
     @SuppressWarnings({"unchecked"})
     @Override
     public void openMap() {
+
+        //sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+
         //OPEN MAP
         map = database.createTreeMap("assets_balances_" + this.name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
-                .counterEnable()
+                //.counterEnable()
                 .makeOrGet();
 
         //HAVE/WANT KEY
         this.assetKeyMap = database.createTreeMap("balances_key_asset_" + this.name)
                 .comparator(Fun.COMPARATOR)
-                .counterEnable()
                 .makeOrGet();
 
         if (Controller.getInstance().onlyProtocolIndexing)
@@ -118,49 +118,12 @@ public abstract class BalanceMap extends DCUMap<Tuple2<Long, Long>,
                 );
     }
 
-	/*
-	public void set(String assence, BigDecimal value)
-	{
-		this.set(assence, FEE_KEY, value);
-	}
-	 */
-
     public void put(Long essence, long key, Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value) {
         this.put(new Tuple2<Long, Long>(essence, key), value);
     }
-
-	/*
-	public BigDecimal get(String assence)
-	{
-		return this.get(assence, FEE_KEY);
-	}
-	 */
 
     public Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> get(long essence, long key) {
         return this.get(new Tuple2<Long, Long>(essence, key));
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getAssetBalancesSortableList(long key) {
-        //FILTER ALL KEYS
-        Collection<Tuple2<Long, Long>> keys = ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.assetKeyMap).subMap(
-                Fun.t3(key, null, null),
-                Fun.t3(key, Fun.HI(), Fun.HI())).values();
-
-        //RETURN
-        return new SortableList<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public SortableList<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getEssenceBalancesSortableList(long essence) {
-        BTreeMap map = (BTreeMap) this.map;
-
-        //FILTER ALL KEYS
-        Collection keys = ((BTreeMap<Tuple2, BigDecimal>) map).subMap(
-                Fun.t2(essence, null),
-                Fun.t2(essence, Fun.HI())).keySet();
-
-        //RETURN
-        return new SortableList<Tuple2<Long, Long>, Tuple4<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
-    }
 }

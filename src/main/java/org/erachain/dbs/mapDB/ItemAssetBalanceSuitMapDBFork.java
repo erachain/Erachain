@@ -29,6 +29,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
     @SuppressWarnings({"unchecked"})
     @Override
     public void openMap() {
+
         //OPEN MAP
         BTreeMap<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
@@ -41,7 +42,6 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
             hashMap = database.createHashMap("balances")
                     .keySerializer(SerializerBase.BYTE_ARRAY)
                     .hasher(Hasher.BYTE_ARRAY)
-                    .counterEnable()
                     .makeOrGet();
             map = hashMap;
         } else {
@@ -56,7 +56,6 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
                     //.comparator(Fun.TUPLE2_COMPARATOR)
                     .comparator(Fun.BYTE_ARRAY_COMPARATOR)
                     //.comparator(UnsignedBytes.lexicographicalComparator())
-                    .counterEnable()
                     .makeOrGet();
             map = treeMap;
         }

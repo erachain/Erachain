@@ -37,8 +37,6 @@ public class ItemAssetMap extends ItemMap {
 
         // OPEN MAP
         map = database.createTreeMap(NAME).valueSerializer(new ItemSerializer(TYPE))
-                // .valueSerializer(new AssetSerializer())
-                // key instead size - .counterEnable()
                 .makeOrGet();
     }
 

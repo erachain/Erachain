@@ -27,8 +27,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     protected DBASet databaseSet;
     protected DB database;
 
-    protected boolean enableSize;
-
     public DBRocksDBTable<T, U> map;
     protected List<IndexDB> indexes;
 
@@ -36,14 +34,14 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue, boolean enableSize) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue, boolean sizeEnable) {
 
         this.databaseSet = databaseSet;
         // database - is null
         this.database = database;
         this.logger = logger;
         this.defaultValue = defaultValue;
-        this.enableSize = enableSize;
+        this.sizeEnable = sizeEnable;
 
         // create INDEXES before
         createIndexes();
@@ -54,8 +52,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         logger.info("USED");
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean enableSize) {
-        this(databaseSet, database, logger, null, enableSize);
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable) {
+        this(databaseSet, database, logger, null, sizeEnable);
     }
 
     @Override

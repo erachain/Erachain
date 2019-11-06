@@ -66,7 +66,6 @@ public class NameExchangeMap extends DCUMap<String, BigDecimal> {
     public void openMap() {
         //OPEN MAP
         map = database.createTreeMap("namesales")
-                .counterEnable()
                 .makeOrGet();
     }
 

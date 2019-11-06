@@ -59,6 +59,8 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
                     new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                     new Fun.Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO));
 
+    static final boolean SIZE_ENABLE = false;
+
     public ItemAssetBalanceMapImpl(int dbsUsed, DCSet databaseSet, DB database) {
         super(dbsUsed, databaseSet, database);
 

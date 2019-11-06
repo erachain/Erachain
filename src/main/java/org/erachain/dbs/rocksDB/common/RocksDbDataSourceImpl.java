@@ -423,12 +423,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public List<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException {
+    public Set<byte[]> filterApprropriateValues(byte[] filter, ColumnFamilyHandle indexDB) throws RuntimeException {
         if (quitIfNotAlive()) {
             return null;
         }
         resetDbLock.readLock().lock();
-        List<byte[]> result = new ArrayList<byte[]>();
+        Set<byte[]> result = new TreeSet<>();
         try (final RocksIterator iter = table.getIterator(indexDB)) {
             for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
                 result.add(iter.value());
@@ -440,7 +440,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public List<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException {
+    public Set<byte[]> filterApprropriateValues(byte[] filter, int indexDB) throws RuntimeException {
         return filterApprropriateValues(filter, columnFamilyHandles.get(indexDB));
     }
 
@@ -676,26 +676,26 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     @Override
     public RockStoreIterator iterator(boolean descending) {
-        return new RockStoreIterator(table.getIterator(), descending, false);
+        return new RockStoreIterator(getIterator(), descending, false);
     }
 
     @Override
     public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
-        return new RockStoreIterator(table.getIterator(columnFamilyHandle), descending, true);
+        return new RockStoreIterator(getIterator(columnFamilyHandle), descending, true);
     }
 
     @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
-        return new RockStoreIteratorFilter(table.getIterator(), descending, true, filter);
+        return new RockStoreIteratorFilter(getIterator(), descending, true, filter);
     }
     @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
-        return new RockStoreIteratorFilter(table.getIterator(columnFamilyHandle), descending, true, filter);
+        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, true, filter);
     }
 
     @Override
     public RockStoreIterator indexIterator(boolean descending, int indexDB) {
-        return new RockStoreIterator(table.getIterator(columnFamilyHandles.get(indexDB)), descending, true);
+        return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
 
     @Override

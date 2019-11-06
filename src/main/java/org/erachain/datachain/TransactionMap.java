@@ -72,9 +72,9 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
     int getTotalDeleted();
 
     int size();
-    Iterator<Long> getIterator(int index, boolean descending);
+    ///Iterator<Long> getIterator(int index, boolean descending);
 
-    Iterator<Long> getIterator();
+    ///Iterator<Long> getIterator();
 
     Collection<Transaction> values();
 
