@@ -334,43 +334,63 @@ public class OrderTest {
                     orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
-                    if (false) {
-                        iterator = ordersMap.getIterator();
-                        count = 0;
-                        while (iterator.hasNext()) {
-                            Long key = (Long) iterator.next();
-                            Order value = ordersMap.get(key);
-                            String price = value.viewPrice();
-                            count++;
-                        }
-                        assertEquals(count, i + 1);
-
-                        iterator = ordersMap.getIterator(0, false);
-                        count = 0;
-                        while (iterator.hasNext()) {
-                            Long key = (Long) iterator.next();
-                            Order value = ordersMap.get(key);
-                            String price = value.viewPrice();
-                            count++;
-                        }
-                        assertEquals(count, i + 1);
-                    }
-
                 }
 
-                dcSet.flush(99999, true, false);
+                ///dcSet.flush(99999, true, false);
                 iterator = ordersMap.getIterator();
                 count = 0;
                 while (iterator.hasNext()) {
                     Long key = (Long) iterator.next();
                     Order value = ordersMap.get(key);
-                    if (value != null) {
-                        String price = value.viewPrice();
-                    }
+                    String price = value.viewPrice();
 
                     count++;
                 }
                 assertEquals(count, len);
+
+                iterator = ordersMap.getIterator(1, false);
+                count = 0;
+                while (iterator.hasNext()) {
+                    Long key = (Long) iterator.next();
+                    Order value = ordersMap.get(key);
+                    String price = value.viewPrice();
+
+                    count++;
+                }
+                assertEquals(count, len);
+
+                List<Order> orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                        null);
+                assertEquals(orders.size(), len);
+
+                //////////////////////////////////////////////////////////////////////////
+                dcSet.flush(99999, true, false);
+                //////////////////////////////////////////////////////////////////////////
+                iterator = ordersMap.getIterator();
+                count = 0;
+                while (iterator.hasNext()) {
+                    Long key = (Long) iterator.next();
+                    Order value = ordersMap.get(key);
+                    String price = value.viewPrice();
+
+                    count++;
+                }
+                assertEquals(count, len);
+
+                iterator = ordersMap.getIterator(1, false);
+                count = 0;
+                while (iterator.hasNext()) {
+                    Long key = (Long) iterator.next();
+                    Order value = ordersMap.get(key);
+                    String price = value.viewPrice();
+
+                    count++;
+                }
+                assertEquals(count, len);
+
+                orders = ordersMap.getOrdersForTradeWithFork(assetB.getKey(dcSet), assetA.getKey(dcSet),
+                        null);
+                assertEquals(orders.size(), len);
 
             } finally {
                 dcSet.close();
