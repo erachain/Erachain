@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import static org.erachain.utils.ByteArrayUtils.areEqualMask;
+
 @Slf4j
 public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, // in OWN - total INCOMED + BALANCE
@@ -152,8 +154,8 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 balanceAddressIndex.getColumnFamilyHandle());
         List<byte[]> result = new ArrayList<>();
 
-        for (iterator.seek(account.getShortAddressBytes()); iterator.isValid() && new String(iterator.key())
-                .startsWith(new String(account.getShortAddressBytes())); iterator.next()) {
+        for (iterator.seek(account.getShortAddressBytes()); iterator.isValid()
+                && areEqualMask(iterator.key(), account.getShortAddressBytes()); iterator.next()) {
             result.add(iterator.value());
         }
 

@@ -31,7 +31,7 @@ import java.util.*;
 public class BlockChain {
 
     public static final int TESTS_VERS = 0; // not use TESTs - or a11 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
 
     /**
      * Задает потолок цепочки
@@ -42,7 +42,7 @@ public class BlockChain {
      * erachain.jar -pass=1 -seed=5:new:1 -nogui -opi -nodatawallet -nocalculated -hardwork=[0..10] -dbschain=[rocksdb|mapdb] <br>
      * сколько транзакции в блоке - если больше 0 то запускает тест на старте
      */
-    public static final int TEST_DB = 0000;
+    public static final int TEST_DB = 10000;
     // запрет сборки своих блоков в ТЕСТЕ
     public static final boolean STOP_GENERATE_BLOCKS = false;
 
@@ -68,7 +68,7 @@ public class BlockChain {
      * Если меньше чем TEST_DB то улучшается скорость за счет схлопыания повторнных изменений балансов счетов.
      */
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[1000];
-    public static final boolean NOT_CHECK_SIGNS = TEST_DB > 0;
+    public static final boolean NOT_CHECK_SIGNS = TEST_DB > 0 && false;
 
     /**
      * set uo all balances ERA to 10000 and COMPU to 100

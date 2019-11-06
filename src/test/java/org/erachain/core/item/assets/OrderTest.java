@@ -1,5 +1,6 @@
 package org.erachain.core.item.assets;
 
+import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
@@ -12,9 +13,11 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.TransactionFinalMapSigns;
+import org.erachain.dbs.rocksDB.DBMapSuit;
 import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.dbs.rocksDB.common.RockStoreIterator;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
+import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -25,6 +28,7 @@ import org.mapdb.Fun;
 import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -399,6 +403,56 @@ public class OrderTest {
     }
 
     @Test
+    public void iteratorRocks() {
+
+        try {
+            init(IDB.DBS_ROCK_DB);
+
+            long have = assetB.getKey(dcSet);
+            long want = assetA.getKey(dcSet);
+
+            int count = 0;
+
+            OrderMap ordersMap = dcSet.getOrderMap();
+
+            // создадим много ордеров
+            int len = 10;
+            for (int i = 0; i < len; i++) {
+                BigDecimal amountSell = new BigDecimal("100");
+                BigDecimal amountBuy = new BigDecimal("" + (100 - (len >> 1) + i));
+
+                orderCreation = new CreateOrderTransaction(accountA, have, want, amountBuy,
+                        amountSell, (byte) 0, timestamp++, 0L);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.process(null, Transaction.FOR_NETWORK);
+
+            }
+
+            byte[] filter = org.bouncycastle.util.Arrays.concatenate(
+                    Longs.toByteArray(have),
+                    Longs.toByteArray(want));
+
+            IndexDB indexDB = ((DBMapSuit) ordersMap.getSource()).map.getIndex(0);
+            assertEquals(indexDB.getNameIndex(), "orders_key_have_want");
+            Iterator iterator = ((DBMapSuit) ordersMap.getSource()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false);
+
+            List<Order> result = new ArrayList<>();
+            count = 0;
+            while (iterator.hasNext()) {
+                count++;
+                result.add(ordersMap.get((Long) iterator.next()));
+
+            }
+            assertEquals(result.size(), len);
+
+        } finally {
+            dcSet.close();
+        }
+    }
+
+    @Test
     public void orphan() {
     }
+
 }

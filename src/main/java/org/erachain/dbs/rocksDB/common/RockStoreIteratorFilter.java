@@ -5,6 +5,8 @@ import org.rocksdb.RocksIterator;
 
 import java.util.NoSuchElementException;
 
+import static org.erachain.utils.ByteArrayUtils.areEqualMask;
+
 @Slf4j
 public final class RockStoreIteratorFilter extends RockStoreIterator {
 
@@ -13,7 +15,6 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
   public RockStoreIteratorFilter(RocksIterator dbIterator, boolean descending, boolean isIndex, byte[] filter) {
     super(dbIterator, descending, isIndex);
     this.filter = filter;
-    //this.dbIterator.seek(filter);
   }
 
   @Override
@@ -21,13 +22,11 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
     boolean hasNext = false;
     try {
       if (jumpToLast) {
-        //dbIterator.seekToLast();
         dbIterator.seekForPrev(filter);
         jumpToLast = false;
         first = false;
       }
       if (first) {
-        //dbIterator.seekToFirst();
         dbIterator.seek(filter);
         first = false;
       }
@@ -43,8 +42,9 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
       }
     }
 
-    hasNext = hasNext && new String(dbIterator.key()).startsWith(new String(filter));
-    return hasNext;
+    // ERROR on some BYTES!!!
+    // hasNext = hasNext && new String(dbIterator.key()).startsWith(new String(filter));
+    return (hasNext = hasNext && areEqualMask(dbIterator.key(), filter));
   }
 
   @Override

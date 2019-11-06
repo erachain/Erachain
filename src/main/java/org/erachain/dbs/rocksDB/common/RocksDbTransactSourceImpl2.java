@@ -26,6 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
+import static org.erachain.utils.ByteArrayUtils.areEqualMask;
 
 /**
  * Самый низкий уровень доступа к функциям RocksDB
@@ -159,7 +160,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = getIterator()) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.key());
             }
             return result;
@@ -176,7 +177,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         List<byte[]> result = new ArrayList<byte[]>();
         try (final RocksIterator iter = getIterator()) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.value());
             }
             return result;
@@ -193,7 +194,7 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>();
         try (final RocksIterator iter = getIterator(indexDB)) {
-            for (iter.seek(filter); iter.isValid() && new String(iter.key()).startsWith(new String(filter)); iter.next()) {
+            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.value());
             }
             return result;
