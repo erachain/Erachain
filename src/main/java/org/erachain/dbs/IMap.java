@@ -73,6 +73,11 @@ public interface IMap<T, U> {
 
     boolean contains(T key);
 
+    /**
+     * @param index      secondary index No
+     * @param descending
+     * @return
+     */
     Iterator<T> getIterator(int index, boolean descending);
 
     Iterator<T> getIterator();

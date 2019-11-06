@@ -64,6 +64,11 @@ public interface RocksDbDataSource {
 
     RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle);
 
+    /**
+     * @param descending
+     * @param indexDB    primary & secondary index No
+     * @return
+     */
     RockStoreIterator indexIterator(boolean descending, int indexDB);
 
     RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter);

@@ -183,7 +183,7 @@ public class OrderTest {
                     orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
-                    iterator = ordersMap.getIterator(1, false);
+                    iterator = ordersMap.getIterator(0, false);
                     count = 0;
                     while (iterator.hasNext()) {
                         Long key = iterator.next();
@@ -206,7 +206,7 @@ public class OrderTest {
                 }
                 assertEquals(count, len);
 
-                iterator = ordersMap.getIterator(1, false);
+                iterator = ordersMap.getIterator(0, false);
                 count = 0;
                 while (iterator.hasNext()) {
                     Long key = iterator.next();
@@ -445,6 +445,10 @@ public class OrderTest {
 
             }
             assertEquals(result.size(), len);
+
+            List<Order> orders = ordersMap.getOrdersForTradeWithFork(have, want, null);
+            assertEquals(orders.size(), len);
+
 
         } finally {
             dcSet.close();
