@@ -179,6 +179,105 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         return (V) byteableValue.receiveObjectFromBytes(bytes);
     }
 
+    void putIndexes(Object key, V value, byte[] keyBytes, boolean oldGetted, byte[] old) {
+        if (!oldGetted) {
+            old = dbSource.get(keyBytes);
+        }
+        if (old != null && old.length > 0) {
+            removeIndexes(key, keyBytes, old);
+        }
+
+        for (IndexDB indexDB : indexes) {
+            if (indexDB instanceof SimpleIndexDB) {
+                if (logON) logger.info("SimpleIndex");
+                ////// тут получаем ответы от двух функций Индекса - формирования ключа и преобразования его в байты
+                //// причем у Глеба тут опять передается ключ первичный - даже для серилиазации результат из вервого вызова
+                SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
+                Object apply = simpleIndexDB.getBiFunction().apply(key, value);
+                byte[] bytes = indexDB.getIndexByteable().toBytes(apply);
+                if (bytes == null) {
+                    continue;
+                }
+                if (logON) logger.info("SimpleIndex.bytes.length = " + bytes.length);
+                byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
+                dbSource.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
+            } else if (indexDB instanceof ArrayIndexDB) {
+                if (logON) logger.info("ArrayIndex");
+                ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
+                BiFunction biFunction = arrayIndexDB.getBiFunction();
+                Object[] apply = (Object[]) biFunction.apply(key, value);
+                if (apply == null) {
+                    continue;
+                }
+                if (logON) logger.info("ArrayIndex.count.elements = " + apply.length);
+                for (Object valueIndex : apply) {
+                    byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex);
+                    if (bytes == null) {
+                        continue;
+                    }
+                    byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
+                    if (logON) logger.info("ArrayIndex.bytes.length = " + bytes.length);
+                    dbSource.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
+                }
+
+            } else if (indexDB instanceof ListIndexDB) {
+                if (logON) logger.info("ListIndex");
+                ListIndexDB listIndexDB = (ListIndexDB) indexDB;
+                BiFunction biFunction = listIndexDB.getBiFunction();
+                List<Object> apply = (List<Object>) biFunction.apply(key, value);
+                if (apply == null) {
+                    continue;
+                }
+                if (logON) logger.info("ListIndex.count.elements = " + apply.size());
+                for (Object valueIndex : apply) {
+                    byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex);
+                    if (bytes == null) {
+                        continue;
+                    }
+                    byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
+                    if (logON) logger.info("ListIndex.bytes.length = " + bytes.length);
+                    dbSource.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
+                }
+
+            } else {
+                throw new UnsupportedTypeIndexException();
+            }
+        }
+
+    }
+
+    @Override
+    public boolean set(K key, V value) {
+        if (logON) logger.info("put invoked");
+        //counterFlush++;
+        final byte[] keyBytes = byteableKey.toBytesObject(key);
+        byte[] old = dbSource.get(keyBytes);
+
+        if (logON) logger.info("keyBytes.length = " + keyBytes.length);
+
+        if (enableSize) {
+            if (old == null || old.length == 0) {
+                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+                size++;
+                if (logON) logger.info("put size = " + size);
+
+                dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
+            }
+        }
+
+        // Значение старое было значит удалим вторичные ключи
+        if (indexes != null && !indexes.isEmpty()) {
+            putIndexes(key, value, keyBytes, true, old);
+        }
+
+        byte[] bytesValue = byteableValue.toBytesObject(value);
+        dbSource.put(keyBytes, bytesValue);
+        if (logON) logger.info("valueBytes.length = " + bytesValue.length);
+
+        return old != null;
+    }
+
     @Override
     public void put(K key, V value) {
         if (logON) logger.info("put invoked");
@@ -204,70 +303,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
         // Значение старое было значит удалим вторичные ключи
         if (indexes != null && !indexes.isEmpty()) {
-            if (!oldGetted) {
-                old = dbSource.get(keyBytes);
-            }
-            if (old != null && old.length > 0) {
-                removeIndexes(key, keyBytes, old);
-            }
-
-            for (IndexDB indexDB : indexes) {
-                if (indexDB instanceof SimpleIndexDB) {
-                    if (logON) logger.info("SimpleIndex");
-                    ////// тут получаем ответы от двух функций Индекса - формирования ключа и преобразования его в байты
-                    //// причем у Глеба тут опять передается ключ первичный - даже для серилиазации результат из вервого вызова
-                    SimpleIndexDB simpleIndexDB = (SimpleIndexDB) indexDB;
-                    Object apply = simpleIndexDB.getBiFunction().apply(key, value);
-                    byte[] bytes = indexDB.getIndexByteable().toBytes(apply);
-                    if (bytes == null) {
-                        continue;
-                    }
-                    if (logON) logger.info("SimpleIndex.bytes.length = " + bytes.length);
-                    byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                    dbSource.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
-                } else if (indexDB instanceof ArrayIndexDB) {
-                    if (logON) logger.info("ArrayIndex");
-                    ArrayIndexDB arrayIndexDB = (ArrayIndexDB) indexDB;
-                    BiFunction biFunction = arrayIndexDB.getBiFunction();
-                    Object[] apply = (Object[]) biFunction.apply(key, value);
-                    if (apply == null) {
-                        continue;
-                    }
-                    if (logON) logger.info("ArrayIndex.count.elements = " + apply.length);
-                    for (Object valueIndex : apply) {
-                        byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex);
-                        if (bytes == null) {
-                            continue;
-                        }
-                        byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                        if (logON) logger.info("ArrayIndex.bytes.length = " + bytes.length);
-                        dbSource.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
-                    }
-
-                } else if (indexDB instanceof ListIndexDB) {
-                    if (logON) logger.info("ListIndex");
-                    ListIndexDB listIndexDB = (ListIndexDB) indexDB;
-                    BiFunction biFunction = listIndexDB.getBiFunction();
-                    List<Object> apply = (List<Object>) biFunction.apply(key, value);
-                    if (apply == null) {
-                        continue;
-                    }
-                    if (logON) logger.info("ListIndex.count.elements = " + apply.size());
-                    for (Object valueIndex : apply) {
-                        byte[] bytes = indexDB.getIndexByteable().toBytes(valueIndex);
-                        if (bytes == null) {
-                            continue;
-                        }
-                        byte[] concatenateBiFunctionKey = Arrays.concatenate(bytes, keyBytes);
-                        if (logON) logger.info("ListIndex.bytes.length = " + bytes.length);
-                        dbSource.put(indexDB.getColumnFamilyHandle(), concatenateBiFunctionKey, keyBytes);
-                    }
-
-                } else {
-                    throw new UnsupportedTypeIndexException();
-                }
-            }
-
+            putIndexes(key, value, keyBytes, oldGetted, old);
         }
 
         byte[] bytesValue = byteableValue.toBytesObject(value);
@@ -330,7 +366,59 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         }
     }
 
-    // TODO переделать на REMOVE так как тут берется Значение - сделаь еще REMOVE тдельно
+    @Override
+    public V remove(Object key) {
+        final byte[] keyBytes = byteableKey.toBytesObject(key);
+
+        byte[] old = dbSource.get(keyBytes);
+
+        // Есть вторичные ключи и значение старое было
+        if (indexes != null && !indexes.isEmpty()) {
+            if (old != null && old.length > 0) {
+                removeIndexes(key, keyBytes, old);
+            }
+        }
+
+        if (enableSize) {
+            if (old != null && old.length > 0) {
+                // UPDATE SIZE
+                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+                size--;
+                dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
+            }
+        }
+        dbSource.delete(keyBytes);
+        return (V) byteableValue.receiveObjectFromBytes(old);
+    }
+
+    // TODO переделать на REMOVE так как тут берется Значение
+    @Override
+    public V removeValue(Object key) {
+        final byte[] keyBytes = byteableKey.toBytesObject(key);
+
+        byte[] old = dbSource.get(keyBytes);
+
+        // Есть вторичные ключи и значение старое было
+        if (indexes != null && !indexes.isEmpty()) {
+            if (old != null && old.length > 0) {
+                removeIndexes(key, keyBytes, old);
+            }
+        }
+
+        if (enableSize) {
+            if (old != null && old.length > 0) {
+                // UPDATE SIZE
+                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
+                size--;
+                dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
+            }
+        }
+        dbSource.delete(keyBytes);
+        return (V) byteableValue.receiveObjectFromBytes(old);
+    }
+
     @Override
     public void delete(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);
@@ -362,7 +450,6 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         dbSource.delete(keyBytes);
     }
 
-    // TODO переделать на REMOVE так как тут берется Значение
     @Override
     public void deleteValue(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);

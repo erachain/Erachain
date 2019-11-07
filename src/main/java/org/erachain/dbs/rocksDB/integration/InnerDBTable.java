@@ -25,7 +25,13 @@ public interface InnerDBTable<K, V> {
 
     V get(Object key);
 
+    boolean set(K key, V value);
+
     void put(K key, V value);
+
+    V remove(Object key);
+
+    V removeValue(Object key);
 
     void delete(Object key);
 

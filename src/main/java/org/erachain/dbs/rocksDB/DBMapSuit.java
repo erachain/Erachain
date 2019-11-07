@@ -105,12 +105,9 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         return map.values();
     }
 
-    // TODO тут надо упростить так как внутри иногда берется предыдущее значение
     @Override
     public boolean set(T key, U value) {
-        boolean old = contains(key);
-        map.put(key, value);
-        return old;
+        return map.set(key, value);
     }
 
     @Override
@@ -118,34 +115,21 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
         map.put(key, value);
     }
 
-    // TODO тут надо упростить так как внутри иногда берется предыдущее значение
     @Override
     public U remove(T key) {
-        U value = null;
-        if (map.containsKey(key)) {
-            value = map.get(key);
-            map.delete(key);
-        }
-        return value;
+        return map.remove(key);
     }
 
     // TODO сделать это у РоксДБ есть
-    // TODO тут надо упростить так как внутри иногда берется предыдущее значение
     @Override
     public U removeValue(T key) {
-        U value = null;
-        if (map.containsKey(key)) {
-            value = map.get(key);
-            map.deleteValue(key);
-        }
-        return value;
+        return map.removeValue(key);
     }
 
     @Override
     public void delete(T key) {
         map.delete(key);
     }
-
 
     // TODO сделать это у РоксДБ есть
     @Override
