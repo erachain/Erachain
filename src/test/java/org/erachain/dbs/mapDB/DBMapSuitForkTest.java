@@ -3,15 +3,52 @@ package org.erachain.dbs.mapDB;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.block.GenesisBlock;
+import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
+import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
+@Slf4j
 public class DBMapSuitForkTest {
+
+    int[] TESTED_DBS = new int[]{
+            //IDB.DBS_MAP_DB,
+            IDB.DBS_ROCK_DB};
+
+    DCSet dcSet;
+    GenesisBlock gb;
+
+    private void init(int dbs) {
+
+        logger.info(" ********** open DBS: " + dbs);
+
+        File tempDir = new File(Settings.getInstance().getDataTempDir());
+        try {
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
+        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
+        gb = new GenesisBlock();
+
+        try {
+            gb.process(dcSet);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * не удаляет одинаковые ключи
@@ -152,6 +189,18 @@ public class DBMapSuitForkTest {
 
     @Test
     public void delete() {
+
+        for (int dbs : TESTED_DBS) {
+
+            try {
+                init(dbs);
+
+                // TODO нужно сделать проверку на HashMap delete
+
+            } finally {
+                dcSet.close();
+            }
+        }
     }
 
     @Test

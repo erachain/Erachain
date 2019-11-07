@@ -389,6 +389,9 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             }
         }
         dbSource.delete(keyBytes);
+        if (old == null)
+            return null;
+
         return (V) byteableValue.receiveObjectFromBytes(old);
     }
 
@@ -416,6 +419,9 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             }
         }
         dbSource.delete(keyBytes);
+        if (old == null)
+            return null;
+
         return (V) byteableValue.receiveObjectFromBytes(old);
     }
 

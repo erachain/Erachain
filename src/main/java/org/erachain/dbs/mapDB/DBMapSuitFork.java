@@ -31,7 +31,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     //ConcurrentHashMap deleted;
     ///////// - если ключи набор байт или других примитивов - то неверный поиск в этом виде таблиц HashMap deleted;
     /// поэтому берем медленный но правильный TreeMap
-    TreeMap<T, Boolean> deleted;
+    /// НЕТ - это определяется на лету при созданий - по типу ключа
+    Map<T, Boolean> deleted;
     int shiftSize;
 
     public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
@@ -175,8 +176,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         U value = this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            if (key instanceof byte[]) {
+                this.deleted = new TreeMap(Fun.BYTE_ARRAY_COMPARATOR);
+            } else {
+                this.deleted = new HashMap(1024, 0.75f);
+            }
         }
 
         // добавляем в любом случае, так как

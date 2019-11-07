@@ -345,6 +345,9 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
             }
         }
         dbSource.delete(columnFamilyHandles.get(0), keyBytes);
+        if (old == null)
+            return null;
+
         return (V) byteableValue.receiveObjectFromBytes(old);
     }
 
@@ -364,6 +367,9 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
             }
         }
         dbSource.delete(columnFamilyHandles.get(0), keyBytes);
+        if (old == null)
+            return null;
+
         return (V) byteableValue.receiveObjectFromBytes(old);
     }
 
