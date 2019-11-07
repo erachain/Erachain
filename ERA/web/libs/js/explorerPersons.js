@@ -137,10 +137,17 @@ function person(data) {
 
     output += data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
     if (data.creator_key != "") {
-        output += data.Label_creator + ': &nbsp&nbsp<a href ="?person=' + data.creator_key + get_lang() + '"><b> ' + data.creator + '</b></a><br>';
+        output += data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator_name + '</b></a><br>';
     } else {
-        output += data.Label_creator + ': &nbsp&nbsp<b> ' + data.creator + '</b><br>';
+        output += data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator + '</b></a><br>';
     }
+
+    if (data.registrar_key != "") {
+        output += data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar_name + '</b></a><br>';
+    } else {
+        output += data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar + '</b></a><br>';
+    }
+
     output += data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
     if ('deathday' in data) {
         output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b><br>'
@@ -164,23 +171,30 @@ function person(data) {
 
 //statuses
     output += '<br>' + data.Label_statuses + ':';
-    output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>' + data.Label_Status_table_status + '<td><b>' + data.Label_Status_table_period + '<td><b>' + data.Label_accounts_table_creator + '<tr>';
+    output += '<table id=statuses BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'
+       + data.Label_Status_table_status + '<td><b>' + data.Label_Status_table_period + '<td><b>' + data.Label_Status_table_appointing + '<tr>';
 
     for (key in data.statuses) {
         output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">' + data.statuses[key].status_name
             + '<td>' + data.statuses[key].status_period
-            + '<td><a href ="?address=' + data.statuses[key].status_creator_address + get_lang() + '">' + data.statuses[key].status_creator + '</a><tr>';
+            + '<td><a href ="?address=' + data.statuses[key].status_creator + get_lang() + '">' + data.statuses[key].status_creator_name + '</a><tr>';
     }
     output += '</table><br>';
 
 // accounts
 
     output += '<br>' + data.Label_accounts + ':';
-    output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>' + data.Label_accounts_table_adress + '<td><b>' + data.Label_accounts_table_to_date + '<td><b>' + data.Label_accounts_table_creator + '<tr>';
+    output += '<table id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800"  class="table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" ><tr bgcolor="f1f1f1"><td><b>'
+        + data.Label_accounts_table_address + '<td><b>' + data.Label_accounts_table_to_date + '<td><b>' + data.Label_accounts_table_verifier + '<tr>';
 
     for (key in data.accounts) {
         output += '<tr><td><a href = "?address=' + data.accounts[key].address + get_lang() + '">' + data.accounts[key].address + '</a><td>'
-            + convertTimestamp(data.accounts[key].to_date, true) + '<td><a href ="?address=' + data.accounts[key].creator_address + get_lang() + '">' + data.accounts[key].creator + '</a><tr>';
+            + convertTimestamp(data.accounts[key].to_date, true) + '<td>';
+         if (data.accounts[key].verifier_key != "") {
+             output += '<a href ="?address=' + data.accounts[key].verifier + get_lang() + '">' + data.accounts[key].verifier_name + '</a><br>';
+         } else {
+             output += '<a href ="?address=' + data.accounts[key].verifier + get_lang() + '">' + data.accounts[key].verifier + '</a><tr>';
+         }
     }
     output += '</table><br>';
 
