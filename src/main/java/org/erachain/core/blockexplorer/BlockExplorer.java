@@ -1431,6 +1431,7 @@ public class BlockExplorer {
             currentStatus.put("txSeqNo", last.e);
             transaction = dcSet.getTransactionFinalMap().get(last.d, last.e);
             currentStatus.put("creator", transaction.getCreator().getAddress());
+            currentStatus.put("creator_name", transaction.getCreator().getPersonAsString());
 
             output.put("last", currentStatus);
 
@@ -1459,6 +1460,7 @@ public class BlockExplorer {
 
                 transaction = dcSet.getTransactionFinalMap().get(item.d, item.e);
                 historyItemJSON.put("creator", transaction.getCreator().getAddress());
+                historyItemJSON.put("creator_name", transaction.getCreator().getPersonAsString());
 
                 historyItemJSON.put("text", itemStatusMap.get(statusKey).toString(dcSet, item.c));
                 if (item.a != null && item.a > Long.MIN_VALUE)
@@ -1553,8 +1555,8 @@ public class BlockExplorer {
         Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
         output.put("registrar", transaction.getCreator().getAddress());
         if (transaction.getCreator().getPerson() != null) {
-            output.put("registrar_key", person.getOwner().getPerson().b.getKey());
-            output.put("registrar_name", person.getOwner().getPerson().b.getName());
+            output.put("registrar_key", transaction.getCreator().getPerson().b.getKey());
+            output.put("registrar_name", transaction.getCreator().getPerson().b.getName());
         } else {
             output.put("registrar_key", "");
             output.put("registrar_name", "");
@@ -1617,6 +1619,7 @@ public class BlockExplorer {
 
             output.put("statuses", statusesJSON);
         }
+
         // accounts
 
         Map accountsJSON = new LinkedHashMap();
@@ -1718,6 +1721,7 @@ public class BlockExplorer {
                 myPersonJSON.put("key", item.getKey());
                 myPersonJSON.put("name", item.getName());
 
+                myPersonJSON.put("seqNo", myIssuePerson.viewHeightSeq());
                 myPersonJSON.put("timestamp", myIssuePerson.getTimestamp());
 
                 myPersonsJSON.put(i, myPersonJSON);
