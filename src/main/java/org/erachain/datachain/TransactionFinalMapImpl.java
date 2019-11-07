@@ -249,7 +249,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             item = this.map.get(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
-            txs.add(item);
+            txs.add(item); // 628853-1
             counter++;
         }
         return txs;

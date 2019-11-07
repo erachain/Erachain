@@ -67,6 +67,7 @@ public class DBRocksDBTableTest {
     public void get() {
     }
 
+    // TODO надо сделать проверку добавления и удаления с вторичными ключами и с учетом размера твблици - чтобы вторичные ключи правильно удалялись
     @Test
     public void put() {
     }

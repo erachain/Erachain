@@ -40,7 +40,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
     private boolean logON = false;
 
     // индексы
-    private List<IndexDB> indexes;
+    private List<IndexDB> indexes; // если добавим enableSize то надо передлывать обработку вторичных ключей - как в integration.DBRocksDBTable.delete
     private List<ColumnFamilyHandle> columnFamilyHandles;
     private ColumnFamilyHandle columnFamilyFieldSize;
 

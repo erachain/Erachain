@@ -97,6 +97,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         return u;
     }
 
+    // TODO тут надо упростить так как внутри иногда берется предыдущее значение
     @Override
     public boolean set(T key, U value) {
 
@@ -130,6 +131,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
     }
 
+    // TODO тут надо упростить так как внутри иногда берется предыдущее значение
     @Override
     public U remove(T key) {
 

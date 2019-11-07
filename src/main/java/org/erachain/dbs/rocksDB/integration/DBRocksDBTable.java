@@ -185,28 +185,32 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         //counterFlush++;
         final byte[] keyBytes = byteableKey.toBytesObject(key);
         byte[] old = null;
+        boolean oldGetted = false;
+
         if (logON) logger.info("keyBytes.length = " + keyBytes.length);
 
-        if (columnFamilyFieldSize != null) {
+        if (enableSize) {
             old = dbSource.get(keyBytes);
+            oldGetted = true;
             if (old == null || old.length == 0) {
                 byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
+
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
-            } else {
-                // Значение старое было значит удалим вторичные ключи
-                if (indexes != null && !indexes.isEmpty()) {
-                    removeIndexes(key, keyBytes, old);
-                }
             }
         }
 
-        byte[] bytesValue = byteableValue.toBytesObject(value);
-        dbSource.put(keyBytes, bytesValue);
-        if (logON) logger.info("valueBytes.length = " + bytesValue.length);
+        // Значение старое было значит удалим вторичные ключи
         if (indexes != null && !indexes.isEmpty()) {
+            if (!oldGetted) {
+                old = dbSource.get(keyBytes);
+            }
+            if (old != null && old.length > 0) {
+                removeIndexes(key, keyBytes, old);
+            }
+
             for (IndexDB indexDB : indexes) {
                 if (indexDB instanceof SimpleIndexDB) {
                     if (logON) logger.info("SimpleIndex");
@@ -263,7 +267,12 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                     throw new UnsupportedTypeIndexException();
                 }
             }
+
         }
+
+        byte[] bytesValue = byteableValue.toBytesObject(value);
+        dbSource.put(keyBytes, bytesValue);
+        if (logON) logger.info("valueBytes.length = " + bytesValue.length);
     }
 
     void removeIndexes(Object key, byte[] keyBytes, byte[] valueByte) {
@@ -326,19 +335,28 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     public void delete(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);
 
-        if (columnFamilyFieldSize != null) {
-            byte[] old = dbSource.get(keyBytes);
-            if (old != null && old.length != 0) {
+        byte[] old = null;
+        boolean oldGetted = false;
+
+        // Есть вторичные ключи и значение старое было
+        if (indexes != null && !indexes.isEmpty()) {
+            old = dbSource.get(keyBytes);
+            oldGetted = true;
+            if (old != null && old.length > 0) {
+                removeIndexes(key, keyBytes, old);
+            }
+        }
+
+        if (enableSize) {
+            if (!oldGetted) {
+                old = dbSource.get(keyBytes);
+            }
+            if (old != null && old.length > 0) {
                 // UPDATE SIZE
                 byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
-
-                // Есть вторичные ключи и значение старое было
-                if (indexes != null && !indexes.isEmpty()) {
-                    removeIndexes(key, keyBytes, old);
-                }
             }
         }
         dbSource.delete(keyBytes);
@@ -348,16 +366,29 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     @Override
     public void deleteValue(Object key) {
         final byte[] keyBytes = byteableKey.toBytesObject(key);
-        byte[] old = dbSource.get(keyBytes);
-        if (old != null && old.length != 0) {
-            if (columnFamilyFieldSize != null) {
+
+        byte[] old = null;
+        boolean oldGetted = false;
+
+        // Есть вторичные ключи и значение старое было
+        if (indexes != null && !indexes.isEmpty()) {
+            old = dbSource.get(keyBytes);
+            oldGetted = true;
+            if (old != null && old.length > 0) {
+                removeIndexes(key, keyBytes, old);
+            }
+        }
+
+        if (enableSize) {
+            if (!oldGetted) {
+                old = dbSource.get(keyBytes);
+            }
+            if (old != null && old.length > 0) {
+                // UPDATE SIZE
                 byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
-            }
-            if (indexes != null && !indexes.isEmpty()) {
-                removeIndexes(key, keyBytes, old);
             }
         }
         dbSource.delete(keyBytes);
