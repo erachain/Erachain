@@ -156,7 +156,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     }
 
     @Override
-    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal limit, Map deleted) {
+    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal stopPrice, Map deleted) {
 
         Iterator<Long> iterator = getHaveWantIterator(have, want);
 
@@ -167,7 +167,13 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                 // SKIP deleted in FORK
                 continue;
             }
-            result.put(key, get(key));
+
+            Order order = get(key);
+            result.put(key, order);
+            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+                break;
+            }
         }
 
         return result;

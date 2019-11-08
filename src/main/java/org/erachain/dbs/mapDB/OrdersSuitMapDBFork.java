@@ -79,20 +79,26 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
     // GET KEYs with FORKED rules
     @Override
-    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal limit, Map deleted_empty) {
+    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal stopPrice, Map deleted_empty) {
 
         // GET FROM PARENT and exclude DELETED here
-        HashMap<Long, Order> result = ((OrderMap) parent).getProtocolEntries(have, want, limit, deleted);
+        HashMap<Long, Order> result = ((OrderMap) parent).getProtocolEntries(have, want, stopPrice, deleted);
 
-        Object limitOrHI = limit == null ? Fun.HI() : limit; // надо тут делать выбор иначе ошибка преобразования в subMap
+        // берем все сейчас! так как тут просто перебьор будет и нам надо вщять + одну выше цены
+        // Object limitOrHI = stopPrice == null ? Fun.HI() : stopPrice; // надо тут делать выбор иначе ошибка преобразования в subMap
         Collection<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, limitOrHI, Fun.HI()))
+                Fun.t4(have, want, Fun.HI(), Fun.HI()))
                 .values();
 
         // UPDATE from this FORKED TABLE
         for (Long key : keys) {
-            result.put(key, get(key));
+            Order order = get(key);
+            result.put(key, order);
+            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+                break;
+            }
         }
 
         return result;

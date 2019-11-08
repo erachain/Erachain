@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 public class OrderTest {
 
     int[] TESTED_DBS = new int[]{
-            //IDB.DBS_MAP_DB,
+            IDB.DBS_MAP_DB,
             IDB.DBS_ROCK_DB};
 
     Long releaserReference = null;
@@ -450,11 +450,14 @@ public class OrderTest {
             assertEquals(orders.size(), len);
 
             /////////////// SEEK price
-            BigDecimal stopPrice = new BigDecimal("100");
-
-            orders = ordersMap.getOrdersForTradeWithFork(have, want, stopPrice);
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("100"));
             assertEquals(orders.size(), len);
 
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("-100"));
+            assertEquals(orders.size(), 1);
+
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("0.98"));
+            assertEquals(orders.size(), 3);
 
         } finally {
             dcSet.close();
