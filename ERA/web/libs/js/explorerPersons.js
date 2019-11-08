@@ -135,24 +135,25 @@ function person(data) {
     output += data.Label_key + ': ' +'<a href=?person=' + data.key + get_lang() + '><b>' + data.key + '</b></a>, &nbsp&nbsp';
     output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
 
-    output += data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
-    output += data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
+    output += '<h4>' + data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b></h4>';
+    output += '<h5>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
     if ('deathday' in data) {
-        output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b><br>'
+        output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b>'
     } else {
-        output += '<br>';
+        output += '</h5>';
     }
-    output += data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
+    output += '<h6>' + data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b></h6>';
 
     if (data.era_balance_a) {
-        output += '<h4>ERA: &nbsp&nbsp<u>A</u>:' + data.era_balance_a + '&nbsp&nbsp<u>B</u>:' + data.era_balance_b + '&nbsp&nbsp<u>C</u>:' + data.era_balance_c + '</h4>';
+        output += '<h5>ERA: &nbsp&nbsp<u>A</u>:<b>' + data.era_balance_a + '</b>&nbsp&nbsp<u>B</u>:<b>'
+            + data.era_balance_b + '</b>&nbsp&nbsp<u>C</u>:<b>' + data.era_balance_c + '</b></h5>';
     }
     if (data.compu_balance) {
-        output += '<h4>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h4>';
+        output += '<h5>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h5>';
     }
 
     if (data.lia_balance_a) {
-        output += '<h5>' + data.Label_total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_total_certified + ': <b>' + data.lia_balance_b + '</b></h5></br>';
+        output += '<h5>' + data.Label_total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_total_certified + ': <b>' + data.lia_balance_b + '</b></h5>';
     }
 
     if (data.creator_name != "") {
@@ -167,7 +168,7 @@ function person(data) {
         output += data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar + '</b></a><br>';
     }
 
-    output += data.Label_description + ':<br>' + fformat(data.description) + '<br>';
+    output += '<h5>' + data.Label_description + ':</h5>' + fformat(data.description) + '<br>';
 
     output += '</td>';
     output += '</tr>';
