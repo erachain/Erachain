@@ -129,21 +129,20 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
 
     @Override
-    public HashSet<Long> getProtocolKeys(long have, long want, BigDecimal limit) {
-        return ((OrderSuit) map).getUnsortedKeysWithParent(have, want, limit);
+    public HashMap<Long, Order> getProtocolEntries(long have, long want, BigDecimal stopPrice, Map deleted) {
+        return ((OrderSuit) map).getUnsortedEntries(have, want, stopPrice, deleted);
     }
 
     @Override
-    public List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal limit) {
+    public List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal stopPrice) {
 
         //FILTER ALL KEYS
-        HashSet<Long> keys = ((OrderSuit) map).getUnsortedKeysWithParent(have, want, limit);
+        HashMap<Long, Order> unsortedEntries = ((OrderSuit) map).getUnsortedEntries(have, want, stopPrice, null);
 
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
-        for (Long key : keys) {
-            Order order = this.get(key);
+        for (Order order : unsortedEntries.values()) {
             if (order != null) {
                 orders.add(order);
             } else {
@@ -160,13 +159,12 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     @Override
     public List<Order> getOrdersForTrade(long have, long want, boolean reverse) {
         //FILTER ALL KEYS
-        Collection<Long> keys = ((OrderSuit) map).getUnsortedKeysWithParent(have, want, null);
+        HashMap<Long, Order> unsortedEntries = ((OrderSuit) map).getUnsortedEntries(have, want, null, null);
 
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
-        for (Long key : keys) {
-            Order order = this.get(key);
+        for (Order order : unsortedEntries.values()) {
             if (order != null) {
                 orders.add(order);
             } else {

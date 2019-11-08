@@ -383,7 +383,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = getIterator(indexDB)) {
-            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
+            for (iter.seek(filter); iter.isValid()
+                    && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.value());
             }
             return result;

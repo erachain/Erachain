@@ -449,6 +449,12 @@ public class OrderTest {
             List<Order> orders = ordersMap.getOrdersForTradeWithFork(have, want, null);
             assertEquals(orders.size(), len);
 
+            /////////////// SEEK price
+            BigDecimal stopPrice = new BigDecimal("100");
+
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, stopPrice);
+            assertEquals(orders.size(), len);
+
 
         } finally {
             dcSet.close();

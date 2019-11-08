@@ -14,8 +14,10 @@ import org.mapdb.Bind;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -77,24 +79,23 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
     // GET KEYs with FORKED rules
     @Override
-    public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
+    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal limit, Map deleted_empty) {
 
-        // GET FROM PARENT
-        HashSet<Long> combinedKeys = ((OrderMap) parent).getProtocolKeys(have, want, limit);
-
-        // DELETE ALL PARENT WAS DELETED HERE
-        if (deleted != null && !deleted.isEmpty()) {
-            combinedKeys.removeAll(deleted.keySet());
-        }
+        // GET FROM PARENT and exclude DELETED here
+        HashMap<Long, Order> result = ((OrderMap) parent).getProtocolEntries(have, want, limit, deleted);
 
         Object limitOrHI = limit == null ? Fun.HI() : limit; // надо тут делать выбор иначе ошибка преобразования в subMap
-        HashSet<Long> keys = new HashSet<Long>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+        Collection<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, limitOrHI, Fun.HI())).values());
+                Fun.t4(have, want, limitOrHI, Fun.HI()))
+                .values();
 
-        combinedKeys.addAll(keys);
+        // UPDATE from this FORKED TABLE
+        for (Long key : keys) {
+            result.put(key, get(key));
+        }
 
-        return combinedKeys;
+        return result;
     }
 
     @Override

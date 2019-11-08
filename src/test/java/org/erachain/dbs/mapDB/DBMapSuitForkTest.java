@@ -233,13 +233,13 @@ public class DBMapSuitForkTest {
     }
 
     // TODO нужно проверить на дублирование ключей при сливе с родителем - поидее нельзя чтобы такое происходило
-    // см . как сделано в org.erachain.dbs.mapDB.OrdersSuitMapDBFork.getProtocolKeys
+    // см . как сделано в org.erachain.dbs.mapDB.OrdersSuitMapDBFork.getProtocolEntries
     // мам Iterable<Long> mergedIterable = Iterables.mergeSorted - не сработал как надо - в списке окалаось 2 одинаковых ключа
     @Test
     public void getIterator() {
 
         /// DBMapSuitFork.getIterator()
         // нужно проверить
-        DCSet.getInstance().getOrderMap().getProtocolKeys(1, 2, null);
+        DCSet.getInstance().getOrderMap().getProtocolEntries(1, 2, null, null);
     }
 }
