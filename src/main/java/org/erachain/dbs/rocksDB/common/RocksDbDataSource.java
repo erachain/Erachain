@@ -52,6 +52,10 @@ public interface RocksDbDataSource {
 
     void delete(ColumnFamilyHandle columnFamilyHandle, byte[] key);
 
+    void deleteRange(byte[] keyFrom, byte[] keyToExclude);
+
+    void deleteRange(ColumnFamilyHandle columnFamilyHandle, byte[] keyFrom, byte[] keyToExclude);
+
     void delete(byte[] key, WriteOptions writeOptions);
 
     void deleteValue(byte[] key);
@@ -60,20 +64,21 @@ public interface RocksDbDataSource {
 
     void deleteValue(byte[] key, WriteOptions writeOptions);
 
-    RockStoreIterator iterator(boolean descending);
+    RockStoreIterator iterator(boolean descending, boolean isIndex);
 
-    RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle);
+    RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle, boolean isIndex);
 
     /**
      * @param descending
      * @param indexDB    primary & secondary index No
+     * @param isIndex use Values or Keys in as result value in NEXT
      * @return
      */
-    RockStoreIterator indexIterator(boolean descending, int indexDB);
+    RockStoreIterator indexIterator(boolean descending, int indexDB, boolean isIndex);
 
-    RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter);
+    RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex);
 
-    RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter);
+    RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex);
 
     void write(WriteBatch batch);
 

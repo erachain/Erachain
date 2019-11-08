@@ -107,7 +107,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public IMap getSource() {
-        return (IMap) map;
+        return null;
     }
 
     //@Override

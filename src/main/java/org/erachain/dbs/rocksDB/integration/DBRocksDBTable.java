@@ -562,8 +562,8 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
-    public Iterator<K> getIterator(boolean descending) {
-        DBIterator iterator = dbSource.iterator(descending);
+    public Iterator<K> getIterator(boolean descending, boolean isIndex) {
+        DBIterator iterator = dbSource.iterator(descending, isIndex);
         return new Iterator<K>() {
             @Override
             public boolean hasNext() {
@@ -577,24 +577,8 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         };
     }
 
-    public Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending) {
-        DBIterator iterator = dbSource.indexIterator(descending, indexDB);
-        return new Iterator<K>() {
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public K next() {
-                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
-            }
-        };
-    }
-
-    @Override
-    public Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending) {
-        DBIterator iterator = dbSource.indexIteratorFilter(descending, filter);
+    public Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending, boolean isIndex) {
+        DBIterator iterator = dbSource.indexIterator(descending, indexDB, isIndex);
         return new Iterator<K>() {
             @Override
             public boolean hasNext() {
@@ -609,8 +593,8 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
-    public Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending) {
-        DBIterator iterator = dbSource.indexIteratorFilter(descending, indexDB, filter);
+    public Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending, boolean isIndex) {
+        DBIterator iterator = dbSource.indexIteratorFilter(descending, filter, isIndex);
         return new Iterator<K>() {
             @Override
             public boolean hasNext() {
@@ -624,8 +608,24 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         };
     }
 
-    public Iterator<K> getIndexIterator(int index, boolean descending) {
-        return getIndexIterator(columnFamilyHandles.get(index), descending);
+    @Override
+    public Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex) {
+        DBIterator iterator = dbSource.indexIteratorFilter(descending, indexDB, filter, isIndex);
+        return new Iterator<K>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public K next() {
+                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
+            }
+        };
+    }
+
+    public Iterator<K> getIndexIterator(int index, boolean descending, boolean isIndex) {
+        return getIndexIterator(columnFamilyHandles.get(index), descending, isIndex);
     }
 
     public Set<K> keys(byte[] fromKey, long limit, int indexDB) {

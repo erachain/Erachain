@@ -57,9 +57,17 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
+    public void deleteForBlock(Integer height) {
+        Iterator<Long> iterator = getBlockIterator(height);
+        while (iterator.hasNext()) {
+            map.remove(iterator.next());
+        }
+    }
+
+    @Override
     public Iterator<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-         return  ((BTreeMap<Long, Transaction>) map)
+        return ((BTreeMap<Long, Transaction>) map)
                 .subMap(Transaction.makeDBRef(height, 0),
                         Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator();
 

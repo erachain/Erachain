@@ -49,14 +49,14 @@ public interface InnerDBTable<K, V> {
 
     //NavigableSet<Fun.Tuple2<?, K>> getIndex(int index, boolean descending);
 
-    Iterator<K> getIterator(boolean descending);
+    Iterator<K> getIterator(boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending);
+    Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending);
+    Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending);
+    Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIterator(int indexDB, boolean descending);
+    Iterator<K> getIndexIterator(int indexDB, boolean descending, boolean isIndex);
 
 }

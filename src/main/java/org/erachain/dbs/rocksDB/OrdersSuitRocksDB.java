@@ -123,28 +123,28 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     public Iterator<Long> getHaveWantIterator(long have, long want) {
         return map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(), org.bouncycastle.util.Arrays.concatenate(
                 Longs.toByteArray(have),
-                Longs.toByteArray(want)), false);
+                Longs.toByteArray(want)), false, true);
     }
 
     @Override
     public Iterator<Long> getHaveWantIterator(long have) {
         return map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(),
                 Longs.toByteArray(have),
-                false);
+                false, true);
     }
 
     @Override
     public Iterator<Long> getWantHaveIterator(long want, long have) {
         return map.getIndexIteratorFilter(wantHaveKeyIndex.getColumnFamilyHandle(), org.bouncycastle.util.Arrays.concatenate(
                 Longs.toByteArray(want),
-                Longs.toByteArray(have)), false);
+                Longs.toByteArray(have)), false, true);
     }
 
     @Override
     public Iterator<Long> getWantHaveIterator(long want) {
         return map.getIndexIteratorFilter(wantHaveKeyIndex.getColumnFamilyHandle(),
                 Longs.toByteArray(want),
-                false);
+                false, true);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                 org.bouncycastle.util.Arrays.concatenate(address.getBytes(),
                         Longs.toByteArray(have),
                         Longs.toByteArray(want)),
-                false);
+                false, true);
     }
 
     @Override

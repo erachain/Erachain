@@ -167,6 +167,14 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     }
 
     @Override
+    public void deleteForBlock(Integer height) {
+        Iterator<Long> iterator = getBlockIterator(height);
+        while (iterator.hasNext()) {
+            map.remove(iterator.next());
+        }
+    }
+
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS

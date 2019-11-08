@@ -3416,7 +3416,7 @@ public class BlockExplorer {
         boolean outcome;
         int type;
 
-        ItemAssetMap assetMap = DCSet.getInstance().getItemAssetMap();
+        //ItemAssetMap assetMap = DCSet.getInstance().getItemAssetMap();
 
         int height = Controller.getInstance().getMyHeight();
 
@@ -3455,9 +3455,13 @@ public class BlockExplorer {
                         outcome = txCalculated.getAmount().signum() < 0;
 
                         //out.put("reference", "--");
-                        out.put("signature", transaction.getBlockHeight() + "-" + transaction.getSeqNo());
-
-                        out.put("timestamp", dcSet.getBlocksHeadsMap().get(transaction.getBlockHeight()).getTimestamp());
+                        out.put("signature", transaction.viewHeightSeq());
+                        // 645124 - calced seq-No 654868
+                        try {
+                            out.put("timestamp", dcSet.getBlocksHeadsMap().get(transaction.getBlockHeight()).getTimestamp());
+                        } catch (Exception e) {
+                            out.put("timestamp", transaction.viewHeightSeq());
+                        }
 
                         String message = txCalculated.getMessage();
                         String typeName = transaction.viewFullTypeName();

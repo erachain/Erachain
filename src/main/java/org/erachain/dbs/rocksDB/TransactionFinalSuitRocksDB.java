@@ -15,7 +15,6 @@ import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
@@ -150,32 +149,43 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         indexes.add(titleTypeTxs);
     }
 
+    // TODO  dbCore.deleteRange(beg, end);
+    @Override
+    public void deleteForBlock(Integer height) {
+        Iterator<Long> iterator = getBlockIterator(height);
+        while (iterator.hasNext()) {
+            map.remove(iterator.next());
+        }
+    }
+
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(Ints.toByteArray(height), false);
+        //map.getIterator();
+        return map.getIndexIteratorFilter(Ints.toByteArray(height), false, false);
 
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getIteratorBySender(String address) {
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
+        //return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
+        return map.getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false, true);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Long> getIteratorByRecipient(String address) {
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false);
+        return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false, true);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), false
-        );
+        ///return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), false);
+        return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), false, true);
     }
 
     @Override
@@ -191,22 +201,24 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         //                filterLower + new String(new byte[]{(byte)255}) : filterLower,
         //                type==0?Integer.MAX_VALUE:type), true);
 
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(titleTypeTxs.getColumnFamilyHandle(), type == 0 ? filter.getBytes()
+        return map.getIndexIteratorFilter(titleTypeTxs.getColumnFamilyHandle(), type == 0 ? filter.getBytes()
                         : Arrays.concatenate(filter.getBytes(), Ints.toByteArray(type))
-                , false);
+                , false, true);
 
     }
 
+    // TODO сделать просто итератор складной - без создания списков и дубляжей в итераторе
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public Iterator<Long> getIteratorByAddress(String address) {
-        Iterator senderKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
-        Iterator recipientKeys = ((DBRocksDBTable) map).getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false);
+        Iterator senderKeys = map.getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false, true);
+        Iterator recipientKeys = map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false, true);
         //return Iterators.concat(senderKeys, recipientKeys);
 
         // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
         Iterator<Long> mergedIterator = Iterators.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+
+        // а тут уже оьбратный порядок дать
         return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
 
     }

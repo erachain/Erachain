@@ -198,7 +198,7 @@ public class OrderTest {
                 OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
                 DBRocksDBTable<Long, Order> mapRocks = source.map;
                 RocksDbDataSource mapSource = mapRocks.dbSource;
-                RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1);
+                RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1, true);
                 count = 0;
                 while (iteratorRocks.hasNext()) {
                     byte[] key = iteratorRocks.next();
@@ -435,7 +435,7 @@ public class OrderTest {
 
             IndexDB indexDB = ((DBMapSuit) ordersMap.getSource()).getIndex(0);
             assertEquals(indexDB.getNameIndex(), "orders_key_have_want");
-            Iterator iterator = ((DBMapSuit) ordersMap.getSource()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false);
+            Iterator iterator = ((DBMapSuit) ordersMap.getSource()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false, true);
 
             List<Order> result = new ArrayList<>();
             count = 0;

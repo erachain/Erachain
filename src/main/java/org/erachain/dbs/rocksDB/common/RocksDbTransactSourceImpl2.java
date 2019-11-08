@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
+import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
@@ -625,27 +626,37 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
-    public RockStoreIterator iterator(boolean descending) {
+    public void deleteRange(byte[] keyFrom, byte[] keyToExclude) {
+        throw new UnsupportedRocksDBOperationException();
+    }
+
+    @Override
+    public void deleteRange(ColumnFamilyHandle columnFamilyHandle, byte[] keyFrom, byte[] keyToExclude) {
+        throw new UnsupportedRocksDBOperationException();
+    }
+
+    @Override
+    public RockStoreIterator iterator(boolean descending, boolean isIndex) {
         return new RockStoreIterator(getIterator(), descending, false);
     }
 
     @Override
-    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
+    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle, boolean isIndex) {
         return new RockStoreIterator(getIterator(columnFamilyHandle), descending, true);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex) {
         return new RockStoreIteratorFilter(getIterator(), descending, true, filter);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex) {
         return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, true, filter);
     }
 
     @Override
-    public RockStoreIterator indexIterator(boolean descending, int indexDB) {
+    public RockStoreIterator indexIterator(boolean descending, int indexDB, boolean isIndex) {
         return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, true);
     }
 

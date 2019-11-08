@@ -145,16 +145,16 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
         if (index == 0) {
-            return map.getIterator(descending);
+            return map.getIterator(descending, true);
         }
 
         // там индексы без учета первичного
-        return map.getIndexIterator(index, descending);
+        return map.getIndexIterator(index, descending, true);
     }
 
     @Override
     public Iterator<T> getIterator() {
-        return map.getIterator(false);
+        return map.getIterator(false, true);
     }
 
     @Override

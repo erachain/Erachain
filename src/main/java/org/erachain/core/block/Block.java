@@ -2273,7 +2273,7 @@ import java.util.*;
             return;
         }
 
-        if (this.heightBlock > 162045 && this.heightBlock < 162050) {
+        if (BlockChain.CHECK_BUGS > 3 && this.heightBlock > 162045 && this.heightBlock < 162050) {
             LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
         }
 

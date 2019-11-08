@@ -153,22 +153,22 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
-        return map.getIndexIteratorFilter(Longs.toByteArray(order.getId()), false);
+        return map.getIndexIteratorFilter(Longs.toByteArray(order.getId()), false, true);
     }
 
     @Override
     public Iterator<Tuple2<Long, Long>> getReverseIterator(Long orderID) {
-        return map.getIndexIteratorFilter(reverseIndex.getColumnFamilyHandle(), Longs.toByteArray(orderID), false);
+        return map.getIndexIteratorFilter(reverseIndex.getColumnFamilyHandle(), Longs.toByteArray(orderID), false, true);
     }
 
     @Override
     public Iterator<Tuple2<Long, Long>> getHaveIterator(long have) {
-        return map.getIndexIteratorFilter(haveIndex.getColumnFamilyHandle(), Longs.toByteArray(have), false);
+        return map.getIndexIteratorFilter(haveIndex.getColumnFamilyHandle(), Longs.toByteArray(have), false, true);
     }
 
     @Override
     public Iterator<Tuple2<Long, Long>> getWantIterator(long want) {
-        return map.getIndexIteratorFilter(wantIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false);
+        return map.getIndexIteratorFilter(wantIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false, true);
     }
 
     @Override
@@ -177,7 +177,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         //System.arraycopy(Longs.toByteArray(have), 0, buffer, 0, 8);
         //System.arraycopy(Longs.toByteArray(want), 0, buffer, 8, 8);
         byte[] filter = receivePairKey(have, want).getBytes(StandardCharsets.US_ASCII);
-        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false);
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
     }
 
     @Override
@@ -200,6 +200,6 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         byte[] filter = receivePairKey(have, want).getBytes(StandardCharsets.US_ASCII);
         byte[] buffer = new byte[filter.length + 8];
         System.arraycopy(Longs.toByteArray(refDBend), 0, buffer, filter.length, 8);
-        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), buffer, false);
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), buffer, false, true);
     }
 }
