@@ -154,7 +154,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public Iterator<T> getIterator() {
-        return map.getIterator(false, true);
+        return map.getIterator(false, false);
     }
 
     @Override

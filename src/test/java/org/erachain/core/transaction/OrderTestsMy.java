@@ -829,7 +829,7 @@ public class OrderTestsMy {
         assertEquals(false, orderCreation.isSignatureValid(db));
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void validateCreateOrderTransaction() {
@@ -1223,7 +1223,7 @@ public class OrderTestsMy {
 
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingDivisible() {
@@ -1532,7 +1532,7 @@ public class OrderTestsMy {
 
     }
 
-    @Ignore
+    //@Ignore
     //TODO actualize the test
     //////////////////////////// reverse price
     @Test

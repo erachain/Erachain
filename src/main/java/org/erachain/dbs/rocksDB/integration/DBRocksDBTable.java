@@ -99,7 +99,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         this.writeOptions = writeOptions;
         this.root = (dbaSet == null // in TESTs
                 || dbaSet.getFile() == null ? // in Memory or in TESTs
-                Settings.getInstance().getDataDir()
+                Settings.getInstance().getDataTempDir()
                 : dbaSet.getFile().getParent()) + ROCKS_DB_FOLDER;
         this.indexes = indexes;
     }
