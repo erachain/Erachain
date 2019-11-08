@@ -136,6 +136,25 @@ function person(data) {
     output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
 
     output += data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b><br>';
+    output += data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
+    if ('deathday' in data) {
+        output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b><br>'
+    } else {
+        output += '<br>';
+    }
+    output += data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
+
+    if (data.era_balance_a) {
+        output += '<h4>ERA: &nbsp&nbsp<u>A</u>:' + data.era_balance_a + '&nbsp&nbsp<u>B</u>:' + data.era_balance_b + '&nbsp&nbsp<u>C</u>:' + data.era_balance_c + '</h4>';
+    }
+    if (data.compu_balance) {
+        output += '<h4>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h4>';
+    }
+
+    if (data.lia_balance_a) {
+        output += '<h5>' + data.Label_total_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.Label_total_certified + ': <b>' + data.lia_balance_b + '</b></h5></br>';
+    }
+
     if (data.creator_name != "") {
         output += data.Label_creator + ': &nbsp&nbsp<a href ="?address=' + data.creator + get_lang() + '"><b> ' + data.creator_name + '</b></a><br>';
     } else {
@@ -148,23 +167,8 @@ function person(data) {
         output += data.Label_registrar + ': &nbsp&nbsp<a href ="?address=' + data.registrar + get_lang() + '"><b> ' + data.registrar + '</b></a><br>';
     }
 
-    output += data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
-    if ('deathday' in data) {
-        output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b><br>'
-    } else {
-        output += '<br>';
-    }
-    output += data.Label_gender + ': &nbsp&nbsp<b> ' + data.gender + '</b><br>';
-    output += data.Label_description + ': &nbsp&nbsp' + fformat(data.description) + '<br>';
-    if (data.era_balance_a) {
-        output += '<h4>ERA: &nbsp&nbsp<u>A</u>:' + data.era_balance_a + '&nbsp&nbsp<u>B</u>:' + data.era_balance_b + '&nbsp&nbsp<u>C</u>:' + data.era_balance_c + '</h4>';
-    }
-    if (data.compu_balance) {
-        output += '<h4>COMPU: &nbsp&nbsp <b>' + data.compu_balance + '</b></h4>';
-    }
-    if (data.lia_balance_a) {
-        output += '<h5>' + data.label_registered + ': <b>' + data.lia_balance_a + '</b>, ' + data.label_certified + ': <b>' + data.lia_balance_b + '</b></h5></br>';
-    }
+    output += data.Label_description + ':<br>' + fformat(data.description) + '<br>';
+
     output += '</td>';
     output += '</tr>';
     output += '</table>';

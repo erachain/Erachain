@@ -1534,6 +1534,8 @@ public class BlockExplorer {
         output.put("Label_registrar", Lang.getInstance().translateFromLangObj("Registrar", langObj));
         output.put("Label_born", Lang.getInstance().translateFromLangObj("Birthday", langObj));
         output.put("Label_gender", Lang.getInstance().translateFromLangObj("Gender", langObj));
+        output.put("Label_total_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
+        output.put("Label_total_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
         output.put("Label_description", Lang.getInstance().translateFromLangObj("Description", langObj));
 
         output.put("img", a);
