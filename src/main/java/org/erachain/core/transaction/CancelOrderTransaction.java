@@ -22,7 +22,7 @@ import java.util.Map;
 
 public class CancelOrderTransaction extends Transaction {
 
-    static Logger LOGGER = LoggerFactory.getLogger(Transaction.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(CancelOrderTransaction.class.getName());
 
     // TODO убрать в новой цепочке
     public static final byte[][] VALID_REC = new byte[][]{
