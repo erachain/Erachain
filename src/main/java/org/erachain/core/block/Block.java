@@ -2363,8 +2363,9 @@ import java.util.*;
         int seqNo;
         for (int i = this.transactionCount - 1; i >= 0; i--) {
             seqNo = i + 1;
-            if (cnt.isOnStopping())
+            if (cnt.isOnStopping()) {
                 throw new Exception("on stoping");
+            }
 
             Transaction transaction = transactions.get(i);
             //logger.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
