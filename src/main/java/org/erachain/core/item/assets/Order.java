@@ -630,12 +630,7 @@ public class Order implements Comparable<Order> {
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
         this.creator.changeBalance(this.dcSet, true, this.haveAssetKey, this.amountHave, true);
 
-        BigDecimal thisPrice = this.price;
         BigDecimal thisPriceReverse = calcPriceReverse();
-
-        //BigDecimal tempPrice;
-        BigDecimal thisIncrement;
-        //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
