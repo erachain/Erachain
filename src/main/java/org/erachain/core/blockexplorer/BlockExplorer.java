@@ -872,9 +872,7 @@ public class BlockExplorer {
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
         assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-        assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-        assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
-        assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
+        assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
 
         Long blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
         Transaction transaction = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
@@ -1505,6 +1503,7 @@ public class BlockExplorer {
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
         assetJSON.put("scale", asset.getScale());
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
+        assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
         assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
         List<Order> orders = dcSet

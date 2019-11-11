@@ -1,5 +1,21 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
+import org.erachain.gui.library.HoldersLibraryPanel;
+import org.erachain.gui.library.HyperLinkAccount;
+import org.erachain.gui.library.Library;
+import org.erachain.gui.library.VoushLibraryPanel;
+import org.erachain.lang.Lang;
+import org.erachain.utils.MenuPopupUtil;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -8,23 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Dictionary;
 import java.util.Hashtable;
-
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.text.*;
-
-import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
-import org.erachain.gui.library.HoldersLibraryPanel;
-import org.erachain.gui.library.HyperLinkAccount;
-import org.erachain.gui.library.VoushLibraryPanel;
-import org.erachain.gui.library.Library;
-import org.erachain.lang.Lang;
-import org.erachain.utils.MenuPopupUtil;
-import org.slf4j.LoggerFactory;
 
 
 public class AssetInfo extends JTextPane {
@@ -120,7 +119,7 @@ public class AssetInfo extends JTextPane {
                 text += Library.to_HTML(asset.viewDescription()) + "</div>";
             }
             text += "<div>" + Lang.getInstance().translate("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
-            text += "<div>" + Lang.getInstance().translate("TYPE") + ": <b>" + Lang.getInstance().translate(asset.viewAssetType()) + "</b>,";
+            text += "<div>" + Lang.getInstance().translate("TYPE") + ": <b>" + Lang.getInstance().translate(asset.viewAssetTypeFull()) + "</b>,";
             text += " " + Lang.getInstance().translate("accuracy") + ": <b>" + asset.getScale() + "</b>,";
             text += " " + Lang.getInstance().translate("quantity") + ": <b>" + asset.getQuantity() + "</b></div><<BR></td></tr></table>";
             text += "<div>";

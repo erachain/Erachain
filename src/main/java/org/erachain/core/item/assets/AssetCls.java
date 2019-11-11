@@ -10,8 +10,6 @@ import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
-import javax.swing.*;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -693,6 +691,7 @@ public abstract class AssetCls extends ItemCls {
         JSONObject json =super.jsonForExplorerPage(langObj);
         json.put("assetTypeKey", this.assetType);
         json.put("assetTypeName", viewAssetType());
+        json.put("assetTypeNameFull", viewAssetTypeFull());
         json.put("quantity", getTotalQuantity(DCSet.getInstance()));
         json.put("scale", scale);
         json.put("orders", getOperations(DCSet.getInstance()));
