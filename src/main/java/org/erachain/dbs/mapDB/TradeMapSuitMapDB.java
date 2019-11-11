@@ -31,7 +31,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
     private BTreeMap pairKeyMap;
     private BTreeMap wantKeyMap;
     private BTreeMap haveKeyMap;
-    private BTreeMap reverseKeyMap;
+    private BTreeMap targetsKeyMap;
 
     public TradeMapSuitMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger, null);
@@ -122,26 +122,29 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
             }
         });
 
+        // TODO: тут получается вообще лишний индекс - причем он 2 раза делается на одну запись - обе стороны
         //REVERSE KEY
-        this.reverseKeyMap = database.createTreeMap("trades_key_reverse")
+        this.targetsKeyMap = database.createTreeMap("trades_key_reverse")
                 //.comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.BYTE_ARRAY_COMPARATOR))
                 .comparator(Fun.TUPLE2_COMPARATOR)
                 .makeOrGet();
 
         //BIND REVERSE KEY
-        Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
+        Bind.secondaryKey(map, this.targetsKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
             @Override
             public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
 
                 return new Tuple2<Long, Long>(key.b, key.a);
             }
         });
-        Bind.secondaryKey(map, this.reverseKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
-            @Override
-            public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
-                return new Tuple2<Long, Long>(key.a, key.b);
-            }
-        });
+        if (false) {
+            Bind.secondaryKey(map, this.targetsKeyMap, new Fun.Function2<Tuple2<Long, Long>, Tuple2<Long, Long>, Trade>() {
+                @Override
+                public Tuple2<Long, Long> run(Tuple2<Long, Long> key, Trade value) {
+                    return new Tuple2<Long, Long>(key.a, key.b);
+                }
+            });
+        }
 
     }
 
@@ -160,13 +163,22 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getReverseIterator(Long orderID) {
+    public Iterator<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
+        //FILTER ALL KEYS
+        Map uncastedMap = map;
+        return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+                Fun.t2(orderID, null),
+                Fun.t2(orderID, Fun.HI())).keySet().iterator();
+    }
 
-        if (reverseKeyMap == null)
+    @Override
+    public Iterator<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
+
+        if (targetsKeyMap == null)
             return null;
 
         //ADD REVERSE KEYS
-        return  ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.reverseKeyMap).subMap(
+        return ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.targetsKeyMap).subMap(
                 Fun.t2(orderID, null),
                 Fun.t2(orderID, Fun.HI())).values().iterator();
     }

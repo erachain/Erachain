@@ -53,7 +53,16 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getReverseIterator(Long orderID) {
+    public Iterator<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
+        //FILTER ALL KEYS
+        Map uncastedMap = map;
+        return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+                Fun.t2(orderID, null),
+                Fun.t2(orderID, Fun.HI())).keySet().iterator();
+    }
+
+    @Override
+    public Iterator<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
         return null;
     }
 
