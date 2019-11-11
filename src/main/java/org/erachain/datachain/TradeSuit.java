@@ -15,4 +15,13 @@ public interface TradeSuit {
     Iterator<Fun.Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long timestamp);
     Iterator<Fun.Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int heightStart);
 
+    static String makeKey(long have, long want) {
+        if (have > want) {
+            return have + "/" + want;
+        } else {
+            return want + "/" + have;
+        }
+
+    }
+
 }

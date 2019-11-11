@@ -145,10 +145,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     @Override
     public Iterator<T> getIterator(int index, boolean descending) {
         if (index == 0) {
-            return map.getIterator(descending, true);
+            // тут берем сами ключи у записей
+            return map.getIterator(descending, false);
         }
 
-        // там индексы без учета первичного
+        // это вторичные индексы, потому как результат нужно взять не сами ключи а значения у записей
         return map.getIndexIterator(index, descending, true);
     }
 

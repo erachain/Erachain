@@ -1503,9 +1503,9 @@ button.white-bgc[disabled]:focus,
                         output += data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + '</a></td>';
 
                         output += '<td><a href=?order=' + data[i].trade.initiatorTxSeqNo + get_lang() + '>';
-                        output += data[i].trade.targetTxSeqNo + '</a> ';
+                        output += data[i].trade.initiatorTxSeqNo + '</a> ';
                         output += '<td><a href=?order=' + data[i].trade.targetTxSeqNo + get_lang() + '>';
-                        output += data[i].trade.initiatorTxSeqNo + '</a></td>';
+                        output += data[i].trade.targetTxSeqNo + '</a></td>';
 
                         output += '<td align=right width=250>Height: <a href=?block=' + data[i].trade.height + get_lang() + '>' + data[i].trade.height + '</a>';
                         output += ' / confirmations: ' + data[i].trade.confirmations + '</td>';

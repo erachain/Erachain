@@ -76,14 +76,8 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
         Bind.secondaryKey(map, this.pairKeyMap, new Fun.Function2<Tuple3<String, Long, Integer>, Tuple2<Long, Long>, Trade>() {
             @Override
             public Tuple3<String, Long, Integer> run(Tuple2<Long, Long> key, Trade value) {
-                long have = value.getHaveKey();
-                long want = value.getWantKey();
-                String pairKey;
-                if (have > want) {
-                    pairKey = have + "/" + want;
-                } else {
-                    pairKey = want + "/" + have;
-                }
+
+                String pairKey = TradeSuit.makeKey(value.getHaveKey(), value.getWantKey());
 
                 return new Tuple3<String, Long, Integer>(pairKey, Long.MAX_VALUE - value.getInitiator(),
                         Integer.MAX_VALUE - value.getSequence());
@@ -209,12 +203,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
         if (this.pairKeyMap == null)
             return null;
 
-        String pairKey;
-        if (have > want) {
-            pairKey = have + "/" + want;
-        } else {
-            pairKey = want + "/" + have;
-        }
+        String pairKey = TradeSuit.makeKey(have, want);
 
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, null, null),
@@ -234,12 +223,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
         if (this.pairKeyMap == null)
             return null;
 
-        String pairKey;
-        if (have > want) {
-            pairKey = have + "/" + want;
-        } else {
-            pairKey = want + "/" + have;
-        }
+        String pairKey = TradeSuit.makeKey(have, want);
 
         // тут индекс не по времени а по номерам блоков как лонг
         int heightStart = Controller.getInstance().getMyHeight();
@@ -257,12 +241,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
         if (this.pairKeyMap == null)
             return null;
 
-        String pairKey;
-        if (have > want) {
-            pairKey = have + "/" + want;
-        } else {
-            pairKey = want + "/" + have;
-        }
+        String pairKey = TradeSuit.makeKey(have, want);
 
         // тут индекс не по времени а по номерам блоков как лонг
         ///int heightStart = Controller.getInstance().getMyHeight();

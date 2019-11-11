@@ -2446,7 +2446,11 @@ public class BlockExplorer {
         Iterator<Tuple2<Long, Long>> iterator = trades.getIterator(0, true);
 
         while (count-- > 0 && iterator.hasNext()) {
-            Trade trade = trades.get(iterator.next());
+            Tuple2<Long, Long> key = iterator.next();
+            Trade trade = trades.get(key);
+            if (trade == null) {
+                Long error = null;
+            }
 
             tradesArray.add(tradeJSON(trade, null, null));
         }
