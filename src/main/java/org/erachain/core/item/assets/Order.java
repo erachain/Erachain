@@ -756,9 +756,8 @@ public class Order implements Comparable<Order> {
             compare = orderPrice.compareTo(thisPriceReverse);
             if (compare > 0) {
                 // Делаем просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
-                BigDecimal thisReversePrice = calcPriceReverse();
                 // и сравним так же по прямой цене со сниженной точностью у Заказа
-                if (orderPrice.compareTo(thisReversePrice) == 0) {
+                if (false && orderPrice.compareTo(thisPriceReverse) == 0) {
                     compare = 0;
                 } else {
                     break;

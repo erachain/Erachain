@@ -97,6 +97,7 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
             if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+
                 break;
             }
         }

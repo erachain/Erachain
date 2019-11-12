@@ -456,8 +456,8 @@ public class OrderTest {
             orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("-100"));
             assertEquals(orders.size(), 1);
 
-            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("0.98"));
-            assertEquals(orders.size(), 3);
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("1.00"));
+            assertEquals(orders.size(), 6);
 
         } finally {
             dcSet.close();
