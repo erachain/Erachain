@@ -2520,17 +2520,16 @@ public class OrderTestsMy {
         assetA = new AssetVenture(accountA, "a", icon, image, "a", 0, 0, 100l);
 
         // CREATE ISSUE ASSET TRANSACTION
-        Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+        Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0L, new byte[64]);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
         // CREATE ASSET
         assetB = new AssetVenture(accountB, "b", icon, image, "b", 0, 0, 1000000l);
 
         // CREATE ISSUE ASSET TRANSACTION
-        issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
-                accountB.getLastTimestamp(dcSet)[0]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+        issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++, 0L, new byte[64]);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, ++seqNo);
         issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
 
         keyA = assetA.getKey(dcSet);
@@ -2599,7 +2598,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // B
-                Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), BigDecimal.valueOf(20000)); // BALANCE
+                Assert.assertEquals(accountA.getBalanceUSE(keyB, dcSet), BigDecimal.valueOf(25000)); // BALANCE
                 // B
                 // FOR
                 // ACCOUNT
@@ -2668,7 +2667,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // A
-                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(5 + 1)); // BALANCE
+                Assert.assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(3)); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -3276,7 +3275,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // B
-                assertEquals(accountA.getBalanceUSE(keyB, dcSet), BigDecimal.valueOf(0).setScale(assetA.getScale())); // BALANCE
+                assertEquals(accountA.getBalanceUSE(keyB, dcSet).setScale(assetA.getScale()), BigDecimal.valueOf(0).setScale(assetA.getScale())); // BALANCE
                 // B
                 // FOR
                 // ACCOUNT
@@ -3355,15 +3354,15 @@ public class OrderTestsMy {
 
                 Trade trade = orderC.getInitiatedTrades(dcSet).get(1);
                 Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_C));
-                assertEquals(trade.getTarget(), orderID_A);
-                Assert.assertEquals(0, trade.getAmountHave().compareTo(new BigDecimal("1000")));
-                Assert.assertEquals(0, trade.getAmountWant().compareTo(new BigDecimal("100")));
+                assertEquals(trade.getTarget(), orderID_B);
+                Assert.assertEquals(trade.getAmountHave().toPlainString(), "250");
+                Assert.assertEquals(trade.getAmountWant().toPlainString(), "50");
 
                 trade = orderC.getInitiatedTrades(dcSet).get(0);
                 Assert.assertEquals(0, trade.getInitiator().compareTo(orderID_C));
-                Assert.assertEquals(0, trade.getTarget().compareTo(orderID_B));
-                Assert.assertEquals(0, trade.getAmountHave().compareTo(new BigDecimal("250")));
-                Assert.assertEquals(0, trade.getAmountWant().compareTo(new BigDecimal("50")));
+                Assert.assertEquals(trade.getTarget(), orderID_A);
+                Assert.assertEquals(trade.getAmountHave().toPlainString(), "1000");
+                Assert.assertEquals(trade.getAmountWant().toPlainString(), "100");
             } finally {
                 dcSet.close();
             }
