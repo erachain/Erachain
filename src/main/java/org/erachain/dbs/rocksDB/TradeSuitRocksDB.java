@@ -144,7 +144,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
-        return map.getIndexIteratorFilter(Longs.toByteArray(order.getId()), false, true);
+        return map.getIndexIteratorFilter(Longs.toByteArray(order.getId()), false, false);
     }
 
     @Override
