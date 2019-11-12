@@ -46,6 +46,8 @@ public class OrderTestsMy {
     long FEE_KEY = Transaction.FEE_KEY;
     byte FEE_POWER = (byte) 0;
     byte[] assetReference = new byte[64];
+    byte[] invalidSign = new byte[64];
+
     long timestamp = NTP.getTime();
 
     Random random = new Random();
@@ -122,6 +124,8 @@ public class OrderTestsMy {
     private void init(int dbs) {
 
         logger.info(" ********** open DBS: " + dbs);
+
+        invalidSign[3] = 1;
 
         File tempDir = new File(Settings.getInstance().getDataTempDir());
         try {
@@ -3555,19 +3559,30 @@ public class OrderTestsMy {
                 // CREATE ORDER
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
                 Long orderID = orderCreation.makeOrder().getId();
+                dcSet.getTransactionFinalMapSigns().put(orderCreation.getSignature(), orderID);
 
                 // CREATE CANCEL ORDER
                 // Long time = maker.getLastReference(dcSet);
                 CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER,
                         timestamp++, 0l);
+                cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                cancelOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
 
                 // CHECK IF CANCEL ORDER IS VALID
                 assertEquals(Transaction.VALIDATE_OK, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
                 cancelOrderTransaction = new CancelOrderTransaction(accountA, new byte[]{5, 7}, FEE_POWER,
                         timestamp++, 0l);
+                try {
+                    cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.CANCEL_ORDERS_ALL_VALID + 2, ++seqNo);
+                    assertEquals("error", "должна была быть ошибка ArrayIndexOutOfBoundsException");
+                } catch (ArrayIndexOutOfBoundsException e) {
+                }
+
+                cancelOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
 
                 // CHECK IF CANCEL ORDER IS INVALID
                 assertEquals(Transaction.ORDER_DOES_NOT_EXIST, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -3578,6 +3593,7 @@ public class OrderTestsMy {
                 PrivateKeyAccount invalidCreator = new PrivateKeyAccount(privateKey);
                 cancelOrderTransaction = new CancelOrderTransaction(invalidCreator, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l,
                         new byte[]{1, 2});
+                cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.CANCEL_ORDERS_ALL_VALID + 2, ++seqNo);
 
                 // CHECK IF CANCEL ORDER IS INVALID
                 assertEquals(Transaction.INVALID_ORDER_CREATOR, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -3585,18 +3601,14 @@ public class OrderTestsMy {
                 // CREATE INVALID CANCEL ORDER NO BALANCE
                 DCSet fork = dcSet.fork();
                 cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l,
-                        new byte[]{1, 2});
-                accountA.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO, false);
+                        invalidSign);
+                cancelOrderTransaction.setDC(fork, Transaction.FOR_NETWORK, BlockChain.CANCEL_ORDERS_ALL_VALID + 2, ++seqNo);
+
+                accountA.changeBalance(fork, true, FEE_KEY, BigDecimal.TEN, false);
 
                 // CHECK IF CANCEL ORDER IS INVALID
                 assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-                // CREATE CANCEL ORDER INVALID REFERENCE
-                cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, -123L,
-                        new byte[]{1, 2});
-
-                // CHECK IF NAME REGISTRATION IS INVALID
-                assertEquals(Transaction.INVALID_REFERENCE, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
             } finally {
                 dcSet.close();
             }
