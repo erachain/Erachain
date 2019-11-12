@@ -166,6 +166,8 @@ public class BlockChain {
 
     public HashSet<String> trustedPeers = new HashSet<>();
 
+    public static final HashSet<Integer> validBlocks = new HashSet<>();
+
     public static final byte[][] WIPED_RECORDS = TEST_DB > 0? new byte[][]{}
         : DEVELOP_USE ?
             new byte[][]{
@@ -565,6 +567,8 @@ public class BlockChain {
 /// end                    new int[][]{{225655, 150000}, {333655, 100000}});
 /// end            FREEZED_BALANCES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6",
 /// end                    new int[][]{{115000, 656000}, {225655, 441000}});
+
+            validBlocks.add(214085);
         }
 
         DCSet dcSet = dcSet_in;
