@@ -75,7 +75,7 @@ public class BlockChain {
      */
     public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || TEST_DB > 0;
 
-    static final public int CHECK_BUGS = TEST_DB > 0 ? 0 : 5;
+    static final public int CHECK_BUGS = TEST_DB > 0 ? 0 : 10;
 
     /**
      * если задан - первое подключение к нему
@@ -153,7 +153,7 @@ public class BlockChain {
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : DEVELOP_USE ? 444340 + 1 : 260120;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 425555 : 260120;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : DEVELOP_USE ? 425555 : 418000;
 
     public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0? 0 : DEVELOP_USE? 0 : 44666;
 
