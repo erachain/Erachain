@@ -925,7 +925,7 @@ public class OrderTestsMy {
                 orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, AssetCls.ERA_KEY,
                         BigDecimal.valueOf(50001), BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, ++seqNo);
 
                 // CHECK IF ORDER CREATION INVALID
                 assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
@@ -951,12 +951,12 @@ public class OrderTestsMy {
                 orderCreation = new CreateOrderTransaction(accountA, keyA, AssetCls.ERA_KEY, BigDecimal.valueOf(50.01),
                         BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, ++seqNo);
 
                 // CHECK IF ORDER CREATION INVALID
                 assertEquals(Transaction.NO_BALANCE, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
 
-                if (false) {
+                if (false) { // сейчас все работает благодаря поавающей точке и системе округления на лету
                     // CREATE INVALID ORDER CREATION INVALID AMOUNT
                     orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, keyA, BigDecimal.valueOf(0.01),
                             BigDecimal.valueOf(1.1), (byte) 0, ++timeStamp, 0l, new byte[64]);
