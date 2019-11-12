@@ -14,7 +14,6 @@ import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -39,7 +38,8 @@ public class OrderTestsMy {
 
     int[] TESTED_DBS = new int[]{
             IDB.DBS_MAP_DB,
-            IDB.DBS_ROCK_DB};
+            //IDB.DBS_ROCK_DB
+    };
 
     Long releaserReference = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -436,6 +436,7 @@ public class OrderTestsMy {
                 orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), AssetCls.FEE_KEY, bal_A_keyA,
                         bal_A_keyB, (byte) 0, timestamp, 0l);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
 
                 // INVALID
@@ -444,6 +445,7 @@ public class OrderTestsMy {
                 orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), AssetCls.FEE_KEY, bal_A_keyA,
                         bal_A_keyB, (byte) 0, timestamp, 0l);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
                 assetA = new AssetVenture(accountA, "AAA", icon, image, ".", 0, 30, 0L);
@@ -456,6 +458,7 @@ public class OrderTestsMy {
                 orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), AssetCls.FEE_KEY, bal_A_keyA,
                         bal_A_keyB, (byte) 0, timestamp, 0l);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.VALIDATE_OK);
 
                 // INVALID HAVE
@@ -476,12 +479,14 @@ public class OrderTestsMy {
                 orderCreation = new CreateOrderTransaction(accountA, assetA.getKey(dcSet), AssetCls.FEE_KEY, amountInvalid,
                         bal_A_keyA, (byte) 0, timestamp, 0l);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
                 // INVALID WANT
                 orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, assetA.getKey(dcSet), bal_A_keyA,
                         amountInvalid, (byte) 0, timestamp, 0l);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 assertEquals(orderCreation.isValid(Transaction.FOR_NETWORK, 0l), Transaction.AMOUNT_SCALE_WRONG);
 
             } finally {
@@ -1383,10 +1388,11 @@ public class OrderTestsMy {
                     Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(100)));
                     // 2
                     trade = order_BA_1.getInitiatedTrades(dcSet).get(1);
-                    Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(20)
+                    Assert.assertEquals(trade.getAmountHave().toPlainString(), BigDecimal.valueOf(20)
                             // .multiply(orderB.getPriceCalcReverse()));
-                            .divide(order_AB_2_tmp.getPrice(), BlockChain.AMOUNT_DEDAULT_SCALE, BigDecimal.ROUND_HALF_UP));
-                    Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(20));
+                            .divide(order_AB_2_tmp.getPrice(), BlockChain.AMOUNT_DEDAULT_SCALE,
+                                    BigDecimal.ROUND_HALF_UP).setScale(trade.getAmountHave().scale(), BigDecimal.ROUND_HALF_UP).toPlainString());
+                    Assert.assertEquals(trade.getAmountWant().toPlainString(), BigDecimal.valueOf(20).toPlainString());
                     Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_2_ID));
                 } else {
                     // 2
@@ -1778,7 +1784,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingWantDivisible() {
@@ -1794,6 +1800,7 @@ public class OrderTestsMy {
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // CREATE ASSET
@@ -1925,7 +1932,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingHaveDivisible() {
@@ -2080,7 +2087,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingHaveDivisible_3() {
@@ -2298,7 +2305,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingHaveDivisible_3point() {
@@ -2555,7 +2562,7 @@ public class OrderTestsMy {
 
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingHaveDivisible_3reverse() {
@@ -2667,8 +2674,9 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
-//TODO actualize the test
+    /**
+     * Провели вместе с новой мультиСУБД и isUnResolved 2019-11-12
+     */
     @Test
     public void testOrderProcessingNonDivisible() {
 
@@ -2785,12 +2793,12 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // B
-                assertEquals(accountA.getBalanceUSE(keyB, dcSet), BigDecimal.valueOf(100).setScale(assetA.getScale())); // BALANCE
+                assertEquals(accountA.getBalanceUSE(keyB, dcSet), BigDecimal.valueOf(105).setScale(assetA.getScale())); // BALANCE
                 // B
                 // FOR
                 // ACCOUNT
                 // A
-                assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(1000).setScale(assetA.getScale())); // BALANCE
+                assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(1024).setScale(assetA.getScale())); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -2804,18 +2812,19 @@ public class OrderTestsMy {
 
                 orderB = dcSet.getOrderMap().get(orderID_B);
                 Assert.assertEquals(false, dcSet.getCompletedOrderMap().contains(orderB.getId()));
-                Assert.assertEquals(0, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(100)));
+                Assert.assertEquals(orderB.getFulfilledHave().toPlainString(), "105");
                 Assert.assertEquals(false, orderB.isFulfilled());
 
-                Order orderC = dcSet.getOrderMap().get(orderID_C);
-                Assert.assertEquals(false, dcSet.getCompletedOrderMap().contains(orderC.getId()));
-                Assert.assertEquals(0, orderC.getFulfilledHave().compareTo(BigDecimal.valueOf(0)));
-                Assert.assertEquals(false, orderC.isFulfilled());
+                Order orderC = dcSet.getCompletedOrderMap().get(orderID_C);
+                Assert.assertEquals(false, dcSet.getOrderMap().contains(orderC.getId()));
+                Assert.assertEquals(orderC.getFulfilledHave().toPlainString(), "24");
+                Assert.assertEquals(true, orderC.isFulfilled());
 
                 // CHECK TRADES
-                Assert.assertEquals(0, orderC.getInitiatedTrades(dcSet).size());
+                Assert.assertEquals(1, orderC.getInitiatedTrades(dcSet).size());
 
-                /////////////////////
+                ///////////////////// ATTENTION
+                //  - здесь произойдет отмена ордера так как его первоначальная цена удет слишком далеко
                 //
                 int amo_A = 20003;
                 int amo_B = 4000;
@@ -2831,7 +2840,8 @@ public class OrderTestsMy {
 
                 // CHECK BALANCES
                 // THIS ORDER must not be RESOLVED
-                assertEquals(accountA.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(48976 - amo_A).setScale(assetA.getScale())); // BALANCE
+                // и будет возврат так как сработает org.erachain.core.item.assets.Order.isUnResolved
+                assertEquals(accountA.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(44501).setScale(assetA.getScale())); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -2846,7 +2856,7 @@ public class OrderTestsMy {
                 // FOR
                 // ACCOUNT
                 // A
-                assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(5500).setScale(assetA.getScale())); // BALANCE
+                assertEquals(accountB.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(5499).setScale(assetA.getScale())); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -2863,8 +2873,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(104)));
                 Assert.assertEquals(true, orderB.isFulfilled());
 
-                Order orderD = dcSet.getOrderMap().get(orderID_D);
-                Assert.assertEquals(false, dcSet.getCompletedOrderMap().contains(orderD.getId()));
+                Order orderD = dcSet.getCompletedOrderMap().get(orderID_D);
+                Assert.assertEquals(false, dcSet.getOrderMap().contains(orderD.getId()));
                 Assert.assertEquals(1, orderD.getFulfilledHave().compareTo(BigDecimal.valueOf(24)));
                 Assert.assertEquals(false, orderD.isFulfilled());
 
@@ -2874,15 +2884,30 @@ public class OrderTestsMy {
                 trade = orderD.getInitiatedTrades(dcSet).get(0);
                 /// ??? assertEquals(trade.getInitiator(), orderID);
                 assertEquals(trade.getTarget(), orderID_B);
-                Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(900)));
-                Assert.assertEquals(0, trade.getAmountWant().compareTo(BigDecimal.valueOf(4500)));
+                Assert.assertEquals(trade.getAmountHave(), BigDecimal.valueOf(895));
+                Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(4475));
+
+                //// TOTALS
+                assertEquals(accountA.getBalanceUSE(keyA, dcSet).add(accountB.getBalanceUSE(keyA, dcSet)),
+                        BigDecimal.valueOf(50000).setScale(assetA.getScale())); // BALANCE
+
+                // еще активные ордера
+                List<Order> ordersAll = dcSet.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, null);
+                BigDecimal total = BigDecimal.ZERO;
+                for (Order order : ordersAll) {
+                    total = total.add(order.getAmountHaveLeft());
+                }
+
+                assertEquals(accountA.getBalanceUSE(keyB, dcSet).add(accountB.getBalanceUSE(keyB, dcSet)).add(total),
+                        BigDecimal.valueOf(50000).setScale(assetA.getScale())); // BALANCE
+
             } finally {
                 dcSet.close();
             }
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingNonDivisible2() {
@@ -2982,7 +3007,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingNonDivisible3() {
@@ -3081,7 +3106,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingDivisible_02() {
@@ -3185,7 +3210,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     @Test
     public void testOrderProcessingMultipleOrders() {
@@ -3340,7 +3365,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
 //TODO actualize the test
     // TODO нужно сделать создание форкнутой базы и покусыавание орлера в ней - так чтобы он появился в форкнутой в измененом виде
     // затем делаем второй проход - и получаем ключи совокупные от родителя и от форка - там этот ордер должен быть в единственном экземпляре!
@@ -3359,6 +3384,7 @@ public class OrderTestsMy {
                 // CREATE ISSUE ASSET TRANSACTION
                 Transaction issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 // transaction = new GenesisTransaction(accountB,
@@ -3373,6 +3399,7 @@ public class OrderTestsMy {
                 issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                         accountB.getLastTimestamp(dcSet)[0]);
                 issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                issueAssetTransaction.sign(accountA, Transaction.FOR_NETWORK);
                 issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
                 long keyA = assetA.getKey(dcSet);
@@ -3516,7 +3543,7 @@ public class OrderTestsMy {
         }
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void validateCancelOrderTransaction() {
 
@@ -3669,7 +3696,9 @@ public class OrderTestsMy {
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
+
                 Long orderID = orderCreation.makeOrder().getId();
+                dcSet.getTransactionFinalMapSigns().put(orderCreation.getSignature(), orderID);
 
                 assertEquals(BigDecimal.valueOf(assetA.getQuantity()).subtract(orderCreation.makeOrder().getAmountHave()),
                         accountA.getBalanceUSE(keyA, dcSet));
@@ -3684,7 +3713,7 @@ public class OrderTestsMy {
 
                 // CHECK BALANCE SENDER
                 assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(assetA.getScale()),
-                        accountA.getBalanceUSE(keyA, dcSet));
+                        accountA.getBalanceUSE(keyA, dcSet).setScale(assetA.getScale()));
 
                 // CHECK REFERENCE SENDER
                 assertEquals((long) cancelOrderTransaction.getTimestamp(), orderCreation.getCreator().getLastTimestamp(dcSet)[0]);
@@ -3695,7 +3724,7 @@ public class OrderTestsMy {
                 ////////// OPHRAN ////////////////
                 // CHECK BALANCE SENDER
                 assertEquals(BigDecimal.valueOf(assetA.getQuantity()).setScale(assetA.getScale()),
-                        accountA.getBalanceUSE(keyA, dcSet));
+                        accountA.getBalanceUSE(keyA, dcSet).setScale(assetA.getScale()));
                 cancelOrderTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
                 // CHECK BALANCE SENDER
@@ -3707,75 +3736,6 @@ public class OrderTestsMy {
 
                 // CHECK ORDER EXISTS
                 assertEquals(true, dcSet.getOrderMap().contains(orderID));
-            } finally {
-                dcSet.close();
-            }
-        }
-    }
-
-    //////////////////////////// Order is exist??
-    @Ignore
-    @Test
-    public void testOrderCreateCancel() {
-        // тут надо сделать тест на одинковые цены с разными датами чтобы
-        // выбиралась сначала дата более старая
-
-        for (int dbs : TESTED_DBS) {
-
-            try {
-                init(dbs);
-
-                //
-                orderCreation = new CreateOrderTransaction(accountA, keyB, keyA, BigDecimal.valueOf(1), BigDecimal.valueOf(100),
-                        (byte) 0, timestamp++, 0l);
-                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-                orderCreation.process(null, Transaction.FOR_NETWORK);
-                order_AB_1_ID = orderCreation.makeOrder().getId();
-
-                // CHECK ORDERS
-                Order order_AB_1 = dcSet.getCompletedOrderMap().get(order_AB_1_ID);
-                Assert.assertEquals(false, dcSet.getOrderMap().contains(order_AB_1.getId()));
-                Assert.assertEquals(order_AB_1.getFulfilledHave(), BigDecimal.valueOf(100));
-                Assert.assertEquals(true, order_AB_1.isFulfilled());
-
-                Order order_BA_1 = dcSet.getOrderMap().get(order_BA_1_ID);
-                Assert.assertEquals(false, dcSet.getCompletedOrderMap().contains(order_BA_1.getId()));
-                Assert.assertEquals(order_BA_1.getFulfilledHave(), BigDecimal.valueOf(1000));
-                // if order is not fulfiller - recalc getFulfilledWant by own price:
-                Assert.assertEquals(BigDecimal.valueOf(50), order_BA_1.getFulfilledHave().multiply(order_BA_1.getPrice()));
-                Assert.assertEquals(false, order_BA_1.isFulfilled());
-
-                // CHECK TRADES
-                Assert.assertEquals(1, order_BA_1.getInitiatedTrades(dcSet).size());
-
-                Trade trade = order_BA_1.getInitiatedTrades(dcSet).get(0);
-                Assert.assertEquals(0, trade.getInitiator().compareTo(order_BA_1_ID));
-                Assert.assertEquals(0, trade.getTarget().compareTo(order_AB_1_ID));
-                Assert.assertEquals(0, trade.getAmountHave().compareTo(BigDecimal.valueOf(100)));
-                Assert.assertEquals(trade.getAmountWant(), BigDecimal.valueOf(1000));
-
-                bal_A_keyA = accountA.getBalanceUSE(keyA, dcSet);
-                bal_A_keyB = accountA.getBalanceUSE(keyB, dcSet);
-                bal_B_keyB = accountB.getBalanceUSE(keyB, dcSet);
-                bal_B_keyA = accountB.getBalanceUSE(keyA, dcSet);
-
-                // CREATE ORDER THREE (SELLING 19.99999999 A FOR B AT A PRICE OF 20)
-                BigDecimal amoHave = BigDecimal.valueOf(1.99999999);
-                BigDecimal amoWant = BigDecimal.valueOf(3.99999998);
-
-                orderCreation = new CreateOrderTransaction(accountA, keyA, keyB, amoHave, amoWant, (byte) 0, timestamp++, 0l);
-                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-                orderCreation.process(null, Transaction.FOR_NETWORK);
-                Order order_BA_2 = orderCreation.makeOrder();
-                Long order_AB_2_ID = order_BA_2.getId();
-                order_BA_2 = reloadOrder(order_BA_2);
-
-                /////// BigDecimal haveTaked =
-                /////// amoHave.multiply(order_BA_1.getPriceCalcReverse()).setScale(8,
-                /////// RoundingMode.HALF_DOWN);
-                BigDecimal order_BA_2_wantTaked = amoHave.divide(order_BA_1.getPrice(), 8, RoundingMode.HALF_DOWN);
             } finally {
                 dcSet.close();
             }

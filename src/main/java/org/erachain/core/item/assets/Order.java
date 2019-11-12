@@ -677,7 +677,6 @@ public class Order implements Comparable<Order> {
                 timestamp = item.getId();
             }
 
-
             List<Order> ordersAll = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, null);
             price = orders.get(0).getPrice();
             timestamp = orders.get(0).getId();
@@ -844,7 +843,7 @@ public class Order implements Comparable<Order> {
                 error ++;
             }
 
-                //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
+            //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
             //AND WE CAN BUY ANYTHING
             if (tradeAmountForHave.compareTo(BigDecimal.ZERO) > 0) {
                 //CREATE TRADE

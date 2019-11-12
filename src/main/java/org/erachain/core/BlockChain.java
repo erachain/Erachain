@@ -265,6 +265,7 @@ public class BlockChain {
     /**
      * Если после исполнения торговой сделки оостатется статок у ордера-инициатора и
      * цена для остатка отклонится больше чем на эту величину то ему возвращаем остаток
+     * see org.erachain.core.item.assets.OrderTestsMy#testOrderProcessingNonDivisible() - 0.0000432
      */
     final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT =     new BigDecimal("0.000001");
     /**
