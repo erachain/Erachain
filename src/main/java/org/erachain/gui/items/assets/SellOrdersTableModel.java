@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
+import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.gui.models.TimerTableModelCls;
@@ -26,6 +27,8 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
     private AssetCls want;
     private long haveKey;
     private long wantKey;
+
+    private CompletedOrderMap completedMap = DCSet.getInstance().getCompletedOrderMap();
 
     public SellOrdersTableModel(AssetCls have, AssetCls want) {
         super(DCSet.getInstance().getOrderMap(), new String[]{"Amount", "Price", "Creator"}, true);
@@ -135,7 +138,20 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
                 || type == ObserverMessage.REMOVE_ORDER_TYPE
                 ) {
 
-            Order order = (Order) message.getValue();
+            Order order;
+            Object object = message.getValue();
+            if (object instanceof Order) {
+                order = (Order) object;
+            } else if (object instanceof Long) {
+                order = completedMap.get((Long) object);
+            } else {
+                return;
+            }
+            if (order == null) {
+                // это возможно если ордера нету
+                return;
+            }
+
             long haveKey = order.getHaveAssetKey();
             long wantKey = order.getWantAssetKey();
             if (!(haveKey == this.haveKey && wantKey == this.wantKey)
