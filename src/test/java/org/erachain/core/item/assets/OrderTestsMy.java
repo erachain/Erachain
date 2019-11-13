@@ -3551,8 +3551,7 @@ public class OrderTestsMy {
 
                 // CREATE ORDER
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-                orderCreation.sign(accountA, Transaction.FOR_NETWORK);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO, ++seqNo);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
                 Long orderID = orderCreation.makeOrder().getId();
                 dcSet.getTransactionFinalMapSigns().put(orderCreation.getSignature(), orderID);
@@ -3570,7 +3569,7 @@ public class OrderTestsMy {
                 cancelOrderTransaction = new CancelOrderTransaction(accountA, new byte[]{5, 7}, FEE_POWER,
                         timestamp++, 0l);
                 try {
-                    cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.CANCEL_ORDERS_ALL_VALID + 2, ++seqNo);
+                    cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 2, ++seqNo);
                     assertEquals("error", "должна была быть ошибка ArrayIndexOutOfBoundsException");
                 } catch (ArrayIndexOutOfBoundsException e) {
                 }
@@ -3586,20 +3585,18 @@ public class OrderTestsMy {
                 PrivateKeyAccount invalidCreator = new PrivateKeyAccount(privateKey);
                 cancelOrderTransaction = new CancelOrderTransaction(invalidCreator, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l,
                         new byte[]{1, 2});
-                cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.CANCEL_ORDERS_ALL_VALID + 2, ++seqNo);
+                cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 2, ++seqNo);
 
                 // CHECK IF CANCEL ORDER IS INVALID
                 assertEquals(Transaction.INVALID_ORDER_CREATOR, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
                 // CREATE INVALID CANCEL ORDER NO BALANCE
                 DCSet fork = dcSet.fork();
-                cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l,
-                        invalidSign);
-                cancelOrderTransaction.setDC(fork, Transaction.FOR_NETWORK, BlockChain.CANCEL_ORDERS_ALL_VALID + 2, ++seqNo);
-
-                accountA.changeBalance(fork, true, FEE_KEY, BigDecimal.TEN, false);
+                cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l);
+                cancelOrderTransaction.setDC(fork, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 2, ++seqNo);
 
                 // CHECK IF CANCEL ORDER IS INVALID
+                accountA.changeBalance(fork, true, FEE_KEY, BigDecimal.TEN, false);
                 assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
             } finally {
