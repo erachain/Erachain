@@ -569,6 +569,8 @@ public class BlockChain {
 /// end                    new int[][]{{115000, 656000}, {225655, 441000}});
 
             validBlocks.add(214085);
+            validBlocks.add(330685);
+
         }
 
         DCSet dcSet = dcSet_in;
