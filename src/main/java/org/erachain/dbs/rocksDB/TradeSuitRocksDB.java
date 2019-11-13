@@ -25,6 +25,13 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * Хранит сделки на бирже
+ * Ключ: ссылка на иницатора + ссылка на цель
+ * Значение - Сделка
+ * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
+ */
+
 @Slf4j
 public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
@@ -47,12 +54,12 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     public void openMap() {
 
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableTuple2LongLong(), new ByteableTrade(),
-                    NAME_TABLE, indexes,
-                    RocksDbSettings.initCustomSettings(7, 64, 32,
-                            256, 10,
-                            1, 256, 32, false),
-                    new WriteOptions().setSync(true).setDisableWAL(false),
-                    new ReadOptions(),
+                NAME_TABLE, indexes,
+                RocksDbSettings.initCustomSettings(7, 64, 32,
+                        256, 10,
+                        1, 256, 32, false),
+                new WriteOptions().setSync(true).setDisableWAL(false),
+                new ReadOptions(),
                 databaseSet, sizeEnable);
     }
 
@@ -191,7 +198,25 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long timestamp) {
-        return null;
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        int heightStart = Controller.getInstance().getMyHeight();
+        int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
+        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+
+        byte[] filter = new byte[16];
+        makeKey(filter, have, want);
+        Iterator<Tuple2<Long, Long>> iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
+
+        Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
+        while (iterator.hasNext()) {
+            Tuple2<Long, Long> key = iterator.next();
+            if (key.a < refDBend)
+                break;
+            keys.add(key);
+        }
+
+        return keys.iterator();
     }
 
     @Override
@@ -211,7 +236,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
         while (iterator.hasNext()) {
             Tuple2<Long, Long> key = iterator.next();
-            if (key.a > refDBend)
+            if (key.a < refDBend)
                 break;
             keys.add(key);
         }
