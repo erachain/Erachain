@@ -13,20 +13,17 @@ import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
-import org.erachain.dbs.rocksDB.transformation.ByteableInteger;
-import org.erachain.dbs.rocksDB.transformation.ByteableLong;
-import org.erachain.dbs.rocksDB.transformation.ByteableString;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrade;
 import org.erachain.dbs.rocksDB.transformation.tuples.ByteableTuple2LongLong;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Slf4j
 public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
@@ -39,7 +36,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> pairIndex;
     SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> wantIndex;
-    SimpleIndexDB<Tuple2<Long, Long>, Trade, Tuple3<String, Long, Integer>> haveIndex;
+    SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> haveIndex;
     SimpleIndexDB<Tuple2<Long, Long>, Trade, byte[]> reverseIndex;
 
     public TradeSuitRocksDB(DBASet databaseSet, DB database) {
@@ -78,33 +75,37 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                     long have = value.getHaveKey();
                     long want = value.getWantKey();
 
-                    byte[] buffer1 = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
+                    /// нельзя! иначе строки длиньше тоже будет воспринимать как подходящие!
+                    // byte[] buffer1 = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
+                    ///byte[] buffer1 = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
+                    //System.arraycopy(buffer1, 0, buffer, 0, buffer1.length);
+                    //System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
+                    //        0, buffer, buffer1.length, 8);
+                    //System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
+                    //        0, buffer, buffer1.length + 8, 4);
 
-                    byte[] buffer = new byte[buffer1.length + 12];
-                    System.arraycopy(buffer1, 0, buffer, 0, buffer1.length);
+                    byte[] filter = new byte[28];
+                    makeKey(filter, have, want);
                     System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
-                            0, buffer, buffer1.length, 8);
+                            0, filter, 16, 8);
                     System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
-                            0, buffer, buffer1.length + 8, 4);
+                            0, filter, 24, 4);
 
-                    return buffer;
+                    return filter;
                 }, (result) -> result);
 
         haveIndex = new SimpleIndexDB<>(
                 tradesKeyHaveIndexName,
                 (key, value) -> {
-                    long have = value.getHaveKey();
-                    String haveKey;
-                    haveKey = String.valueOf(have);
-                    return new Tuple3<>(
-                            haveKey,
-                            Long.MAX_VALUE - value.getInitiator(),
-                            Integer.MAX_VALUE - value.getSequence());
-                }
-                , (result) -> org.bouncycastle.util.Arrays.concatenate(
-                new ByteableString().toBytesObject(result.a),
-                new ByteableLong().toBytesObject(result.b),
-                new ByteableInteger().toBytesObject(result.c)));
+                    byte[] buffer = new byte[20];
+                    System.arraycopy(Longs.toByteArray(value.getHaveKey()),
+                            0, buffer, 0, 8);
+                    System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
+                            0, buffer, 8, 8);
+                    System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
+                            0, buffer, 16, 4);
+                    return buffer;
+                }, (result) -> result);
 
         wantIndex = new SimpleIndexDB<>(
                 tradesKeyWantIndexName,
@@ -132,6 +133,18 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         indexes.add(haveIndex);
         indexes.add(wantIndex);
         indexes.add(reverseIndex);
+    }
+
+    static void makeKey(byte[] buffer, long have, long want) {
+
+        if (have > want) {
+            System.arraycopy(Longs.toByteArray(have), 0, buffer, 0, 8);
+            System.arraycopy(Longs.toByteArray(want), 0, buffer, 8, 8);
+        } else {
+            System.arraycopy(Longs.toByteArray(want), 0, buffer, 0, 8);
+            System.arraycopy(Longs.toByteArray(have), 0, buffer, 8, 8);
+        }
+
     }
 
     public void add(Trade trade) {
@@ -170,7 +183,9 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
-        byte[] filter = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
+        //byte[] filter = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
+        byte[] filter = new byte[16];
+        makeKey(filter, have, want);
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
     }
 
@@ -188,10 +203,20 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
         long refDBend = Transaction.makeDBRef(heightEnd, 0);
 
-        byte[] filter = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
+        ///byte[] filter = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
+        byte[] filter = new byte[16];
+        makeKey(filter, have, want);
+        Iterator<Tuple2<Long, Long>> iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
 
-        byte[] buffer = new byte[filter.length + 8];
-        System.arraycopy(Longs.toByteArray(refDBend), 0, buffer, filter.length, 8);
-        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), buffer, false, true);
+        Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
+        while (iterator.hasNext()) {
+            Tuple2<Long, Long> key = iterator.next();
+            if (key.a > refDBend)
+                break;
+            keys.add(key);
+        }
+
+        return keys.iterator();
+
     }
 }

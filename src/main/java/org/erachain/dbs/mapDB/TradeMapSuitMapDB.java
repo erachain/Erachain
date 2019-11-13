@@ -77,7 +77,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
             @Override
             public Tuple3<String, Long, Integer> run(Tuple2<Long, Long> key, Trade value) {
 
-                String pairKey = TradeSuit.makeKey(value.getHaveKey(), value.getWantKey());
+                String pairKey = makeKey(value.getHaveKey(), value.getWantKey());
 
                 return new Tuple3<String, Long, Integer>(pairKey, Long.MAX_VALUE - value.getInitiator(),
                         Integer.MAX_VALUE - value.getSequence());
@@ -144,6 +144,15 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
                     return new Tuple2<Long, Long>(key.a, key.b);
                 }
             });
+        }
+
+    }
+
+    static String makeKey(long have, long want) {
+        if (have > want) {
+            return have + "/" + want;
+        } else {
+            return want + "/" + have;
         }
 
     }
@@ -215,7 +224,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
         if (this.pairKeyMap == null)
             return null;
 
-        String pairKey = TradeSuit.makeKey(have, want);
+        String pairKey = makeKey(have, want);
 
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, null, null),
@@ -235,7 +244,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
         if (this.pairKeyMap == null)
             return null;
 
-        String pairKey = TradeSuit.makeKey(have, want);
+        String pairKey = makeKey(have, want);
 
         // тут индекс не по времени а по номерам блоков как лонг
         int heightStart = Controller.getInstance().getMyHeight();
@@ -253,7 +262,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
         if (this.pairKeyMap == null)
             return null;
 
-        String pairKey = TradeSuit.makeKey(have, want);
+        String pairKey = makeKey(have, want);
 
         // тут индекс не по времени а по номерам блоков как лонг
         ///int heightStart = Controller.getInstance().getMyHeight();
