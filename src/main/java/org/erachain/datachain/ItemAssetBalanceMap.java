@@ -10,7 +10,6 @@ import org.mapdb.Fun.Tuple5;
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.Observer;
-import java.util.Set;
 
 /**
  * Interface for MAP + static methods
@@ -45,9 +44,9 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> value);
 
-    Tuple5<
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
-            Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> get(byte[] key);
+    //Tuple5<
+    //        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
+    //        Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> get(byte[] key);
 
     Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
@@ -61,11 +60,12 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>,
             Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> getBalancesSortableList(Account account);
 
-    Set<byte[]> keySet();
+    //Set<byte[]> keySet();
 
-    Iterator<byte[]> getIterator(int index, boolean descending);
+    //Iterator<byte[]> getIterator(int index, boolean descending);
+    Iterator<byte[]> getIteratorByAsset(long assetKey);
 
-    void clear();
+    //void clear();
 
     void addObserver(Observer o);
 

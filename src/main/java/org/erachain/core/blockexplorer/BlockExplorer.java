@@ -552,7 +552,7 @@ public class BlockExplorer {
                 "blockexplorer.json?address={address}&start={offset}&allOnOnePage&withoutBlocks&showWithout={1,2,blocks}&showOnly={type}");
         help.put("Top Richest", "blockexplorer.json?top");
         help.put("Top Richest", "blockexplorer.json?top={limit}&asset={asset}");
-        help.put("Address All Not Zero", "blockexplorer.json?top=allnotzero");
+        help.put("Address All Not Zero", "blockexplorer.json?top=all|[limit]");
         help.put("Address All Addresses", "blockexplorer.json?top=all");
         help.put("Assets List", "blockexplorer.json?assets");
         help.put("Assets List", "blockexplorer.json?assets");
@@ -1759,7 +1759,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTopRichest100(int limit, long key) {
+    public Map jsonQueryTopRichest100(int limit, long assetKey) {
 
         output.put("type", "top");
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type asset key", langObj));
@@ -1772,50 +1772,40 @@ public class BlockExplorer {
         List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        Collection<byte[]> addrs = map.keySet();
+        Iterator<byte[]> iterator = map.getIteratorByAsset(assetKey);
+
         //BigDecimal total = BigDecimal.ZERO;
         //BigDecimal totalNeg = BigDecimal.ZERO;
-        for (byte[] addrKey : addrs) {
-            try {
-                if (ItemAssetBalanceMap.getAssetKeyFromKey(addrKey) == key) {
-                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
-                            map.get(addrKey);
-                    // all = all.add(ball.a);
-                    Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(addrKey));
-                    BigDecimal ballans = account.getBalanceUSE(key);
-                    //if (ball.a.b.signum() > 0) {
-                    //total = total.add(ball.a.b);
-                    //} else {
-                    //    totalNeg = totalNeg.add(ball.a.b);
-                    //}
 
-                    top100s.add(Fun.t3(account.getAddress(), ballans, ball.a.b));
-                }
+        byte[] key;
+        Crypto crypto = Crypto.getInstance();
+        while (iterator.hasNext()) {
+            key = iterator.next();
+
+            try {
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                        ball = map.get(key);
+
+                BigDecimal ballans = ball.a.b.add(ball.b.b);
+
+                top100s.add(Fun.t3(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)), ballans, ball.a.b));
             } catch (java.lang.ArrayIndexOutOfBoundsException e) {
-                logger.error(" wrong key raw: ");
-                byte[] ddd = addrKey;
+                logger.error("Wrong key raw: ");
             }
         }
-
-        //totalNeg = total.add(totalNeg);
 
         Collection<Order> orders = dcSet.getOrderMap().values();
 
         for (Order order : orders) {
-            if (order.getHaveAssetKey() == key) {
+            if (order.getHaveAssetKey() == assetKey) {
                 alloreders = alloreders.add(order.getFulfilledHave());
             }
         }
+
         Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_C()));
 
         int couter = 0;
         for (Tuple3<String, BigDecimal, BigDecimal> top100 : top100s) {
-            if (limit == -1) {
-                // allnotzero {
-                if (top100.b.compareTo(BigDecimal.ZERO) <= 0) {
-                    break;
-                }
-            }
 
             couter++;
 
@@ -1834,12 +1824,12 @@ public class BlockExplorer {
 
             balances.put(couter, balance);
 
-            if (couter >= limit && limit != -2 && limit != -1) // -2 = all
+            if (limit > 0 && couter >= limit) // && limit != -2 && limit != -1) // -2 = all
             {
                 break;
             }
         }
-        AssetCls asset = Controller.getInstance().getAsset(key);
+        AssetCls asset = Controller.getInstance().getAsset(assetKey);
         if (asset == null) {
             output.put("allTotal", "-1");// (all.add(alloreders)).toPlainString());
             output.put("assetName", "--");
@@ -1876,7 +1866,7 @@ public class BlockExplorer {
 
         output.put("all", all.toPlainString());
         output.put("allinOrders", alloreders.toPlainString());
-        output.put("assetKey", key);
+        output.put("assetKey", assetKey);
         output.put("limit", limit);
         output.put("count", couter);
 
@@ -1892,9 +1882,7 @@ public class BlockExplorer {
         String limitStr = info.getQueryParameters().getFirst("top");
         int limit = 100;
         if (limitStr.equals("all")) {
-            limit = -2;
-        } else if (limitStr.equals("allnotzero")) {
-            limit = -1;
+            limit = 0;
         } else {
             try {
                 limit = Integer.valueOf(limitStr);
@@ -1915,7 +1903,8 @@ public class BlockExplorer {
 
         // balance assets from
         LinkedHashMap output = new LinkedHashMap();
-        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> balances = Controller.getInstance().getBalances(account);
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                balances = Controller.getInstance().getBalances(account);
 
         ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
         //ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
@@ -3396,12 +3385,36 @@ public class BlockExplorer {
     }
 
 
+    public class BigDecimalComparator_B implements Comparator<Tuple3<String, BigDecimal, BigDecimal>> {
+
+        @Override
+        public int compare(Tuple3<String, BigDecimal, BigDecimal> a, Tuple3<String, BigDecimal, BigDecimal> b) {
+            try {
+                int result = a.b.compareTo(b.b);
+                if (result != 0)
+                    return result;
+
+                // учет еще по Должен
+                return a.c.compareTo(b.c);
+
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+
+    }
+
     public class BigDecimalComparator_C implements Comparator<Tuple3<String, BigDecimal, BigDecimal>> {
 
         @Override
         public int compare(Tuple3<String, BigDecimal, BigDecimal> a, Tuple3<String, BigDecimal, BigDecimal> b) {
             try {
-                return a.c.compareTo(b.c);
+                int result = a.c.compareTo(b.c);
+                if (result != 0)
+                    return result;
+
+                // учет еще по Должен
+                return a.b.compareTo(b.b);
             } catch (Exception e) {
                 return 0;
             }
