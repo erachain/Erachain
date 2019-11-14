@@ -421,10 +421,11 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     }
 
     @Override
-    public void writeToParent() {
-        super.writeToParent();
+    public boolean writeToParent() {
+        boolean updated = super.writeToParent();
         ((ItemMap) parent).atomicKey.set(this.key);
         ((ItemMap) parent).key = this.key;
+        return updated;
     }
 
 }

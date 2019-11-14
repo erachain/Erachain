@@ -598,14 +598,19 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     /**
      * ВНИМАНИЕ!!! в связи с работой этого метода при сливе - нельяза в стандартных методах
+     * @return
      */
     @Override
-    public void writeToParent() {
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
             parent.map.put(key, this.map.get(key));
+            updated = true;
         }
 
         // нужно очистить сразу так как общий размер изменится иначе будет ++ больше
@@ -618,8 +623,11 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
                 T key = iterator.next();
                 // напрямую в карту сливаем чтобы логику Таблицы не повторить дважды
                 parent.map.remove(key);
+                updated = true;
             }
         }
+
+        return updated;
     }
 
     @Override

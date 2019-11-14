@@ -235,13 +235,17 @@ public abstract class DBMapSuitForkOld<T, U> extends DBMapSuit<T, U> implements 
     }
 
     @Override
-    public void writeToParent() {
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             U item = this.map.get(key);
             if (item != null) {
                 parent.put(key, this.map.get(key));
+                updated = true;
             }
         }
 
@@ -249,8 +253,11 @@ public abstract class DBMapSuitForkOld<T, U> extends DBMapSuit<T, U> implements 
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
                 parent.delete(iterator.next());
+                updated = true;
             }
         }
+
+        return updated;
     }
 
     @Override

@@ -315,8 +315,21 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
-    public void writeToParent() {
-        ((ForkedMap) this.map).writeToParent();
+    public boolean writeToParent() {
+
+        if (((ForkedMap) this.map).writeToParent()) {
+            // NOTYFIES
+            if (this.observableData != null) {
+                //NOTIFY LIST
+                if (this.observableData.containsKey(NOTIFY_LIST)) {
+                    this.setChanged();
+                    this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
+                }
+            }
+            return true;
+        }
+        return false;
+
     }
 
     @Override

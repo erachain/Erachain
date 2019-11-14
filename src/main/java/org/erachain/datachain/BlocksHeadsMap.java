@@ -133,10 +133,11 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
     }
 
     @Override
-    public void writeToParent() {
-        super.writeToParent();
+    public boolean writeToParent() {
+        boolean updated = super.writeToParent();
         ((BlocksHeadsMap) parent).fullWeightVar.set(this.fullWeight);
         ((BlocksHeadsMap) parent).fullWeight = this.fullWeight;
+        return updated;
     }
 
 }

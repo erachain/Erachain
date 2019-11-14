@@ -4,7 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.gui.models.TimerTableModelCls;
@@ -28,8 +27,6 @@ public class BuyOrdersTableModel extends TimerTableModelCls<Order> implements Ob
     private AssetCls want;
     private long haveKey;
     private long wantKey;
-
-    private CompletedOrderMap completedMap = DCSet.getInstance().getCompletedOrderMap();
 
     public BuyOrdersTableModel(AssetCls have, AssetCls want) {
         super(DCSet.getInstance().getOrderMap(), new String[]{"Creator", "Price", "Amount"}, true);
@@ -58,8 +55,6 @@ public class BuyOrdersTableModel extends TimerTableModelCls<Order> implements Ob
         if (row < size) {
             order = this.list.get(row);
             if (order == null) {
-                //totalCalc();
-                //this.fireTableRowsDeleted(row, row);
                 return null;
             }
 
@@ -142,27 +137,40 @@ public class BuyOrdersTableModel extends TimerTableModelCls<Order> implements Ob
         if (type == ObserverMessage.ADD_ORDER_TYPE
                 || type == ObserverMessage.REMOVE_ORDER_TYPE
         ) {
+
+            long haveKey;
+            long wantKey;
+
             Order order;
             Object object = message.getValue();
             if (object instanceof Order) {
                 order = (Order) object;
+                haveKey = order.getHaveAssetKey();
+                wantKey = order.getWantAssetKey();
             } else if (object instanceof Long) {
-                order = completedMap.get((Long) object);
+                // Сработал ордер или отменили значит он удалился но еще не добавлся в Исполненые
+                // Поэтому просто ищем тутт по ID
+                for (Order item : list) {
+                    if (item.getId().equals(object)) {
+                        this.needUpdate = true;
+                        return;
+                    }
+                }
+                // not found
+                return;
             } else {
                 return;
             }
-            if (order == null) {
-                // это возможно если ордера нету
-                return;
-            }
 
-            long haveKey = order.getHaveAssetKey();
-            long wantKey = order.getWantAssetKey();
             if (!(haveKey == this.haveKey && wantKey == this.wantKey)
                     && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
                 return;
             }
 
+            this.needUpdate = true;
+            return;
+
+        } else if (type == ObserverMessage.LIST_ORDER_TYPE) {
             this.needUpdate = true;
             return;
 
