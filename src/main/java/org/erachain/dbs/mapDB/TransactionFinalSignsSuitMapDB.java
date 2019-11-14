@@ -27,7 +27,7 @@ public class TransactionFinalSignsSuitMapDB extends DBMapSuit<byte[], Long> impl
 
 
     public TransactionFinalSignsSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, true);
     }
 
     @Override
@@ -38,6 +38,7 @@ public class TransactionFinalSignsSuitMapDB extends DBMapSuit<byte[], Long> impl
                 .keySerializer(SerializerBase.BYTE_ARRAY)
                 .hasher(Hasher.BYTE_ARRAY)
                 .valueSerializer(SerializerBase.LONG)
+                .counterEnable()
                 .makeOrGet();
     }
 

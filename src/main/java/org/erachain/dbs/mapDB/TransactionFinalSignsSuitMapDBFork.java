@@ -31,7 +31,7 @@ public class TransactionFinalSignsSuitMapDBFork extends DBMapSuitFork<byte[], Lo
 
 
     public TransactionFinalSignsSuitMapDBFork(TransactionFinalMapSigns parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+        super(parent, databaseSet, logger, null, true);
     }
 
     @Override
@@ -45,6 +45,7 @@ public class TransactionFinalSignsSuitMapDBFork extends DBMapSuitFork<byte[], Lo
                     .keySerializer(SerializerBase.BYTE_ARRAY)
                     .hasher(Hasher.BYTE_ARRAY)
                     .valueSerializer(SerializerBase.LONG)
+                    .counterEnable()
                     .makeOrGet();
         }
     }

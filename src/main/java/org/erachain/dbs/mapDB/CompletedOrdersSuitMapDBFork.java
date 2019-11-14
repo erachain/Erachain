@@ -18,7 +18,7 @@ import org.mapdb.Fun;
 public class CompletedOrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> {
 
     public CompletedOrdersSuitMapDBFork(CompletedOrderMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+        super(parent, databaseSet, logger, null, false);
     }
 
     @Override

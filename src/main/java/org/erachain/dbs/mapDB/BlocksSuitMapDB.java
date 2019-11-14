@@ -31,7 +31,7 @@ public class BlocksSuitMapDB extends DBMapSuit<Integer, Block> implements Blocks
 
 
     public BlocksSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, false);
     }
 
     @Override

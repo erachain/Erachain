@@ -79,29 +79,33 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new TransactionFinalSuitRocksDB(databaseSet, database);
+                    map = new TransactionFinalSuitRocksDB(databaseSet, database, sizeEnable);
                     break;
                 default:
-                    map = new TransactionFinalSuitMapDB(databaseSet, database);
+                    map = new TransactionFinalSuitMapDB(databaseSet, database, sizeEnable);
             }
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
+                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
                     break;
                 case DBS_ROCK_DB:
-                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet);
+                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
                     break;
                 default:
                     /// НЕЛЬЗЯ HashMap !!!  так как удаляем по фильтру блока тут в delete(Integer height)
                     // map = new NativeMapHashMapFork(parent, databaseSet, null);
                     /// - тоже нельзя так как удаление по номеру блока не получится
                     // map = new NativeMapTreeMapFork(parent, databaseSet, null, null);
-                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
+                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
             }
         }
     }
 
+    @Override
+    public int size() {
+        return ((DCSet) this.databaseSet).getTransactionFinalMapSigns().size();
+    }
     /**
      * Это протокольный вызов - поэтому в форке он тоже бывает
      *

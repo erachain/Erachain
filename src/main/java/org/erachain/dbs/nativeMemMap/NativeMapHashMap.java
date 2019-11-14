@@ -11,7 +11,7 @@ import java.util.HashMap;
 public class NativeMapHashMap<T, U> extends DBMapSuit<T, U> {
 
     public NativeMapHashMap(DBASet databaseSet, DB database, U defaultValue) {
-        super(databaseSet, database, logger, defaultValue);
+        super(databaseSet, database, logger, defaultValue, false);
     }
 
     @Override

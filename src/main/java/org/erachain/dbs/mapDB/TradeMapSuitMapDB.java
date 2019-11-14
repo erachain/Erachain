@@ -34,7 +34,7 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
     private BTreeMap targetsKeyMap;
 
     public TradeMapSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, null);
+        super(databaseSet, database, logger);
     }
 
     @Override

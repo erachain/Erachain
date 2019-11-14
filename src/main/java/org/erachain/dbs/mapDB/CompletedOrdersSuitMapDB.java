@@ -18,7 +18,7 @@ import org.mapdb.Fun;
 public class CompletedOrdersSuitMapDB extends DBMapSuit<Long, Order> {
 
     public CompletedOrdersSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger);
+        super(databaseSet, database, logger, false);
     }
 
     @Override

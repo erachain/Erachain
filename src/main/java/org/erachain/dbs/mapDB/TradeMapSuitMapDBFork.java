@@ -24,7 +24,7 @@ Initiator DBRef (Long) + Target DBRef (Long) -> Trade
 public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
     public TradeMapSuitMapDBFork(TradeMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+        super(parent, databaseSet, logger);
     }
 
     @Override

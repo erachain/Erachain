@@ -35,13 +35,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     Map<T, Boolean> deleted;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue, boolean sizeEnable) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
         this.logger = logger;
         this.defaultValue = defaultValue;
+        this.sizeEnable = sizeEnable;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
@@ -61,6 +62,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         this.openMap();
 
+    }
+
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+        this(parent, dcSet, logger, defaultValue, false);
+    }
+
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
+        this(parent, dcSet, logger, null, false);
     }
 
 

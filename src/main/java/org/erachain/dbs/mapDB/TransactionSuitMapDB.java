@@ -35,11 +35,11 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     public NavigableSet typeKey;
 
     public TransactionSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, null);
+        super(databaseSet, database, logger, null, true);
     }
 
     public TransactionSuitMapDB(DBASet databaseSet, DB database, Logger logger) {
-        super(databaseSet, database, logger, null);
+        super(databaseSet, database, logger, null, true);
     }
 
     @Override

@@ -102,6 +102,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_RESET_BLOCK_TYPE:
+            case ObserverMessage.LIST_UNC_TRANSACTION_TYPE:
             case ObserverMessage.RESET_UNC_TRANSACTION_TYPE:
                 counter = 0;
                 needUpdate = true;

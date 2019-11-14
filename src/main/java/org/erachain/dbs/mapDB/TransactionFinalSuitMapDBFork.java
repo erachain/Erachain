@@ -36,14 +36,12 @@ import java.util.Iterator;
 public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transaction>
         implements TransactionFinalSuit {
 
-    public TransactionFinalSuitMapDBFork(TransactionFinalMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+    public TransactionFinalSuitMapDBFork(TransactionFinalMap parent, DBASet databaseSet, boolean sizeEnable) {
+        super(parent, databaseSet, logger, null, sizeEnable);
     }
 
     @Override
     public void openMap() {
-
-        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
 
         // OPEN MAP
         // TREE MAP for sortable search
@@ -51,7 +49,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 .keySerializer(BasicKeySerializer.BASIC)
                 //.keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
                 .valueSerializer(new TransactionSerializer())
-                .counterEnable()
+                ///.counterEnable()
                 .makeOrGet();
 
     }
