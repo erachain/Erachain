@@ -1784,11 +1784,15 @@ public class BlockExplorer {
 
             try {
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                        ball = map.get(key);
+                        ballance = map.get(key);
 
-                BigDecimal ballans = ball.a.b.add(ball.b.b);
+                BigDecimal balanceUSE = ballance.a.b.add(ballance.b.b);
 
-                top100s.add(Fun.t3(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)), ballans, ball.a.b));
+                // пустые не берем
+                if (ballance.a.b.signum() == 0 && ballance.b.b.signum() == 0 && ballance.c.b.signum() == 0)
+                    continue;
+
+                top100s.add(Fun.t3(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)), balanceUSE, ballance.a.b));
             } catch (java.lang.ArrayIndexOutOfBoundsException e) {
                 logger.error("Wrong key raw: ");
             }
