@@ -164,7 +164,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
         ) {
 
             Object object = message.getValue();
-            if (object instanceof Order) {
+            if (object instanceof Trade) {
                 Trade trade = (Trade) message.getValue();
                 long haveKey = trade.getHaveKey();
                 long wantKey = trade.getWantKey();
@@ -192,6 +192,10 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
             } else {
                 return;
             }
+
+        } else if (type == ObserverMessage.LIST_TRADE_TYPE) {
+            this.needUpdate = true;
+            return;
 
         } else if (needUpdate) {
             if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE
