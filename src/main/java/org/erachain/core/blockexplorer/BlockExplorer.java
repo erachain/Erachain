@@ -1918,7 +1918,8 @@ public class BlockExplorer {
             Iterator<Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> iterator = balances.iterator();
             while (iterator.hasNext()) {
 
-                Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> item = iterator.next();
+                Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                        item = iterator.next();
 
                 long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.getA());
                 if (assetKey == AssetCls.LIA_KEY) {

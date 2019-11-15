@@ -143,7 +143,6 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
                 balanceKeyAssetIndex.getColumnFamilyHandle());
     }
 
-
     @Override
     public Iterator<byte[]> assetIterator(long assetKey) {
         return assetKeys(assetKey).iterator();
@@ -164,7 +163,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public Iterator<byte[]> accountIterator(Account account) {
-        return accountKeys(account).iterator();
+        return ((DBRocksDBTable) map).getIndexIteratorFilter(balanceAddressIndex.getColumnFamilyHandle(), account.getShortAddressBytes(), false, true);
     }
 
 }
