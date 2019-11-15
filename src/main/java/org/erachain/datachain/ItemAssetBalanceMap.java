@@ -65,6 +65,8 @@ public interface ItemAssetBalanceMap extends DBTab<byte[], Tuple5<
     //Iterator<byte[]> getIterator(int index, boolean descending);
     Iterator<byte[]> getIteratorByAsset(long assetKey);
 
+    Iterator<byte[]> getIteratorByAccount(Account account);
+
     //void clear();
 
     void addObserver(Observer o);

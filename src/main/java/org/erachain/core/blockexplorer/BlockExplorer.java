@@ -21,7 +21,6 @@ import org.erachain.core.payment.Payment;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.database.FilteredByStringArray;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.*;
 import org.erachain.dbs.DBTab;
 import org.erachain.gui.models.PeersTableModel;
@@ -1907,21 +1906,19 @@ public class BlockExplorer {
 
         // balance assets from
         LinkedHashMap output = new LinkedHashMap();
-        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                balances = Controller.getInstance().getBalances(account);
 
         ItemAssetMap assetsMap = DCSet.getInstance().getItemAssetMap();
-        //ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         TreeMap balAssets = new TreeMap();
-        if (balances != null && !balances.isEmpty()) {
-            Iterator<Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>> iterator = balances.iterator();
+        Iterator<byte[]> iterator = map.getIteratorByAccount(account);
+        byte[] key;
+        if (iterator != null) {
             while (iterator.hasNext()) {
 
-                Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
-                        item = iterator.next();
+                key = iterator.next();
 
-                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(item.getA());
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
                 if (assetKey == AssetCls.LIA_KEY) {
                     continue;
                 }
@@ -1930,7 +1927,12 @@ public class BlockExplorer {
                 if (asset == null)
                     continue;
 
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> itemBals = item.getB();
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                        itemBals = map.get(key);
+
+                if (itemBals == null)
+                    continue;
+
                 Map bal = new LinkedHashMap();
                 bal.put("asset_key", assetKey);
                 bal.put("asset_name", asset.viewName());
