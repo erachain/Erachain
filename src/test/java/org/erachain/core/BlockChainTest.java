@@ -63,12 +63,11 @@ public class BlockChainTest {
 
                 lastSignature = blockHead.signature;
 
-                if (height % 1000 == 0) {
+                if (height % 10000 == 0) {
                     logger.info(" checked: " + height);
+                    dcSet.clearCache();
                 }
-
             }
-
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
