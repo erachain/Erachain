@@ -555,25 +555,29 @@ public class Network extends Observable {
 
             case Message.TELEGRAM_TYPE:
 
-                this.telegramer.offerMessage(message);
+                if (telegramer != null)
+                    this.telegramer.offerMessage(message);
 
                 return;
 
             case Message.TRANSACTION_TYPE:
 
-                controller.transactionsPool.offerMessage(message);
+                if (controller.transactionsPool != null)
+                    controller.transactionsPool.offerMessage(message);
 
                 return;
 
             case Message.WIN_BLOCK_TYPE:
 
-                controller.winBlockSelector.offerMessage(message);
+                if (controller.winBlockSelector != null)
+                    controller.winBlockSelector.offerMessage(message);
 
                 return;
 
             case Message.GET_BLOCK_TYPE:
 
-                controller.blockRequester.offerMessage(message);
+                if (controller.blockRequester != null)
+                    controller.blockRequester.offerMessage(message);
 
                 return;
 

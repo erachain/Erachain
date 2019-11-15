@@ -743,7 +743,7 @@ public class Synchronizer extends Thread {
 
     }
 
-    private List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
+    public List<byte[]> getBlockSignatures(byte[] header, Peer peer) throws Exception {
 
         /*
          * logger.
