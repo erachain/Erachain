@@ -267,11 +267,28 @@ function pagesComponentBeauty(start, label, numberLast, step, linkName) {
     return output;
 }
 
+function filterTX() {
+    if ($('#useForge').is(':checked')) {
+        window.location = updateURLParameter(window.location.href, 'forge', 'yes')
+    } else {
+        window.location = updateURLParameter(window.location.href, 'forge', 'no')
+    }
+
+    //window.location.reload(true);
+
+}
+
 function transactions_Table(data) {
 
+    var output = '';
     //console.log("data=")
     //console.log(data)
-    var output = data.Transactions.label_transactions_table + ':<br>';
+    output += '<h4>' + data.Transactions.label_transactions_table + '</h4>';
+
+    var useForgeChecked = getQueryParams('forge') == 'yes'? 'checked' : '';
+
+    output += '<input id="useForge" type="checkbox" name="option1" value="useForge" ' + useForgeChecked + ' onClick="filterTX()">' + data.Transactions.label_useForge + '<br>';
+
     output += pagesComponent2(data);
 
     output += '<table id="transactions" id=accounts BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +

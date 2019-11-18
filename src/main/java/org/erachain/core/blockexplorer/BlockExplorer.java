@@ -307,7 +307,7 @@ public class BlockExplorer {
                         break;
                     case "addresses":
                         //search addresses
-                        output.putAll(jsonQueryAddress(search, (int) start, false));
+                        output.putAll(jsonQueryAddress(search, (int) start, info));
                         break;
                     case "persons":
                         //search persons
@@ -450,8 +450,7 @@ public class BlockExplorer {
         ///////////////////////////// ADDRESSES //////////////////////
         // address
         else if (info.getQueryParameters().containsKey("address")) {
-            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int) start,
-                    info.getQueryParameters().getFirst("noforge") != null));
+            output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int) start, info));
         }
         else if (info.getQueryParameters().containsKey("addresses")) {
             jsonQueryAddresses();
@@ -2557,15 +2556,19 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryAddress(String address, int start, boolean noForge) {
+    public Map jsonQueryAddress(String address, int start, UriInfo info) {
 
         output.put("type", "address");
         output.put("search", "addresses");
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
         output.put("search_message", address);
 
+        Object forge = info.getQueryParameters().getFirst("forge");
+        boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
+                || forge.toString().toLowerCase().equals("1"));
+
         int limit = 100;
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit, noForge);
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit, !useForge);
         LinkedHashMap output = new LinkedHashMap();
         output.put("address", address);
 
@@ -3586,6 +3589,9 @@ public class BlockExplorer {
         }
 
         outputTXs.put("transactions", transactionsJSON);
+
+        outputTXs.put("label_useForge", Lang.getInstance().translateFromLangObj("Forging", langObj));
+
         outputTXs.put("label_seqNo", Lang.getInstance().translateFromLangObj("Number", langObj));
         outputTXs.put("label_block", Lang.getInstance().translateFromLangObj("Block", langObj));
         outputTXs.put("label_date", Lang.getInstance().translateFromLangObj("Date", langObj));
