@@ -303,7 +303,7 @@ public class BlockExplorer {
                         break;
                     case "transactions":
                         //search transactions
-                        jsonQueryTransactions(search, (int) start);
+                        jsonQueryTransactions(search, (int) start, info);
                         break;
                     case "addresses":
                         //search addresses
@@ -473,7 +473,7 @@ public class BlockExplorer {
 
         // transactions
         else if (info.getQueryParameters().containsKey("transactions")) {
-            jsonQueryTransactions(null, (int)start);
+            jsonQueryTransactions(null, (int) start, info);
         }
         // unconfirmed transactions
         else if (info.getQueryParameters().containsKey("unconfirmed")) {
@@ -2474,10 +2474,14 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public void jsonQueryTransactions(String filterStr, int start) {
+    public void jsonQueryTransactions(String filterStr, int start, UriInfo info) {
 
         output.put("type", "transactions");
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or signature or BlockNo-SeqNo", langObj));
+
+        Object forge = info.getQueryParameters().getFirst("forge");
+        boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
+                || forge.toString().toLowerCase().equals("1"));
 
         TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
         int size = 200;
@@ -2524,13 +2528,14 @@ public class BlockExplorer {
             Iterator<Long> iterator = map.getIterator(0, true);
             int counter = size;
             transactions = new ArrayList<>();
+            //if (useForge) counter <<=1;
             while (iterator.hasNext() && counter > 0 ) {
 
                 Transaction transaction = map.get(iterator.next());
                 if (transaction == null)
                     continue;
 
-                if (transaction.getType() == Transaction.CALCULATED_TRANSACTION
+                if (!useForge && transaction.getType() == Transaction.CALCULATED_TRANSACTION
                         && ((RCalculated)transaction).getMessage().equals("forging"))
                     continue;
 

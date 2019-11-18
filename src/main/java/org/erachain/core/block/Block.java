@@ -1964,7 +1964,7 @@ import java.util.*;
                     totalFee, true);
 
             // MAKE CALCULATED TRANSACTIONS
-            if (!dcSet.isFork() && !asOrphan && !Controller.getInstance().noCalculated) {
+            if (!asOrphan && !Controller.getInstance().noCalculated) {
                 if (this.txCalculated == null)
                     this.txCalculated = new ArrayList<RCalculated>();
 
@@ -2038,6 +2038,13 @@ import java.util.*;
         }
     }
 
+    /**
+     * Вызывается только если идет обработка попутно
+     *
+     * @param cnt
+     * @param dcSet
+     * @throws Exception
+     */
     // TODO - make it trownable
     public void process_after(Controller cnt, DCSet dcSet) throws Exception {
 
@@ -2151,7 +2158,8 @@ import java.util.*;
         this.getTransactions();
 
         if (this.transactionCount > 0) {
-            if (dcSet.isFork() || cnt.noCalculated) {
+            if (/// теперь нужно счтитать так как у нас из Форка слив напрямую идет dcSet.isFork() ||
+                    cnt.noCalculated) {
                 this.txCalculated = null;
             } else {
                 // make pool for calculated
