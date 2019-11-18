@@ -92,7 +92,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.20.02 beta dev";
+    public static String version = "4.21.01 DBS";
     public static String buildTime = "2019-09-18 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -145,9 +145,9 @@ public class Controller extends Observable {
     public TransactionsPool transactionsPool;
     public WinBlockSelector winBlockSelector;
     public BlocksRequest blockRequester;
-    private BlockChain blockChain;
+    public BlockChain blockChain;
     private BlockGenerator blockGenerator;
-    private Synchronizer synchronizer;
+    public Synchronizer synchronizer;
     private TransactionCreator transactionCreator;
     private boolean needSyncWallet = false;
     private Timer connectTimer;
@@ -155,9 +155,10 @@ public class Controller extends Observable {
     private byte[] foundMyselfID = new byte[128];
     private byte[] messageMagic;
     private long toOfflineTime;
-    private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight;
-    private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions;
-    private DLSet dlSet; // = DLSet.getInstance();
+    private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>(20, 1);
+    private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>(20, 1);
+
+    public DLSet dlSet; // = DLSet.getInstance();
     private DCSet dcSet; // = DLSet.getInstance();
     public Gui gui;
     public GuiTimer guiTimer;
@@ -615,12 +616,6 @@ public class Controller extends Observable {
         this.toOfflineTime = NTP.getTime();
         this.foundMyselfID = new byte[128];
         this.random.nextBytes(this.foundMyselfID);
-
-        this.peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>(20, 1);
-        // LINKED TO PRESERVE ORDER WHEN SYNCHRONIZING (PRIORITIZE SYNCHRONIZING
-        // FROM LONGEST CONNECTION ALIVE)
-
-        this.peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>(20, 1);
 
         // CHECK NETWORK PORT AVAILABLE
         if (BlockChain.TEST_DB == 0 && !Network.isPortAvailable(Controller.getInstance().getNetworkPort())) {

@@ -1,29 +1,19 @@
 package org.erachain.gui.items.assets;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.accounts.AccountAssetRepayDebtPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class AssetDetailsPanel extends JPanel {
 
@@ -166,7 +156,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //TYPE
         detailGBC.gridy = gridy;
-        JTextField textType = new JTextField(Lang.getInstance().translate(asset.viewAssetType()));
+        JTextField textType = new JTextField(Lang.getInstance().translate(asset.viewAssetTypeFull()));
 
         //	textType.setSelected(asset.isDivisible()); // SELECT - OPION = asset.getAssetType();
         //	asset.viewAssetType()

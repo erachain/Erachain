@@ -110,10 +110,11 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
     }
 
     @Override
-    public void writeToParent() {
-        super.writeToParent();
+    public boolean writeToParent() {
+        boolean result = super.writeToParent();
         ((AutoIntegerByte) parent).atomicKey.set(this.key);
         ((AutoIntegerByte) parent).key = this.key;
+        return result;
     }
 
 }

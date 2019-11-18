@@ -15,7 +15,7 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
 {
 
     public TransactionSuitMapDBFork(TransactionMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null);
+        super(parent, databaseSet, logger);
     }
 
     @Override

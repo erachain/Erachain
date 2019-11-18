@@ -1501,9 +1501,13 @@ import java.util.*;
         final long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
         if (targetedWinValue < 1) {
-            //targetedWinValue = this.calcWinValueTargeted(dcSet);
-            LOGGER.debug("*** Block[" + this.heightBlock + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
-            return false;
+            if (BlockChain.validBlocks.contains(heightBlock)) {
+                targetedWinValue = (int) currentTarget >> 1;
+            } else {
+                //targetedWinValue = this.calcWinValueTargeted(dcSet);
+                LOGGER.debug("*** Block[" + this.heightBlock + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
+                return false;
+            }
         }
         this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
         if (this.target == 0) {
@@ -2273,7 +2277,7 @@ import java.util.*;
             return;
         }
 
-        if (this.heightBlock > 162045 && this.heightBlock < 162050) {
+        if (BlockChain.CHECK_BUGS > 3 && this.heightBlock > 162045 && this.heightBlock < 162050) {
             LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
         }
 
@@ -2363,8 +2367,9 @@ import java.util.*;
         int seqNo;
         for (int i = this.transactionCount - 1; i >= 0; i--) {
             seqNo = i + 1;
-            if (cnt.isOnStopping())
+            if (cnt.isOnStopping()) {
                 throw new Exception("on stoping");
+            }
 
             Transaction transaction = transactions.get(i);
             //logger.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());

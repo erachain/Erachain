@@ -25,7 +25,13 @@ public interface InnerDBTable<K, V> {
 
     V get(Object key);
 
+    boolean set(K key, V value);
+
     void put(K key, V value);
+
+    V remove(Object key);
+
+    V removeValue(Object key);
 
     void delete(Object key);
 
@@ -43,14 +49,14 @@ public interface InnerDBTable<K, V> {
 
     //NavigableSet<Fun.Tuple2<?, K>> getIndex(int index, boolean descending);
 
-    Iterator<K> getIterator(boolean descending);
+    Iterator<K> getIterator(boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending);
+    Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending);
+    Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending);
+    Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex);
 
-    Iterator<K> getIndexIterator(int indexDB, boolean descending);
+    Iterator<K> getIndexIterator(int indexDB, boolean descending, boolean isIndex);
 
 }

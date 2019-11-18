@@ -175,6 +175,36 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
     }
 
+    @Override
+    public void deleteRange(byte[] keyFrom, byte[] keyToExclude) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            writeBatch.deleteRange(keyFrom, keyToExclude);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void deleteRange(ColumnFamilyHandle columnFamilyHandle, byte[] keyFrom, byte[] keyToExclude) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            writeBatch.deleteRange(columnFamilyHandle, keyFrom, keyToExclude);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
     /**
      * Используем newIteratorWithBase - для перебора вместе с ключами от родительской Таблицы
      * @return

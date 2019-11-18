@@ -14,8 +14,10 @@ import org.mapdb.Bind;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -77,24 +79,30 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
 
     // GET KEYs with FORKED rules
     @Override
-    public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
+    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal stopPrice, Map deleted_empty) {
 
-        // GET FROM PARENT
-        HashSet<Long> combinedKeys = ((OrderMap) parent).getProtocolKeys(have, want, limit);
+        // GET FROM PARENT and exclude DELETED here
+        HashMap<Long, Order> result = ((OrderMap) parent).getProtocolEntries(have, want, stopPrice, deleted);
 
-        // DELETE ALL PARENT WAS DELETED HERE
-        if (deleted != null && !deleted.isEmpty()) {
-            combinedKeys.removeAll(deleted.keySet());
+        // берем все сейчас! так как тут просто перебьор будет и нам надо вщять + одну выше цены
+        // Object limitOrHI = stopPrice == null ? Fun.HI() : stopPrice; // надо тут делать выбор иначе ошибка преобразования в subMap
+        Collection<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, want, null, null),
+                Fun.t4(have, want, Fun.HI(), Fun.HI()))
+                .values();
+
+        // UPDATE from this FORKED TABLE
+        for (Long key : keys) {
+            Order order = get(key);
+            result.put(key, order);
+            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+
+                break;
+            }
         }
 
-        Object limitOrHI = limit == null ? Fun.HI() : limit; // надо тут делать выбор иначе ошибка преобразования в subMap
-        HashSet<Long> keys = new HashSet<Long>(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
-                Fun.t4(have, want, null, null),
-                Fun.t4(have, want, limitOrHI, Fun.HI())).values());
-
-        combinedKeys.addAll(keys);
-
-        return combinedKeys;
+        return result;
     }
 
     @Override

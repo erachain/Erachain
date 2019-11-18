@@ -9,6 +9,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.RCalculated;
@@ -17,7 +18,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDBFork;
-import org.erachain.dbs.nativeMemMap.NativeMapHashMapFork;
+import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDB;
 import org.erachain.dbs.rocksDB.TransactionFinalSuitRocksDBFork;
 import org.erachain.utils.ObserverMessage;
@@ -78,25 +79,33 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new TransactionFinalSuitRocksDB(databaseSet, database);
+                    map = new TransactionFinalSuitRocksDB(databaseSet, database, sizeEnable);
                     break;
                 default:
-                    map = new TransactionFinalSuitMapDB(databaseSet, database);
+                    map = new TransactionFinalSuitMapDB(databaseSet, database, sizeEnable);
             }
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
+                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
                     break;
                 case DBS_ROCK_DB:
-                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet);
+                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
                     break;
                 default:
-                    map = new NativeMapHashMapFork(parent, databaseSet, null);
+                    /// НЕЛЬЗЯ HashMap !!!  так как удаляем по фильтру блока тут в delete(Integer height)
+                    // map = new NativeMapHashMapFork(parent, databaseSet, null);
+                    /// - тоже нельзя так как удаление по номеру блока не получится
+                    // map = new NativeMapTreeMapFork(parent, databaseSet, null, null);
+                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
             }
         }
     }
 
+    @Override
+    public int size() {
+        return ((DCSet) this.databaseSet).getTransactionFinalMapSigns().size();
+    }
     /**
      * Это протокольный вызов - поэтому в форке он тоже бывает
      *
@@ -106,14 +115,24 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {
 
-        // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
+        if (BlockChain.CHECK_BUGS > 2 && height == 652627) {
+            int tt = 1;
+        }
 
+        // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
         if (map instanceof TransactionFinalSuit) {
-            // если карта как NativeMapHashMapFork открыт то сюда не заходим
-            Iterator<Long> iterator = ((TransactionFinalSuit) map).getBlockIterator(height);
+            ((TransactionFinalSuit) map).deleteForBlock(height);
+        } else if (map instanceof NativeMapTreeMapFork) {
+            Iterator<Long> iterator = map.getIterator();
             while (iterator.hasNext()) {
-                map.delete(iterator.next());
+                Long key = iterator.next();
+                if (Transaction.parseDBRef(key).a.equals(height)) {
+                    map.delete(key);
+                }
             }
+        } else {
+            Long error = null;
+            ++error;
         }
 
     }
@@ -249,7 +268,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             item = this.map.get(key);
             item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
-            txs.add(item);
+            txs.add(item); // 628853-1
             counter++;
         }
         return txs;

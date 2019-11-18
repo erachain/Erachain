@@ -258,19 +258,27 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
-    public void writeToParent() {
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             parent.put(key, this.map.get(key));
+            updated = true;
         }
 
         if (deleted != null) {
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
                 parent.delete(iterator.next());
+                updated = true;
             }
         }
+
+        return updated;
+
     }
 
     @Override

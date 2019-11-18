@@ -31,4 +31,6 @@ public interface DBTab<T, U> extends IMap<T, U>, ForkedMap {
 
     SortableList<T, U> getList();
 
+    void notifyObserverList();
+
 }

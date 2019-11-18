@@ -1,7 +1,7 @@
 {
   "_lang_ISO_": "ru",
   "_lang_name_": "Русский",
-  "_timestamp_of_translation_": 1496805081966,
+  "_timestamp_of_translation_": 1496805081977,
   " ( * optional field )": " ( * дополнительное поле )",
   " and start the application again.": " и запустите приложение снова.",
   "( DO NOT USE your wallet's password. )": "( Не используйте Ваш пароль кошелька! )",
@@ -28,6 +28,7 @@
   "Account not found!": "Счет не определён!",
   "Account to Deposit": "Пополняемый счет",
   "Accounting (bookkeeping) units. They do not have a generally accepted value and can only be exchanged among themselves. Actions with them are possible only for accounting purposes: transfer, take for storage (on balance), lend, take back the debt, etc.": "Счетные (бухгалтерские) единицы. Не имеют общепринятой стоимости и могут обмениваться только между собой. Действия с ними возможны только в целях учета: передать, принять на хранение (на баланс), выдать в долг, забрать долг и т.д.",
+  "Account Verifier": "Заверитель счета",
   "ACCT": "",
   "Accuracy": "Точность",
   "accuracy": "точность",
@@ -80,6 +81,7 @@
   "Anyone who has access to your seed will have access to your wallet.": "всем, кто знает ваш ключ будут иметь доступ к вашему кошельку.",
   "and": "и",
   "And click button '%1' to open the panel for payment": "И нажмите кнопку '%1' для перехода на панель оплаты",
+  "Appointing": "Назначивший",
   "Are you sure you want to close?":"Хотите закрыть программу?",
   "Asset Details": "Сведения об Активах",
   "Asset Exchange": "Обмен Активами",
@@ -275,8 +277,7 @@
   "Created by default Account": "Создано счетом по умолчению",
   "Create and insert Person": "Создать и вставить персону",
   "Create Person and copy to clipboard": "Создать персону и скопировать в буфер обмена",
-  "Creation date:": "Дата создания:",
-  "Creator:": "Создатель:",
+  "Creation Date": "Дата создания",
   "Creator": "Создатель",
   "Creator of data": "Создатель данных",
   "Creator Publick Key": "Откр. кл. Создателя",
@@ -836,7 +837,8 @@
   "Register Name Transaction": "Транзакция Регистрации Имени",
   "Register Name": "Регистрация Имени",
   "Register": "Регистрация",
-  "Registrant:": "Регистратор",
+  "Registrar": "Регистратор",
+  "Registrant": "Регистратрирумый",
   "Registered": "Зарегистрировано",
   "registered": "зарегистрировано",
   "Remote": "Удалённый",
@@ -1472,5 +1474,5 @@
 
   "<b>ERA</b> is an <u>Accounting Unit</u> allowing a User, that has a sufficient amount of such units and with such sufficiency threshold preset in the ERACHAIN Software, to use the ERACHAIN Software for making his Request Entries to the Log, including provision of such service to other Users, receiving it for the COMPU Accounting Units and producing new COMPU Accounting Units as per the ERACHAIN Software rules and operating procedure available on the Erachain.org website. For more information see Erachain Licence Agreement on the <a href=\"http://erachain.org\">Erachain.org</a>.": "<b>ERA</b> - это <u>Учетная единица</u>, дающая право Пользователю, обладающему достаточным количеством этих единиц, порог достаточности которого задан в Программном обеспечении ERACHAIN использовать Программное обеспечение ERACHAIN для внесения своих Записей-заявок в Журнал, в том числе оказывать эту услугу для других Пользователей, получая за это от них Учетные единицы COMPU и производя новые Учетные единицы COMPU в соответствии с правилами и порядком работы Программного обеспечения ERACHAIN, доступными на веб-сайте Erachain.org. Для большей информации смотрите Лицензионное Соглашение Эрачейн на сайте <a href=\"http://erachain.org\">Erachain.org</a>",
   "<b>COMPU</b> is an <u>Accounting Unit</u> allowing a User that has a sufficient amount of such units, with such sufficiency threshold computed in the ERACHAIN Software, to use the ERACHAIN Software for entering that User’s Request Entries on the Log, both on his own and by having such service provided by other Users. The COMPU Accounting Unit operates on the Log as a unit used to pay for the provision of service of making an entry to the Log. For more information see Erachain Licence Agreementon the <a href=\"http://erachain.org\">Erachain.org</a>.": "<b>COMPU</b> - это <u>Учетная единица</u>, дающая право Пользователю, обладающему достаточным количеством этих единиц, порог достаточности которого вычисляется в Программном обеспечении ERACHAIN, использовать Программное обеспечение ERACHAIN для внесения Записей-заявок Пользователя в Журнал как самостоятельно, так и путем получения такой услуги от других Пользователей. Учетная единица COMPU действует в Журнале как единица оплаты за оказание услуги внесения записи в Журнал. Для большей информации смотрите Лицензионное Соглашение Эрачейн на сайте <a href=\"http://erachain.org\">Erachain.org</a>",
-  "": "",
+  "": ""
 }

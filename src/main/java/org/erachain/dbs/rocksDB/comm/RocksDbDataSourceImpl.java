@@ -383,7 +383,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         resetDbLock.readLock().lock();
         Set<byte[]> result = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         try (final RocksIterator iter = getIterator(indexDB)) {
-            for (iter.seek(filter); iter.isValid() && areEqualMask(iter.key(), filter); iter.next()) {
+            for (iter.seek(filter); iter.isValid()
+                    && areEqualMask(iter.key(), filter); iter.next()) {
                 result.add(iter.value());
             }
             return result;
@@ -604,6 +605,36 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public void deleteRange(byte[] keyFrom, byte[] keyToExclude) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.deleteRange(keyFrom, keyToExclude);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public void deleteRange(ColumnFamilyHandle columnFamilyHandle, byte[] keyFrom, byte[] keyToExclude) {
+        if (quitIfNotAlive()) {
+            return;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            dbCore.deleteRange(columnFamilyHandle, keyFrom, keyToExclude);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public void delete(byte[] key, WriteOptions writeOptions) {
         if (quitIfNotAlive()) {
             return;
@@ -634,28 +665,28 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public RockStoreIterator iterator(boolean descending) {
-        return new RockStoreIterator(getIterator(), descending, false);
+    public RockStoreIterator iterator(boolean descending, boolean isIndex) {
+        return new RockStoreIterator(getIterator(), descending, isIndex);
     }
 
     @Override
-    public RockStoreIterator indexIterator(boolean descending, int indexDB) {
-        return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, true);
+    public RockStoreIterator indexIterator(boolean descending, int indexDB, boolean isIndex) {
+        return new RockStoreIterator(getIterator(columnFamilyHandles.get(indexDB)), descending, isIndex);
     }
 
     @Override
-    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle) {
-        return new RockStoreIterator(getIterator(columnFamilyHandle), descending, true);
+    public RockStoreIterator indexIterator(boolean descending, ColumnFamilyHandle columnFamilyHandle, boolean isIndex) {
+        return new RockStoreIterator(getIterator(columnFamilyHandle), descending, isIndex);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter) {
-        return new RockStoreIteratorFilter(getIterator(), descending, true, filter);
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex) {
+        return new RockStoreIteratorFilter(getIterator(), descending, isIndex, filter);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter) {
-        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, true, filter);
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex) {
+        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, isIndex, filter);
     }
 
     @Override

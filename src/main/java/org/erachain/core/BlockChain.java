@@ -50,7 +50,7 @@ public class BlockChain {
      * для каждого счета по времени создания транзакции сохраняется ссылка на транзакцию,
      * что требует создания длинных ключей 20 + 8. Это используется при откатах для восстановления последего значения
      */
-    public static final boolean NOT_STORE_REFFS_HISTORY = TEST_DB > 0;
+    public static final boolean NOT_STORE_REFFS_HISTORY = TEST_DB > 0 && false;
 
     /**
      * для каждого счета сохраняется последнее время транзакции и потом проверяется на повторы.
@@ -61,7 +61,7 @@ public class BlockChain {
      * Вдобавок если != 0 то проверки на коллизию ключа (подписи) в TransactionFinalMapSigns не проверяется,
      * что ускоряет работу но воявляется вероятность колллизии - поэтому можно там увеличить длинну ключа если тут != 0
      */
-    public static final int CHECK_DOUBLE_SPEND_DEEP = TEST_DB > 0 ? -1 : 0;
+    public static final int CHECK_DOUBLE_SPEND_DEEP = TEST_DB > 0 ? 0 : 0;
 
     /**
      * Число счетов для теста базы данных - чем больше тем болше нагрузка и сложнее считать.
@@ -75,7 +75,7 @@ public class BlockChain {
      */
     public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || TEST_DB > 0;
 
-    static final public int CHECK_BUGS = TEST_DB > 0 ? 0 : 5;
+    static final public int CHECK_BUGS = TEST_DB > 0 ? 0 : 10;
 
     /**
      * если задан - первое подключение к нему
@@ -152,8 +152,8 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0? 0 : DEVELOP_USE ? 430000 : 260120;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0? 0 : DEVELOP_USE? 425555 : 260120;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : DEVELOP_USE ? 444340 + 1 : 261406 + 1; //260120;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : DEVELOP_USE ? 425555 : 418000;
 
     public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0? 0 : DEVELOP_USE? 0 : 44666;
 
@@ -165,6 +165,8 @@ public class BlockChain {
     public static final int DEVELOP_FORGING_START = 100;
 
     public HashSet<String> trustedPeers = new HashSet<>();
+
+    public static final HashSet<Integer> validBlocks = new HashSet<>();
 
     public static final byte[][] WIPED_RECORDS = TEST_DB > 0? new byte[][]{}
         : DEVELOP_USE ?
@@ -265,6 +267,7 @@ public class BlockChain {
     /**
      * Если после исполнения торговой сделки оостатется статок у ордера-инициатора и
      * цена для остатка отклонится больше чем на эту величину то ему возвращаем остаток
+     * see org.erachain.core.item.assets.OrderTestsMy#testOrderProcessingNonDivisible() - 0.0000432
      */
     final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT =     new BigDecimal("0.000001");
     /**
@@ -564,6 +567,10 @@ public class BlockChain {
 /// end                    new int[][]{{225655, 150000}, {333655, 100000}});
 /// end            FREEZED_BALANCES.put("7Rt6gdkrFzayyqNec3nLhEGjuK9UsxycZ6",
 /// end                    new int[][]{{115000, 656000}, {225655, 441000}});
+
+            validBlocks.add(214085);
+            validBlocks.add(330685);
+
         }
 
         DCSet dcSet = dcSet_in;

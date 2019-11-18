@@ -61,14 +61,12 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     // private NavigableSet <Tuple2<String,Tuple2<Integer,
     // Integer>>>signature_key;
 
-    public TransactionFinalSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, null);
+    public TransactionFinalSuitMapDB(DBASet databaseSet, DB database, boolean sizeEnable) {
+        super(databaseSet, database, logger, null, sizeEnable);
     }
 
     @Override
     public void openMap() {
-
-        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
 
         // OPEN MAP
         // TREE MAP for sortable search
@@ -76,7 +74,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 .keySerializer(BasicKeySerializer.BASIC)
                 //.keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
                 .valueSerializer(new TransactionSerializer())
-                .counterEnable()
+                ////.counterEnable()
                 .makeOrGet();
 
         if (Controller.getInstance().onlyProtocolIndexing)
@@ -164,6 +162,14 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         return keys;
                     }
                 });
+    }
+
+    @Override
+    public void deleteForBlock(Integer height) {
+        Iterator<Long> iterator = getBlockIterator(height);
+        while (iterator.hasNext()) {
+            map.remove(iterator.next());
+        }
     }
 
     @Override

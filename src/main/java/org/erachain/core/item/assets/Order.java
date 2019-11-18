@@ -599,14 +599,17 @@ public class Order implements Comparable<Order> {
 
         boolean debug = false;
 
-        if (BlockChain.CHECK_BUGS > 3 &&
+        if (BlockChain.CHECK_BUGS > 1 &&
                 //this.creator.equals("78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5") &&
                 //this.id.equals(Transaction.makeDBRef(12435, 1))
                 //this.id.equals(770667456757788l) // 174358 ---- 	255979-3	255992-1
                 //height == 255979 // 133236 //  - тут остаток неисполнимый и у ордера нехватка - поэтому иницалицирующий отменяется
                 //// 	255979-3	255992-1
                 //|| height == 255992
-                Transaction.viewDBRef(id).equals("178617-18")
+                ///Transaction.viewDBRef(id).equals("15057-1")
+
+                Transaction.viewDBRef(id).equals("39836-1")
+
                 //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
                 //|| height == 253841 // сработал NEW_FLOR 2-й
                 //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
@@ -627,25 +630,21 @@ public class Order implements Comparable<Order> {
         //this.creator.setBalance(this.have, this.creator.getBalance(db, this.have).subtract(this.amountHave), db);
         this.creator.changeBalance(this.dcSet, true, this.haveAssetKey, this.amountHave, true);
 
-        BigDecimal thisPrice = this.price;
-
-        //BigDecimal tempPrice;
-        BigDecimal thisIncrement;
-        //boolean isReversePrice = thisPrice.compareTo(BigDecimal.ONE) < 0;
+        BigDecimal thisPriceReverse = calcPriceReverse();
 
         //GET ALL ORDERS(WANT, HAVE) LOWEST PRICE FIRST
         //TRY AND COMPLETE ORDERS
-        List<Order> orders = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPrice);
+        List<Order> orders = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPriceReverse);
 
         /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
-        if (BlockChain.CHECK_BUGS > 3 && !orders.isEmpty()) {
+        if ((debug || BlockChain.CHECK_BUGS > 3) && !orders.isEmpty()) {
             BigDecimal price = orders.get(0).getPrice();
             Long timestamp = orders.get(0).getId();
             Long id = 0L;
             for (Order item: orders) {
                 if (item.getId().equals(id)) {
                     // RISE ERROR
-                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPrice);
+                    List<Order> orders_test = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPriceReverse);
                     timestamp = null;
                     ++timestamp;
                 }
@@ -678,6 +677,27 @@ public class Order implements Comparable<Order> {
                 timestamp = item.getId();
             }
 
+            List<Order> ordersAll = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, null);
+            price = orders.get(0).getPrice();
+            timestamp = orders.get(0).getId();
+            for (Order item : ordersAll) {
+                int comp = price.compareTo(item.getPrice());
+                if (comp > 0) {
+                    // RISE ERROR
+                    timestamp = null;
+                    ++timestamp;
+                } else if (comp == 0) {
+                    // здесь так же должно быть возростание
+                    // если не так то ошибка
+                    if (timestamp.compareTo(item.getId()) > 0) {
+                        // RISE ERROR
+                        timestamp = null;
+                        ++timestamp;
+                    }
+                }
+                price = item.getPrice();
+                timestamp = item.getId();
+            }
         }
 
         BigDecimal thisAmountHaveLeft = this.getAmountHaveLeft();
@@ -708,7 +728,7 @@ public class Order implements Comparable<Order> {
             index++;
 
             if (debug ||
-                    Transaction.viewDBRef(id).equals("178617-18")
+                    Transaction.viewDBRef(id).equals("-178617-18")
                         ) {
                 debug = true;
             }
@@ -731,12 +751,12 @@ public class Order implements Comparable<Order> {
 
             /////////////// - разность точности цены из-за того что у одного ордера значение больше на порядки и этот порядок в точность уходит
             //CHECK IF BUYING PRICE IS HIGHER OR EQUAL THEN OUR SELLING PRICE
-            compare = thisPrice.compareTo(orderReversePrice);
+            //////// old compare = thisPrice.compareTo(orderReversePrice);
+            compare = orderPrice.compareTo(thisPriceReverse);
             if (compare > 0) {
                 // Делаем просто проверку на обратную цену и все - без игр с округлением и проверки дополнительной
-                BigDecimal thisReversePrice = calcPriceReverse();
                 // и сравним так же по прямой цене со сниженной точностью у Заказа
-                if (orderPrice.compareTo(thisReversePrice) == 0) {
+                if (false && orderReversePrice.compareTo(price) == 0) {
                     compare = 0;
                 } else {
                     break;
@@ -823,7 +843,7 @@ public class Order implements Comparable<Order> {
                 error ++;
             }
 
-                //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
+            //CHECK IF AMOUNT AFTER ROUNDING IS NOT ZERO
             //AND WE CAN BUY ANYTHING
             if (tradeAmountForHave.compareTo(BigDecimal.ZERO) > 0) {
                 //CREATE TRADE

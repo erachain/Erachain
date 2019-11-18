@@ -4,8 +4,9 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.dbs.DBTab;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface OrderMap extends DBTab<Long, Order> {
 
@@ -20,7 +21,7 @@ public interface OrderMap extends DBTab<Long, Order> {
 
     long getCountOrders(long haveWant);
 
-    HashSet<Long> getProtocolKeys(long have, long want, BigDecimal limit);
+    HashMap<Long, Order> getProtocolEntries(long have, long want, BigDecimal limit, Map deleted);
     List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal limit);
 
     List<Order> getOrdersForTrade(long have, long want, boolean reverse);

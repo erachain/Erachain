@@ -40,28 +40,33 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     /**
-     *
-     * @param databaseSet
+     *  @param databaseSet
      * @param database - общая база данных для данного набора - вообще надо ее в набор свтавить и все.
      *                 У каждой таблицы внутри может своя база данных открытьваться.
      *                 А команды базы данных типа close commit должны из таблицы передаваться в свою.
      *                 Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
      * @param logger
+     * @param sizeEnable
      */
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue, boolean sizeEnable) {
 
         this.databaseSet = databaseSet;
         this.database = database;
         this.logger = logger;
         this.defaultValue = defaultValue;
+        this.sizeEnable = sizeEnable;
 
         openMap();
         createIndexes();
         logger.info("USED");
     }
 
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable) {
+        this(databaseSet, database, logger, null, sizeEnable);
+    }
+
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
-        this(databaseSet, database, logger, null);
+        this(databaseSet, database, logger, null, false);
     }
 
     /**
@@ -107,7 +112,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
     @Override
     public IMap getSource() {
-        return (IMap) map;
+        return null;
     }
 
     //@Override

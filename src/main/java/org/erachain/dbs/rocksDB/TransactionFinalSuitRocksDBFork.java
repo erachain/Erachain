@@ -7,7 +7,6 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
@@ -19,8 +18,8 @@ import java.util.Iterator;
 @Slf4j
 public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionFinalSuit {
 
-    public TransactionFinalSuitRocksDBFork(TransactionFinalMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null, false);
+    public TransactionFinalSuitRocksDBFork(TransactionFinalMap parent, DBASet databaseSet, boolean sizeEnable) {
+        super(parent, databaseSet, logger, null, sizeEnable);
     }
 
     @Override
@@ -40,9 +39,17 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
+    public void deleteForBlock(Integer height) {
+        Iterator<Long> iterator = getBlockIterator(height);
+        while (iterator.hasNext()) {
+            map.remove(iterator.next());
+        }
+    }
+
+    @Override
     public Iterator<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(Ints.toByteArray(height), false);
+        return map.getIndexIteratorFilter(Ints.toByteArray(height), false, false);
     }
 
     @Override

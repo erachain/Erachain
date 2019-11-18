@@ -39,6 +39,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     protected boolean sizeEnable;
 
+    @Getter
     protected Map<Integer, Integer> observableData;
 
 
@@ -310,13 +311,33 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
                 this.setChanged();
                 this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_RESET), this));
             }
-
         }
     }
 
     @Override
-    public void writeToParent() {
-        ((ForkedMap) this.map).writeToParent();
+    public void notifyObserverList() {
+        // NOTYFIES
+        if (this.observableData != null) {
+            //NOTIFY LIST
+            if (this.observableData.containsKey(NOTIFY_LIST)) {
+                this.setChanged();
+                this.notifyObservers(new ObserverMessage(this.observableData.get(NOTIFY_LIST), this));
+            }
+        }
+    }
+
+    @Override
+    public boolean writeToParent() {
+
+        if (((ForkedMap) this.map).writeToParent()) {
+            if (parent != null) {
+                // нужно кинуть событие обновления в ГУИ родителя - если при сливе были изменения
+                parent.notifyObserverList();
+            }
+            return true;
+        }
+        return false;
+
     }
 
     @Override

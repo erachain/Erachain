@@ -97,6 +97,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         return u;
     }
 
+    // TODO тут надо упростить так как внутри иногда берется предыдущее значение
     @Override
     public boolean set(T key, U value) {
 
@@ -130,6 +131,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
     }
 
+    // TODO тут надо упростить так как внутри иногда берется предыдущее значение
     @Override
     public U remove(T key) {
 
@@ -244,16 +246,21 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
      commit();
      }
      *
+      * @return
      */
 
     @Override
-    public void writeToParent() {
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
         Iterator<T> iterator = this.map.keySet().iterator();
         while (iterator.hasNext()) {
             T key = iterator.next();
             U item = this.map.get(key);
             if (item != null) {
                 parent.getSource().put(key, this.map.get(key));
+                updated = true;
             }
         }
 
@@ -261,8 +268,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
                 parent.getSource().delete(iterator.next());
+                updated = true;
             }
         }
+
+        return updated;
+
     }
 
     @Override

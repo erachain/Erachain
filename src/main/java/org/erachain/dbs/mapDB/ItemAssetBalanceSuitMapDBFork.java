@@ -23,7 +23,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         implements ItemAssetBalanceSuit {
 
     public ItemAssetBalanceSuitMapDBFork(ItemAssetBalanceMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE);
+        super(parent, databaseSet, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE, false);
     }
 
     @SuppressWarnings({"unchecked"})

@@ -31,16 +31,18 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     //ConcurrentHashMap deleted;
     ///////// - если ключи набор байт или других примитивов - то неверный поиск в этом виде таблиц HashMap deleted;
     /// поэтому берем медленный но правильный TreeMap
-    TreeMap<T, Boolean> deleted;
+    /// НЕТ - это определяется на лету при созданий - по типу ключа
+    Map<T, Boolean> deleted;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue, boolean sizeEnable) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
         this.logger = logger;
         this.defaultValue = defaultValue;
+        this.sizeEnable = sizeEnable;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"
@@ -60,6 +62,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         this.openMap();
 
+    }
+
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
+        this(parent, dcSet, logger, defaultValue, false);
+    }
+
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
+        this(parent, dcSet, logger, null, false);
     }
 
 
@@ -175,8 +185,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         U value = this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            if (key instanceof byte[]) {
+                this.deleted = new TreeMap(Fun.BYTE_ARRAY_COMPARATOR);
+            } else {
+                this.deleted = new HashMap(1024, 0.75f);
+            }
         }
 
         // добавляем в любом случае, так как
@@ -357,19 +370,27 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
-    public void writeToParent() {
+    public boolean writeToParent() {
+
+        boolean updated = false;
+
         Iterator<T> iterator = this.map.keySet().iterator();
+
         while (iterator.hasNext()) {
             T key = iterator.next();
             parent.getSource().put(key, this.map.get(key));
+            updated = true;
         }
 
         if (deleted != null) {
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
                 parent.getSource().delete(iterator.next());
+                updated = true;
             }
         }
+
+        return updated;
     }
 
     @Override

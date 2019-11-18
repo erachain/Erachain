@@ -55,8 +55,6 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
             order = this.list.get(row);
 
             if (order == null) {
-                //totalCalc();
-                //this.fireTableRowsDeleted(row, row);
                 return null;
             }
 
@@ -133,16 +131,42 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
         // CHECK IF LIST UPDATED
         if (type == ObserverMessage.ADD_ORDER_TYPE
                 || type == ObserverMessage.REMOVE_ORDER_TYPE
-                ) {
+        ) {
 
-            Order order = (Order) message.getValue();
-            long haveKey = order.getHaveAssetKey();
-            long wantKey = order.getWantAssetKey();
+
+            long haveKey;
+            long wantKey;
+
+            Order order;
+            Object object = message.getValue();
+            if (object instanceof Order) {
+                order = (Order) object;
+                haveKey = order.getHaveAssetKey();
+                wantKey = order.getWantAssetKey();
+            } else if (object instanceof Long) {
+                // Сработал ордер или отменили значит он удалился но еще не добавлся в Исполненые
+                // Поэтому просто ищем тутт по ID
+                for (Order item : list) {
+                    if (item.getId().equals(object)) {
+                        this.needUpdate = true;
+                        return;
+                    }
+                }
+                // not found
+                return;
+            } else {
+                return;
+            }
+
             if (!(haveKey == this.haveKey && wantKey == this.wantKey)
                     && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
                 return;
             }
 
+            this.needUpdate = true;
+            return;
+
+        } else if (type == ObserverMessage.LIST_ORDER_TYPE) {
             this.needUpdate = true;
             return;
 

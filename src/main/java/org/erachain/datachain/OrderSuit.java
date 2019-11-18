@@ -1,8 +1,11 @@
 package org.erachain.datachain;
 
+import org.erachain.core.item.assets.Order;
+
 import java.math.BigDecimal;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public interface OrderSuit {
 
@@ -20,9 +23,10 @@ public interface OrderSuit {
      * @param have
      * @param want
      * @param limit
+     * @param deleted
      * @return
      */
-    HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit);
+    HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal limit, Map deleted);
 
     Iterator<Long> getAddressHaveWantIterator(String address, long have, long want);
 }

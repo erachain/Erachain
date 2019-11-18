@@ -795,6 +795,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
                     dcSet.clearCache();
 
+                    // и перед всем этим необходимо слить все изменения на диск чтобы потом когда откат закончился
+                    // не было остаков в пакетах RocksDB и трынзакциях MapDB
+                    dcSet.flush(0, true, true);
+
                     try {
                         while (bchain.getHeight(dcSet) >= this.orphanto
                             //    && bchain.getHeight(dcSet) > 157044

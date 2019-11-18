@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 public class OrderTest {
 
     int[] TESTED_DBS = new int[]{
-            //IDB.DBS_MAP_DB,
+            IDB.DBS_MAP_DB,
             IDB.DBS_ROCK_DB};
 
     Long releaserReference = null;
@@ -198,7 +198,7 @@ public class OrderTest {
                 OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
                 DBRocksDBTable<Long, Order> mapRocks = source.map;
                 RocksDbDataSource mapSource = mapRocks.dbSource;
-                RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1);
+                RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1, true);
                 count = 0;
                 while (iteratorRocks.hasNext()) {
                     byte[] key = iteratorRocks.next();
@@ -435,7 +435,7 @@ public class OrderTest {
 
             IndexDB indexDB = ((DBMapSuit) ordersMap.getSource()).getIndex(0);
             assertEquals(indexDB.getNameIndex(), "orders_key_have_want");
-            Iterator iterator = ((DBMapSuit) ordersMap.getSource()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false);
+            Iterator iterator = ((DBMapSuit) ordersMap.getSource()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false, true);
 
             List<Order> result = new ArrayList<>();
             count = 0;
@@ -449,6 +449,15 @@ public class OrderTest {
             List<Order> orders = ordersMap.getOrdersForTradeWithFork(have, want, null);
             assertEquals(orders.size(), len);
 
+            /////////////// SEEK price
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("100"));
+            assertEquals(orders.size(), len);
+
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("-100"));
+            assertEquals(orders.size(), 1);
+
+            orders = ordersMap.getOrdersForTradeWithFork(have, want, new BigDecimal("1.00"));
+            assertEquals(orders.size(), 6);
 
         } finally {
             dcSet.close();

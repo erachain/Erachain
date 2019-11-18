@@ -3,15 +3,53 @@ package org.erachain.dbs.mapDB;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
+import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.block.GenesisBlock;
+import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.HashesMap;
+import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
+@Slf4j
 public class DBMapSuitForkTest {
+
+    int[] TESTED_DBS = new int[]{
+            IDB.DBS_MAP_DB,
+            IDB.DBS_ROCK_DB};
+
+    DCSet dcSet;
+    GenesisBlock gb;
+
+    private void init(int dbs) {
+
+        logger.info(" ********** open DBS: " + dbs);
+
+        File tempDir = new File(Settings.getInstance().getDataTempDir());
+        try {
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+        }
+
+        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
+        gb = new GenesisBlock();
+
+        try {
+            gb.process(dcSet);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * не удаляет одинаковые ключи
@@ -150,8 +188,44 @@ public class DBMapSuitForkTest {
 
     }
 
+    /**
+     * Проверка работы карты deleted в форкнутой базе - если там таблица с ключами Байты
+     */
     @Test
     public void delete() {
+
+        for (int dbs : TESTED_DBS) {
+
+            try {
+                init(dbs);
+
+                HashesMap hashes = dcSet.getHashesMap();
+
+                hashes.set(new byte[]{0, 0, 123, 12}, new byte[]{2, 1, 123, 12});
+                hashes.put(new byte[]{0, 0, 13, 12}, new byte[]{2, 41, 123, 12});
+
+                assertEquals(hashes.contains(new byte[]{0, 0, 13, 12}), true);
+
+                DCSet forkedDC = dcSet.fork();
+                HashesMap forkedHashes = forkedDC.getHashesMap();
+
+                assertEquals(Arrays.equals(forkedHashes.remove(new byte[]{0, 0, 13, 12}), new byte[]{2, 41, 123, 12}), true);
+
+                // in PARENT EXIST
+                assertEquals(hashes.contains(new byte[]{0, 0, 13, 12}), true);
+
+                // in FORK DELETED
+                assertEquals(forkedHashes.contains(new byte[]{0, 0, 13, 12}), false);
+
+                forkedHashes.put(new byte[]{0, 0, 13, 12}, new byte[]{12, 41, 123, 12});
+
+                assertEquals(Arrays.equals(forkedHashes.get(new byte[]{0, 0, 13, 12}), new byte[]{12, 41, 123, 12}), true);
+
+
+            } finally {
+                dcSet.close();
+            }
+        }
     }
 
     @Test
@@ -159,13 +233,13 @@ public class DBMapSuitForkTest {
     }
 
     // TODO нужно проверить на дублирование ключей при сливе с родителем - поидее нельзя чтобы такое происходило
-    // см . как сделано в org.erachain.dbs.mapDB.OrdersSuitMapDBFork.getProtocolKeys
+    // см . как сделано в org.erachain.dbs.mapDB.OrdersSuitMapDBFork.getProtocolEntries
     // мам Iterable<Long> mergedIterable = Iterables.mergeSorted - не сработал как надо - в списке окалаось 2 одинаковых ключа
     @Test
     public void getIterator() {
 
         /// DBMapSuitFork.getIterator()
         // нужно проверить
-        DCSet.getInstance().getOrderMap().getProtocolKeys(1, 2, null);
+        DCSet.getInstance().getOrderMap().getProtocolEntries(1, 2, null, null);
     }
 }

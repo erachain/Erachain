@@ -15,8 +15,9 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 ;
 
@@ -164,16 +165,31 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     }
 
     @Override
-    public HashSet<Long> getUnsortedKeysWithParent(long have, long want, BigDecimal limit) {
+    public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal stopPrice, Map deleted) {
 
-        Object limitOrHI = limit == null ? Fun.HI() : limit; // надо тут делать выбор иначе ошибка преобразования в subMap
+        // берем все сейчас! так как тут просто перебьор будет и нам надо вщять + одну выше цены
+        // Object limitOrHI = stopPrice == null ? Fun.HI() : stopPrice; // надо тут делать выбор иначе ошибка преобразования в subMap
         Collection<Long> keys = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
-                Fun.t4(have, want, limitOrHI, Fun.HI()))
-                //Fun.t4(have, want, limit, Fun.HI()))
+                Fun.t4(have, want, Fun.HI(), Fun.HI()))
                 .values();
 
-        return new HashSet<>(keys);
+        HashMap<Long, Order> result = new HashMap<>();
+        for (Long key : keys) {
+            if (deleted != null && deleted.containsKey(key)) {
+                // SKIP deleted in FORK
+                continue;
+            }
+
+            Order order = get(key);
+            result.put(key, order);
+            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+                break;
+            }
+        }
+
+        return result;
     }
 
 }

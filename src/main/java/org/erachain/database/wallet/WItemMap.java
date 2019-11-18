@@ -161,7 +161,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
 
     public void add(Account account, long refDB, ItemCls item) {
         this.put(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
-                refDB), new Tuple2<Long, ItemCls>(null, item));
+                refDB), new Tuple2<Long, ItemCls>(item.getKey(), item));
     }
 	
 	/*

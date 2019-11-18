@@ -29,7 +29,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     protected BTreeMap addressKeyMap;
 
     public ItemAssetBalanceSuitMapDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE);
+        super(databaseSet, database, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE, false);
 
     }
 

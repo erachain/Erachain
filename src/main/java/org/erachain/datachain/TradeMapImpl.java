@@ -38,7 +38,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_TRADE_TYPE);
-            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_TRADE_TYPE);
             this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_TRADE_TYPE);
             this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_TRADE_TYPE);
         }
@@ -105,10 +105,16 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
         }
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getReverseIterator(orderID);
 
-        //GET ALL ORDERS FOR KEYS
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorByKeys(orderID);
+        //GET ALL ORDERS FOR KEYS as INITIATOR
         List<Trade> trades = new ArrayList<Trade>();
+        while (iterator.hasNext()) {
+            trades.add(this.get(iterator.next()));
+        }
+
+        iterator = ((TradeSuit) this.map).getTargetsIterator(orderID);
+        //GET ALL ORDERS FOR KEYS as TARGET
         while (iterator.hasNext()) {
             trades.add(this.get(iterator.next()));
         }

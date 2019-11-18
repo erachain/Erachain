@@ -189,4 +189,30 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
     }
 
+    public Iterator<byte[]> getIteratorByAccount(Account account) {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            return null;
+
+        return ((ItemAssetBalanceSuit) map).accountIterator(account);
+
+    }
+
+    public Iterator<byte[]> getIteratorByAsset(long assetKey) {
+
+        if (Controller.getInstance().onlyProtocolIndexing)
+            return null;
+
+        if (assetKey < 0)
+            assetKey = -assetKey;
+
+        if (map instanceof ItemAssetBalanceSuitRocksDB) {
+            //FILTER ALL KEYS
+            return ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
+        } else {
+            return ((ItemAssetBalanceSuit) map).assetKeys(assetKey).iterator();
+        }
+
+    }
+
 }

@@ -1,23 +1,25 @@
-package org.erachain.core.blocks;
+package org.erachain.core;
 
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;;
-import org.erachain.core.Synchronizer;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.DLSet;
 import org.erachain.datachain.DCSet;
+import org.erachain.network.Network;
+import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +27,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+;
+
+@Slf4j
 public class SynchronizerTests {
 
     static Logger LOGGER = LoggerFactory.getLogger(SynchronizerTests.class.getName());
@@ -49,7 +54,7 @@ public class SynchronizerTests {
         //GENERATE 5 BLOCKS FROM ACCOUNT 1
 
         try {
-        blockChain = new BlockChain(databaseSet);
+            blockChain = new BlockChain(databaseSet);
         } catch (Exception e1) {
         }
 
@@ -306,4 +311,77 @@ public class SynchronizerTests {
         //CHECK HEIGHT
         assertEquals(11, databaseSet1.getBlockMap().last().getHeight());
     }
+
+    /**
+     * Проверка всех подписей в цепочке
+     */
+    @Test
+    public void checkMyHeaders() {
+
+        Controller cnt = Controller.getInstance();
+
+        DCSet dcSet = null;
+        try {
+
+            cnt.dlSet = new DLSet(null, DCSet.makeDBinMemory(), false, false);
+
+            dcSet = DCSet.getInstance(false, false, false);
+            cnt.setDCSet(dcSet);
+
+            cnt.network = new Network(cnt);
+
+            // CREATE BLOCKCHAIN
+            cnt.blockChain = new BlockChain(dcSet);
+
+            // CREATE SYNCHRONIZOR
+            cnt.synchronizer = new Synchronizer(cnt, cnt.blockChain);
+
+            Peer peer = null;
+            try {
+                peer = new Peer(InetAddress.getByName("89.235.184.229"));
+            } catch (Exception e) {
+                assertEquals("", "not connected");
+            }
+
+            //cnt.network.addPeer(peer, 0);
+
+            if (!peer.connect(null, cnt.network, "connected TEST ")) {
+                assertEquals("", "not connected");
+            }
+
+            List<byte[]> headers = null;
+
+            int myHeight = dcSet.getBlockSignsMap().size();
+            logger.info(" start TO: " + myHeight);
+            int height = 1;
+            byte[] lastSignature = cnt.blockChain.getGenesisBlock().getSignature();
+            while (myHeight > height) {
+                try {
+                    headers = cnt.synchronizer.getBlockSignatures(lastSignature, peer);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+
+                for (byte[] signature : headers) {
+                    if (dcSet.getBlockSignsMap().get(signature) == null) {
+                        logger.error("HEIGHT fork: " + height);
+                    }
+                    lastSignature = signature;
+                    height++;
+                }
+
+                if (height % 1000 == 0) {
+                    logger.info(" checked: " + height);
+                }
+
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            dcSet.close();
+            cnt.dlSet.close();
+        }
+    }
+
 }

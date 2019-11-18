@@ -13,7 +13,6 @@ import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableLong;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableTuple3StringLongInteger;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableString;
@@ -122,23 +121,23 @@ public class TransactionSuitRocksDB extends DBMapSuit<Long, Transaction> impleme
 
     @Override
     public Iterator<Long> typeIterator(String sender, Long timestamp, Integer type) {
-        return ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeIndex.getColumnFamilyHandle(), toBytesStringLongInteger.toBytes(sender, timestamp, type)
-                , false);
+        return map.getIndexIteratorFilter(addressTypeIndex.getColumnFamilyHandle(),
+                toBytesStringLongInteger.toBytes(sender, timestamp, type), false, true);
     }
 
     @Override
     public Iterator<Long> senderIterator(String sender) {
-        return ((DBRocksDBTable) map).getIndexIteratorFilter(senderIndex.getColumnFamilyHandle(), sender.getBytes(), false);
+        return map.getIndexIteratorFilter(senderIndex.getColumnFamilyHandle(), sender.getBytes(), false, true);
     }
 
     @Override
     public Iterator<Long> recipientIterator(String recipient) {
-        return ((DBRocksDBTable) map).getIndexIteratorFilter(recipientsIndex.getColumnFamilyHandle(), recipient.getBytes(), false);
+        return map.getIndexIteratorFilter(recipientsIndex.getColumnFamilyHandle(), recipient.getBytes(), false, true);
     }
 
     @Override
     public Iterator<Long> getTimestampIterator(boolean descending) {
-        return map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), descending);
+        return map.getIndexIterator(timestampIndex.getColumnFamilyHandle(), descending, true);
     }
 
 

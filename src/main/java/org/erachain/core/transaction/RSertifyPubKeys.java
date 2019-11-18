@@ -586,7 +586,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
             PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
 
-            //////////// FIND Issuer (registrator) this PERSON
+            //////////// FIND Issuer (registrar) this PERSON
             // FIND person
             ItemCls person = dcSet.getItemPersonMap().get(this.key);
             // FIND issue record
@@ -621,13 +621,13 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
-            issuer.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
+            issuer.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false);
             if (makeCalculates) {
-                block.txCalculated.add(new RCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRATOR_4_11,
+                block.txCalculated.add(new RCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                         "register reward @P:" + this.key, this.dbRef));
             }
-            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
+            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // TO EMITTE FEE (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, true, FEE_KEY, issued_FEE_BD_total, true);
@@ -706,7 +706,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
             PublicKeyAccount pkAccount = this.sertifiedPublicKeys.get(0);
 
-            //////////// FIND Issuer (registrator) this PERSON
+            //////////// FIND Issuer (registrar) this PERSON
             // FIND person
             ItemCls person = dcSet.getItemPersonMap().get(this.key);
             // FIND issue record
@@ -733,9 +733,9 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
-            issuer.changeBalance(dcSet, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRATOR_4_11,
+            issuer.changeBalance(dcSet, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRAR_4_11,
                     false);
-            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRATOR_4_11);
+            issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // ADD to EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD_total, true);
