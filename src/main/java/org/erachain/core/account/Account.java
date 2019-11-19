@@ -978,7 +978,7 @@ public class Account {
 
     public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
         if (this.personDuration == null) {
-            this.personDuration =  db.getAddressPersonMap().getItem(address);
+            this.personDuration = db.getAddressPersonMap().getItem(shortBytes);
 
         }
         return this.personDuration;

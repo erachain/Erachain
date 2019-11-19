@@ -661,7 +661,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         String address;
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             address = publicAccount.getAddress();
-            dcSet.getAddressPersonMap().addItem(address, itemA);
+            dcSet.getAddressPersonMap().addItem(publicAccount.getShortAddressBytes(), itemA);
             dcSet.getPersonAddressMap().addItem(this.key, address, itemP);
 
 
@@ -686,7 +686,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         String address;
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             address = publicAccount.getAddress();
-            dcSet.getAddressPersonMap().removeItem(address);
+            dcSet.getAddressPersonMap().removeItem(publicAccount.getShortAddressBytes());
             dcSet.getPersonAddressMap().removeItem(this.key, address);
         }
 

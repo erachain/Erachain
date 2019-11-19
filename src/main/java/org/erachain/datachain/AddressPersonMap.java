@@ -11,15 +11,11 @@ public interface AddressPersonMap extends DBTab<byte[], Stack<Fun.Tuple4<
         Integer, // block height
         Integer>>> {
 
-    void addItem(String address, Fun.Tuple4<Long, Integer, Integer, Integer> item);
-
     void addItem(byte[] address, Fun.Tuple4<Long, Integer, Integer, Integer> item);
 
     Fun.Tuple4<Long, Integer, Integer, Integer> getItem(String address);
 
     Fun.Tuple4<Long, Integer, Integer, Integer> getItem(byte[] address);
-
-    void removeItem(String address);
 
     void removeItem(byte[] address);
 }

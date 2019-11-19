@@ -4,16 +4,15 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.ObserverMessage;
 
-import javax.validation.constraints.Null;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Stack;
+import java.util.TreeMap;
 
 ////////
 
@@ -86,7 +85,7 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
                 if (transaction.getCreator().getPerson() == null) return null;
 
                 Fun.Tuple4<Long, Integer, Integer, Integer> item = DCSet.getInstance().getAddressPersonMap()
-                        .getItem(transaction.getCreator().getAddress());
+                        .getItem(transaction.getCreator().getShortAddressBytes());
                 return item.a;
 
             case COLUMN_CREATOR_NAME:

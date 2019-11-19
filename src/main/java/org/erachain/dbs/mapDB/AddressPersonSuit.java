@@ -32,9 +32,8 @@ public class AddressPersonSuit extends DBMapSuit<byte[], Stack<Tuple4<
         Integer, // block height
         Integer>>> // transaction index
 {
-    public AddressPersonSuit(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, false);
-        ;
+    public AddressPersonSuit(DBASet databaseSet, DB database, Stack defaultValue) {
+        super(databaseSet, database, logger, defaultValue, false);
     }
 
     @Override

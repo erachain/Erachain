@@ -1,8 +1,10 @@
 package org.erachain.datachain;
 
+import org.erachain.core.account.Account;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.AddressPersonSuit;
 import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
+import org.erachain.dbs.rocksDB.AddressPersonRocksSuit;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple4;
@@ -54,10 +56,10 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new AddressPersonSuit(databaseSet, database);
-                    //break;
+                    map = new AddressPersonRocksSuit(databaseSet, database, DEFAULT_VALUE);
+                    break;
                 default:
-                    map = new AddressPersonSuit(databaseSet, database);
+                    map = new AddressPersonSuit(databaseSet, database, DEFAULT_VALUE);
             }
         } else {
             switch (dbsUsed) {
@@ -73,19 +75,14 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
         }
     }
 
-    protected void getMemoryMap_old() {
-        // HashMap ?
-        //map = new TreeMap<String, Stack<Tuple4<Long, Integer, Integer, Integer>>>();
-    }
-
     @Override
     public void addItem(byte[] address, Tuple4<Long, Integer, Integer, Integer> item) {
         Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
 
         Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
 
-        if (this.parent == null)
-            value_new = value;
+        if (false && this.parent == null)
+            value_new = value; // тут DEFAULT_VALUE даже меняет ((
         else {
             // !!!! NEEED .clone() !!!
             // need for updates only in fork - not in parent DB
@@ -99,12 +96,6 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
     }
 
     @Override
-    public void addItem(String address, Tuple4<Long, Integer, Integer, Integer> item) {
-        ;
-
-    }
-
-    @Override
     public Tuple4<Long, Integer, Integer, Integer> getItem(byte[] address) {
         Stack<Tuple4<Long, Integer, Integer, Integer>> value = this.get(address);
         return value == null || value.isEmpty() ? null : value.peek();
@@ -112,7 +103,8 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
 
     @Override
     public Tuple4<Long, Integer, Integer, Integer> getItem(String address) {
-        return null;
+        Account account = new Account(address);
+        return getItem(account.getShortAddressBytes());
     }
 
     @Override
@@ -121,8 +113,8 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
         if (value == null || value.isEmpty()) return;
 
         Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
-        if (this.parent == null)
-            value_new = value;
+        if (false && this.parent == null)
+            value_new = value; // тут DEFAULT_VALUE даже меняет ((
         else {
             // !!!! NEEED .clone() !!!
             // need for updates only in fork - not in parent DB
@@ -135,7 +127,4 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
 
     }
 
-    public void removeItem(String address) {
-
-    }
 }
