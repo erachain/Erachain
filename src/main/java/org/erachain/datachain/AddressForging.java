@@ -159,14 +159,15 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         Tuple2<Integer, Integer> lastPoint = getLast(key.a);
         if (lastPoint == null) {
             // обычно такого не должно случаться!!!
-            LOGGER.error("ERROR LAST forging POINTS = null for KEY: " + key);
+            if (BlockChain.CHECK_BUGS > 5)
+                LOGGER.error("ERROR LAST forging POINTS = null for KEY: " + key);
             return super.remove(key);
         } else {
-            LOGGER.debug("last POINT: " + lastPoint);
+            //LOGGER.debug("last POINT: " + lastPoint);
             if (lastPoint.a.equals(key.b)) {
                 Tuple2<Integer, Integer> previous = super.remove(key);
                 this.setLast(key.a, previous);
-                LOGGER.debug("delete and set prev POINT as last: " + (previous == null? "null" : previous) + " for " + key);
+                //LOGGER.debug("delete and set prev POINT as last: " + (previous == null? "null" : previous) + " for " + key);
                 return previous;
             } else if (lastPoint.a > key.b) {
                 // там могут быть накладки если новый счет с отступом 100 виртуальный форжинг поставил при первой сборке блока
@@ -175,7 +176,8 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
                     ;
                 } else {
                     // тут ошибка
-                    LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
+                    if (BlockChain.CHECK_BUGS > 3)
+                        LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
                     //Tuple2<Integer, Integer> previous = super.remove(key);
                     //this.setLast(key.a, previous);
                     assert (lastPoint.a <= key.b);
