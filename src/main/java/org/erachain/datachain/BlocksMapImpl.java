@@ -251,12 +251,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             return;
         }
 
-        logger.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE");
+        long time = System.currentTimeMillis();
         this.setChanged();
         // NEED in BLOCK!
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_ADD_BLOCK_TYPE, block));
+        time -= System.currentTimeMillis();
+        if (time < -1) {
+            logger.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE period: " + -time);
+        }
 
-        logger.debug("++++++ NOTIFY CHAIN_ADD_BLOCK_TYPE END");
     }
 
     @Override
@@ -266,12 +269,15 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
             return;
         }
 
-        logger.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE");
+        long time = System.currentTimeMillis();
         this.setChanged();
         // NEED in BLOCK!
         this.notifyObservers(new ObserverMessage(ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE, block));
+        time -= System.currentTimeMillis();
+        if (time < -1) {
+            logger.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE period: " + -time);
+        }
 
-        logger.debug("===== NOTIFY CHAIN_REMOVE_BLOCK_TYPE END");
     }
 
 }

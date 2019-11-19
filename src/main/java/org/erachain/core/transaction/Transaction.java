@@ -1510,21 +1510,20 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public int getConfirmations(int chainHeight) {
 
-        if (this.height == 0) {
+        if (this.height == 0)
             return 0;
-        } else {
-            return chainHeight - this.height;
-        }
+
+        return 1 + chainHeight - this.height;
     }
 
     public int getConfirmations(DCSet db) {
 
         // CHECK IF IN UNCONFIRMED TRANSACTION
 
-        if (this.height > 0)
-            return 1 + db.getBlockMap().size() - this.height;
+        if (this.height == 0)
+            return 0;
 
-        return 0;
+        return 1 + db.getBlockMap().size() - this.height;
 
     }
 
