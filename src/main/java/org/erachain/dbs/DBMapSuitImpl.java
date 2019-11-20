@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
 
-    protected U defaultValue;
+    protected DBTab cover;
 
     protected boolean sizeEnable;
     //protected abstract void openMap();
@@ -27,7 +27,10 @@ public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
 
     @Override
     public U getDefaultValue() {
-        return defaultValue;
+        if (cover != null)
+            return (U) cover.getDefaultValue();
+
+        return null;
     }
 
 }

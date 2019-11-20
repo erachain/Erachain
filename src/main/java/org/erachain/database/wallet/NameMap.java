@@ -84,11 +84,6 @@ public class NameMap extends DCUMapImpl<Tuple2<String, String>, Name> {
         map = new TreeMap<Tuple2<String, String>, Name>(Fun.TUPLE2_COMPARATOR);
     }
 
-    @Override
-    protected Name getDefaultValue() {
-        return null;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Name> get(Account account) {
         List<Name> names = new ArrayList<Name>();

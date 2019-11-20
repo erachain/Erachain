@@ -10,8 +10,8 @@ import java.util.HashMap;
 @Slf4j
 public class NativeMapHashMapFork<T, U> extends DBMapSuitFork<T, U> implements ForkedMap {
 
-    public NativeMapHashMapFork(DBTab parent, DBASet databaseSet, U defaultValue) {
-        super(parent, databaseSet, null, logger, defaultValue);
+    public NativeMapHashMapFork(DBTab parent, DBASet databaseSet, DBTab cover) {
+        super(parent, databaseSet, null, logger, cover);
     }
 
     @Override

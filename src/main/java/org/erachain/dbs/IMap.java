@@ -17,6 +17,8 @@ public interface IMap<T, U> {
 
     IMap getSource();
 
+    U getDefaultValue();
+
     int size();
 
     boolean isSizeEnable();

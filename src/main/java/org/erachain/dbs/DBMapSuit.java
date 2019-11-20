@@ -10,7 +10,4 @@ public interface DBMapSuit<T, U> extends IMap<T, U> { // DBTabSuitCommon
 
     //void getMap();
     //void createIndexes();
-
-    U getDefaultValue();
-
 }

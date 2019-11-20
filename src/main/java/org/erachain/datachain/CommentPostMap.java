@@ -43,11 +43,6 @@ public class CommentPostMap extends DCUMap<byte[], byte[]> {
     }
 
     @Override
-    protected byte[] getDefaultValue() {
-        return null;
-    }
-
-    @Override
     protected void createIndexes() {
     }
 }

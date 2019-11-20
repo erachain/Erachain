@@ -146,6 +146,11 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
+    public U getDefaultValue() {
+        return null;
+    }
+
+    @Override
     public Set<T> keySet() {
         return this.map.keySet();
     }

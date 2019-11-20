@@ -38,11 +38,6 @@ public class UpdateNameMap extends DCUMap<byte[], Name> {
         map = new TreeMap<byte[], Name>(UnsignedBytes.lexicographicalComparator());
     }
 
-    @Override
-    protected Name getDefaultValue() {
-        return null;
-    }
-
     public Name get(Transaction transaction) {
         return this.get(transaction.getSignature());
     }

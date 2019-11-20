@@ -11,14 +11,14 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.settings.Settings;
+import org.erachain.utils.Pair;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.erachain.settings.Settings;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -138,7 +138,7 @@ public class BlockExplorerTest {
             List<String> listaddr = new ArrayList<>();
             listaddr.add(addr);
 
-            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr.get(0), 1, true);
+            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr.get(0), 1, null);
 
             Map<Long, String> totalBalance = (Map<Long, String>) output.get("balance").get("total");
 

@@ -60,12 +60,6 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
         map = new TreeMap<String, Integer>();
     }
 
-    @Override
-    protected Integer getDefaultValue() {
-        return null;
-    }
-
-
     public List<Account> getAccounts() {
 
         List<Account> accounts = new ArrayList<Account>();

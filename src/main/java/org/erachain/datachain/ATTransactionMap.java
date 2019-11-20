@@ -92,12 +92,6 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
         return map;
     }
 
-
-    @Override
-    protected ATTransaction getDefaultValue() {
-        return null;
-    }
-
     public boolean add(Integer blockHeight, int seq, ATTransaction atTx) {
         atTx.setBlockHeight(blockHeight);
         atTx.setSeq(seq);

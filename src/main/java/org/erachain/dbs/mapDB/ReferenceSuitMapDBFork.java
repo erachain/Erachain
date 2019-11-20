@@ -21,7 +21,7 @@ public class ReferenceSuitMapDBFork extends DBMapSuitFork<byte[], long[]>
         implements ReferenceSuit {
 
     public ReferenceSuitMapDBFork(ReferenceMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null, false);
+        super(parent, databaseSet, logger, false, null);
     }
 
     @Override

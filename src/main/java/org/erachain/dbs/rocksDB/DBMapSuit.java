@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IMap;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
@@ -34,13 +35,13 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue, boolean sizeEnable) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable, DBTab cover) {
 
         this.databaseSet = databaseSet;
         // database - is null
         this.database = database;
         this.logger = logger;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
         this.sizeEnable = sizeEnable;
 
         // create INDEXES before
@@ -53,7 +54,7 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable) {
-        this(databaseSet, database, logger, null, sizeEnable);
+        this(databaseSet, database, logger, sizeEnable, null);
     }
 
     @Override

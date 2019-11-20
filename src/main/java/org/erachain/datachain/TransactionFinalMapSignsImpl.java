@@ -50,7 +50,7 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
                     //map = new TransactionFinalSignsSuitRocksDBFork((TransactionFinalMapSigns) parent, databaseSet);
                     //break;
                 default:
-                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
+                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
             }
         }
     }

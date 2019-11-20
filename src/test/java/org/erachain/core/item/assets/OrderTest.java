@@ -13,12 +13,12 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.TransactionFinalMapSigns;
+import org.erachain.dbs.IMap;
 import org.erachain.dbs.rocksDB.DBMapSuit;
 import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.dbs.rocksDB.common.RockStoreIterator;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -195,9 +195,9 @@ public class OrderTest {
 
                 }
 
-                OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
-                DBRocksDBTable<Long, Order> mapRocks = source.map;
-                RocksDbDataSource mapSource = mapRocks.dbSource;
+                IMap source = ordersMap.getSource();
+                IMap mapRocks = source.getSource();
+                RocksDbDataSource mapSource = (RocksDbDataSource) mapRocks.getSource();
                 RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1, true);
                 count = 0;
                 while (iteratorRocks.hasNext()) {

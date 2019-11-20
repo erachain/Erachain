@@ -84,11 +84,6 @@ public class PollMap extends DCUMapImpl<Tuple2<String, String>, Poll> {
         map = new TreeMap<Tuple2<String, String>, Poll>(Fun.TUPLE2_COMPARATOR);
     }
 
-    @Override
-    protected Poll getDefaultValue() {
-        return null;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Poll> get(Account account) {
         List<Poll> polls = new ArrayList<Poll>();

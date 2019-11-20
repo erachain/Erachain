@@ -62,7 +62,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     // Integer>>>signature_key;
 
     public TransactionFinalSuitMapDB(DBASet databaseSet, DB database, boolean sizeEnable) {
-        super(databaseSet, database, logger, null, sizeEnable);
+        super(databaseSet, database, logger, sizeEnable, null);
     }
 
     @Override

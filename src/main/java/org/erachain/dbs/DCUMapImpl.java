@@ -84,7 +84,6 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     public abstract void openMap();
     protected abstract void getMemoryMap();
-    protected abstract U getDefaultValue();
 
     protected void createIndexes() {
     }
