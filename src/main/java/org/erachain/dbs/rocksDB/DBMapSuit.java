@@ -1,10 +1,9 @@
 package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.dbs.DBSuitImpl;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.Transacted;
-import org.erachain.dbs.UMap;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.mapdb.DB;
@@ -22,7 +21,7 @@ import java.util.Set;
  * @param <U>
  */
 
-public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
+public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     protected Logger logger;
     protected DBASet databaseSet;
@@ -58,8 +57,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public UMap getSource() {
-        return (UMap) map;
+    public Object getSource() {
+        return map;
     }
 
     public IndexDB getIndexByName(String name) {

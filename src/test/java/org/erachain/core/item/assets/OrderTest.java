@@ -13,7 +13,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.TransactionFinalMapSigns;
-import org.erachain.dbs.IMap;
+import org.erachain.dbs.DBSuit;
 import org.erachain.dbs.rocksDB.DBMapSuit;
 import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.dbs.rocksDB.common.RockStoreIterator;
@@ -195,15 +195,13 @@ public class OrderTest {
 
                 }
 
-                Object suit = ordersMap.getSource();
-                if (!(suit instanceof IMap))
+                DBSuit suit = ordersMap.getSource();
+
+                Object source = suit.getSource();
+                if (!(source instanceof RocksDbDataSource))
                     continue;
 
-                suit = ((IMap) suit).getSource();
-                if (!(suit instanceof IMap))
-                    continue;
-
-                IMap mapRocks = (IMap) suit;
+                DBMapSuit mapRocks = (DBMapSuit) suit;
 
                 RocksDbDataSource mapSource = (RocksDbDataSource) mapRocks.getSource();
                 RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1, true);

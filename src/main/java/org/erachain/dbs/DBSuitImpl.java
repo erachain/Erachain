@@ -3,7 +3,7 @@ package org.erachain.dbs;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class DBMapSuitImpl<T, U> implements DBMapSuit<T, U> {
+public abstract class DBSuitImpl<T, U> implements DBSuit<T, U> {
 
     protected DBTab cover;
 

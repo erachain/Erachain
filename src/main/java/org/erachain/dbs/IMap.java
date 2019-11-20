@@ -9,13 +9,11 @@ import java.util.Set;
  * @param <T>
  * @param <U>
  */
-public interface IMap<T, U> extends UMap<T, U> {
+public interface IMap<T, U> {
 
     Boolean EXIST = true;
 
     void openMap();
-
-    UMap getSource();
 
     U getDefaultValue();
 

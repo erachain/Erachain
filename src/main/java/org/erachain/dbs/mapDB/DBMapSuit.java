@@ -1,9 +1,8 @@
 package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapSuitImpl;
+import org.erachain.dbs.DBSuitImpl;
 import org.erachain.dbs.DBTab;
-import org.erachain.dbs.UMap;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -20,7 +19,7 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
+public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     protected Logger logger;
     public int DESCENDING_SHIFT_INDEX = 10000;
@@ -113,8 +112,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public UMap getSource() {
-        return (UMap) map;
+    public Object getSource() {
+        return map;
     }
 
     //@Override

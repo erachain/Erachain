@@ -19,6 +19,8 @@ public interface DBTab<T, U> extends IMap<T, U>, ForkedMap {
 
     IDB getDBSet();
 
+    DBSuit getSource();
+
     Map<Integer, Integer> getObservableData();
 
     Integer deleteObservableData(int index);
