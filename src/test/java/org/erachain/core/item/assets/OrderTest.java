@@ -195,8 +195,16 @@ public class OrderTest {
 
                 }
 
-                IMap source = ordersMap.getSource();
-                IMap mapRocks = source.getSource();
+                Object suit = ordersMap.getSource();
+                if (!(suit instanceof IMap))
+                    continue;
+
+                suit = ((IMap) suit).getSource();
+                if (!(suit instanceof IMap))
+                    continue;
+
+                IMap mapRocks = (IMap) suit;
+
                 RocksDbDataSource mapSource = (RocksDbDataSource) mapRocks.getSource();
                 RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1, true);
                 count = 0;

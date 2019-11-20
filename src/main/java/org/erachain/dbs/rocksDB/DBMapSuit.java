@@ -3,8 +3,8 @@ package org.erachain.dbs.rocksDB;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
 import org.erachain.dbs.DBTab;
-import org.erachain.dbs.IMap;
 import org.erachain.dbs.Transacted;
+import org.erachain.dbs.UMap;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.mapdb.DB;
@@ -58,8 +58,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public IMap getSource() {
-        return (IMap) map;
+    public UMap getSource() {
+        return (UMap) map;
     }
 
     public IndexDB getIndexByName(String name) {

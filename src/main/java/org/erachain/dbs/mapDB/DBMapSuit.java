@@ -3,7 +3,7 @@ package org.erachain.dbs.mapDB;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBMapSuitImpl;
 import org.erachain.dbs.DBTab;
-import org.erachain.dbs.IMap;
+import org.erachain.dbs.UMap;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -113,8 +113,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public IMap getSource() {
-        return null;
+    public UMap getSource() {
+        return (UMap) map;
     }
 
     //@Override

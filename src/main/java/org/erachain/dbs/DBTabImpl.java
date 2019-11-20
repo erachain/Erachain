@@ -126,7 +126,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     public void setSource(IMap map) { this.map = map; }
 
     @Override
-    public IMap getSource() {
+    public UMap getSource() {
         return map;
     }
 
