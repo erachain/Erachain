@@ -128,7 +128,7 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     @Override
-    public DBSuit getSource() {
+    public DBSuit getSuit() {
         return map;
     }
 
