@@ -2,9 +2,9 @@ package org.erachain.core.crypto;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -48,12 +48,23 @@ public class Crypto {
     }
 
     public Pair<byte[], byte[]> createKeyPair(byte[] seed) {
-        try {
-            //GENERATE PUBLIC KEY
-            return Ed25519.createKeyPair(seed);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
-            return null;
+        if (seed.length == HASH_LENGTH) {
+            try {
+                //GENERATE PUBLIC KEY
+                return Ed25519.createKeyPair(seed);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                return null;
+            }
+        } else {
+            // здесь СИД из Мобилки - в нем уже лежит пара
+            byte[] privateKey = new byte[Crypto.HASH_LENGTH];
+            System.arraycopy(seed, 0, privateKey, 0, 32);
+            byte[] pubKey = new byte[Crypto.HASH_LENGTH];
+            System.arraycopy(seed, 32, pubKey, 0, 32);
+
+            return new Pair(privateKey, pubKey);
+
         }
     }
 

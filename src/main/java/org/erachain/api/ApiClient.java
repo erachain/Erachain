@@ -1,6 +1,12 @@
 package org.erachain.api;
 // 30/03
 
+import org.erachain.core.item.assets.AssetCls;
+import org.erachain.settings.Settings;
+import org.erachain.utils.StrJSonFine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,13 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.settings.Settings;
-import org.erachain.utils.StrJSonFine;
 
 public class ApiClient {
 
@@ -349,6 +348,11 @@ public class ApiClient {
                             "POST addresses <addressSeed>",
                             "Imports the given 32-byte long base58-encoded account seed. Returns the address when successfully imported.",
                             "Errors: 103 - Invalid seed. 201 - Wallet does not exist. 203 - Wallet is locked."
+                    },
+                    {
+                            "GET importprivatekey/<privatekey>",
+                            "Imports the given 64-byte long base58-encoded private key (from mobile). Returns the address when successfully imported.",
+                            "Errors: 103 - Invalid key. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
                     {
                             "DELETE addresses/<address>",
