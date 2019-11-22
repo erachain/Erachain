@@ -350,7 +350,7 @@ public class ApiClient {
                             "Errors: 103 - Invalid seed. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },
                     {
-                            "GET importprivatekey/<privatekey>",
+                            "GET addresses/importprivatekey/<privatekey>",
                             "Imports the given 64-byte long base58-encoded private key (from mobile). Returns the address when successfully imported.",
                             "Errors: 103 - Invalid key. 201 - Wallet does not exist. 203 - Wallet is locked."
                     },

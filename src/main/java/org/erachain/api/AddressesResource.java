@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -191,7 +192,7 @@ public class AddressesResource {
 
     @GET
     @Path("/private/{address}")
-    public String getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
+    public Response getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
 
         // CHECK IF VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -222,7 +223,10 @@ public class AddressesResource {
         }
 
         byte[] privateKey = Controller.getInstance().getPrivateKeyAccountByAddress(address).getPrivateKey();
-        return Base58.encode(privateKey);
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                //.header("Access-Control-Allow-Origin", "*")
+                .entity(Base58.encode(privateKey)).build(); // " ! " + Base58.encode(privateKey) - норм работает
+
     }
 
     @GET
