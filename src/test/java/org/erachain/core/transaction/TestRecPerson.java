@@ -1,5 +1,6 @@
 package org.erachain.core.transaction;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -86,6 +87,8 @@ public class TestRecPerson {
     private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
     //CREATE EMPTY MEMORY DATABASE
     private DCSet dcSet;
+    private Controller cntrl;
+    private BlockChain bchain;
     private GenesisBlock gb;
 
     int seqNo = 1;
@@ -101,11 +104,16 @@ public class TestRecPerson {
         }
 
         dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
+
+        cntrl = Controller.getInstance();
+        cntrl.initBlockChain(dcSet);
+        bchain = cntrl.getBlockChain();
+        gb = bchain.getGenesisBlock();
+
         dbPA = dcSet.getPersonAddressMap();
         dbAP = dcSet.getAddressPersonMap();
         dbPS = dcSet.getPersonStatusMap();
 
-        gb = new GenesisBlock();
         try {
             gb.process(dcSet);
         } catch (Exception e) {
@@ -886,6 +894,16 @@ public class TestRecPerson {
 
                 DCSet fork = dcSet.fork();
 
+                BigDecimal userAccount2ERM = userAccount2.getBalanceUSE(ERM_KEY, fork);
+                BigDecimal userAccount2FEE = userAccount2.getBalanceUSE(FEE_KEY, fork);
+                BigDecimal userAccount3ERM = userAccount3.getBalanceUSE(ERM_KEY, fork);
+                BigDecimal userAccount3FEE = userAccount3.getBalanceUSE(FEE_KEY, fork);
+
+                //CHECK REFERENCE RECIPIENT
+                long[] userAccount1ref = userAccount1.getLastTimestamp(fork);
+                long[] userAccount2ref = userAccount2.getLastTimestamp(fork);
+                long[] userAccount3ref = userAccount3.getLastTimestamp(fork);
+
                 PersonAddressMap dbPA_fork = fork.getPersonAddressMap();
                 AddressPersonMap dbAP_fork = fork.getAddressPersonMap();
                 KKPersonStatusMap dbPS_fork = fork.getPersonStatusMap();
@@ -983,7 +1001,6 @@ public class TestRecPerson {
                 assertEquals(true, userAccount2.isPerson(fork, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
                 assertEquals(true, userAccount3.isPerson(fork, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
 
-
                 ////////// ORPHAN //////////////////
                 r_SertifyPubKeys.orphan(gb, Transaction.FOR_NETWORK);
 
@@ -993,19 +1010,21 @@ public class TestRecPerson {
 
                 //CHECK BALANCE RECIPIENT
                 assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, fork));
-                assertEquals(oil_amount_user, userAccount1.getBalanceUSE(FEE_KEY, fork));
-                assertEquals(BG_ZERO, userAccount2.getBalanceUSE(ERM_KEY, fork));
-                assertEquals(BG_ZERO, userAccount2.getBalanceUSE(FEE_KEY, fork));
-                assertEquals(BG_ZERO, userAccount3.getBalanceUSE(ERM_KEY, fork));
-                assertEquals(BG_ZERO, userAccount3.getBalanceUSE(FEE_KEY, fork));
+                assertEquals(oil_amount_user.setScale(userAccount1.getBalanceUSE(FEE_KEY, fork).scale()), userAccount1.getBalanceUSE(FEE_KEY, fork));
+                assertEquals(userAccount2ERM, userAccount2.getBalanceUSE(ERM_KEY, fork));
+                assertEquals(userAccount2FEE, userAccount2.getBalanceUSE(FEE_KEY, fork));
+                assertEquals(userAccount3ERM, userAccount3.getBalanceUSE(ERM_KEY, fork));
+                assertEquals(userAccount3FEE, userAccount3.getBalanceUSE(FEE_KEY, fork));
 
                 //CHECK REFERENCE SENDER
                 //assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(fork));
 
                 //CHECK REFERENCE RECIPIENT
-                assertEquals(null, userAccount1.getLastTimestamp(fork));
-                assertEquals(null, userAccount2.getLastTimestamp(fork));
-                assertEquals(null, userAccount3.getLastTimestamp(fork));
+                // дело втом что для того чтобы был известен публичный ключ в ситеме по счету - при Процессинге его закатываем
+                // а при откате - игнорируем удаление - но тогда там может спутаться при откате у других
+                assertNotEquals(userAccount1ref, userAccount1.getLastTimestamp(fork));
+                assertNotEquals(userAccount2ref, userAccount2.getLastTimestamp(fork));
+                assertNotEquals(userAccount3ref, userAccount3.getLastTimestamp(fork));
 
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
                 // PERSON STATUS ALIVE - must not be modified!
