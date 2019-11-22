@@ -34,11 +34,6 @@ public class NameMap extends DCUMap<String, Name> {
         map = new HashMap<String, Name>();
     }
 
-    @Override
-    protected Name getDefaultValue() {
-        return null;
-    }
-
     public boolean contains(Name name) {
         return this.contains(name.getName());
     }

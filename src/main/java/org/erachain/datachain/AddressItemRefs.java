@@ -60,11 +60,6 @@ public abstract class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[
         map = new TreeMap<Tuple2<byte[], Long>, byte[]>();
     }
 
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
-    }
-
     public byte[] get(String address, Long key) {
         return this.get(new Tuple2<byte[], Long>(Base58.decode(address), key));
     }

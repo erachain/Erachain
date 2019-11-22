@@ -970,20 +970,56 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	// IMPORT/EXPORT
-
 	public String importAccountSeed(byte[] accountSeed) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.isUnlocked()) {
-			return "";
+			return "Wallet is locked";
 		}
 
 		// CHECK LENGTH
 		if (accountSeed.length != Crypto.HASH_LENGTH) {
-			return "";
+			return "Wrong length != 32";
 		}
 
 		// CREATE ACCOUNT
 		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
+
+		// CHECK IF ACCOUNT ALREADY EXISTS
+		if (!this.accountExists(account.getAddress())) {
+			// ADD TO DATABASE
+			this.secureDatabase.getAccountSeedMap().add(account);
+			this.database.getAccountMap().add(account, -1);
+
+			// SAVE TO DISK
+			this.database.hardFlush();
+
+			// SYNCHRONIZE
+			this.synchronize(true);
+
+			// NOTIFY
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
+
+			// RETURN
+			return account.getAddress();
+		}
+
+		return "";
+	}
+
+	public String importPrivateKey(byte[] privateKey64) {
+		// CHECK IF WALLET IS OPEN
+		if (!this.isUnlocked()) {
+			return "Wallet is locked";
+		}
+
+		// CHECK LENGTH
+		if (privateKey64.length != Crypto.SIGNATURE_LENGTH) {
+			return "Wrong length != 64";
+		}
+
+		// CREATE ACCOUNT
+		PrivateKeyAccount account = new PrivateKeyAccount(privateKey64);
 
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account.getAddress())) {

@@ -73,11 +73,6 @@ public class PollMap extends DCUMap<String, Poll> {
         map = new HashMap<String, Poll>();
     }
 
-    @Override
-    protected Poll getDefaultValue() {
-        return null;
-    }
-
     public boolean contains(Poll poll) {
         return this.contains(poll.getName());
     }

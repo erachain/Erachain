@@ -75,7 +75,7 @@ public class NameExchangeMap extends DCUMap<String, BigDecimal> {
     }
 
     @Override
-    protected BigDecimal getDefaultValue() {
+    public BigDecimal getDefaultValue() {
         return BigDecimal.ZERO;
     }
 

@@ -13,12 +13,9 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.TransactionFinalMapSigns;
+import org.erachain.dbs.DBSuit;
 import org.erachain.dbs.rocksDB.DBMapSuit;
-import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
-import org.erachain.dbs.rocksDB.common.RockStoreIterator;
-import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
-import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -195,13 +192,12 @@ public class OrderTest {
 
                 }
 
-                OrdersSuitRocksDB source = (OrdersSuitRocksDB) ordersMap.getSource();
-                DBRocksDBTable<Long, Order> mapRocks = source.map;
-                RocksDbDataSource mapSource = mapRocks.dbSource;
-                RockStoreIterator iteratorRocks = mapSource.indexIterator(false, 1, true);
+                DBSuit suit = ordersMap.getSuit();
+                iterator = suit.getIterator(1, false);
+
                 count = 0;
-                while (iteratorRocks.hasNext()) {
-                    byte[] key = iteratorRocks.next();
+                while (iterator.hasNext()) {
+                    Long key = iterator.next();
                     count++;
                 }
                 assertEquals(count, len);
@@ -210,7 +206,7 @@ public class OrderTest {
                 count = 0;
                 while (iterator.hasNext()) {
                     Long key = iterator.next();
-                    Order value = ((OrdersSuitRocksDB) ordersMap.getSource()).get(key);
+                    Order value = ordersMap.get(key);
                     String price = value.viewPrice();
                     count++;
                 }
@@ -433,9 +429,9 @@ public class OrderTest {
                     Longs.toByteArray(have),
                     Longs.toByteArray(want));
 
-            IndexDB indexDB = ((DBMapSuit) ordersMap.getSource()).getIndex(0);
+            IndexDB indexDB = ((DBMapSuit) ordersMap.getSuit()).getIndex(0);
             assertEquals(indexDB.getNameIndex(), "orders_key_have_want");
-            Iterator iterator = ((DBMapSuit) ordersMap.getSource()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false, true);
+            Iterator iterator = ((DBMapSuit) ordersMap.getSuit()).map.getIndexIteratorFilter(indexDB.getColumnFamilyHandle(), filter, false, true);
 
             List<Order> result = new ArrayList<>();
             count = 0;

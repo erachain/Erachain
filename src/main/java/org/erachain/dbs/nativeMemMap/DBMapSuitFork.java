@@ -36,11 +36,11 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Comparator comparator, Logger logger, U defaultValue) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Comparator comparator, Logger logger, DBTab cover) {
         this.logger = logger;
         this.databaseSet = dcSet;
         this.database = dcSet.database;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
             // System.out.println("########################### Free Memory:"

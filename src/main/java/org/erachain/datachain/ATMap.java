@@ -214,11 +214,6 @@ public class ATMap extends DCUMapImpl<String, AT> {
         return keys;
     }
 
-    @Override
-    protected AT getDefaultValue() {
-        return null;
-    }
-
     public boolean add(AT at) {
         //TODO CHECK PROPER at.getCreator() ENCODING
         return add(at, at.getCreationBlockHeight());

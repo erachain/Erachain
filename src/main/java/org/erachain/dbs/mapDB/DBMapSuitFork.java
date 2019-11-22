@@ -35,13 +35,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     Map<T, Boolean> deleted;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue, boolean sizeEnable) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, boolean sizeEnable, DBTab cover) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
         this.logger = logger;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
         this.sizeEnable = sizeEnable;
 
         if (Runtime.getRuntime().maxMemory() == Runtime.getRuntime().totalMemory()) {
@@ -64,12 +64,12 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     }
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue) {
-        this(parent, dcSet, logger, defaultValue, false);
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, DBTab cover) {
+        this(parent, dcSet, logger, false, cover);
     }
 
     public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger) {
-        this(parent, dcSet, logger, null, false);
+        this(parent, dcSet, logger, false, null);
     }
 
 
@@ -378,14 +378,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         while (iterator.hasNext()) {
             T key = iterator.next();
-            parent.getSource().put(key, this.map.get(key));
+            parent.getSuit().put(key, this.map.get(key));
             updated = true;
         }
 
         if (deleted != null) {
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
-                parent.getSource().delete(iterator.next());
+                parent.getSuit().delete(iterator.next());
                 updated = true;
             }
         }

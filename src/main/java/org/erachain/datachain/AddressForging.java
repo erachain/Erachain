@@ -61,11 +61,6 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         map = new HashMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>>();
     }
 
-    @Override
-    protected Tuple2<Integer, Integer> getDefaultValue() {
-        return null; //new Tuple2<Integer, Integer>(-1, 0);
-    }
-
     /**
      * Возвращает ПУСТО если что, тут нельзя Последнее возвращать
      * @param address

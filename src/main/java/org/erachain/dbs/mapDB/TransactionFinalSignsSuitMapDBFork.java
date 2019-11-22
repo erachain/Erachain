@@ -31,7 +31,7 @@ public class TransactionFinalSignsSuitMapDBFork extends DBMapSuitFork<byte[], Lo
 
 
     public TransactionFinalSignsSuitMapDBFork(TransactionFinalMapSigns parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null, true);
+        super(parent, databaseSet, logger, true, null);
     }
 
     @Override

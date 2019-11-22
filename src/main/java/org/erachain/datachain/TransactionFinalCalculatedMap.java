@@ -151,11 +151,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         this.openMap();
     }
 
-    @Override
-    protected Calculated getDefaultValue() {
-        return null;
-    }
-
     // TODO сделать удаление по фильтру разом - как у RocksDB - deleteRange(final byte[] beginKey, final byte[] endKey)
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Integer height) {

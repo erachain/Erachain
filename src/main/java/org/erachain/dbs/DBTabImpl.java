@@ -14,7 +14,7 @@ import java.util.*;
 
 /**
  * К Обработке данных добалены события. Это Суперкласс для таблиц проекта.
- * Однако в каждой таблице есть еще обертка для каждой СУБД отдельно - DBMapSuit
+ * Однако в каждой таблице есть еще обертка для каждой СУБД отдельно - DBSuit
  * @param <T>
  * @param <U>
  */
@@ -30,9 +30,9 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     protected DBASet databaseSet;
     protected DB database;
 
-    protected IMap<T, U> map;
+    protected DBSuit<T, U> map;
     // Эта Карта не должна путаться вверху с DCU картой - иначе НУЛ при заходе в DBMapCommonImpl
-    ////protected DBMapSuit<T, U> map;
+    ////protected DBSuit<T, U> map;
 
     @Getter
     protected DBTab<T, U> parent;
@@ -123,10 +123,12 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     // for TESTS etc.
-    public void setSource(IMap map) { this.map = map; }
+    public void setSource(DBSuit map) {
+        this.map = map;
+    }
 
     @Override
-    public IMap getSource() {
+    public DBSuit getSuit() {
         return map;
     }
 
@@ -143,6 +145,11 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     @Override
     public boolean isSizeEnable() {
         return sizeEnable;
+    }
+
+    @Override
+    public U getDefaultValue() {
+        return null;
     }
 
     @Override

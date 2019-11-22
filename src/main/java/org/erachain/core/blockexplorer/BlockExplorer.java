@@ -1573,7 +1573,7 @@ public class BlockExplorer {
         String gender = Lang.getInstance().translateFromLangObj("Man", langObj);
         if (person.getGender() == 0) {
             gender = Lang.getInstance().translateFromLangObj("Man", langObj);
-        } else if (person.getGender() == 0) {
+        } else if (person.getGender() == 1) {
             gender = Lang.getInstance().translateFromLangObj("Woman", langObj);
         } else {
             gender = Lang.getInstance().translateFromLangObj("-", langObj);
@@ -2563,7 +2563,7 @@ public class BlockExplorer {
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
         output.put("search_message", address);
 
-        Object forge = info.getQueryParameters().getFirst("forge");
+        Object forge = info == null ? false : info.getQueryParameters().getFirst("forge");
         boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
                 || forge.toString().toLowerCase().equals("1"));
 

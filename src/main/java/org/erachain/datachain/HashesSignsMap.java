@@ -55,7 +55,7 @@ public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
     }
 
     @Override
-    protected Stack<Tuple3<Long, Integer, Integer>> getDefaultValue() {
+    public Stack<Tuple3<Long, Integer, Integer>> getDefaultValue() {
         return new Stack<Tuple3<Long, Integer, Integer>>();
     }
 

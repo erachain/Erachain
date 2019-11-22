@@ -31,13 +31,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     Boolean EXIST = true;
     int shiftSize;
 
-    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, U defaultValue, boolean enableSize) {
+    public DBMapSuitFork(DBTab parent, DBASet dcSet, Logger logger, boolean enableSize, DBTab cover) {
         assert (parent != null);
 
         this.databaseSet = dcSet;
         this.database = dcSet.database;
         this.logger = logger;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
         this.sizeEnable = enableSize;
 
         this.parent = parent;
@@ -259,7 +259,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             T key = iterator.next();
             U item = this.map.get(key);
             if (item != null) {
-                parent.getSource().put(key, this.map.get(key));
+                parent.getSuit().put(key, this.map.get(key));
                 updated = true;
             }
         }
@@ -267,7 +267,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         if (deleted != null) {
             iterator = this.deleted.keySet().iterator();
             while (iterator.hasNext()) {
-                parent.getSource().delete(iterator.next());
+                parent.getSuit().delete(iterator.next());
                 updated = true;
             }
         }

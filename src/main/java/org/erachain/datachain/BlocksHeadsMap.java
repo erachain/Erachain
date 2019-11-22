@@ -65,11 +65,6 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
     }
 
     @Override
-    protected Block.BlockHead getDefaultValue() {
-        return null;
-    }
-
-    @Override
     public int size() {
         return ((DCSet) databaseSet).getBlockSignsMap().size();
     }
