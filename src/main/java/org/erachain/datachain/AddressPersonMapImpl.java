@@ -81,7 +81,7 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
         Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
 
         if (false && this.parent == null)
-            value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>) value.clone(); // тут DEFAULT_VALUE даже меняет ((
+            value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>) value; //.clone(); // тут DEFAULT_VALUE даже меняет ((
         else {
             // !!!! NEEED .clone() !!!
             // need for updates only in fork - not in parent DB
@@ -113,7 +113,7 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
 
         Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
         if (false && this.parent == null)
-            value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>) value.clone(); // тут DEFAULT_VALUE даже меняет ((
+            value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>) value; //.clone(); // тут DEFAULT_VALUE даже меняет ((
         else {
             // !!!! NEEED .clone() !!!
             // need for updates only in fork - not in parent DB
