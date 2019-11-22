@@ -214,6 +214,9 @@ public class TestRecPerson {
 
                 //issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
+                // ADD FEE
+                userAccount1.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+
                 //CHECK IF ISSUE PERSON IS VALID
                 assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -221,13 +224,9 @@ public class TestRecPerson {
                 issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, timestamp + 10L, new byte[64]);
                 issuePersonTransaction.setDC(dcSet);
                 assertEquals(Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
-                // ADD FEE
-                userAccount1.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-                person.setReference(personOwnSign);
-                //issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, timestamp + 10L);
-                //issuePersonTransaction.setDC(dcSet);
-                //issuePersonTransaction.sign(userAccount1, Transaction.FOR_NETWORK);
-                assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
+
+                ((PersonHuman) person).sign(certifier);
+                assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
             } finally {
                 dcSet.close();
