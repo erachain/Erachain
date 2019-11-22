@@ -57,13 +57,11 @@ public class Crypto {
                 return null;
             }
         } else {
-            // здесь СИД из Мобилки - в нем уже лежит пара
-            byte[] privateKey = new byte[Crypto.HASH_LENGTH];
-            System.arraycopy(seed, 0, privateKey, 0, 32);
+            // здесь СИД из Мобилки - в нем уже лежит публичный ключ
             byte[] pubKey = new byte[Crypto.HASH_LENGTH];
             System.arraycopy(seed, 32, pubKey, 0, 32);
 
-            return new Pair(privateKey, pubKey);
+            return new Pair(seed, pubKey);
 
         }
     }
