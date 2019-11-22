@@ -37,11 +37,6 @@ public abstract class AutoKeyDBMap<T, U> extends DCUMapImpl<T, U> {
         });
     }
 
-    @Override
-    protected U getDefaultValue() {
-        return null;
-    }
-
     public Collection<T> getFromToKeys(long fromKey, long toKey) {
         // РАБОТАЕТ намного БЫСТРЕЕ
         return AUTOKEY_INDEX.subMap(fromKey, toKey).values();

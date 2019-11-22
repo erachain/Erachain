@@ -6,11 +6,9 @@ package org.erachain.dbs;
  * @param <T>
  * @param <U>
  */
-public interface DBMapSuit<T, U> extends IMap<T, U> { // DBTabSuitCommon
+public interface DBSuit<T, U> extends IMap<T, U> { // DBTabSuitCommon
 
+    Object getSource();
     //void getMap();
     //void createIndexes();
-
-    U getDefaultValue();
-
 }

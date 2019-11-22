@@ -76,11 +76,6 @@ public class PostCommentMap extends DCUMap<byte[], List<byte[]>> {
     }
 
     @Override
-    protected List<byte[]> getDefaultValue() {
-        return null;
-    }
-
-    @Override
     protected void createIndexes() {
     }
 

@@ -83,6 +83,7 @@ public class AccountSeedMap {
     }
 
     public void add(PrivateKeyAccount account) {
+        //if ()
         this.accountSeedsSet.add(account.getSeed());
 
         if (this.privateKeyAccounts == null) {

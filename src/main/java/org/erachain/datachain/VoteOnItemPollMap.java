@@ -57,11 +57,6 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         map = new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
     }
 
-    @Override
-    protected Stack<Tuple2<Integer, Integer>> getDefaultValue() {
-        return null;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public NavigableSet<Tuple3> getVotes(Long pollKey) {
         BTreeMap map = (BTreeMap) this.map;

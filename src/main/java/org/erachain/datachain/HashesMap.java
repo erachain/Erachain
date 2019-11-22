@@ -35,9 +35,4 @@ public class HashesMap extends DCUMap<byte[], byte[]> {
         map = new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
     }
 
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
-    }
-
 }

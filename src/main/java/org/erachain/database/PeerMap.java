@@ -44,11 +44,6 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
         map = new TreeMap<byte[], byte[]>(UnsignedBytes.lexicographicalComparator());
     }
 
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
-    }
-
     public List<Peer> getAllPeers(int amount) {
         try {
             //GET ITERATOR

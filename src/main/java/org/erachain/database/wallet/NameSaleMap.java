@@ -102,7 +102,7 @@ public class NameSaleMap extends DCUMapImpl<Tuple2<String, String>, BigDecimal> 
     }
 
     @Override
-    protected BigDecimal getDefaultValue() {
+    public BigDecimal getDefaultValue() {
         return BigDecimal.ZERO;
     }
 

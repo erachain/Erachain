@@ -36,11 +36,6 @@ public class BlogPostMap extends DCUMap<String, List<byte[]>> {
     protected void createIndexes() {
     }
 
-    @Override
-    protected List<byte[]> getDefaultValue() {
-        return null;
-    }
-
     public void add(String blogname, byte[] signature) {
         List<byte[]> list;
         if (blogname == null) {

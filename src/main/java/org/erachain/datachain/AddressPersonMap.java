@@ -55,7 +55,7 @@ public class AddressPersonMap extends DCUMap<String, Stack<Tuple4<
     }
 
     @Override
-    protected Stack<Tuple4<Long, Integer, Integer, Integer>> getDefaultValue() {
+    public Stack<Tuple4<Long, Integer, Integer, Integer>> getDefaultValue() {
         return new Stack<Tuple4<Long, Integer, Integer, Integer>>();
     }
 

@@ -37,7 +37,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
         implements TransactionFinalSuit {
 
     public TransactionFinalSuitMapDBFork(TransactionFinalMap parent, DBASet databaseSet, boolean sizeEnable) {
-        super(parent, databaseSet, logger, null, sizeEnable);
+        super(parent, databaseSet, logger, sizeEnable, null);
     }
 
     @Override

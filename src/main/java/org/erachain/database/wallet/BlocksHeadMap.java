@@ -165,11 +165,6 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
         map = new TreeMap<>();
     }
 
-    @Override
-    protected Block.BlockHead getDefaultValue() {
-        return null;
-    }
-
     public Block.BlockHead getLast() {
 
         Iterator<Integer> iterator = this.getIterator(TIMESTAMP_INDEX, true);

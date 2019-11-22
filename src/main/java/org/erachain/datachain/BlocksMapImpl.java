@@ -77,7 +77,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
                     //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
                     //break;
                 default:
-                    map = new NativeMapHashMapFork(parent, databaseSet, null);
+                    map = new NativeMapHashMapFork(parent, databaseSet, this);
             }
         }
     }

@@ -32,11 +32,6 @@ public class HashtagPostMap extends DCUMap<String, List<byte[]>> {
     }
 
     @Override
-    protected List<byte[]> getDefaultValue() {
-        return null;
-    }
-
-    @Override
     protected void createIndexes() {
     }
 

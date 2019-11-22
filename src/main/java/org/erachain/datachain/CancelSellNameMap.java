@@ -43,11 +43,6 @@ public class CancelSellNameMap extends DCUMap<byte[], BigDecimal> {
         map = new TreeMap<byte[], BigDecimal>(UnsignedBytes.lexicographicalComparator());
     }
 
-    @Override
-    protected BigDecimal getDefaultValue() {
-        return null;
-    }
-
     public void delete(CancelSellNameTransaction transaction) {
         this.delete(transaction.getSignature());
     }

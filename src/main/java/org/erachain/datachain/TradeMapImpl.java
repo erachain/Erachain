@@ -61,7 +61,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
                     //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
-                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, null);
+                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
                     break;
                 default:
                     map = new TradeMapSuitMapDBFork((TradeMap)parent, databaseSet);

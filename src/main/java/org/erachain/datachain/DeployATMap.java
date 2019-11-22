@@ -35,8 +35,8 @@ public class DeployATMap extends DCUMap<byte[], Long> {
     }
 
     @Override
-    protected Long getDefaultValue() {
-        return -1l;
+    public Long getDefaultValue() {
+        return -1L;
     }
 
     public Long get(Transaction transaction) {

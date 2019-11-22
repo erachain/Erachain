@@ -22,7 +22,7 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     ///private final String NAME_TABLE = "TRANSACTIONS_UNCONFIRMED_TABLE_FORK";
 
     public TransactionSuitRocksDBFork(TransactionMap parent, DBRocksDBTable parentMap, DBASet databaseSet) {
-        super(parent, databaseSet, logger, null, true);
+        super(parent, databaseSet, logger, true, null);
     }
 
     @Override

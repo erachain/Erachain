@@ -65,9 +65,4 @@ public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
 
     }
 
-    @Override
-    protected List<byte[]> getDefaultValue() {
-        return null;
-    }
-
 }

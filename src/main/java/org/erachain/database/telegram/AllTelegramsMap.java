@@ -38,12 +38,6 @@ public class AllTelegramsMap extends DCUMapImpl<String, Transaction> {
     protected void getMemoryMap() {
     }
 
-    @Override
-    protected Transaction getDefaultValue() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public boolean add(String signature, Transaction telegramMessage) {
         return this.set(signature, telegramMessage);
     }

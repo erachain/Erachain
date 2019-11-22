@@ -38,9 +38,4 @@ public class LocalDataMap extends DCUMap<String, String> {
     protected void createIndexes() {
     }
 
-    @Override
-    protected String getDefaultValue() {
-        return null;
-    }
-
 }
