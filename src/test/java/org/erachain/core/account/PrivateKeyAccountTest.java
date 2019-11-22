@@ -10,11 +10,17 @@ import static org.junit.Assert.assertEquals;
 
 public class PrivateKeyAccountTest {
 
+    /**
+     * Проверка работы по СИДУ из мобилки
+     */
     @Test
     public void mobilePrivateKey() {
         String privKyeMobi = "5BzAsmeoXwNzzWdeR253vxLXv7qqutHg952CbFsj1iqaBf3AeswgE9JjzEu78ddi516imb1FaR78gbf54812i7Fe";
         byte[] privKyeMobiByte = Base58.decode(privKyeMobi, Crypto.SIGNATURE_LENGTH);
         PrivateKeyAccount privAccount = new PrivateKeyAccount(privKyeMobiByte);
+        assertEquals("249wR1G2X5udjMcyRCKVtgcQmVbq39jC35YpjHkLM8b2", Base58.encode(privAccount.publicKey));
+        assertEquals("7583vPjLhbuSjSVykLnS1i2SjS8KjYPCi7", privAccount.address);
+
         byte[] signature = Crypto.getInstance().sign(privAccount, privKyeMobiByte);
         assertEquals(true, Crypto.getInstance().verify(privAccount.getPublicKey(), signature, privKyeMobiByte));
 

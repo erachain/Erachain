@@ -57,11 +57,7 @@ public class Crypto {
                 return null;
             }
         } else {
-            // здесь СИД из Мобилки - в нем уже лежит публичный ключ
-            byte[] pubKey = new byte[Crypto.HASH_LENGTH];
-            System.arraycopy(seed, 32, pubKey, 0, 32);
-
-            return new Pair(seed, pubKey);
+            return Ed25519.createKeyPair(seed);
 
         }
     }
