@@ -209,7 +209,6 @@ public class TestRecPerson {
             try {
                 init(dbs);
 
-                byte[] personOwnSign = person.getReference();
                 issuePersonTransaction.setDC(dcSet);
 
                 //issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
@@ -362,8 +361,9 @@ public class TestRecPerson {
             try {
                 init(dbs);
 
-                //assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(dcSet, Transaction.FOR_NETWORK));
-                assertEquals(Transaction.INVALID_IMAGE_LENGTH_MAX, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
+                issuePersonTransaction.setDC(dcSet);
+
+                assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
                 issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1);
                 issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
@@ -371,9 +371,20 @@ public class TestRecPerson {
 
                 LOGGER.info("person KEY: " + person.getKey(dcSet));
 
+                BigDecimal eraUSE = new BigDecimal("1000");
+                if (BlockChain.ERA_COMPU_ALL_UP) {
+                    eraUSE = eraUSE.add(certifier.addDEVAmount(ERM_KEY));
+                }
+
                 //CHECK BALANCE ISSUER
-                assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(BigDecimal.valueOf(1).subtract(issuePersonTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(eraUSE.setScale(certifier.getBalanceUSE(ERM_KEY, dcSet).scale()), certifier.getBalanceUSE(ERM_KEY, dcSet));
+
+                BigDecimal compuUSE = new BigDecimal("1");
+                if (BlockChain.ERA_COMPU_ALL_UP) {
+                    compuUSE = compuUSE.add(certifier.addDEVAmount(FEE_KEY));
+                }
+                assertEquals(compuUSE.subtract(issuePersonTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
+                        certifier.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK PERSON EXISTS DB AS CONFIRMED:  key > -1
                 long key = dcSet.getIssuePersonMap().get(issuePersonTransaction);
@@ -384,14 +395,14 @@ public class TestRecPerson {
                 assertEquals(true, Arrays.equals(dcSet.getItemPersonMap().get(key).toBytes(true, false), person.toBytes(true, false)));
 
                 //CHECK REFERENCE SENDER
-                assertEquals(issuePersonTransaction.getTimestamp(), certifier.getLastTimestamp(dcSet));
+                assertEquals(issuePersonTransaction.getTimestamp(), new Long(certifier.getLastTimestamp(dcSet)[0]));
 
                 //////// ORPHAN /////////
                 issuePersonTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
                 //CHECK BALANCE ISSUER
-                assertEquals(BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(eraUSE.setScale(certifier.getBalanceUSE(ERM_KEY, dcSet).scale()), certifier.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(compuUSE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK PERSON EXISTS ISSUER
                 assertEquals(false, dcSet.getItemPersonMap().contains(personKey));
