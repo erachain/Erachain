@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
 import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
@@ -23,8 +24,8 @@ public class AddressPersonRocksSuit extends DBMapSuit<byte[], Stack<Fun.Tuple4<
 
     private final String NAME_TABLE = "ADDRESS_PERSON_TABLE";
 
-    public AddressPersonRocksSuit(DBASet databaseSet, DB database, Stack defaultValue) {
-        super(databaseSet, database, logger, defaultValue, false);
+    public AddressPersonRocksSuit(DBASet databaseSet, DB database, DBTab cover) {
+        super(databaseSet, database, logger, false, cover);
     }
 
     @Override

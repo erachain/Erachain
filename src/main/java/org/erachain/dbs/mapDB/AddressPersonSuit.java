@@ -2,6 +2,7 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
+import org.erachain.dbs.DBTab;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Hasher;
@@ -32,8 +33,8 @@ public class AddressPersonSuit extends DBMapSuit<byte[], Stack<Tuple4<
         Integer, // block height
         Integer>>> // transaction index
 {
-    public AddressPersonSuit(DBASet databaseSet, DB database, Stack defaultValue) {
-        super(databaseSet, database, logger, defaultValue, false);
+    public AddressPersonSuit(DBASet databaseSet, DB database, DBTab cover) {
+        super(databaseSet, database, logger, false, cover);
     }
 
     @Override

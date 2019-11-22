@@ -8,6 +8,7 @@ import org.mapdb.Fun.Tuple4;
 
 public class ByteableStackTuple4 extends ByteableStack<Tuple4<Long, Integer, Integer, Integer>> {
 
+    final static int LENGHT = Long.BYTES + Integer.BYTES + Integer.BYTES + Integer.BYTES;
     ByteableLong byteableLong = new ByteableLong();
     ByteableInteger byteableInteger = new ByteableInteger();
 
@@ -25,7 +26,7 @@ public class ByteableStackTuple4 extends ByteableStack<Tuple4<Long, Integer, Int
 
     @Override
     public int sizeElement() {
-        return Long.BYTES + Long.BYTES + Integer.BYTES + Integer.BYTES;
+        return LENGHT;
     }
 
 

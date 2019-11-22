@@ -36,8 +36,6 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
         Integer>>> implements AddressPersonMap // transaction index
 {
 
-    final static Stack<Tuple4<Long, Integer, Integer, Integer>> DEFAULT_VALUE = new Stack<Tuple4<Long, Integer, Integer, Integer>>();
-
     public AddressPersonMapImpl(int dbs, DCSet databaseSet, DB database) {
         super(dbs, databaseSet, database);
     }
@@ -56,23 +54,24 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
         if (parent == null) {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    map = new AddressPersonRocksSuit(databaseSet, database, DEFAULT_VALUE);
+                    map = new AddressPersonRocksSuit(databaseSet, database, this);
                     break;
                 default:
-                    map = new AddressPersonSuit(databaseSet, database, DEFAULT_VALUE);
+                    map = new AddressPersonSuit(databaseSet, database, this);
             }
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    //map = new BlocksSuitMapDBFork((TransactionMap) parent, databaseSet);
-                    //break;
                 case DBS_ROCK_DB:
-                    //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
-                    //break;
                 default:
-                    map = new NativeMapTreeMapFork<>(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, DEFAULT_VALUE);
+                    map = new NativeMapTreeMapFork<>(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
             }
         }
+    }
+
+    @Override
+    public Stack<Tuple4<Long, Integer, Integer, Integer>> getDefaultValue() {
+        return new Stack<Tuple4<Long, Integer, Integer, Integer>>();
     }
 
     @Override
@@ -82,7 +81,7 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
         Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
 
         if (false && this.parent == null)
-            value_new = value; // тут DEFAULT_VALUE даже меняет ((
+            value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>) value.clone(); // тут DEFAULT_VALUE даже меняет ((
         else {
             // !!!! NEEED .clone() !!!
             // need for updates only in fork - not in parent DB
@@ -114,7 +113,7 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
 
         Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
         if (false && this.parent == null)
-            value_new = value; // тут DEFAULT_VALUE даже меняет ((
+            value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>) value.clone(); // тут DEFAULT_VALUE даже меняет ((
         else {
             // !!!! NEEED .clone() !!!
             // need for updates only in fork - not in parent DB
