@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.ItemAssetBalanceMapImpl;
 import org.erachain.datachain.ItemAssetBalanceSuit;
+import org.erachain.dbs.DBTab;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -22,8 +22,8 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
         Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
         implements ItemAssetBalanceSuit {
 
-    public ItemAssetBalanceSuitMapDBFork(ItemAssetBalanceMap parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, ItemAssetBalanceMapImpl.DEFAULT_VALUE, false);
+    public ItemAssetBalanceSuitMapDBFork(ItemAssetBalanceMap parent, DBASet databaseSet, DBTab cover) {
+        super(parent, databaseSet, logger, false, cover);
     }
 
     @SuppressWarnings({"unchecked"})

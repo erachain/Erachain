@@ -82,11 +82,6 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
     }
 
-    @Override
-    protected Tuple2<Long, ItemCls> getDefaultValue() {
-        return null;
-    }
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Tuple2<Long, ItemCls>> get(Account account) {
         List<Tuple2<Long, ItemCls>> items = new ArrayList<Tuple2<Long, ItemCls>>();

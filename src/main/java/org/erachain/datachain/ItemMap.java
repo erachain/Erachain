@@ -161,11 +161,6 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         map = new TreeMap<Long, ItemCls>();
     }
 
-    @Override
-    protected ItemCls getDefaultValue() {
-        return null;
-    }
-
     public ItemCls get(Long key) {
         ItemCls item = super.get(key);
         if (item == null) {

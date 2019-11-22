@@ -36,7 +36,7 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
     }
 
     @Override
-    protected Long getDefaultValue() {
+    public Long getDefaultValue() {
         return 0L;
     }
 

@@ -33,11 +33,6 @@ public class OrphanNameStorageMap extends DCUMap<byte[], Map<String, String>> {
     }
 
     @Override
-    protected Map<String, String> getDefaultValue() {
-        return null;
-    }
-
-    @Override
     protected void createIndexes() {
     }
 

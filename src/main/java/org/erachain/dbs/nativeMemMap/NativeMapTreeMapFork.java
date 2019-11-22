@@ -11,8 +11,8 @@ import java.util.TreeMap;
 @Slf4j
 public class NativeMapTreeMapFork<T, U> extends DBMapSuitFork<T, U> implements ForkedMap {
 
-    public NativeMapTreeMapFork(DBTab parent, DBASet databaseSet, Comparator comparator, U defaultValue) {
-        super(parent, databaseSet, comparator, logger, defaultValue);
+    public NativeMapTreeMapFork(DBTab parent, DBASet databaseSet, Comparator comparator, DBTab cover) {
+        super(parent, databaseSet, comparator, logger, cover);
     }
 
     @Override

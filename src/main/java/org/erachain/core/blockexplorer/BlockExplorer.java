@@ -2563,7 +2563,7 @@ public class BlockExplorer {
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
         output.put("search_message", address);
 
-        Object forge = info.getQueryParameters().getFirst("forge");
+        Object forge = info == null ? false : info.getQueryParameters().getFirst("forge");
         boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
                 || forge.toString().toLowerCase().equals("1"));
 

@@ -45,9 +45,4 @@ public class AccountsPropertisMap extends DCUMapImpl<String, Tuple2<String, Stri
         map = new TreeMap<String, Tuple2<String, String>>(Fun.COMPARATOR);
     }
 
-    @Override
-    protected Tuple2<String, String> getDefaultValue() {
-        return null;
-    }
-
 }

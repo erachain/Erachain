@@ -30,11 +30,6 @@ public class NameStorageMap extends DCUMap<String, Map<String, String>> {
         map = new HashMap<String, Map<String, String>>();
     }
 
-    @Override
-    protected Map<String, String> getDefaultValue() {
-        return null;
-    }
-
     protected void createIndexes() {
     }
 

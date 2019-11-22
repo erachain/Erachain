@@ -97,7 +97,7 @@ public class DBRocksDBTableTest {
 
         init();
 
-        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null);
+        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null, null);
 
         long assetKey1 = 1L;
 
@@ -224,7 +224,7 @@ public class DBRocksDBTableTest {
     public void assetIteratorAndReplace() {
         init();
 
-        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null);
+        ItemAssetBalanceSuitRocksDB tab = new ItemAssetBalanceSuitRocksDB(null, null, null);
 
         int size = tab.size();
 

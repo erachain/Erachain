@@ -1,8 +1,8 @@
 package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapSuitImpl;
-import org.erachain.dbs.IMap;
+import org.erachain.dbs.DBSuitImpl;
+import org.erachain.dbs.DBTab;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -19,7 +19,7 @@ import java.util.*;
  * @param <T>
  * @param <U>
  */
-public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
+public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     protected Logger logger;
     public int DESCENDING_SHIFT_INDEX = 10000;
@@ -40,20 +40,21 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     /**
-     *  @param databaseSet
+     * @param databaseSet
      * @param database - общая база данных для данного набора - вообще надо ее в набор свтавить и все.
      *                 У каждой таблицы внутри может своя база данных открытьваться.
      *                 А команды базы данных типа close commit должны из таблицы передаваться в свою.
      *                 Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
      * @param logger
      * @param sizeEnable
+     * @param cover
      */
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue, boolean sizeEnable) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable, DBTab cover) {
 
         this.databaseSet = databaseSet;
         this.database = database;
         this.logger = logger;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
         this.sizeEnable = sizeEnable;
 
         openMap();
@@ -62,11 +63,11 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable) {
-        this(databaseSet, database, logger, null, sizeEnable);
+        this(databaseSet, database, logger, sizeEnable, null);
     }
 
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger) {
-        this(databaseSet, database, logger, null, false);
+        this(databaseSet, database, logger, false, null);
     }
 
     /**
@@ -111,8 +112,8 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     @Override
-    public IMap getSource() {
-        return null;
+    public Object getSource() {
+        return map;
     }
 
     //@Override
@@ -362,11 +363,6 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
 
         this.outUses();
 
-    }
-
-    @Override
-    public U getDefaultValue() {
-        return defaultValue;
     }
 
     @Override

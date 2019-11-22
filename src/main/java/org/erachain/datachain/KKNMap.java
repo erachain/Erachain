@@ -69,7 +69,7 @@ public class KKNMap extends DCUMap<
     }
 
     @Override
-    protected TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> getDefaultValue() {
+    public TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> getDefaultValue() {
         return new TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>>();
     }
 

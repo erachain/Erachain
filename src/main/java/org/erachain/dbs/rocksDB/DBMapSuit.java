@@ -1,8 +1,8 @@
 package org.erachain.dbs.rocksDB;
 
 import org.erachain.database.DBASet;
-import org.erachain.dbs.DBMapSuitImpl;
-import org.erachain.dbs.IMap;
+import org.erachain.dbs.DBSuitImpl;
+import org.erachain.dbs.DBTab;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -21,7 +21,7 @@ import java.util.Set;
  * @param <U>
  */
 
-public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
+public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
 
     protected Logger logger;
     protected DBASet databaseSet;
@@ -34,13 +34,13 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     public DBMapSuit() {
     }
 
-    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, U defaultValue, boolean sizeEnable) {
+    public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable, DBTab cover) {
 
         this.databaseSet = databaseSet;
         // database - is null
         this.database = database;
         this.logger = logger;
-        this.defaultValue = defaultValue;
+        this.cover = cover;
         this.sizeEnable = sizeEnable;
 
         // create INDEXES before
@@ -53,12 +53,12 @@ public abstract class DBMapSuit<T, U> extends DBMapSuitImpl<T, U> {
     }
 
     public DBMapSuit(DBASet databaseSet, DB database, Logger logger, boolean sizeEnable) {
-        this(databaseSet, database, logger, null, sizeEnable);
+        this(databaseSet, database, logger, sizeEnable, null);
     }
 
     @Override
-    public IMap getSource() {
-        return (IMap) map;
+    public Object getSource() {
+        return map;
     }
 
     public IndexDB getIndexByName(String name) {

@@ -133,9 +133,4 @@ public class ATStateMap extends DCUMap<Tuple2<Integer, String>, byte[]> {
         }
     }
 
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
-    }
-
 }
