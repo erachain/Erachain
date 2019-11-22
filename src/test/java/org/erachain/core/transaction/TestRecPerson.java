@@ -88,6 +88,8 @@ public class TestRecPerson {
     private DCSet dcSet;
     private GenesisBlock gb;
 
+    int seqNo = 1;
+
     // INIT PERSONS
     private void init(int dbs) {
         LOGGER.info(" ********** open DBS: " + dbs);
@@ -122,13 +124,13 @@ public class TestRecPerson {
         //personGeneral.setKey(genesisPersonKey);
 
         GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-        genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1);
+        genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
         genesis_issue_person.process(gb, Transaction.FOR_NETWORK);
         //genesisPersonKey = dcSet.getIssuePersonMap().size();
         genesisPersonKey = genesis_issue_person.getAssetKey(dcSet);
 
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, genesisPersonKey);
-        genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1);
+        genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
         certifier.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
@@ -155,12 +157,17 @@ public class TestRecPerson {
 
     public void initPersonalize() {
 
-        issuePersonTransaction.setDC(dcSet);
+        issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
         assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
         issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
+
+        // нужно занести ее в базу чтобы считать по этой записи персону создавшую эту запись
+        dcSet.getTransactionFinalMap().put(issuePersonTransaction);
+        dcSet.getTransactionFinalMapSigns().put(issuePersonTransaction.signature, issuePersonTransaction.dbRef);
+
         personKey = person.getKey(dcSet);
 
         // issue 1 genesis person in init() here
@@ -364,7 +371,7 @@ public class TestRecPerson {
                 issuePersonTransaction.setDC(dcSet);
 
                 assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
-                issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1);
+                issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
                 issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
 
                 issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
@@ -451,7 +458,7 @@ public class TestRecPerson {
                         sertifiedPublicKeys,
                         356, timestamp, userAccount1.getLastTimestamp(dcSet)[0]);
                 //CREATE INVALID ISSUE PERSON - NOT FEE
-                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
                 assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
                 // ADD FEE
                 userAccount1.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
@@ -832,6 +839,8 @@ public class TestRecPerson {
                 assertEquals(false, userAccount2.isPerson(dcSet, dcSet.getBlockMap().size()));
                 assertEquals(false, userAccount3.isPerson(dcSet, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
 
+                BigDecimal oil_amount_start = certifier.getBalanceUSE(FEE_KEY, dcSet);
+
                 initPersonalize();
 
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
@@ -857,7 +866,11 @@ public class TestRecPerson {
                 // PERSON -> ADDRESS
                 assertEquals(null, dbPA.getItem(personKey, userAddress3));
 
-                BigDecimal oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
+                BigDecimal oil_amount_diff;
+                if (false)
+                    oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
+                else
+                    oil_amount_diff = RSertifyPubKeys.BONUS_FOR_PERSON_4_11.add(RSertifyPubKeys.BONUS_FOR_PERSON_4_11);
 
                 BigDecimal erm_amount = certifier.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount = certifier.getBalanceUSE(FEE_KEY, dcSet);
@@ -877,39 +890,39 @@ public class TestRecPerson {
                 AddressPersonMap dbAP_fork = fork.getAddressPersonMap();
                 KKPersonStatusMap dbPS_fork = fork.getPersonStatusMap();
 
-
+                r_SertifyPubKeys.setDC(fork);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
                 int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
-
-                //assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
                 //CHECK BALANCE SENDER
                 assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, dcSet));
                 // CHECK FEE BALANCE - FEE - GIFT
-                assertEquals(oil_amount,
-                        certifier.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(oil_amount, certifier.getBalanceUSE(FEE_KEY, dcSet));
 
-                // INN FORK
+                // IN FORK
                 //CHECK BALANCE SENDER
                 assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, fork));
                 // CHECK FEE BALANCE - FEE - GIFT
-                assertEquals(oil_amount.subtract(oil_amount_diff).subtract(r_SertifyPubKeys.getFee()),
-                        certifier.getBalanceUSE(FEE_KEY, fork));
+                // тут мы заверителю возвращаем его затраты - у него должно сать столько же как до внесения персоны
+                assertEquals(oil_amount_start, certifier.getBalanceUSE(FEE_KEY, fork));
 
                 //CHECK BALANCE RECIPIENT
-                assertEquals(BG_ZERO, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
                 // in FORK
                 //CHECK BALANCE RECIPIENT
-                assertEquals(BlockChain.GIFTED_COMPU_AMOUNT, userAccount1.getBalanceUSE(FEE_KEY, fork));
+                if (BlockChain.DEVELOP_USE)
+                    assertEquals(oil_amount_diff.add(userAccount1.addDEVAmount(FEE_KEY)), userAccount1.getBalanceUSE(FEE_KEY, fork));
+                else
+                    assertEquals(oil_amount_diff, userAccount1.getBalanceUSE(FEE_KEY, fork));
 
                 //CHECK REFERENCE SENDER
-                assertEquals(last_ref, certifier.getLastTimestamp(dcSet));
-                assertEquals(r_SertifyPubKeys.getTimestamp(), certifier.getLastTimestamp(fork));
+                assertEquals(last_ref, (Long) certifier.getLastTimestamp(dcSet)[0]);
+                assertEquals(r_SertifyPubKeys.getTimestamp(), (Long) certifier.getLastTimestamp(fork)[0]);
 
                 //CHECK REFERENCE RECIPIENT
                 // TRUE - new reference for first send FEE
                 assertEquals(null, userAccount1.getLastTimestamp(dcSet));
-                assertEquals(r_SertifyPubKeys.getTimestamp(), userAccount1.getLastTimestamp(fork));
+                assertEquals(r_SertifyPubKeys.getTimestamp(), (Long) userAccount1.getLastTimestamp(fork)[0]);
 
                 ////////// TO DATE ////////
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
@@ -1035,7 +1048,7 @@ public class TestRecPerson {
                         "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
                 GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
-                genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 1, 5);
+                genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
                 genesis_issue_person.process(gb, Transaction.FOR_NETWORK);
                 //genesisPersonKey = dcSet.getIssuePersonMap().size();
                 genesisPersonKey = genesis_issue_person.getAssetKey(dcSet);
