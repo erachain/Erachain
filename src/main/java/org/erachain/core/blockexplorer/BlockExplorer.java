@@ -853,7 +853,9 @@ public class BlockExplorer {
             assetJSON.put("description", asset.viewDescription());
         }
         assetJSON.put("owner", asset.getOwner().getAddress());
-        assetJSON.put("quantity", asset.getQuantity());
+        assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
+        assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
+
         assetJSON.put("scale", asset.getScale());
 
         assetJSON.put("key", asset.getKey());
@@ -865,7 +867,6 @@ public class BlockExplorer {
             assetJSON.put("description", asset.viewDescription());
         }
         assetJSON.put("owner", asset.getOwner().getAddress());
-        assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
         assetJSON.put("scale", asset.getScale());
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
         assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));

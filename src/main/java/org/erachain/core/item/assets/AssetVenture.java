@@ -154,13 +154,16 @@ public class AssetVenture extends AssetCls {
             // IF UNLIMIT QIUNTITY
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
             long bal = -bals.a.b.longValue();
-            if (bal == 0) {
-                bal = 1l;
-            }
             return bal;
         } else {
             return this.quantity;
         }
+    }
+
+    @Override
+    public BigDecimal getReleased(DCSet dcSet) {
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
+        return bals.a.b.negate();
     }
 
     @Override
@@ -201,8 +204,11 @@ public class AssetVenture extends AssetCls {
         JSONObject assetJSON = super.toJson();
 
         // ADD DATA
-        assetJSON.put("quantity", this.getQuantity());
-
+        if (quantity > 0) {
+            assetJSON.put("quantity", this.getQuantity());
+        } else {
+            assetJSON.put("released", this.getTotalQuantity(DCSet.getInstance()));
+        }
         return assetJSON;
     }
 

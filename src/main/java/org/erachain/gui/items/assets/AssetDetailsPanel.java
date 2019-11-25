@@ -145,7 +145,11 @@ public class AssetDetailsPanel extends JPanel {
 
         //QUANTITY
         detailGBC.gridy = gridy;
-        JTextField txtQuantity = new JTextField(asset.getQuantity().toString());
+        long quantity = asset.getQuantity();
+        if (quantity <= 0) {
+            quantity = asset.getTotalQuantity(DCSet.getInstance());
+        }
+        JTextField txtQuantity = new JTextField("" + quantity);
         txtQuantity.setEditable(false);
         this.add(txtQuantity, detailGBC);
 
