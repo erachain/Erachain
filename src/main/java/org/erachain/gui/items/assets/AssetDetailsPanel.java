@@ -9,6 +9,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.utils.NumberAsString;
 
 import javax.swing.*;
 import java.awt.*;
@@ -145,13 +146,18 @@ public class AssetDetailsPanel extends JPanel {
 
         //QUANTITY
         detailGBC.gridy = gridy;
-        long quantity = asset.getQuantity();
-        if (quantity <= 0) {
-            quantity = asset.getTotalQuantity(DCSet.getInstance());
-        }
-        JTextField txtQuantity = new JTextField("" + quantity);
+        JTextField txtQuantity = new JTextField(NumberAsString.formatAsString(asset.getQuantity()));
         txtQuantity.setEditable(false);
         this.add(txtQuantity, detailGBC);
+
+        //LABEL RELEASED
+        labelGBC.gridy = ++gridy;
+        this.add(new JLabel(Lang.getInstance().translate("Released") + ":"), labelGBC);
+        //RELEASED
+        detailGBC.gridy = gridy;
+        JTextField txtReleased = new JTextField(NumberAsString.formatAsString(asset.getReleased()));
+        txtReleased.setEditable(false);
+        this.add(txtReleased, detailGBC);
 
         //LABEL TYPE
         labelGBC.gridy = ++gridy;

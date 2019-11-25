@@ -7,7 +7,9 @@ import com.google.common.primitives.Ints;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.datachain.DCSet;
+import org.mapdb.Fun;
 
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -128,8 +130,13 @@ public class AssetUnique extends AssetCls {
     }
 
     @Override
-    public Long getTotalQuantity(DCSet dc) {
-        return 1L;
+    public BigDecimal getReleased(DCSet dcSet) {
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
+        return BigDecimal.ONE.subtract(bals.a.b);
+    }
+
+    public BigDecimal getReleased() {
+        return getReleased(DCSet.getInstance());
     }
 
     //OTHER

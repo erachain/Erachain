@@ -2,18 +2,10 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.core.item.persons.PersonCls;
-import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
-import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
-
-import java.util.Collection;
-import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class WalletItemAssetsTableModel extends WalletAutoKeyTableModel<Tuple2<Long, Long>, Tuple2<Long, AssetCls>> {
@@ -64,7 +56,7 @@ public class WalletItemAssetsTableModel extends WalletAutoKeyTableModel<Tuple2<L
 
             case COLUMN_AMOUNT:
 
-                return asset.getTotalQuantity(DCSet.getInstance());
+                return asset.getQuantity();
 
             case COLUMN_CONFIRMED:
 

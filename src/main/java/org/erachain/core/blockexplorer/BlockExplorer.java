@@ -850,7 +850,7 @@ public class BlockExplorer {
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
             assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
         } else {
-            assetJSON.put("description", asset.viewDescription());
+            assetJSON.put("description ", asset.viewDescription());
         }
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
@@ -1499,7 +1499,8 @@ public class BlockExplorer {
             assetJSON.put("description", asset.viewDescription());
         }
         assetJSON.put("owner", asset.getOwner().getAddress());
-        assetJSON.put("quantity", NumberAsString.formatAsString(asset.getTotalQuantity(dcSet)));
+        assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
+        //assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
         assetJSON.put("scale", asset.getScale());
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
@@ -1834,7 +1835,7 @@ public class BlockExplorer {
         }
         AssetCls asset = Controller.getInstance().getAsset(assetKey);
         if (asset == null) {
-            output.put("allTotal", "-1");// (all.add(alloreders)).toPlainString());
+            output.put("released", "--");// (all.add(alloreders)).toPlainString());
             output.put("assetName", "--");
             output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
                     .replace("%limit%", String.valueOf(limit))).replace("%assetName%", "--"));
@@ -1845,7 +1846,7 @@ public class BlockExplorer {
                     (Lang.getInstance().translateFromLangObj("All %assetName% accounts (%count%)", langObj)
                             .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
         } else {
-            output.put("allTotal", asset.getTotalQuantity(dcSet));// (all.add(alloreders)).toPlainString());
+            output.put("released", asset.getReleased(dcSet));// (all.add(alloreders)).toPlainString());
             output.put("assetName", asset.getName());
             output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
                     .replace("%limit%", String.valueOf(limit))).replace("%assetName%", asset.getName()));

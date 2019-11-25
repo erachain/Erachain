@@ -10,6 +10,7 @@ import org.erachain.gui.library.Library;
 import org.erachain.gui.library.VoushLibraryPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
+import org.erachain.utils.NumberAsString;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
@@ -121,11 +122,8 @@ public class AssetInfo extends JTextPane {
             text += "<div>" + Lang.getInstance().translate("Owner") + ": <a href = '!!Owner'><b>" + hl_Owner.get_Text() + "</b></a></div>";
             text += "<div>" + Lang.getInstance().translate("TYPE") + ": <b>" + Lang.getInstance().translate(asset.viewAssetTypeFull()) + "</b>,";
             text += " " + Lang.getInstance().translate("accuracy") + ": <b>" + asset.getScale() + "</b>,";
-            if (asset.getQuantity() > 0) {
-                text += " " + Lang.getInstance().translate("quantity") + ": <b>" + asset.getQuantity() + "</b>";
-            } else {
-                text += " " + Lang.getInstance().translate("released") + ": <b>" + asset.getTotalQuantity(DCSet.getInstance()) + "</b>";
-            }
+            text += " " + Lang.getInstance().translate("quantity") + ": <b>" + NumberAsString.formatAsString(asset.getQuantity()) + "</b>";
+            text += " " + Lang.getInstance().translate("released") + ": <b>" + NumberAsString.formatAsString(asset.getReleased()) + "</b>";
 
             text += "</div><<BR></td></tr></table>";
             text += "<div>";
