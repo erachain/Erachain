@@ -987,38 +987,23 @@ button.white-bgc[disabled]:focus,
                 output += '<tr>';
 
                 output += '<td><b>';
-                output += '<a href="?asset=' + data.asset.this.key + '&asset=' + key + get_lang() + '">';
-                output += getAssetName2(data.asset.this.key, data.asset.this.name);
-                output += '/' + getAssetName2(key, data.asset.pairs[key].assetName);
+                output += '<a href="?asset=' + key + get_lang() + '">';
+                output += getAssetName2(key, data.asset.pairs[key].assetName);
 
                 output += '<td>' + data.asset.pairs[key].openOrdersCount;
 
                 output += '<td nowrap>';
-                if (data.asset.pairs[key].ordersPriceVolume == '0.00000000') {
-                    output += '<font color=#e1e1e1>' + addCommas(data.asset.pairs[key].ordersPriceVolume) + ' ' + getAssetNameMiniGrey(key, data.asset.pairs[key].assetName) + '</font>';
-                } else {
-                    output += '<font color=black>' + addCommas(data.asset.pairs[key].ordersPriceVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName) + '</font>';
-                }
+                output += '<a href="?asset=' + key + '&asset=' + data.this.key + get_lang() + '">'
+                output += addCommas(data.asset.pairs[key].ordersPriceVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName);
+                output += '</a>';
 
-                if (data.asset.pairs[key].ordersAmountVolume == '0.00000000') {
-                    output += '<br><font color="#e0e0e0">' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMiniGrey(data.asset.this.key, data.asset.this.name) + '</font>';
-                } else {
-                    output += '<br><font color=black>' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name) + '</font>';
-                }
+                output += '<br>' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 
                 output += '<td>' + data.asset.pairs[key].tradesCount;
 
                 output += '<td nowrap>';
-                if (data.asset.pairs[key].tradeAmountVolume == '0.00000000') {
-                    output += '<font color=#e1e1e1>' + addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMiniGrey(key, data.asset.pairs[key].assetName);
-                } else {
-                    output += '<font color=black>' + addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName);
-                }
-                if (data.asset.pairs[key].tradesPriceVolume == '0.00000000') {
-                    output += '<br><font color=#e1e1e1>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMiniGrey(data.asset.this.key, data.asset.this.name);
-                } else {
-                    output += '<br><font color=black>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
-                }
+                output += addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName);
+                output += '<br>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 
                 output += '<td>' + escapeHtml(data.asset.pairs[key].description.substr(0, 100));
             }

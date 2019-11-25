@@ -692,9 +692,9 @@ public class BlockExplorer {
             List<Order> orders,
             List<Trade> trades) {
 
-        Map<Long, Integer> pairsOpenOrders = new TreeMap<Long, Integer>();
-        Map<Long, BigDecimal> volumePriceOrders = new TreeMap<Long, BigDecimal>();
-        Map<Long, BigDecimal> volumeAmountOrders = new TreeMap<Long, BigDecimal>();
+        Map<Long, Integer> pairsOpenOrders = new HashMap<Long, Integer>();
+        Map<Long, BigDecimal> volumePriceOrders = new HashMap<Long, BigDecimal>();
+        Map<Long, BigDecimal> volumeAmountOrders = new HashMap<Long, BigDecimal>();
 
         int count;
         BigDecimal volumePrice = BigDecimal.ZERO;
