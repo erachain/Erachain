@@ -7,6 +7,7 @@ import com.google.common.primitives.Ints;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.datachain.DCSet;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
@@ -132,7 +133,7 @@ public class AssetUnique extends AssetCls {
     @Override
     public BigDecimal getReleased(DCSet dcSet) {
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> bals = this.getOwner().getBalance(this.getKey(dcSet));
-        return BigDecimal.ONE.subtract(bals.a.b);
+        return BigDecimal.ONE.subtract(bals.a.b).stripTrailingZeros();
     }
 
     public BigDecimal getReleased() {
@@ -158,6 +159,21 @@ public class AssetUnique extends AssetCls {
     public int getDataLength(boolean includeReference) {
         return super.getDataLength(includeReference)
                 + SCALE_LENGTH + ASSET_TYPE_LENGTH;
+    }
+
+    //OTHER
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public JSONObject toJson() {
+
+        JSONObject assetJSON = super.toJson();
+
+        // ADD DATA
+        assetJSON.put("quantity", 1);
+        assetJSON.put("released", this.getReleased());
+
+        return assetJSON;
     }
 
 }

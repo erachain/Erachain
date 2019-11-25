@@ -935,6 +935,7 @@ public class BlockExplorer {
         output.put("label_Scale", Lang.getInstance().translateFromLangObj("Accuracy", langObj));
         output.put("label_AssetType", Lang.getInstance().translateFromLangObj("TYPE", langObj));
         output.put("label_Quantity", Lang.getInstance().translateFromLangObj("Quantity", langObj));
+        output.put("label_Released", Lang.getInstance().translateFromLangObj("Released", langObj));
         output.put("label_Holders", Lang.getInstance().translateFromLangObj("Holders", langObj));
         output.put("label_Available_pairs", Lang.getInstance().translateFromLangObj("Available pairs", langObj));
         output.put("label_Pair", Lang.getInstance().translateFromLangObj("Pair", langObj));
@@ -1500,7 +1501,7 @@ public class BlockExplorer {
         }
         assetJSON.put("owner", asset.getOwner().getAddress());
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
-        //assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
+        assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
         assetJSON.put("scale", asset.getScale());
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
@@ -1798,17 +1799,17 @@ public class BlockExplorer {
             }
         }
 
-        Collection<Order> orders = dcSet.getOrderMap().values();
+        Collection<Order> orders = dcSet.getOrderMap().getOrders(assetKey);
 
         for (Order order : orders) {
-            if (order.getHaveAssetKey() == assetKey) {
-                alloreders = alloreders.add(order.getFulfilledHave());
-            }
+            alloreders = alloreders.add(order.getAmountHaveLeft());
         }
 
         Collections.sort(top100s, new ReverseComparator(new BigDecimalComparator_C()));
 
         int couter = 0;
+        AssetCls asset = Controller.getInstance().getAsset(assetKey);
+
         for (Tuple3<String, BigDecimal, BigDecimal> top100 : top100s) {
 
             couter++;
@@ -1833,9 +1834,10 @@ public class BlockExplorer {
                 break;
             }
         }
-        AssetCls asset = Controller.getInstance().getAsset(assetKey);
+
         if (asset == null) {
-            output.put("released", "--");// (all.add(alloreders)).toPlainString());
+            output.put("total", "--");// (all.add(alloreders)).toPlainString());
+            output.put("released", "--");
             output.put("assetName", "--");
             output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
                     .replace("%limit%", String.valueOf(limit))).replace("%assetName%", "--"));
@@ -1846,7 +1848,12 @@ public class BlockExplorer {
                     (Lang.getInstance().translateFromLangObj("All %assetName% accounts (%count%)", langObj)
                             .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
         } else {
-            output.put("released", asset.getReleased(dcSet));// (all.add(alloreders)).toPlainString());
+            if (asset.getQuantity() > 0) {
+                output.put("total", asset.getQuantity());
+            } else {
+                output.put("total", asset.getReleased(dcSet).toPlainString());
+            }
+            output.put("released", asset.getReleased(dcSet).toPlainString());
             output.put("assetName", asset.getName());
             output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
                     .replace("%limit%", String.valueOf(limit))).replace("%assetName%", asset.getName()));
@@ -1863,13 +1870,12 @@ public class BlockExplorer {
         output.put("Label_Table_Prop", Lang.getInstance().translateFromLangObj("Prop.", langObj));
         output.put("Label_Table_person", Lang.getInstance().translateFromLangObj("Owner", langObj));
 
-        output.put("Label_minus", Lang.getInstance().translateFromLangObj("minus", langObj));
+        output.put("Label_Released", Lang.getInstance().translateFromLangObj("released", langObj));
         output.put("Label_in_order", Lang.getInstance().translateFromLangObj("in order", langObj));
 
         output.put("Label_Top", Lang.getInstance().translateFromLangObj("Top", langObj));
 
-        output.put("all", all.toPlainString());
-        output.put("allinOrders", alloreders.toPlainString());
+        output.put("allinOrders", alloreders.stripTrailingZeros().toPlainString());
         output.put("assetKey", assetKey);
         output.put("limit", limit);
         output.put("count", couter);
