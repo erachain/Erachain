@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
@@ -55,9 +56,14 @@ public class TestRecPerson {
     //CREATE KNOWN ACCOUNT
     byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-    PrivateKeyAccount certifier = new PrivateKeyAccount(privateKey);
+    PrivateKeyAccount registrar = new PrivateKeyAccount(privateKey);
+
     //GENERATE ACCOUNT SEED
     int nonce = 1;
+
+    byte[] certifierSeed = Wallet.generateAccountSeed(seed, nonce++);
+    PrivateKeyAccount certifier = new PrivateKeyAccount(certifierSeed);
+
     //byte[] accountSeed;
     //core.wallet.Wallet.generateAccountSeed(byte[], int)
     byte[] accountSeed1 = Wallet.generateAccountSeed(seed, nonce++);
@@ -101,6 +107,7 @@ public class TestRecPerson {
         try {
             Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
         } catch (Throwable e) {
+            LOGGER.info(" ********** " + e.getMessage());
         }
 
         dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
@@ -126,7 +133,7 @@ public class TestRecPerson {
         // GET RIGHTS TO CERTIFIER
         byte gender = 1;
         long birthDay = timestamp - 12345678;
-        personGeneral = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
+        personGeneral = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         //personGeneral.setKey(genesisPersonKey);
@@ -137,21 +144,21 @@ public class TestRecPerson {
         //genesisPersonKey = dcSet.getIssuePersonMap().size();
         genesisPersonKey = genesis_issue_person.getAssetKey(dcSet);
 
-        GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(certifier, genesisPersonKey);
+        GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(registrar, genesisPersonKey);
         genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
-        certifier.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        certifier.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        certifier.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        registrar.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
+        registrar.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        registrar.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
-        person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+        person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
         //person.setKey(genesisPersonKey + 1);
         //CREATE ISSUE PERSON TRANSACTION
-        issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastTimestamp(dcSet)[0]);
+        issuePersonTransaction = new IssuePersonRecord(registrar, person, FEE_POWER, timestamp, registrar.getLastTimestamp(dcSet)[0]);
 
         sertifiedPrivateKeys.add(userAccount1);
         sertifiedPrivateKeys.add(userAccount2);
@@ -168,7 +175,7 @@ public class TestRecPerson {
         issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
         assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-        issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
+        issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -186,7 +193,7 @@ public class TestRecPerson {
         timestamp += 100;
         r_SertifyPubKeys = new RSertifyPubKeys(version, certifier, FEE_POWER, personKey,
                 sertifiedPublicKeys,
-                timestamp, certifier.getLastTimestamp(dcSet)[0]);
+                timestamp, registrar.getLastTimestamp(dcSet)[0]);
 
     }
 
@@ -200,13 +207,13 @@ public class TestRecPerson {
             try {
                 init(dbs);
 
-                issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
+                issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 
                 //CHECK IF ISSUE PERSON TRANSACTION IS VALID
                 assertEquals(true, issuePersonTransaction.isSignatureValid(dcSet));
 
                 //INVALID SIGNATURE
-                issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, certifier.getLastTimestamp(dcSet)[0], new byte[64]);
+                issuePersonTransaction = new IssuePersonRecord(registrar, person, FEE_POWER, timestamp, registrar.getLastTimestamp(dcSet)[0], new byte[64]);
                 //CHECK IF ISSUE PERSON IS INVALID
                 assertEquals(false, issuePersonTransaction.isSignatureValid(dcSet));
 
@@ -226,7 +233,7 @@ public class TestRecPerson {
 
                 issuePersonTransaction.setDC(dcSet);
 
-                //issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
+                //issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 
                 // ADD FEE
                 userAccount1.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
@@ -239,7 +246,7 @@ public class TestRecPerson {
                 issuePersonTransaction.setDC(dcSet);
                 assertEquals(Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
-                ((PersonHuman) person).sign(certifier);
+                ((PersonHuman) person).sign(registrar);
                 assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
             } finally {
@@ -295,7 +302,7 @@ public class TestRecPerson {
 
 
                 // PARSE ISSEU PERSON RECORD
-                issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
+                issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
                 //issuePersonTransaction.process(dcSet, false);
 
                 //CONVERT TO BYTES
@@ -380,7 +387,7 @@ public class TestRecPerson {
 
                 assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
                 issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
-                issuePersonTransaction.sign(certifier, Transaction.FOR_NETWORK);
+                issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
 
                 issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
@@ -388,18 +395,18 @@ public class TestRecPerson {
 
                 BigDecimal eraUSE = new BigDecimal("1000");
                 if (BlockChain.ERA_COMPU_ALL_UP) {
-                    eraUSE = eraUSE.add(certifier.addDEVAmount(ERM_KEY));
+                    eraUSE = eraUSE.add(registrar.addDEVAmount(ERM_KEY));
                 }
 
                 //CHECK BALANCE ISSUER
-                assertEquals(eraUSE.setScale(certifier.getBalanceUSE(ERM_KEY, dcSet).scale()), certifier.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(eraUSE.setScale(registrar.getBalanceUSE(ERM_KEY, dcSet).scale()), registrar.getBalanceUSE(ERM_KEY, dcSet));
 
                 BigDecimal compuUSE = new BigDecimal("1");
                 if (BlockChain.ERA_COMPU_ALL_UP) {
-                    compuUSE = compuUSE.add(certifier.addDEVAmount(FEE_KEY));
+                    compuUSE = compuUSE.add(registrar.addDEVAmount(FEE_KEY));
                 }
                 assertEquals(compuUSE.subtract(issuePersonTransaction.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE),
-                        certifier.getBalanceUSE(FEE_KEY, dcSet));
+                        registrar.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK PERSON EXISTS DB AS CONFIRMED:  key > -1
                 long key = dcSet.getIssuePersonMap().get(issuePersonTransaction);
@@ -410,20 +417,20 @@ public class TestRecPerson {
                 assertEquals(true, Arrays.equals(dcSet.getItemPersonMap().get(key).toBytes(true, false), person.toBytes(true, false)));
 
                 //CHECK REFERENCE SENDER
-                assertEquals(issuePersonTransaction.getTimestamp(), new Long(certifier.getLastTimestamp(dcSet)[0]));
+                assertEquals(issuePersonTransaction.getTimestamp(), new Long(registrar.getLastTimestamp(dcSet)[0]));
 
                 //////// ORPHAN /////////
                 issuePersonTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
                 //CHECK BALANCE ISSUER
-                assertEquals(eraUSE.setScale(certifier.getBalanceUSE(ERM_KEY, dcSet).scale()), certifier.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(compuUSE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(eraUSE.setScale(registrar.getBalanceUSE(ERM_KEY, dcSet).scale()), registrar.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(compuUSE.setScale(BlockChain.AMOUNT_DEDAULT_SCALE), registrar.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK PERSON EXISTS ISSUER
                 assertEquals(false, dcSet.getItemPersonMap().contains(personKey));
 
                 //CHECK REFERENCE ISSUER
-                //assertEquals(issuePersonTransaction.getReference(), certifier.getLastReference(dcSet));
+                //assertEquals(issuePersonTransaction.getReference(), registrar.getLastReference(dcSet));
             } finally {
                 dcSet.close();
             }
@@ -456,9 +463,9 @@ public class TestRecPerson {
                 assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
                 //CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
-                personalizeRecord_0 = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey + 10,
+                personalizeRecord_0 = new RSertifyPubKeys(0, registrar, FEE_POWER, personKey + 10,
                         sertifiedPublicKeys,
-                        356, timestamp, certifier.getLastTimestamp(dcSet)[0]);
+                        356, timestamp, registrar.getLastTimestamp(dcSet)[0]);
                 assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
                 //CREATE INVALID ISSUE PERSON FOR INVALID PERSONALIZE
@@ -480,9 +487,9 @@ public class TestRecPerson {
                 sertifiedPublicKeys011.add(new PublicKeyAccount(new byte[60]));
                 sertifiedPublicKeys011.add(new PublicKeyAccount(userAccount2.getPublicKey()));
                 sertifiedPublicKeys011.add(new PublicKeyAccount(userAccount3.getPublicKey()));
-                personalizeRecord_0 = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
+                personalizeRecord_0 = new RSertifyPubKeys(0, registrar, FEE_POWER, personKey,
                         sertifiedPublicKeys011,
-                        356, timestamp, certifier.getLastTimestamp(dcSet)[0]);
+                        356, timestamp, registrar.getLastTimestamp(dcSet)[0]);
                 assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
 
@@ -500,20 +507,20 @@ public class TestRecPerson {
             try {
                 init(dbs);
 
-                // SIGN only by certifier
+                // SIGN only by registrar
                 version = 0;
                 initPersonalize();
 
-                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
                 // TRUE
                 assertEquals(true, r_SertifyPubKeys.isSignatureValid(dcSet));
 
                 version = 1;
-                r_SertifyPubKeys = new RSertifyPubKeys(version, certifier, FEE_POWER, personKey,
+                r_SertifyPubKeys = new RSertifyPubKeys(version, registrar, FEE_POWER, personKey,
                         sertifiedPublicKeys,
-                        timestamp, certifier.getLastTimestamp(dcSet)[0]);
+                        timestamp, registrar.getLastTimestamp(dcSet)[0]);
 
-                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
                 // + sign by user
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
                 // true !
@@ -535,7 +542,7 @@ public class TestRecPerson {
                 assertEquals(false, r_SertifyPubKeys.isSignatureValid(dcSet));
 
                 // BACK TO VALID
-                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
                 assertEquals(true, r_SertifyPubKeys.isSignatureValid(dcSet));
 
 
@@ -558,7 +565,7 @@ public class TestRecPerson {
 
                 // SIGN
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
-                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
 
                 //CONVERT TO BYTES
                 byte[] rawPersonTransfer = r_SertifyPubKeys.toBytes(Transaction.FOR_NETWORK, true);
@@ -595,7 +602,7 @@ public class TestRecPerson {
                     assertEquals(r_SertifyPubKeys.getKey(), parsedPersonTransfer.getKey());
 
                     //CHECK AMOUNT
-                    assertEquals(r_SertifyPubKeys.getAmount(certifier), parsedPersonTransfer.getAmount(certifier));
+                    assertEquals(r_SertifyPubKeys.getAmount(registrar), parsedPersonTransfer.getAmount(registrar));
 
                     //CHECK USER SIGNATURES
                     assertEquals(true, Arrays.equals(r_SertifyPubKeys.getSertifiedPublicKeys().get(2).getPublicKey(),
@@ -631,13 +638,28 @@ public class TestRecPerson {
             try {
                 init(dbs);
 
-                //assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
-
                 assertEquals(false, userAccount1.isPerson(dcSet, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
                 assertEquals(false, userAccount2.isPerson(dcSet, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
                 assertEquals(false, userAccount3.isPerson(dcSet, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
 
+                BigDecimal erm_amount_registrar = registrar.getBalanceUSE(ERM_KEY, dcSet);
+                BigDecimal oil_amount_registrar = registrar.getBalanceUSE(FEE_KEY, dcSet);
+
+                BigDecimal erm_amount_certifier = certifier.getBalanceUSE(ERM_KEY, dcSet);
+                BigDecimal oil_amount_certifier = certifier.getBalanceUSE(FEE_KEY, dcSet);
+
+                BigDecimal erm_amount_user = userAccount1.getBalanceUSE(ERM_KEY, dcSet);
+                BigDecimal oil_amount_user = userAccount1.getBalanceUSE(FEE_KEY, dcSet);
+
                 initPersonalize();
+
+                //CHECK BALANCE REGISTRAR
+                assertEquals(erm_amount_registrar, registrar.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(oil_amount_registrar.subtract(issuePersonTransaction.getFee()), registrar.getBalanceUSE(FEE_KEY, dcSet));
+
+                //CHECK BALANCE CERTIFIER
+                assertEquals(erm_amount_certifier, certifier.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(oil_amount_certifier, certifier.getBalanceUSE(FEE_KEY, dcSet));
 
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
                 // PERSON STATUS ALIVE
@@ -664,42 +686,41 @@ public class TestRecPerson {
 
                 BigDecimal oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
 
-                BigDecimal erm_amount = certifier.getBalanceUSE(ERM_KEY, dcSet);
-                BigDecimal oil_amount = certifier.getBalanceUSE(FEE_KEY, dcSet);
-
-                BigDecimal erm_amount_user = userAccount1.getBalanceUSE(ERM_KEY, dcSet);
-                BigDecimal oil_amount_user = userAccount1.getBalanceUSE(FEE_KEY, dcSet);
-
                 //// PROCESS /////
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
-                r_SertifyPubKeys.setDC(dcSet);
-                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12, 3);
+                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
                 int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 
-                //CHECK BALANCE SENDER
-                assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, dcSet));
+                //CHECK BALANCE REGISTRAR
+                assertEquals(erm_amount_registrar, registrar.getBalanceUSE(ERM_KEY, dcSet));
                 // CHECK FEE BALANCE - FEE - GIFT
-                assertEquals(oil_amount.subtract(oil_amount_diff).subtract(r_SertifyPubKeys.getFee()),
-                        certifier.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals("0.00062550", r_SertifyPubKeys.getFee().toPlainString());
+                assertEquals("0.00050000", BlockChain.GIFTED_COMPU_AMOUNT_BD.toPlainString());
+                assertEquals(oil_amount_registrar, registrar.getBalanceUSE(FEE_KEY, dcSet));
 
-                //CHECK BALANCE RECIPIENT
-                assertEquals(BG_ZERO, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(BlockChain.GIFTED_COMPU_AMOUNT, userAccount1.getBalanceUSE(FEE_KEY, dcSet));
-                assertEquals(BG_ZERO, userAccount2.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(BG_ZERO, userAccount2.getBalanceUSE(FEE_KEY, dcSet));
-                assertEquals(BG_ZERO, userAccount3.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(BG_ZERO, userAccount3.getBalanceUSE(FEE_KEY, dcSet));
+                //CHECK BALANCE CERTIFIER
+                assertEquals(erm_amount_certifier, certifier.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(oil_amount_certifier.subtract(r_SertifyPubKeys.getFee()), certifier.getBalanceUSE(FEE_KEY, dcSet));
+
+                //CHECK BALANCE PERSON CREATOR
+                assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(oil_amount_user.add(RSertifyPubKeys.BONUS_FOR_PERSON_4_11), userAccount1.getBalanceUSE(FEE_KEY, dcSet));
+
+                assertEquals(userAccount2.addDEVAmount(ERM_KEY), userAccount2.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(userAccount2.addDEVAmount(FEE_KEY), userAccount2.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(userAccount3.addDEVAmount(ERM_KEY), userAccount3.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(userAccount3.addDEVAmount(FEE_KEY), userAccount3.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK REFERENCE SENDER
-                assertEquals(r_SertifyPubKeys.getTimestamp(), certifier.getLastTimestamp(dcSet));
+                assertEquals((long) r_SertifyPubKeys.getTimestamp(), certifier.getLastTimestamp(dcSet)[0]);
 
                 //CHECK REFERENCE RECIPIENT
                 // TRUE - new reference for first send FEE
-                assertEquals(r_SertifyPubKeys.getTimestamp(), userAccount1.getLastTimestamp(dcSet));
-                // byte[0]
-                assertEquals(null, userAccount2.getLastTimestamp(dcSet));
-                assertEquals(null, userAccount3.getLastTimestamp(dcSet));
+                assertEquals((long) r_SertifyPubKeys.getTimestamp(), userAccount1.getLastTimestamp(dcSet)[0]);
+                assertEquals((long) r_SertifyPubKeys.getTimestamp(), userAccount2.getLastTimestamp(dcSet)[0]);
+                assertEquals((long) r_SertifyPubKeys.getTimestamp(), userAccount3.getLastTimestamp(dcSet)[0]);
 
                 ////////// TO DATE ////////
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
@@ -747,20 +768,24 @@ public class TestRecPerson {
                 ////////// ORPHAN //////////////////
                 r_SertifyPubKeys.orphan(gb, Transaction.FOR_NETWORK);
 
-                //CHECK BALANCE SENDER
-                assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(oil_amount, certifier.getBalanceUSE(FEE_KEY, dcSet));
+                //CHECK BALANCE REGISTRAR
+                assertEquals(erm_amount_registrar, registrar.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(oil_amount_registrar.subtract(issuePersonTransaction.getFee()), registrar.getBalanceUSE(FEE_KEY, dcSet));
+
+                //CHECK BALANCE CERTIFIER
+                assertEquals(erm_amount_certifier, certifier.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(oil_amount_certifier.setScale(certifier.getBalanceUSE(FEE_KEY, dcSet).scale()), certifier.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK BALANCE RECIPIENT
                 assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(oil_amount_user, userAccount1.getBalanceUSE(FEE_KEY, dcSet));
-                assertEquals(BG_ZERO, userAccount2.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(BG_ZERO, userAccount2.getBalanceUSE(FEE_KEY, dcSet));
-                assertEquals(BG_ZERO, userAccount3.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(BG_ZERO, userAccount3.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(oil_amount_user.setScale(userAccount1.getBalanceUSE(FEE_KEY, dcSet).scale()), userAccount1.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(userAccount2.addDEVAmount(ERM_KEY), userAccount2.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(userAccount2.addDEVAmount(FEE_KEY), userAccount2.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(userAccount3.addDEVAmount(ERM_KEY), userAccount3.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(userAccount3.addDEVAmount(FEE_KEY), userAccount3.getBalanceUSE(FEE_KEY, dcSet));
 
                 //CHECK REFERENCE SENDER
-                //assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(dcSet));
+                //assertEquals(r_SertifyPubKeys.getReference(), registrar.getLastReference(dcSet));
 
                 //CHECK REFERENCE RECIPIENT
                 assertEquals(null, userAccount1.getLastTimestamp(dcSet));
@@ -791,13 +816,16 @@ public class TestRecPerson {
                 /////////////////////////////////////////////// TEST DURATIONS
                 // TRY DURATIONS
                 int end_date = 222;
-                r_SertifyPubKeys = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
+                r_SertifyPubKeys = new RSertifyPubKeys(0, registrar, FEE_POWER, personKey,
                         sertifiedPublicKeys,
-                        end_date, timestamp, certifier.getLastTimestamp(dcSet)[0]);
+                        end_date, timestamp, registrar.getLastTimestamp(dcSet)[0]);
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
-                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12, 3);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
 
+                // у нас перезапись времени - по максимум сразу берем если не минус
+                end_date = RSertifyPubKeys.DEFAULT_DURATION;
                 int abs_end_date = end_date + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
                 // PERSON STATUS ALIVE - date_begin
@@ -806,16 +834,20 @@ public class TestRecPerson {
                 assertEquals(abs_end_date, (int) userAccount1.getPersonDuration(dcSet).b);
                 assertEquals(true, userAccount2.isPerson(dcSet, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
 
+                Block lastBlock = dcSet.getBlockMap().last();
+                long currentTimestamp = lastBlock.getTimestamp();
+
                 // TEST LIST and STACK
                 int end_date2 = -12;
-                r_SertifyPubKeys = new RSertifyPubKeys(0, certifier, FEE_POWER, personKey,
+                r_SertifyPubKeys = new RSertifyPubKeys(0, registrar, FEE_POWER, personKey,
                         sertifiedPublicKeys,
-                        end_date2, timestamp, certifier.getLastTimestamp(dcSet)[0]);
+                        end_date2, currentTimestamp, registrar.getLastTimestamp(dcSet)[0]);
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
-                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 3);
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
 
-                int abs_end_date2 = end_date2 + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
+                int abs_end_date2 = end_date2 + (int) (r_SertifyPubKeys.getTimestamp() / 86400000L);
 
                 assertEquals(abs_end_date2, (int) userAccount2.getPersonDuration(dcSet).b);
                 assertEquals(false, userAccount2.isPerson(dcSet, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
@@ -847,7 +879,7 @@ public class TestRecPerson {
                 assertEquals(false, userAccount2.isPerson(dcSet, dcSet.getBlockMap().size()));
                 assertEquals(false, userAccount3.isPerson(dcSet, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
 
-                BigDecimal oil_amount_start = certifier.getBalanceUSE(FEE_KEY, dcSet);
+                BigDecimal oil_amount_start = registrar.getBalanceUSE(FEE_KEY, dcSet);
 
                 initPersonalize();
 
@@ -880,17 +912,17 @@ public class TestRecPerson {
                 else
                     oil_amount_diff = RSertifyPubKeys.BONUS_FOR_PERSON_4_11.add(RSertifyPubKeys.BONUS_FOR_PERSON_4_11);
 
-                BigDecimal erm_amount = certifier.getBalanceUSE(ERM_KEY, dcSet);
-                BigDecimal oil_amount = certifier.getBalanceUSE(FEE_KEY, dcSet);
+                BigDecimal erm_amount = registrar.getBalanceUSE(ERM_KEY, dcSet);
+                BigDecimal oil_amount = registrar.getBalanceUSE(FEE_KEY, dcSet);
 
                 BigDecimal erm_amount_user = userAccount1.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount_user = userAccount1.getBalanceUSE(FEE_KEY, dcSet);
 
-                last_ref = certifier.getLastTimestamp(dcSet)[0];
+                last_ref = registrar.getLastTimestamp(dcSet)[0];
 
                 //// PROCESS /////
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
-                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
 
                 DCSet fork = dcSet.fork();
 
@@ -913,16 +945,16 @@ public class TestRecPerson {
                 int transactionIndex = gb.getTransactionSeq(r_SertifyPubKeys.getSignature());
 
                 //CHECK BALANCE SENDER
-                assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, dcSet));
+                assertEquals(erm_amount, registrar.getBalanceUSE(ERM_KEY, dcSet));
                 // CHECK FEE BALANCE - FEE - GIFT
-                assertEquals(oil_amount, certifier.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(oil_amount, registrar.getBalanceUSE(FEE_KEY, dcSet));
 
                 // IN FORK
                 //CHECK BALANCE SENDER
-                assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, fork));
+                assertEquals(erm_amount, registrar.getBalanceUSE(ERM_KEY, fork));
                 // CHECK FEE BALANCE - FEE - GIFT
                 // тут мы заверителю возвращаем его затраты - у него должно сать столько же как до внесения персоны
-                assertEquals(oil_amount_start, certifier.getBalanceUSE(FEE_KEY, fork));
+                assertEquals(oil_amount_start, registrar.getBalanceUSE(FEE_KEY, fork));
 
                 //CHECK BALANCE RECIPIENT
                 assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
@@ -934,8 +966,8 @@ public class TestRecPerson {
                     assertEquals(oil_amount_diff, userAccount1.getBalanceUSE(FEE_KEY, fork));
 
                 //CHECK REFERENCE SENDER
-                assertEquals(last_ref, (Long) certifier.getLastTimestamp(dcSet)[0]);
-                assertEquals(r_SertifyPubKeys.getTimestamp(), (Long) certifier.getLastTimestamp(fork)[0]);
+                assertEquals(last_ref, (Long) registrar.getLastTimestamp(dcSet)[0]);
+                assertEquals(r_SertifyPubKeys.getTimestamp(), (Long) registrar.getLastTimestamp(fork)[0]);
 
                 //CHECK REFERENCE RECIPIENT
                 // TRUE - new reference for first send FEE
@@ -1005,8 +1037,8 @@ public class TestRecPerson {
                 r_SertifyPubKeys.orphan(gb, Transaction.FOR_NETWORK);
 
                 //CHECK BALANCE SENDER
-                assertEquals(erm_amount, certifier.getBalanceUSE(ERM_KEY, fork));
-                assertEquals(oil_amount, certifier.getBalanceUSE(FEE_KEY, fork));
+                assertEquals(erm_amount, registrar.getBalanceUSE(ERM_KEY, fork));
+                assertEquals(oil_amount, registrar.getBalanceUSE(FEE_KEY, fork));
 
                 //CHECK BALANCE RECIPIENT
                 assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, fork));
@@ -1017,7 +1049,7 @@ public class TestRecPerson {
                 assertEquals(userAccount3FEE, userAccount3.getBalanceUSE(FEE_KEY, fork));
 
                 //CHECK REFERENCE SENDER
-                //assertEquals(r_SertifyPubKeys.getReference(), certifier.getLastReference(fork));
+                //assertEquals(r_SertifyPubKeys.getReference(), registrar.getLastReference(fork));
 
                 //CHECK REFERENCE RECIPIENT
                 // дело втом что для того чтобы был известен публичный ключ в ситеме по счету - при Процессинге его закатываем
@@ -1062,7 +1094,7 @@ public class TestRecPerson {
 
                 long birthDay = timestamp - 12345678;
 
-                person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+                person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                         (byte) 0, "Slav", (float) 28.12345, (float) 133.7777,
                         "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 

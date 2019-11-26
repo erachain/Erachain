@@ -688,6 +688,13 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             address = publicAccount.getAddress();
             dcSet.getAddressPersonMap().removeItem(publicAccount.getShortAddressBytes());
             dcSet.getPersonAddressMap().removeItem(this.key, address);
+
+            // при откате нужно след в истории удалить а сам публичный ключ отсавить на всякий случай?
+            long[] lastPoint = publicAccount.getLastTimestamp(dcSet);
+            if (lastPoint != null && lastPoint[0] == timestamp) {
+                publicAccount.removeLastTimestamp(dcSet);
+            }
+
         }
 
         boolean personalized = false;
