@@ -288,7 +288,7 @@ public class TestRecPerson {
                 assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
                 //CREATE INVALID ISSUE PERSON - INVALID PERSONALIZE
-                issuePersonTransaction = new IssuePersonRecord(userAccount1, person, FEE_POWER, timestamp, timestamp + 10L, new byte[64]);
+                issuePersonTransaction = new IssuePersonRecord(certifier, person, FEE_POWER, timestamp, timestamp + 10L, new byte[64]);
                 issuePersonTransaction.setDC(dcSet);
                 assertEquals(Transaction.ITEM_PERSON_OWNER_SIGNATURE_INVALID, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
@@ -699,14 +699,9 @@ public class TestRecPerson {
 
                 BigDecimal erm_amount_registrar = registrar.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount_registrar = registrar.getBalanceUSE(FEE_KEY, dcSet);
-                assertEquals("9609.00000000", erm_amount_registrar.toPlainString());
-                assertEquals("101.00000000", oil_amount_registrar.toPlainString());
 
                 BigDecimal erm_amount_certifier = certifier.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount_certifier = certifier.getBalanceUSE(FEE_KEY, dcSet);
-
-                assertEquals("8093", erm_amount_certifier.toPlainString());
-                assertEquals("100.0", oil_amount_certifier.toPlainString());
 
                 BigDecimal erm_amount_user = userAccount1.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount_user = userAccount1.getBalanceUSE(FEE_KEY, dcSet);
@@ -950,7 +945,7 @@ public class TestRecPerson {
 
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
                 // PERSON STATUS ALIVE
-                assertEquals(2, personKey);
+                assertEquals(4, personKey);
                 //assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
 
                 // ADDRESSES
@@ -978,7 +973,8 @@ public class TestRecPerson {
                 BigDecimal erm_amount_user = userAccount1.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount_user = userAccount1.getBalanceUSE(FEE_KEY, dcSet);
 
-                last_ref = registrar.getLastTimestamp(dcSet)[0];
+                Long last_refRegistrar = registrar.getLastTimestamp(dcSet)[0];
+                Long last_refCertifier = certifier.getLastTimestamp(dcSet)[0];
 
                 //// PROCESS /////
                 r_SertifyPubKeys.signUserAccounts(sertifiedPrivateKeys);
@@ -1025,11 +1021,15 @@ public class TestRecPerson {
                 else
                     assertEquals(oil_amount_diff, userAccount1.getBalanceUSE(FEE_KEY, fork));
 
-                //CHECK REFERENCE SENDER
-                assertEquals(last_ref, (Long) registrar.getLastTimestamp(dcSet)[0]);
-                assertEquals(r_SertifyPubKeys.getTimestamp(), (Long) registrar.getLastTimestamp(fork)[0]);
+                //CHECK REFERENCE REGISTRAR
+                assertEquals(last_refRegistrar, (Long) registrar.getLastTimestamp(dcSet)[0]);
+                assertEquals(last_refRegistrar, (Long) registrar.getLastTimestamp(fork)[0]);
 
-                //CHECK REFERENCE RECIPIENT
+                //CHECK REFERENCE CERTIFIER
+                assertEquals(last_refCertifier, (Long) certifier.getLastTimestamp(dcSet)[0]);
+                assertEquals(r_SertifyPubKeys.getTimestamp(), (Long) certifier.getLastTimestamp(fork)[0]);
+
+                //CHECK REFERENCE PERSON MAKER
                 // TRUE - new reference for first send FEE
                 assertEquals(null, userAccount1.getLastTimestamp(dcSet));
                 assertEquals(r_SertifyPubKeys.getTimestamp(), (Long) userAccount1.getLastTimestamp(fork)[0]);
@@ -1112,11 +1112,9 @@ public class TestRecPerson {
                 //assertEquals(r_SertifyPubKeys.getReference(), registrar.getLastReference(fork));
 
                 //CHECK REFERENCE RECIPIENT
-                // дело втом что для того чтобы был известен публичный ключ в ситеме по счету - при Процессинге его закатываем
-                // а при откате - игнорируем удаление - но тогда там может спутаться при откате у других
-                assertNotEquals(userAccount1ref, userAccount1.getLastTimestamp(fork));
-                assertNotEquals(userAccount2ref, userAccount2.getLastTimestamp(fork));
-                assertNotEquals(userAccount3ref, userAccount3.getLastTimestamp(fork));
+                assertEquals(null, userAccount1.getLastTimestamp(fork));
+                assertEquals(null, userAccount2.getLastTimestamp(fork));
+                assertEquals(null, userAccount3.getLastTimestamp(fork));
 
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
                 // PERSON STATUS ALIVE - must not be modified!
