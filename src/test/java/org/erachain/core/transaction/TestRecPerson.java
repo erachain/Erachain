@@ -160,13 +160,17 @@ public class TestRecPerson {
         //CREATE ISSUE PERSON TRANSACTION
         issuePersonTransaction = new IssuePersonRecord(registrar, person, FEE_POWER, timestamp, registrar.getLastTimestamp(dcSet)[0]);
 
-        sertifiedPrivateKeys.add(userAccount1);
-        sertifiedPrivateKeys.add(userAccount2);
-        sertifiedPrivateKeys.add(userAccount3);
+        if (sertifiedPrivateKeys.isEmpty()) {
+            sertifiedPrivateKeys.add(userAccount1);
+            sertifiedPrivateKeys.add(userAccount2);
+            sertifiedPrivateKeys.add(userAccount3);
+        }
 
-        sertifiedPublicKeys.add(new PublicKeyAccount(userAccount1.getPublicKey()));
-        sertifiedPublicKeys.add(new PublicKeyAccount(userAccount2.getPublicKey()));
-        sertifiedPublicKeys.add(new PublicKeyAccount(userAccount3.getPublicKey()));
+        if (sertifiedPublicKeys.isEmpty()) {
+            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount1.getPublicKey()));
+            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount2.getPublicKey()));
+            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount3.getPublicKey()));
+        }
 
     }
 
@@ -644,9 +648,14 @@ public class TestRecPerson {
 
                 BigDecimal erm_amount_registrar = registrar.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount_registrar = registrar.getBalanceUSE(FEE_KEY, dcSet);
+                assertEquals("9609.00000000", erm_amount_registrar.toPlainString());
+                assertEquals("101.00000000", oil_amount_registrar.toPlainString());
 
                 BigDecimal erm_amount_certifier = certifier.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount_certifier = certifier.getBalanceUSE(FEE_KEY, dcSet);
+
+                assertEquals("8093", erm_amount_certifier.toPlainString());
+                assertEquals("100.0", oil_amount_certifier.toPlainString());
 
                 BigDecimal erm_amount_user = userAccount1.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount_user = userAccount1.getBalanceUSE(FEE_KEY, dcSet);
