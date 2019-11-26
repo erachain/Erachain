@@ -80,7 +80,9 @@ public class KKNMap extends DCUMap<
 
         TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
 
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -94,7 +96,9 @@ public class KKNMap extends DCUMap<
             stack.push(item);
             value_new.put(nameKey, stack);
         } else {
-            if (this.parent == null) {
+            if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                    // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                    && this.parent == null) {
                 stack.push(item);
                 value_new.put(nameKey, stack);
             } else {
@@ -121,7 +125,9 @@ public class KKNMap extends DCUMap<
         TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 
         TreeMap<String, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -132,7 +138,9 @@ public class KKNMap extends DCUMap<
         Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(nameKey);
         if (stack == null || stack.isEmpty()) return;
 
-        if (this.parent == null) {
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null) {
             stack.pop();
             value_new.put(nameKey, stack);
         } else {

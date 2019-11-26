@@ -67,7 +67,9 @@ public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
 
         Stack<Tuple3<Long, Integer, Integer>> value_new;
 
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -92,7 +94,9 @@ public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
         if (value == null || value.isEmpty()) return;
 
         Stack<Tuple3<Long, Integer, Integer>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!

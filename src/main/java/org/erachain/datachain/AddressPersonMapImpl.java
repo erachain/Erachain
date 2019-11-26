@@ -80,7 +80,9 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
 
         Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
 
-        if (false && this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>) value; //.clone(); // тут DEFAULT_VALUE даже меняет ((
         else {
             // !!!! NEEED .clone() !!!
@@ -112,7 +114,9 @@ public class AddressPersonMapImpl extends DBTabImpl<byte[], Stack<Tuple4<
         if (value == null || value.isEmpty()) return;
 
         Stack<Tuple4<Long, Integer, Integer, Integer>> value_new;
-        if (false && this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = (Stack<Tuple4<Long, Integer, Integer, Integer>>) value; //.clone(); // тут DEFAULT_VALUE даже меняет ((
         else {
             // !!!! NEEED .clone() !!!
