@@ -839,7 +839,8 @@ public class BlockExplorer {
 
         List<Order> orders = dcSet.getOrderMap().getOrders(key);
 
-        List<Trade> trades = dcSet.getTradeMap().getTrades(key);
+        TradeMapImpl tradesMap = dcSet.getTradeMap();
+        List<Trade> trades = tradesMap.getTrades(key);
 
         AssetCls asset = Controller.getInstance().getAsset(key);
 
@@ -923,6 +924,22 @@ public class BlockExplorer {
             } else {
                 pairJSON.put("description", assetWant.viewDescription());
             }
+
+            Trade trade = tradesMap.getLastTrade(key, pair.getKey());
+            //Order initiator
+            if (trade == null) {
+                pairJSON.put("last", "---");
+                pairJSON.put("lastReverse", "---");
+            } else {
+                if (trade.getHaveKey().equals(pair.getKey())) {
+                    pairJSON.put("last", trade.calcPrice().toPlainString());
+                    pairJSON.put("lastReverse", trade.calcPriceRevers().toPlainString());
+                } else {
+                    pairJSON.put("last", trade.calcPriceRevers().toPlainString());
+                    pairJSON.put("lastReverse", trade.calcPrice().toPlainString());
+                }
+            }
+
             pairsJSON.put(pair.getKey(), pairJSON);
         }
 

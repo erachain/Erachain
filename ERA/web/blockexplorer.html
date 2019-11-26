@@ -993,11 +993,12 @@ button.white-bgc[disabled]:focus,
                 output += '<td>' + data.asset.pairs[key].openOrdersCount;
 
                 output += '<td nowrap>';
-                output += '<a href="?asset=' + key + '&asset=' + data.this.key + get_lang() + '">'
-                output += addCommas(data.asset.pairs[key].ordersPriceVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName);
-                output += '</a>';
+                output += '<a href="?asset=' + data.asset.this.key + '&asset=' + key + get_lang() + '"><b>'
+                output += addCommas(data.asset.pairs[key].last);
+                output += '</b></a> / <a href="?asset=' + key + '&asset=' + data.asset.this.key + get_lang() + '"><b>'
+                output += addCommas(data.asset.pairs[key].lastReverse) + '</b></a><br>';
 
-                output += '<br>' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
+                output += addCommas(data.asset.pairs[key].ordersPriceVolume) + ' / ' + addCommas(data.asset.pairs[key].ordersAmountVolume);
 
                 output += '<td>' + data.asset.pairs[key].tradesCount;
 
@@ -1023,7 +1024,12 @@ button.white-bgc[disabled]:focus,
 
             output += lastBlock(data.lastBlock);
 
-            output += '<h3 style="display:inline;">' + data.label_Trades + ' </h3>';
+            output += '';
+
+            output += '<h3 style="display:inline;"><a href="?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang()
+                + '"><img src="img/exchange.png" width=33></a> '
+                + data.label_Trades + '</h3> ';
+
             output += '<a href="?asset=' + data.assetHave + '&asset=' + data.assetWant + get_lang() + '"><h3 style="display:inline;">';
             output += getAssetName2(data.assetHave, data.assetHaveName) + '/';
             output += getAssetName2(data.assetWant, data.assetWantName) + '</h3></a>';
