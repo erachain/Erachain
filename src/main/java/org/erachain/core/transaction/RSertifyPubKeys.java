@@ -469,7 +469,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         if (result != VALIDATE_OK)
             return result;
 
-        if (!BlockChain.ANONIM_SERT_USE
+        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
                 && !BlockChain.DEVELOP_USE && !this.creator.isPerson(dcSet, height)) {
             boolean creator_admin = false;
             long personsCount = dcSet.getItemPersonMap().getLastKey();

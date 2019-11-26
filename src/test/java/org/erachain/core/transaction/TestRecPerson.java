@@ -9,6 +9,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.ItemFactory;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
 import org.erachain.core.wallet.Wallet;
@@ -21,6 +22,7 @@ import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple4;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +91,7 @@ public class TestRecPerson {
     //int version = 0; // without signs of person
     int version = 1; // with signs of person
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
-    private byte[] image = new byte[2000]; // default value
+    private byte[] image = new byte[18000]; // default value
     private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
     //CREATE EMPTY MEMORY DATABASE
     private DCSet dcSet;
@@ -130,9 +132,53 @@ public class TestRecPerson {
 
         last_ref = gb.getTimestamp();
 
-        // GET RIGHTS TO CERTIFIER
-        byte gender = 1;
+        registrar.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
+        registrar.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        registrar.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+
+        certifier.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
+        certifier.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        certifier.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+
+        byte gender = 0;
         long birthDay = timestamp - 12345678;
+
+        ownerSignature = new byte[64];
+        ownerSignature[1] = (byte) 1;
+        person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
+                gender, "Slav", (float) 28.12345, (float) 133.7777,
+                "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
+        person.setReference(ownerSignature);
+        dcSet.getItemPersonMap().add(person);
+        long keyRegistrar = person.getKey(dcSet);
+
+        ownerSignature = new byte[64];
+        ownerSignature[1] = (byte) 2;
+        person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+                gender, "Slav", (float) 28.12345, (float) 133.7777,
+                "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
+        person.setReference(ownerSignature);
+        dcSet.getItemPersonMap().add(person);
+        long keyCertifier = person.getKey(dcSet);
+
+        // внесем его как удостовренную персону
+        Fun.Tuple3<Integer, Integer, Integer> itemPRegistrar = new Fun.Tuple3<Integer, Integer, Integer>(999999, 2, 2);
+        Tuple4<Long, Integer, Integer, Integer> itemARegistrar = new Tuple4<Long, Integer, Integer, Integer>(keyRegistrar, 999999, 2, 3);
+
+        dcSet.getAddressPersonMap().addItem(registrar.getShortAddressBytes(), itemARegistrar);
+        dcSet.getPersonAddressMap().addItem(33L, registrar.getAddress(), itemPRegistrar);
+
+        // внесем его как удостовренную персону
+        Fun.Tuple3<Integer, Integer, Integer> itemPCertifier = new Fun.Tuple3<Integer, Integer, Integer>(999999, 2, 2);
+        Tuple4<Long, Integer, Integer, Integer> itemACertifier = new Tuple4<Long, Integer, Integer, Integer>(keyCertifier, 999999, 2, 3);
+
+        dcSet.getAddressPersonMap().addItem(certifier.getShortAddressBytes(), itemACertifier);
+        dcSet.getPersonAddressMap().addItem(33L, certifier.getAddress(), itemPCertifier);
+
+        ownerSignature = new byte[64];
+        ownerSignature[1] = (byte) -1;
+
+        // GET RIGHTS TO CERTIFIER
         personGeneral = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
@@ -147,10 +193,6 @@ public class TestRecPerson {
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(registrar, genesisPersonKey);
         genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
-
-        registrar.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
-        registrar.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        registrar.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
 
         person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
@@ -455,7 +497,12 @@ public class TestRecPerson {
 
                 initPersonalize();
 
+                r_SertifyPubKeys.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 3);
+
                 assertEquals(Transaction.VALIDATE_OK, r_SertifyPubKeys.isValid(Transaction.FOR_NETWORK, flags));
+
+                certifier.changeBalance(this.dcSet, true, AssetCls.ERA_KEY, new BigDecimal("1000"), false);
+                assertEquals(Transaction.NOT_ENOUGH_RIGHTS, r_SertifyPubKeys.isValid(Transaction.FOR_NETWORK, flags | Transaction.NOT_VALIDATE_FLAG_PERSONAL));
 
                 //r_SertifyPerson.sign(maker, false);
                 //r_SertifyPerson.process(dcSet, false);
@@ -463,25 +510,29 @@ public class TestRecPerson {
                 //CREATE INVALID PERSONALIZE RECORD NOT ENOUGH ERM BALANCE
                 RSertifyPubKeys personalizeRecord_0 = new RSertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
                         sertifiedPublicKeys,
-                        356, timestamp, userAccount1.getLastTimestamp(dcSet)[0]);
-                assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
+                        356, timestamp);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 4);
+                if (!BlockChain.DEVELOP_USE) {
+                    assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
+                }
 
                 //CREATE INVALID PERSONALIZE RECORD KEY NOT EXIST
                 personalizeRecord_0 = new RSertifyPubKeys(0, registrar, FEE_POWER, personKey + 10,
-                        sertifiedPublicKeys,
-                        356, timestamp, registrar.getLastTimestamp(dcSet)[0]);
+                        sertifiedPublicKeys, registrar.getLastTimestamp(dcSet)[0] + 1, 0L);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 5);
                 assertEquals(Transaction.ITEM_PERSON_NOT_EXIST, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
 
                 //CREATE INVALID ISSUE PERSON FOR INVALID PERSONALIZE
-                personalizeRecord_0 = new RSertifyPubKeys(0, userAccount1, FEE_POWER, personKey,
+                personalizeRecord_0 = new RSertifyPubKeys(0, userAccount2, FEE_POWER, personKey,
                         sertifiedPublicKeys,
-                        356, timestamp, userAccount1.getLastTimestamp(dcSet)[0]);
+                        356, timestamp);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, 5);
+
                 //CREATE INVALID ISSUE PERSON - NOT FEE
-                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
-                assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
+                userAccount2.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+                assertEquals(Transaction.NOT_ENOUGH_FEE, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags | Transaction.NOT_VALIDATE_FLAG_PERSONAL));
                 // ADD FEE
-                userAccount1.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-                //assertEquals(Transaction.NOT_ENOUGH_RIGHTS, personalizeRecord_0.isValid(dcSet, Transaction.FOR_NETWORK));
+                userAccount2.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
                 assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
                 // ADD RIGHTS
                 userAccount1.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(10000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
@@ -494,8 +545,8 @@ public class TestRecPerson {
                 personalizeRecord_0 = new RSertifyPubKeys(0, registrar, FEE_POWER, personKey,
                         sertifiedPublicKeys011,
                         356, timestamp, registrar.getLastTimestamp(dcSet)[0]);
+                personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 1, 5);
                 assertEquals(Transaction.INVALID_PUBLIC_KEY, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
-
 
             } finally {
                 dcSet.close();
@@ -515,7 +566,7 @@ public class TestRecPerson {
                 version = 0;
                 initPersonalize();
 
-                r_SertifyPubKeys.sign(registrar, Transaction.FOR_NETWORK);
+                r_SertifyPubKeys.sign(certifier, Transaction.FOR_NETWORK);
                 // TRUE
                 assertEquals(true, r_SertifyPubKeys.isSignatureValid(dcSet));
 

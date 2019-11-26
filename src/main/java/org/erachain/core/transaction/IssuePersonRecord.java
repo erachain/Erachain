@@ -252,7 +252,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
-        if (!BlockChain.ANONIM_SERT_USE
+        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
                 && !BlockChain.DEVELOP_USE && !creator.isPerson(dcSet, height)) {
             long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
