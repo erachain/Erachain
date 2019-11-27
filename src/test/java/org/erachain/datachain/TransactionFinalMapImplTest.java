@@ -7,6 +7,7 @@ import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -146,16 +148,27 @@ public class TransactionFinalMapImplTest {
                 assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
                 dcSet.getTransactionFinalMap().put(assetTransfer);
 
+                Iterator<Long> iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
+
+                // .size сбрасывает Итератор на конец списка
+                assertEquals(3, Iterators.size(iterator));
+
+                /// пошлем сами себе - эта трнзакция будет в обоих Итераторах
+                assetTransfer = new RSend(accountA, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
+                assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
+
                 //Set<BlExpUnit> iteratorA = dcSet.getTransactionFinalCalculatedMap().getBlExpCalculatedsByAddress(accountA.getAddress());
 
-                //List<Trade> iteratorT = dcSet.getTradeMap().getTrades(1L);
+                List<Trade> iteratorT = dcSet.getTradeMap().getTrades(1L);
 
                 //Iterator iteratorU = dcSet.getTransactionTab().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, desc, type, service, offset);
 
-                Iterator<Long> iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
+                iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
 
-                // .size сбрасывает Итерот на конец списка
-                assertEquals(3, Iterators.size(iterator));
+                // .size сбрасывает Итератор на конец списка
+                assertEquals(4, Iterators.size(iterator));
 
             } finally {
                 dcSet.close();

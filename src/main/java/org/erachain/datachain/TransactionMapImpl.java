@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
@@ -435,8 +434,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             //iterator = senderKeys;
             //iterator.addAll(Sets.newTreeSet(recipientKeys));
             // not sorted! Iterators.concat(iterator, recipientKeys);
-            Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-            iterator = mergedIterable.iterator();
+            iterator = Iterators.mergeSorted(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
             //iterator.addAll(Sets.newTreeSet(senderKeys));
@@ -502,8 +500,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         Iterators.advance(recipientKeys, 100);
 
         //treeKeys  = Iterators.concat(senderKeys, recipientKeys);
-        Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-        Iterator<Long> iterator = mergedIterable.iterator();
+        Iterator<Long> iterator = Iterators.mergeSorted(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         Iterators.advance(iterator, 100);
 

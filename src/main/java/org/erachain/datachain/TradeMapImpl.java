@@ -136,8 +136,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         if (iterator == null)
             return new ArrayList<Trade>();
 
-        iterator = Iterators.mergeSorted(ImmutableList.of(iterator,
-                ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
+        iterator = Iterators.mergeSorted(ImmutableList.of(iterator, ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
 
         //GET ALL ORDERS FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();
