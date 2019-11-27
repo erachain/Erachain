@@ -434,6 +434,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             //iterator = senderKeys;
             //iterator.addAll(Sets.newTreeSet(recipientKeys));
             // not sorted! Iterators.concat(iterator, recipientKeys);
+            // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
             iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
@@ -500,6 +501,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         Iterators.advance(recipientKeys, 100);
 
         //treeKeys  = Iterators.concat(senderKeys, recipientKeys);
+        // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
         Iterator<Long> iterator = Iterators.mergeSorted(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         Iterators.advance(iterator, 100);

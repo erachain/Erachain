@@ -8,6 +8,7 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.HashesMap;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
@@ -71,14 +72,14 @@ public class DBMapSuitForkTest {
         Iterator<Long> iter2 = list2.iterator();
 
         // тут будет просто сложение - все элементы войдут, даже повторение
-        Iterator<Long> iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
+        Iterator<Long> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
 
         int count = 0;
         while (iterator.hasNext()) {
             Long key = iterator.next();
             count++;
         }
-        assertEquals(count, 5);
+        assertEquals(count, 4);
 
         /// оказывается итератор уже перебрали там и он в конце!
         iter1 = list1.iterator();
@@ -99,7 +100,37 @@ public class DBMapSuitForkTest {
         iter2 = list2.iterator();
         // удалим повторы
 
-        Iterable iterable = (Iterable) Iterables.mergeSorted((Iterable) ImmutableList.of(list1, list2), Fun.COMPARATOR);
+        Iterable iterable = (Iterable) new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list1, list2), Fun.COMPARATOR);
+        iter1 = iterable.iterator();
+        count = 0;
+        while (iter1.hasNext()) {
+            Long key = iter1.next();
+            count++;
+        }
+        /// так же все сложит без удления дубляжей
+        assertEquals(count, 5);
+
+        assertEquals(list1.size(), 3);
+        assertEquals(list2.size(), 2);
+
+        // заново возьмем
+        iter1 = list1.iterator();
+        iter2 = list2.iterator();
+        // удалим повторы - УДАЛЯЕТ и из СПИСКА базового от котрого Итератор создан - причем болше чем надо
+        Iterators.removeAll(iter1, list2);
+
+        assertEquals(list1.size(), 2);
+        assertEquals(list2.size(), 2);
+
+        iter1 = list1.iterator();
+        iter2 = list2.iterator();
+        iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
+
+        assertEquals(Iterators.size(iterator), 4);
+
+
+        //////////////////////////////
+        iterable = (Iterable) Iterables.mergeSorted((Iterable) ImmutableList.of(list1, list2), Fun.COMPARATOR);
         iter1 = iterable.iterator();
         count = 0;
         while (iter1.hasNext()) {
@@ -114,8 +145,12 @@ public class DBMapSuitForkTest {
             Long key = iter2.next();
             count++;
         }
-        assertEquals(count, 3);
+        assertEquals(count, 2);
 
+        // обновим итераторы
+        iter1 = list1.iterator();
+        iter2 = list2.iterator();
+        // тоже самое - не убирает дубляжи ((
         iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
 
         count = 0;
