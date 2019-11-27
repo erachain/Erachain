@@ -434,7 +434,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             //iterator = senderKeys;
             //iterator.addAll(Sets.newTreeSet(recipientKeys));
             // not sorted! Iterators.concat(iterator, recipientKeys);
-            iterator = Iterators.mergeSorted(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
             //iterator.addAll(Sets.newTreeSet(senderKeys));

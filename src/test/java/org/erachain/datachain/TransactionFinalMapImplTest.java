@@ -108,6 +108,9 @@ public class TransactionFinalMapImplTest {
     public void findTransactionsCount() {
     }
 
+    /**
+     * Проверка Итераторов - были ошибки преобразования типов и двойные Значения в списке итератора
+     */
     @Test
     public void findTransactionsKeys() {
         //192.168.1.156:9047/apirecords/find?address=7PXf6Bk9m7uLrC9ATTHPyEtxRkCeeWDG3b&type=31&startblock=0
@@ -168,6 +171,7 @@ public class TransactionFinalMapImplTest {
                 iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
 
                 // .size сбрасывает Итератор на конец списка
+                /// фигово что тут будут повторения ключей - так как в обоих Итераторах есть значения то они удваиваются в слитом итераторе
                 assertEquals(4, Iterators.size(iterator));
 
             } finally {

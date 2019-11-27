@@ -393,7 +393,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // в рекурсии все хорошо - соберем ключи
             ///Iterator<Long> rescurseIterator = result.getB();
             ///iterator = Iterators.concat(iterator, rescurseIterator);
-            iterator = Iterators.mergeSorted(ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
+            iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
+            ////Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
+            ////iterator = mergedIterable.iterator();
+
 
             return new Pair<>(0, iterator);
 
