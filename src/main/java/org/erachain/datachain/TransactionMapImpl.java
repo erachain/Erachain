@@ -11,6 +11,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
@@ -435,7 +436,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             //iterator.addAll(Sets.newTreeSet(recipientKeys));
             // not sorted! Iterators.concat(iterator, recipientKeys);
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-            iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
             //iterator.addAll(Sets.newTreeSet(senderKeys));
@@ -502,7 +503,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
         //treeKeys  = Iterators.concat(senderKeys, recipientKeys);
         // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-        Iterator<Long> iterator = Iterators.mergeSorted(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+        Iterator<Long> iterator = new MergedIteratorNoDuplicates(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         Iterators.advance(iterator, 100);
 

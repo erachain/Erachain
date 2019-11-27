@@ -72,7 +72,7 @@ public class DBMapSuitForkTest {
         Iterator<Long> iter2 = list2.iterator();
 
         // тут будет просто сложение - все элементы войдут, даже повторение
-        Iterator<Long> iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
+        Iterator<Long> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
 
         int count = 0;
         while (iterator.hasNext()) {
@@ -124,7 +124,7 @@ public class DBMapSuitForkTest {
 
         iter1 = list1.iterator();
         iter2 = list2.iterator();
-        iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
+        iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
 
         assertEquals(Iterators.size(iterator), 4);
 
@@ -151,7 +151,7 @@ public class DBMapSuitForkTest {
         iter1 = list1.iterator();
         iter2 = list2.iterator();
         // тоже самое - не убирает дубляжи ((
-        iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
+        iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
 
         count = 0;
         while (iterator.hasNext()) {
@@ -233,7 +233,7 @@ public class DBMapSuitForkTest {
         Iterator<Long> iter2 = list2.iterator();
 
         // тут будет просто сложение - все элементы войдут, даже повторение
-        Iterator<Long> iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
+        Iterator<Long> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
 
         int count = 0;
         while (iterator.hasNext()) {

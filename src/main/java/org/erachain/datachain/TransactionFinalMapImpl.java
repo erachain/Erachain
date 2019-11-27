@@ -15,6 +15,7 @@ import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
@@ -394,7 +395,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             ///Iterator<Long> rescurseIterator = result.getB();
             ///iterator = Iterators.concat(iterator, rescurseIterator);
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-            iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
+            iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
             ////Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
             ////iterator = mergedIterable.iterator();
 
@@ -689,7 +690,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR).iterator();
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
             // поэтому нужно удалить дубли
-            iterator = Iterators.mergeSorted(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            iterator = new MergedIteratorNoDuplicates(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null) {
             iterator = senderKeys;

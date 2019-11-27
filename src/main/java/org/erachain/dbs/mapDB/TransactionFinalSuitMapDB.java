@@ -11,6 +11,7 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -264,7 +265,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             Iterator<Long> recipientKeysIterator = recipientKeys.iterator();
 
             // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
-            Iterator<Long> mergedIterator = Iterators.mergeSorted((Iterable) ImmutableList.of(senderKeysIterator, recipientKeysIterator), Fun.COMPARATOR);
+            Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeysIterator, recipientKeysIterator), Fun.COMPARATOR);
             return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
 
         }
