@@ -680,9 +680,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (address != null) {
-            //iterator = Iterators.concat(senderKeys, recipientKeys);
-            Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-            iterator = mergedIterable.iterator();
+            ///iterator = Iterators.concat(senderKeys, recipientKeys);
+            iterator = Iterators.mergeSorted(
+                    (Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
         } else if (sender != null && recipient != null) {
             iterator = senderKeys;
             Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
