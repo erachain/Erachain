@@ -152,16 +152,16 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
     }
 
     public Iterator typeIterator(String sender, Long timestamp, Integer type) {
-        return Fun.filter(((TransactionSuitMapDB)map).typeKey,
+        return Fun.filter(typeKey,
                 new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type)).iterator();
     }
 
     public Iterator senderIterator(String sender) {
-        return Fun.filter(((TransactionSuitMapDB)map).senderKey, sender).iterator();
+        return Fun.filter(senderKey, sender).iterator();
     }
 
     public Iterator recipientIterator(String recipient) {
-        return Fun.filter(((TransactionSuitMapDB)map).recipientKey, recipient).iterator();
+        return Fun.filter(recipientKey, recipient).iterator();
     }
 
     @Override

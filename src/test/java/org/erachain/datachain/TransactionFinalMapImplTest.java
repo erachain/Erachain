@@ -126,25 +126,36 @@ public class TransactionFinalMapImplTest {
                 int offset = 0;
                 int limit = 0;
 
+                int seqNo = 1;
+
                 Account recipientAcc = new Account(address);
                 BigDecimal amount_asset = new BigDecimal("1");
 
                 RSend assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
                 assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1);
-                assetTransfer.process(gb, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
 
                 assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
-                assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
-                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, 1);
-                assetTransfer.process(gb, Transaction.FOR_NETWORK);
+                assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
 
-                Iterator<Long> iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(),
-                        sender, recipient, minHeight,
-                        maxHeight, type, service, desc, offset, limit);
+                assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
+                assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
 
-                assertEquals(2, Iterators.size(iterator));
+                //Set<BlExpUnit> iteratorA = dcSet.getTransactionFinalCalculatedMap().getBlExpCalculatedsByAddress(accountA.getAddress());
 
+                //List<Trade> iteratorT = dcSet.getTradeMap().getTrades(1L);
+
+                //Iterator iteratorU = dcSet.getTransactionTab().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, desc, type, service, offset);
+
+                Iterator<Long> iterator = dcSet.getTransactionFinalMap().findTransactionsKeys(accountA.getAddress(), sender, recipient, minHeight, maxHeight, type, service, desc, offset, limit);
+
+                // .size сбрасывает Итерот на конец списка
+                assertEquals(3, Iterators.size(iterator));
 
             } finally {
                 dcSet.close();
