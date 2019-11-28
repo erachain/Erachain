@@ -396,8 +396,8 @@ public class Network extends Observable {
         return this.telegramer.deleteForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter) {
-        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter);
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
+        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes);
     }
     //public TelegramMessage getTelegram64(String signature) {
     //	return this.telegramer.getTelegram64(signature);
