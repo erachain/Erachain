@@ -123,7 +123,7 @@ public class TelegramManager extends Thread {
 
 
     // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter) {
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         if (!Controller.getInstance().isOnStopping()) {
 
@@ -159,7 +159,7 @@ public class TelegramManager extends Thread {
     }
 
     // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsForAddress(String recipient, long timestamp, String filter) {
+    public List<TelegramMessage> getTelegramsForAddress(String recipient, long timestamp, String filter, boolean outcomes) {
         // TelegramMessage telegram;
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         // ASK DATABASE FOR A LIST OF PEERS

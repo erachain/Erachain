@@ -80,6 +80,7 @@ public class TelegramManagerTest {
 
         init();
 
+        boolean outcomes = false;
         Transaction transaction;
 
         Controller cntr = Controller.getInstance();
@@ -100,7 +101,7 @@ public class TelegramManagerTest {
 
         }
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null, outcomes);
         assertEquals(telegrams.size(), 100);
 
         transaction = telegrams.get(10).getTransaction();
@@ -111,10 +112,10 @@ public class TelegramManagerTest {
 
         assertEquals((int)telegramer.telegramCount(), 100 - 1);
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null, outcomes);
         assertEquals(telegrams.size(), 100 - 1);
 
-        telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
+        telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null, outcomes);
         assertEquals(telegrams.size(), 100 - 1);
 
         List<String> signsList = new ArrayList<String>();
@@ -130,10 +131,10 @@ public class TelegramManagerTest {
 
         assertEquals((int)telegramer.telegramCount(), 100 - 1 - signsList.size());
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null, outcomes);
         assertEquals(telegrams.size(), 100 - 1 - signsList.size());
 
-        telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
+        telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null, outcomes);
         assertEquals(telegrams.size(), 100 - 1 - signsList.size());
 
     }

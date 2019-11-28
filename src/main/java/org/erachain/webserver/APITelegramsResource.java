@@ -33,10 +33,10 @@ public class APITelegramsResource {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("apitelegrams/getbysignature/{signature}", "Get Telegramm by signature");
-        help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}",
-                "Get messages by filter. Filter is title.");
-        help.put("apitelegrams/timestamp/{timestamp}?filter={filter}",
-                "Get messages from timestamp with filter. Filter is title.");
+        help.put("apitelegrams/get?address={address}&timestamp={timestamp}&filter={filter}&outcomes=true",
+                "Get messages by filter. Filter is title. If outcomes=true get outcomes too");
+        help.put("apitelegrams/timestamp/{timestamp}?filter={filter}&outcomes=true",
+                "Get messages from timestamp with filter. Filter is title. If outcomes=true get outcomes too");
         help.put("apitelegrams/check/{signature}",
                 "Check telegrams contain in node");
 
@@ -90,7 +90,8 @@ public class APITelegramsResource {
     @SuppressWarnings("unchecked")
     @GET
     @Path("get")
-    public Response getTelegramsTimestamp(@QueryParam("address") String address, @QueryParam("timestamp") int timestamp, @QueryParam("filter") String filter) {
+    public Response getTelegramsTimestamp(@QueryParam("address") String address, @QueryParam("timestamp") int timestamp,
+                                          @QueryParam("filter") String filter, @QueryParam("outcomes") boolean outcomes) {
 
         // CHECK ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -99,7 +100,7 @@ public class APITelegramsResource {
 
         int limit = 1024 << (Controller.HARD_WORK >> 1);
         JSONArray array = new JSONArray();
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(address, timestamp, filter)) {
+        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(address, timestamp, filter, outcomes)) {
             if (--limit < 0)
                 break;
 
@@ -113,11 +114,12 @@ public class APITelegramsResource {
     @GET
     @Path("timestamp/{timestamp}")
     public Response getTelegramsLimited(@PathParam("timestamp") long timestamp,
-                                      @QueryParam("filter") String filter) {
+                                        @QueryParam("filter") String filter, @QueryParam("outcomes") boolean outcomes
+    ) {
 
         int limit = 1024 << (Controller.HARD_WORK>>1);
         JSONArray array = new JSONArray();
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, null, filter)) {
+        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, null, filter, outcomes)) {
             if (--limit < 0)
                 break;
 
