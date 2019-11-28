@@ -127,6 +127,7 @@ public class TelegramManager extends Thread {
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         if (!Controller.getInstance().isOnStopping()) {
 
+            boolean skip = false;
             SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.tailMap(timestamp);
             for (Entry<Long, List<TelegramMessage>> item : subMap.entrySet()) {
                 List<TelegramMessage> telegramsTimestamp = item.getValue();
@@ -142,10 +143,16 @@ public class TelegramManager extends Thread {
                                 continue;
                         }
 
-                        if (recipient != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                            Account account = ((RSend) transaction).getRecipient();
-                            if (!account.equals(recipient))
+                        if (recipient != null) {
+                            if (
+                                // только входящие
+                                    transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                                            && !((RSend) transaction).getRecipient().equals(recipient)
+                                            // можно и исходящие
+                                            && outcomes && !transaction.getCreator().equals(recipient)
+                            ) {
                                 continue;
+                            }
                         }
 
                         telegrams.add(telegram);
@@ -159,7 +166,7 @@ public class TelegramManager extends Thread {
     }
 
     // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsForAddress(String recipient, long timestamp, String filter, boolean outcomes) {
+    public List<TelegramMessage> getTelegramsForAddress(String recipient, long timestamp, String filter) {
         // TelegramMessage telegram;
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         // ASK DATABASE FOR A LIST OF PEERS

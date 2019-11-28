@@ -2428,10 +2428,6 @@ public class Controller extends Observable {
         return this.wallet.getLastBlocks(account, limit);
     }
 
-    public List<TelegramMessage> getLastTelegrams(Account account, long timestamp, String filter, boolean outcomes) {
-        return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter, outcomes);
-    }
-
     public List<String> deleteTelegram(List<String> telegramSignatures) {
         return this.network.deleteTelegram(telegramSignatures);
     }
@@ -2444,8 +2440,8 @@ public class Controller extends Observable {
         return this.network.deleteTelegramsForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getLastTelegrams(String address, long timestamp, String filter, boolean outcomes) {
-        return this.network.getTelegramsForAddress(address, timestamp, filter, outcomes);
+    public List<TelegramMessage> getLastIncomeTelegrams(Account account, long timestamp, String filter) {
+        return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter);
     }
 
     public List<TelegramMessage> getLastTelegrams(long timestamp, String recipient, String filter, boolean outcomes) {

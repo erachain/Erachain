@@ -179,8 +179,8 @@ public class TelegramsResource {
     @Path("address/{address}/timestamp/{timestamp}")
     public String getTelegramsTimestamp(@PathParam("address") String address, @PathParam("timestamp") long timestamp,
                                         @QueryParam("filter") String filter,
-                                        @QueryParam("outcomes") boolean outcomes,
                                         @QueryParam("decrypt") boolean decrypt,
+                                        @QueryParam("outcomes") boolean outcomes,
                                         @QueryParam("password") String password) {
 
         Tuple2<Account, String> account = Account.tryMakeAccount(address);
@@ -194,7 +194,7 @@ public class TelegramsResource {
         JSONArray array = new JSONArray();
         JSONObject item;
         Transaction transaction;
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(account.a, timestamp, filter, outcomes)) {
+        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, account.a.getAddress(), filter, outcomes)) {
 
             item = telegram.toJson();
 

@@ -84,14 +84,15 @@ public class APITelegramsResource {
      * @param address   account user
      * @param timestamp value time
      * @param filter    is title message.
+     * @param outcomes  is True get outcomes too
      * @return json string all find message by filter
      * @author Ruslan
      */
     @SuppressWarnings("unchecked")
     @GET
     @Path("get")
-    public Response getTelegramsTimestamp(@QueryParam("address") String address, @QueryParam("timestamp") int timestamp,
-                                          @QueryParam("filter") String filter, @QueryParam("outcomes") boolean outcomes) {
+    public Response getTelegramsByTimestamp(@QueryParam("address") String address, @QueryParam("timestamp") int timestamp,
+                                            @QueryParam("filter") String filter, @QueryParam("outcomes") boolean outcomes) {
 
         // CHECK ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -100,7 +101,7 @@ public class APITelegramsResource {
 
         int limit = 1024 << (Controller.HARD_WORK >> 1);
         JSONArray array = new JSONArray();
-        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(address, timestamp, filter, outcomes)) {
+        for (TelegramMessage telegram : Controller.getInstance().getLastTelegrams(timestamp, address, filter, outcomes)) {
             if (--limit < 0)
                 break;
 

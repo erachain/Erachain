@@ -381,8 +381,8 @@ public class Network extends Observable {
         return this.telegramer.add(telegram);
     }
 
-    public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter, boolean outcomes) {
-        return this.telegramer.getTelegramsForAddress(address, timestamp, filter, outcomes);
+    public List<TelegramMessage> getTelegramsForAddress(String address, long timestamp, String filter) {
+        return this.telegramer.getTelegramsForAddress(address, timestamp, filter);
     }
 
     public List<String> deleteTelegram(List<String> telegramSignatures) {
