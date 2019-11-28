@@ -3505,6 +3505,9 @@ public class OrderTestsMy {
 
                 Assert.assertEquals(false, fork2.getOrderMap().contains(orderID_C));
                 Assert.assertEquals(false, fork2.getCompletedOrderMap().contains(orderID_C));
+
+                Assert.assertEquals(false, fork2.getTradeMap().contains(orderID_C));
+
             } finally {
                 dcSet.close();
             }
