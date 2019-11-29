@@ -82,12 +82,7 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long timestamp) {
-        return null;
-    }
-
-    @Override
-    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int heightStart) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long refDBstart, long refDBend) {
         return null;
     }
 

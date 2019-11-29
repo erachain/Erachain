@@ -4,10 +4,8 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
@@ -197,51 +195,21 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long timestamp) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long refDBstart, long refDBend) {
 
-        // тут индекс не по времени а по номерам блоков как лонг
-        int heightStart = Controller.getInstance().getMyHeight();
-        int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        long refDBend = Transaction.makeDBRef(heightEnd, 0);
-
-        byte[] filter = new byte[16];
+        byte[] filter = new byte[24];
         makeKey(filter, have, want);
+        System.arraycopy(Longs.toByteArray(refDBend), 0, filter, 16, 8);
         Iterator<Tuple2<Long, Long>> iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
 
         Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
         while (iterator.hasNext()) {
             Tuple2<Long, Long> key = iterator.next();
-            if (key.a < refDBend)
+            if (key.a < refDBstart)
                 break;
             keys.add(key);
         }
 
         return keys.iterator();
-    }
-
-    @Override
-    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int heightStart) {
-
-        // тут индекс не по времени а по номерам блоков как лонг
-        ///int heightStart = Controller.getInstance().getMyHeight();
-        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
-        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
-        long refDBend = Transaction.makeDBRef(heightEnd, 0);
-
-        ///byte[] filter = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
-        byte[] filter = new byte[16];
-        makeKey(filter, have, want);
-        Iterator<Tuple2<Long, Long>> iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
-
-        Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
-        while (iterator.hasNext()) {
-            Tuple2<Long, Long> key = iterator.next();
-            if (key.a < refDBend)
-                break;
-            keys.add(key);
-        }
-
-        return keys.iterator();
-
     }
 }

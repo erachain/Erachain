@@ -4,8 +4,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.mapDB.TradeMapSuitMapDBFork;
@@ -202,7 +204,16 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, timestamp);
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        int heightStart = Controller.getInstance().getMyHeight();
+        int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
+        //int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
+
+        long refDBstart = Transaction.makeDBRef(heightEnd - 1, 0);
+        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, refDBend, 0L);
         if (iterator == null)
             return null;
 
@@ -228,7 +239,16 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
         // тут индекс не по времени а по номерам блоков как лонг
         int heightStart = Controller.getInstance().getMyHeight();
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairHeightIterator(have, want, heightStart);
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        ///int heightStart = Controller.getInstance().getMyHeight();
+        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
+        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
+        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+
+        long refDBstart = Transaction.makeDBRef(heightEnd - 1, 0);
+
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, refDBstart, refDBend);
         if (iterator == null)
             return null;
 

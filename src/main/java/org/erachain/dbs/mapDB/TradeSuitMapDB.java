@@ -2,10 +2,8 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.TradeSuit;
@@ -236,43 +234,20 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
      * Get trades by timestamp
      * @param have
      * @param want
-     * @param timestamp from to height
+     * @param refDBstart
+     * @param refDBend from to height
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long timestamp) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long refDBstart, long refDBend) {
 
         if (this.pairKeyMap == null)
             return null;
 
         String pairKey = makeKey(have, want);
 
-        // тут индекс не по времени а по номерам блоков как лонг
-        int heightStart = Controller.getInstance().getMyHeight();
-        int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        long refDBend = Transaction.makeDBRef(heightEnd, 0);
-
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, null, null),
-                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, Fun.HI())).values().iterator();
-    }
-
-    @Override
-    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int heightStart) {
-
-        if (this.pairKeyMap == null)
-            return null;
-
-        String pairKey = makeKey(have, want);
-
-        // тут индекс не по времени а по номерам блоков как лонг
-        ///int heightStart = Controller.getInstance().getMyHeight();
-        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
-        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
-        long refDBend = Transaction.makeDBRef(heightEnd, 0);
-
-        return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, null, null),
-                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, Fun.HI())).values().iterator();
+                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, null),
+                Fun.t3(pairKey, Long.MAX_VALUE - refDBstart, Fun.HI())).values().iterator();
     }
 
 }
