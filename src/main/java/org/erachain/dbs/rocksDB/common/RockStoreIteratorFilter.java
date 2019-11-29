@@ -52,9 +52,16 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
 
     // ERROR on some BYTES!!!
     // hasNext = hasNext && new String(dbIterator.key()).startsWith(new String(filter));
-    return (hasNext = hasNext
-            && (stop == null && areEqualMask(dbIterator.key(), filter)
-            || descending ^ Arrays.compareUnsigned(stop, dbIterator.key()) > 0));
+
+    if (stop == null) {
+      return (hasNext = hasNext && areEqualMask(dbIterator.key(), filter));
+    } else {
+      if (descending) {
+        return (hasNext = hasNext && Arrays.compareUnsigned(stop, dbIterator.key()) <= 0);
+      } else {
+        return (hasNext = hasNext && Arrays.compareUnsigned(stop, dbIterator.key()) >= 0);
+      }
+    }
   }
 
   @Override
