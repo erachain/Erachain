@@ -26,14 +26,14 @@ import java.util.Map;
 Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
+public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
     private BTreeMap pairKeyMap;
     private BTreeMap wantKeyMap;
     private BTreeMap haveKeyMap;
     private BTreeMap targetsKeyMap;
 
-    public TradeMapSuitMapDB(DBASet databaseSet, DB database) {
+    public TradeSuitMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger);
     }
 

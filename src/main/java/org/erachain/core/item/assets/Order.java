@@ -992,7 +992,8 @@ public class Order implements Comparable<Order> {
         OrderMap ordersMap = this.dcSet.getOrderMap();
         TradeMap tradesMap = this.dcSet.getTradeMap();
 
-        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled - на всякий случай удалим его
+        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
+        // - на всякий случай удалим его в любом случае
         completedMap.delete(this);
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
@@ -1005,7 +1006,8 @@ public class Order implements Comparable<Order> {
             BigDecimal tradeAmountHave = trade.getAmountHave();
             BigDecimal tradeAmountWant = trade.getAmountWant();
 
-            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled  - на всякий случай удалим его
+            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+            // - на всякий случай удалим его в любом случае
             completedMap.delete(target);
 
             //REVERSE FULFILLED

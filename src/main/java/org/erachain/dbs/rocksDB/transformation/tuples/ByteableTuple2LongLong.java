@@ -9,6 +9,11 @@ public class ByteableTuple2LongLong extends ByteableTuple2<Long,Long>{
         setByteables(new Byteable[]{new ByteableLong(), new ByteableLong()});
     }
 
+    /**
+     * Длинна только одного первого элемента
+     *
+     * @return
+     */
     @Override
     public int sizeElements() {
         return Long.BYTES;
