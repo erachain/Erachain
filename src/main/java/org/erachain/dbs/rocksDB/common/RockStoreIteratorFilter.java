@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB.common;
 
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksIterator;
+import org.spongycastle.util.Arrays;
 
 import java.util.NoSuchElementException;
 
@@ -10,11 +11,18 @@ import static org.erachain.utils.ByteArrayUtils.areEqualMask;
 @Slf4j
 public final class RockStoreIteratorFilter extends RockStoreIterator {
 
+  byte[] stop;
   byte[] filter;
 
   public RockStoreIteratorFilter(RocksIterator dbIterator, boolean descending, boolean isIndex, byte[] filter) {
     super(dbIterator, descending, isIndex);
     this.filter = filter;
+  }
+
+  public RockStoreIteratorFilter(RocksIterator dbIterator, boolean descending, boolean isIndex, byte[] start, byte[] stop) {
+    super(dbIterator, descending, isIndex);
+    this.filter = start;
+    this.stop = stop;
   }
 
   @Override
@@ -44,7 +52,9 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
 
     // ERROR on some BYTES!!!
     // hasNext = hasNext && new String(dbIterator.key()).startsWith(new String(filter));
-    return (hasNext = hasNext && areEqualMask(dbIterator.key(), filter));
+    return (hasNext = hasNext
+            && (stop == null && areEqualMask(dbIterator.key(), filter)
+            || descending ^ Arrays.compareUnsigned(stop, dbIterator.key()) > 0));
   }
 
   @Override

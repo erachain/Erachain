@@ -11,17 +11,20 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.*;
-import org.erachain.ntp.NTP;
-import org.erachain.utils.Pair;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.OrderMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.ntp.NTP;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.StrJSonFine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -338,7 +341,7 @@ public class TradeResource {
         }
 
         int limitInt = limit.intValue();
-        List<Trade> listResult = Controller.getInstance().getTradeByTimestmp(have, want, timestamp, limitInt);
+        List<Trade> listResult = Controller.getInstance().getTradeByTimestmp(have, want, timestamp * 1000, limitInt);
 
         JSONArray arrayJSON = new JSONArray();
         for (Trade trade: listResult) {

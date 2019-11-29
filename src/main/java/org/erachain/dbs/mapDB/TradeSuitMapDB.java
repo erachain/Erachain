@@ -236,10 +236,9 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
      * @param want
      * @param start
      * @param stop from to height
-     * @param limit
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop, int limit) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop) {
 
         if (this.pairKeyMap == null)
             return null;

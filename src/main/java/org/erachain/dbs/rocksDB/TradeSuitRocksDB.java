@@ -20,8 +20,6 @@ import org.rocksdb.WriteOptions;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Хранит сделки на бирже
@@ -195,30 +193,26 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop, int limit) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop) {
 
         byte[] filter;
+        Iterator<Tuple2<Long, Long>> iterator;
         if (start > 0) {
-            filter = new byte[20];
-            makeKey(filter, have, want);
-            System.arraycopy(Ints.toByteArray(start), 0, filter, 16, 4);
+            byte[] startBytes = new byte[20];
+            makeKey(startBytes, have, want);
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - start), 0, startBytes, 16, 4);
+
+            byte[] stopBytes = new byte[20];
+            makeKey(stopBytes, have, want);
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stop), 0, stopBytes, 16, 4);
+
+            iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
         } else {
             filter = new byte[16];
             makeKey(filter, have, want);
+            iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
         }
 
-        Iterator<Tuple2<Long, Long>> iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
-
-        int count = limit;
-        Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
-        while (iterator.hasNext()) {
-            Tuple2<Long, Long> key = iterator.next();
-            if (stop > 0 && key.a < stop
-                    || limit > 0 && count-- <= 0)
-                break;
-            keys.add(key);
-        }
-
-        return keys.iterator();
+        return iterator;
     }
 }

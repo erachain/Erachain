@@ -209,7 +209,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
         int fromBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
 
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, fromBlock, 0, limit);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, fromBlock, 0);
         if (iterator == null)
             return null;
 
@@ -241,7 +241,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
         int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
 
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, heightStart, heightEnd, 0);
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, heightStart, heightEnd);
         if (iterator == null)
             return null;
 
