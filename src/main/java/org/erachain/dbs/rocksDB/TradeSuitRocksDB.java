@@ -195,17 +195,26 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long refDBstart, long refDBend) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop, int limit) {
 
-        byte[] filter = new byte[24];
-        makeKey(filter, have, want);
-        System.arraycopy(Longs.toByteArray(refDBend), 0, filter, 16, 8);
+        byte[] filter;
+        if (start > 0) {
+            filter = new byte[20];
+            makeKey(filter, have, want);
+            System.arraycopy(Ints.toByteArray(start), 0, filter, 16, 4);
+        } else {
+            filter = new byte[16];
+            makeKey(filter, have, want);
+        }
+
         Iterator<Tuple2<Long, Long>> iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
 
+        int count = limit;
         Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
         while (iterator.hasNext()) {
             Tuple2<Long, Long> key = iterator.next();
-            if (key.a < refDBstart)
+            if (stop > 0 && key.a < stop
+                    || limit > 0 && count-- <= 0)
                 break;
             keys.add(key);
         }

@@ -234,20 +234,22 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
      * Get trades by timestamp
      * @param have
      * @param want
-     * @param refDBstart
-     * @param refDBend from to height
+     * @param start
+     * @param stop from to height
+     * @param limit
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long refDBstart, long refDBend) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop, int limit) {
 
         if (this.pairKeyMap == null)
             return null;
 
         String pairKey = makeKey(have, want);
+        Long toEnd = stop > 0 ? Long.MAX_VALUE - stop : Fun.HI();
 
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, null),
-                Fun.t3(pairKey, Long.MAX_VALUE - refDBstart, Fun.HI())).values().iterator();
+                Fun.t3(pairKey, Long.MAX_VALUE - start, null),
+                Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
     }
 
 }

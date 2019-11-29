@@ -19,6 +19,6 @@ public interface TradeSuit {
 
     Iterator<Fun.Tuple2<Long, Long>> getPairIterator(long have, long want);
 
-    Iterator<Fun.Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long refDBstart, long refDBend);
+    Iterator<Fun.Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop, int limit);
 
 }
