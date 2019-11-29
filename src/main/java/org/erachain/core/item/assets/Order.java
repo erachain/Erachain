@@ -11,6 +11,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -1026,6 +1027,15 @@ public class Order implements Comparable<Order> {
 
             //REMOVE TRADE FROM DATABASE
             tradesMap.delete(trade);
+
+            if (BlockChain.CHECK_BUGS > 3) {
+                if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
+                    Long err = null;
+                    err++;
+                }
+            }
+
+
         }
 
         //REMOVE ORDER FROM DATABASE

@@ -977,8 +977,8 @@ public class OrderTestsMy {
                 }
 
                 // CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-                orderCreation = new CreateOrderTransaction(accountA, 111l, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1),
-                        BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l, new byte[64]);
+                orderCreation = new CreateOrderTransaction(accountA, 10022L, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1),
+                        BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0L, new byte[64]);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
 
@@ -986,7 +986,7 @@ public class OrderTestsMy {
                 assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
 
                 // CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-                orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 114l, BigDecimal.valueOf(0.1),
+                orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 2114L, BigDecimal.valueOf(0.1),
                         BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l, new byte[64]);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
@@ -3583,7 +3583,7 @@ public class OrderTestsMy {
                 cancelOrderTransaction = new CancelOrderTransaction(accountA, new byte[]{5, 7}, FEE_POWER,
                         timestamp++, 0l);
                 try {
-                    cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 2, ++seqNo);
+                    cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.CANCEL_ORDERS_ALL_VALID + 2, ++seqNo);
                     assertEquals("error", "должна была быть ошибка ArrayIndexOutOfBoundsException");
                 } catch (ArrayIndexOutOfBoundsException e) {
                 }
@@ -3608,9 +3608,10 @@ public class OrderTestsMy {
                 DCSet fork = dcSet.fork();
                 cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l);
                 cancelOrderTransaction.setDC(fork, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 2, ++seqNo);
+                cancelOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
 
                 // CHECK IF CANCEL ORDER IS INVALID
-                accountA.changeBalance(fork, true, FEE_KEY, BigDecimal.TEN, false);
+                accountA.changeBalance(fork, true, FEE_KEY, new BigDecimal("1000"), false);
                 assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
             } finally {
