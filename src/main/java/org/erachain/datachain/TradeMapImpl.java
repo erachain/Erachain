@@ -225,6 +225,28 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
+    public List<Trade> getTradesByTimestamp(long have, long want, int start, int stop, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, start, stop);
+        if (iterator == null)
+            return null;
+
+        iterator = limit > 0 ? Iterators.limit(iterator, limit) : iterator;
+
+        List<Trade> trades = new ArrayList<Trade>();
+        while (iterator.hasNext()) {
+            trades.add(this.get((Tuple2<Long, Long>) iterator.next()));
+        }
+
+        //RETURN
+        return trades;
+    }
+
+    @Override
     public BigDecimal getVolume24(long have, long want) {
 
         BigDecimal volume = BigDecimal.ZERO;

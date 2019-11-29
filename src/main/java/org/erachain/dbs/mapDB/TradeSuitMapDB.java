@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.TradeSuit;
@@ -244,10 +245,10 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
             return null;
 
         String pairKey = makeKey(have, want);
-        Long toEnd = stop > 0 ? Long.MAX_VALUE - stop : Fun.HI();
+        Object toEnd = stop > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(stop, 0) : Fun.HI();
 
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, Long.MAX_VALUE - start, null),
+                Fun.t3(pairKey, start > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(start, 0) : null, null),
                 Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
     }
 
