@@ -150,12 +150,35 @@ public class TradeMapImplTest {
                         3, 5, index++);
                 tradesMap.put(trade);
 
+                trade = new Trade(Transaction.makeDBRef(start - 1, 3), targetID, haveKey, wantKey,
+                        new BigDecimal("22"), new BigDecimal("44"),
+                        3, 5, index++);
+                tradesMap.put(trade);
+
+                trade = new Trade(Transaction.makeDBRef(stop + 1, 4), targetID, haveKey, wantKey,
+                        new BigDecimal("22"), new BigDecimal("44"),
+                        3, 5, index++);
+                tradesMap.put(trade);
+
                 trade = new Trade(Transaction.makeDBRef(stop, 4), targetID, haveKey, wantKey,
                         new BigDecimal("22"), new BigDecimal("44"),
                         3, 5, index++);
                 tradesMap.put(trade);
 
-                assertEquals(2, tradesMap.getTradesByTimestamp(haveKey, wantKey, start, stop, 0).size());
+                assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, start + 1, stop - 1, 0).size());
+
+                assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, 0, 0, 0).size());
+
+                assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, 0, stop, 0).size());
+
+                assertEquals(2, tradesMap.getTradesByTimestamp(haveKey, wantKey, stop + 1, stop, 0).size());
+
+                assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, start, 0, 0).size());
+
+                assertEquals(2, tradesMap.getTradesByTimestamp(haveKey, wantKey, start, start - 1, 0).size());
+
+                assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, start, stop, 0).size());
+
 
             } finally {
                 dcSet.close();

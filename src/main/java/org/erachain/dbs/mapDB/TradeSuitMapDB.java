@@ -248,7 +248,7 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         Object toEnd = stop > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(stop, 0) : Fun.HI();
 
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, start > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(start, 0) : null, null),
+                Fun.t3(pairKey, start > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(start + 1, 0) : null, null),
                 Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
     }
 
