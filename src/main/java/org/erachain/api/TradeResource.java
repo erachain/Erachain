@@ -58,6 +58,9 @@ public class TradeResource {
         help.put("GET trade/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades for HaveKey & WantKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50.");
+        help.put("GET trade/tradesbyid/[have]/[want]?from=[orderID]&limit=[limit]",
+                "Get trades for HaveKey & WantKey, "
+                        + "limit is count record. The number of trades is limited by input param, default 50. Order ID as Block-seqNo. For example 103506-3");
         help.put("GET trade/getbyaddress/[creator]/[haveKey]/[wantKey]",
                 "get list of orders in CAP by address");
         help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
@@ -341,7 +344,46 @@ public class TradeResource {
         }
 
         int limitInt = limit.intValue();
-        List<Trade> listResult = Controller.getInstance().getTradeByTimestmp(have, want, timestamp * 1000, limitInt);
+        if (limitInt > 200)
+            limitInt = 200;
+        else if (limitInt < 0)
+            limitInt = 0;
+        List<Trade> listResult = Controller.getInstance().getTradeByTimestamp(have, want, timestamp * 1000, limitInt);
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade: listResult) {
+            arrayJSON.add(trade.toJson(have));
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
+    @Path("tradesbyid/{have}/{want}")
+    // /trades/1/2?timestamp=3&limit=4
+    public static String getTradesFromOrderID(@PathParam("have") Long have, @PathParam("want") Long want,
+                                                @QueryParam("from") String fromID,
+                                                @DefaultValue("50") @QueryParam("limit") Long limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        Long startOrderID = Transaction.parseDBRef(fromID);
+        int limitInt = limit.intValue();
+        if (limitInt > 200)
+            limitInt = 200;
+        else if (limitInt < 0)
+            limitInt = 0;
+
+        List<Trade> listResult = Controller.getInstance().getTradeByOrderID(have, want, startOrderID, limitInt);
 
         JSONArray arrayJSON = new JSONArray();
         for (Trade trade: listResult) {

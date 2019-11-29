@@ -235,20 +235,33 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
      * Get trades by timestamp
      * @param have
      * @param want
-     * @param start
-     * @param stop from to height
+     * @param startHeight
+     * @param stopHeight from to height
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int startHeight, int stopHeight) {
 
         if (this.pairKeyMap == null)
             return null;
 
         String pairKey = makeKey(have, want);
-        Object toEnd = stop > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(stop, 0) : Fun.HI();
+        Object toEnd = stopHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, 0) : Fun.HI();
 
+        // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, start > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(start + 1, 0) : null, null),
+                Fun.t3(pairKey, startHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(startHeight, Integer.MAX_VALUE) : null, null),
+                Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
+    }
+
+    @Override
+    public Iterator<Fun.Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
+        if (this.pairKeyMap == null)
+            return null;
+
+        String pairKey = makeKey(have, want);
+        Object toEnd = stopOrderID > 0 ? Long.MAX_VALUE - stopOrderID : Fun.HI();
+        return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+                Fun.t3(pairKey, startOrderID > 0 ? Long.MAX_VALUE - startOrderID : null, null),
                 Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
     }
 

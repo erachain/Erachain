@@ -225,21 +225,48 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
+    public List<Trade> getTradesByOrderID(long have, long want, long startOrderID, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        Iterator<Fun.Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairOrderIDIterator(have, want, startOrderID, 0);
+
+        int counter = limit;
+        List<Trade> trades = new ArrayList<Trade>();
+        while (iterator.hasNext()) {
+            trades.add(this.get(iterator.next()));
+            if (limit > 0 && counter-- < 0)
+                break;
+        }
+
+        return  trades;
+    }
+
+    @Override
     public List<Trade> getTradesByTimestamp(long have, long want, int start, int stop, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
+        if (start < stop) {
+            int temp = stop;
+            stop = start;
+            start = temp;
+        }
+
         Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, start, stop);
         if (iterator == null)
             return null;
 
-        iterator = limit > 0 ? Iterators.limit(iterator, limit) : iterator;
-
+        int counter = limit;
         List<Trade> trades = new ArrayList<Trade>();
         while (iterator.hasNext()) {
-            trades.add(this.get((Tuple2<Long, Long>) iterator.next()));
+            trades.add(this.get(iterator.next()));
+            if (limit > 0 && counter-- < 0)
+                break;
         }
 
         //RETURN
@@ -268,7 +295,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
             return null;
 
         while (iterator.hasNext()) {
-            Trade trade = this.get((Tuple2<Long, Long>) iterator.next());
+            Trade trade = this.get(iterator.next());
             if (trade.getHaveKey() == want) {
                 volume = volume.add(trade.getAmountHave());
             } else {

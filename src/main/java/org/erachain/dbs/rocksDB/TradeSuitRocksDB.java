@@ -186,33 +186,53 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
-        //byte[] filter = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
         byte[] filter = new byte[16];
         makeKey(filter, have, want);
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int start, int stop) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int startHeight, int stopHeight) {
 
-        byte[] filter;
+        byte[] startBytes = new byte[20];
+        makeKey(startBytes, have, want);
+        System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 16, 4);
+
+        byte[] stopBytes = new byte[20];
+        makeKey(stopBytes, have, want);
+        // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
+        System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stopHeight - 1), 0, stopBytes, 16, 4);
+
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
+
+    }
+
+    @Override
+    public Iterator<Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
+
         Iterator<Tuple2<Long, Long>> iterator;
-        if (start > 0) {
-            byte[] startBytes = new byte[20];
+
+        byte[] startBytes;
+        if (startOrderID > 0) {
+            startBytes = new byte[24];
             makeKey(startBytes, have, want);
-            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - start), 0, startBytes, 16, 4);
-
-            byte[] stopBytes = new byte[20];
-            makeKey(stopBytes, have, want);
-            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stop), 0, stopBytes, 16, 4);
-
-            iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
+            System.arraycopy(startOrderID, 0, startBytes, 16, 8);
         } else {
-            filter = new byte[16];
-            makeKey(filter, have, want);
-            iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
+            startBytes = new byte[24];
+            makeKey(startBytes, have, want);
         }
 
-        return iterator;
+        byte[] stopBytes;
+        if (stopOrderID > 0) {
+            stopBytes = new byte[24];
+            makeKey(stopBytes, have, want);
+            System.arraycopy(stopOrderID, 0, stopBytes, 16, 8);
+        } else {
+            stopBytes = new byte[16];
+            makeKey(stopBytes, have, want);
+        }
+
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
+
     }
 }
