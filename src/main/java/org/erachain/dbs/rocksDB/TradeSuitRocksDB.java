@@ -4,10 +4,8 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
-import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
@@ -22,8 +20,6 @@ import org.rocksdb.WriteOptions;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Хранит сделки на бирже
@@ -190,58 +186,53 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
     @Override
     public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
-        //byte[] filter = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
         byte[] filter = new byte[16];
         makeKey(filter, have, want);
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long timestamp) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int startHeight, int stopHeight) {
 
-        // тут индекс не по времени а по номерам блоков как лонг
-        int heightStart = Controller.getInstance().getMyHeight();
-        int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+        byte[] startBytes = new byte[20];
+        makeKey(startBytes, have, want);
+        System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 16, 4);
 
-        byte[] filter = new byte[16];
-        makeKey(filter, have, want);
-        Iterator<Tuple2<Long, Long>> iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
+        byte[] stopBytes = new byte[20];
+        makeKey(stopBytes, have, want);
+        // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
+        System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stopHeight - 1), 0, stopBytes, 16, 4);
 
-        Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
-        while (iterator.hasNext()) {
-            Tuple2<Long, Long> key = iterator.next();
-            if (key.a < refDBend)
-                break;
-            keys.add(key);
-        }
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
 
-        return keys.iterator();
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int heightStart) {
+    public Iterator<Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
 
-        // тут индекс не по времени а по номерам блоков как лонг
-        ///int heightStart = Controller.getInstance().getMyHeight();
-        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
-        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
-        long refDBend = Transaction.makeDBRef(heightEnd, 0);
+        Iterator<Tuple2<Long, Long>> iterator;
 
-        ///byte[] filter = TradeSuit.makeKey(have, want).getBytes(StandardCharsets.UTF_8);
-        byte[] filter = new byte[16];
-        makeKey(filter, have, want);
-        Iterator<Tuple2<Long, Long>> iterator = map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
-
-        Set<Tuple2<Long, Long>> keys = new TreeSet<Tuple2<Long, Long>>();
-        while (iterator.hasNext()) {
-            Tuple2<Long, Long> key = iterator.next();
-            if (key.a < refDBend)
-                break;
-            keys.add(key);
+        byte[] startBytes;
+        if (startOrderID > 0) {
+            startBytes = new byte[24];
+            makeKey(startBytes, have, want);
+            System.arraycopy(startOrderID, 0, startBytes, 16, 8);
+        } else {
+            startBytes = new byte[24];
+            makeKey(startBytes, have, want);
         }
 
-        return keys.iterator();
+        byte[] stopBytes;
+        if (stopOrderID > 0) {
+            stopBytes = new byte[24];
+            makeKey(stopBytes, have, want);
+            System.arraycopy(stopOrderID, 0, stopBytes, 16, 8);
+        } else {
+            stopBytes = new byte[16];
+            makeKey(stopBytes, have, want);
+        }
+
+        return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
 
     }
 }

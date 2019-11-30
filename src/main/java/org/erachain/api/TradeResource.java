@@ -11,17 +11,20 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.*;
-import org.erachain.ntp.NTP;
-import org.erachain.utils.Pair;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.OrderMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.ntp.NTP;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.StrJSonFine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -55,6 +58,10 @@ public class TradeResource {
         help.put("GET trade/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades for HaveKey & WantKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50.");
+        help.put("GET trade/tradesfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get trades for HaveKey & WantKey, "
+                        + "limit is count record. The number of trades is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
         help.put("GET trade/getbyaddress/[creator]/[haveKey]/[wantKey]",
                 "get list of orders in CAP by address");
         help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
@@ -324,7 +331,7 @@ public class TradeResource {
     // /trades/1/2?timestamp=3&limit=4
     public static String getTradesFromTimestamp(@PathParam("have") Long have, @PathParam("want") Long want,
                                                 @DefaultValue("0") @QueryParam("timestamp") Long timestamp,
-                                                @DefaultValue("50") @QueryParam("limit") Long limit) {
+                                                @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
         // DOES ASSETID EXIST
@@ -337,8 +344,49 @@ public class TradeResource {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        int limitInt = limit.intValue();
-        List<Trade> listResult = Controller.getInstance().getTradeByTimestmp(have, want, timestamp, limitInt);
+        List<Trade> listResult = Controller.getInstance().getTradeByTimestamp(have, want, timestamp * 1000, limit);
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade: listResult) {
+            arrayJSON.add(trade.toJson(have));
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
+    @Path("tradesfrom/{have}/{want}")
+    public static String getTradesFrom(@PathParam("have") Long have, @PathParam("want") Long want,
+                                              @QueryParam("height") Integer fromHeight,
+                                              @QueryParam("order") String fromOrder,
+                                              @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                              @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        List<Trade> listResult;
+        if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+
+            listResult = Controller.getInstance().getTradeByOrderID(have, want, startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getTradeByHeight(have, want, fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getTradeByTimestamp(have, want, fromTimestamp * 1000, limit);
+        }
 
         JSONArray arrayJSON = new JSONArray();
         for (Trade trade: listResult) {

@@ -11,6 +11,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
 import org.json.simple.JSONObject;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -992,7 +993,8 @@ public class Order implements Comparable<Order> {
         OrderMap ordersMap = this.dcSet.getOrderMap();
         TradeMap tradesMap = this.dcSet.getTradeMap();
 
-        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled - на всякий случай удалим его
+        //REMOVE FROM COMPLETED ORDERS - он может быть был отменен, поэтому нельзя проверять по Fulfilled
+        // - на всякий случай удалим его в любом случае
         completedMap.delete(this);
 
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
@@ -1005,7 +1007,8 @@ public class Order implements Comparable<Order> {
             BigDecimal tradeAmountHave = trade.getAmountHave();
             BigDecimal tradeAmountWant = trade.getAmountWant();
 
-            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled  - на всякий случай удалим его
+            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+            // - на всякий случай удалим его в любом случае
             completedMap.delete(target);
 
             //REVERSE FULFILLED
@@ -1024,6 +1027,15 @@ public class Order implements Comparable<Order> {
 
             //REMOVE TRADE FROM DATABASE
             tradesMap.delete(trade);
+
+            if (BlockChain.CHECK_BUGS > 3) {
+                if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
+                    Long err = null;
+                    err++;
+                }
+            }
+
+
         }
 
         //REMOVE ORDER FROM DATABASE
