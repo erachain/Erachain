@@ -48,7 +48,7 @@ public class MergedIteratorNoDuplicates<T> extends UnmodifiableIterator<T> {
     }
 
     @Override
-    public T next() {
+    public synchronized T next() {
         do {
             PeekingIterator<T> nextIter = queue.remove();
             T next = nextIter.next();

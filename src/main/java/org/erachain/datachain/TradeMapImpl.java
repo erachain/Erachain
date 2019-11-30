@@ -10,7 +10,6 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
-import org.erachain.dbs.mapDB.TradeMapSuitMapDB;
 import org.erachain.dbs.mapDB.TradeMapSuitMapDBFork;
 import org.erachain.dbs.mapDB.TradeSuitMapDB;
 import org.erachain.dbs.rocksDB.TradeSuitRocksDB;
