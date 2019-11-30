@@ -2,7 +2,6 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
@@ -26,14 +25,14 @@ import java.util.Map;
 Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
+public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
     private BTreeMap pairKeyMap;
     private BTreeMap wantKeyMap;
     private BTreeMap haveKeyMap;
     private BTreeMap targetsKeyMap;
 
-    public TradeMapSuitMapDB(DBASet databaseSet, DB database) {
+    public TradeSuitMapDB(DBASet databaseSet, DB database) {
         super(databaseSet, database, logger);
     }
 
@@ -236,43 +235,34 @@ public class TradeMapSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impl
      * Get trades by timestamp
      * @param have
      * @param want
-     * @param timestamp from to height
+     * @param startHeight
+     * @param stopHeight from to height
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, long timestamp) {
+    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int startHeight, int stopHeight) {
 
         if (this.pairKeyMap == null)
             return null;
 
         String pairKey = makeKey(have, want);
+        Object toEnd = stopHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, 0) : Fun.HI();
 
-        // тут индекс не по времени а по номерам блоков как лонг
-        int heightStart = Controller.getInstance().getMyHeight();
-        int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        long refDBend = Transaction.makeDBRef(heightEnd, 0);
-
+        // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, null, null),
-                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, Fun.HI())).values().iterator();
+                Fun.t3(pairKey, startHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(startHeight, Integer.MAX_VALUE) : null, null),
+                Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int heightStart) {
-
+    public Iterator<Fun.Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
         if (this.pairKeyMap == null)
             return null;
 
         String pairKey = makeKey(have, want);
-
-        // тут индекс не по времени а по номерам блоков как лонг
-        ///int heightStart = Controller.getInstance().getMyHeight();
-        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
-        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
-        long refDBend = Transaction.makeDBRef(heightEnd, 0);
-
+        Object toEnd = stopOrderID > 0 ? Long.MAX_VALUE - stopOrderID : Fun.HI();
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
-                Fun.t3(pairKey, null, null),
-                Fun.t3(pairKey, Long.MAX_VALUE - refDBend, Fun.HI())).values().iterator();
+                Fun.t3(pairKey, startOrderID > 0 ? Long.MAX_VALUE - startOrderID : null, null),
+                Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
     }
 
 }

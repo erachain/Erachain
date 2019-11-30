@@ -977,8 +977,8 @@ public class OrderTestsMy {
                 }
 
                 // CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-                orderCreation = new CreateOrderTransaction(accountA, 111l, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1),
-                        BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l, new byte[64]);
+                orderCreation = new CreateOrderTransaction(accountA, 10022L, AssetCls.ERA_KEY, BigDecimal.valueOf(0.1),
+                        BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0L, new byte[64]);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
 
@@ -986,7 +986,7 @@ public class OrderTestsMy {
                 assertEquals(Transaction.ITEM_ASSET_NOT_EXIST, orderCreation.isValid(Transaction.FOR_NETWORK, flags));
 
                 // CREATE INVALID ORDER CREATION WANT DOES NOT EXIST
-                orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 114l, BigDecimal.valueOf(0.1),
+                orderCreation = new CreateOrderTransaction(accountA, AssetCls.FEE_KEY, 2114L, BigDecimal.valueOf(0.1),
                         BigDecimal.valueOf(1), (byte) 0, ++timeStamp, 0l, new byte[64]);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
                 orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
@@ -3408,7 +3408,7 @@ public class OrderTestsMy {
                         BigDecimal.valueOf(1000), BigDecimal.valueOf(100), (byte) 0, timestamp++,
                         accountA.getLastTimestamp(fork1)[0], new byte[]{5, 6});
                 createOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
-                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                createOrderTransaction.setDC(fork1, Transaction.FOR_NETWORK, 2, ++seqNo);
                 createOrderTransaction.process(null, Transaction.FOR_NETWORK);
                 Long orderID_A = createOrderTransaction.makeOrder().getId();
 
@@ -3417,21 +3417,32 @@ public class OrderTestsMy {
                 createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                         BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2)[0], new byte[]{1, 2});
                 createOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
-                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                createOrderTransaction.setDC(fork1, Transaction.FOR_NETWORK, 2, ++seqNo);
                 createOrderTransaction.process(null, Transaction.FOR_NETWORK);
                 Long orderID_B = createOrderTransaction.makeOrder().getId();
+
+                Order orderB = fork1.getOrderMap().get(orderID_B);
+                Assert.assertEquals(0, orderB.getInitiatedTrades(fork1).size());
 
                 // CREATE ORDER THREE (SELLING 150 B FOR A AT A PRICE OF 5)
                 DCSet fork3 = fork2.fork();
                 createOrderTransaction = new CreateOrderTransaction(accountB, keyB, keyA, BigDecimal.valueOf(150),
                         BigDecimal.valueOf(750), (byte) 0, timestamp++, accountA.getLastTimestamp(fork3)[0], new byte[]{3, 4});
                 createOrderTransaction.sign(accountB, Transaction.FOR_NETWORK);
-                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                createOrderTransaction.setDC(fork3, Transaction.FOR_NETWORK, 2, ++seqNo);
                 createOrderTransaction.process(null, Transaction.FOR_NETWORK);
                 Long orderID_C = createOrderTransaction.makeOrder().getId();
 
+                Order orderC = fork3.getCompletedOrderMap().get(orderID_C);
+                // CHECK TRADES
+                Assert.assertEquals(2, orderC.getInitiatedTrades(fork3).size());
+                // in fork is NULL Assert.assertEquals(2, fork3.getTradeMap().getTradesByOrderID(orderID_C).size());
+
                 // ORPHAN ORDER THREE
                 createOrderTransaction.orphan(gb, Transaction.FOR_NETWORK);
+
+                Assert.assertEquals(0, orderC.getInitiatedTrades(fork3).size());
+                // in fork is NULL Assert.assertEquals(0, fork3.getTradeMap().getTradesByOrderID(orderID_C).size());
 
                 // CHECK BALANCES
                 Assert.assertEquals(0, accountA.getBalanceUSE(keyA, fork3).compareTo(BigDecimal.valueOf(48000))); // BALANCE
@@ -3461,37 +3472,38 @@ public class OrderTestsMy {
                 Assert.assertEquals(0, orderA.getFulfilledHave().compareTo(BigDecimal.valueOf(0)));
                 Assert.assertEquals(false, orderA.isFulfilled());
 
-                Order orderB = fork3.getOrderMap().get(orderID_B);
+                orderB = fork3.getOrderMap().get(orderID_B);
                 Assert.assertEquals(false, fork3.getCompletedOrderMap().contains(orderB.getId()));
                 assertEquals(orderB.getFulfilledHave(), BigDecimal.valueOf(0));
                 Assert.assertEquals(false, orderB.isFulfilled());
 
                 // CHECK TRADES
+                Assert.assertEquals(0, orderB.getInitiatedTrades(dcSet).size());
                 Assert.assertEquals(0, orderB.getInitiatedTrades(fork3).size());
 
                 // ORPHAN ORDER TWO
                 createOrderTransaction = new CreateOrderTransaction(accountA, keyA, keyB, BigDecimal.valueOf(1000),
                         BigDecimal.valueOf(200), (byte) 0, timestamp++, accountA.getLastTimestamp(fork2)[0], new byte[]{1, 2});
-                createOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                createOrderTransaction.setDC(fork3, Transaction.FOR_NETWORK, 2, ++seqNo);
                 createOrderTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
                 // CHECK BALANCES
-                Assert.assertEquals(0, accountA.getBalanceUSE(keyA, fork2).compareTo(BigDecimal.valueOf(49000))); // BALANCE
+                Assert.assertEquals(0, accountA.getBalanceUSE(keyA, fork3).compareTo(BigDecimal.valueOf(49000))); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
                 // A
-                Assert.assertEquals(0, accountB.getBalanceUSE(keyB, fork2).compareTo(BigDecimal.valueOf(50000))); // BALANCE
+                Assert.assertEquals(0, accountB.getBalanceUSE(keyB, fork3).compareTo(BigDecimal.valueOf(50000))); // BALANCE
                 // B
                 // FOR
                 // ACCOUNT
                 // B
-                Assert.assertEquals(0, accountA.getBalanceUSE(keyB, fork2).compareTo(BigDecimal.valueOf(0))); // BALANCE
+                Assert.assertEquals(0, accountA.getBalanceUSE(keyB, fork3).compareTo(BigDecimal.valueOf(0))); // BALANCE
                 // B
                 // FOR
                 // ACCOUNT
                 // A
-                Assert.assertEquals(0, accountB.getBalanceUSE(keyA, fork2).compareTo(BigDecimal.valueOf(0))); // BALANCE
+                Assert.assertEquals(0, accountB.getBalanceUSE(keyA, fork3).compareTo(BigDecimal.valueOf(0))); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -3506,7 +3518,6 @@ public class OrderTestsMy {
                 Assert.assertEquals(false, fork2.getOrderMap().contains(orderID_C));
                 Assert.assertEquals(false, fork2.getCompletedOrderMap().contains(orderID_C));
 
-                Assert.assertEquals(false, fork2.getTradeMap().contains(orderID_C));
 
             } finally {
                 dcSet.close();
@@ -3572,7 +3583,7 @@ public class OrderTestsMy {
                 cancelOrderTransaction = new CancelOrderTransaction(accountA, new byte[]{5, 7}, FEE_POWER,
                         timestamp++, 0l);
                 try {
-                    cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 2, ++seqNo);
+                    cancelOrderTransaction.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.CANCEL_ORDERS_ALL_VALID + 2, ++seqNo);
                     assertEquals("error", "должна была быть ошибка ArrayIndexOutOfBoundsException");
                 } catch (ArrayIndexOutOfBoundsException e) {
                 }
@@ -3597,9 +3608,10 @@ public class OrderTestsMy {
                 DCSet fork = dcSet.fork();
                 cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER, timestamp++, 0l);
                 cancelOrderTransaction.setDC(fork, Transaction.FOR_NETWORK, BlockChain.ALL_BALANCES_OK_TO + 2, ++seqNo);
+                cancelOrderTransaction.sign(accountA, Transaction.FOR_NETWORK);
 
                 // CHECK IF CANCEL ORDER IS INVALID
-                accountA.changeBalance(fork, true, FEE_KEY, BigDecimal.TEN, false);
+                accountA.changeBalance(fork, true, FEE_KEY, new BigDecimal("1000"), false);
                 assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
 
             } finally {

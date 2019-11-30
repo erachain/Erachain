@@ -651,8 +651,18 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] start, byte[] stop, boolean isIndex) {
+        return new RockStoreIteratorFilter(getIterator(), descending, isIndex, start, stop);
+    }
+
+    @Override
     public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex) {
-        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, true, filter);
+        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, isIndex, filter);
+    }
+
+    @Override
+    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] start, byte[] stop, boolean isIndex) {
+        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, isIndex, start, stop);
     }
 
     @Override

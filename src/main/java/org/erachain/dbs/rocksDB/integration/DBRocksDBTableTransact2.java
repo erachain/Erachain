@@ -551,8 +551,40 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
     }
 
     @Override
+    public Iterator<K> getIndexIteratorFilter(byte[] start, byte[] stop, boolean descending, boolean isIndex) {
+        DBIterator iterator = dbSource.indexIteratorFilter(descending, start, stop, isIndex);
+        return new Iterator<K>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public K next() {
+                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
+            }
+        };
+    }
+
+    @Override
     public Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex) {
         DBIterator iterator = dbSource.indexIteratorFilter(descending, indexDB, filter, isIndex);
+        return new Iterator<K>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public K next() {
+                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
+            }
+        };
+    }
+
+    @Override
+    public Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] start, byte[] stop, boolean descending, boolean isIndex) {
+        DBIterator iterator = dbSource.indexIteratorFilter(descending, indexDB, start, stop, isIndex);
         return new Iterator<K>() {
             @Override
             public boolean hasNext() {

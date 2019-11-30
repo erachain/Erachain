@@ -4,13 +4,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
-import org.erachain.dbs.mapDB.TradeMapSuitMapDB;
 import org.erachain.dbs.mapDB.TradeMapSuitMapDBFork;
-import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
+import org.erachain.dbs.mapDB.TradeSuitMapDB;
 import org.erachain.dbs.rocksDB.TradeSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
@@ -55,14 +55,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                     map = new TradeSuitRocksDB(databaseSet, database);
                     break;
                 default:
-                    map = new TradeMapSuitMapDB(databaseSet, database);
+                    map = new TradeSuitMapDB(databaseSet, database);
             }
         } else {
             switch (dbsUsed) {
                 case DBS_ROCK_DB:
-                    //map = new BlocksSuitMapDBFotk((TransactionMap) parent, databaseSet);
-                    map = new NativeMapTreeMapFork(parent, databaseSet, Fun.BYTE_ARRAY_COMPARATOR, this);
-                    break;
+                    //map = new NativeMapTreeMapFork(parent, databaseSet, Fun.TUPLE2_COMPARATOR, this);
+                    //break;
                 default:
                     map = new TradeMapSuitMapDBFork((TradeMap)parent, databaseSet);
             }
@@ -192,7 +191,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     /**
-     * Get transaction by timestamp
+     * Get trades by timestamp. From Timestamp to deep.
      *  @param have      include
      * @param want      wish
      * @param timestamp is time
@@ -204,7 +203,13 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, timestamp);
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        //int heightStart = Controller.getInstance().getMyHeight();
+        //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
+        int fromBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
+
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, fromBlock, 0);
         if (iterator == null)
             return null;
 
@@ -213,6 +218,55 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         List<Trade> trades = new ArrayList<Trade>();
         while (iterator.hasNext()) {
             trades.add(this.get((Tuple2<Long, Long>) iterator.next()));
+        }
+
+        //RETURN
+        return trades;
+    }
+
+    @Override
+    public List<Trade> getTradesByOrderID(long have, long want, long startOrderID, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        Iterator<Fun.Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairOrderIDIterator(have, want, startOrderID, 0);
+
+        int counter = limit;
+        List<Trade> trades = new ArrayList<Trade>();
+        while (iterator.hasNext()) {
+            trades.add(this.get(iterator.next()));
+            if (limit > 0 && counter-- < 0)
+                break;
+        }
+
+        return  trades;
+    }
+
+    @Override
+    public List<Trade> getTradesByTimestamp(long have, long want, int start, int stop, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        if (start < stop) {
+            int temp = stop;
+            stop = start;
+            start = temp;
+        }
+
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, start, stop);
+        if (iterator == null)
+            return null;
+
+        int counter = limit;
+        List<Trade> trades = new ArrayList<Trade>();
+        while (iterator.hasNext()) {
+            trades.add(this.get(iterator.next()));
+            if (limit > 0 && counter-- < 0)
+                break;
         }
 
         //RETURN
@@ -230,12 +284,18 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
         // тут индекс не по времени а по номерам блоков как лонг
         int heightStart = Controller.getInstance().getMyHeight();
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairHeightIterator(have, want, heightStart);
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        ///int heightStart = Controller.getInstance().getMyHeight();
+        //// с последнего -- long refDBstart = Transaction.makeDBRef(heightStart, 0);
+        int heightEnd = heightStart - BlockChain.BLOCKS_PER_DAY(heightStart);
+
+        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairTimestampIterator(have, want, heightStart, heightEnd);
         if (iterator == null)
             return null;
 
         while (iterator.hasNext()) {
-            Trade trade = this.get((Tuple2<Long, Long>) iterator.next());
+            Trade trade = this.get(iterator.next());
             if (trade.getHaveKey() == want) {
                 volume = volume.add(trade.getAmountHave());
             } else {
