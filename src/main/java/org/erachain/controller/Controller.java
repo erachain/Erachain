@@ -2791,6 +2791,12 @@ public class Controller extends Observable {
         return dcSet.getTradeMap().getTradesByOrderID(have, want, orderID, limit);
     }
 
+    public List<Trade> getTradeByHeight(long have, long want, int height, int limit) {
+        // так как там обратный отсчет
+        return dcSet.getTradeMap().getTradesByOrderID(have, want,
+                Transaction.makeDBRef(height, Integer.MAX_VALUE), limit);
+    }
+
     // IMPRINTS
     public ImprintCls getItemImprint(long key) {
         return (ImprintCls) this.dcSet.getItemImprintMap().get(key);
