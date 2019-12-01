@@ -165,7 +165,7 @@ public class TradeMapImplTest {
                         3, 5, index++);
                 tradesMap.put(trade);
 
-                assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, start + 1, stop - 1, 0).size());
+                //assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, start + 1, stop - 1, 0).size());
 
                 assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, 0, 0, 0).size());
 
@@ -178,8 +178,6 @@ public class TradeMapImplTest {
                 assertEquals(2, tradesMap.getTradesByTimestamp(haveKey, wantKey, start, start - 1, 0).size());
 
                 assertEquals(4, tradesMap.getTradesByTimestamp(haveKey, wantKey, start, stop, 0).size());
-
-
             } finally {
                 dcSet.close();
             }

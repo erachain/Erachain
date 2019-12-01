@@ -11,6 +11,7 @@ import java.util.Queue;
 
 /**
  * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
+ * Правда в теста вылетает ошибка доступа при закрытии - org.erachain.datachain.TradeMapImplTest#getTradesByTimestamp()
  *
  * @param <T>
  */
