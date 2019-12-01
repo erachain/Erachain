@@ -222,8 +222,6 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     @Override
     public Iterator<Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
 
-        Iterator<Tuple2<Long, Long>> iterator;
-
         byte[] startBytes;
         if (startOrderID > 0) {
             startBytes = new byte[24];
