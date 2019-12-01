@@ -247,16 +247,10 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
     }
 
     @Override
-    public List<Trade> getTradesByTimestamp(long have, long want, int start, int stop, int limit) {
+    public List<Trade> getTradesByHeight(long have, long want, int start, int stop, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
-        }
-
-        if (start < stop) {
-            int temp = stop;
-            stop = start;
-            start = temp;
         }
 
         Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairHeightIterator(have, want, start, stop);

@@ -194,14 +194,26 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     @Override
     public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
 
-        byte[] startBytes = new byte[20];
-        makeKey(startBytes, have, want);
-        System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 16, 4);
+        byte[] startBytes;
+        if (startHeight > 0) {
+            startBytes = new byte[20];
+            makeKey(startBytes, have, want);
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 16, 4);
+        } else {
+            startBytes = new byte[16];
+            makeKey(startBytes, have, want);
+        }
 
-        byte[] stopBytes = new byte[20];
-        makeKey(stopBytes, have, want);
-        // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
-        System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stopHeight - 1), 0, stopBytes, 16, 4);
+        byte[] stopBytes;
+        if (stopHeight > 0) {
+            stopBytes = new byte[20];
+            makeKey(stopBytes, have, want);
+            // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stopHeight - 1), 0, stopBytes, 16, 4);
+        } else {
+            stopBytes = new byte[16];
+            makeKey(stopBytes, have, want);
+        }
 
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
 
@@ -218,7 +230,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
             makeKey(startBytes, have, want);
             System.arraycopy(startOrderID, 0, startBytes, 16, 8);
         } else {
-            startBytes = new byte[24];
+            startBytes = new byte[16];
             makeKey(startBytes, have, want);
         }
 
