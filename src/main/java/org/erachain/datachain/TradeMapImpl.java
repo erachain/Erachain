@@ -9,7 +9,6 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
-import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.mapDB.TradeMapSuitMapDBFork;
 import org.erachain.dbs.mapDB.TradeSuitMapDB;
 import org.erachain.dbs.rocksDB.TradeSuitRocksDB;
@@ -138,7 +137,9 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
         // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
         // но тут поидее не должно быть дублей по определению
-        iterator = new MergedIteratorNoDuplicates(ImmutableList.of(iterator, ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
+        /// тут нет дублей в любом случае iterator = new MergedIteratorNoDuplicates(ImmutableList.of(iterator, ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
+        /// поэтому берем Гуглевский вариант
+        iterator = Iterators.mergeSorted(ImmutableList.of(iterator, ((TradeSuit) this.map).getWantIterator(haveWant)), Fun.COMPARATOR);
 
         //GET ALL ORDERS FOR KEYS
         List<Trade> trades = new ArrayList<Trade>();

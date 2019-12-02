@@ -312,7 +312,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         while (parentIterator.hasNext()) {
             T key = parentIterator.next();
             // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key))
+            if (deleted != null && deleted.containsKey(key)
+                    || map.containsKey(key))
                 continue;
             list.add(key);
         }
@@ -335,7 +336,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         while (parentIterator.hasNext()) {
             T key = parentIterator.next();
             // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key))
+            if (deleted != null && deleted.containsKey(key)
+                    || map.containsKey(key))
                 continue;
             list.add(key);
         }
