@@ -879,7 +879,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public static int parseDBRefHeight(long dbRef) {
-        return (int) dbRef >>> 4;
+        return (int) (dbRef >> 32);
     }
 
     public boolean addCalculated(Block block, Account creator, long assetKey, BigDecimal amount,
