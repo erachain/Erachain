@@ -194,13 +194,14 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
     /**
      * Get trades by timestamp. From Timestamp to deep.
-     *  @param have      include
+     * @param have      include
      * @param want      wish
-     * @param timestamp is time
+     * @param startTimestamp is time
+     * @param stopTimestamp
      * @param limit
      */
     @Override
-    public List<Trade> getTradesByTimestamp(long have, long want, long timestamp, int limit) {
+    public List<Trade> getTradesByTimestamp(long have, long want, long startTimestamp, long stopTimestamp, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -209,31 +210,21 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         // тут индекс не по времени а по номерам блоков как лонг
         //int heightStart = Controller.getInstance().getMyHeight();
         //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        int fromBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-
-        Iterator<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairHeightIterator(have, want, fromBlock, 0);
-        if (iterator == null)
-            return null;
-
-        iterator = Iterators.limit(iterator, limit);
-
-        List<Trade> trades = new ArrayList<Trade>();
-        while (iterator.hasNext()) {
-            trades.add(this.get((Tuple2<Long, Long>) iterator.next()));
-        }
+        int fromBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(startTimestamp);
+        int toBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(stopTimestamp);
 
         //RETURN
-        return trades;
+        return getTradesByHeight(have, want, fromBlock, toBlock, limit);
     }
 
     @Override
-    public List<Trade> getTradesByOrderID(long have, long want, long startOrderID, int limit) {
+    public List<Trade> getTradesByOrderID(long have, long want, long startOrderID, long stopOrderID, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        Iterator<Fun.Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairOrderIDIterator(have, want, startOrderID, 0);
+        Iterator<Fun.Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairOrderIDIterator(have, want, startOrderID, stopOrderID);
 
         int counter = limit;
         List<Trade> trades = new ArrayList<Trade>();
