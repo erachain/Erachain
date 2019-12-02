@@ -1121,6 +1121,9 @@ public class BlockExplorer {
         tradeJSON.put("assetWantKey", pairAssetWant.getKey());
         tradeJSON.put("assetWantName", pairAssetWant.getName());
 
+        tradeJSON.put("assetHaveOwner", pairAssetHave.getOwner().getAddress());
+        tradeJSON.put("assetWantOwner", pairAssetWant.getOwner().getAddress());
+
         Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
 
         //tradeJSON.put("realPrice", trade.calcPrice(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
