@@ -192,16 +192,30 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairTimestampIterator(long have, long want, int startHeight, int stopHeight) {
+    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
 
-        byte[] startBytes = new byte[20];
-        makeKey(startBytes, have, want);
-        System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 16, 4);
+        byte[] startBytes;
+        if (startHeight > 0) {
+            startBytes = new byte[20];
+            makeKey(startBytes, have, want);
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 16, 4);
+        } else {
+            startBytes = new byte[16];
+            makeKey(startBytes, have, want);
+        }
 
-        byte[] stopBytes = new byte[20];
-        makeKey(stopBytes, have, want);
-        // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
-        System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stopHeight - 1), 0, stopBytes, 16, 4);
+        byte[] stopBytes;
+        if (stopHeight > 0) {
+            stopBytes = new byte[21];
+            makeKey(stopBytes, have, want);
+            // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stopHeight - 1), 0, stopBytes, 16, 4);
+            stopBytes[20] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
+        } else {
+            stopBytes = new byte[17];
+            makeKey(stopBytes, have, want);
+            stopBytes[16] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
+        }
 
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
 
@@ -216,20 +230,22 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         if (startOrderID > 0) {
             startBytes = new byte[24];
             makeKey(startBytes, have, want);
-            System.arraycopy(startOrderID, 0, startBytes, 16, 8);
+            System.arraycopy(Longs.toByteArray(startOrderID), 0, startBytes, 16, 8);
         } else {
-            startBytes = new byte[24];
+            startBytes = new byte[16];
             makeKey(startBytes, have, want);
         }
 
         byte[] stopBytes;
         if (stopOrderID > 0) {
-            stopBytes = new byte[24];
+            stopBytes = new byte[25];
             makeKey(stopBytes, have, want);
-            System.arraycopy(stopOrderID, 0, stopBytes, 16, 8);
+            System.arraycopy(Longs.toByteArray(stopOrderID), 0, stopBytes, 16, 8);
+            stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все Sequence
         } else {
-            stopBytes = new byte[16];
+            stopBytes = new byte[17];
             makeKey(stopBytes, have, want);
+            stopBytes[16] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
         }
 
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);

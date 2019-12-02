@@ -110,7 +110,7 @@ public class APIExchange {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TradeResource.getTradesFrom(have, want, fromHeight, fromOrder, fromTimestamp, limit))
+                .entity(TradeResource.getTradesFrom(have, want, fromHeight, fromOrder, fromTimestamp, limitInt))
                 .build();
     }
 
