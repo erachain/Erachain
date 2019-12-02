@@ -2428,10 +2428,6 @@ public class Controller extends Observable {
         return this.wallet.getLastBlocks(account, limit);
     }
 
-    public List<TelegramMessage> getLastTelegrams(Account account, long timestamp, String filter) {
-        return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter);
-    }
-
     public List<String> deleteTelegram(List<String> telegramSignatures) {
         return this.network.deleteTelegram(telegramSignatures);
     }
@@ -2444,12 +2440,12 @@ public class Controller extends Observable {
         return this.network.deleteTelegramsForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getLastTelegrams(String address, long timestamp, String filter) {
-        return this.network.getTelegramsForAddress(address, timestamp, filter);
+    public List<TelegramMessage> getLastIncomeTelegrams(Account account, long timestamp, String filter) {
+        return this.network.getTelegramsForAddress(account.getAddress(), timestamp, filter);
     }
 
-    public List<TelegramMessage> getLastTelegrams(long timestamp, String recipient, String filter) {
-        return this.network.getTelegramsFromTimestamp(timestamp, recipient, filter);
+    public List<TelegramMessage> getLastTelegrams(long timestamp, String recipient, String filter, boolean outcomes) {
+        return this.network.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes);
     }
 
     public TelegramMessage getTelegram(byte[] signature) {
@@ -2787,8 +2783,17 @@ public class Controller extends Observable {
         return dcSet.getOrderMap().getOrdersForTrade(have, want, false);
     }
 
-    public List<Trade> getTradeByTimestmp(long have, long want, long timestamp, int limit) {
-        return dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp, limit);
+    public List<Trade> getTradeByTimestamp(long have, long want, long timestamp, int limit) {
+        return dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp, 0, limit);
+    }
+
+    public List<Trade> getTradeByOrderID(long have, long want, long orderID, int limit) {
+        return dcSet.getTradeMap().getTradesByOrderID(have, want, orderID, 0, limit);
+    }
+
+    public List<Trade> getTradeByHeight(long have, long want, int height, int limit) {
+        // так как там обратный отсчет
+        return dcSet.getTradeMap().getTradesByHeight(have, want, height, 0, limit);
     }
 
     // IMPRINTS

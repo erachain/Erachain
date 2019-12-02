@@ -5,29 +5,24 @@ package org.erachain.webserver;
 //import com.sun.org.apache.xpath.internal.operations.Or;
 //import javafx.print.Collation;
 import org.erachain.api.ApiErrorFactory;
-//import com.google.gson.Gson;
 import org.erachain.api.TradeResource;
 import org.erachain.controller.Controller;
-import org.erachain.core.crypto.Base58;
-import org.erachain.core.item.assets.Order;
-import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
-import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.utils.StrJSonFine;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-//import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+//import com.google.gson.Gson;
+//import org.mapdb.Fun;
 
 @Path("apiexchange")
 @Produces(MediaType.APPLICATION_JSON)
@@ -49,6 +44,10 @@ public class APIExchange {
         help.put("apiexchange/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades from timestamp for HaveKey & WantKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
+        help.put("GET apiexchange/tradesfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get trades for HaveKey & WantKey, "
+                        + "limit is count record. The number of trades is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
         help.put("apiexchange/volume24/[have]/[want]",
                 "Get day volume of trades for HaveKey & WantKey");
 
@@ -79,14 +78,39 @@ public class APIExchange {
                                                 @DefaultValue("0") @QueryParam("timestamp") Long timestamp,
                                                 @DefaultValue("50") @QueryParam("limit") Long limit) {
 
+        int limitInt = limit.intValue();
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
-            if (limit > 200)
-                limit = 200L;
+            if (limitInt > 200)
+                limitInt = 200;
+            else if (limitInt < 0)
+                limitInt = 0;
         }
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TradeResource.getTradesFromTimestamp(have, want, timestamp, limit))
+                .entity(TradeResource.getTradesFromTimestamp(have, want, timestamp, limitInt))
+                .build();
+    }
+
+    @GET
+    @Path("tradesfrom/{have}/{want}")
+    public Response getTradesFrom(@PathParam("have") Long have, @PathParam("want") Long want,
+                                  @QueryParam("height") Integer fromHeight,
+                                  @QueryParam("order") String fromOrder,
+                                  @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                  @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        int limitInt = limit.intValue();
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limitInt > 200)
+                limitInt = 200;
+            else if (limitInt < 0)
+                limitInt = 0;
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(TradeResource.getTradesFrom(have, want, fromHeight, fromOrder, fromTimestamp, limitInt))
                 .build();
     }
 

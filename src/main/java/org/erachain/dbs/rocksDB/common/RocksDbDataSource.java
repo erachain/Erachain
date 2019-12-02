@@ -78,7 +78,11 @@ public interface RocksDbDataSource {
 
     RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex);
 
+    RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] start, byte[] stop, boolean isIndex);
+
     RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex);
+
+    RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] start, byte[] stop, boolean isIndex);
 
     void write(WriteBatch batch);
 

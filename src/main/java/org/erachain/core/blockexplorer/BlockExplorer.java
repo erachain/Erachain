@@ -1089,13 +1089,13 @@ public class BlockExplorer {
             if (pairHaveKey == 2L && pairWantKey == 1l
                     || pairHaveKey == 95l
                     || pairHaveKey > 33 && pairHaveKey < 1000
-                            && (pairWantKey < 33 && pairWantKey > 1000)
+                    && (pairWantKey < 33 && pairWantKey > 1000)
                     || pairHaveKey > 10 && pairHaveKey < 33
-                        && (pairWantKey < 10)
+                    && (pairWantKey < 10)
                     || pairAssetHave.isIndex() && pairHaveKey < pairWantKey
                     || pairAssetHave.isInsideCurrency() && pairHaveKey < pairWantKey
                     || pairHaveKey < 5 && pairWantKey > 1000
-                ) {
+            ) {
                 // swap pair
                 tempKey = pairHaveKey;
                 pairHaveKey = pairWantKey;
@@ -1121,6 +1121,9 @@ public class BlockExplorer {
         tradeJSON.put("assetWantKey", pairAssetWant.getKey());
         tradeJSON.put("assetWantName", pairAssetWant.getName());
 
+        tradeJSON.put("assetHaveOwner", pairAssetHave.getOwner().getAddress());
+        tradeJSON.put("assetWantOwner", pairAssetWant.getOwner().getAddress());
+
         Order orderTarget = Order.getOrder(dcSet, trade.getTarget());
 
         //tradeJSON.put("realPrice", trade.calcPrice(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
@@ -1130,10 +1133,17 @@ public class BlockExplorer {
         //tradeJSON.put("realReversePrice", trade.calcPriceRevers(pairAssetWant.getScale()).setScale(pairAssetWant.getScale(), RoundingMode.HALF_DOWN).toPlainString());
         tradeJSON.put("realReversePrice", trade.calcPriceRevers());
 
-        tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
-        tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
-        tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getPersonOrShortAddress(12));
-        tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        if (BlockChain.CHECK_BUGS > 3 && orderInitiator != null) {
+            tradeJSON.put("initiatorTx", Transaction.viewDBRef(orderInitiator.getId()));
+            tradeJSON.put("initiatorCreator_addr", orderInitiator.getCreator().getAddress()); // viewCreator
+            tradeJSON.put("initiatorCreator", orderInitiator.getCreator().getPersonOrShortAddress(12));
+            tradeJSON.put("initiatorAmount", orderInitiator.getAmountHave().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());
+        } else {
+            tradeJSON.put("initiatorTx", "--");
+            tradeJSON.put("initiatorCreator_addr", "--"); // viewCreator
+            tradeJSON.put("initiatorCreator", "--");
+            tradeJSON.put("initiatorAmount", "--");
+        }
 
         tradeJSON.put("targetTx", Transaction.viewDBRef(orderTarget.getId()));
         tradeJSON.put("targetCreator_addr", orderTarget.getCreator().getAddress()); // viewCreator
@@ -1142,7 +1152,7 @@ public class BlockExplorer {
 
         tradeJSON.put("timestamp", trade.getTimestamp());
 
-        if (pairHaveKey == orderInitiator.getHaveAssetKey()) {
+        if (BlockChain.CHECK_BUGS > 3 && orderInitiator != null && pairHaveKey == orderInitiator.getHaveAssetKey()) {
             tradeJSON.put("type", "sell");
 
             tradeJSON.put("amountHave", trade.getAmountWant().setScale(pairAssetHave.getScale(), RoundingMode.HALF_DOWN).toPlainString());

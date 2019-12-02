@@ -30,6 +30,7 @@ import java.util.*;
  */
 public class BlockChain {
 
+
     public static final int TESTS_VERS = 0; // not use TESTs - or a11 (as version)
     public static final boolean DEVELOP_USE = false;
 
@@ -50,7 +51,7 @@ public class BlockChain {
      * для каждого счета по времени создания транзакции сохраняется ссылка на транзакцию,
      * что требует создания длинных ключей 20 + 8. Это используется при откатах для восстановления последего значения
      */
-    public static final boolean NOT_STORE_REFFS_HISTORY = TEST_DB > 0 && false;
+    public static final boolean NOT_STORE_REFFS_HISTORY = TEST_DB > 0;
 
     /**
      * для каждого счета сохраняется последнее время транзакции и потом проверяется на повторы.
@@ -61,7 +62,7 @@ public class BlockChain {
      * Вдобавок если != 0 то проверки на коллизию ключа (подписи) в TransactionFinalMapSigns не проверяется,
      * что ускоряет работу но воявляется вероятность колллизии - поэтому можно там увеличить длинну ключа если тут != 0
      */
-    public static final int CHECK_DOUBLE_SPEND_DEEP = TEST_DB > 0 ? 0 : 0;
+    public static final int CHECK_DOUBLE_SPEND_DEEP = TEST_DB > 0 ? -1 : 0;
 
     /**
      * Число счетов для теста базы данных - чем больше тем болше нагрузка и сложнее считать.

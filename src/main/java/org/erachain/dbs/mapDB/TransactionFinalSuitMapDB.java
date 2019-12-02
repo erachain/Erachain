@@ -11,6 +11,7 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -231,11 +232,11 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     // TODO need benchmark tests
     public Iterator<Long> getIteratorByAddress(String address) {
 
-        if (false) {
+        if (true) {
             Iterable senderKeys = Fun.filter(this.senderKey, address);
             Iterable recipientKeys = Fun.filter(this.recipientKey, address);
 
-            if (false) {
+            if (true) {
                 Set<Long> treeKeys = new TreeSet<>();
 
                 treeKeys.addAll(Sets.newTreeSet(senderKeys));
@@ -245,17 +246,26 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             } else {
                 // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
                 Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-                return Lists.newLinkedList(mergedIterable).descendingIterator();
+                // не удаляет дубли индексов return Lists.newLinkedList(mergedIterable).descendingIterator();
+                // удалит дубли индексов и отсортирует - но тогда нен ужны
+                return Sets.newTreeSet(mergedIterable).descendingIterator();
+
             }
         } else {
 
             // ТУТ СОРТИООВКА не в ту тсорону получается
 
-            Iterator<Long> senderKeys = Fun.filter(this.senderKey, address).iterator();
-            Iterator<Long> recipientKeys = Fun.filter(this.recipientKey, address).iterator();
+            Iterable senderKeys = Fun.filter(this.senderKey, address);
+            Iterator<Long> senderKeysIterator = senderKeys.iterator();
+            Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+            Iterators.removeAll(senderKeysIterator, (Collection) recipientKeys);
+
+            // заново возьмем итератор а тот прошелся весь до конца уже
+            senderKeysIterator = senderKeys.iterator();
+            Iterator<Long> recipientKeysIterator = recipientKeys.iterator();
 
             // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
-            Iterator<Long> mergedIterator = Iterators.mergeSorted(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeysIterator, recipientKeysIterator), Fun.COMPARATOR);
             return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
 
         }
