@@ -109,6 +109,11 @@ public class Trade {
         JSONObject trade = new JSONObject();
         trade.put("initiator", Transaction.viewDBRef(initiator));
         trade.put("target", Transaction.viewDBRef(target));
+
+        int height = Transaction.parseDBRefHeight(initiator);
+        trade.put("height", height);
+        trade.put("timestamp", Controller.getInstance().blockChain.getTimestamp(height));
+
         trade.put("sequence", sequence);
         if (keyForBuySell == haveKey) {
             trade.put("type", "sell");
