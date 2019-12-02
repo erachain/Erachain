@@ -209,19 +209,22 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         } else {
             startBytes = new byte[16];
             makeKey(startBytes, have, want);
+            //startBytes[16] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
         }
 
         byte[] stopBytes;
         if (stopHeight > 0) {
-            stopBytes = new byte[25];
+            stopBytes = new byte[24];
             makeKey(stopBytes, have, want);
             // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
-            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - Transaction.makeDBRef(startHeight, Integer.MAX_VALUE)), 0, stopBytes, 16, 8);
-            stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
+            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, 0)), 0, stopBytes, 16, 8);
+            //stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
         } else {
-            stopBytes = new byte[17];
+            stopBytes = new byte[16];
             makeKey(stopBytes, have, want);
-            stopBytes[16] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
+            // из-за того что тут RockStoreIteratorFilter(org.rocksdb.RocksIterator, boolean, boolean, byte[], byte[])
+            // использует сравнение
+            //stopBytes[16] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
         }
 
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
