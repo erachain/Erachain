@@ -240,7 +240,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         if (startOrderID > 0) {
             startBytes = new byte[24];
             makeKey(startBytes, have, want);
-            System.arraycopy(Longs.toByteArray(startOrderID), 0, startBytes, 16, 8);
+            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - startOrderID), 0, startBytes, 16, 8);
         } else {
             startBytes = new byte[16];
             makeKey(startBytes, have, want);
@@ -250,7 +250,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         if (stopOrderID > 0) {
             stopBytes = new byte[24];
             makeKey(stopBytes, have, want);
-            System.arraycopy(Longs.toByteArray(stopOrderID), 0, stopBytes, 16, 8);
+            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - stopOrderID - 1), 0, stopBytes, 16, 8);
             //stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все Sequence
         } else {
             stopBytes = new byte[16];

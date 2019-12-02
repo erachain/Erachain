@@ -166,8 +166,10 @@ public class TradeMapImplTest {
                 tradesMap.put(trade);
 
                 assertEquals(4, tradesMap.getTradesByHeight(haveKey, wantKey, 0, 0, 0).size());
+                assertEquals(4, tradesMap.getTradesByOrderID(haveKey, wantKey, 0, 0, 0).size());
 
                 assertEquals(4, tradesMap.getTradesByHeight(haveKey, wantKey, start + 1, stop - 1, 0).size());
+                assertEquals(4, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(start + 1, Integer.MAX_VALUE), Transaction.makeDBRef(stop - 1, 0), 0).size());
 
                 assertEquals(4, tradesMap.getTradesByHeight(haveKey, wantKey, 0, stop, 0).size());
 
@@ -178,6 +180,10 @@ public class TradeMapImplTest {
                 assertEquals(2, tradesMap.getTradesByHeight(haveKey, wantKey, start, start - 1, 0).size());
 
                 assertEquals(4, tradesMap.getTradesByHeight(haveKey, wantKey, start, stop, 0).size());
+
+                assertEquals(3, tradesMap.getTradesByHeight(haveKey, wantKey, start, stop + 1, 0).size());
+
+                assertEquals(3, tradesMap.getTradesByHeight(haveKey, wantKey, start - 1, stop, 0).size());
 
 
             } finally {
