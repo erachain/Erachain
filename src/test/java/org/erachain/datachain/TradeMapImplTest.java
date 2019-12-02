@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 public class TradeMapImplTest {
 
     int[] TESTED_DBS = new int[]{
-            //IDB.DBS_MAP_DB,
+            IDB.DBS_MAP_DB,
             IDB.DBS_ROCK_DB};
 
     Long releaserReference = null;

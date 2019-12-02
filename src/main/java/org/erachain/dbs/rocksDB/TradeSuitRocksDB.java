@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
@@ -89,6 +90,8 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
                     byte[] filter = new byte[28];
                     makeKey(filter, have, want);
+                    // обратная сортировка поэтому все вычитаем Однако тут по другому минусы учитываются - они больше чем положительные числа!
+                    // поэтому нужно еще делать корректировку как у Чисел
                     System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
                             0, filter, 16, 8);
                     System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - value.getSequence()),
@@ -101,6 +104,8 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                 tradesKeyHaveIndexName,
                 (key, value) -> {
                     byte[] buffer = new byte[20];
+                    // обратная сортировка поэтому все вычитаем Однако тут по другому минусы учитываются - они больше чем положительные числа!
+                    // поэтому нужно еще делать корректировку как у Чисел
                     System.arraycopy(Longs.toByteArray(value.getHaveKey()),
                             0, buffer, 0, 8);
                     System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
@@ -114,6 +119,8 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
                 tradesKeyWantIndexName,
                 (key, value) -> {
                     byte[] buffer = new byte[20];
+                    // обратная сортировка поэтому все вычитаем Однако тут по другому минусы учитываются - они больше чем положительные числа!
+                    // поэтому нужно еще делать корректировку как у Чисел
                     System.arraycopy(Longs.toByteArray(value.getWantKey()),
                             0, buffer, 0, 8);
                     System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - value.getInitiator()),
@@ -198,7 +205,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         if (startHeight > 0) {
             startBytes = new byte[20];
             makeKey(startBytes, have, want);
-            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 16, 4);
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight - 1), 0, startBytes, 16, 4);
         } else {
             startBytes = new byte[16];
             makeKey(startBytes, have, want);
@@ -206,11 +213,11 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
         byte[] stopBytes;
         if (stopHeight > 0) {
-            stopBytes = new byte[21];
+            stopBytes = new byte[25];
             makeKey(stopBytes, have, want);
             // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
-            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - stopHeight - 1), 0, stopBytes, 16, 4);
-            stopBytes[20] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
+            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - Transaction.makeDBRef(startHeight, Integer.MAX_VALUE)), 0, stopBytes, 16, 8);
+            stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
         } else {
             stopBytes = new byte[17];
             makeKey(stopBytes, have, want);
@@ -238,14 +245,14 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
         byte[] stopBytes;
         if (stopOrderID > 0) {
-            stopBytes = new byte[25];
+            stopBytes = new byte[24];
             makeKey(stopBytes, have, want);
             System.arraycopy(Longs.toByteArray(stopOrderID), 0, stopBytes, 16, 8);
-            stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все Sequence
+            //stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все Sequence
         } else {
-            stopBytes = new byte[17];
+            stopBytes = new byte[16];
             makeKey(stopBytes, have, want);
-            stopBytes[16] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
+            //stopBytes[16] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все в это Высоте
         }
 
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
