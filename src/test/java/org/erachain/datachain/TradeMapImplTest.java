@@ -172,10 +172,24 @@ public class TradeMapImplTest {
                 assertEquals(4, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(start + 1, Integer.MAX_VALUE), Transaction.makeDBRef(stop - 1, 0), 0).size());
 
                 assertEquals(4, tradesMap.getTradesByHeight(haveKey, wantKey, 0, stop, 0).size());
+                assertEquals(3, tradesMap.getTradesByOrderID(haveKey, wantKey, 0, Transaction.makeDBRef(stop, 5), 0).size());
+                assertEquals(4, tradesMap.getTradesByOrderID(haveKey, wantKey, 0, Transaction.makeDBRef(stop, 4), 0).size());
+                assertEquals(4, tradesMap.getTradesByOrderID(haveKey, wantKey, 0, Transaction.makeDBRef(stop, 3), 0).size());
 
-                assertEquals(2, tradesMap.getTradesByHeight(haveKey, wantKey, stop + 1, stop, 0).size());
+                assertEquals(0, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(stop + 1, 0), Transaction.makeDBRef(stop, 5), 0).size());
+                assertEquals(1, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(stop + 1, 0), Transaction.makeDBRef(stop, 4), 0).size());
+                assertEquals(1, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(stop + 1, 0), Transaction.makeDBRef(stop, 3), 0).size());
 
                 assertEquals(4, tradesMap.getTradesByHeight(haveKey, wantKey, start, 0, 0).size());
+                assertEquals(4, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(start, 4), 0, 0).size());
+                assertEquals(4, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(start, 3), 0, 0).size());
+                assertEquals(3, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(start, 2), 0, 0).size());
+
+                assertEquals(1, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(start, 4), Transaction.makeDBRef(start - 1, 99), 0).size());
+                assertEquals(1, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(start, 3), Transaction.makeDBRef(start - 1, 99), 0).size());
+                assertEquals(0, tradesMap.getTradesByOrderID(haveKey, wantKey, Transaction.makeDBRef(start, 2), Transaction.makeDBRef(start - 1, 99), 0).size());
+
+                assertEquals(2, tradesMap.getTradesByHeight(haveKey, wantKey, stop + 1, stop, 0).size());
 
                 assertEquals(2, tradesMap.getTradesByHeight(haveKey, wantKey, start, start - 1, 0).size());
 

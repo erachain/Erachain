@@ -265,7 +265,7 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         Object toEnd = stopOrderID > 0 ? Long.MAX_VALUE - stopOrderID : Fun.HI();
         return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
                 // обратная сортировка поэтому все вычитаем и -1 для всех getSequence
-                Fun.t3(pairKey, startOrderID > 0 ? Long.MAX_VALUE - startOrderID - 1 : null, null),
+                Fun.t3(pairKey, startOrderID > 0 ? Long.MAX_VALUE - startOrderID : null, null),
                 Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
     }
 

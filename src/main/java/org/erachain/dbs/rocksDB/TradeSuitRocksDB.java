@@ -205,7 +205,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         if (startHeight > 0) {
             startBytes = new byte[20];
             makeKey(startBytes, have, want);
-            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight - 1), 0, startBytes, 16, 4);
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 16, 4);
         } else {
             startBytes = new byte[16];
             makeKey(startBytes, have, want);
@@ -234,7 +234,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     @Override
     public Iterator<Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
 
-        Iterator<Tuple2<Long, Long>> iterator;
+        //Iterator<Tuple2<Long, Long>> iterator;
 
         byte[] startBytes;
         if (startOrderID > 0) {
@@ -250,7 +250,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         if (stopOrderID > 0) {
             stopBytes = new byte[24];
             makeKey(stopBytes, have, want);
-            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - stopOrderID - 1), 0, stopBytes, 16, 8);
+            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - stopOrderID), 0, stopBytes, 16, 8);
             //stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все Sequence
         } else {
             stopBytes = new byte[16];
