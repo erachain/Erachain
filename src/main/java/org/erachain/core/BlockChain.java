@@ -32,7 +32,7 @@ public class BlockChain {
 
 
     public static final int TESTS_VERS = 0; // not use TESTs - or a11 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
 
     /**
      * Задает потолок цепочки

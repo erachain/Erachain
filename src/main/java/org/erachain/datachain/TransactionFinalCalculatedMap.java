@@ -2,7 +2,6 @@ package org.erachain.datachain;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.erachain.controller.Controller;
@@ -10,6 +9,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transCalculated.Calculated;
 import org.erachain.database.serializer.CalculatedSerializer;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.*;
@@ -258,9 +258,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-        Iterator<Tuple2<Integer, Integer>> iterator = mergedIterable.iterator();
-
+        Iterator<Tuple2<Integer, Integer>> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         Set<BlExpUnit> txs = new TreeSet<>();
         while (iterator.hasNext()) {
@@ -277,8 +275,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         Iterator recipientKeys = Fun.filter(this.recipientKey, address).iterator();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-        Iterator<Tuple2<Integer, Integer>> iterator = mergedIterable.iterator();
+        Iterator<Tuple2<Integer, Integer>> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         List<Calculated> txs = new ArrayList<>();
         while (iterator.hasNext()) {
@@ -296,9 +293,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         //Set<Tuple2<Integer, Integer>> treeKeys = new TreeSet<>();
 
         //iterator = Iterators.concat(senderKeys, recipientKeys);
-        Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-
-        return Iterators.size(mergedIterable.iterator());
+        return Iterators.size(new MergedIteratorNoDuplicates((Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys), Fun.COMPARATOR));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -381,8 +376,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
         if (address != null) {
             //iterator = Iterators.concat(senderKeys, recipientKeys);
-            Iterable mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-            iterator = mergedIterable.iterator();
+            iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of((Iterable) senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
             iterator = senderKeys;

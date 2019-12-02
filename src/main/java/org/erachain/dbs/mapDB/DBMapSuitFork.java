@@ -1,13 +1,13 @@
 package org.erachain.dbs.mapDB;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.ForkedMap;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 
@@ -312,13 +312,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         while (parentIterator.hasNext()) {
             T key = parentIterator.next();
             // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key))
+            if (deleted != null && deleted.containsKey(key)
+                    || map.containsKey(key))
                 continue;
             list.add(key);
         }
 
         //Map uncastedMap = this.map;
-        Iterator<T> iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+        Iterator<T> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
 
         this.outUses();
         return iterator;
@@ -335,7 +336,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         while (parentIterator.hasNext()) {
             T key = parentIterator.next();
             // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key))
+            if (deleted != null && deleted.containsKey(key)
+                    || map.containsKey(key))
                 continue;
             list.add(key);
         }
@@ -362,7 +364,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
         }
 
-        iterator = Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
+        iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
 
         this.outUses();
         return iterator;

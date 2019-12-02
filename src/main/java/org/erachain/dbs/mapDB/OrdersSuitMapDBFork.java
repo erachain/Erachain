@@ -94,10 +94,11 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
         // UPDATE from this FORKED TABLE
         for (Long key : keys) {
             Order order = get(key);
+            // здесь дубли сами собой схлопнутся но если брать итератор, то нажо использовать
+            // в будущем new MergedIteratorNoDuplicates
             result.put(key, order);
-            // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
+            // сдесь хотя бы одну заявку с неподходящей вроде бы ценой нужно взять
             if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
-
                 break;
             }
         }

@@ -147,7 +147,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         return null;
     }
 
-    // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало
+    // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало иначе сломшком большой LIST делается
     @Override
     public Iterator<T> getIterator() {
         this.addUses();
@@ -162,11 +162,14 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             while (parentIterator.hasNext()) {
                 T key = parentIterator.next();
                 // пропустим если он есть в удаленных
-                if (deleted != null && deleted.containsKey(key))
+                if (deleted != null && deleted.containsKey(key)
+                        || map.containsKey(key))
                     continue;
                 list.add(key);
             }
 
+            /// тут нет дублей они уже удалены и дубли не взяты
+            /// return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
             return Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
 
         } finally {

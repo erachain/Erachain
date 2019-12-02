@@ -1,7 +1,6 @@
 package org.erachain.dbs.rocksDB;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +10,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
 import org.erachain.dbs.rocksDB.indexes.ListIndexDB;
@@ -216,7 +216,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         //return Iterators.concat(senderKeys, recipientKeys);
 
         // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
-        Iterator<Long> mergedIterator = Iterators.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+        Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         // а тут уже оьбратный порядок дать
         return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();

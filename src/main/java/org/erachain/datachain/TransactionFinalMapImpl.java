@@ -4,7 +4,6 @@ package org.erachain.datachain;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +15,7 @@ import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
@@ -394,8 +394,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // в рекурсии все хорошо - соберем ключи
             ///Iterator<Long> rescurseIterator = result.getB();
             ///iterator = Iterators.concat(iterator, rescurseIterator);
-            Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
-            iterator = mergedIterable.iterator();
+            // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
+            iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
+            ////Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
+            ////iterator = mergedIterable.iterator();
+
 
             return new Pair<>(0, iterator);
 
@@ -665,6 +668,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 senderKeys = ((TransactionFinalSuit)map).getIteratorByAddressAndType(sender, type);
             } else {
                 //senderKeys = Fun.filter(this.senderKey, sender);
+                //int sizeS = Iterators.size(((TransactionFinalSuit)map).getIteratorBySender(sender));
+
                 senderKeys = ((TransactionFinalSuit)map).getIteratorBySender(sender);
             }
         }
@@ -674,18 +679,19 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 //recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
                 recipientKeys = ((TransactionFinalSuit)map).getIteratorByAddressAndType(recipient, type);
             } else {
+                //int sizeR = Iterators.size(((TransactionFinalSuit)map).getIteratorByRecipient(recipient));
                 //recipientKeys = Fun.filter(this.recipientKey, recipient);
                 recipientKeys = ((TransactionFinalSuit)map).getIteratorByRecipient(recipient);
             }
         }
 
-        if (address != null) {
-            //iterator = Iterators.concat(senderKeys, recipientKeys);
-            Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-            iterator = mergedIterable.iterator();
-        } else if (sender != null && recipient != null) {
-            iterator = senderKeys;
-            Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
+        if (address != null || sender != null && recipient != null) {
+            // просто добавляет в конец iterator = Iterators.concat(senderKeys, recipientKeys);
+            // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR).iterator();
+            // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
+            // поэтому нужно удалить дубли
+            iterator = new MergedIteratorNoDuplicates(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+
         } else if (sender != null) {
             iterator = senderKeys;
         } else if (recipient != null) {
@@ -719,10 +725,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
         }
 
-        limit = (limit == 0) ? Iterators.size(iterator) : limit;
         Iterators.advance(iterator, offset);
 
-        return Iterators.limit(iterator, limit);
+        return limit > 0 ? Iterators.limit(iterator, limit) : iterator;
     }
 
     @Override

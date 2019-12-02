@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
@@ -12,6 +11,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
@@ -435,8 +435,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             //iterator = senderKeys;
             //iterator.addAll(Sets.newTreeSet(recipientKeys));
             // not sorted! Iterators.concat(iterator, recipientKeys);
-            Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-            iterator = mergedIterable.iterator();
+            // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
+            iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
             //iterator.addAll(Sets.newTreeSet(senderKeys));
@@ -502,8 +502,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         Iterators.advance(recipientKeys, 100);
 
         //treeKeys  = Iterators.concat(senderKeys, recipientKeys);
-        Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-        Iterator<Long> iterator = mergedIterable.iterator();
+        // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
+        Iterator<Long> iterator = new MergedIteratorNoDuplicates(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         Iterators.advance(iterator, 100);
 
