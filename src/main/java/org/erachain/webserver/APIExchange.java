@@ -4,6 +4,7 @@ package org.erachain.webserver;
 //import com.google.gson.internal.LinkedHashTreeMap;
 //import com.sun.org.apache.xpath.internal.operations.Or;
 //import javafx.print.Collation;
+
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.TradeResource;
 import org.erachain.controller.Controller;
@@ -38,18 +39,20 @@ public class APIExchange {
     public Response Default() {
         Map<String, String> help = new LinkedHashMap<>();
 
-        help.put("apiexchange/orders/[have]/[want]?limit=[limit]",
-                "Get orders for HaveKey & WantKey, "
+        help.put("apiexchange/order/[seqNo|signature]",
+                "Get Order by seqNo or Signature. For example: 4321-2");
+        help.put("apiexchange/orders/[amountAssetKey]/[priceAssetKey]?limit=[limit]",
+                "Get orders for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 50, default 20.");
-        help.put("apiexchange/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
-                "Get trades from timestamp for HaveKey & WantKey, "
+        help.put("apiexchange/trades/[amountAssetKey]/[priceAssetKey]?timestamp=[timestamp]&limit=[limit]",
+                "Get trades from timestamp for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
-        help.put("GET apiexchange/tradesfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
-                "Get trades for HaveKey & WantKey, "
+        help.put("GET apiexchange/tradesfrom/[amountAssetKey]/[priceAssetKey]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
-        help.put("apiexchange/volume24/[have]/[want]",
-                "Get day volume of trades for HaveKey & WantKey");
+        help.put("apiexchange/volume24/[amountAssetKey]/[priceAssetKey]",
+                "Get day volume of trades for amountAssetKey & priceAssetKey");
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*").entity(StrJSonFine.convert(help)).build();
@@ -111,6 +114,16 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(TradeResource.getTradesFrom(have, want, fromHeight, fromOrder, fromTimestamp, limitInt))
+                .build();
+    }
+
+    @GET
+    @Path("order/[seqNo|signature]")
+    public Response getOrder(@PathParam("seqNo") String seqNo) {
+
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(TradeResource.getOrder(seqNo))
                 .build();
     }
 

@@ -48,21 +48,21 @@ public class TradeResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("GET trade/rater/[start/stop]",
                 "Start Rater: 1 - start, 0 - stop");
-        help.put("GET trade/create/[creator]/[haveKey]/[wantKey]/[haveAmount]/[wantAmount]?feePow=[feePow]&password=[password]",
+        help.put("GET trade/create/[creator]/[amountAssetKey]/[priceAssetKey]/[haveAmount]/[wantAmount]?feePow=[feePow]&password=[password]",
                 "make and broadcast CreateOrder");
-        help.put("GET trade/get/[signature]",
-                "Get Order");
+        help.put("GET trade/get/[seqNo|signature]",
+                "Get Order by seqNo or Signature. For example: 4321-2");
         help.put("GET trade/orders/[have]/[want]?limit=[limit]",
-                "Get tradeorders for HaveKey & WantKey, "
+                "Get tradeorders for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 20.");
         help.put("GET trade/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
-                "Get trades for HaveKey & WantKey, "
+                "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50.");
         help.put("GET trade/tradesfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
-                "Get trades for HaveKey & WantKey, "
+                "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
-        help.put("GET trade/getbyaddress/[creator]/[haveKey]/[wantKey]",
+        help.put("GET trade/getbyaddress/[creator]/[amountAssetKey]/[priceAssetKey]",
                 "get list of orders in CAP by address");
         help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
                 "Cancel Order");
@@ -83,7 +83,7 @@ public class TradeResource {
      *
      * @param creatorStr address in wallet
      * @param haveKey    haveKey
-     * @param wantKey    wantKey
+     * @param priceAssetKey    priceAssetKey
      * @param haveAmount haveAmount or head
      * @param wantAmount wantAmount
      * @param feePower   fee Power
@@ -96,9 +96,9 @@ public class TradeResource {
      * {}
      */
     @GET
-    @Path("create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}")
+    @Path("create/{creator}/{haveKey}/{priceAssetKey}/{haveAmount}/{wantAmount}")
     public String sendGet(@PathParam("creator") String creatorStr,
-                          @PathParam("haveKey") Long haveKey, @PathParam("wantKey") Long wantKey,
+                          @PathParam("haveKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey,
                           /// STRING for AMOUNT!!! SCALE is GOOD
                           @PathParam("haveAmount") BigDecimal haveAmount, @PathParam("wantAmount") BigDecimal wantAmount,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
@@ -117,7 +117,7 @@ public class TradeResource {
         if (haveAsset == null)
             throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
 
-        AssetCls wantAsset = cntr.getAsset(wantKey);
+        AssetCls wantAsset = cntr.getAsset(priceAssetKey);
         if (wantAsset == null)
             throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
 
@@ -146,27 +146,34 @@ public class TradeResource {
 
     @GET
     @Path("get/{signature}")
-    public String get(@PathParam("signature") String signatureStr) {
+    public static String getOrder(@PathParam("signature") String signatureStr) {
 
-        byte[] signature;
+        Long orderID;
         try {
-            signature = Base58.decode(signatureStr);
+            orderID = Transaction.parseDBRef(signatureStr);
         } catch (Exception e) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+
+            byte[] signature;
+            try {
+                signature = Base58.decode(signatureStr);
+            } catch (Exception e1) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+            }
+
+            if (DCSet.getInstance().getTransactionTab().contains(signature)) {
+                JSONObject out = new JSONObject();
+                out.put("unconfirmed", true);
+                return out.toJSONString();
+            }
+
+            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
+            if (key == null) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
+            }
+
+            orderID = key;
         }
 
-        if (DCSet.getInstance().getTransactionTab().contains(signature)) {
-            JSONObject out = new JSONObject();
-            out.put("unconfirmed", true);
-            return out.toJSONString();
-        }
-
-        Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
-        if (key == null) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
-        }
-
-        Long orderID = key;
         if (DCSet.getInstance().getOrderMap().contains(orderID)) {
             JSONObject out = DCSet.getInstance().getOrderMap().get(orderID).toJson();
             out.put("active", true);
@@ -307,8 +314,8 @@ public class TradeResource {
         }
         result.put("want", arrayWant);
 
-        result.put("haveKey", have);
-        result.put("wantKey", want);
+        result.put("amountAssetKey", have);
+        result.put("priceAssetKey", want);
         result.put("limited", limitInt);
 
         return result.toJSONString();
@@ -397,9 +404,9 @@ public class TradeResource {
     }
 
     @GET
-    @Path("getbyaddress/{creator}/{haveKey}/{wantKey}")
+    @Path("getbyaddress/{creator}/{haveKey}/{priceAssetKey}")
     public String cancel(@PathParam("creator") String address,
-                         @PathParam("haveKey") Long haveKey, @PathParam("wantKey") Long wantKey) {
+                         @PathParam("haveKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey) {
 
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
@@ -407,7 +414,7 @@ public class TradeResource {
         Transaction createOrder;
 
         JSONArray out = new JSONArray();
-        for( Order order: ordersMap.getOrdersForAddress(address, haveKey, wantKey)) {
+        for (Order order : ordersMap.getOrdersForAddress(address, haveKey, priceAssetKey)) {
             JSONObject orderJson = order.toJson();
             Long key = order.getId();
             createOrder = finalMap.get(key);

@@ -32,7 +32,7 @@ public class BlockChain {
 
 
     public static final int TESTS_VERS = 0; // not use TESTs - or a11 (as version)
-    public static final boolean DEVELOP_USE = false;
+    public static final boolean DEVELOP_USE = true;
 
     /**
      * Задает потолок цепочки
@@ -76,7 +76,7 @@ public class BlockChain {
      */
     public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || TEST_DB > 0;
 
-    static final public int CHECK_BUGS = TEST_DB > 0 ? 0 : 10;
+    static final public int CHECK_BUGS = TEST_DB > 0 ? 0 : 5;
 
     /**
      * если задан - первое подключение к нему
