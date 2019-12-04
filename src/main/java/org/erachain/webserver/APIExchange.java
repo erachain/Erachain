@@ -118,8 +118,8 @@ public class APIExchange {
     }
 
     @GET
-    @Path("order/[seqNo|signature]")
-    public Response getOrder(@PathParam("seqNo") String seqNo) {
+    @Path("order/{signature}")
+    public Response getOrder(@PathParam("signature") String seqNo) {
 
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")

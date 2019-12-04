@@ -152,7 +152,10 @@ public class TradeResource {
         try {
             orderID = Transaction.parseDBRef(signatureStr);
         } catch (Exception e) {
+            orderID = null;
+        }
 
+        if (orderID == null) {
             byte[] signature;
             try {
                 signature = Base58.decode(signatureStr);
@@ -172,6 +175,7 @@ public class TradeResource {
             }
 
             orderID = key;
+
         }
 
         if (DCSet.getInstance().getOrderMap().contains(orderID)) {
@@ -180,6 +184,9 @@ public class TradeResource {
             return out.toJSONString();
         } else {
             Order order = DCSet.getInstance().getCompletedOrderMap().get(orderID);
+            if (order == null)
+                throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
+
             JSONObject out = order.toJson();
             if (order.isFulfilled()) {
                 out.put("completed", true);
