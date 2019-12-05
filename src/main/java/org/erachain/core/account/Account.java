@@ -1,6 +1,7 @@
 package org.erachain.core.account;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -76,7 +77,7 @@ public class Account {
             assert(addressBytes.length == 25);
         }
 
-        this.address = Base58.encode(bytes);
+        /// make on demand this.address = Base58.encode(bytes);
     }
 
     public static byte[] makeShortBytes(String address) {
@@ -325,6 +326,9 @@ public class Account {
      */
 
     public String getAddress() {
+        if (address == null) {
+            this.address = Base58.encode(bytes);
+        }
         return address;
     }
 
@@ -443,7 +447,7 @@ public class Account {
         BigDecimal ownVol = balance.a.b;
 
         if (!BlockChain.DEVELOP_USE && !BlockChain.ERA_COMPU_ALL_UP && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
-            int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
+            int[][] item = BlockChain.FREEZED_BALANCES.get(this.getAddress());
             if (item != null) {
                 if (item[0][0] < 0) {
                     return BigDecimal.ZERO;
@@ -954,16 +958,16 @@ public class Account {
 
     @Override
     public int hashCode() {
-        return address.hashCode();
+        return Ints.fromByteArray(shortBytes);
     }
 
     // EQUALS
     @Override
     public boolean equals(Object b) {
         if (b instanceof Account) {
-            return this.address.equals(((Account) b).getAddress());
+            return Arrays.equals(this.shortBytes, ((Account) b).getShortAddressBytes());
         } else if (b instanceof String) {
-            return this.address.equals(b);
+            return this.getAddress().equals(b);
         } else if (b instanceof byte[]) {
             byte[] bs = (byte[]) b;
             if (bs.length == ADDRESS_LENGTH) {
@@ -978,7 +982,7 @@ public class Account {
 
     public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
         if (this.personDuration == null) {
-            this.personDuration =  db.getAddressPersonMap().getItem(address);
+            this.personDuration = db.getAddressPersonMap().getItem(getAddress());
 
         }
         return this.personDuration;
@@ -1077,7 +1081,7 @@ public class Account {
 
     // previous forging block or changed ERA volume
     public Tuple2<Integer, Integer> getForgingData(DCSet db, int height) {
-        return db.getAddressForging().get(this.address, height);
+        return db.getAddressForging().get(getAddress(), height);
     }
     /*
      * public void setLastForgingData(DCSet db, int height) { getAddressForging
@@ -1086,25 +1090,25 @@ public class Account {
      */
 
     public void setForgingData(DCSet db, int height, int forgingBalance) {
-        db.getAddressForging().putAndProcess(this.address, height, forgingBalance);
+        db.getAddressForging().putAndProcess(getAddress(), height, forgingBalance);
     }
 
     public void delForgingData(DCSet db, int height) {
-        db.getAddressForging().deleteAndProcess(this.address, height);
+        db.getAddressForging().deleteAndProcess(getAddress(), height);
     }
 
     public Tuple2<Integer, Integer> getLastForgingData(DCSet db) {
-        return db.getAddressForging().getLast(this.address);
+        return db.getAddressForging().getLast(getAddress());
     }
 
     public Tuple2<String, String> getName() {
 
-        return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(this.getAddress());
+        return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(getAddress());
 
     }
 
     public int getAccountNo() {
-        return Controller.getInstance().wallet.database.getAccountMap().getAccountNo(this.address);
+        return Controller.getInstance().wallet.database.getAccountMap().getAccountNo(getAddress());
     }
 
 }
