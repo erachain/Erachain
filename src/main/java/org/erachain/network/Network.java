@@ -430,7 +430,9 @@ public class Network extends Observable {
             if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
 
                 if (knownPeer.isUsed()) {
-                    knownPeer.close("before accept anew");
+                    /// зачем разрывать - поновой слать трнзакции накладн - используем его же
+                    ///knownPeer.close("before accept anew");
+                    return knownPeer;
                 }
                 // IF PEER not USED and not onUSED
                 knownPeer.connect(socket, this, "connected by restore!!! ");
