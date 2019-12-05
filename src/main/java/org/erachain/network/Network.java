@@ -27,6 +27,16 @@ public class Network extends Observable {
     private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = 1024 << (3 + Controller.HARD_WORK);
     private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = 256 + BlockChain.MAX_BLOCK_SIZE_GEN;
     private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = 128 >> (Controller.HARD_WORK >> 1);
+
+    /**
+     * Если включено то при входящем запросе на коннект от пира, который уже на связи
+     * разрываем текущий коннект и пересоздаем на новый входящий. Таким обраом если под одним IP
+     * будет к нам стучасять несколько отдельных нод то каждая из них будет забирать себе соединение.
+     * Но на самом деле сначала происходит обрыв на некотрое время - поэтому кодна нод мало - это плохо.
+     * Так что лучше не включать. И зачем разрывать - по-новой слать транзакции накладно.
+     */
+    private static final boolean BREAK_PEER_ON_NEW_INCOME = false;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class.getSimpleName());
 
     private Controller controller;
@@ -430,9 +440,12 @@ public class Network extends Observable {
             if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
 
                 if (knownPeer.isUsed() || knownPeer.isOnUsed()) {
-                    /// зачем разрывать - поновой слать трнзакции накладн - используем его же
-                    ///knownPeer.close("before accept anew");
-                    return knownPeer;
+                    if (BREAK_PEER_ON_NEW_INCOME) {
+                        knownPeer.close("before accept anew");
+                    } else {
+                        /// зачем разрывать - поновой слать транзакции накладн - используем его же
+                        return knownPeer;
+                    }
                 }
                 // IF PEER not USED and not onUSED
                 knownPeer.connect(socket, this, "connected by restore!!! ");
