@@ -106,7 +106,7 @@ public class WinBlockSelector extends MonitoredThread {
     public void run() {
 
         runned = true;
-        //Message message;
+
         while (runned) {
             try {
                 processMessage(blockingQueue.take());
