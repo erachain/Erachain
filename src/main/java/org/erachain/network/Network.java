@@ -429,7 +429,7 @@ public class Network extends Observable {
             //CHECK IF ADDRESS IS THE SAME
             if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
 
-                if (knownPeer.isUsed()) {
+                if (knownPeer.isUsed() || knownPeer.isOnUsed()) {
                     /// зачем разрывать - поновой слать трнзакции накладн - используем его же
                     ///knownPeer.close("before accept anew");
                     return knownPeer;
