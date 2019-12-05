@@ -189,11 +189,16 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
                 }
             } else {
-                // more then 2 - need to UPDATE
-                LOGGER.debug("to update - peers " + maxPeer
-                        + " headers: " + headersSize);
-                betterPeer = peer;
-                return true;
+                /// наоборот значит тут точно та же цепочка
+                if (false) {
+                    // more then 2 - need to UPDATE
+                    LOGGER.debug("to update - peers " + maxPeer
+                            + " headers: " + headersSize);
+                    betterPeer = peer;
+                    return true;
+                } else {
+                    ctrl.resetWeightOfPeer(peer);
+                }
             }
 
         }
