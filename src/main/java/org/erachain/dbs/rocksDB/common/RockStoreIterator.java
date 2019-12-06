@@ -21,11 +21,15 @@ public class RockStoreIterator implements DBIterator {
     this.isIndex = isIndex;
   }
 
+  // see https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+  // нужно обязательно на нижний уровень передевать вызов иначе память кончается
   @Override
   public void close() {
     dbIterator.close();
   }
 
+  // see https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+  // нужно обязательно на нижний уровень передевать вызов иначе память кончается
   @Override
   public void finalize() {
     close();
