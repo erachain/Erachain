@@ -149,13 +149,15 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
     }
 
     public List<byte[]> accountKeys(Account account) {
-        RocksIterator iterator = map.dbSource.getDbCore().newIterator(
-                balanceAddressIndex.getColumnFamilyHandle());
+
         List<byte[]> result = new ArrayList<>();
 
-        for (iterator.seek(account.getShortAddressBytes()); iterator.isValid()
-                && areEqualMask(iterator.key(), account.getShortAddressBytes()); iterator.next()) {
-            result.add(iterator.value());
+        try (final RocksIterator iterator = map.dbSource.getDbCore().newIterator(
+                balanceAddressIndex.getColumnFamilyHandle())) {
+            for (iterator.seek(account.getShortAddressBytes()); iterator.isValid()
+                    && areEqualMask(iterator.key(), account.getShortAddressBytes()); iterator.next()) {
+                result.add(iterator.value());
+            }
         }
 
         return result;

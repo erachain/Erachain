@@ -3,8 +3,6 @@ package org.erachain.dbs.rocksDB.common;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksIterator;
 
-import java.io.IOException;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -26,6 +24,11 @@ public class RockStoreIterator implements DBIterator {
   @Override
   public void close() {
     dbIterator.close();
+  }
+
+  @Override
+  public void finalize() {
+    close();
   }
 
   @Override

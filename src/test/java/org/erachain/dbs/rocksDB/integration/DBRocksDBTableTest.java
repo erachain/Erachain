@@ -134,32 +134,33 @@ public class DBRocksDBTableTest {
                 balanceTmp;
 
         ColumnFamilyHandle indexDB = ((DBMapSuit) tab).getIndex(1).getColumnFamilyHandle();
-        RocksIterator iteratorFilteredNative = ((TransactionDB) ((DBRocksDBTable) tab.map).dbSource.getDbCore()).newIterator(indexDB);
-        iteratorFilteredNative.seek(account1.getShortAddressBytes());
 
         long assetKeyTMP = 0;
         int iteratorSize = 0;
-        while (iteratorFilteredNative.isValid()) {
-            byte[] keyIter = iteratorFilteredNative.key();
-            byte[] valueIter = iteratorFilteredNative.value();
-            iteratorSize++;
-            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(valueIter);
-            byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(valueIter);
-            assertEquals(account1.equals(addressKey), true);
+        try (RocksIterator iteratorFilteredNative = ((TransactionDB) ((DBRocksDBTable) tab.map).dbSource.getDbCore()).newIterator(indexDB)) {
+            iteratorFilteredNative.seek(account1.getShortAddressBytes());
+            while (iteratorFilteredNative.isValid()) {
+                byte[] keyIter = iteratorFilteredNative.key();
+                byte[] valueIter = iteratorFilteredNative.value();
+                iteratorSize++;
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(valueIter);
+                byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(valueIter);
+                assertEquals(account1.equals(addressKey), true);
 
-            balanceTmp = tab.get(valueIter);
+                balanceTmp = tab.get(valueIter);
 
-            // Нужно положить их с отсутпом
-            logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
-
-            if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
+                // Нужно положить их с отсутпом
                 logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
-                // всегда идем по возрастанию
-                assertEquals(assetKeyTMP > assetKey, false);
-            }
-            balance = balanceTmp;
 
-            iteratorFilteredNative.next();
+                if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
+                    logger.error(" assetKey sorted: " + assetKey + " for bal:" + balanceTmp.a.b);
+                    // всегда идем по возрастанию
+                    assertEquals(assetKeyTMP > assetKey, false);
+                }
+                balance = balanceTmp;
+
+                iteratorFilteredNative.next();
+            }
         }
         logger.error(" NATIVE completed ");
 
