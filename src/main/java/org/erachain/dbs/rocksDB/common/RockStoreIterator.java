@@ -3,8 +3,6 @@ package org.erachain.dbs.rocksDB.common;
 import lombok.extern.slf4j.Slf4j;
 import org.rocksdb.RocksIterator;
 
-import java.io.IOException;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 @Slf4j
@@ -23,9 +21,18 @@ public class RockStoreIterator implements DBIterator {
     this.isIndex = isIndex;
   }
 
+  // see https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+  // нужно обязательно на нижний уровень передевать вызов иначе память кончается
   @Override
   public void close() {
     dbIterator.close();
+  }
+
+  // see https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+  // нужно обязательно на нижний уровень передевать вызов иначе память кончается
+  @Override
+  public void finalize() {
+    close();
   }
 
   @Override
