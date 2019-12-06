@@ -302,24 +302,19 @@ public class Synchronizer extends Thread {
             }
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки чуть больше нашей
-            if (myHeight == height - 1 && myHeight > newHeight - 2) {
+            if (!BlockChain.ERA_COMPU_ALL_UP // в таком режиме не проверяем так как нод и так мало
+                    && myHeight == height && myHeight > newHeight - 2) {
                 if (myWeight > fork.getBlocksHeadsMap().getFullWeight()) {
                     // суть в том что тут цепочка на этой высоте слабже моей,
                     // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
                     // - может мы лучше цепочку собрем еще
+                    // тут нельзя НЕ банить - будет циклическая синхронизация с этим узлом
 
-                    if (BlockChain.REPEAT_WIN < 10) {
-                        // INVALID BLOCK THROW EXCEPTION
-                        String mess = "Dishonest peer by weak FullWeight, height: " + height
-                                + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
-                        peer.ban(mess);
-                        throw new Exception(mess);
-                    } else {
-                        // сбросим его силу чтобы сейчас не коннектиться к нему
-                        cnt.resetWeightOfPeer(peer);
-                        throw new Exception("peer by weak FullWeight, height: " + height
-                                + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight());
-                    }
+                    // INVALID BLOCK THROW EXCEPTION
+                    String mess = "Dishonest peer by weak FullWeight, height: " + height
+                            + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
+                    peer.ban(mess);
+                    throw new Exception(mess);
                 }
             }
 
