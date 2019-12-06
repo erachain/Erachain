@@ -716,7 +716,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         if (quitIfNotAlive()) {
             return;
         }
-        try (WriteBatch batch = new WriteBatch()) {
+        try (final WriteBatch batch = new WriteBatch()) {
             for (Entry<byte[], byte[]> entry : rows.entrySet()) {
                 if (entry.getValue() == null) {
                     batch.delete(entry.getKey());
@@ -733,7 +733,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         if (quitIfNotAlive()) {
             return;
         }
-        try (WriteBatch batch = new WriteBatch()) {
+        try (final WriteBatch batch = new WriteBatch()) {
             for (Entry<byte[], byte[]> entry : rows.entrySet()) {
                 if (entry.getValue() == null) {
                     batch.delete(entry.getKey());
