@@ -52,9 +52,13 @@ public class TradeResource {
                 "make and broadcast CreateOrder");
         help.put("GET trade/get/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
-        help.put("GET trade/orders/[have]/[want]?limit=[limit]",
-                "Get tradeorders for amountAssetKey & priceAssetKey, "
+        help.put("GET trade/ordersbook/[have]/[want]?limit=[limit]",
+                "Get active orders in orderbook for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 20.");
+        help.put("GET trade/completedordersfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get completed orders for amountAssetKey & priceAssetKey, "
+                        + "limit is count record. The number of orders is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
         help.put("GET trade/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50.");
@@ -270,10 +274,10 @@ public class TradeResource {
     }
 
     @GET
-    @Path("orders/{have}/{want}")
+    @Path("ordersbook/{have}/{want}")
     // orders/1/2?imit=4
-    public static String getOrders(@PathParam("have") Long have, @PathParam("want") Long want,
-                                   @DefaultValue("20") @QueryParam("limit") Long limit) {
+    public static String getOrdersBook(@PathParam("have") Long have, @PathParam("want") Long want,
+                                       @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 
@@ -296,7 +300,7 @@ public class TradeResource {
 
         JSONArray arrayHave = new JSONArray();
         for (Order order: haveOrders) {
-            JSONObject json = new JSONObject();
+            JSONObject json = order.toJson();
             json.put("id", order.getId());
             json.put("seqNo", Transaction.viewDBRef(order.getId()));
             json.put("creator", order.getCreator().getAddress());
@@ -411,9 +415,52 @@ public class TradeResource {
     }
 
     @GET
-    @Path("getbyaddress/{creator}/{haveKey}/{priceAssetKey}")
+    @Path("completedordersfrom/{have}/{want}")
+    public static String getOrdersFrom(@PathParam("have") Long have, @PathParam("want") Long want,
+                                       @QueryParam("height") Integer fromHeight,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        List<Order> listResult;
+        if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+
+            listResult = Controller.getInstance().getOrdersByOrderID(have, want, startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getOrdersByHeight(have, want, fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getOrdersByTimestamp(have, want, fromTimestamp * 1000, limit);
+        }
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Order order : listResult) {
+            arrayJSON.add(order.toJson());
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+
+    @GET
+    @Path("getbyaddress/{creator}/{amountAssetKey}/{priceAssetKey}")
     public String cancel(@PathParam("creator") String address,
-                         @PathParam("haveKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey) {
+                         @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey) {
 
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
