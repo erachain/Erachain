@@ -116,7 +116,7 @@ public class DBMapSuitForkTest {
         // заново возьмем
         iter1 = list1.iterator();
         iter2 = list2.iterator();
-        // удалим повторы - УДАЛЯЕТ и из СПИСКА базового от котрого Итератор создан - причем болше чем надо
+        // удалим повторы - УДАЛЯЕТ и из СПИСКА базового от которого Итератор создан - причем болше чем надо
         Iterators.removeAll(iter1, list2);
 
         assertEquals(list1.size(), 2);
