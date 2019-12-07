@@ -292,12 +292,12 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
      * @return
      */
     @Override
-    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+    public Iterator<T> getIterator(int index, boolean descending) {
         return map.getIterator(index, descending);
     }
 
     @Override
-    public IteratorCloseable<T> getIterator() {
+    public Iterator<T> getIterator() {
         return map.getIterator();
     }
 

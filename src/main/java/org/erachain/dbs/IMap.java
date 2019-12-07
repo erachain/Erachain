@@ -1,6 +1,7 @@
 package org.erachain.dbs;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -78,9 +79,9 @@ public interface IMap<T, U> {
      * @param descending true if need descending sort
      * @return
      */
-    IteratorCloseable<T> getIterator(int index, boolean descending);
+    Iterator<T> getIterator(int index, boolean descending);
 
-    IteratorCloseable<T> getIterator();
+    Iterator<T> getIterator();
 
     int getDefaultIndex();
 

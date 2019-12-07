@@ -7,7 +7,6 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.ForkedMap;
-import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
@@ -305,7 +304,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
-    public IteratorCloseable<T> getIterator() {
+    public Iterator<T> getIterator() {
         this.addUses();
 
         List<T> list = new ArrayList<>();
@@ -329,7 +328,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
     // TODO надо рекурсию к Родителю по итератору делать
     @Override
-    public IteratorCloseable<T> getIterator(int index, boolean descending) {
+    public Iterator<T> getIterator(int index, boolean descending) {
         this.addUses();
 
         List<T> list = new ArrayList<>();

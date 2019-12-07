@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -255,6 +256,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         boolean updated = false;
 
+        /// обязательно нужно осовбождать память - см. тут
+        /// https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
         try (IteratorCloseable<T> iterator = this.getIterator()) {
             while (iterator.hasNext()) {
                 T key = iterator.next();
@@ -264,16 +267,17 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                     updated = true;
                 }
             }
-
-            if (deleted != null) {
-                iterator = this.deleted.keySet().iterator();
-                while (iterator.hasNext()) {
-                    parent.getSuit().delete(iterator.next());
-                    updated = true;
-                }
-            }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+        }
+
+        if (deleted != null) {
+            // тут обычная карта в памяти -- ее не нужно особо закрывать
+            Iterator deletedIterator = this.deleted.keySet().iterator();
+            while (deletedIterator.hasNext()) {
+                parent.getSuit().delete(deletedIterator.next());
+                updated = true;
+            }
         }
 
         return updated;

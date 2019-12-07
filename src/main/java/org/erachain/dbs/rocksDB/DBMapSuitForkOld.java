@@ -5,8 +5,10 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.ForkedMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -239,20 +241,26 @@ public abstract class DBMapSuitForkOld<T, U> extends DBMapSuit<T, U> implements 
 
         boolean updated = false;
 
-        Iterator<T> iterator = this.map.keySet().iterator();
-        while (iterator.hasNext()) {
-            T key = iterator.next();
-            U item = this.map.get(key);
-            if (item != null) {
-                parent.put(key, this.map.get(key));
-                updated = true;
+        /// обязательно нужно осовбождать память - см. тут
+        /// https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+        try (IteratorCloseable<T> iterator = this.getIterator()) {
+            while (iterator.hasNext()) {
+                T key = iterator.next();
+                U item = this.map.get(key);
+                if (item != null) {
+                    parent.getSuit().put(key, this.map.get(key));
+                    updated = true;
+                }
             }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
 
         if (deleted != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                parent.delete(iterator.next());
+            // тут обычная карта в памяти -- ее не нужно особо закрывать
+            Iterator deletedIterator = this.deleted.keySet().iterator();
+            while (deletedIterator.hasNext()) {
+                parent.getSuit().delete(deletedIterator.next());
                 updated = true;
             }
         }
