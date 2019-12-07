@@ -3,6 +3,7 @@ package org.erachain.dbs.rocksDB.integration;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.Arrays;
 import org.erachain.database.DBASet;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.DBIterator;
 import org.erachain.dbs.rocksDB.common.RocksDbDataSource;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
@@ -21,6 +22,7 @@ import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.WriteOptions;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -562,9 +564,18 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
-    public Iterator<K> getIterator(boolean descending, boolean isIndex) {
+    public IteratorCloseable<K> getIterator(boolean descending, boolean isIndex) {
         DBIterator iterator = dbSource.iterator(descending, isIndex);
-        return new Iterator<K>() {
+        return new IteratorCloseable<K>() {
+            @Override
+            public void close() {
+                try {
+                    iterator.close();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+
             @Override
             public boolean hasNext() {
                 return iterator.hasNext();
@@ -577,7 +588,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         };
     }
 
-    public Iterator<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending, boolean isIndex) {
+    public IteratorCloseable<K> getIndexIterator(ColumnFamilyHandle indexDB, boolean descending, boolean isIndex) {
         DBIterator iterator = dbSource.indexIterator(descending, indexDB, isIndex);
         return new Iterator<K>() {
             @Override
@@ -608,7 +619,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
-    public Iterator<K> getIndexIteratorFilter(byte[] filter, boolean descending, boolean isIndex) {
+    public IteratorCloseable<K> getIndexIteratorFilter(byte[] filter, boolean descending, boolean isIndex) {
         DBIterator iterator = dbSource.indexIteratorFilter(descending, filter, isIndex);
         return new Iterator<K>() {
             @Override
@@ -624,7 +635,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
-    public Iterator<K> getIndexIteratorFilter(byte[] start, byte[] stop, boolean descending, boolean isIndex) {
+    public IteratorCloseable<K> getIndexIteratorFilter(byte[] start, byte[] stop, boolean descending, boolean isIndex) {
         DBIterator iterator = dbSource.indexIteratorFilter(descending, start, stop, isIndex);
         return new Iterator<K>() {
             @Override
@@ -640,7 +651,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
-    public Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex) {
+    public IteratorCloseable<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex) {
         DBIterator iterator = dbSource.indexIteratorFilter(descending, indexDB, filter, isIndex);
         return new Iterator<K>() {
             @Override
@@ -656,7 +667,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
     }
 
     @Override
-    public Iterator<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] start, byte[] stop, boolean descending, boolean isIndex) {
+    public IteratorCloseable<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] start, byte[] stop, boolean descending, boolean isIndex) {
         DBIterator iterator = dbSource.indexIteratorFilter(descending, indexDB, start, stop, isIndex);
         return new Iterator<K>() {
             @Override
@@ -671,7 +682,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         };
     }
 
-    public Iterator<K> getIndexIterator(int index, boolean descending, boolean isIndex) {
+    public IteratorCloseable<K> getIndexIterator(int index, boolean descending, boolean isIndex) {
         return getIndexIterator(columnFamilyHandles.get(index), descending, isIndex);
     }
 

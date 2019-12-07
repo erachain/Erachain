@@ -1,11 +1,12 @@
 package org.erachain.datachain;
 
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.Iterator;
 import java.util.NavigableSet;
 
-public class IndexIterator<T> implements Iterator<T> {
+public class IndexIterator<T> implements IteratorCloseable<T> {
 
     private Iterator<Tuple2<?, T>> iterator;
     private int index;
@@ -30,4 +31,10 @@ public class IndexIterator<T> implements Iterator<T> {
     public void remove() {
         this.iterator.remove();
     }
+
+    @Override
+    public void close() {
+    }
+
+
 }

@@ -149,7 +149,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало иначе сломшком большой LIST делается
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         this.addUses();
 
         try {
@@ -185,7 +185,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
      * @return
      */
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes

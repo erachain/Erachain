@@ -5,6 +5,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.settings.Settings;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
@@ -12,7 +13,6 @@ import org.mapdb.SerializerBase;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -163,14 +163,14 @@ public class TransactionSuitMapDBinMem extends TransactionSuitMapDB {
     }
 
     @Override
-    public Iterator<Long> getIterator(int index, boolean descending) {
+    public IteratorCloseable<Long> getIterator(int index, boolean descending) {
         if (database.getEngine().isClosed())
             return new TreeSet<Long>().iterator();
         return super.getIterator(index, descending);
     }
 
     @Override
-    public Iterator<Long> getIterator() {
+    public IteratorCloseable<Long> getIterator() {
         if (database.getEngine().isClosed())
             return new TreeSet<Long>().iterator();
         return super.getIterator();

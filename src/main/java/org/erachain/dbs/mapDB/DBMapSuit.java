@@ -1,8 +1,10 @@
 package org.erachain.dbs.mapDB;
 
 import org.erachain.database.DBASet;
+import org.erachain.datachain.IndexIterator;
 import org.erachain.dbs.DBSuitImpl;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -135,20 +137,20 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes
         NavigableSet<Tuple2<?, T>> indexSet = getIndex(index, descending);
         if (indexSet != null) {
 
-            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
+            IndexIterator<T> u = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
             this.outUses();
             return u;
 
         } else {
             if (descending) {
-                Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                IndexIterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
                 this.outUses();
                 return u;
             }
@@ -161,7 +163,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         this.addUses();
 
         Iterator<T> u = map.keySet().iterator();

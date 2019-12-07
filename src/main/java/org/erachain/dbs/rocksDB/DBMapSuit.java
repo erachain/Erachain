@@ -3,6 +3,7 @@ package org.erachain.dbs.rocksDB;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.DBSuitImpl;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -10,7 +11,6 @@ import org.mapdb.DB;
 import org.slf4j.Logger;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -143,7 +143,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         if (index == 0) {
             // тут берем сами ключи у записей
             return map.getIterator(descending, false);
@@ -154,7 +154,7 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         return map.getIterator(false, false);
     }
 

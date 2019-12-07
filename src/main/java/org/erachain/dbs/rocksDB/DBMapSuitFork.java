@@ -5,10 +5,11 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.ForkedMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -254,22 +255,25 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
 
         boolean updated = false;
 
-        Iterator<T> iterator = this.map.keySet().iterator();
-        while (iterator.hasNext()) {
-            T key = iterator.next();
-            U item = this.map.get(key);
-            if (item != null) {
-                parent.getSuit().put(key, this.map.get(key));
-                updated = true;
-            }
-        }
-
-        if (deleted != null) {
-            iterator = this.deleted.keySet().iterator();
+        try (IteratorCloseable<T> iterator = this.getIterator()) {
             while (iterator.hasNext()) {
-                parent.getSuit().delete(iterator.next());
-                updated = true;
+                T key = iterator.next();
+                U item = this.map.get(key);
+                if (item != null) {
+                    parent.getSuit().put(key, this.map.get(key));
+                    updated = true;
+                }
             }
+
+            if (deleted != null) {
+                iterator = this.deleted.keySet().iterator();
+                while (iterator.hasNext()) {
+                    parent.getSuit().delete(iterator.next());
+                    updated = true;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return updated;
