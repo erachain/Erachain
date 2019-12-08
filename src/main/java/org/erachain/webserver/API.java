@@ -1549,7 +1549,7 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
@@ -1668,7 +1668,7 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
         //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
 
         if (personItem == null) {

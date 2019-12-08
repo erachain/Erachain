@@ -94,9 +94,9 @@ public class TestRecUnion {
         // GET RIGHTS TO CERTIFIER
         unionGeneral = new Union(certifier, "СССР", timestamp - 12345678,
                 parent, icon, image, "Союз Совестких Социалистических Республик");
-        //GenesisIssueUnionRecord genesis_issue_union = new GenesisIssueUnionRecord(unionGeneral, certifier);
+        //GenesisIssueUnionRecord genesis_issue_union = new GenesisIssueUnionRecord(unionGeneral, registrar);
         //genesis_issue_union.process(db, false);
-        //GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(certifier, 0L);
+        //GenesisCertifyUnionRecord genesis_certify = new GenesisCertifyUnionRecord(registrar, 0L);
         //genesis_certify.process(db, false);
 
         certifier.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
@@ -321,7 +321,7 @@ public class TestRecUnion {
         assertEquals(false, db.getItemUnionMap().contains(unionKey));
 
         //CHECK REFERENCE ISSUER
-        //assertEquals(issueUnionTransaction.getReference(), certifier.getLastReference(db));
+        //assertEquals(issueUnionTransaction.getReference(), registrar.getLastReference(db));
     }
 
 

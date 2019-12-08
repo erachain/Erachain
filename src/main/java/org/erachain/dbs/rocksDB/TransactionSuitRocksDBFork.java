@@ -36,12 +36,6 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes() {
-        indexes = new ArrayList<>();
-    }
-
-    @Override
     public IteratorCloseable<Long> getTimestampIterator(boolean descending) {
         return null;
     }

@@ -32,8 +32,4 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
                 databaseSet, true);
     }
 
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes() {
-    }
 }

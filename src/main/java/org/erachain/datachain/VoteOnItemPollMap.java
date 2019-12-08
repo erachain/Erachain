@@ -149,7 +149,9 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
 
         Stack<Tuple2<Integer, Integer>> new_stack;
 
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             new_stack = stack;
         else {
             // !!!! NEEED .clone() !!!
@@ -175,7 +177,9 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
             return null;
 
         Stack<Tuple2<Integer, Integer>> new_stack;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             new_stack = stack;
         else {
             // !!!! NEEED .clone() !!!

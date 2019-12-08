@@ -53,7 +53,7 @@ public class Account {
     protected byte[] bytes;
     protected byte[] shortBytes;
     // private long generatingBalance; //used for forging balance
-    Tuple4<Long, Integer, Integer, Integer> personDuration;
+    // нельзя тут запминать так как при откате данные не будут очищены Tuple4<Long, Integer, Integer, Integer> personDuration;
     Tuple2<Integer, PersonCls> person;
     int viewBalancePosition = 0;
 
@@ -530,9 +530,9 @@ public class Account {
 
     // Добавляем величины для тестовых режимов
     public BigDecimal addDEVAmount(long key) {
-        if (key == 1)
+        if (BlockChain.DEVELOP_USE && key == 1)
             return BigDecimal.valueOf(( 512000 + 500 * this.getShortAddressBytes()[10]) >> 6);
-        else if (key == 2)
+        else if (BlockChain.DEVELOP_USE && key == 2)
             return new BigDecimal("100.0");
 
         return BigDecimal.ZERO;
@@ -980,12 +980,20 @@ public class Account {
         return false;
     }
 
-    public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
-        if (this.personDuration == null) {
-            this.personDuration = db.getAddressPersonMap().getItem(getAddress());
+    //public void resetPersonDuration() {
+    //    this.personDuration = null;
+    //}
 
-        }
-        return this.personDuration;
+    public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
+        //    if (this.personDuration == null) {
+        //        нельзя использовать старые значения так как при откатах они не будут чиститься
+        //        this.personDuration = db.getAddressPersonMap().getItem(shortBytes);
+        //    }
+
+        //return this.personDuration;
+
+        return db.getAddressPersonMap().getItem(shortBytes);
+
     }
 
     public boolean isPerson(DCSet dcSet, int forHeight) {
