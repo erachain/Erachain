@@ -8,6 +8,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.datachain.OrderSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -16,7 +17,6 @@ import org.mapdb.Fun;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 ;
@@ -126,7 +126,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have, long want) {
+    public IteratorCloseable<Long> getHaveWantIterator(long have, long want) {
 
         return ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, want, null, null),
@@ -135,14 +135,14 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have) {
+    public IteratorCloseable<Long> getHaveWantIterator(long have) {
         return ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
                 Fun.t4(have, null, null, null),
                 Fun.t4(have, Fun.HI(), Fun.HI(), Fun.HI())).values().iterator();
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want, long have) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want, long have) {
 
         return ((BTreeMap<Fun.Tuple4, Long>) this.wantHaveKeyMap).subMap(
                 Fun.t4(want, have, null, null),
@@ -151,14 +151,14 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want) {
         return ((BTreeMap<Fun.Tuple4, Long>) this.wantHaveKeyMap).subMap(
                 Fun.t4(want, null, null, null),
                 Fun.t4(want, Fun.HI(), Fun.HI(), Fun.HI())).values().iterator();
     }
 
     @Override
-    public Iterator<Long> getAddressHaveWantIterator(String address, long have, long want) {
+    public IteratorCloseable<Long> getAddressHaveWantIterator(String address, long have, long want) {
         return ((BTreeMap<Fun.Tuple5, Long>) this.addressHaveWantKeyMap).subMap(
                 Fun.t5(address, have, want, null, null),
                 Fun.t5(address, have, want, Fun.HI(), Fun.HI())).values().iterator();

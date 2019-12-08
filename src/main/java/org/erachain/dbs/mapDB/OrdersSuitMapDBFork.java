@@ -9,6 +9,7 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.OrderSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.Fun;
@@ -16,7 +17,6 @@ import org.mapdb.Fun;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 
@@ -107,27 +107,27 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have, long want) {
+    public IteratorCloseable<Long> getHaveWantIterator(long have, long want) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have) {
+    public IteratorCloseable<Long> getHaveWantIterator(long have) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want, long have) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want, long have) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getAddressHaveWantIterator(String address, long have, long want) {
+    public IteratorCloseable<Long> getAddressHaveWantIterator(String address, long have, long want) {
         return null;
     }
 

@@ -6,6 +6,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableLong;
@@ -47,33 +48,33 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
     }
 
     @Override
-    public Iterator<Long> getBlockIterator(Integer height) {
+    public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
         return map.getIndexIteratorFilter(Ints.toByteArray(height), false, false);
     }
 
     @Override
-    public Iterator<Long> getIteratorBySender(String address) {
+    public IteratorCloseable<Long> getIteratorBySender(String address) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByRecipient(String address) {
+    public IteratorCloseable<Long> getIteratorByRecipient(String address) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
+    public IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByAddress(String address) {
+    public IteratorCloseable<Long> getIteratorByAddress(String address) {
         return null;
     }
 

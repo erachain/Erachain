@@ -8,6 +8,7 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 
@@ -63,7 +64,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public Iterator<Long> getBlockIterator(Integer height) {
+    public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
         return ((BTreeMap<Long, Transaction>) map)
                 .subMap(Transaction.makeDBRef(height, 0),
@@ -72,27 +73,27 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public Iterator<Long> getIteratorByRecipient(String address) {
+    public IteratorCloseable<Long> getIteratorByRecipient(String address) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorBySender(String address) {
+    public IteratorCloseable<Long> getIteratorBySender(String address) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
+    public IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
         return null;
     }
 
     @Override
-    public Iterator<Long> getIteratorByAddress(String address) {
+    public IteratorCloseable<Long> getIteratorByAddress(String address) {
         return null;
     }
 

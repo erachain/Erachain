@@ -11,6 +11,7 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
@@ -175,7 +176,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getBlockIterator(Integer height) {
+    public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
          return  ((BTreeMap<Long, Transaction>) map)
                 .subMap(Transaction.makeDBRef(height, 0),
@@ -185,7 +186,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getIteratorByRecipient(String address) {
+    public IteratorCloseable<Long> getIteratorByRecipient(String address) {
         Iterable keys = Fun.filter(this.recipientKey, address);
         Iterator iter = keys.iterator();
         return iter;
@@ -193,7 +194,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getIteratorBySender(String address) {
+    public IteratorCloseable<Long> getIteratorBySender(String address) {
         Iterable keys = Fun.filter(this.senderKey, address);
         Iterator iter = keys.iterator();
         return iter;
@@ -202,7 +203,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type) {
         Iterable keys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(address, type));
         Iterator iter = keys.iterator();
         return iter;
@@ -211,7 +212,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
+    public IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
 
         String filterLower = filter.toLowerCase();
         Iterable keys = Fun.filter(this.titleKey,
@@ -230,7 +231,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     // скорость сортировки в том или ином случае может быть разная - нужны ТЕСТЫ на 3 варианта работы
     // TODO need benchmark tests
-    public Iterator<Long> getIteratorByAddress(String address) {
+    public IteratorCloseable<Long> getIteratorByAddress(String address) {
 
         if (true) {
             Iterable senderKeys = Fun.filter(this.senderKey, address);

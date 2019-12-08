@@ -9,6 +9,7 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
@@ -149,7 +150,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public IteratorCloseable<byte[]> assetIterator(long assetKey) {
-        return assetKeys(assetKey).iterator();
+        return new IteratorCloseableImpl(assetKeys(assetKey).iterator());
     }
 
     @Override
@@ -162,7 +163,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public IteratorCloseable<byte[]> accountIterator(Account account) {
-        return accountKeys(account).iterator();
+        return new IteratorCloseableImpl(accountKeys(account).iterator());
     }
 
 

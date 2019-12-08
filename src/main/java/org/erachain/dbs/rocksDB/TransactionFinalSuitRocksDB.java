@@ -10,6 +10,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
@@ -160,7 +161,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getBlockIterator(Integer height) {
+    public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
         //map.getIterator();
         return map.getIndexIteratorFilter(Ints.toByteArray(height), false, false);
@@ -169,21 +170,21 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getIteratorBySender(String address) {
+    public IteratorCloseable<Long> getIteratorBySender(String address) {
         //return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false);
         return map.getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false, true);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getIteratorByRecipient(String address) {
+    public IteratorCloseable<Long> getIteratorByRecipient(String address) {
         return map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false, true);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Iterator<Long> getIteratorByAddressAndType(String address, Integer type) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type) {
         ///return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), false);
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), false, true);
     }
@@ -191,7 +192,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Iterator<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
+    public IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
 
         String filterLower = filter.toLowerCase();
         //Iterable keys = Fun.filter(this.titleKey,
@@ -210,7 +211,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     // TODO сделать просто итератор складной - без создания списков и дубляжей в итераторе
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator<Long> getIteratorByAddress(String address) {
+    public IteratorCloseable<Long> getIteratorByAddress(String address) {
         Iterator senderKeys = map.getIndexIteratorFilter(senderTxs.getColumnFamilyHandle(), address.getBytes(), false, true);
         Iterator recipientKeys = map.getIndexIteratorFilter(recipientTxs.getColumnFamilyHandle(), address.getBytes(), false, true);
         //return Iterators.concat(senderKeys, recipientKeys);

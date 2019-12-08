@@ -7,6 +7,7 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.OrderSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
@@ -119,35 +120,35 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have, long want) {
+    public IteratorCloseable<Long> getHaveWantIterator(long have, long want) {
         return map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(), org.bouncycastle.util.Arrays.concatenate(
                 Longs.toByteArray(have),
                 Longs.toByteArray(want)), false, true);
     }
 
     @Override
-    public Iterator<Long> getHaveWantIterator(long have) {
+    public IteratorCloseable<Long> getHaveWantIterator(long have) {
         return map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(),
                 Longs.toByteArray(have),
                 false, true);
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want, long have) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want, long have) {
         return map.getIndexIteratorFilter(wantHaveKeyIndex.getColumnFamilyHandle(), org.bouncycastle.util.Arrays.concatenate(
                 Longs.toByteArray(want),
                 Longs.toByteArray(have)), false, true);
     }
 
     @Override
-    public Iterator<Long> getWantHaveIterator(long want) {
+    public IteratorCloseable<Long> getWantHaveIterator(long want) {
         return map.getIndexIteratorFilter(wantHaveKeyIndex.getColumnFamilyHandle(),
                 Longs.toByteArray(want),
                 false, true);
     }
 
     @Override
-    public Iterator<Long> getAddressHaveWantIterator(String address, long have, long want) {
+    public IteratorCloseable<Long> getAddressHaveWantIterator(String address, long have, long want) {
         return map.getIndexIteratorFilter(
                 addressHaveWantKeyIndex.getColumnFamilyHandle(),
                 org.bouncycastle.util.Arrays.concatenate(address.getBytes(),

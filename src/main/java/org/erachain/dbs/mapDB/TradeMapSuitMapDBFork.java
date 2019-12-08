@@ -8,6 +8,7 @@ import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.TradeMap;
 import org.erachain.datachain.TradeSuit;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.BTreeMap;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
@@ -47,18 +48,18 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
         //FILTER ALL KEYS
         Map uncastedMap = map;
-        return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
                 Fun.t2(order.getId(), null),
-                Fun.t2(order.getId(), Fun.HI())).keySet().iterator();
+                Fun.t2(order.getId(), Fun.HI())).keySet().iterator());
     }
 
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
         //FILTER ALL KEYS
         Map uncastedMap = map;
-        return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
                 Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).keySet().iterator();
+                Fun.t2(orderID, Fun.HI())).keySet().iterator());
     }
 
     @Override
