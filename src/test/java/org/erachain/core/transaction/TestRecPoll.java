@@ -108,9 +108,9 @@ public class TestRecPoll {
 
         // GET RIGHTS TO CERTIFIER
         pollGeneral = new Poll(certifier, "СССР", icon, image, "wqeqwe", options);
-        //GenesisIssuePollRecord genesis_issue_poll = new GenesisIssuePollRecord(pollGeneral, certifier);
+        //GenesisIssuePollRecord genesis_issue_poll = new GenesisIssuePollRecord(pollGeneral, registrar);
         //genesis_issue_poll.process(db, false);
-        //GenesisCertifyPollRecord genesis_certify = new GenesisCertifyPollRecord(certifier, 0L);
+        //GenesisCertifyPollRecord genesis_certify = new GenesisCertifyPollRecord(registrar, 0L);
         //genesis_certify.process(db, false);
 
         certifier.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
@@ -298,8 +298,8 @@ public class TestRecPoll {
         LOGGER.info("poll KEY: " + poll.getKey(db));
 
         //CHECK BALANCE ISSUER
-        //assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
-        //assertEquals(issuePollTransaction.getFee().setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
+        //assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, registrar.getBalanceUSE(ERM_KEY, db));
+        //assertEquals(issuePollTransaction.getFee().setScale(BlockChain.AMOUNT_DEDAULT_SCALE), registrar.getBalanceUSE(FEE_KEY, db));
 
         //CHECK POLL EXISTS DB AS CONFIRMED:  key > -1
         long key = db.getIssuePollMap().get(issuePollTransaction);
@@ -324,7 +324,7 @@ public class TestRecPoll {
         assertEquals(false, db.getItemPollMap().contains(pollKey));
 
         //CHECK REFERENCE ISSUER
-        //assertEquals(issuePollTransaction.getReference(), certifier.getLastReference(db));
+        //assertEquals(issuePollTransaction.getReference(), registrar.getLastReference(db));
     }
 
 

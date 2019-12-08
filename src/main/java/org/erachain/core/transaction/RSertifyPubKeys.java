@@ -469,7 +469,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         if (result != VALIDATE_OK)
             return result;
 
-        if (!BlockChain.ANONIM_SERT_USE
+        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
                 && !BlockChain.DEVELOP_USE && !this.creator.isPerson(dcSet, height)) {
             boolean creator_admin = false;
             long personsCount = dcSet.getItemPersonMap().getLastKey();
@@ -661,7 +661,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         String address;
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             address = publicAccount.getAddress();
-            dcSet.getAddressPersonMap().addItem(address, itemA);
+            dcSet.getAddressPersonMap().addItem(publicAccount.getShortAddressBytes(), itemA);
             dcSet.getPersonAddressMap().addItem(this.key, address, itemP);
 
 
@@ -686,8 +686,15 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         String address;
         for (PublicKeyAccount publicAccount : this.sertifiedPublicKeys) {
             address = publicAccount.getAddress();
-            dcSet.getAddressPersonMap().removeItem(address);
+            dcSet.getAddressPersonMap().removeItem(publicAccount.getShortAddressBytes());
             dcSet.getPersonAddressMap().removeItem(this.key, address);
+
+            // при откате нужно след в истории удалить а сам публичный ключ отсавить на всякий случай?
+            long[] lastPoint = publicAccount.getLastTimestamp(dcSet);
+            if (lastPoint != null && lastPoint[0] == timestamp) {
+                publicAccount.removeLastTimestamp(dcSet);
+            }
+
         }
 
         boolean personalized = false;

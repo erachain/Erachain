@@ -1301,7 +1301,9 @@ public abstract class Transaction implements ExplorerJsonLine {
         }
 
         if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
-                && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
+                && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
+                && this.signature != null
+                && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;
         }

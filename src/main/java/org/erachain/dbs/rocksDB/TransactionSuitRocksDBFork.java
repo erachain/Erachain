@@ -12,7 +12,6 @@ import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.rocksdb.WriteOptions;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 @Slf4j
@@ -33,12 +32,6 @@ public class TransactionSuitRocksDBFork extends DBMapSuitFork<Long, Transaction>
                         256, 10,
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false), sizeEnable);
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes() {
-        indexes = new ArrayList<>();
     }
 
     @Override

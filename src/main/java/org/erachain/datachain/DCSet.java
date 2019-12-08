@@ -119,7 +119,7 @@ public class DCSet extends DBASet {
     private KKPersonUnionMap kKPersonUnionMap;
     private KKPollUnionMap kKPollUnionMap;
     private KKStatusUnionMap kKStatusUnionMap;
-    private AddressPersonMap addressPersonMap;
+    private AddressPersonMapImpl addressPersonMap;
     private PersonAddressMap personAddressMap;
     private KKKMapPersonStatusUnion kK_KPersonStatusUnionMapPersonStatusUnionTable;
     private VouchRecordMap vouchRecordMap;
@@ -233,6 +233,7 @@ public class DCSet extends DBASet {
                     TRADES_MAP
                     , this, database);
 
+            this.addressPersonMap = new AddressPersonMapImpl(defaultDBS > 0 ? defaultDBS : DBS_MAP_DB, this, database);
 
             this.actions = 0L;
 
@@ -250,7 +251,6 @@ public class DCSet extends DBASet {
             this.kKPersonUnionMap = new KKPersonUnionMap(this, database);
             this.kKPollUnionMap = new KKPollUnionMap(this, database);
             this.kKStatusUnionMap = new KKStatusUnionMap(this, database);
-            this.addressPersonMap = new AddressPersonMap(this, database);
             this.personAddressMap = new PersonAddressMap(this, database);
             this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(this, database);
             this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(this, database);
@@ -397,6 +397,8 @@ public class DCSet extends DBASet {
                 //DBS_NATIVE_MAP
                 , parent.tradeMap, this);
 
+        this.addressPersonMap = new AddressPersonMapImpl(DBS_MAP_DB, parent.addressPersonMap, this);
+
 
         this.addressForging = new AddressForging(parent.addressForging, this);
         this.credit_AddressesMap = new CreditAddressesMap(parent.credit_AddressesMap, this);
@@ -409,7 +411,6 @@ public class DCSet extends DBASet {
         this.kKPollUnionMap = new KKPollUnionMap(parent.kKPollUnionMap, this);
         this.kKStatusUnionMap = new KKStatusUnionMap(parent.kKStatusUnionMap, this);
 
-        this.addressPersonMap = new AddressPersonMap(parent.addressPersonMap, this);
         this.personAddressMap = new PersonAddressMap(parent.personAddressMap, this);
         this.kK_KPersonStatusUnionMapPersonStatusUnionTable = new KKKMapPersonStatusUnion(parent.kK_KPersonStatusUnionMapPersonStatusUnionTable, this);
         this.transactionFinalCalculatedMap = new TransactionFinalCalculatedMap(parent.transactionFinalCalculatedMap, this);
