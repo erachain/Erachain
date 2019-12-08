@@ -1,5 +1,7 @@
 package org.erachain.dbs.rocksDB.common;
 
+import org.erachain.dbs.rocksDB.RockStoreIterator;
+import org.erachain.dbs.rocksDB.RockStoreIteratorFilter;
 import org.rocksdb.*;
 
 import java.nio.file.Path;

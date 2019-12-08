@@ -5,6 +5,7 @@ import org.bouncycastle.util.Arrays;
 import org.erachain.database.DBASet;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.Transacted;
+import org.erachain.dbs.rocksDB.IteratorCloseableImpl;
 import org.erachain.dbs.rocksDB.common.*;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedTypeIndexException;
@@ -556,102 +557,22 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
 
     @Override
     public IteratorCloseable<K> getIndexIteratorFilter(byte[] filter, boolean descending, boolean isIndex) {
-        DBIterator iterator = dbSource.indexIteratorFilter(descending, filter, isIndex);
-        return new IteratorCloseable<K>() {
-            /// нужно обязательно освобождать память, см https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
-            @Override
-            public void close() {
-                try {
-                    iterator.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public K next() {
-                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
-            }
-        };
+        return new IteratorCloseableImpl(dbSource.indexIteratorFilter(descending, filter, isIndex), byteableKey);
     }
 
     @Override
     public IteratorCloseable<K> getIndexIteratorFilter(byte[] start, byte[] stop, boolean descending, boolean isIndex) {
-        DBIterator iterator = dbSource.indexIteratorFilter(descending, start, stop, isIndex);
-        return new IteratorCloseable<K>() {
-            /// нужно обязательно освобождать память, см https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
-            @Override
-            public void close() {
-                try {
-                    iterator.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public K next() {
-                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
-            }
-        };
+        return new IteratorCloseableImpl(dbSource.indexIteratorFilter(descending, start, stop, isIndex), byteableKey);
     }
 
     @Override
     public IteratorCloseable<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] filter, boolean descending, boolean isIndex) {
-        DBIterator iterator = dbSource.indexIteratorFilter(descending, indexDB, filter, isIndex);
-        return new IteratorCloseable<K>() {
-            /// нужно обязательно освобождать память, см https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
-            @Override
-            public void close() {
-                try {
-                    iterator.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public K next() {
-                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
-            }
-        };
+        return new IteratorCloseableImpl(dbSource.indexIteratorFilter(descending, indexDB, filter, isIndex), byteableKey);
     }
 
     @Override
     public IteratorCloseable<K> getIndexIteratorFilter(ColumnFamilyHandle indexDB, byte[] start, byte[] stop, boolean descending, boolean isIndex) {
-        DBIterator iterator = dbSource.indexIteratorFilter(descending, indexDB, start, stop, isIndex);
-        return new IteratorCloseable<K>() {
-            /// нужно обязательно освобождать память, см https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
-            @Override
-            public void close() {
-                try {
-                    iterator.close();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public K next() {
-                return (K) byteableKey.receiveObjectFromBytes(iterator.next());
-            }
-        };
+        return new IteratorCloseableImpl(dbSource.indexIteratorFilter(descending, indexDB, start, stop, isIndex), byteableKey);
     }
 
     public IteratorCloseable<K> getIndexIterator(int index, boolean descending, boolean isIndex) {

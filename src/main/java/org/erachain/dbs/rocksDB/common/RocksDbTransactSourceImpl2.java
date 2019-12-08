@@ -5,6 +5,8 @@ import com.google.common.primitives.Ints;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.Transacted;
+import org.erachain.dbs.rocksDB.RockStoreIterator;
+import org.erachain.dbs.rocksDB.RockStoreIteratorFilter;
 import org.erachain.dbs.rocksDB.exceptions.UnsupportedRocksDBOperationException;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.transformation.ByteableInteger;

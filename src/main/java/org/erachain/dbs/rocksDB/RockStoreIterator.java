@@ -1,6 +1,7 @@
-package org.erachain.dbs.rocksDB.common;
+package org.erachain.dbs.rocksDB;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.dbs.rocksDB.common.DBIterator;
 import org.rocksdb.RocksIterator;
 
 import java.util.NoSuchElementException;
@@ -33,6 +34,13 @@ public class RockStoreIterator implements DBIterator {
   @Override
   public void finalize() {
     close();
+    try {
+      /// сообщим о том что объект не закрывали вручную
+      Long err = null;
+      err++;
+    } catch (Exception e) {
+      logger.warn("FINALIZE used", e);
+    }
   }
 
   @Override
