@@ -36,5 +36,4 @@ public class IndexIterator<T> implements IteratorCloseable<T> {
     public void close() {
     }
 
-
 }

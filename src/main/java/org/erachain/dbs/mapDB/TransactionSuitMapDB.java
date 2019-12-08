@@ -8,6 +8,8 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionSuit;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.utils.ReverseComparator;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -19,7 +21,6 @@ import org.slf4j.Logger;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableSet;
 
@@ -151,21 +152,21 @@ public class TransactionSuitMapDB extends DBMapSuit<Long, Transaction> implement
 
     }
 
-    public Iterator typeIterator(String sender, Long timestamp, Integer type) {
-        return Fun.filter(typeKey,
-                new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type)).iterator();
+    public IteratorCloseable<Long> typeIterator(String sender, Long timestamp, Integer type) {
+        return new IteratorCloseableImpl(Fun.filter(typeKey,
+                new Fun.Tuple3<String, Long, Integer>(sender, timestamp, type)).iterator());
     }
 
-    public Iterator senderIterator(String sender) {
-        return Fun.filter(senderKey, sender).iterator();
+    public IteratorCloseable<Long> senderIterator(String sender) {
+        return new IteratorCloseableImpl(Fun.filter(senderKey, sender).iterator());
     }
 
-    public Iterator recipientIterator(String recipient) {
-        return Fun.filter(recipientKey, recipient).iterator();
+    public IteratorCloseable<Long> recipientIterator(String recipient) {
+        return new IteratorCloseableImpl(Fun.filter(recipientKey, recipient).iterator());
     }
 
     @Override
-    public Iterator<Long> getTimestampIterator(boolean descending) {
+    public IteratorCloseable<Long> getTimestampIterator(boolean descending) {
         return getIterator(TIMESTAMP_INDEX, descending);
     }
 

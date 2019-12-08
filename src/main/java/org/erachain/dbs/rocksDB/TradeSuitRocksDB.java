@@ -9,6 +9,7 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TradeSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTableDBCommitedAsBath;
@@ -20,7 +21,6 @@ import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Хранит сделки на бирже
@@ -166,40 +166,40 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
         return map.getIndexIteratorFilter(Longs.toByteArray(order.getId()), false, false);
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
         // тут нужно не Индекс включать
         return map.getIndexIteratorFilter(Longs.toByteArray(orderID), false, false);
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
         return map.getIndexIteratorFilter(reverseIndex.getColumnFamilyHandle(), Longs.toByteArray(orderID), false, true);
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getHaveIterator(long have) {
+    public IteratorCloseable<Tuple2<Long, Long>> getHaveIterator(long have) {
         return map.getIndexIteratorFilter(haveIndex.getColumnFamilyHandle(), Longs.toByteArray(have), false, true);
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getWantIterator(long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getWantIterator(long want) {
         return map.getIndexIteratorFilter(wantIndex.getColumnFamilyHandle(), Longs.toByteArray(want), false, true);
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairIterator(long have, long want) {
         byte[] filter = new byte[16];
         makeKey(filter, have, want);
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
 
         byte[] startBytes;
         if (startHeight > 0) {
@@ -232,7 +232,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
 
         byte[] startBytes;
         if (startOrderID > 0) {

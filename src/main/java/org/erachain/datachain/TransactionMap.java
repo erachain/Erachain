@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -31,7 +32,7 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     Integer setObservableData(int index, Integer data);
 
-    Iterator<Long> getTimestampIterator(boolean descending);
+    IteratorCloseable<Long> getTimestampIterator(boolean descending);
 
     int clearByDeadTimeAndLimit(long timestamp, boolean cutDeadTime);
 

@@ -8,13 +8,13 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Iterator;
 
 // TODO SOFT HARD TRUE
 
@@ -148,7 +148,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     }
 
     @Override
-    public Iterator<byte[]> assetIterator(long assetKey) {
+    public IteratorCloseable<byte[]> assetIterator(long assetKey) {
         return assetKeys(assetKey).iterator();
     }
 
@@ -161,7 +161,7 @@ public class ItemAssetBalanceSuitMapDB extends DBMapSuit<byte[], Tuple5<
     }
 
     @Override
-    public Iterator<byte[]> accountIterator(Account account) {
+    public IteratorCloseable<byte[]> accountIterator(Account account) {
         return accountKeys(account).iterator();
     }
 

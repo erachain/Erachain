@@ -7,11 +7,11 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.TradeMap;
 import org.erachain.datachain.TradeSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.BTreeMap;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -44,7 +44,7 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
      * @return
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
         //FILTER ALL KEYS
         Map uncastedMap = map;
         return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
@@ -53,7 +53,7 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
         //FILTER ALL KEYS
         Map uncastedMap = map;
         return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
@@ -62,32 +62,32 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
         return null;
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getHaveIterator(long have) {
+    public IteratorCloseable<Tuple2<Long, Long>> getHaveIterator(long have) {
         return null;
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getWantIterator(long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getWantIterator(long want) {
         return null;
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairIterator(long have, long want) {
         return null;
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
         return null;
     }
 
     @Override
-    public Iterator<Fun.Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
         return null;
     }
 

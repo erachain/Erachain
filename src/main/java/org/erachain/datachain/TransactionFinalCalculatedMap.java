@@ -9,6 +9,8 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transCalculated.Calculated;
 import org.erachain.database.serializer.CalculatedSerializer;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.utils.BlExpUnit;
 import org.erachain.utils.ObserverMessage;
@@ -16,6 +18,7 @@ import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -176,13 +179,15 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Calculated> getCalculatedsByRecipient(String address, int limit) {
-        Iterator iterator = Fun.filter(this.recipientKey, address).iterator();
 
         List<Calculated> txs = new ArrayList<>();
         int counter = 0;
-        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
-            txs.add(this.map.get(iterator.next()));
-            counter++;
+        try (IteratorCloseable iterator = new IteratorCloseableImpl(Fun.filter(this.recipientKey, address).iterator())) {
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+                txs.add(this.map.get(iterator.next()));
+                counter++;
+            }
+        } catch (IOException e) {
         }
         return txs;
     }

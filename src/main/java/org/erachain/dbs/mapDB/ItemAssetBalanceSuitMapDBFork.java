@@ -6,12 +6,12 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
 
 // TODO SOFT HARD TRUE
@@ -64,7 +64,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
 
     @Override
     // NOT used in FORK
-    public Iterator<byte[]> assetIterator(long key) {
+    public IteratorCloseable<byte[]> assetIterator(long key) {
         return null;
     }
 
@@ -76,7 +76,7 @@ public class ItemAssetBalanceSuitMapDBFork extends DBMapSuitFork<byte[], Tuple5<
 
     @Override
     // NOT used in FORK
-    public Iterator<byte[]> accountIterator(Account account) {
+    public IteratorCloseable<byte[]> accountIterator(Account account) {
         return null;
     }
 

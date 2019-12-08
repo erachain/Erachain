@@ -3,16 +3,16 @@ package org.erachain.datachain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.Fun;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
 import java.util.List;
 
 public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
     void put(Trade trade);
 
-    Iterator<Fun.Tuple2<Long, Long>> getIterator(Order order);
+    IteratorCloseable<Fun.Tuple2<Long, Long>> getIterator(Order order);
 
     List<Trade> getInitiatedTrades(Order order);
 

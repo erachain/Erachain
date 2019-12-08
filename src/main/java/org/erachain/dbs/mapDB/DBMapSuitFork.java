@@ -5,12 +5,11 @@ import lombok.Getter;
 import org.erachain.controller.Controller;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.ForkedMap;
-import org.erachain.dbs.MergedIteratorNoDuplicates;
+import org.erachain.dbs.*;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -304,45 +303,49 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     }
 
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         this.addUses();
 
         List<T> list = new ArrayList<>();
-        Iterator<T> parentIterator = parent.getIterator();
-        while (parentIterator.hasNext()) {
-            T key = parentIterator.next();
-            // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key)
-                    || map.containsKey(key))
-                continue;
-            list.add(key);
+        try (IteratorCloseable<T> parentIterator = parent.getIterator()) {
+            while (parentIterator.hasNext()) {
+                T key = parentIterator.next();
+                // пропустим если он есть в удаленных
+                if (deleted != null && deleted.containsKey(key)
+                        || map.containsKey(key))
+                    continue;
+                list.add(key);
+            }
+        } catch (IOException e) {
         }
 
         //Map uncastedMap = this.map;
         Iterator<T> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
 
         this.outUses();
-        return iterator;
+        return new IteratorCloseableImpl(iterator);
 
     }
 
     // TODO надо рекурсию к Родителю по итератору делать
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         this.addUses();
 
         List<T> list = new ArrayList<>();
-        Iterator<T> parentIterator = parent.getIterator(index, descending);
-        while (parentIterator.hasNext()) {
-            T key = parentIterator.next();
-            // пропустим если он есть в удаленных
-            if (deleted != null && deleted.containsKey(key)
-                    || map.containsKey(key))
-                continue;
-            list.add(key);
+        try (IteratorCloseable<T> parentIterator = parent.getIterator(index, descending)) {
+            while (parentIterator.hasNext()) {
+                T key = parentIterator.next();
+                // пропустим если он есть в удаленных
+                if (deleted != null && deleted.containsKey(key)
+                        || map.containsKey(key))
+                    continue;
+                list.add(key);
+            }
+        } catch (IOException e) {
         }
 
-        Iterator<T> iterator;
+        IteratorCloseable<T> iterator;
 
         if (index > 0) {
             // 0 - это главный индекс - он не в списке indexes
@@ -351,24 +354,23 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                 iterator = new org.erachain.datachain.IndexIterator<>(this.indexes.get(index));
             } else {
                 if (descending) {
-                    iterator = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                    iterator = new IteratorCloseableImpl(((NavigableMap<T, U>) this.map).descendingKeySet().iterator());
                 } else {
-                    iterator = this.map.keySet().iterator();
+                    iterator = new IteratorCloseableImpl(this.map.keySet().iterator());
                 }
             }
         } else {
             if (descending) {
-                iterator = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
+                iterator = new IteratorCloseableImpl(((NavigableMap<T, U>) this.map).descendingKeySet().iterator());
             } else {
-                iterator = this.map.keySet().iterator();
+                iterator = new IteratorCloseableImpl(this.map.keySet().iterator());
             }
         }
 
-        iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
+        Iterator iteratorUncasted = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
 
         this.outUses();
-        return iterator;
-
+        return (IteratorCloseable) iteratorUncasted;
     }
 
     @Override
@@ -385,9 +387,9 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         if (deleted != null) {
-            iterator = this.deleted.keySet().iterator();
-            while (iterator.hasNext()) {
-                parent.getSuit().delete(iterator.next());
+            Iterator iteratorDeleted = this.deleted.keySet().iterator();
+            while (iteratorDeleted.hasNext()) {
+                parent.getSuit().delete(iteratorDeleted.next());
                 updated = true;
             }
         }

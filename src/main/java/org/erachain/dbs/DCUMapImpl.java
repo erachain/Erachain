@@ -149,12 +149,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     // TODO: сделать два итератора и удаленные чтобы без создания новых списков работало иначе сломшком большой LIST делается
     @Override
-    public Iterator<T> getIterator() {
+    public IteratorCloseable<T> getIterator() {
         this.addUses();
 
         try {
             if (parent == null) {
-                return map.keySet().iterator();
+                return new IteratorCloseableImpl(map.keySet().iterator());
             }
 
             List<T> list = new ArrayList<>();
@@ -170,7 +170,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
             /// тут нет дублей они уже удалены и дубли не взяты
             /// return new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
-            return Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+            return new IteratorCloseableImpl(Iterators.mergeSorted((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR));
 
         } finally {
             this.outUses();
@@ -185,7 +185,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
      * @return
      */
     @Override
-    public Iterator<T> getIterator(int index, boolean descending) {
+    public IteratorCloseable<T> getIterator(int index, boolean descending) {
         this.addUses();
 
         // 0 - это главный индекс - он не в списке indexes
@@ -200,12 +200,12 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             if (descending) {
                 Iterator<T> u = ((NavigableMap<T, U>) this.map).descendingKeySet().iterator();
                 this.outUses();
-                return u;
+                return new IteratorCloseableImpl(u);
             }
 
             Iterator<T> u = ((NavigableMap<T, U>) this.map).keySet().iterator();
             this.outUses();
-            return u;
+            return new IteratorCloseableImpl(u);
 
         }
     }

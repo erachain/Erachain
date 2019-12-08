@@ -11,6 +11,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
@@ -377,7 +378,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     }
 
     @Override
-    public Iterator<Long> getTimestampIterator(boolean descending) {
+    public IteratorCloseable<Long> getTimestampIterator(boolean descending) {
         return ((TransactionSuit)map).getTimestampIterator(descending);
     }
 

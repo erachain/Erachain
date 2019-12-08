@@ -9,6 +9,7 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.mapDB.TradeMapSuitMapDBFork;
 import org.erachain.dbs.mapDB.TradeSuitMapDB;
 import org.erachain.dbs.rocksDB.TradeSuitRocksDB;
@@ -79,7 +80,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
      * @return
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
         return ((TradeSuit) this.map).getIterator(order);
     }
 

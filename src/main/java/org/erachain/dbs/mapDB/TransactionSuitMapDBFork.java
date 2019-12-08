@@ -6,9 +6,8 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.datachain.TransactionSuit;
+import org.erachain.dbs.IteratorCloseable;
 import org.mapdb.SerializerBase;
-
-import java.util.Iterator;
 
 @Slf4j
 public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionSuit
@@ -38,22 +37,22 @@ public class TransactionSuitMapDBFork extends DBMapSuitFork<Long, Transaction> i
     }
 
     @Override
-    public Iterator<Long> getTimestampIterator(boolean descending) {
+    public IteratorCloseable<Long> getTimestampIterator(boolean descending) {
         return null;
     }
 
     @Override
-    public Iterator typeIterator(String sender, Long timestamp, Integer type) {
+    public IteratorCloseable<Long> typeIterator(String sender, Long timestamp, Integer type) {
         return null;
     }
 
     @Override
-    public Iterator senderIterator(String sender) {
+    public IteratorCloseable<Long> senderIterator(String sender) {
         return null;
     }
 
     @Override
-    public Iterator recipientIterator(String recipient) {
+    public IteratorCloseable<Long> recipientIterator(String recipient) {
         return null;
     }
 

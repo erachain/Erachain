@@ -1,11 +1,10 @@
 package org.erachain.dbs;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
 import com.google.common.collect.UnmodifiableIterator;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.Closeable;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -15,30 +14,31 @@ import java.util.Queue;
  *
  * @param <T>
  */
-public class MergedIteratorNoDuplicates<T> extends UnmodifiableIterator<T> {
+@Slf4j
+public class MergedIteratorNoDuplicates<T> extends UnmodifiableIterator<T> implements Closeable {
 
-    final Queue<PeekingIterator<T>> queue;
+    final Queue<PeekingIteratorCloseable<T>> queue;
     protected T lastNext;
     final Comparator<? super T> itemComparator;
 
-    public MergedIteratorNoDuplicates(Iterable<? extends Iterator<? extends T>> iterators,
+    public MergedIteratorNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
                                       final Comparator<? super T> itemComparator) {
         // A comparator that's used by the heap, allowing the heap
         // to be sorted based on the top of each iterator.
-        Comparator<PeekingIterator<T>> heapComparator =
-                new Comparator<PeekingIterator<T>>() {
+        Comparator<PeekingIteratorCloseable<T>> heapComparator =
+                new Comparator<PeekingIteratorCloseable<T>>() {
                     @Override
-                    public int compare(PeekingIterator<T> o1, PeekingIterator<T> o2) {
+                    public int compare(PeekingIteratorCloseable<T> o1, PeekingIteratorCloseable<T> o2) {
                         return itemComparator.compare(o1.peek(), o2.peek());
                     }
                 };
 
-        queue = new PriorityQueue<PeekingIterator<T>>(2, heapComparator);
+        queue = new PriorityQueue<PeekingIteratorCloseable<T>>(2, heapComparator);
         this.itemComparator = itemComparator;
 
-        for (Iterator<? extends T> iterator : iterators) {
+        for (IteratorCloseable<? extends T> iterator : iterators) {
             if (iterator.hasNext()) {
-                queue.add(Iterators.peekingIterator(iterator));
+                queue.add(new PeekingIteratorCloseable(iterator));
             }
         }
     }
@@ -51,7 +51,7 @@ public class MergedIteratorNoDuplicates<T> extends UnmodifiableIterator<T> {
     @Override
     public synchronized T next() {
         do {
-            PeekingIterator<T> nextIter = queue.remove();
+            PeekingIteratorCloseable<T> nextIter = queue.remove();
             T next = nextIter.next();
             if (nextIter.hasNext()) {
                 queue.add(nextIter);
@@ -64,4 +64,24 @@ public class MergedIteratorNoDuplicates<T> extends UnmodifiableIterator<T> {
 
         return lastNext;
     }
+
+    @Override
+    public void close() {
+        for (PeekingIteratorCloseable<? extends T> iterator : queue) {
+            iterator.close();
+        }
+    }
+
+    @Override
+    public void finalize() {
+        close();
+        try {
+            /// сообщим о том что объект не закрывали вручную
+            Long err = null;
+            err++;
+        } catch (Exception e) {
+            logger.warn("FINALIZE used", e);
+        }
+    }
+
 }

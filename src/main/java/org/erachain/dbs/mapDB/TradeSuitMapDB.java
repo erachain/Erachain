@@ -8,6 +8,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TradeSerializer;
 import org.erachain.datachain.TradeSuit;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
 import org.mapdb.DB;
@@ -15,7 +17,6 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -165,72 +166,72 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
      * @return
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getIterator(Order order) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
         //FILTER ALL KEYS
         Map uncastedMap = map;
-        return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
                 Fun.t2(order.getId(), null),
-                Fun.t2(order.getId(), Fun.HI())).keySet().iterator();
+                Fun.t2(order.getId(), Fun.HI())).keySet().iterator());
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
         //FILTER ALL KEYS
         Map uncastedMap = map;
-        return ((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
                 Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).keySet().iterator();
+                Fun.t2(orderID, Fun.HI())).keySet().iterator());
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getTargetsIterator(Long orderID) {
 
         if (targetsKeyMap == null)
             return null;
 
         //ADD REVERSE KEYS
-        return ((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.targetsKeyMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2, Tuple2<Long, Long>>) this.targetsKeyMap).subMap(
                 Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).values().iterator();
+                Fun.t2(orderID, Fun.HI())).values().iterator());
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getHaveIterator(long have) {
+    public IteratorCloseable<Tuple2<Long, Long>> getHaveIterator(long have) {
 
         if (this.haveKeyMap == null)
             return null;
 
         String haveKey = String.valueOf(have);
-        return ((BTreeMap<Tuple3, Tuple2<Long, Long>>)
+        return new IteratorCloseableImpl(((BTreeMap<Tuple3, Tuple2<Long, Long>>)
                 this.haveKeyMap).subMap(
                     Fun.t3(haveKey, null, null),
-                    Fun.t3(haveKey, Fun.HI(), Fun.HI())).values().iterator();
+                    Fun.t3(haveKey, Fun.HI(), Fun.HI())).values().iterator());
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getWantIterator(long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getWantIterator(long want) {
 
         if (this.wantKeyMap == null)
             return null;
 
         String wantKey = String.valueOf(want);
 
-        return ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.wantKeyMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.wantKeyMap).subMap(
                 Fun.t3(wantKey, null, null),
-                Fun.t3(wantKey, Fun.HI(), Fun.HI())).values().iterator();
+                Fun.t3(wantKey, Fun.HI(), Fun.HI())).values().iterator());
     }
 
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairIterator(long have, long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairIterator(long have, long want) {
 
         if (this.pairKeyMap == null)
             return null;
 
         String pairKey = makeKey(have, want);
 
-        return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+        return  new IteratorCloseableImpl(((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, null, null),
-                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values().iterator();
+                Fun.t3(pairKey, Fun.HI(), Fun.HI())).values().iterator());
 
     }
 
@@ -240,9 +241,10 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
      * @param want
      * @param startHeight
      * @param stopHeight from to height
+     * @return
      */
     @Override
-    public Iterator<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
 
         if (this.pairKeyMap == null)
             return null;
@@ -251,22 +253,22 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         Object toEnd = stopHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, 0) : Fun.HI();
 
         // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
-        return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, startHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(startHeight, Integer.MAX_VALUE) : null, null),
-                Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
+                Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator());
     }
 
     @Override
-    public Iterator<Fun.Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long have, long want, long startOrderID, long stopOrderID) {
         if (this.pairKeyMap == null)
             return null;
 
         String pairKey = makeKey(have, want);
         Object toEnd = stopOrderID > 0 ? Long.MAX_VALUE - stopOrderID : Fun.HI();
-        return  ((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
                 // обратная сортировка поэтому все вычитаем и -1 для всех getSequence
                 Fun.t3(pairKey, startOrderID > 0 ? Long.MAX_VALUE - startOrderID : null, null),
-                Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator();
+                Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator());
     }
 
 }
