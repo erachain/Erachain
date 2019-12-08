@@ -11,6 +11,7 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.ArrayIndexDB;
@@ -220,7 +221,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         // а тут уже оьбратный порядок дать
-        return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
+        return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
 
     }
 

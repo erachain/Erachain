@@ -8,6 +8,7 @@ import org.erachain.database.DBASet;
 import org.erachain.datachain.ItemAssetBalanceSuit;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.rocksDB.indexes.SimpleIndexDB;
 import org.erachain.dbs.rocksDB.indexes.indexByteables.IndexByteableBigDecimal;
 import org.erachain.dbs.rocksDB.integration.DBRocksDBTable;
@@ -145,7 +146,7 @@ public class ItemAssetBalanceSuitRocksDB extends DBMapSuit<byte[], Tuple5<
 
     @Override
     public IteratorCloseable<byte[]> assetIterator(long assetKey) {
-        return assetKeys(assetKey).iterator();
+        return new IteratorCloseableImpl(assetKeys(assetKey).iterator());
     }
 
     public List<byte[]> accountKeys(Account account) {

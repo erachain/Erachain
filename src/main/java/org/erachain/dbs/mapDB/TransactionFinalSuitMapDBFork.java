@@ -9,6 +9,7 @@ import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 
@@ -66,9 +67,9 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     @Override
     public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        return ((BTreeMap<Long, Transaction>) map)
+        return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
                 .subMap(Transaction.makeDBRef(height, 0),
-                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator();
+                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
 
     }
 

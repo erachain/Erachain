@@ -12,6 +12,7 @@ import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
@@ -178,9 +179,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-         return  ((BTreeMap<Long, Transaction>) map)
+         return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
                 .subMap(Transaction.makeDBRef(height, 0),
-                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator();
+                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
 
     }
 
@@ -189,7 +190,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorByRecipient(String address) {
         Iterable keys = Fun.filter(this.recipientKey, address);
         Iterator iter = keys.iterator();
-        return iter;
+        return new IteratorCloseableImpl(iter);
     }
 
     @Override
@@ -197,7 +198,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorBySender(String address) {
         Iterable keys = Fun.filter(this.senderKey, address);
         Iterator iter = keys.iterator();
-        return iter;
+        return new IteratorCloseableImpl(iter);
     }
 
     @Override
@@ -206,7 +207,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type) {
         Iterable keys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(address, type));
         Iterator iter = keys.iterator();
-        return iter;
+        return new IteratorCloseableImpl(iter);
     }
 
     @Override
@@ -223,7 +224,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         type==0?Integer.MAX_VALUE:type), true);
 
         Iterator iter = keys.iterator();
-        return iter;
+        return new IteratorCloseableImpl(iter);
     }
 
     @Override
@@ -243,13 +244,13 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 treeKeys.addAll(Sets.newTreeSet(senderKeys));
                 treeKeys.addAll(Sets.newTreeSet(recipientKeys));
 
-                return ((TreeSet<Long>) treeKeys).descendingIterator();
+                return new IteratorCloseableImpl(((TreeSet<Long>) treeKeys).descendingIterator());
             } else {
                 // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
                 Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
                 // не удаляет дубли индексов return Lists.newLinkedList(mergedIterable).descendingIterator();
                 // удалит дубли индексов и отсортирует - но тогда нен ужны
-                return Sets.newTreeSet(mergedIterable).descendingIterator();
+                return new IteratorCloseableImpl(Sets.newTreeSet(mergedIterable).descendingIterator());
 
             }
         } else {
@@ -267,7 +268,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
             // тут нельзя обратный КОМПАРАТОР REVERSE_COMPARATOR использоваьт ак как все перемешается
             Iterator<Long> mergedIterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeysIterator, recipientKeysIterator), Fun.COMPARATOR);
-            return Lists.reverse(Lists.newArrayList(mergedIterator)).iterator();
+            return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
 
         }
     }
