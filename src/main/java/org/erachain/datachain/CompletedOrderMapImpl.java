@@ -79,7 +79,8 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
             }
 
             Order order = this.get(key);
-            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want) {
+            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want
+                    || order.getHaveAssetKey() == want && order.getWantAssetKey() == have) {
                 orders.add(order);
                 if (limit > 0 && --counter < 0)
                     break;
@@ -130,7 +131,8 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
                 break;
 
             Order order = this.get(key);
-            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want) {
+            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want
+                    || order.getHaveAssetKey() == want && order.getWantAssetKey() == have) {
                 orders.add(order);
                 if (limit > 0 && --counter < 0)
                     break;
@@ -143,8 +145,8 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     @Override
     public List<Order> getOrdersByHeight(long have, long want, int startHeight, int stopHeight, int limit) {
 
-        Long startOrderID = Transaction.makeDBRef(startHeight, 0);
-        Long stopOrderID = Transaction.makeDBRef(stopHeight, Integer.MAX_VALUE);
+        Long startOrderID = startHeight > 0 ? Transaction.makeDBRef(startHeight, 0) : 0;
+        Long stopOrderID = stopHeight > 0 ? Transaction.makeDBRef(stopHeight, Integer.MAX_VALUE) : 0;
 
         return getOrdersByOrderID(have, want, startOrderID, stopOrderID, limit);
     }
