@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
@@ -10,6 +11,10 @@ import org.erachain.dbs.mapDB.CompletedOrdersSuitMapDBFork;
 import org.erachain.dbs.rocksDB.CompletedOrdersSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.erachain.database.IDB.DBS_ROCK_DB;
 
@@ -56,6 +61,94 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
                     map = new CompletedOrdersSuitMapDBFork((CompletedOrderMap) parent, databaseSet);
             }
         }
+    }
+
+    // TODO сделать встроенный поиск первого значения
+    @Override
+    public List<Order> getOrders(long have, long want, int offset, int limit) {
+
+        Iterator<Long> iterator = this.map.getIterator();
+
+        int counter = limit;
+        List<Order> orders = new ArrayList<Order>();
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            if (offset > 0) {
+                offset--;
+                continue;
+            }
+
+            Order order = this.get(key);
+            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want
+                    || order.getHaveAssetKey() == want && order.getWantAssetKey() == have) {
+                orders.add(order);
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        }
+
+        return orders;
+    }
+
+    /**
+     * Get trades by timestamp. From Timestamp to deep.
+     *
+     * @param have           include
+     * @param want           wish
+     * @param startTimestamp is time
+     * @param stopTimestamp
+     * @param limit
+     */
+    @Override
+    public List<Order> getOrdersByTimestamp(long have, long want, long startTimestamp, long stopTimestamp, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        //int heightStart = Controller.getInstance().getMyHeight();
+        //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
+        int fromBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(startTimestamp);
+        int toBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(stopTimestamp);
+
+        //RETURN
+        return getOrdersByHeight(have, want, fromBlock, toBlock, limit);
+    }
+
+    @Override
+    public List<Order> getOrdersByOrderID(long have, long want, long startOrderID, long stopOrderID, int limit) {
+
+        Iterator<Long> iterator = this.map.getIterator();
+
+        int counter = limit;
+        List<Order> orders = new ArrayList<Order>();
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            if (startOrderID > 0 && key < startOrderID)
+                continue;
+            else if (stopOrderID > 0 && key > stopOrderID)
+                break;
+
+            Order order = this.get(key);
+            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want
+                    || order.getHaveAssetKey() == want && order.getWantAssetKey() == have) {
+                orders.add(order);
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        }
+
+        return orders;
+    }
+
+    @Override
+    public List<Order> getOrdersByHeight(long have, long want, int startHeight, int stopHeight, int limit) {
+
+        Long startOrderID = startHeight > 0 ? Transaction.makeDBRef(startHeight, 0) : 0;
+        Long stopOrderID = stopHeight > 0 ? Transaction.makeDBRef(stopHeight, Integer.MAX_VALUE) : 0;
+
+        return getOrdersByOrderID(have, want, startOrderID, stopOrderID, limit);
     }
 
     @Override
