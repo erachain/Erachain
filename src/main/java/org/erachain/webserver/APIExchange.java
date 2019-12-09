@@ -41,9 +41,13 @@ public class APIExchange {
 
         help.put("apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
-        help.put("apiexchange/orders/[amountAssetKey]/[priceAssetKey]?limit=[limit]",
-                "Get orders for amountAssetKey & priceAssetKey, "
-                        + "limit is count record. The number of transactions is limited by input param. Max 50, default 20.");
+        help.put("GET apiexchange/ordersbook/[have]/[want]?limit=[limit]",
+                "Get active orders in orderbook for amountAssetKey & priceAssetKey, "
+                        + "limit is count record. The number of orders is limited by input param, default 20.");
+        help.put("GET apiexchange/completedordersfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get completed orders for amountAssetKey & priceAssetKey, "
+                        + "limit is count record. The number of orders is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
         help.put("apiexchange/trades/[amountAssetKey]/[priceAssetKey]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades from timestamp for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
@@ -59,10 +63,10 @@ public class APIExchange {
     }
 
     @GET
-    @Path("orders/{have}/{want}")
+    @Path("ordersbook/{have}/{want}")
     // orders/1/2?imit=4
-    public Response getOrders(@PathParam("have") Long have, @PathParam("want") Long want,
-                              @DefaultValue("20") @QueryParam("limit") Long limit) {
+    public Response getOrdersBook(@PathParam("have") Long have, @PathParam("want") Long want,
+                                  @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
             if (limit > 50)
@@ -71,7 +75,30 @@ public class APIExchange {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TradeResource.getOrders(have, want, limit))
+                .entity(TradeResource.getOrdersBook(have, want, limit))
+                .build();
+    }
+
+
+    @GET
+    @Path("completedordersfrom/{have}/{want}")
+    public Response getOrdersFrom(@PathParam("have") Long have, @PathParam("want") Long want,
+                                  @QueryParam("height") Integer fromHeight,
+                                  @QueryParam("order") String fromOrder,
+                                  @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                  @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        int limitInt = limit.intValue();
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limitInt > 200)
+                limitInt = 200;
+            else if (limitInt < 0)
+                limitInt = 0;
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(TradeResource.getOrdersFrom(have, want, fromHeight, fromOrder, fromTimestamp, limitInt))
                 .build();
     }
 

@@ -266,7 +266,7 @@ public class Synchronizer extends Thread {
                     // все же может не просчитаться высота блока м цель его из-за ошибки валидации
                     // поэтому делаем проверку все равно
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
                     throw new Exception(mess);
                 }
@@ -279,7 +279,7 @@ public class Synchronizer extends Thread {
                 // CHECK IF VALID
                 if (!block.isSignatureValid()) {
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
                     throw new Exception(mess);
                 }
@@ -295,7 +295,7 @@ public class Synchronizer extends Thread {
 
                 if (!block.isValid(fork, true)) {
                     // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by not is Valid block, heigh: " + height;
+                    String mess = "Dishonest peer by not is Valid block, height: " + height;
                     peer.ban(BAN_BLOCK_TIMES << 1, mess);
                     throw new Exception(mess);
                 }
