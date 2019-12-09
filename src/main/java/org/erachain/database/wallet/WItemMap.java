@@ -92,6 +92,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
                     Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
             //GET ITERATOR
+            // TODO Closeable добавить потом
             Iterator<Tuple2<Long, ItemCls>> iterator = accountItems.values().iterator();
 
             while (iterator.hasNext()) {

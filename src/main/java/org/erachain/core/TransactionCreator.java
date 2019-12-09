@@ -30,14 +30,19 @@ import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
 import org.mapdb.DB;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -95,9 +100,8 @@ public class TransactionCreator {
         if (false) {
             // У форка нет вторичных индексов поэтому этот вариант не покатит
             for (Account account: Controller.getInstance().getAccounts()) {
-                try {
-                    Iterator<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
-                            0, false, 0, 0, 0L);
+                try (IteratorCloseable<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
+                        0, false, 0, 0, 0L)) {
                     while (iterator.hasNext()) {
                         transaction = transactionTab.get(iterator.next());
                         accountTransactions.add(transaction);
@@ -113,14 +117,18 @@ public class TransactionCreator {
 
         } else {
             // здесь нужен протокольный итератор!
-            Iterator<Long> iterator = transactionTab.getIterator();
-            List<Account> accountMap = Controller.getInstance().getAccounts();
 
-            while (iterator.hasNext()) {
-                transaction = transactionTab.get(iterator.next());
-                if (accountMap.contains(transaction.getCreator())) {
-                    accountTransactions.add(transaction);
+            try (IteratorCloseable<Long> iterator = transactionTab.getIterator()) {
+                List<Account> accountMap = Controller.getInstance().getAccounts();
+
+                while (iterator.hasNext()) {
+                    transaction = transactionTab.get(iterator.next());
+                    if (accountMap.contains(transaction.getCreator())) {
+                        accountTransactions.add(transaction);
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 

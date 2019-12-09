@@ -9,10 +9,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.DBTabImpl;
-import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.MergedIteratorNoDuplicates;
+import org.erachain.dbs.*;
 import org.erachain.dbs.mapDB.TransactionSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBFork;
 import org.erachain.dbs.mapDB.TransactionSuitMapDBinMem;
@@ -21,6 +18,7 @@ import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.erachain.database.IDB.DBS_MAP_DB_IN_MEM;
@@ -397,12 +395,12 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
 
-    public Iterator findTransactionsKeys(String address, String sender, String recipient,
-                                         int type, boolean desc, int offset, int limit, long timestamp) {
-        Iterator senderKeys = null;
-        Iterator recipientKeys = null;
+    public IteratorCloseable findTransactionsKeys(String address, String sender, String recipient,
+                                                  int type, boolean desc, int offset, int limit, long timestamp) {
+        IteratorCloseable senderKeys = null;
+        IteratorCloseable recipientKeys = null;
         //TreeSet<Object> iterator = new TreeSet<>();
-        Iterator iterator; // = new TreeSet<>().iterator();
+        IteratorCloseable iterator; // = new TreeSet<>().iterator();
 
         if (address != null) {
             sender = address;
@@ -410,7 +408,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         }
 
         if (sender == null && recipient == null) {
-            return new TreeSet<>().iterator();
+            return new IteratorCloseableImpl(new TreeSet<>().iterator());
         }
         //  timestamp = null;
         if (sender != null) {
@@ -431,52 +429,57 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             }
         }
 
+        Iterator iteratorMerged;
         if (address != null) {
             //iterator.addAll(Sets.newTreeSet(senderKeys));
             //iterator = senderKeys;
             //iterator.addAll(Sets.newTreeSet(recipientKeys));
             // not sorted! Iterators.concat(iterator, recipientKeys);
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-            iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null && recipient != null) {
             //iterator.addAll(Sets.newTreeSet(senderKeys));
-            iterator = senderKeys;
+            iteratorMerged = senderKeys;
             //iterator.retainAll(Sets.newTreeSet(recipientKeys));
-            Iterators.retainAll(iterator, Lists.newArrayList(recipientKeys));
+            Iterators.retainAll(iteratorMerged, Lists.newArrayList(recipientKeys));
         } else if (sender != null) {
             //iterator.addAll(Sets.newTreeSet(senderKeys));
-            iterator = senderKeys;
+            iteratorMerged = senderKeys;
         } else if (recipient != null) {
             //iterator.addAll(Sets.newTreeSet(recipientKeys));
-            iterator = recipientKeys;
+            iteratorMerged = recipientKeys;
         } else {
-            iterator = new TreeSet<>().iterator();
+            iteratorMerged = new TreeSet<>().iterator();
         }
 
         if (desc) {
             //keys = ((TreeSet) iterator).descendingSet();
-            iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
+            iteratorMerged = Lists.reverse(Lists.newArrayList(iteratorMerged)).iterator();
         }
 
         if (offset > 0) {
-            Iterators.advance(iterator, offset);
+            Iterators.advance(iteratorMerged, offset);
         }
 
         if (limit > 0) {
-            iterator = Iterators.limit(iterator, limit);
+            iteratorMerged = Iterators.limit(iteratorMerged, limit);
         }
 
-        return iterator;
+        return new IteratorCloseableImpl(iteratorMerged);
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,
                                               int type, boolean desc, int offset, int limit, long timestamp) {
 
-        Iterator keys = findTransactionsKeys(address, sender, recipient,
-                type, desc, offset, limit, timestamp);
-        return getUnconfirmedTransaction(keys);
+        try (IteratorCloseable keys = findTransactionsKeys(address, sender, recipient,
+                type, desc, offset, limit, timestamp)) {
+            return getUnconfirmedTransaction(keys);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+        return null;
     }
 
 

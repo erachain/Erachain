@@ -55,6 +55,10 @@ public class APIExchange {
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+        help.put("GET apiexchange/tradesfrom/[amountAssetKey]/[priceAssetKey]/[address]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get trades for amountAssetKey & priceAssetKey for creator [address], "
+                        + "limit is count record. The number of trades is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
         help.put("apiexchange/volume24/[amountAssetKey]/[priceAssetKey]",
                 "Get day volume of trades for amountAssetKey & priceAssetKey");
 
@@ -141,6 +145,28 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(TradeResource.getTradesFrom(have, want, fromHeight, fromOrder, fromTimestamp, limitInt))
+                .build();
+    }
+
+    @GET
+    @Path("tradesfrom/{have}/{want}/{address}")
+    public Response getTradesAddressFrom(@PathParam("have") Long have, @PathParam("want") Long want, @PathParam("address") String address,
+                                         @QueryParam("height") Integer fromHeight,
+                                         @QueryParam("order") String fromOrder,
+                                         @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                         @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        int limitInt = limit.intValue();
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limitInt > 200)
+                limitInt = 200;
+            else if (limitInt < 0)
+                limitInt = 0;
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(TradeResource.getTradesAddressFrom(have, want, address, fromHeight, fromOrder, fromTimestamp, limitInt))
                 .build();
     }
 

@@ -19,6 +19,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.datachain.OrderMapImpl;
 import org.erachain.datachain.ReferenceMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
@@ -29,9 +30,13 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 //import org.erachain.core.crypto.Base64;
 
@@ -219,15 +224,18 @@ public class Account {
         } else {
 
             // здесь нужен протокольный итератор! его нету у балансов поэтому через перебор ключей
-            Iterator<byte[]> iterator = map.getIterator(0, true);
+            try (IteratorCloseable<byte[]> iterator = map.getIterator(0, true)) {
 
-            byte[] iteratorKey;
-            while (iterator.hasNext()) {
-                iteratorKey = iterator.next();
-                if (ItemAssetBalanceMap.getAssetKeyFromKey(iteratorKey) == key) {
-                    ballance = map.get(iteratorKey);
-                    values.put(ItemAssetBalanceMap.getShortAccountFromKey(iteratorKey), ballance.a.b);
+                byte[] bytesKey;
+                while (iterator.hasNext()) {
+                    bytesKey = iterator.next();
+                    if (ItemAssetBalanceMap.getAssetKeyFromKey(bytesKey) == key) {
+                        ballance = map.get(bytesKey);
+                        values.put(ItemAssetBalanceMap.getShortAccountFromKey(bytesKey), ballance.a.b);
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
         }
@@ -244,14 +252,17 @@ public class Account {
     public static Map<byte[], BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<byte[], BigDecimal> values) {
 
         OrderMapImpl map = dcSet.getOrderMap();
-        Iterator<Long> iterator = map.getIterator(0, true);
         Order order;
-        while (iterator.hasNext()) {
-            order = map.get(iterator.next());
-            if (order.getHaveAssetKey() == key) {
-                byte[] address = order.getCreator().getShortAddressBytes();
-                values.put(address, values.get(address).add(order.getAmountHave()));
+        try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
+            while (iterator.hasNext()) {
+                order = map.get(iterator.next());
+                if (order.getHaveAssetKey() == key) {
+                    byte[] address = order.getCreator().getShortAddressBytes();
+                    values.put(address, values.get(address).add(order.getAmountHave()));
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         DCSet dcParent = dcSet.getParent();

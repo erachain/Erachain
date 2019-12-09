@@ -13,6 +13,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.datachain.TransactionMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.network.message.MessageFactory;
@@ -351,13 +352,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         try {
             TransactionMap map = dcSet.getTransactionTab();
-            Iterator<Long> iterator = map.getTimestampIterator(false);
-
             needRemoveInvalids = new ArrayList<byte[]>();
 
             this.setMonitorStatusBefore("getUnconfirmedTransactions");
 
-            try {
+            try (IteratorCloseable<Long> iterator = map.getTimestampIterator(false)) {
+
                 long testTime = 0;
                 while (iterator.hasNext()) {
 
@@ -538,14 +538,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             long start = System.currentTimeMillis();
 
             TransactionMap map = dcSet.getTransactionTab();
+            LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 
-            try {
-                Iterator<Long> iterator = map.getTimestampIterator(false);
-                LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
+            needRemoveInvalids = new ArrayList<byte[]>();
 
-                needRemoveInvalids = new ArrayList<byte[]>();
+            this.setMonitorStatusBefore("checkForRemove");
 
-                this.setMonitorStatusBefore("checkForRemove");
+            try (IteratorCloseable<Long> iterator = map.getTimestampIterator(false)) {
 
                 while (iterator.hasNext()) {
 

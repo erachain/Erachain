@@ -51,8 +51,8 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
     Collection<Long> getFromToKeys(long fromKey, long toKey);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    Iterator findTransactionsKeys(String address, String sender, String recipient,
-                                  int type, boolean desc, int offset, int limit, long timestamp);
+    IteratorCloseable findTransactionsKeys(String address, String sender, String recipient,
+                                           int type, boolean desc, int offset, int limit, long timestamp);
 
     List<Transaction> findTransactions(String address, String sender, String recipient,
                                        int type, boolean desc, int offset, int limit, long timestamp);
@@ -73,9 +73,9 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
     int getTotalDeleted();
 
     int size();
-    ///Iterator<Long> getIterator(int index, boolean descending);
+    ///IteratorCloseable<Long> getIterator(int index, boolean descending);
 
-    ///Iterator<Long> getIterator();
+    ///IteratorCloseable<Long> getIterator();
 
     Collection<Transaction> values();
 

@@ -66,6 +66,10 @@ public class TradeResource {
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+        help.put("GET trade/tradesfrom/[have]/[want]/[address]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get trades for amountAssetKey & priceAssetKey for creator [address], "
+                        + "limit is count record. The number of trades is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
         help.put("GET trade/getbyaddress/[creator]/[amountAssetKey]/[priceAssetKey]",
                 "get list of orders in CAP by address");
         help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
@@ -409,6 +413,53 @@ public class TradeResource {
         JSONArray arrayJSON = new JSONArray();
         for (Trade trade: listResult) {
             arrayJSON.add(trade.toJson(have));
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
+    @Path("tradesfrom/{have}/{want}/{address}")
+    public static String getTradesAddressFrom(@PathParam("have") Long have, @PathParam("want") Long want, @PathParam("address") String address,
+                                              @QueryParam("height") Integer fromHeight,
+                                              @QueryParam("order") String fromOrder,
+                                              @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                              @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        List<Trade> listResult;
+        if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+
+            listResult = Controller.getInstance().getTradeByOrderID(have, want, startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getTradeByHeight(have, want, fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getTradeByTimestamp(have, want, fromTimestamp * 1000, limit);
+        }
+
+        DCSet dcSet = DCSet.getInstance();
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade : listResult) {
+            Order initiator = trade.getInitiatorOrder(dcSet);
+            Order target = trade.getTargetOrder(dcSet);
+            if (initiator.getCreator().equals(address) || target.getCreator().equals(address)) {
+                arrayJSON.add(trade.toJson(have));
+            }
         }
 
         return arrayJSON.toJSONString();
