@@ -3,7 +3,6 @@ package org.erachain.datachain;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
-import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
@@ -64,14 +63,30 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
         }
     }
 
+    // TODO сделать встроенный поиск первого значения
     @Override
     public List<Order> getOrders(long have, long want, int offset, int limit) {
-        return null;
-    }
 
-    @Override
-    public Trade getLastOrder(long have, long want) {
-        return null;
+        Iterator<Long> iterator = this.map.getIterator();
+
+        int counter = limit;
+        List<Order> orders = new ArrayList<Order>();
+        while (iterator.hasNext()) {
+            Long key = iterator.next();
+            if (offset > 0) {
+                offset--;
+                continue;
+            }
+
+            Order order = this.get(key);
+            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want) {
+                orders.add(order);
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        }
+
+        return orders;
     }
 
     /**
@@ -114,9 +129,12 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
             else if (stopOrderID > 0 && key > stopOrderID)
                 break;
 
-            orders.add(this.get(key));
-            if (limit > 0 && counter-- < 0)
-                break;
+            Order order = this.get(key);
+            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want) {
+                orders.add(order);
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
         }
 
         return orders;
@@ -125,27 +143,10 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     @Override
     public List<Order> getOrdersByHeight(long have, long want, int startHeight, int stopHeight, int limit) {
 
-        Iterator<Long> iterator = this.map.getIterator();
+        Long startOrderID = Transaction.makeDBRef(startHeight, 0);
+        Long stopOrderID = Transaction.makeDBRef(stopHeight, Integer.MAX_VALUE);
 
-        // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
-        Long startOrderID = Long.MAX_VALUE - Transaction.makeDBRef(startHeight, 0);
-        Long stopOrderID = Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, Integer.MAX_VALUE);
-
-        int counter = limit;
-        List<Order> orders = new ArrayList<Order>();
-        while (iterator.hasNext()) {
-            Long key = iterator.next();
-            if (startHeight > 0 && key < startOrderID)
-                continue;
-            else if (stopHeight > 0 && key > stopOrderID)
-                break;
-
-            orders.add(this.get(key));
-            if (limit > 0 && counter-- < 0)
-                break;
-        }
-
-        return orders;
+        return getOrdersByOrderID(have, want, startOrderID, stopOrderID, limit);
     }
 
     @Override
