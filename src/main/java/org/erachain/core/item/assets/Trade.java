@@ -104,7 +104,7 @@ public class Trade {
     }
 
     @SuppressWarnings("unchecked")
-    public JSONObject toJson(long keyForBuySell) {
+    public JSONObject toJson(long keyForBuySell, boolean withCreators) {
 
         JSONObject trade = new JSONObject();
         trade.put("initiator", Transaction.viewDBRef(initiator));
@@ -137,6 +137,15 @@ public class Trade {
 
             trade.put("price", calcPrice());
             trade.put("reversePrice", calcPriceRevers());
+
+        }
+
+        if (withCreators) {
+            Order order = getInitiatorOrder(DCSet.getInstance());
+            trade.put("initiatorCreator", order.getCreator().getAddress());
+
+            order = getTargetOrder(DCSet.getInstance());
+            trade.put("targetCreator", order.getCreator().getAddress());
 
         }
 

@@ -158,6 +158,13 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
     }
 
     @Override
+    public IteratorCloseable<Long> getAddressIterator(String address) {
+        return map.getIndexIteratorFilter(
+                addressHaveWantKeyIndex.getColumnFamilyHandle(),
+                address.getBytes(), false, true);
+    }
+
+    @Override
     public HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal stopPrice, Map deleted) {
 
         Iterator<Long> iterator = getHaveWantIterator(have, want);

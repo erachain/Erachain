@@ -131,4 +131,9 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
         return null;
     }
 
+    @Override
+    public IteratorCloseable<Long> getAddressIterator(String address) {
+        return null;
+    }
+
 }

@@ -1867,7 +1867,7 @@ public class BlockExplorer {
             output.put("released", "--");
             output.put("assetName", "--");
             output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
-                    .replace("%limit%", String.valueOf(limit))).replace("%assetName%", "--"));
+                    .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", "--"));
             output.put("Label_All_non",
                     (Lang.getInstance().translateFromLangObj("All non-empty %assetName% accounts (%count%)", langObj)
                             .replace("%assetName%", "--")).replace("%count%", String.valueOf(couter)));
@@ -1883,7 +1883,7 @@ public class BlockExplorer {
             output.put("released", asset.getReleased(dcSet).toPlainString());
             output.put("assetName", asset.getName());
             output.put("Label_Title", (Lang.getInstance().translateFromLangObj("Top %limit% %assetName% Richest", langObj)
-                    .replace("%limit%", String.valueOf(limit))).replace("%assetName%", asset.getName()));
+                    .replace("%limit%", String.valueOf(limit > 0 ? limit : ""))).replace("%assetName%", asset.getName()));
             output.put("Label_All_non",
                     (Lang.getInstance().translateFromLangObj("All non-empty %assetName% accounts (%count%)", langObj)
                             .replace("%assetName%", asset.getName())).replace("%count%", String.valueOf(couter)));
@@ -2008,7 +2008,7 @@ public class BlockExplorer {
             Trade trade = (Trade) unit;
 
             if (true) {
-                transactionDataJSON = trade.toJson(0);
+                transactionDataJSON = trade.toJson(0, false);
                 Order orderInitiator = trade.getInitiatorOrder(dcSet);
                 Order orderTarget = trade.getTargetOrder(dcSet);
                 AssetCls haveAsset = Controller.getInstance().getAsset(orderInitiator.getHaveAssetKey());
