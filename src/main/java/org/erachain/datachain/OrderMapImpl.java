@@ -227,6 +227,32 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
+    public List<Order> getOrdersForAddress(
+            String address) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return new ArrayList<>();
+        }
+        Iterator<Long> iterator = ((OrderSuit) map).getAddressIterator(address);
+
+        //GET ALL ORDERS FOR KEYS
+        List<Order> orders = new ArrayList<Order>();
+
+        while (iterator.hasNext()) {
+
+            Long key = iterator.next();
+            Order order = this.get(key);
+
+            // MAY BE NULLS!!!
+            if (order != null)
+                orders.add(this.get(key));
+        }
+
+        return orders;
+
+    }
+
+    @Override
     public boolean set(Long id, Order order) {
         if (BlockChain.CHECK_BUGS > 3) {
             if (((DCSet) this.getDBSet()).getCompletedOrderMap().contains(id)) {

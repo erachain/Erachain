@@ -160,9 +160,18 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
 
     @Override
     public IteratorCloseable<Long> getAddressHaveWantIterator(String address, long have, long want) {
+
         return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple5, Long>) this.addressHaveWantKeyMap).subMap(
                 Fun.t5(address, have, want, null, null),
                 Fun.t5(address, have, want, Fun.HI(), Fun.HI())).values().iterator());
+    }
+
+    @Override
+    public IteratorCloseable<Long> getAddressIterator(String address) {
+
+        return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple5, Long>) this.addressHaveWantKeyMap).subMap(
+                Fun.t5(address, null, null, null, null),
+                Fun.t5(address, Fun.HI(), Fun.HI(), Fun.HI(), Fun.HI())).values().iterator());
     }
 
     @Override

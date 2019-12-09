@@ -31,6 +31,8 @@ public interface OrderMap extends DBTab<Long, Order> {
 
     List<Order> getOrdersForAddress(String address, Long have, Long want);
 
+    List<Order> getOrdersForAddress(String address);
+
     void put(Order order);
 
     void delete(Order order);

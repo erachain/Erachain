@@ -28,5 +28,7 @@ public interface OrderSuit {
      */
     HashMap<Long, Order> getUnsortedEntries(long have, long want, BigDecimal limit, Map deleted);
 
+    IteratorCloseable<Long> getAddressIterator(String address);
     IteratorCloseable<Long> getAddressHaveWantIterator(String address, long have, long want);
+
 }
