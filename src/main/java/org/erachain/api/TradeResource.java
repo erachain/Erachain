@@ -66,7 +66,7 @@ public class TradeResource {
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
-        help.put("GET trade/tradesfrom/[have]/[want]/[address]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+        help.put("GET trade/tradesfrom/[address]/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
                 "Get trades for amountAssetKey & priceAssetKey for creator [address], "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
@@ -419,8 +419,8 @@ public class TradeResource {
     }
 
     @GET
-    @Path("tradesfrom/{have}/{want}/{address}")
-    public static String getTradesAddressFrom(@PathParam("have") Long have, @PathParam("want") Long want, @PathParam("address") String address,
+    @Path("tradesfrom/{address}/{have}/{want}")
+    public static String getTradesAddressFrom(@PathParam("address") String address, @PathParam("have") Long have, @PathParam("want") Long want,
                                               @QueryParam("height") Integer fromHeight,
                                               @QueryParam("order") String fromOrder,
                                               @DefaultValue("0") @QueryParam("time") Long fromTimestamp,

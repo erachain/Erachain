@@ -55,7 +55,7 @@ public class APIExchange {
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
-        help.put("GET apiexchange/tradesfrom/[amountAssetKey]/[priceAssetKey]/[address]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+        help.put("GET apiexchange/tradesfrom/[address]/[amountAssetKey]/[priceAssetKey]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
                 "Get trades for amountAssetKey & priceAssetKey for creator [address], "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
@@ -149,8 +149,8 @@ public class APIExchange {
     }
 
     @GET
-    @Path("tradesfrom/{have}/{want}/{address}")
-    public Response getTradesAddressFrom(@PathParam("have") Long have, @PathParam("want") Long want, @PathParam("address") String address,
+    @Path("tradesfrom/{address}/{have}/{want}")
+    public Response getTradesAddressFrom(@PathParam("address") String address, @PathParam("have") Long have, @PathParam("want") Long want,
                                          @QueryParam("height") Integer fromHeight,
                                          @QueryParam("order") String fromOrder,
                                          @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
@@ -166,7 +166,7 @@ public class APIExchange {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TradeResource.getTradesAddressFrom(have, want, address, fromHeight, fromOrder, fromTimestamp, limitInt))
+                .entity(TradeResource.getTradesAddressFrom(address, have, want, fromHeight, fromOrder, fromTimestamp, limitInt))
                 .build();
     }
 
