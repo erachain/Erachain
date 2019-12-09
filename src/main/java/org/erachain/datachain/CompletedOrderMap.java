@@ -17,8 +17,9 @@ public interface CompletedOrderMap extends DBTab<Long, Order> {
 
     List<Order> getOrdersByTimestamp(long have, long want, long startTimestamp, long stopTimestamp, int limit);
 
+    List<Order> getOrdersByOrderID(long have, long want, long start, long stop, int limit);
+
     List<Order> getOrdersByHeight(long have, long want, int start, int stop, int limit);
 
-    List<Order> getOrdersByOrderID(long have, long want, long startOrderID, long stopOrderID, int limit);
 
 }
