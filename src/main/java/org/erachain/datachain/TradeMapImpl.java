@@ -232,7 +232,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         List<Trade> trades = new ArrayList<Trade>();
         while (iterator.hasNext()) {
             trades.add(this.get(iterator.next()));
-            if (limit > 0 && counter-- < 0)
+            if (limit > 0 && --counter < 0)
                 break;
         }
 
@@ -254,7 +254,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         List<Trade> trades = new ArrayList<Trade>();
         while (iterator.hasNext()) {
             trades.add(this.get(iterator.next()));
-            if (limit > 0 && counter-- < 0)
+            if (limit > 0 && --counter < 0)
                 break;
         }
 

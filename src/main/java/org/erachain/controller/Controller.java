@@ -2783,6 +2783,19 @@ public class Controller extends Observable {
         return dcSet.getOrderMap().getOrdersForTrade(have, want, false);
     }
 
+    public List<Order> getOrdersByTimestamp(long have, long want, long timestamp, int limit) {
+        return dcSet.getCompletedOrderMap().getOrdersByTimestamp(have, want, timestamp, 0, limit);
+    }
+
+    public List<Order> getOrdersByOrderID(long have, long want, long orderID, int limit) {
+        return dcSet.getCompletedOrderMap().getOrdersByOrderID(have, want, orderID, 0, limit);
+    }
+
+    public List<Order> getOrdersByHeight(long have, long want, int height, int limit) {
+        // так как там обратный отсчет
+        return dcSet.getCompletedOrderMap().getOrdersByHeight(have, want, height, 0, limit);
+    }
+
     public List<Trade> getTradeByTimestamp(long have, long want, long timestamp, int limit) {
         return dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp, 0, limit);
     }
