@@ -29,9 +29,9 @@ public interface OrderMap extends DBTab<Long, Order> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     List<Order> getOrders(long have, long want, int limit);
 
-    List<Order> getOrdersForAddress(String address, Long have, Long want);
+    List<Order> getOrdersForAddress(String address, Long have, Long want, int limit);
 
-    List<Order> getOrdersForAddress(String address);
+    List<Order> getOrdersForAddress(String address, int limit);
 
     void put(Order order);
 

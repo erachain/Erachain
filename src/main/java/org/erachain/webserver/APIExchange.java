@@ -44,6 +44,9 @@ public class APIExchange {
         help.put("GET apiexchange/ordersbook/[have]/[want]?limit=[limit]",
                 "Get active orders in orderbook for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 20.");
+        help.put("GET apiexchange/ordersbyaddress/[address]?limit=[limit]",
+                "Get active orders in orderbook for creator address, "
+                        + "limit is count record. The number of orders is limited by input param, default 20.");
         help.put("GET apiexchange/completedordersfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
                 "Get completed orders for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 50."
@@ -80,6 +83,24 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(TradeResource.getOrdersBook(have, want, limit))
+                .build();
+    }
+
+
+    @GET
+    @Path("ordersbyaddress/{address}")
+    // orders/1/2?imit=4
+    public Response getOrdersByAddress(@PathParam("address") String address,
+                                       @DefaultValue("20") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 50)
+                limit = 50;
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(TradeResource.getByAddress(address, limit))
                 .build();
     }
 

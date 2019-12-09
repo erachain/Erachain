@@ -190,11 +190,12 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         }
         Iterator<Long> iterator = ((OrderSuit) map).getHaveWantIterator(have, want);
 
-        iterator = Iterators.limit(iterator, limit);
-
+        int counter = limit;
         List<Order> orders = new ArrayList<>();
         while (iterator.hasNext()) {
             orders.add(get(iterator.next()));
+            if (limit > 0 && --counter < 0)
+                break;
         }
 
         return orders;
@@ -202,7 +203,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public List<Order> getOrdersForAddress(
-            String address, Long have, Long want) {
+            String address, Long have, Long want, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
@@ -212,6 +213,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
+        int counter = limit;
         while (iterator.hasNext()) {
 
             Long key = iterator.next();
@@ -220,6 +222,9 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
             // MAY BE NULLS!!!
             if (order != null)
                 orders.add(this.get(key));
+
+            if (limit > 0 && --counter < 0)
+                break;
         }
 
         return orders;
@@ -227,8 +232,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
-    public List<Order> getOrdersForAddress(
-            String address) {
+    public List<Order> getOrdersForAddress(String address, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
@@ -238,6 +242,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
+        int counter = limit;
         while (iterator.hasNext()) {
 
             Long key = iterator.next();
@@ -246,6 +251,10 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
             // MAY BE NULLS!!!
             if (order != null)
                 orders.add(this.get(key));
+
+            if (limit > 0 && --counter < 0)
+                break;
+
         }
 
         return orders;
