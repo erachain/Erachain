@@ -370,7 +370,7 @@ public class TradeResource {
 
         JSONArray arrayJSON = new JSONArray();
         for (Trade trade: listResult) {
-            arrayJSON.add(trade.toJson(have));
+            arrayJSON.add(trade.toJson(have, false));
         }
 
         return arrayJSON.toJSONString();
@@ -412,7 +412,7 @@ public class TradeResource {
 
         JSONArray arrayJSON = new JSONArray();
         for (Trade trade: listResult) {
-            arrayJSON.add(trade.toJson(have));
+            arrayJSON.add(trade.toJson(have, true));
         }
 
         return arrayJSON.toJSONString();
@@ -458,7 +458,7 @@ public class TradeResource {
             Order initiator = trade.getInitiatorOrder(dcSet);
             Order target = trade.getTargetOrder(dcSet);
             if (initiator.getCreator().equals(address) || target.getCreator().equals(address)) {
-                arrayJSON.add(trade.toJson(have));
+                arrayJSON.add(trade.toJson(have, true));
             }
         }
 
@@ -510,8 +510,8 @@ public class TradeResource {
 
     @GET
     @Path("getbyaddress/{creator}/{amountAssetKey}/{priceAssetKey}")
-    public String cancel(@PathParam("creator") String address,
-                         @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey) {
+    public String getByAddress(@PathParam("creator") String address,
+                               @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey) {
 
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();

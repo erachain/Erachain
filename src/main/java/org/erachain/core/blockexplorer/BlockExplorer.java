@@ -2008,7 +2008,7 @@ public class BlockExplorer {
             Trade trade = (Trade) unit;
 
             if (true) {
-                transactionDataJSON = trade.toJson(0);
+                transactionDataJSON = trade.toJson(0, false);
                 Order orderInitiator = trade.getInitiatorOrder(dcSet);
                 Order orderTarget = trade.getTargetOrder(dcSet);
                 AssetCls haveAsset = Controller.getInstance().getAsset(orderInitiator.getHaveAssetKey());
