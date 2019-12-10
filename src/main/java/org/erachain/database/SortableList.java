@@ -58,20 +58,20 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Clos
 
     public static SortableList makeSortableList(DBTabImpl map, boolean descending, int limit) {
 
+        List keys = new ArrayList<Object>();
+
         // обрезаем полный список в базе до 1000
         try (IteratorCloseable iterator = map.getIterator(map.DEFAULT_INDEX, descending)) {
-
-            List keys = new ArrayList<Object>();
 
             int i = 0;
             while (iterator.hasNext() && i++ < limit) {
                 keys.add(iterator.next());
             }
 
-            return new SortableList(map, keys);
         } catch (IOException e) {
-
         }
+
+        return new SortableList(map, keys);
 
     }
 
