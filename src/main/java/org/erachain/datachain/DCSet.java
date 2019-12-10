@@ -48,15 +48,17 @@ public class DCSet extends DBASet {
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
     public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT;
 
+    // эти настройки по умолчанию при ФАСТ режиме пойдут
+
     /**
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
-    public static final int BLOCKS_MAP = DBS_MAP_DB;
+    public static final int BLOCKS_MAP = DBS_ROCK_DB;
     public static final int BLOCKS_MAP_FORK = DBS_NATIVE_MAP;
     /**
      * DBS_MAP_DB - slow then DBS_ROCK_DB
      */
-    public static final int FINAL_TX_MAP = DBS_MAP_DB;
+    public static final int FINAL_TX_MAP = DBS_ROCK_DB;
     public static final int FINAL_TX_MAP_FORK = DBS_NATIVE_MAP;
 
     /**
@@ -77,7 +79,7 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
      */
-    public static final int ACCOUNT_BALANCES = DBS_MAP_DB;
+    public static final int ACCOUNT_BALANCES = DBS_ROCK_DB;
     public static final int ACCOUNT_BALANCES_FORK = DBS_NATIVE_MAP;
 
     /**
@@ -85,8 +87,8 @@ public class DCSet extends DBASet {
      */
     public static final int ACCOUNTS_REFERENCES = DBS_MAP_DB;
 
-    public static final int ORDERS_MAP = DBS_MAP_DB;
-    public static final int COMPLETED_ORDERS_MAP = DBS_MAP_DB;
+    public static final int ORDERS_MAP = DBS_ROCK_DB;
+    public static final int COMPLETED_ORDERS_MAP = DBS_ROCK_DB;
     public static final int TRADES_MAP = DBS_MAP_DB;
 
     /**
@@ -199,41 +201,41 @@ public class DCSet extends DBASet {
 
         try {
             // переделанные таблицы
-            this.assetBalanceMap = new ItemAssetBalanceMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.assetBalanceMap = new ItemAssetBalanceMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ACCOUNT_BALANCES
                     , this, database);
 
-            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     FINAL_TX_MAP
                     , this, database);
 
             this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
 
-            this.referenceMap = new ReferenceMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.referenceMap = new ReferenceMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ACCOUNTS_REFERENCES
                     , this, database);
 
-            this.blockMap = new BlocksMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.blockMap = new BlocksMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     BLOCKS_MAP
                     , this, database);
 
-            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS > 0 ? defaultDBS :
+            this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     FINAL_TX_SIGNS_MAP
                     , this, database);
 
-            this.orderMap = new OrderMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.orderMap = new OrderMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ORDERS_MAP
                     , this, database);
 
-            this.completedOrderMap = new CompletedOrderMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.completedOrderMap = new CompletedOrderMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     COMPLETED_ORDERS_MAP
                     , this, database);
 
-            this.tradeMap = new TradeMapImpl(defaultDBS > 0 ? defaultDBS :
+            this.tradeMap = new TradeMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     TRADES_MAP
                     , this, database);
 
-            this.addressPersonMap = new AddressPersonMapImpl(defaultDBS > 0 ? defaultDBS : DBS_MAP_DB, this, database);
+            this.addressPersonMap = new AddressPersonMapImpl(defaultDBS != DBS_FAST ? defaultDBS : DBS_MAP_DB, this, database);
 
             this.actions = 0L;
 
