@@ -3616,6 +3616,8 @@ public class Controller extends Observable {
                         databaseSystem = DCSet.DBS_ROCK_DB;
                     } else if (dbsChain.equals("mapdb")) {
                         databaseSystem = DCSet.DBS_MAP_DB;
+                    } else if (dbsChain.equals("fast")) {
+                        databaseSystem = DCSet.DBS_FAST;
                     }
 
                 } catch (Exception e) {
