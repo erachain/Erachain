@@ -79,7 +79,7 @@ public class DCSet extends DBASet {
     /**
      * DBS_MAP_DB - good, DBS_ROCK_DB - very SLOW потому что BigDecimal 20 байт - хотя с -opi это не делаем
      */
-    public static final int ACCOUNT_BALANCES = DBS_ROCK_DB;
+    public static final int ACCOUNT_BALANCES = DBS_MAP_DB;
     public static final int ACCOUNT_BALANCES_FORK = DBS_NATIVE_MAP;
 
     /**
@@ -87,7 +87,7 @@ public class DCSet extends DBASet {
      */
     public static final int ACCOUNTS_REFERENCES = DBS_MAP_DB;
 
-    public static final int ORDERS_MAP = DBS_ROCK_DB;
+    public static final int ORDERS_MAP = DBS_MAP_DB;
     public static final int COMPLETED_ORDERS_MAP = DBS_ROCK_DB;
     public static final int TRADES_MAP = DBS_MAP_DB;
 
