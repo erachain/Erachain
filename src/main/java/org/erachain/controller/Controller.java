@@ -39,6 +39,7 @@ import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DLSet;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.*;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.AboutFrame;
 import org.erachain.gui.Gui;
 import org.erachain.gui.GuiTimer;
@@ -1263,93 +1264,94 @@ public class Controller extends Observable {
             return false;
 
         try {
-            Iterator<Long> iterator = map.getIterator(TransactionSuit.TIMESTAMP_INDEX, false);
-            long ping = 0;
-            int counter = 0;
-            ///////// big maxCounter freeze network and make bans on response
-            ///////// headers andblocks
-            int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
-            long dTime = this.blockChain.getTimestamp(this.dcSet);
-            boolean pinged = false;
-            long timePoint;
+            try (IteratorCloseable<Long> iterator = map.getIterator(TransactionSuit.TIMESTAMP_INDEX, false)) {
+                long ping = 0;
+                int counter = 0;
+                ///////// big maxCounter freeze network and make bans on response
+                ///////// headers andblocks
+                int stepCount = 64; // datachain.TransactionMap.MAX_MAP_SIZE>>2;
+                long dTime = this.blockChain.getTimestamp(this.dcSet);
+                boolean pinged = false;
+                long timePoint;
 
-            while (iterator.hasNext() && stepCount > 2 && peer.isUsed()) {
+                while (iterator.hasNext() && stepCount > 2 && peer.isUsed()) {
 
-                counter++;
+                    counter++;
 
-                if (this.isStopping) {
-                    return false;
-                }
-
-                if (map.isClosed())
-                    return false;
-                Transaction transaction = map.get(iterator.next());
-                if (transaction == null)
-                    continue;
-
-                // logger.error(" time " + transaction.viewTimestamp());
-
-                if (counter > BlockChain.ON_CONNECT_SEND_UNCONFIRMED_UNTIL
-                    // дело в том что при коннекте новому узлу надо все же
-                    // передавать все так как он может собрать пустой блок
-                    /////&& !map.needBroadcasting(transaction, peerByte)
-                )
-                    break;
-
-                try {
-                    Thread.sleep(1);
-                } catch (Exception e) {
-                }
-
-                Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
-
-                try {
-                    // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
-                    if (peer.directSendMessage(message)) {
-
-                        if (peer.getPing() > 300) {
-                            this.network.notifyObserveUpdatePeer(peer);
-                            LOGGER.debug(" bad ping " + peer.getPing() + "ms for:" + counter);
-
-                            try {
-                                Thread.sleep(1000);
-                            } catch (Exception e) {
-                            }
-                        }
-
-                    } else {
-                        return false;
-                    }
-                } catch (Exception e) {
                     if (this.isStopping) {
                         return false;
                     }
-                    LOGGER.error(e.getMessage(), e);
-                }
 
-                if (counter % stepCount == 0) {
+                    if (map.isClosed())
+                        return false;
+                    Transaction transaction = map.get(iterator.next());
+                    if (transaction == null)
+                        continue;
 
-                    pinged = true;
-                    //peer.tryPing();
-                    //this.network.notifyObserveUpdatePeer(peer);
-                    ping = peer.getPing();
+                    // logger.error(" time " + transaction.viewTimestamp());
 
-                    if (ping < 0 || ping > 300) {
+                    if (counter > BlockChain.ON_CONNECT_SEND_UNCONFIRMED_UNTIL
+                        // дело в том что при коннекте новому узлу надо все же
+                        // передавать все так как он может собрать пустой блок
+                        /////&& !map.needBroadcasting(transaction, peerByte)
+                    )
+                        break;
 
-                        stepCount >>= 1;
-
-                        try {
-                            Thread.sleep(2000);
-                        } catch (Exception e) {
-                        }
-
-                        LOGGER.debug(peer + " stepCount down " + stepCount);
-
-                    } else if (ping < 100) {
-                        stepCount <<= 1;
-                        LOGGER.debug(peer + " stepCount UP " + stepCount + " for PING: " + ping);
+                    try {
+                        Thread.sleep(1);
+                    } catch (Exception e) {
                     }
 
+                    Message message = MessageFactory.getInstance().createTransactionMessage(transaction);
+
+                    try {
+                        // воспользуемся тут прямой пересылкой - так как нам надо именно ждать всю обработку
+                        if (peer.directSendMessage(message)) {
+
+                            if (peer.getPing() > 300) {
+                                this.network.notifyObserveUpdatePeer(peer);
+                                LOGGER.debug(" bad ping " + peer.getPing() + "ms for:" + counter);
+
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (Exception e) {
+                                }
+                            }
+
+                        } else {
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        if (this.isStopping) {
+                            return false;
+                        }
+                        LOGGER.error(e.getMessage(), e);
+                    }
+
+                    if (counter % stepCount == 0) {
+
+                        pinged = true;
+                        //peer.tryPing();
+                        //this.network.notifyObserveUpdatePeer(peer);
+                        ping = peer.getPing();
+
+                        if (ping < 0 || ping > 300) {
+
+                            stepCount >>= 1;
+
+                            try {
+                                Thread.sleep(2000);
+                            } catch (Exception e) {
+                            }
+
+                            LOGGER.debug(peer + " stepCount down " + stepCount);
+
+                        } else if (ping < 100) {
+                            stepCount <<= 1;
+                            LOGGER.debug(peer + " stepCount UP " + stepCount + " for PING: " + ping);
+                        }
+
+                    }
                 }
             }
 

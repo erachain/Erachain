@@ -3,10 +3,10 @@ package org.erachain.datachain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.Pair;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredByStringArray {
@@ -43,12 +43,12 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    Iterator getKeysByTitleAndType(String filter, Integer type, int offset, int limit);
+    IteratorCloseable<Long> getKeysByTitleAndType(String filter, Integer type, int offset, int limit);
 
-    Pair<Integer, Iterator<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray);
+    Pair<Integer, IteratorCloseable<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    Pair<String, Iterator> getKeysIteratorByFilterAsArray(String filter, int offset, int limit);
+    Pair<String, IteratorCloseable<Long>> getKeysIteratorByFilterAsArray(String filter, int offset, int limit);
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -56,7 +56,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    Iterator getIteratorByAddress(String address);
+    IteratorCloseable<Long> getIteratorByAddress(String address);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
@@ -79,8 +79,8 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
                               int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    Iterator findTransactionsKeys(String address, String sender, String recipient, int minHeight,
-                                  int maxHeight, int type, int service, boolean desc, int offset, int limit);
+    IteratorCloseable<Long> findTransactionsKeys(String address, String sender, String recipient, int minHeight,
+                                                 int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     byte[] getSignature(int hight, int seg);

@@ -23,6 +23,7 @@ import org.erachain.core.voting.Poll;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.*;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.*;
@@ -36,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
@@ -1800,30 +1802,32 @@ public class BlockExplorer {
         List<Tuple3<String, BigDecimal, BigDecimal>> top100s = new ArrayList<Tuple3<String, BigDecimal, BigDecimal>>();
 
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        Iterator<byte[]> iterator = map.getIteratorByAsset(assetKey);
-
         //BigDecimal total = BigDecimal.ZERO;
         //BigDecimal totalNeg = BigDecimal.ZERO;
-
         byte[] key;
         Crypto crypto = Crypto.getInstance();
-        while (iterator.hasNext()) {
-            key = iterator.next();
 
-            try {
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                        ballance = map.get(key);
+        try (IteratorCloseable<byte[]> iterator = map.getIteratorByAsset(assetKey)) {
+            while (iterator.hasNext()) {
+                key = iterator.next();
 
-                BigDecimal balanceUSE = ballance.a.b.add(ballance.b.b);
+                try {
+                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                            ballance = map.get(key);
 
-                // пустые не берем
-                if (ballance.a.b.signum() == 0 && ballance.b.b.signum() == 0 && ballance.c.b.signum() == 0)
-                    continue;
+                    BigDecimal balanceUSE = ballance.a.b.add(ballance.b.b);
 
-                top100s.add(Fun.t3(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)), balanceUSE, ballance.a.b));
-            } catch (java.lang.ArrayIndexOutOfBoundsException e) {
-                logger.error("Wrong key raw: ");
+                    // пустые не берем
+                    if (ballance.a.b.signum() == 0 && ballance.b.b.signum() == 0 && ballance.c.b.signum() == 0)
+                        continue;
+
+                    top100s.add(Fun.t3(crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key)), balanceUSE, ballance.a.b));
+                } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+                    logger.error("Wrong key raw: ");
+                }
             }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
 
         Collection<Order> orders = dcSet.getOrderMap().getOrders(assetKey);
@@ -1945,43 +1949,46 @@ public class BlockExplorer {
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
 
         TreeMap balAssets = new TreeMap();
-        Iterator<byte[]> iterator = map.getIteratorByAccount(account);
         byte[] key;
-        if (iterator != null) {
-            while (iterator.hasNext()) {
+        try (IteratorCloseable<byte[]> iterator = map.getIteratorByAccount(account)) {
+            if (iterator != null) {
+                while (iterator.hasNext()) {
 
-                key = iterator.next();
+                    key = iterator.next();
 
-                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
-                if (assetKey == AssetCls.LIA_KEY) {
-                    continue;
+                    long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+                    if (assetKey == AssetCls.LIA_KEY) {
+                        continue;
+                    }
+
+                    AssetCls asset = assetsMap.get(assetKey);
+                    if (asset == null)
+                        continue;
+
+                    Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                            itemBals = map.get(key);
+
+                    if (itemBals == null)
+                        continue;
+
+                    Map bal = new LinkedHashMap();
+                    bal.put("asset_key", assetKey);
+                    bal.put("asset_name", asset.viewName());
+
+                    if (BlockChain.ERA_COMPU_ALL_UP) {
+                        bal.put("balance_1", itemBals.a.b.add(account.addDEVAmount(assetKey)));
+                    } else {
+                        bal.put("balance_1", itemBals.a.b);
+                    }
+
+                    bal.put("balance_2", itemBals.b.b);
+                    bal.put("balance_3", itemBals.c.b);
+                    bal.put("balance_4", itemBals.d.b);
+                    balAssets.put("" + assetKey, bal);
                 }
-
-                AssetCls asset = assetsMap.get(assetKey);
-                if (asset == null)
-                    continue;
-
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
-                        itemBals = map.get(key);
-
-                if (itemBals == null)
-                    continue;
-
-                Map bal = new LinkedHashMap();
-                bal.put("asset_key", assetKey);
-                bal.put("asset_name", asset.viewName());
-
-                if (BlockChain.ERA_COMPU_ALL_UP) {
-                    bal.put("balance_1", itemBals.a.b.add(account.addDEVAmount(assetKey)));
-                } else {
-                    bal.put("balance_1", itemBals.a.b);
-                }
-
-                bal.put("balance_2", itemBals.b.b);
-                bal.put("balance_3", itemBals.c.b);
-                bal.put("balance_4", itemBals.d.b);
-                balAssets.put("" + assetKey, bal);
             }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
 
         output.put("balances", balAssets);
@@ -2472,16 +2479,19 @@ public class BlockExplorer {
         JSONArray tradesArray = new JSONArray();
 
         int count = 25;
-        Iterator<Tuple2<Long, Long>> iterator = trades.getIterator(0, true);
 
-        while (count-- > 0 && iterator.hasNext()) {
-            Tuple2<Long, Long> key = iterator.next();
-            Trade trade = trades.get(key);
-            if (trade == null) {
-                Long error = null;
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = trades.getIterator(0, true)) {
+            while (count-- > 0 && iterator.hasNext()) {
+                Tuple2<Long, Long> key = iterator.next();
+                Trade trade = trades.get(key);
+                if (trade == null) {
+                    Long error = null;
+                }
+
+                tradesArray.add(tradeJSON(trade, null, null));
             }
-
-            tradesArray.add(tradeJSON(trade, null, null));
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
         }
 
         output.put("lastTrades", tradesArray);
@@ -2522,16 +2532,18 @@ public class BlockExplorer {
         List<Transaction> transactions;
         if (filterStr != null) {
             //transactions = map.getTransactionsByTitleAndType(filterStr, null, size, true);
-            Pair<String, Iterator> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
+            Pair<String, IteratorCloseable<Long>> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
             if (pair.getA() != null) {
                 output.put("error", pair.getA());
                 return;
             }
 
             transactions = new ArrayList<>();
-            Iterator iterator = pair.getB();
-            while (iterator.hasNext()) {
-                transactions.add(map.get((Long) iterator.next()));
+            try (IteratorCloseable iterator = pair.getB()) {
+                while (iterator.hasNext()) {
+                    transactions.add(map.get((Long) iterator.next()));
+                }
+            } catch (IOException e) {
             }
 
             if (Base58.isExtraSymbols(filterStr)) {
@@ -2559,22 +2571,25 @@ public class BlockExplorer {
 
         } else {
             // берем все с перебором с последней
-            Iterator<Long> iterator = map.getIterator(0, true);
-            int counter = size;
             transactions = new ArrayList<>();
-            //if (useForge) counter <<=1;
-            while (iterator.hasNext() && counter > 0 ) {
+            try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
+                int counter = size;
+                //if (useForge) counter <<=1;
+                while (iterator.hasNext() && counter > 0) {
 
-                Transaction transaction = map.get(iterator.next());
-                if (transaction == null)
-                    continue;
+                    Transaction transaction = map.get(iterator.next());
+                    if (transaction == null)
+                        continue;
 
-                if (!useForge && transaction.getType() == Transaction.CALCULATED_TRANSACTION
-                        && ((RCalculated)transaction).getMessage().equals("forging"))
-                    continue;
+                    if (!useForge && transaction.getType() == Transaction.CALCULATED_TRANSACTION
+                            && ((RCalculated) transaction).getMessage().equals("forging"))
+                        continue;
 
-                transactions.add(transaction);
-                counter--;
+                    transactions.add(transaction);
+                    counter--;
+                }
+            } catch (IOException e) {
+
             }
         }
 

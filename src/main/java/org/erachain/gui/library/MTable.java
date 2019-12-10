@@ -4,7 +4,6 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.models.RendererBoolean;
 import org.erachain.gui.models.RendererRight;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -150,7 +149,8 @@ public class MTable<U, T> extends JTable {
             }
         }
 
-        Iterator<Tuple2<Tuple3<U, RowFilter<TableModel, T>, ComparisonType>, Tuple3<U, RowFilter<TableModel, T>, ComparisonType>>> s = filters.values().iterator();
+        Iterator<Tuple2<Tuple3<U, RowFilter<TableModel, T>, ComparisonType>, Tuple3<U, RowFilter<TableModel, T>, ComparisonType>>>
+                s = filters.values().iterator();
         List<RowFilter<TableModel, T>> rowfolters = new ArrayList();
         while (s.hasNext()) {
             Tuple2<Tuple3<U, RowFilter<TableModel, T>, ComparisonType>, Tuple3<U, RowFilter<TableModel, T>, ComparisonType>> a = s.next();
