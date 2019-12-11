@@ -102,6 +102,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
+    // TODO кстати показало что скорость Получить данные очень медллоеный при просчете РАЗМЕРА в getTransactionFinalMapSigns - может для РоксДБ оставить тут счетчик?
     public int size() {
         return ((DCSet) this.databaseSet).getTransactionFinalMapSigns().size();
     }
