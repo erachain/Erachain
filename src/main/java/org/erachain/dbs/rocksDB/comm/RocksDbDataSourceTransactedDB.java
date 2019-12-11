@@ -37,11 +37,13 @@ public class RocksDbDataSourceTransactedDB extends RocksDbDataSourceTransactione
 
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
+        dbOptions = new DBOptions(options);
         dbCore = TransactionDB.open(options, transactionDbOptions, getDbPathAndFile().toString());
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
+        this.dbOptions = dbOptions;
         dbCore = TransactionDB.open(dbOptions, transactionDbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
     }
 

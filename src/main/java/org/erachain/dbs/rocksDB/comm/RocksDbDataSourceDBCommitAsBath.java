@@ -38,12 +38,14 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
 
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
+        dbOptions = new DBOptions(options);
         dbCore = RocksDB.open(options, getDbPathAndFile().toString());
         writeBatch = new WriteBatchWithIndex(true);
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
+        this.dbOptions = dbOptions;
         dbCore = RocksDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
         writeBatch = new WriteBatchWithIndex(true);
     }
@@ -88,7 +90,14 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            return writeBatch.getFromBatchAndDB(dbCore, readOptions, key) != null;
+            // быстрая проверка - потенциально он может содержаться в базе?
+            if (!dbCore.keyMayExist(key, inCache)) {
+                // тогда еще пакет проверим
+                return writeBatch.getFromBatch(dbOptions, key) != null;
+            }
+
+            // возможность что есть, все равно проверим
+            return writeBatch.getFromBatch(dbOptions, key) != null || dbCore.get(key) != null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -99,6 +108,46 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
 
     @Override
     public boolean contains(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        if (quitIfNotAlive()) {
+            return false;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            // быстрая проверка - потенциально он может содержаться в базе?
+            // быстрая проверка - потенциально он может содержаться в базе?
+            if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
+                // тогда еще пакет проверим
+                return writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null;
+            }
+
+            // возможность что есть, все равно проверим
+            return writeBatch.getFromBatch(dbOptions, key) != null || dbCore.get(columnFamilyHandle, key) != null;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return false;
+    }
+
+    //@Override
+    public boolean contains2(byte[] key) {
+        if (quitIfNotAlive()) {
+            return false;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return writeBatch.getFromBatchAndDB(dbCore, readOptions, key) != null;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return false;
+    }
+
+    //@Override
+    public boolean contains2(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return false;
         }

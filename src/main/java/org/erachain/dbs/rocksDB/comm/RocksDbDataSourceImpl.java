@@ -44,6 +44,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     //protected boolean dbSync = true;
 
     public WriteOptions writeOptions;
+    public DBOptions dbOptions;
     protected boolean enableSize;
 
     /**
