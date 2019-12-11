@@ -34,13 +34,7 @@ public class RockStoreIterator implements DBIterator {
   @Override
   public void finalize() {
     close();
-    try {
-      /// сообщим о том что объект не закрывали вручную
-      Long err = null;
-      err++;
-    } catch (Exception e) {
-      logger.warn("FINALIZE used", e);
-    }
+    logger.warn("FINALIZE used");
   }
 
   @Override

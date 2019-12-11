@@ -704,23 +704,23 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (minHeight != 0 || maxHeight != 0) {
-            iterator = (IteratorCloseable) Iterators.filter(iterator, new Predicate<Long>() {
+            iterator = IteratorCloseableImpl.make(Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
                     return (minHeight == 0 || pair.a >= minHeight) && (maxHeight == 0 || pair.a <= maxHeight);
                 }
-            });
+            }));
         }
 
         if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
-            iterator = (IteratorCloseable) Iterators.filter(iterator, new Predicate<Long>() {
+            iterator = IteratorCloseableImpl.make(Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     ArbitraryTransaction tx = (ArbitraryTransaction) map.get(key);
                     return tx.getService() == service;
                 }
-            });
+            }));
         }
 
         if (desc) {
@@ -734,7 +734,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         Iterators.advance(iterator, offset);
 
-        return limit > 0 ? (IteratorCloseable) Iterators.limit(iterator, limit) : iterator;
+        return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
     }
 
     @Override

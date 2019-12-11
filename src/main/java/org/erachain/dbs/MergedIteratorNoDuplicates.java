@@ -53,7 +53,7 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     }
 
     @Override
-    public synchronized T next() {
+    public T next() {
         do {
             PeekingIteratorCloseable<T> nextIter = queue.remove();
             T next = nextIter.next();
@@ -64,7 +64,7 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
                 lastNext = next;
                 break;
             }
-        } while (true);
+        } while (!queue.isEmpty());
 
         return lastNext;
     }
