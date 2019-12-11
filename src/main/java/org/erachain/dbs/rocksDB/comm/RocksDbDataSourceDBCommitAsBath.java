@@ -40,7 +40,6 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = RocksDB.open(options, getDbPathAndFile().toString());
         writeBatch = new WriteBatchWithIndex(true);
-        // создаем позже открытия иначе крах
         dbOptions = new DBOptions(options);
     }
 
@@ -94,11 +93,15 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(key, inCache)) {
                 // тогда еще пакет проверим
-                return writeBatch.getFromBatch(dbOptions, key) != null;
+                try (DBOptions optionsDB = new DBOptions(dbOptions)) {
+                    return writeBatch.getFromBatch(optionsDB, key) != null;
+                }
             }
 
             // возможность что есть, все равно проверим
-            return writeBatch.getFromBatch(dbOptions, key) != null || dbCore.get(key) != null;
+            try (DBOptions optionsDB = new DBOptions(dbOptions)) {
+                return writeBatch.getFromBatch(optionsDB, key) != null || dbCore.get(key) != null;
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -117,11 +120,15 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
                 // тогда еще пакет проверим
-                return writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null;
+                try (DBOptions optionsDB = new DBOptions(dbOptions)) {
+                    return writeBatch.getFromBatch(columnFamilyHandle, optionsDB, key) != null;
+                }
             }
 
             // возможность что есть, все равно проверим
-            return writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null || dbCore.get(columnFamilyHandle, key) != null;
+            try (DBOptions optionsDB = new DBOptions(dbOptions)) {
+                return writeBatch.getFromBatch(columnFamilyHandle, optionsDB, key) != null || dbCore.get(columnFamilyHandle, key) != null;
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {

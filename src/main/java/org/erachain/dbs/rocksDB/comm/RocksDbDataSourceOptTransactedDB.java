@@ -46,7 +46,6 @@ public class RocksDbDataSourceOptTransactedDB extends RocksDbDataSourceTransacti
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
         dbCore = OptimisticTransactionDB.open(options, getDbPathAndFile().toString());
-        // создаем позже открытия иначе крах
         dbOptions = new DBOptions(options);
     }
 
