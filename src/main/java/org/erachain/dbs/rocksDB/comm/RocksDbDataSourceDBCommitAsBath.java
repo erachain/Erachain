@@ -83,6 +83,8 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
     }
 
+    DBOptions optionsDBcont = new DBOptions();
+
     @Override
     public boolean contains(byte[] key) {
         if (quitIfNotAlive()) {
@@ -93,15 +95,11 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(key, inCache)) {
                 // тогда еще пакет проверим
-                try (DBOptions optionsDB = new DBOptions(dbOptions)) {
-                    return writeBatch.getFromBatch(optionsDB, key) != null;
-                }
+                return writeBatch.getFromBatch(optionsDBcont, key) != null;
             }
 
             // возможность что есть, все равно проверим
-            try (DBOptions optionsDB = new DBOptions(dbOptions)) {
-                return writeBatch.getFromBatch(optionsDB, key) != null || dbCore.get(key) != null;
-            }
+            return writeBatch.getFromBatch(optionsDBcont, key) != null || dbCore.get(key) != null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -120,47 +118,11 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
                 // тогда еще пакет проверим
-                try (DBOptions optionsDB = new DBOptions(dbOptions)) {
-                    return writeBatch.getFromBatch(columnFamilyHandle, optionsDB, key) != null;
-                }
+                return writeBatch.getFromBatch(columnFamilyHandle, optionsDBcont, key) != null;
             }
 
             // возможность что есть, все равно проверим
-            try (DBOptions optionsDB = new DBOptions(dbOptions)) {
-                return writeBatch.getFromBatch(columnFamilyHandle, optionsDB, key) != null || dbCore.get(columnFamilyHandle, key) != null;
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            resetDbLock.readLock().unlock();
-        }
-        return false;
-    }
-
-    //@Override
-    public boolean contains2(byte[] key) {
-        if (quitIfNotAlive()) {
-            return false;
-        }
-        resetDbLock.readLock().lock();
-        try {
-            return writeBatch.getFromBatchAndDB(dbCore, readOptions, key) != null;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            resetDbLock.readLock().unlock();
-        }
-        return false;
-    }
-
-    //@Override
-    public boolean contains2(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
-        if (quitIfNotAlive()) {
-            return false;
-        }
-        resetDbLock.readLock().lock();
-        try {
-            return writeBatch.getFromBatchAndDB(dbCore, columnFamilyHandle, readOptions, key) != null;
+            return writeBatch.getFromBatch(columnFamilyHandle, optionsDBcont, key) != null || dbCore.get(columnFamilyHandle, key) != null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
