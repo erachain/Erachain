@@ -120,7 +120,7 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             }
 
             // возможность что есть, все равно проверим
-            return writeBatch.getFromBatch(dbOptions, key) != null || dbCore.get(columnFamilyHandle, key) != null;
+            return writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null || dbCore.get(columnFamilyHandle, key) != null;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
