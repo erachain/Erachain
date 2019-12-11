@@ -182,7 +182,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
         List<Calculated> txs = new ArrayList<>();
         int counter = 0;
-        try (IteratorCloseable iterator = new IteratorCloseableImpl(Fun.filter(this.recipientKey, address).iterator())) {
+        try (IteratorCloseable iterator = IteratorCloseableImpl.make(Fun.filter(this.recipientKey, address).iterator())) {
             while (iterator.hasNext() && (limit == 0 || counter < limit)) {
                 txs.add(this.map.get(iterator.next()));
                 counter++;

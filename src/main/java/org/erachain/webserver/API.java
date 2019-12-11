@@ -341,7 +341,6 @@ public class API {
     }
 
     @GET
-    // 		this.getIterator(23, true)
     @Path("blockbyheight2/{height}")
     public Response blockByHeight2(@PathParam("height") String heightStr) {
 

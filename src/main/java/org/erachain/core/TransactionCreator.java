@@ -128,7 +128,6 @@ public class TransactionCreator {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
             }
         }
 

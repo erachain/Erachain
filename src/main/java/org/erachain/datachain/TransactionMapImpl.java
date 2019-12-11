@@ -466,7 +466,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             iteratorMerged = Iterators.limit(iteratorMerged, limit);
         }
 
-        return new IteratorCloseableImpl(iteratorMerged);
+        return IteratorCloseableImpl.make(iteratorMerged);
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,

@@ -8,6 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDB;
 import org.erachain.dbs.mapDB.ItemAssetBalanceSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
@@ -190,7 +191,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
                 Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>(this, keys);
     }
 
-    public Iterator<byte[]> getIteratorByAccount(Account account) {
+    public IteratorCloseable<byte[]> getIteratorByAccount(Account account) {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
@@ -199,7 +200,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
 
     }
 
-    public Iterator<byte[]> getIteratorByAsset(long assetKey) {
+    public IteratorCloseable<byte[]> getIteratorByAsset(long assetKey) {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             return null;
@@ -207,12 +208,7 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (assetKey < 0)
             assetKey = -assetKey;
 
-        if (map instanceof ItemAssetBalanceSuitRocksDB) {
-            //FILTER ALL KEYS
-            return ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
-        } else {
-            return ((ItemAssetBalanceSuit) map).assetKeys(assetKey).iterator();
-        }
+        return ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
 
     }
 

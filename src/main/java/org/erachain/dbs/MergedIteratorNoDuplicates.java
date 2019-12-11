@@ -1,9 +1,7 @@
 package org.erachain.dbs;
 
-import com.google.common.collect.UnmodifiableIterator;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.Closeable;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -15,11 +13,16 @@ import java.util.Queue;
  * @param <T>
  */
 @Slf4j
-public class MergedIteratorNoDuplicates<T> extends UnmodifiableIterator<T> implements Closeable {
+public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
 
     final Queue<PeekingIteratorCloseable<T>> queue;
     protected T lastNext;
     final Comparator<? super T> itemComparator;
+
+    protected MergedIteratorNoDuplicates() {
+        queue = null;
+        itemComparator = null;
+    }
 
     public MergedIteratorNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
                                       final Comparator<? super T> itemComparator) {
@@ -63,6 +66,12 @@ public class MergedIteratorNoDuplicates<T> extends UnmodifiableIterator<T> imple
         } while (true);
 
         return lastNext;
+    }
+
+    @Deprecated
+    @Override
+    public final void remove() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -13,9 +13,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.dbs.DBTab;
-import org.erachain.dbs.DBTabImpl;
-import org.erachain.dbs.MergedIteratorNoDuplicates;
+import org.erachain.dbs.*;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDB;
 import org.erachain.dbs.mapDB.TransactionFinalSuitMapDBFork;
 import org.erachain.dbs.nativeMemMap.NativeMapTreeMapFork;
@@ -27,6 +25,7 @@ import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
+import java.io.IOException;
 import java.util.*;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
@@ -308,7 +307,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Iterator getKeysByTitleAndType(String filter, Integer type, int offset, int limit) {
+    public IteratorCloseable<Long> getKeysByTitleAndType(String filter, Integer type, int offset, int limit) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -322,26 +321,26 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         //        new Tuple2<String, Integer>(filtrLower + new String(new byte[]{(byte)254}),
         //                type==0?Integer.MAX_VALUE:type), true);
 
-        Iterator iterator = ((TransactionFinalSuit) map).getIteratorByTitleAndType(filter, true, type);
+        IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByTitleAndType(filter, true, type);
 
         if (offset > 0)
             Iterators.advance(iterator, offset);
 
         if (limit > 0)
-            iterator = Iterators.limit(iterator, limit);
+            iterator = IteratorCloseableImpl.limit(iterator, limit);
 
         return iterator;
 
     }
 
     @Override
-    public Pair<Integer, Iterator<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
+    public Pair<Integer, IteratorCloseable<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        Iterator iterator;
+        IteratorCloseable iterator;
 
         String stepFilter = filterArray[step];
         if (!stepFilter.endsWith("!")) {
@@ -385,7 +384,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (step > 0) {
 
             // погнали в РЕКУРСИЮ
-            Pair<Integer, Iterator<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
+            Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
 
             if (result.getA() > 0) {
                 return result;
@@ -404,7 +403,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         } else {
 
-            return new Pair<Integer, Iterator<Long>>(0, iterator);
+            return new Pair<Integer, IteratorCloseable<Long>>(0, iterator);
 
         }
 
@@ -422,7 +421,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, Iterator> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
+    public Pair<String, IteratorCloseable<Long>> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -430,18 +429,18 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         String[] filterArray = filter.toLowerCase().split(DCSet.SPLIT_CHARS);
 
-        Pair<Integer, Iterator<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
+        Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
         if (result.getA() > 0) {
             return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
         }
 
-        Iterator<Long> iterator = result.getB();
+        IteratorCloseable<Long> iterator = result.getB();
 
         if (offset > 0)
             Iterators.advance(iterator, offset);
 
         if (limit > 0)
-            iterator = Iterators.limit(iterator, limit);
+            iterator = IteratorCloseableImpl.limit(iterator, limit);
 
         return new Pair<>(null, iterator);
 
@@ -459,22 +458,23 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return new ArrayList<>();
         }
 
-        Pair<String, Iterator> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        Pair<String, IteratorCloseable<Long>> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
         if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }
 
         List<Long> result = new ArrayList<>();
 
-        Iterator<Long> iterator = resultKeys.getB();
+        try (IteratorCloseable<Long> iterator = resultKeys.getB()) {
 
-        while (iterator.hasNext()) {
-            Long key = iterator.next();
-            Transaction item = get(key);
-            if (item != null)
-                result.add(key);
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                Transaction item = get(key);
+                if (item != null)
+                    result.add(key);
+            }
+        } catch (IOException e) {
         }
-
         return result;
     }
 
@@ -491,18 +491,20 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return new ArrayList<>();
         }
 
-        Pair<String, Iterator> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
+        Pair<String, IteratorCloseable<Long>> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
         if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }
 
         List<Transaction> result = new ArrayList<>();
 
-        Iterator<Long> iterator = resultKeys.getB();
+        try (IteratorCloseable<Long> iterator = resultKeys.getB()) {
 
-        while (iterator.hasNext()) {
-            Transaction item = get(iterator.next());
-            result.add(item);
+            while (iterator.hasNext()) {
+                Transaction item = get(iterator.next());
+                result.add(item);
+            }
+        } catch (IOException e) {
         }
 
         return result;
@@ -511,7 +513,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Iterator getIteratorByAddress(String address) {
+    public IteratorCloseable getIteratorByAddress(String address) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
@@ -644,14 +646,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public Iterator<Long> findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
-                                               final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
+    public IteratorCloseable findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
+                                                  final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
-        Iterator<Long> senderKeys = null;
-        Iterator<Long> recipientKeys = null;
-        Iterator<Long> iterator;
+        IteratorCloseable<Long> senderKeys = null;
+        IteratorCloseable<Long> recipientKeys = null;
 
         if (address != null) {
             sender = address;
@@ -659,7 +660,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (sender == null && recipient == null) {
-            return new TreeSet<Long>().iterator();
+            return IteratorCloseableImpl.make(new TreeSet<Long>().iterator());
         }
 
         if (sender != null) {
@@ -685,6 +686,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             }
         }
 
+        IteratorCloseable<Long> iterator;
         if (address != null || sender != null && recipient != null) {
             // просто добавляет в конец iterator = Iterators.concat(senderKeys, recipientKeys);
             // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR).iterator();
@@ -697,11 +699,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } else if (recipient != null) {
             iterator = recipientKeys;
         } else {
-            iterator = new TreeSet<Long>().iterator();
+            iterator = IteratorCloseableImpl.make(new TreeSet<Long>().iterator());
         }
 
         if (minHeight != 0 || maxHeight != 0) {
-            iterator = Iterators.filter(iterator, new Predicate<Long>() {
+            iterator = (IteratorCloseable) Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
@@ -711,7 +713,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (false && type == Transaction.ARBITRARY_TRANSACTION && service != 0) {
-            iterator = Iterators.filter(iterator, new Predicate<Long>() {
+            iterator = (IteratorCloseable) Iterators.filter(iterator, new Predicate<Long>() {
                 @Override
                 public boolean apply(Long key) {
                     ArbitraryTransaction tx = (ArbitraryTransaction) map.get(key);
@@ -721,13 +723,17 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         if (desc) {
-            //iterator = ((TreeSet) iterator).descendingIterator();
-            iterator = Lists.reverse(Lists.newArrayList(iterator)).iterator();
+            // нужно старый Итератор закрыть и в переменную закатывать новый итератора уже
+            // иначе память может не освободитсья в РоксДБ
+            try (IteratorCloseable iteratorForClose = iterator) {
+                iterator = IteratorCloseableImpl.make(Lists.reverse(Lists.newArrayList(iteratorForClose)).iterator());
+            } catch (IOException e) {
+            }
         }
 
         Iterators.advance(iterator, offset);
 
-        return limit > 0 ? Iterators.limit(iterator, limit) : iterator;
+        return limit > 0 ? (IteratorCloseable) Iterators.limit(iterator, limit) : iterator;
     }
 
     @Override
