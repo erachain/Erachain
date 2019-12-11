@@ -34,18 +34,20 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
       // Safe to cast <? extends T> to <T> because Impl only uses T
       // covariantly (and cannot be subclassed to add non-covariant uses).
       @SuppressWarnings("unchecked")
-      IteratorCloseableImpl<T> closable = (IteratorCloseableImpl<T>) iterator;
+      IteratorCloseable<T> closable = (IteratorCloseable<T>) iterator;
       return closable;
     }
     return new IteratorCloseableImpl<T>(iterator);
   }
 
+  /// нужно обязательно освобождать память, см https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
   @Override
   public void close() {
     if (iterator instanceof IteratorCloseable) {
       try {
         ((IteratorCloseable) iterator).close();
       } catch (IOException e) {
+        logger.error(e.getMessage(), e);
       }
     }
   }
@@ -53,6 +55,7 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
   @Override
   public void finalize() {
     close();
+    logger.warn("FINALIZE used");
   }
 
   @Override

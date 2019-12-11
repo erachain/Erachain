@@ -3,6 +3,7 @@ package org.erachain.dbs;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -39,7 +40,7 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
         queue = new PriorityQueue<PeekingIteratorCloseable<T>>(2, heapComparator);
         this.itemComparator = itemComparator;
 
-        for (IteratorCloseable<? extends T> iterator : iterators) {
+        for (Iterator<? extends T> iterator : iterators) {
             if (iterator.hasNext()) {
                 queue.add(new PeekingIteratorCloseable(iterator));
             }
@@ -84,13 +85,6 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     @Override
     public void finalize() {
         close();
-        try {
-            /// сообщим о том что объект не закрывали вручную
-            Long err = null;
-            err++;
-        } catch (Exception e) {
-            logger.warn("FINALIZE used", e);
-        }
     }
 
 }

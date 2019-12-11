@@ -6,15 +6,21 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Iterator;
 
 @Slf4j
 public class PeekingIteratorCloseable<T> implements PeekingIterator<T>, Closeable {
 
-    private PeekingIterator<T> iteratorPeeking;
     private IteratorCloseable<T> parentIterator;
+    private PeekingIterator<T> iteratorPeeking;
 
     PeekingIteratorCloseable(IteratorCloseable iterator) {
         this.parentIterator = iterator;
+        this.iteratorPeeking = Iterators.peekingIterator(iterator);
+    }
+
+    PeekingIteratorCloseable(Iterator iterator) {
+        this.parentIterator = IteratorCloseableImpl.make(iterator);
         this.iteratorPeeking = Iterators.peekingIterator(iterator);
     }
 
@@ -29,13 +35,7 @@ public class PeekingIteratorCloseable<T> implements PeekingIterator<T>, Closeabl
     @Override
     public void finalize() {
         close();
-        try {
-            /// сообщим о том что объект не закрывали вручную
-            Long err = null;
-            err++;
-        } catch (Exception e) {
-            logger.warn("FINALIZE used", e);
-        }
+        logger.warn("FINALIZE used");
     }
 
     @Override
