@@ -114,7 +114,6 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         resetDbLock.readLock().lock();
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
-            // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
                 // тогда еще пакет проверим
                 return writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null;
