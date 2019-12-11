@@ -74,6 +74,10 @@ public class API {
         help.put("see /apiexchange", "Help for exchange API");
         help.put("see /apirecords", "Help for transactions API");
 
+        help.put("*** BALANCE SYSTEM ***", "");
+        help.put("bal 1", "Balance Components - {Total_Income, Remaining_Balance]");
+        help.put("bal 2", "Balances Array - [Balance in Own, Balance in Debt, Balance on Hold, Balance of Consumer]");
+
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
         help.put("GET First Block", "firstblock");
