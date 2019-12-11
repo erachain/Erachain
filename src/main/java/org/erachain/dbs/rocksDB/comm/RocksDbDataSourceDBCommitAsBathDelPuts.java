@@ -51,18 +51,19 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
 
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        dbOptions = new DBOptions(options);
         dbCore = RocksDB.open(options, getDbPathAndFile().toString());
         writeBatch = new WriteBatchWithIndex(true);
+        // создаем позже открытия иначе крах
+        dbOptions = new DBOptions(options);
         deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        this.dbOptions = dbOptions;
         dbCore = RocksDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
         writeBatch = new WriteBatchWithIndex(true);
+        this.dbOptions = dbOptions;
         deleted = new TreeSet<>(Fun.BYTE_ARRAY_COMPARATOR);
         puts = new TreeMap<>(Fun.BYTE_ARRAY_COMPARATOR);
     }

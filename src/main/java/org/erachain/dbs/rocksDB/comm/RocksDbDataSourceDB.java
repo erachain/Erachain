@@ -29,14 +29,15 @@ public class RocksDbDataSourceDB extends RocksDbDataSourceImpl {
 
     @Override
     protected void createDB(Options options, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        dbOptions = new DBOptions(options);
         dbCore = RocksDB.open(options, getDbPathAndFile().toString());
+        // создаем позже открытия иначе крах
+        dbOptions = new DBOptions(options);
     }
 
     @Override
     protected void openDB(DBOptions dbOptions, List<ColumnFamilyDescriptor> columnFamilyDescriptors) throws RocksDBException {
-        this.dbOptions = dbOptions;
         dbCore = RocksDB.open(dbOptions, getDbPathAndFile().toString(), columnFamilyDescriptors, columnFamilyHandles);
+        this.dbOptions = dbOptions;
 
     }
 }
