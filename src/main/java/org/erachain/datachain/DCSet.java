@@ -207,7 +207,7 @@ public class DCSet extends DBASet {
 
             this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     FINAL_TX_MAP
-                    , this, database);
+                    , this, database, false);
 
             this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
 
@@ -221,7 +221,7 @@ public class DCSet extends DBASet {
 
             this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     FINAL_TX_SIGNS_MAP
-                    , this, database);
+                    , this, database, true);
 
             this.orderMap = new OrderMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ORDERS_MAP
@@ -381,7 +381,7 @@ public class DCSet extends DBASet {
 
         this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
                 FINAL_TX_SIGNS_MAP_FORK
-                , parent.transactionFinalMapSigns, this);
+                , parent.transactionFinalMapSigns, this, true);
 
         this.orderMap = new OrderMapImpl(
                 DBS_MAP_DB

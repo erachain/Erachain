@@ -18,8 +18,8 @@ import java.util.Iterator;
 @Slf4j
 public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionFinalSuit {
 
-    public TransactionFinalSuitRocksDBFork(TransactionFinalMap parent, DBASet databaseSet, boolean sizeEnable) {
-        super(parent, databaseSet, logger, sizeEnable, null);
+    public TransactionFinalSuitRocksDBFork(TransactionFinalMap parent, DBASet databaseSet) {
+        super(parent, databaseSet, logger, false, null);
     }
 
     @Override

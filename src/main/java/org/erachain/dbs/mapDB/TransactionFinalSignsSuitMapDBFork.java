@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.TransactionFinalMapSigns;
 import org.erachain.datachain.TransactionFinalMapSignsSuit;
+import org.mapdb.DB;
 import org.mapdb.Hasher;
 import org.mapdb.SerializerBase;
 
@@ -30,8 +31,8 @@ public class TransactionFinalSignsSuitMapDBFork extends DBMapSuitFork<byte[], Lo
         implements TransactionFinalMapSignsSuit {
 
 
-    public TransactionFinalSignsSuitMapDBFork(TransactionFinalMapSigns parent, DBASet databaseSet) {
-        super(parent, databaseSet, logger, true, null);
+    public TransactionFinalSignsSuitMapDBFork(TransactionFinalMapSigns parent, DBASet databaseSet, boolean sizeEnable) {
+        super(parent, databaseSet, logger, sizeEnable, null);
     }
 
     @Override
@@ -40,13 +41,18 @@ public class TransactionFinalSignsSuitMapDBFork extends DBMapSuitFork<byte[], Lo
         if (database == null) {
             map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());
         } else {
+
             // HASH map is so QUICK
-            map = database.createHashMap("signature_final_tx")
+            DB.HTreeMapMaker mapConstruct = database.createHashMap("signature_final_tx")
                     .keySerializer(SerializerBase.BYTE_ARRAY)
                     .hasher(Hasher.BYTE_ARRAY)
-                    .valueSerializer(SerializerBase.LONG)
-                    .counterEnable()
-                    .makeOrGet();
+                    .valueSerializer(SerializerBase.LONG);
+
+            if (sizeEnable)
+                mapConstruct = mapConstruct.counterEnable();
+
+            map = mapConstruct.makeOrGet();
+
         }
     }
 

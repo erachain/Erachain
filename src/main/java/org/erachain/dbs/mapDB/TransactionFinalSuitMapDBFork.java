@@ -38,8 +38,8 @@ import java.util.Iterator;
 public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transaction>
         implements TransactionFinalSuit {
 
-    public TransactionFinalSuitMapDBFork(TransactionFinalMap parent, DBASet databaseSet, boolean sizeEnable) {
-        super(parent, databaseSet, logger, sizeEnable, null);
+    public TransactionFinalSuitMapDBFork(TransactionFinalMap parent, DBASet databaseSet) {
+        super(parent, databaseSet, logger, false, null);
     }
 
     @Override
@@ -51,7 +51,6 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
                 .keySerializer(BasicKeySerializer.BASIC)
                 //.keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
                 .valueSerializer(new TransactionSerializer())
-                ///.counterEnable()
                 .makeOrGet();
 
     }
