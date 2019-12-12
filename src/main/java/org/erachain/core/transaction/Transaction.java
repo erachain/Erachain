@@ -370,6 +370,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected long timestamp;
     protected PublicKeyAccount creator;
 
+    /**
+     * если да то значит взята из Пула трнзакций и на двойную трату проверялась
+     */
+    public boolean checkedByPool;
+
     // need for genesis
     protected Transaction(byte type, String type_name) {
         this.typeBytes = new byte[]{type, 0, 0, 0}; // for GENESIS
@@ -1302,6 +1307,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
+                && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
                 && this.signature != null
                 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии

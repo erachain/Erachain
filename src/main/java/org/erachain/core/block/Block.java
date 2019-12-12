@@ -1656,7 +1656,10 @@ import java.util.*;
                     // TRY QUCK check SIGNATURE by FIND in POOL
                     try {
                         if (!unconfirmedMap.isClosed() && unconfirmedMap.contains(transactionSignature)) {
-                            isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature));
+                            if (isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature))) {
+                                // если трнзакция была в пуле ожидания - она уде провернная на Дубль
+                                transaction.checkedByPool = true;
+                            }
                         } else {
                             unconfirmedMap = dcSetPlace.getTransactionTab();
                         }
