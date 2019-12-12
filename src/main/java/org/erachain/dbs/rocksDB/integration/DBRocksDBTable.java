@@ -20,7 +20,6 @@ import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
 import org.rocksdb.ReadOptions;
-import org.rocksdb.RocksDBException;
 import org.rocksdb.WriteOptions;
 
 import java.io.File;
@@ -409,10 +408,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             if (old != null && old.length > 0) {
                 // UPDATE SIZE
                 // быстро возьмем
-                try {
-                    dbSource.getDbCore().get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
-                } catch (RocksDBException e) {
-                }
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
                 ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
@@ -444,10 +440,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             if (old != null && old.length > 0) {
                 // UPDATE SIZE
                 // быстро возьмем
-                try {
-                    dbSource.getDbCore().get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
-                } catch (RocksDBException e) {
-                }
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
                 ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
@@ -484,10 +477,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             if (old != null && old.length > 0) {
                 // UPDATE SIZE
                 // быстро возьмем
-                try {
-                    dbSource.getDbCore().get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
-                } catch (RocksDBException e) {
-                }
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
                 ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
@@ -520,10 +510,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             if (old != null && old.length > 0) {
                 // UPDATE SIZE
                 // быстро возьмем
-                try {
-                    dbSource.getDbCore().get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
-                } catch (RocksDBException e) {
-                }
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
                 ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
