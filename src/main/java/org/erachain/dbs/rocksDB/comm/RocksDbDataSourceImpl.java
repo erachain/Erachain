@@ -43,6 +43,7 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
     //protected boolean dbSync = true;
 
+    Options options;
     public WriteOptions writeOptions;
     public DBOptions dbOptions;
     protected boolean enableSize;
@@ -52,7 +53,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
      */
     @Getter
     public RocksDB dbCore;
-    Options options;
 
     protected boolean alive;
     protected String pathName;
@@ -474,6 +474,9 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     final StringBuilder inCache = new StringBuilder();
+    DBOptions optionsDBcont = (options == null ? new DBOptions() : new DBOptions(options)).setAllowMmapReads(true);
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+    byte[] containsBuff = new byte[0];
 
     @Override
     public boolean contains(byte[] key) {
@@ -484,8 +487,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCore.get(key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -503,8 +506,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCore.get(columnFamilyHandle, key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCore.get(columnFamilyHandle, optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {

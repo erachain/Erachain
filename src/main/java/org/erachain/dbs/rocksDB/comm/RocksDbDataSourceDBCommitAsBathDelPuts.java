@@ -127,8 +127,8 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
             }
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCore.get(key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -157,7 +157,7 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) return false;
             // теперь ищем по настоящему
-            return dbCore.get(columnFamilyHandle, key) != null;
+            return dbCore.get(columnFamilyHandle, optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
