@@ -974,7 +974,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     @Override
     public int size() {
         if (enableSize) {
-            byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            try {
+                // быстро возьмем
+                dbCore.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
+            } catch (RocksDBException e) {
+            }
             return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
         } else return -1;
     }

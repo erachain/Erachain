@@ -990,16 +990,17 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     // опции для быстрого чтения
     ReadOptions optionsReadDBcont = new ReadOptions(false, false);
-    byte[] sizeBytes = new byte[4];
 
     @Override
     public int size() {
-        try {
-            // быстро возьмем
-            dbCore.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
-        } catch (RocksDBException e) {
-        }
-        return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
+        if (enableSize) {
+            try {
+                // быстро возьмем
+                dbCore.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
+            } catch (RocksDBException e) {
+            }
+            return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
+        } else return -1;
     }
 
     @Override

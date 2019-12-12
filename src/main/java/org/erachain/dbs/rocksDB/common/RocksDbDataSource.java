@@ -110,6 +110,8 @@ public interface RocksDbDataSource {
 
     boolean deleteDbBakPath(String dir);
 
+    byte[] sizeBytes = new byte[4];
+
     int size();
 
     boolean isEmpty();

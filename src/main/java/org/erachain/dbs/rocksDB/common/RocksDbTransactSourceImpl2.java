@@ -467,6 +467,10 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
      * if a value is found in block-cache
      */
     final StringBuilder inCache = new StringBuilder();
+    DBOptions optionsDBcont = new DBOptions().setAllowMmapReads(true);
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+    byte[] containsBuff = new byte[0];
+
     @Override
     public boolean contains(byte[] key) {
         if (quitIfNotAlive()) {
@@ -476,8 +480,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCoreParent.keyMayExist(key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCoreParent.get(key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCoreParent.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -495,8 +499,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCoreParent.keyMayExist(columnFamilyHandle, key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCoreParent.get(columnFamilyHandle, key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCoreParent.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -930,10 +934,6 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     public boolean deleteDbBakPath(String dir) {
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
-
-    // опции для быстрого чтения
-    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
-    byte[] sizeBytes = new byte[4];
 
     @Override
     public int size() {
