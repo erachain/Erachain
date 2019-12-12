@@ -28,7 +28,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
+import static org.erachain.dbs.rocksDB.common.RocksDbDataSource.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.rocksdb.RocksDB.loadLibrary;
 
@@ -279,10 +279,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
             if (!oldExist) {
 
-                try {
-                    dbSource.getDbCore().get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
-                } catch (RocksDBException e) {
-                }
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
@@ -325,10 +322,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
             if (oldExist) {
                 // быстро возьмем
-                try {
-                    dbSource.getDbCore().get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
-                } catch (RocksDBException e) {
-                }
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
                 ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;

@@ -36,7 +36,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
-    public static final byte[] SIZE_BYTE_KEY = new byte[]{0};
 
     //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
@@ -533,6 +532,22 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
@@ -540,6 +555,22 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         resetDbLock.readLock().lock();
         try {
             return dbCore.get(columnFamilyHandle, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(columnFamilyHandle, readOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -971,13 +1002,15 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public int size() {
         if (enableSize) {
             try {
-                // быстро возьмем
-                dbCore.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
+                sizeBytes = dbCore.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
             } catch (RocksDBException e) {
+                e.printStackTrace();
             }
             return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
         } else return -1;

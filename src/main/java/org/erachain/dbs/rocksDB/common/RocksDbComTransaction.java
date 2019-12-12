@@ -69,7 +69,17 @@ public class RocksDbComTransaction implements RocksDbCom, TransactedThrows
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) throws RocksDBException {
+        return dbTransaction.get(readOptions, key);
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) throws RocksDBException {
+        return dbTransaction.get(columnFamilyHandle, readOptions, key);
+    }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) throws RocksDBException {
         return dbTransaction.get(columnFamilyHandle, readOptions, key);
     }
 

@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.erachain.utils.ByteArrayUtils.areEqualMask;
 
@@ -526,6 +525,22 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
@@ -533,6 +548,22 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         try {
             return dbCore.get(columnFamilyHandle, transactReadOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(columnFamilyHandle, readOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -934,6 +965,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     public boolean deleteDbBakPath(String dir) {
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
+
+    byte[] sizeBytes = new byte[4];
 
     @Override
     public int size() {
