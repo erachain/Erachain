@@ -988,9 +988,17 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
+    // опции для быстрого чтения
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public int size() {
-        byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+        try {
+            // быстро возьмем
+            dbCore.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY, sizeBytes);
+        } catch (RocksDBException e) {
+        }
         return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
     }
 
