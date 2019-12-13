@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Slf4j
 public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
   protected Iterator<? extends T> iterator;
+  protected boolean isClosed;
 
   protected IteratorCloseableImpl() {
   }
@@ -49,13 +50,18 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
       } catch (IOException e) {
         logger.error(e.getMessage(), e);
       }
+      isClosed = true;
     }
   }
 
   @Override
-  public void finalize() {
-    close();
-    logger.warn("FINALIZE used");
+  public void finalize() throws Throwable {
+    if (!isClosed) {
+      close();
+      logger.warn("FINALIZE used");
+    }
+
+    super.finalize();
   }
 
   @Override
