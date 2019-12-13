@@ -187,6 +187,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 dbOptions.setCreateMissingColumnFamilies(true);
                                 dbOptions.setIncreaseParallelism(3);
                                 dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
+
+                                //dbOptions.setNumLevels(settings.getLevelNumber());
+                                //dbOptions.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
+                                //dbOptions.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
+
                                 dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
                                 dbOptions.setAllowConcurrentMemtableWrite(true);
                                 dbOptions.setMaxManifestFileSize(0);
