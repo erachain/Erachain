@@ -474,7 +474,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
 
     final StringBuilder inCache = new StringBuilder();
     DBOptions optionsDBcont = (options == null ? new DBOptions() : new DBOptions(options)).setAllowMmapReads(true);
-    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false)
+            .setIgnoreRangeDeletions(true).setReadaheadSize(100);
     byte[] containsBuff = new byte[0];
 
     @Override

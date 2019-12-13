@@ -24,11 +24,11 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
     public void openMap() {
 
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableTrivial(), new ByteableLong(), NAME_TABLE, indexes,
-                RocksDbSettings.initCustomSettings(7, 64, 32,
-                        256, 10,
-                        1, 256, 32, false),
+                RocksDbSettings.initCustomSettings(2, 640, 8,
+                        56, 30,
+                        2, 256, 1, true),
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(false, false),
+                new ReadOptions(false, false).setReadaheadSize(100).setFillCache(false),
                 databaseSet, sizeEnable);
     }
 
