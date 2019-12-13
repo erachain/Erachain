@@ -13,6 +13,7 @@ public class PeekingIteratorCloseable<T> implements PeekingIterator<T>, Closeabl
 
     private IteratorCloseable<T> parentIterator;
     private PeekingIterator<T> iteratorPeeking;
+    private boolean isClosed;
 
     PeekingIteratorCloseable(IteratorCloseable iterator) {
         this.parentIterator = iterator;
@@ -30,12 +31,16 @@ public class PeekingIteratorCloseable<T> implements PeekingIterator<T>, Closeabl
             parentIterator.close();
         } catch (IOException e) {
         }
+        isClosed = true;
     }
 
     @Override
-    public void finalize() {
-        close();
-        logger.warn("FINALIZE used");
+    public void finalize() throws Throwable {
+        if (!isClosed) {
+            close();
+            logger.warn("FINALIZE used");
+        }
+        super.finalize();
     }
 
     @Override

@@ -12,6 +12,7 @@ public class IteratorCloseableImpl<K> implements IteratorCloseable<K> {
 
     private DBIterator iterator;
     private Byteable byteableKey;
+    private boolean isClosed;
 
 
     public IteratorCloseableImpl(DBIterator iterator, Byteable byteableKey) {
@@ -27,11 +28,16 @@ public class IteratorCloseableImpl<K> implements IteratorCloseable<K> {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
+        isClosed = true;
     }
+
     @Override
-    public void finalize() {
-        close();
-        logger.warn("FINALIZE used");
+    public void finalize() throws Throwable {
+        if (!isClosed) {
+            close();
+            logger.warn("FINALIZE used");
+        }
+        super.finalize();
     }
 
     @Override

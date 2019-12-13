@@ -511,6 +511,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         DBIterator iterator = dbSource.iterator(descending, isIndex);
         return new IteratorCloseable<K>() {
             /// нужно обязательно освобождать память, см https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+            boolean isClosed;
             @Override
             public void close() {
                 try {
@@ -518,6 +519,16 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                 }
+                isClosed = true;
+            }
+
+            @Override
+            public void finalize() throws Throwable {
+                if (!isClosed) {
+                    close();
+                    logger.warn("FINALIZE used");
+                }
+                super.finalize();
             }
             @Override
             public boolean hasNext() {
@@ -535,6 +546,7 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         DBIterator iterator = dbSource.indexIterator(descending, indexDB, isIndex);
         return new IteratorCloseable<K>() {
             /// нужно обязательно освобождать память, см https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
+            boolean isClosed;
             @Override
             public void close() {
                 try {
@@ -542,6 +554,16 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                 }
+                isClosed = true;
+            }
+
+            @Override
+            public void finalize() throws Throwable {
+                if (!isClosed) {
+                    close();
+                    logger.warn("FINALIZE used");
+                }
+                super.finalize();
             }
             @Override
             public boolean hasNext() {
