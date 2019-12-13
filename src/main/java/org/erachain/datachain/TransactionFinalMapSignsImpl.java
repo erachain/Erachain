@@ -20,9 +20,9 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implements TransactionFinalMapSigns {
 
     /**
-     * Задает обрезание длинны подписи - чень меньше тем быстрее поиск и запись но больше вероятность повтора и отклонения
+     * Задает обрезание длинны подписи - чем меньше тем быстрее поиск и запись но больше вероятность повтора и отклонения
      */
-    public static int KEY_LEN = 6;
+    public static int KEY_LEN = 8;
 
     public TransactionFinalMapSignsImpl(int dbs, DCSet databaseSet, DB database, boolean sizeEnable) {
         super(dbs, databaseSet, database, sizeEnable);
