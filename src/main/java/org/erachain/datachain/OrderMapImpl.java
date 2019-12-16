@@ -9,12 +9,14 @@ import org.erachain.core.item.assets.OrderComparatorForTradeReverse;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.mapDB.OrdersSuitMapDB;
 import org.erachain.dbs.mapDB.OrdersSuitMapDBFork;
 import org.erachain.dbs.rocksDB.OrdersSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -77,7 +79,11 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
-        return Iterators.size(((OrderSuit) map).getHaveWantIterator(have, want));
+        try (IteratorCloseable iterator = ((OrderSuit) map).getHaveWantIterator(have, want)) {
+            return Iterators.size(iterator);
+        } catch (IOException e) {
+            return 0;
+        }
     }
 
     @Override
@@ -85,12 +91,20 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
-        return Iterators.size(((OrderSuit) map).getHaveWantIterator(have));
+        try (IteratorCloseable iterator = ((OrderSuit) map).getHaveWantIterator(have)) {
+            return Iterators.size(iterator);
+        } catch (IOException e) {
+            return 0;
+        }
     }
 
     @Override
     public long getCountWant(long want) {
-        return Iterators.size(((OrderSuit) map).getWantHaveIterator(want));
+        try (IteratorCloseable iterator = ((OrderSuit) map).getWantHaveIterator(want)) {
+            return Iterators.size(iterator);
+        } catch (IOException e) {
+            return 0;
+        }
     }
 
     @Override
@@ -103,16 +117,18 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
 
-        Iterator<Long> iterator = ((OrderSuit) map).getHaveWantIterator(haveWant);
-
-        while (iterator.hasNext()) {
-            orders.add(map.get(iterator.next()));
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getHaveWantIterator(haveWant)) {
+            while (iterator.hasNext()) {
+                orders.add(map.get(iterator.next()));
+            }
+        } catch (IOException e) {
         }
 
-        iterator = ((OrderSuit) map).getWantHaveIterator(haveWant);
-
-        while (iterator.hasNext()) {
-            orders.add(map.get(iterator.next()));
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getWantHaveIterator(haveWant)) {
+            while (iterator.hasNext()) {
+                orders.add(map.get(iterator.next()));
+            }
+        } catch (IOException e) {
         }
 
         return orders;
@@ -188,14 +204,17 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
         }
-        Iterator<Long> iterator = ((OrderSuit) map).getHaveWantIterator(have, want);
 
-        int counter = limit;
         List<Order> orders = new ArrayList<>();
-        while (iterator.hasNext()) {
-            orders.add(get(iterator.next()));
-            if (limit > 0 && --counter < 0)
-                break;
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getHaveWantIterator(have, want)) {
+
+            int counter = limit;
+            while (iterator.hasNext()) {
+                orders.add(get(iterator.next()));
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        } catch (IOException e) {
         }
 
         return orders;
@@ -208,23 +227,26 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
         }
-        Iterator<Long> iterator = ((OrderSuit) map).getAddressHaveWantIterator(address, have, want);
 
-        //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getAddressHaveWantIterator(address, have, want)) {
 
-        int counter = limit;
-        while (iterator.hasNext()) {
+            //GET ALL ORDERS FOR KEYS
 
-            Long key = iterator.next();
-            Order order = this.get(key);
+            int counter = limit;
+            while (iterator.hasNext()) {
 
-            // MAY BE NULLS!!!
-            if (order != null)
-                orders.add(this.get(key));
+                Long key = iterator.next();
+                Order order = this.get(key);
 
-            if (limit > 0 && --counter < 0)
-                break;
+                // MAY BE NULLS!!!
+                if (order != null)
+                    orders.add(this.get(key));
+
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        } catch (IOException e) {
         }
 
         return orders;
@@ -237,24 +259,26 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
         if (Controller.getInstance().onlyProtocolIndexing) {
             return new ArrayList<>();
         }
-        Iterator<Long> iterator = ((OrderSuit) map).getAddressIterator(address);
 
-        //GET ALL ORDERS FOR KEYS
         List<Order> orders = new ArrayList<Order>();
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getAddressIterator(address)) {
 
-        int counter = limit;
-        while (iterator.hasNext()) {
+            //GET ALL ORDERS FOR KEYS
+            int counter = limit;
+            while (iterator.hasNext()) {
 
-            Long key = iterator.next();
-            Order order = this.get(key);
+                Long key = iterator.next();
+                Order order = this.get(key);
 
-            // MAY BE NULLS!!!
-            if (order != null)
-                orders.add(this.get(key));
+                // MAY BE NULLS!!!
+                if (order != null)
+                    orders.add(this.get(key));
 
-            if (limit > 0 && --counter < 0)
-                break;
+                if (limit > 0 && --counter < 0)
+                    break;
 
+            }
+        } catch (IOException e) {
         }
 
         return orders;
