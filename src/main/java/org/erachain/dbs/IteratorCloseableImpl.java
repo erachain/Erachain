@@ -50,8 +50,8 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
       } catch (IOException e) {
         logger.error(e.getMessage(), e);
       }
-      isClosed = true;
     }
+    isClosed = true;
   }
 
   @Override
@@ -76,7 +76,7 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
 
 
   public static <T> IteratorCloseable<T> limit(
-          final Iterator<T> iterator, final int limitSize) {
+          final IteratorCloseable<T> iterator, final int limitSize) {
     checkNotNull(iterator);
     checkArgument(limitSize >= 0, "limit is negative");
     return new IteratorCloseableImpl<T>(iterator) {
@@ -99,6 +99,26 @@ public class IteratorCloseableImpl<T> implements IteratorCloseable<T> {
       @Override
       public void remove() {
         iterator.remove();
+      }
+
+      @Override
+      public void close() {
+        try {
+          ((IteratorCloseable) iterator).close();
+        } catch (IOException e) {
+          logger.error(e.getMessage(), e);
+        }
+        isClosed = true;
+      }
+
+      @Override
+      public void finalize() throws Throwable {
+        if (!isClosed) {
+          close();
+          logger.warn("FINALIZE used");
+        }
+
+        super.finalize();
       }
 
     };

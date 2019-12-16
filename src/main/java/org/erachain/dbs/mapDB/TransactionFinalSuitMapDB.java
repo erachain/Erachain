@@ -22,6 +22,7 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Function2;
 import org.mapdb.Fun.Tuple2;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -169,9 +170,11 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     public void deleteForBlock(Integer height) {
-        Iterator<Long> iterator = getBlockIterator(height);
-        while (iterator.hasNext()) {
-            map.remove(iterator.next());
+        try (IteratorCloseable<Long> iterator = getBlockIterator(height)) {
+            while (iterator.hasNext()) {
+                map.remove(iterator.next());
+            }
+        } catch (IOException e) {
         }
     }
 

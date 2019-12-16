@@ -98,52 +98,6 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         }
     }
 
-    /**
-     * Используется для получения транзакций для сборки блока
-     * Поидее нужно братьв се что есть без учета времени протухания для сборки блока своего
-     * @param timestamp
-     * @param notSetDCSet
-     * @param cutDeadTime true is need filter by Dead Time
-     * @return
-     */
-    public List<Transaction> getSubSet(long timestamp, boolean notSetDCSet, boolean cutDeadTime) {
-
-        List<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = this.getTimestampIterator(false);
-        Transaction transaction;
-        int count = 0;
-        int bytesTotal = 0;
-        Long key;
-        while (iterator.hasNext()) {
-            key = iterator.next();
-            transaction = this.map.get(key);
-
-            if (cutDeadTime && transaction.getDeadline() < timestamp)
-                continue;
-            if (transaction.getTimestamp() > timestamp)
-                // мы используем отсортированный индекс, поэтому можно обрывать
-                break;
-
-            if (++count > BlockChain.MAX_BLOCK_SIZE_GEN)
-                break;
-
-            bytesTotal += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            if (bytesTotal > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN
-                ///+ (BlockChain.MAX_BLOCK_SIZE_BYTE >> 3)
-            ) {
-                break;
-            }
-
-            if (!notSetDCSet)
-                transaction.setDC((DCSet)databaseSet);
-
-            values.add(transaction);
-
-        }
-
-        return values;
-    }
-
     public void setTotalDeleted(int value) { totalDeleted = value; }
     public int getTotalDeleted() { return totalDeleted; }
 
@@ -193,40 +147,40 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                  * по несколько секунд итератор берется - при том что таблица пустая -
                  * - дале COMPACT не помогает
                  */
-                //Iterator<Long> iterator = this.getIterator(TIMESTAMP_INDEX, false);
-                //Iterator<Tuple2<?, Long>> iterator = map.getIterator(TIMESTAMP_INDEX, false);
-                Iterator<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false);
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
-                }
-
-                Transaction transaction;
-
-                tickerIter = System.currentTimeMillis();
-                long size = this.map.size();
-                tickerIter = System.currentTimeMillis() - tickerIter;
-                if (tickerIter > 10) {
-                    LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
-                }
-                while (iterator.hasNext()) {
-                    Long key = iterator.next();
-                    transaction = this.map.get(key);
-                    if (transaction == null) {
-                        // такая ошибка уже было
-                        break;
+                try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false)) {
+                    tickerIter = System.currentTimeMillis() - tickerIter;
+                    if (tickerIter > 10) {
+                        LOGGER.debug("TAKE ITERATOR: " + tickerIter + " ms");
                     }
 
-                    long deadline = transaction.getDeadline();
-                    if (deadline < timestamp
-                            || size - deletions >
-                            (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3
-                                    : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
-                        this.delete(key);
-                        deletions++;
-                    } else {
-                        break;
+                    Transaction transaction;
+
+                    tickerIter = System.currentTimeMillis();
+                    long size = this.map.size();
+                    tickerIter = System.currentTimeMillis() - tickerIter;
+                    if (tickerIter > 10) {
+                        LOGGER.debug("TAKE ITERATOR.SIZE: " + tickerIter + " ms");
                     }
+                    while (iterator.hasNext()) {
+                        Long key = iterator.next();
+                        transaction = this.map.get(key);
+                        if (transaction == null) {
+                            // такая ошибка уже было
+                            break;
+                        }
+
+                        long deadline = transaction.getDeadline();
+                        if (deadline < timestamp
+                                || size - deletions >
+                                (cutMaximum ? BlockChain.MAX_UNCONFIGMED_MAP_SIZE >> 3
+                                        : BlockChain.MAX_UNCONFIGMED_MAP_SIZE)) {
+                            this.delete(key);
+                            deletions++;
+                        } else {
+                            break;
+                        }
+                    }
+                } catch (IOException e) {
                 }
 
                 long ticker = System.currentTimeMillis() - realTime;
@@ -363,12 +317,16 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         List<Long> treeKeys = new ArrayList<Long>();
 
         // DESCENDING + 1000
-        Iterator iterator =((TransactionSuit)map).getTimestampIterator(true);
-        Iterators.advance(iterator, (int)fromKey);
-        Iterator<Long> iteratorLimit = Iterators.limit(iterator, (int) (toKey - fromKey));
+        try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(true)) {
 
-        while (iteratorLimit.hasNext()) {
-            treeKeys.add(iteratorLimit.next());
+            Iterators.advance(iterator, (int) fromKey);
+
+            Iterator<Long> iteratorLimited = IteratorCloseableImpl.limit(iterator, (int) (toKey - fromKey));
+
+            while (iteratorLimited.hasNext()) {
+                treeKeys.add(iteratorLimited.next());
+            }
+        } catch (IOException e) {
         }
 
         return treeKeys;
@@ -399,8 +357,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                                                   int type, boolean desc, int offset, int limit, long timestamp) {
         IteratorCloseable senderKeys = null;
         IteratorCloseable recipientKeys = null;
-        //TreeSet<Object> iterator = new TreeSet<>();
-        IteratorCloseable iterator; // = new TreeSet<>().iterator();
+        IteratorCloseable iterator;
 
         if (address != null) {
             sender = address;
@@ -429,7 +386,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             }
         }
 
-        Iterator iteratorMerged;
+        IteratorCloseable iteratorMerged;
         if (address != null) {
             //iterator.addAll(Sets.newTreeSet(senderKeys));
             //iterator = senderKeys;
@@ -450,12 +407,16 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
             //iterator.addAll(Sets.newTreeSet(recipientKeys));
             iteratorMerged = recipientKeys;
         } else {
-            iteratorMerged = new TreeSet<>().iterator();
+            iteratorMerged = new IteratorCloseableImpl(new TreeSet<>().iterator());
         }
 
         if (desc) {
             //keys = ((TreeSet) iterator).descendingSet();
-            iteratorMerged = Lists.reverse(Lists.newArrayList(iteratorMerged)).iterator();
+            /// закроем по выходу итератор так как тут новый делается
+            try (IteratorCloseable mergedOld = iteratorMerged) {
+                iteratorMerged = new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(iteratorMerged)).iterator());
+            } catch (IOException e) {
+            }
         }
 
         if (offset > 0) {
@@ -463,10 +424,10 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         }
 
         if (limit > 0) {
-            iteratorMerged = Iterators.limit(iteratorMerged, limit);
+            iteratorMerged = IteratorCloseableImpl.limit(iteratorMerged, limit);
         }
 
-        return IteratorCloseableImpl.make(iteratorMerged);
+        return iteratorMerged;
     }
 
     public List<Transaction> findTransactions(String address, String sender, String recipient,
@@ -476,7 +437,6 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
                 type, desc, offset, limit, timestamp)) {
             return getUnconfirmedTransaction(keys);
         } catch (IOException e) {
-            e.printStackTrace();
         }
 
         return null;
@@ -499,58 +459,59 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     // TODO выдает ошибку на шаге treeKeys.addAll(Sets.newTreeSet(senderKeys));
     public List<Transaction> getTransactionsByAddressFast100(String address) {
 
-        Iterator<Long> senderKeys = ((TransactionSuit)map).senderIterator(address);
-        Iterator<Long> recipientKeys = ((TransactionSuit)map).recipientIterator(address);
+        // здесь не нужно обрамления с try (=) - так как они оба потом закроются в объединенном итераторе
+        IteratorCloseable<Long> senderKeys = ((TransactionSuit) map).senderIterator(address);
+        IteratorCloseable<Long> recipientKeys = ((TransactionSuit) map).recipientIterator(address);
 
-        Iterators.advance(senderKeys, 100);
-        Iterators.advance(recipientKeys, 100);
-
-        //treeKeys  = Iterators.concat(senderKeys, recipientKeys);
         // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-        Iterator<Long> iterator = new MergedIteratorNoDuplicates(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-
-        Iterators.advance(iterator, 100);
-
-        return getUnconfirmedTransaction(iterator);
-
+        /// берем свой итератор
+        try (IteratorCloseable<Long> iterator = new MergedIteratorNoDuplicates(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR)) {
+            return getUnconfirmedTransaction(IteratorCloseableImpl.limit(iterator, 200));
+        } catch (IOException e) {
+            return new ArrayList<>();
+        }
     }
 
     // slow?? without index
     public List<Transaction> getTransactionsByAddress(String address) {
 
         ArrayList<Transaction> values = new ArrayList<Transaction>();
-        Iterator<Long> iterator = ((TransactionSuit)map).getTimestampIterator(false);
-        Account account = new Account(address);
 
-        Transaction transaction;
-        boolean ok = false;
+        try (IteratorCloseable<Long> iterator = ((TransactionSuit) map).getTimestampIterator(false)) {
+            Account account = new Account(address);
 
-        int i = 0;
-        while (iterator.hasNext()) {
+            Transaction transaction;
+            boolean ok = false;
 
-            transaction = map.get(iterator.next());
-            if (transaction.getCreator().equals(address))
-                ok = true;
-            else
-                ok = false;
+            int i = 0;
+            while (iterator.hasNext()) {
 
-            if (!ok) {
-                transaction.setDC((DCSet)databaseSet);
-                HashSet<Account> recipients = transaction.getRecipientAccounts();
+                transaction = map.get(iterator.next());
+                if (transaction.getCreator().equals(address))
+                    ok = true;
+                else
+                    ok = false;
 
-                if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
-                    continue;
+                if (!ok) {
+                    transaction.setDC((DCSet) databaseSet);
+                    HashSet<Account> recipients = transaction.getRecipientAccounts();
+
+                    if (recipients == null || recipients.isEmpty() || !recipients.contains(account)) {
+                        continue;
+                    }
+
                 }
 
+                // SET LIMIT
+                if (++i > 100)
+                    break;
+
+                values.add(transaction);
+
             }
-
-            // SET LIMIT
-            if (++i > 100)
-                break;
-
-            values.add(transaction);
-
+        } catch (IOException e) {
         }
+
         return values;
     }
 
@@ -559,45 +520,51 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         ArrayList<Transaction> values = new ArrayList<Transaction>();
 
         //LOGGER.debug("get ITERATOR");
-        Iterator<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending);
-        //LOGGER.debug("get ITERATOR - DONE"); / for merge
+        try (IteratorCloseable<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+            //LOGGER.debug("get ITERATOR - DONE"); / for merge
 
-        Transaction transaction;
-        for (int i = 0; i < count; i++) {
-            if (!iterator.hasNext())
-                break;
+            Transaction transaction;
+            for (int i = 0; i < count; i++) {
+                if (!iterator.hasNext())
+                    break;
 
-            transaction = this.get(iterator.next());
-            transaction.setDC((DCSet)databaseSet);
-            values.add(transaction);
+                transaction = this.get(iterator.next());
+                transaction.setDC((DCSet) databaseSet);
+                values.add(transaction);
+            }
+        } catch (IOException e) {
         }
+
         return values;
     }
 
     public List<Transaction> getIncomedTransactions(String address, int type, long timestamp, int count, boolean descending) {
 
         ArrayList<Transaction> values = new ArrayList<>();
-        Iterator<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending);
-        Account account = new Account(address);
+        try (IteratorCloseable<Long> iterator = this.getIterator(TransactionSuit.TIMESTAMP_INDEX, descending)) {
+            Account account = new Account(address);
 
-        int i = 0;
-        Transaction transaction;
-        while (iterator.hasNext()) {
-            transaction = map.get(iterator.next());
-            if (type != 0 && type != transaction.getType())
-                continue;
+            int i = 0;
+            Transaction transaction;
+            while (iterator.hasNext()) {
+                transaction = map.get(iterator.next());
+                if (type != 0 && type != transaction.getType())
+                    continue;
 
-            transaction.setDC((DCSet)databaseSet);
-            HashSet<Account> recipients = transaction.getRecipientAccounts();
-            if (recipients == null || recipients.isEmpty())
-                continue;
-            if (recipients.contains(account) && transaction.getTimestamp() >= timestamp) {
-                values.add(transaction);
-                i++;
-                if (count > 0 && i > count)
-                    break;
+                transaction.setDC((DCSet) databaseSet);
+                HashSet<Account> recipients = transaction.getRecipientAccounts();
+                if (recipients == null || recipients.isEmpty())
+                    continue;
+                if (recipients.contains(account) && transaction.getTimestamp() >= timestamp) {
+                    values.add(transaction);
+                    i++;
+                    if (count > 0 && i > count)
+                        break;
+                }
             }
+        } catch (IOException e) {
         }
+
         return values;
     }
 

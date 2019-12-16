@@ -165,24 +165,25 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        //Iterable keys = Fun.filter(this.recipientKey, address);
-        //Iterator iterator = keys.iterator();
-        Iterator iterator = ((TransactionFinalSuit)map).getIteratorByRecipient(address);
-        List<Transaction> txs = new ArrayList<>();
-        int counter = 0;
-        Transaction item;
-        Long key;
-        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByRecipient(address)) {
+            List<Transaction> txs = new ArrayList<>();
+            int counter = 0;
+            Transaction item;
+            Long key;
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
 
-            key = (Long) iterator.next();
-            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-            item = this.map.get(key);
-            item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+                key = (Long) iterator.next();
+                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                item = this.map.get(key);
+                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
-            txs.add(item);
-            counter++;
+                txs.add(item);
+                counter++;
+            }
+            return txs;
+        } catch (IOException e) {
+            return null;
         }
-        return txs;
     }
 
     @Override
@@ -198,19 +199,23 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        Iterator<Long> iterator = ((TransactionFinalSuit)map).getBlockIterator(block);
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBlockIterator(block)) {
 
-        if (offset > 0)
-            Iterators.advance(iterator, offset);
+            if (offset > 0)
+                Iterators.advance(iterator, offset);
 
-        if (limit > 0)
-            iterator = Iterators.limit(iterator, limit);
+            List<Transaction> txs = new ArrayList<>();
+            int count = limit;
+            while (iterator.hasNext()) {
+                if (limit > 0 && --count < 0)
+                    break;
 
-        List<Transaction> txs = new ArrayList<>();
-        while (iterator.hasNext()) {
-            txs.add(map.get(iterator.next()));
+                txs.add(map.get(iterator.next()));
+            }
+            return txs;
+        } catch (IOException e) {
+            return null;
         }
-        return txs;
 
     }
 
@@ -227,23 +232,24 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        //Iterable keys = Fun.filter(this.senderKey, address);
-        //Iterator iterator = keys.iterator();
-        Iterator iterator = ((TransactionFinalSuit)map).getIteratorBySender(address);
-        List<Transaction> txs = new ArrayList<>();
-        int counter = 0;
-        Transaction item;
-        Long key;
-        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
-            key = (Long) iterator.next();
-            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-            item = this.map.get(key);
-            item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorBySender(address)) {
+            List<Transaction> txs = new ArrayList<>();
+            int counter = 0;
+            Transaction item;
+            Long key;
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+                key = (Long) iterator.next();
+                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                item = this.map.get(key);
+                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
-            txs.add(item);
-            counter++;
+                txs.add(item);
+                counter++;
+            }
+            return txs;
+        } catch (IOException e) {
+            return null;
         }
-        return txs;
     }
 
     @Override
@@ -255,23 +261,24 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        //Iterable keys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(address, type));
-        //Iterator iterator = keys.iterator();
-        Iterator iterator = ((TransactionFinalSuit)map).getIteratorByAddressAndType(address, type);
-        List<Transaction> txs = new ArrayList<>();
-        int counter = 0;
-        Transaction item;
-        Long key;
-        while (iterator.hasNext() && (limit == 0 || counter < limit)) {
-            key = (Long) iterator.next();
-            Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-            item = this.map.get(key);
-            item.setDC((DCSet)databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(address, type)) {
+            List<Transaction> txs = new ArrayList<>();
+            int counter = 0;
+            Transaction item;
+            Long key;
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+                key = (Long) iterator.next();
+                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                item = this.map.get(key);
+                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
-            txs.add(item); // 628853-1
-            counter++;
+                txs.add(item); // 628853-1
+                counter++;
+            }
+            return txs;
+        } catch (IOException e) {
+            return null;
         }
-        return txs;
     }
 
     @Override
