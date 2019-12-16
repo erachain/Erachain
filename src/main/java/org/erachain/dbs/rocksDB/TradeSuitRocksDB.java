@@ -192,7 +192,7 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getPairIterator(long have, long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairIteratorDesc(long have, long want) {
         byte[] filter = new byte[16];
         makeKey(filter, have, want);
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);

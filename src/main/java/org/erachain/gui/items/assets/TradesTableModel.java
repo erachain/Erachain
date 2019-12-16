@@ -30,7 +30,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
 
     public TradesTableModel(AssetCls have, AssetCls want) {
 
-        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Amount", "Price", "Total"}, true);
+        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Amount", "Price", "Total"}, false);
 
         this.have = have;
         this.want = want;
