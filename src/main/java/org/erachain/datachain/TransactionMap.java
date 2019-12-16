@@ -48,7 +48,7 @@ public interface TransactionMap extends DBTab<Long, Transaction> {
 
     Transaction get(byte[] signature);
 
-    Collection<Long> getFromToKeys(long fromKey, long toKey);
+    Collection<Long> getFromToKeys(long fromKey, int limit);
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     IteratorCloseable findTransactionsKeys(String address, String sender, String recipient,

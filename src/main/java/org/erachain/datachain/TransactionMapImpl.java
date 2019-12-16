@@ -312,7 +312,7 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         return null;
     }
 
-    public Collection<Long> getFromToKeys(long fromKey, long toKey) {
+    public Collection<Long> getFromToKeys(long fromKey, int limit) {
 
         List<Long> treeKeys = new ArrayList<Long>();
 
@@ -321,7 +321,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
             Iterators.advance(iterator, (int) fromKey);
 
-            Iterator<Long> iteratorLimited = IteratorCloseableImpl.limit(iterator, (int) (toKey - fromKey));
+            // тут не нужно уже делать Закрываемый Итератор - так достаточно того что внутренний Итератор закроется
+            Iterator<Long> iteratorLimited = Iterators.limit(iterator, limit);
 
             while (iteratorLimited.hasNext()) {
                 treeKeys.add(iteratorLimited.next());

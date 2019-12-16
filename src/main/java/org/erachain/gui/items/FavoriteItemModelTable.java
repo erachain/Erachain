@@ -104,7 +104,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
     }
 
     @Override
-    public void getIntervalThis(long startBack, long endBack) {
+    public void getIntervalThis(long startBack, int endBack) {
         listSorted = new SortableList<Long, Object>(map, favoriteMap.getFromToKeys(0, Long.MAX_VALUE));
         listSorted.sort();
 

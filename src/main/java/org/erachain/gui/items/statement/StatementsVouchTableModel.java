@@ -7,8 +7,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.datachain.VouchRecordMap;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.DateTimeFormat;
+import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -99,7 +99,7 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
         if (list == null) {
             list = new ArrayList<>();

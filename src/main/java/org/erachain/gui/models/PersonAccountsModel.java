@@ -180,7 +180,7 @@ public class PersonAccountsModel extends TimerTableModelCls<Fun.Tuple5<String, I
 
     }
 
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
         list = new ArrayList<>();
         TreeMap<String, Stack<Tuple3<Integer, Integer, Integer>>> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey);

@@ -142,8 +142,8 @@ public class UnconfirmedTransactionsTableModel extends SortedListTableModelCls<L
     }
 
     @Override
-    public void getIntervalThis(long startBack, long endBack) {
-        listSorted = new SortableList<Long, Transaction>(map, ((TransactionMap) map).getFromToKeys(startBack, endBack));
+    public void getIntervalThis(long startBack, int limit) {
+        listSorted = new SortableList<Long, Transaction>(map, ((TransactionMap) map).getFromToKeys(startBack, limit));
 
         DCSet dcSet = DCSet.getInstance();
         for (Pair<Long, Transaction> item: listSorted) {
