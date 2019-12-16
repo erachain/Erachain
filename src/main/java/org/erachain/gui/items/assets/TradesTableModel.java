@@ -148,7 +148,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
     @Override
     public void getIntervalThis(long start, int limit) {
 
-        this.list = ((TradeMap)map).getTrades(haveKey, wantKey,0,300);
+        this.list = ((TradeMap) map).getTrades(haveKey, wantKey, (int) start, limit);
 
     }
 
