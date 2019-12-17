@@ -480,7 +480,7 @@ public class API {
 
     @POST
     @Path("recordparse")
-    public Response recordParse(@QueryParam("raw") String raw) // throws JSONException
+    public Response recordParse(String raw) // throws JSONException
     {
 
         JSONObject out = new JSONObject();
