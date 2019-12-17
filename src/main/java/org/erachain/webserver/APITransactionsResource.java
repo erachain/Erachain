@@ -437,7 +437,7 @@ public class APITransactionsResource {
     ) {
 
         List<Transaction> result = DCSet.getInstance().getTransactionFinalMap().findTransactions(address, sender,
-                recipient, minHeight, maxHeight, type, 0, false, offset, limit);
+                recipient, minHeight, maxHeight, type, 0, desc, offset, limit);
 
         JSONArray array = new JSONArray();
         for (Transaction trans : result) {
@@ -446,7 +446,7 @@ public class APITransactionsResource {
 
         if (unconfirmed) {
             List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender,
-                    recipient, type, false, 0, limit, 0);
+                    recipient, type, desc, 0, limit, 0);
             for (Transaction trans : resultUnconfirmed) {
                 array.add(trans.toJson());
             }
