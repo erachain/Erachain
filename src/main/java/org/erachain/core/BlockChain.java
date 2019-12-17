@@ -42,7 +42,7 @@ public class BlockChain {
      * erachain.jar -pass=1 -seed=5:new:1 -nogui -opi -nodatawallet -nocalculated -hardwork=[0..10] -dbschain=[rocksdb|mapdb] <br>
      * сколько транзакции в блоке - если больше 0 то запускает тест на старте
      */
-    public static final int TEST_DB = 0000;
+    public static final int TEST_DB = 10000;
     // запрет сборки своих блоков в ТЕСТЕ
     public static final boolean STOP_GENERATE_BLOCKS = false;
 
