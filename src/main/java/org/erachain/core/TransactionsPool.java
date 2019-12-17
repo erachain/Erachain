@@ -149,6 +149,7 @@ public class TransactionsPool extends MonitoredThread {
             // проверка на двойной ключ в основной таблице транзакций
             if (this.controller.isOnStopping()
                     || BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
+                    && false // теперь не проверяем так как люч сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
                     && this.dcSet.getTransactionFinalMapSigns().contains(signature)) {
                 return;
             }

@@ -1305,7 +1305,8 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+        if (false &&  // теперь не проверяем так как люч сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+                (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
                 && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
                 && this.signature != null
