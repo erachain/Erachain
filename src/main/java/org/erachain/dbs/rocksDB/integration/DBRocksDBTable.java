@@ -19,6 +19,7 @@ import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
 import java.io.File;
@@ -26,7 +27,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
+import static org.erachain.dbs.rocksDB.common.RocksDbDataSource.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.rocksdb.RocksDB.loadLibrary;
 
@@ -247,18 +248,37 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
 
     }
 
+    // опции для быстрого чтения
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public boolean set(K key, V value) {
         if (logON) logger.info("put invoked");
         //counterFlush++;
         final byte[] keyBytes = byteableKey.toBytesObject(key);
-        byte[] old = dbSource.get(keyBytes);
+        boolean hasIndexes = indexes != null && !indexes.isEmpty();
+        byte[] old;
+        boolean oldExist;
 
         if (logON) logger.info("keyBytes.length = " + keyBytes.length);
 
+        if (hasIndexes) {
+            oldExist = (old = dbSource.get(keyBytes)) != null;
+
+            // Значение старое было значит удалим вторичные ключи
+            putIndexes(key, value, keyBytes, true, old);
+
+        } else {
+            oldExist = dbSource.contains(keyBytes);
+        }
+
         if (enableSize) {
-            if (old == null || old.length == 0) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+
+            if (!oldExist) {
+
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
@@ -267,16 +287,12 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             }
         }
 
-        // Значение старое было значит удалим вторичные ключи
-        if (indexes != null && !indexes.isEmpty()) {
-            putIndexes(key, value, keyBytes, true, old);
-        }
-
         byte[] bytesValue = byteableValue.toBytesObject(value);
         dbSource.put(keyBytes, bytesValue);
+
         if (logON) logger.info("valueBytes.length = " + bytesValue.length);
 
-        return old != null;
+        return oldExist;
     }
 
     @Override
@@ -284,27 +300,35 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         if (logON) logger.info("put invoked");
         //counterFlush++;
         final byte[] keyBytes = byteableKey.toBytesObject(key);
-        byte[] old = null;
-        boolean oldGetted = false;
+        boolean hasIndexes = indexes != null && !indexes.isEmpty();
+        byte[] old;
+        boolean oldExist;
+
+        if (hasIndexes) {
+            // Значение старое было значит удалим вторичные ключи
+            oldExist = (old = dbSource.get(keyBytes)) != null;
+            putIndexes(key, value, keyBytes, true, old);
+        } else {
+            oldExist = false;
+        }
 
         if (logON) logger.info("keyBytes.length = " + keyBytes.length);
 
         if (enableSize) {
-            old = dbSource.get(keyBytes);
-            oldGetted = true;
-            if (old == null || old.length == 0) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            if (!hasIndexes) {
+                oldExist = dbSource.contains(keyBytes);
+            }
+
+            if (oldExist) {
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
 
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
             }
-        }
-
-        // Значение старое было значит удалим вторичные ключи
-        if (indexes != null && !indexes.isEmpty()) {
-            putIndexes(key, value, keyBytes, oldGetted, old);
         }
 
         byte[] bytesValue = byteableValue.toBytesObject(value);
@@ -383,7 +407,9 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         if (enableSize) {
             if (old != null && old.length > 0) {
                 // UPDATE SIZE
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
@@ -413,7 +439,9 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
         if (enableSize) {
             if (old != null && old.length > 0) {
                 // UPDATE SIZE
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
@@ -448,7 +476,9 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             }
             if (old != null && old.length > 0) {
                 // UPDATE SIZE
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
@@ -479,7 +509,9 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
             }
             if (old != null && old.length > 0) {
                 // UPDATE SIZE
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));

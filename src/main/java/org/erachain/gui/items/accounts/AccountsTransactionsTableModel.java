@@ -239,7 +239,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             trr.key = createOrder.getKey();
             trr.owner = createOrder.getCreator();
             trr.transaction = createOrder;
-            trr.amount = createOrder.getAmount();
+            trr.amount = createOrder.getAmount().negate();
             trr.recipient = "" + createOrder.getWantKey();
             trr.title = ""+ createOrder.getAmountWant().toPlainString();
 

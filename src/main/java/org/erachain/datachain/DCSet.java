@@ -48,6 +48,11 @@ public class DCSet extends DBASet {
     private static final long TIME_COMPACT_DB = 1L * 24L * 3600000L;
     public static final long DELETIONS_BEFORE_COMPACT = (long) ACTIONS_BEFORE_COMMIT;
 
+    /**
+     * Включает подсчет количество в основной таблице трнзакций или в Таблице с подписями
+     */
+    static private boolean SIZE_ENABLE_IN_FINAL = false;
+
     // эти настройки по умолчанию при ФАСТ режиме пойдут
 
     /**
@@ -207,7 +212,7 @@ public class DCSet extends DBASet {
 
             this.transactionFinalMap = new TransactionFinalMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     FINAL_TX_MAP
-                    , this, database);
+                    , this, database, SIZE_ENABLE_IN_FINAL);
 
             this.transactionTab = new TransactionMapImpl(UNCONF_TX_MAP, this, database);
 
@@ -221,7 +226,7 @@ public class DCSet extends DBASet {
 
             this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     FINAL_TX_SIGNS_MAP
-                    , this, database);
+                    , this, database, !SIZE_ENABLE_IN_FINAL);
 
             this.orderMap = new OrderMapImpl(defaultDBS != DBS_FAST ? defaultDBS :
                     ORDERS_MAP
@@ -381,7 +386,7 @@ public class DCSet extends DBASet {
 
         this.transactionFinalMapSigns = new TransactionFinalMapSignsImpl(
                 FINAL_TX_SIGNS_MAP_FORK
-                , parent.transactionFinalMapSigns, this);
+                , parent.transactionFinalMapSigns, this, true);
 
         this.orderMap = new OrderMapImpl(
                 DBS_MAP_DB

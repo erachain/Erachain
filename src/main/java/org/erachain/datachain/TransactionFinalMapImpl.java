@@ -57,8 +57,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     private static int CUT_NAME_INDEX = 12;
 
-    public TransactionFinalMapImpl(int dbsUsed, DCSet databaseSet, DB database) {
-        super(dbsUsed, databaseSet, database);
+    public TransactionFinalMapImpl(int dbsUsed, DCSet databaseSet, DB database, boolean sizeEnable) {
+        super(dbsUsed, databaseSet, database, sizeEnable);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_TRANSACTION_TYPE);
@@ -86,17 +86,17 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } else {
             switch (dbsUsed) {
                 case DBS_MAP_DB:
-                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
+                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
                     break;
                 case DBS_ROCK_DB:
-                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
+                    map = new TransactionFinalSuitRocksDBFork((TransactionFinalMap) parent, databaseSet);
                     break;
                 default:
                     /// НЕЛЬЗЯ HashMap !!!  так как удаляем по фильтру блока тут в delete(Integer height)
                     // map = new NativeMapHashMapFork(parent, databaseSet, null);
                     /// - тоже нельзя так как удаление по номеру блока не получится
                     // map = new NativeMapTreeMapFork(parent, databaseSet, null, null);
-                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet, sizeEnable);
+                    map = new TransactionFinalSuitMapDBFork((TransactionFinalMap) parent, databaseSet);
             }
         }
     }
@@ -104,6 +104,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     // TODO кстати показало что скорость Получить данные очень медллоеный при просчете РАЗМЕРА в getTransactionFinalMapSigns - может для РоксДБ оставить тут счетчик?
     public int size() {
+        if (sizeEnable)
+            return map.size();
+
         return ((DCSet) this.databaseSet).getTransactionFinalMapSigns().size();
     }
     /**

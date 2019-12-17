@@ -85,7 +85,6 @@ public class TransactionsPool extends MonitoredThread {
                 clearCount++;
             }
 
-
         } else if (item instanceof TransactionMessage) {
 
             long timeCheck = System.nanoTime();
@@ -105,9 +104,11 @@ public class TransactionsPool extends MonitoredThread {
                 return;
             }
 
+            long currentTimestamp = this.blockChain.getTimestamp(this.dcSet);
             // DEADTIME
-            if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)) {
-                // so OLD transaction
+            if (transaction.getDeadline() < this.blockChain.getTimestamp(this.dcSet)
+                    || transaction.getTimestamp() > currentTimestamp + 3600000) {
+                // so OLD transaction or from future
                 return;
             }
 
@@ -124,6 +125,7 @@ public class TransactionsPool extends MonitoredThread {
             if (LOG_UNCONFIRMED_PROCESS)
                 timeCheck = System.currentTimeMillis();
 
+            // проверка на двойной ключ в таблице ожидания транзакций
             if (utxMap.contains(signature)) {
                 if (LOG_UNCONFIRMED_PROCESS) {
                     timeCheck = System.currentTimeMillis() - timeCheck;
@@ -133,6 +135,7 @@ public class TransactionsPool extends MonitoredThread {
                 }
                 return;
             }
+
             if (LOG_UNCONFIRMED_PROCESS) {
                 timeCheck = System.currentTimeMillis() - timeCheck;
                 if (timeCheck > 20) {
@@ -143,8 +146,10 @@ public class TransactionsPool extends MonitoredThread {
             if (LOG_UNCONFIRMED_PROCESS)
                 timeCheck = System.currentTimeMillis();
 
+            // проверка на двойной ключ в основной таблице транзакций
             if (this.controller.isOnStopping()
-                    || BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(signature)) {
+                    || BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
+                    && this.dcSet.getTransactionFinalMapSigns().contains(signature)) {
                 return;
             }
 

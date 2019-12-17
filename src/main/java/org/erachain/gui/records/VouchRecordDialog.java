@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RVouch;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
@@ -76,7 +77,7 @@ public class VouchRecordDialog extends JDialog {
         if (block_No != null && rec_No != null) {
             jTextField_recordID.setText(block_No.toString() + "-" + rec_No.toString());
             VouchRecordDialog.record = refreshRecordDetails(jTextField_recordID.getText());
-            jTextField_recordID.enable(false);
+            jTextField_recordID.setEnabled(false);
         }
 
         this.setTitle(Lang.getInstance().translate("Vouch Record"));
@@ -92,26 +93,16 @@ public class VouchRecordDialog extends JDialog {
     //private Transaction refreshRecordDetails(JTextField recordTxt, JLabel recordDetails)
     private Transaction refreshRecordDetails(String text) {
 
-		/*
-		if(Controller.getInstance().getStatus() != Controller.STATUS_OK)
-		{
-			infoPanel.show_mess(Lang.getInstance().translate("Status must be OK to show public key details."));
-	        jLabel_RecordInfo.setViewportView(infoPanel);
-			return null;
-		}
-		*/
-
-        Transaction record = null;
+        Transaction record;
         if (text.length() < 40) {
             //record = RVouch.getVouchingRecord(DLSet.getInstance(), jTextField_recordID.getText());
             record = DCSet.getInstance().getTransactionFinalMap().getRecord(text);
         } else {
-            record = Transaction.findByDBRef(DCSet.getInstance(), Base58.decode(text));
+            record = Transaction.findByDBRef(DCSet.getInstance(), Base58.decode(text, Crypto.SIGNATURE_LENGTH));
         }
 
         if (record == null) {
-            //	infoPanel.show_mess(Lang.getInstance().translate("Error - use signature of record or blockNo-recNo"));
-            //    jLabel_RecordInfo.setViewportView(infoPanel);
+            jLabel_Title.setText(Lang.getInstance().translate("Error - use signature of record or blockNo-recNo"));
             return record;
         }
 

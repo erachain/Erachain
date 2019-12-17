@@ -1,9 +1,6 @@
 package org.erachain.dbs.rocksDB.common;
 
-import org.rocksdb.ColumnFamilyHandle;
-import org.rocksdb.RocksDBException;
-import org.rocksdb.RocksIterator;
-import org.rocksdb.WriteOptions;
+import org.rocksdb.*;
 
 public interface RocksDbCom {
 
@@ -27,7 +24,11 @@ public interface RocksDbCom {
 
     byte[] get(byte[] key) throws RocksDBException;
 
+    byte[] get(ReadOptions readOptions, byte[] key) throws RocksDBException;
+
     byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) throws RocksDBException;
+
+    byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) throws RocksDBException;
 
     void remove(byte[] key) throws RocksDBException;
 

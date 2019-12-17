@@ -36,13 +36,13 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
-    public static final byte[] SIZE_BYTE_KEY = new byte[]{0};
 
     //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
     // Если ЛОЖЬ то данные утрачиваются при КРАХЕ
     //protected boolean dbSync = true;
 
+    Options options;
     public WriteOptions writeOptions;
     public DBOptions dbOptions;
     protected boolean enableSize;
@@ -52,7 +52,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
      */
     @Getter
     public RocksDB dbCore;
-    Options options;
 
     protected boolean alive;
     protected String pathName;
@@ -188,6 +187,11 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
                                 dbOptions.setCreateMissingColumnFamilies(true);
                                 dbOptions.setIncreaseParallelism(3);
                                 dbOptions.setMaxOpenFiles(settings.getMaxOpenFiles());
+
+                                //dbOptions.setNumLevels(settings.getLevelNumber());
+                                //dbOptions.setMaxBytesForLevelMultiplier(settings.getMaxBytesForLevelMultiplier());
+                                //dbOptions.setMaxBytesForLevelBase(settings.getMaxBytesForLevelBase());
+
                                 dbOptions.setMaxBackgroundCompactions(settings.getCompactThreads());
                                 dbOptions.setAllowConcurrentMemtableWrite(true);
                                 dbOptions.setMaxManifestFileSize(0);
@@ -474,6 +478,10 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     final StringBuilder inCache = new StringBuilder();
+    DBOptions optionsDBcont = (options == null ? new DBOptions() : new DBOptions(options)).setAllowMmapReads(true);
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false)
+            .setIgnoreRangeDeletions(true).setReadaheadSize(100);
+    byte[] containsBuff = new byte[0];
 
     @Override
     public boolean contains(byte[] key) {
@@ -484,8 +492,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCore.get(key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -503,8 +511,8 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCore.get(columnFamilyHandle, key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCore.get(columnFamilyHandle, optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -530,6 +538,22 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
@@ -537,6 +561,22 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         resetDbLock.readLock().lock();
         try {
             return dbCore.get(columnFamilyHandle, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(columnFamilyHandle, readOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -968,10 +1008,12 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public int size() {
         if (enableSize) {
-            byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+            sizeBytes = get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
             return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
         } else return -1;
     }

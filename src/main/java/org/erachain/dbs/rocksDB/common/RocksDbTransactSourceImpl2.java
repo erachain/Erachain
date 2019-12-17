@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import static org.erachain.dbs.rocksDB.common.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 import static org.erachain.dbs.rocksDB.utils.ConstantsRocksDB.ROCKS_DB_FOLDER;
 import static org.erachain.utils.ByteArrayUtils.areEqualMask;
 
@@ -467,6 +466,10 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
      * if a value is found in block-cache
      */
     final StringBuilder inCache = new StringBuilder();
+    DBOptions optionsDBcont = new DBOptions().setAllowMmapReads(true);
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+    byte[] containsBuff = new byte[0];
+
     @Override
     public boolean contains(byte[] key) {
         if (quitIfNotAlive()) {
@@ -476,8 +479,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCoreParent.keyMayExist(key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCoreParent.get(key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCoreParent.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -495,8 +498,8 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         try {
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCoreParent.keyMayExist(columnFamilyHandle, key, inCache)) return false;
-            // теперь ищем по настоящему
-            return dbCoreParent.get(columnFamilyHandle, key) != null;
+            // теперь ищем по настоящему - без получения данных
+            return dbCoreParent.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -522,6 +525,22 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
@@ -529,6 +548,22 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         resetDbLock.readLock().lock();
         try {
             return dbCore.get(columnFamilyHandle, transactReadOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return dbCore.get(columnFamilyHandle, readOptions, key);
         } catch (RocksDBException e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -931,9 +966,11 @@ public class RocksDbTransactSourceImpl2 implements RocksDbDataSource, Transacted
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public int size() {
-        byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+        sizeBytes = get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
         return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
     }
 

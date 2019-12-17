@@ -83,8 +83,6 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
     }
 
-    DBOptions optionsDBcont = new DBOptions();
-
     @Override
     public boolean contains(byte[] key) {
         if (quitIfNotAlive()) {
@@ -98,8 +96,12 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
                 return writeBatch.getFromBatch(optionsDBcont, key) != null;
             }
 
-            // возможность что есть, все равно проверим
-            return writeBatch.getFromBatch(optionsDBcont, key) != null || dbCore.get(key) != null;
+            // возможно что есть, проверим сначала в пакете
+            return writeBatch.getFromBatch(optionsDBcont, key) != null ||
+                    ////dbCore.get(key, containsBuff) != RocksDB.NOT_FOUND;
+                    /// быстрый поиск без получения данных
+                    dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
+
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -122,7 +124,9 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
             }
 
             // возможность что есть, все равно проверим
-            return writeBatch.getFromBatch(columnFamilyHandle, optionsDBcont, key) != null || dbCore.get(columnFamilyHandle, key) != null;
+            return writeBatch.getFromBatch(columnFamilyHandle, optionsDBcont, key) != null ||
+                    /// быстрый поиск без получения данных
+                    dbCore.get(columnFamilyHandle, optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -147,8 +151,38 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
     }
 
-    @Override
+    // USE readOptions
+    public byte[] get(final ReadOptions readOptions, final byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return writeBatch.getFromBatchAndDB(dbCore, readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return writeBatch.getFromBatchAndDB(dbCore, columnFamilyHandle, readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+    }
+
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, final ReadOptions readOptions, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
         }

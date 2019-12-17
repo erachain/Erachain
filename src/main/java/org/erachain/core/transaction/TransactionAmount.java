@@ -964,6 +964,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
 
         // так как мы не лезем в супер класс то тут проверим тоже ее
         if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;

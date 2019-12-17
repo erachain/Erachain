@@ -16,20 +16,21 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
 
     private final String NAME_TABLE = "TRANSACTION_FINAL_SIGNS_TABLE";
 
-    public TransactionFinalSignsSuitRocksDB(DBASet databaseSet, DB database) {
-        super(databaseSet, database, logger, true);
+    public TransactionFinalSignsSuitRocksDB(DBASet databaseSet, DB database, boolean sizeEnable) {
+        super(databaseSet, database, logger, sizeEnable);
     }
 
     @Override
     public void openMap() {
 
+        // see https://github.com/facebook/rocksdb/wiki/Read-Modify-Write-Benchmarks
         map = new DBRocksDBTableDBCommitedAsBath<>(new ByteableTrivial(), new ByteableLong(), NAME_TABLE, indexes,
                 RocksDbSettings.initCustomSettings(7, 64, 32,
                         256, 10,
                         1, 256, 32, false),
                 new WriteOptions().setSync(true).setDisableWAL(false),
-                new ReadOptions(),
-                databaseSet, true);
+                new ReadOptions(false, false).setReadaheadSize(100).setFillCache(false),
+                databaseSet, sizeEnable);
     }
 
 }

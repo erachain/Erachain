@@ -36,7 +36,6 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         // DB<byte[], byte[]>, Flusher, DbSourceInter<byte[]>
 {
     protected String dataBaseName;
-    public static final byte[] SIZE_BYTE_KEY = org.erachain.dbs.rocksDB.comm.RocksDbDataSourceImpl.SIZE_BYTE_KEY;
 
     //Глеб * эта переменная позаимствована из проекта "tron" нужна для создания каких-то настроек
     // Это включает логирование данных на диск синхронизированно - защищает от утрат при КРАХЕ но чуть медленне работает
@@ -573,6 +572,22 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return table.get(readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) {
         if (quitIfNotAlive()) {
             return null;
@@ -587,6 +602,23 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         }
         return null;
     }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) {
+        if (quitIfNotAlive()) {
+            return null;
+        }
+        resetDbLock.readLock().lock();
+        try {
+            return table.get(columnFamilyHandle, readOptions, key);
+        } catch (RocksDBException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            resetDbLock.readLock().unlock();
+        }
+        return null;
+    }
+
 
     @Override
     public void delete(byte[] key) {
@@ -988,10 +1020,16 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
         return FileUtil.deleteDir(new File(dir + getDBName()));
     }
 
+    // опции для быстрого чтения
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public int size() {
-        byte[] sizeBytes = get(columnFamilyFieldSize, SIZE_BYTE_KEY);
-        return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
+        if (enableSize) {
+            sizeBytes = get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+            return Ints.fromBytes(sizeBytes[0], sizeBytes[1], sizeBytes[2], sizeBytes[3]);
+        } else return -1;
     }
 
     @Override

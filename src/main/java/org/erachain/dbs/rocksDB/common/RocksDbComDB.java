@@ -66,8 +66,18 @@ public class RocksDbComDB implements RocksDbCom {
     }
 
     @Override
+    public byte[] get(ReadOptions readOptions, byte[] key) throws RocksDBException {
+        return rocksDB.get(readOptions, key);
+    }
+
+    @Override
     public byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key) throws RocksDBException {
         return rocksDB.get(columnFamilyHandle, key);
+    }
+
+    @Override
+    public byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key) throws RocksDBException {
+        return rocksDB.get(columnFamilyHandle, readOptions, key);
     }
 
     @Override

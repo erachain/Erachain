@@ -74,12 +74,15 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         // OPEN MAP
         // TREE MAP for sortable search
-        map = database.createTreeMap("height_seq_transactions")
+        DB.BTreeMapMaker mapConstruct = database.createTreeMap("height_seq_transactions")
                 .keySerializer(BasicKeySerializer.BASIC)
                 //.keySerializer(BTreeKeySerializer.ZERO_OR_POSITIVE_LONG)
-                .valueSerializer(new TransactionSerializer())
-                ////.counterEnable()
-                .makeOrGet();
+                .valueSerializer(new TransactionSerializer());
+
+        if (sizeEnable)
+            mapConstruct = mapConstruct.counterEnable();
+
+        map = mapConstruct.makeOrGet();
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES

@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.Set;
 
 public interface RocksDbDataSource {
+
+    byte[] SIZE_BYTE_KEY = new byte[]{0};
+
     Path getDbPathAndFile();
 
     boolean isAlive();
@@ -48,7 +51,11 @@ public interface RocksDbDataSource {
 
     byte[] get(byte[] key);
 
+    byte[] get(final ReadOptions readOptions, final byte[] key);
+
     byte[] get(ColumnFamilyHandle columnFamilyHandle, byte[] key);
+
+    byte[] get(ColumnFamilyHandle columnFamilyHandle, ReadOptions readOptions, byte[] key);
 
     void delete(byte[] key);
 

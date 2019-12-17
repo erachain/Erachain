@@ -19,6 +19,7 @@ import org.erachain.dbs.rocksDB.transformation.ByteableTrivial;
 import org.erachain.dbs.rocksDB.utils.FileUtil;
 import org.erachain.settings.Settings;
 import org.rocksdb.ColumnFamilyHandle;
+import org.rocksdb.ReadOptions;
 
 import java.io.IOException;
 import java.util.*;
@@ -206,6 +207,10 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
 
     }
 
+    // опции для быстрого чтения
+    ReadOptions optionsReadDBcont = new ReadOptions(false, false);
+    byte[] sizeBytes = new byte[4];
+
     @Override
     public boolean set(K key, V value) {
         if (logON) logger.info("put invoked");
@@ -215,7 +220,9 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         byte[] old = dbSource.get(keyBytes);
         if (old == null || old.length == 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
@@ -247,7 +254,9 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         byte[] old = dbSource.get(keyBytes);
         if (old == null || old.length == 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size++;
                 if (logON) logger.info("put size = " + size);
@@ -338,7 +347,9 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         byte[] old = dbSource.get(keyBytes);
         if (old != null && old.length != 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
@@ -360,7 +371,9 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         byte[] old = dbSource.get(keyBytes);
         if (old != null && old.length != 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
@@ -382,7 +395,9 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         byte[] old = dbSource.get(keyBytes);
         if (old != null && old.length != 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
@@ -400,7 +415,9 @@ public class DBRocksDBTableTransact2<K, V> implements InnerDBTable
         byte[] old = dbSource.get(keyBytes);
         if (old != null && old.length != 0) {
             if (columnFamilyFieldSize != null) {
-                byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
+                // быстро возьмем
+                sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
+                ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
                 Integer size = byteableInteger.receiveObjectFromBytes(sizeBytes);
                 size--;
                 dbSource.put(columnFamilyFieldSize, SIZE_BYTE_KEY, byteableInteger.toBytesObject(size));
