@@ -70,7 +70,7 @@ public class DCSet extends DBASet {
      * DBS_MAP_DB - fast, DBS_ROCK_DB - slow
      */
     public static final int FINAL_TX_SIGNS_MAP = DBS_MAP_DB;
-    public static final int FINAL_TX_SIGNS_MAP_FORK = DBS_NATIVE_MAP;
+    public static final int FINAL_TX_SIGNS_MAP_FORK = DBS_MAP_DB;
 
     /**
      * DBS_MAP_DB - slow, DBS_ROCK_DB - crash, DBS_MAP_DB_IN_MEM - fast
