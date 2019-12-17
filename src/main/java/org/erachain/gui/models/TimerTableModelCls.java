@@ -181,7 +181,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
             long startBack = -getMapSize() + start;
             getIntervalThis(startBack, step);
         } else {
-            getIntervalThis(start, step);
+             getIntervalThis(start, step);
         }
 
     }

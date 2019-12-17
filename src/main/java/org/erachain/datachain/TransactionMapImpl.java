@@ -356,9 +356,8 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
 
     public IteratorCloseable findTransactionsKeys(String address, String sender, String recipient,
                                                   int type, boolean desc, int offset, int limit, long timestamp) {
-        IteratorCloseable senderKeys = null;
-        IteratorCloseable recipientKeys = null;
-        IteratorCloseable iterator;
+        IteratorCloseable iteratorSender = null;
+        IteratorCloseable iteratorRecipient = null;
 
         if (address != null) {
             sender = address;
@@ -371,42 +370,30 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
         //  timestamp = null;
         if (sender != null) {
             if (type > 0 || timestamp > 0) {
-                senderKeys = ((TransactionSuit)map).typeIterator(sender, timestamp, type);
+                iteratorSender = ((TransactionSuit)map).typeIterator(sender, timestamp, type);
             } else {
-                senderKeys = ((TransactionSuit)map).senderIterator(sender);
+                iteratorSender = ((TransactionSuit)map).senderIterator(sender);
             }
         }
 
         if (recipient != null) {
             if (type > 0 || timestamp > 0) {
                 //recipientKeys = Fun.filter(this.typeKey, new Fun.Tuple3<String, Long, Integer>(recipient, timestamp, type));
-                recipientKeys = ((TransactionSuit)map).typeIterator(recipient, timestamp, type);
+                iteratorRecipient = ((TransactionSuit)map).typeIterator(recipient, timestamp, type);
             } else {
                 //recipientKeys = Fun.filter(this.recipientKey, recipient);
-                recipientKeys = ((TransactionSuit)map).recipientIterator(recipient);
+                iteratorRecipient = ((TransactionSuit)map).recipientIterator(recipient);
             }
         }
 
         IteratorCloseable iteratorMerged;
-        if (address != null) {
-            //iterator.addAll(Sets.newTreeSet(senderKeys));
-            //iterator = senderKeys;
-            //iterator.addAll(Sets.newTreeSet(recipientKeys));
-            // not sorted! Iterators.concat(iterator, recipientKeys);
+        if (address != null || sender != null && recipient != null) {
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-            iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
-
-        } else if (sender != null && recipient != null) {
-            //iterator.addAll(Sets.newTreeSet(senderKeys));
-            iteratorMerged = senderKeys;
-            //iterator.retainAll(Sets.newTreeSet(recipientKeys));
-            Iterators.retainAll(iteratorMerged, Lists.newArrayList(recipientKeys));
+            iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iteratorSender, iteratorRecipient), Fun.COMPARATOR);
         } else if (sender != null) {
-            //iterator.addAll(Sets.newTreeSet(senderKeys));
-            iteratorMerged = senderKeys;
+            iteratorMerged = iteratorSender;
         } else if (recipient != null) {
-            //iterator.addAll(Sets.newTreeSet(recipientKeys));
-            iteratorMerged = recipientKeys;
+            iteratorMerged = iteratorRecipient;
         } else {
             iteratorMerged = new IteratorCloseableImpl(new TreeSet<>().iterator());
         }
@@ -461,12 +448,12 @@ public class TransactionMapImpl extends DBTabImpl<Long, Transaction>
     public List<Transaction> getTransactionsByAddressFast100(String address) {
 
         // здесь не нужно обрамления с try (=) - так как они оба потом закроются в объединенном итераторе
-        IteratorCloseable<Long> senderKeys = ((TransactionSuit) map).senderIterator(address);
-        IteratorCloseable<Long> recipientKeys = ((TransactionSuit) map).recipientIterator(address);
+        IteratorCloseable<Long> iteratorSender = ((TransactionSuit) map).senderIterator(address);
+        IteratorCloseable<Long> iteratorRecipient = ((TransactionSuit) map).recipientIterator(address);
 
         // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
         /// берем свой итератор
-        try (IteratorCloseable<Long> iterator = new MergedIteratorNoDuplicates(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR)) {
+        try (IteratorCloseable<Long> iterator = new MergedIteratorNoDuplicates(ImmutableList.of(iteratorSender, iteratorRecipient), Fun.COMPARATOR)) {
             return getUnconfirmedTransaction(IteratorCloseableImpl.limit(iterator, 200));
         } catch (IOException e) {
             return new ArrayList<>();
