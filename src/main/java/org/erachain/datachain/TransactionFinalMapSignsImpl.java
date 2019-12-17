@@ -46,7 +46,7 @@ public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implem
                 case DBS_MAP_DB:
                 default:
                     // поидее это самая быстрая реализация для больших блоков
-                    map = new TransactionFinalSignsSuitMapDBFork((TransactionFinalMapSigns) parent, databaseSet, true);
+                    map = new TransactionFinalSignsSuitMapDBFork((TransactionFinalMapSigns) parent, databaseSet, false);
             }
         }
     }
