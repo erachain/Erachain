@@ -16,6 +16,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /*
  * Tuple4
@@ -56,10 +57,16 @@ public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Or
 
     @Override
     protected void getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
 
         //OPEN MAP
-        map = this.openMap(database);
+        if (true) {
+            map = new TreeMap<Tuple2<String, Long>, Tuple2<Long, Order>>(Fun.TUPLE2_COMPARATOR);
+        } else {
+            /// нет смысла новую базу создавать -- ее же надо потом закрывать!
+            // возможно тут и была неболшьшая утечка
+            DB database = DBMaker.newMemoryDB().make();
+            map = this.openMap(database);
+        }
     }
 
     private Map<Tuple2<String, Long>, Tuple2<Long, Order>> openMap(DB database) {

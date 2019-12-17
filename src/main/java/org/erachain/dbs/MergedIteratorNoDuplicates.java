@@ -83,8 +83,9 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     }
 
     @Override
-    public void finalize() {
+    public void finalize() throws Throwable {
         close();
+        super.finalize();
     }
 
 }

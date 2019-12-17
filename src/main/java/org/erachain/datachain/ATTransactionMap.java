@@ -49,7 +49,6 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
 
     @Override
     protected void getMemoryMap() {
-        database = DCSet.makeDBinMemory();
         openMap();
     }
 

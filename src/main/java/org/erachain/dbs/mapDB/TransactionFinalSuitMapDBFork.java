@@ -13,7 +13,7 @@ import org.erachain.dbs.IteratorCloseableImpl;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 
-import java.util.Iterator;
+import java.io.IOException;
 
 //import java.math.BigDecimal;
 
@@ -57,9 +57,11 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
 
     @Override
     public void deleteForBlock(Integer height) {
-        Iterator<Long> iterator = getBlockIterator(height);
-        while (iterator.hasNext()) {
-            map.remove(iterator.next());
+        try (IteratorCloseable<Long> iterator = getBlockIterator(height)) {
+            while (iterator.hasNext()) {
+                map.remove(iterator.next());
+            }
+        } catch (IOException e) {
         }
     }
 

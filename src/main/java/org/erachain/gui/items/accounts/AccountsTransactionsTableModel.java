@@ -129,11 +129,12 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
         if (this.sender == null || this.asset == null)
             return;
 
+        /// WALLET addesses
         Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
 
         list = new ArrayList<>();

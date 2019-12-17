@@ -19,10 +19,10 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import static org.erachain.database.IDB.DBS_MAP_DB;
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -152,9 +152,11 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (map instanceof ItemAssetBalanceSuitRocksDB) {
             //FILTER ALL KEYS
             keys = new ArrayList<>();
-            Iterator<byte[]> iterator = ((ItemAssetBalanceSuit) map).assetIterator(assetKey);
-            while (iterator.hasNext()) {
-                keys.add(iterator.next());
+            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).assetIterator(assetKey)) {
+                while (iterator.hasNext()) {
+                    keys.add(iterator.next());
+                }
+            } catch (IOException e) {
             }
         } else {
             keys = ((ItemAssetBalanceSuit)map).assetKeys(assetKey);
@@ -178,9 +180,11 @@ public class ItemAssetBalanceMapImpl extends DBTabImpl<byte[], Tuple5<
         if (map instanceof ItemAssetBalanceSuitRocksDB) {
             //FILTER ALL KEYS
             keys = new ArrayList<>();
-            Iterator<byte[]> iterator = ((ItemAssetBalanceSuit) map).accountIterator(account);
-            while (iterator.hasNext()) {
-                keys.add(iterator.next());
+            try (IteratorCloseable<byte[]> iterator = ((ItemAssetBalanceSuit) map).accountIterator(account)) {
+                while (iterator.hasNext()) {
+                    keys.add(iterator.next());
+                }
+            } catch (IOException e) {
             }
         } else {
             keys = ((ItemAssetBalanceSuit)map).accountKeys(account);

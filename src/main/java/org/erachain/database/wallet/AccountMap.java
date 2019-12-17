@@ -27,6 +27,9 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
 
     private Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> assetsBalanceMap;
     private Set<byte[]> publickKeys;
+    List<Account> accounts;
+    List<PublicKeyAccount> accountPubKeys;
+
 
     public AccountMap(DWSet dWSet, DB database) {
         super(dWSet, database);
@@ -37,7 +40,6 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
             this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_ACCOUNT_TYPE);
             this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_ACCOUNT_TYPE);
         }
-
     }
 
     @Override
@@ -53,6 +55,9 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
 
         this.assetsBalanceMap = database.getTreeMap(ADDRESS_ASSETS);
         map = database.getTreeMap(ADDRESSES_NO);
+
+        accounts = getAccounts();
+        accountPubKeys = getPublicKeyAccounts();
     }
 
     @Override
@@ -61,6 +66,9 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     public List<Account> getAccounts() {
+
+        if (accounts != null)
+            return accounts;
 
         List<Account> accounts = new ArrayList<Account>();
 
@@ -75,6 +83,10 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     public List<PublicKeyAccount> getPublicKeyAccounts() {
+
+        if (accountPubKeys != null)
+            return accountPubKeys;
+
         List<PublicKeyAccount> accounts = new ArrayList<PublicKeyAccount>();
 
         synchronized (this.publickKeys) {
@@ -95,7 +107,6 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
 
         Collection<Tuple2<String, Long>> keys = this.assetsBalanceMap.keySet();
 
-        //for(PublicKeyAccount publickKey: this.publickKeys)
         for (Tuple2<String, Long> key : keys) {
             account_assets.add(new Tuple2<Account, Long>(new Account(key.a), key.b));
         }
@@ -112,12 +123,9 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     public boolean exists(String address) {
-        //return this.assetsBalanceMap.containsKey(address);
-        for (byte[] publickKey : this.publickKeys) {
-            PublicKeyAccount account = new PublicKeyAccount(publickKey);
-            if (account.getAddress().equals(address)) return true;
+        for (Account account : this.accounts) {
+            if (account.equals(address)) return true;
         }
-        //return this.publickKeys.containsKey(address);
         return false;
     }
 
@@ -127,11 +135,10 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
 
     public PublicKeyAccount getPublicKeyAccount(String address) {
 
-        synchronized (this.publickKeys) {
-            for (byte[] publickKeyBytes : this.publickKeys) {
-                PublicKeyAccount publickKey = new PublicKeyAccount(publickKeyBytes);
-                if (publickKey.getAddress().equals(address)) {
-                    return publickKey;
+        synchronized (this.accountPubKeys) {
+            for (PublicKeyAccount account : this.accountPubKeys) {
+                if (account.equals(address)) {
+                    return account;
                 }
             }
         }
@@ -211,17 +218,20 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     // ADD AN PUBLIC KEY ACCOUNT in wallet
-    public void add(PublicKeyAccount account, Integer number) {
+    public void add(PublicKeyAccount pubKeyAccount, Integer number) {
 
         synchronized (this.publickKeys) {
-            if (!this.publickKeys.contains(account.getPublicKey())) {
-                this.publickKeys.add(account.getPublicKey());
+            if (!this.publickKeys.contains(pubKeyAccount.getPublicKey())) {
+                this.publickKeys.add(pubKeyAccount.getPublicKey());
+                this.accountPubKeys.add(pubKeyAccount);
+                this.accounts.add((Account) pubKeyAccount);
+
                 if (number < 0) {
                     number = Controller.getInstance().wallet.getAccountNonce();
                 }
 
                 // USE NOTIFY
-                super.put(account.getAddress(), number);
+                super.put(pubKeyAccount.getAddress(), number);
 
             }
         }
@@ -233,12 +243,12 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     // delete all assets for this account
-    public void delete(PublicKeyAccount account) {
+    public void delete(PublicKeyAccount accountPublicKey) {
 
         Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> keys = ((BTreeMap) this.assetsBalanceMap).subMap(
                 //BTreeMap keys = ((BTreeMap) this.assetsBalanceMap).subMap(
-                Fun.t2(account.getAddress(), null),
-                Fun.t2(account.getAddress(), Fun.HI()));
+                Fun.t2(accountPublicKey.getAddress(), null),
+                Fun.t2(accountPublicKey.getAddress(), Fun.HI()));
 
         /*
 		if(this.publickKeys == null)
@@ -254,10 +264,12 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
                 this.assetsBalanceMap.remove(key);
             }
 
-            this.publickKeys.remove(account.getPublicKey());
+            this.publickKeys.remove(accountPublicKey.getPublicKey());
+            this.publickKeys.remove(accountPublicKey);
+            this.accountPubKeys.remove((Account) accountPublicKey);
 
             // USE NOTIFY
-            super.delete(account.getAddress());
+            super.delete(accountPublicKey.getAddress());
 
         }
     }
@@ -265,6 +277,9 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     public void clear() {
         synchronized (this.publickKeys) {
             this.publickKeys.clear();
+            this.accountPubKeys.clear();
+            this.accounts.clear();
+
             this.assetsBalanceMap.clear();
 
             this.map.clear();

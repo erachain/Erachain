@@ -222,7 +222,7 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getPairIterator(long have, long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairIteratorDesc(long have, long want) {
 
         if (this.pairKeyMap == null)
             return null;

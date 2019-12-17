@@ -198,18 +198,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Calculated> getCalculatedsByBlock(Integer block, int limit) {
-		/*
-		Iterable keys = Fun.filter(this.block_Key, block);
-		Iterator iter = keys.iterator();
-		keys = null;
-		List<Calculated> txs = new ArrayList<>();
-		int counter = 0;
-		while (iter.hasNext() && (limit == 0 || counter < limit)) {
-			txs.add(this.map.get(iter.next()));
-			counter++;
-		}
-		iter = null;
-		*/
         //BTreeMap map = (BTreeMap) this.map;
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
         Collection<Calculated> keys1 = ((BTreeMap) map)
@@ -219,9 +207,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         List<Calculated> txs = new ArrayList<>();
         for (Calculated bb : keys1) {
             txs.add(bb);
-            bb = null;
         }
-        keys1 = null;
         return txs;
 
     }

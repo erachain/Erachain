@@ -6,14 +6,15 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.mapDB.CompletedOrdersSuitMapDB;
 import org.erachain.dbs.mapDB.CompletedOrdersSuitMapDBFork;
 import org.erachain.dbs.rocksDB.CompletedOrdersSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static org.erachain.database.IDB.DBS_ROCK_DB;
@@ -67,24 +68,26 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     @Override
     public List<Order> getOrders(long have, long want, int offset, int limit) {
 
-        Iterator<Long> iterator = this.map.getIterator();
-
-        int counter = limit;
         List<Order> orders = new ArrayList<Order>();
-        while (iterator.hasNext()) {
-            Long key = iterator.next();
-            if (offset > 0) {
-                offset--;
-                continue;
-            }
+        try (IteratorCloseable<Long> iterator = this.map.getIterator()) {
 
-            Order order = this.get(key);
-            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want
-                    || order.getHaveAssetKey() == want && order.getWantAssetKey() == have) {
-                orders.add(order);
-                if (limit > 0 && --counter < 0)
-                    break;
+            int counter = limit;
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
+
+                Order order = this.get(key);
+                if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want
+                        || order.getHaveAssetKey() == want && order.getWantAssetKey() == have) {
+                    orders.add(order);
+                    if (limit > 0 && --counter < 0)
+                        break;
+                }
             }
+        } catch (IOException e) {
         }
 
         return orders;
@@ -119,24 +122,26 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     @Override
     public List<Order> getOrdersByOrderID(long have, long want, long startOrderID, long stopOrderID, int limit) {
 
-        Iterator<Long> iterator = this.map.getIterator();
-
-        int counter = limit;
         List<Order> orders = new ArrayList<Order>();
-        while (iterator.hasNext()) {
-            Long key = iterator.next();
-            if (startOrderID > 0 && key < startOrderID)
-                continue;
-            else if (stopOrderID > 0 && key > stopOrderID)
-                break;
+        try (IteratorCloseable<Long> iterator = this.map.getIterator()) {
 
-            Order order = this.get(key);
-            if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want
-                    || order.getHaveAssetKey() == want && order.getWantAssetKey() == have) {
-                orders.add(order);
-                if (limit > 0 && --counter < 0)
+            int counter = limit;
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                if (startOrderID > 0 && key < startOrderID)
+                    continue;
+                else if (stopOrderID > 0 && key > stopOrderID)
                     break;
+
+                Order order = this.get(key);
+                if (order.getHaveAssetKey() == have && order.getWantAssetKey() == want
+                        || order.getHaveAssetKey() == want && order.getWantAssetKey() == have) {
+                    orders.add(order);
+                    if (limit > 0 && --counter < 0)
+                        break;
+                }
             }
+        } catch (IOException e) {
         }
 
         return orders;

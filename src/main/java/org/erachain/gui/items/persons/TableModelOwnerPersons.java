@@ -9,7 +9,10 @@ import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.mapdb.Fun;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+import java.util.TreeMap;
 
 @SuppressWarnings("serial")
 public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
@@ -68,7 +71,7 @@ public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
         list = new ArrayList<>();
 

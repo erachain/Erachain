@@ -153,7 +153,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     //public abstract void getIntervalThis(int startBack, int endBack);
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
     }
 
     public int getMapDefaultIndex() {
@@ -179,9 +179,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
         if (descending) {
             long startBack = -getMapSize() + start;
-            getIntervalThis(startBack, startBack + step);
+            getIntervalThis(startBack, step);
         } else {
-            getIntervalThis(start, start + step);
+             getIntervalThis(start, step);
         }
 
     }

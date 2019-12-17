@@ -27,6 +27,7 @@ public class SecureWalletDatabase {
         //File transactionFile = new File(Settings.getInstance().getWalletDir(), "wallet.s.dat.t");
         //transactionFile.delete();
 
+        // тут база данных еще пустая или закрыта выше по .lock()
         this.database = DBMaker.newFileDB(SECURE_WALLET_FILE)
                 .encryptionEnable(password)
                 // убрал .closeOnJvmShutdown() it closing not by my code and rise errors! closed before my closing

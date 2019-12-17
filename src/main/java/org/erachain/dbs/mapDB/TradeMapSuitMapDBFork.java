@@ -78,7 +78,7 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     }
 
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getPairIterator(long have, long want) {
+    public IteratorCloseable<Tuple2<Long, Long>> getPairIteratorDesc(long have, long want) {
         return null;
     }
 

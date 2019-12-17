@@ -13,7 +13,7 @@ import org.erachain.dbs.rocksDB.transformation.ByteableLong;
 import org.erachain.dbs.rocksDB.transformation.ByteableTransaction;
 import org.rocksdb.WriteOptions;
 
-import java.util.Iterator;
+import java.io.IOException;
 
 @Slf4j
 public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transaction> implements TransactionFinalSuit {
@@ -34,9 +34,11 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
 
     @Override
     public void deleteForBlock(Integer height) {
-        Iterator<Long> iterator = getBlockIterator(height);
-        while (iterator.hasNext()) {
-            map.remove(iterator.next());
+        try (IteratorCloseable<Long> iterator = getBlockIterator(height)) {
+            while (iterator.hasNext()) {
+                map.remove(iterator.next());
+            }
+        } catch (IOException e) {
         }
     }
 

@@ -30,7 +30,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
 
     public TradesTableModel(AssetCls have, AssetCls want) {
 
-        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Amount", "Price", "Total"}, true);
+        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Amount", "Price", "Total"}, false);
 
         this.have = have;
         this.want = want;
@@ -146,9 +146,9 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
-        this.list = ((TradeMap)map).getTrades(haveKey, wantKey,0,300);
+        this.list = ((TradeMap) map).getTrades(haveKey, wantKey, (int) start, limit);
 
     }
 

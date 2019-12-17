@@ -16,7 +16,13 @@ public interface TradeSuit {
 
     IteratorCloseable<Fun.Tuple2<Long, Long>> getWantIterator(long want);
 
-    IteratorCloseable<Fun.Tuple2<Long, Long>> getPairIterator(long have, long want);
+    /**
+     * Обратная сортировка - для просмотра последних
+     * @param have
+     * @param want
+     * @return
+     */
+    IteratorCloseable<Fun.Tuple2<Long, Long>> getPairIteratorDesc(long have, long want);
 
     IteratorCloseable<Fun.Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight);
 

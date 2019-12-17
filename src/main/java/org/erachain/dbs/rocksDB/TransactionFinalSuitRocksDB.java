@@ -27,6 +27,7 @@ import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 import org.spongycastle.util.Arrays;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -154,9 +155,11 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     // TODO  dbCore.deleteRange(beg, end);
     @Override
     public void deleteForBlock(Integer height) {
-        Iterator<Long> iterator = getBlockIterator(height);
-        while (iterator.hasNext()) {
-            map.remove(iterator.next());
+        try (IteratorCloseable<Long> iterator = getBlockIterator(height)) {
+            while (iterator.hasNext()) {
+                map.remove(iterator.next());
+            }
+        } catch (IOException e) {
         }
     }
 
