@@ -99,7 +99,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
     @Override
     public void getInterval() {
 
-        getIntervalThis( start, step);
+        getIntervalThis(start, step);
 
     }
 
