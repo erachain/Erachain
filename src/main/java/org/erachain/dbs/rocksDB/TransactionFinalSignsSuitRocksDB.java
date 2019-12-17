@@ -16,6 +16,13 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
 
     private final String NAME_TABLE = "TRANSACTION_FINAL_SIGNS_TABLE";
 
+    /**
+     * Задает обрезание длинны подписи - чем меньше тем быстрее поиск и запись но больше вероятность повтора и отклонения.
+     * Если задаем ключ более 16 байт то не нужна проверка на Двойную запись - иначе долгий поиск в РоксДБ получается.
+     * При изменени - нужно пересобрать всю базу трнзакций иначе поиск сломается с новой длинной
+     */
+    public static int KEY_LEN = 24;
+
     public TransactionFinalSignsSuitRocksDB(DBASet databaseSet, DB database, boolean sizeEnable) {
         super(databaseSet, database, logger, sizeEnable);
     }
@@ -31,6 +38,51 @@ public class TransactionFinalSignsSuitRocksDB extends DBMapSuit<byte[], Long> im
                 new WriteOptions().setSync(true).setDisableWAL(false),
                 new ReadOptions(false, false).setReadaheadSize(100).setFillCache(false),
                 databaseSet, sizeEnable);
+    }
+
+    @Override
+    public boolean contains(byte[] signature) {
+
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        return super.contains(key);
+    }
+
+    @Override
+    public Long get(byte[] signature) {
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        return super.get(key);
+    }
+
+    @Override
+    public void delete(byte[] signature) {
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        super.delete(key);
+    }
+
+    @Override
+    public Long remove(byte[] signature) {
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        return super.remove(key);
+    }
+
+    @Override
+    public boolean set(byte[] signature, Long refernce) {
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        return super.set(key, refernce);
+
+    }
+
+    @Override
+    public void put(byte[] signature, Long refernce) {
+        byte[] key = new byte[KEY_LEN];
+        System.arraycopy(signature, 0, key, 0, KEY_LEN);
+        super.put(key, refernce);
+
     }
 
 }
