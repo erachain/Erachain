@@ -199,6 +199,27 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(int startHeight, int stopHeight) {
+        byte[] startBytes;
+        if (startHeight > 0) {
+            startBytes = new byte[4];
+            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 0, 4);
+        } else {
+            startBytes = null;
+        }
+
+        byte[] stopBytes;
+        if (stopHeight > 0) {
+            stopBytes = new byte[8];
+            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, 0)), 0, stopBytes, 0, 8);
+        } else {
+            stopBytes = null;
+        }
+
+        return map.getIndexIteratorFilter(startBytes, stopBytes, false, false);
+    }
+
+    @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
 
         byte[] startBytes;
@@ -229,6 +250,28 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
 
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), startBytes, stopBytes, false, true);
 
+    }
+
+    @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long startOrderID, long stopOrderID) {
+        byte[] startBytes;
+        if (startOrderID > 0) {
+            startBytes = new byte[8];
+            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - startOrderID), 0, startBytes, 0, 8);
+        } else {
+            startBytes = null;
+        }
+
+        byte[] stopBytes;
+        if (stopOrderID > 0) {
+            stopBytes = new byte[8];
+            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - stopOrderID), 0, stopBytes, 0, 8);
+            //stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все Sequence
+        } else {
+            stopBytes = null;
+        }
+
+        return map.getIndexIteratorFilter(startBytes, stopBytes, false, false);
     }
 
     @Override

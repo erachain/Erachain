@@ -383,12 +383,44 @@ public class TradeResource {
     }
 
     @GET
+    @Path("tradesfrom")
+    public static String getTradesFrom(@QueryParam("height") Integer fromHeight,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+
+        List<Trade> listResult;
+        if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+
+            listResult = Controller.getInstance().getTradeByOrderID(startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getTradeByHeight(fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getTradeByTimestamp(fromTimestamp * 1000, limit);
+        }
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade: listResult) {
+            arrayJSON.add(trade.toJson(0, true));
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
     @Path("tradesfrom/{have}/{want}")
     public static String getTradesFrom(@PathParam("have") Long have, @PathParam("want") Long want,
-                                              @QueryParam("height") Integer fromHeight,
-                                              @QueryParam("order") String fromOrder,
-                                              @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
-                                              @DefaultValue("50") @QueryParam("limit") Integer limit) {
+                                       @QueryParam("height") Integer fromHeight,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
         // DOES ASSETID EXIST
@@ -417,7 +449,7 @@ public class TradeResource {
         }
 
         JSONArray arrayJSON = new JSONArray();
-        for (Trade trade: listResult) {
+        for (Trade trade : listResult) {
             arrayJSON.add(trade.toJson(have, true));
         }
 

@@ -235,8 +235,22 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
 
     }
 
+    @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(int startHeight, int stopHeight) {
+
+        if (this.pairKeyMap == null)
+            return null;
+
+        Long toEnd = stopHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, 0) : Long.MAX_VALUE;
+
+        // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
+                Fun.t2(startHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(startHeight, Integer.MAX_VALUE) : null, null),
+                Fun.t2(toEnd, Long.MAX_VALUE)).keySet().iterator());
+    }
+
     /**
-     * Get trades by timestamp
+     * Get trades by Height
      * @param have
      * @param want
      * @param startHeight
@@ -256,6 +270,18 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         return new IteratorCloseableImpl(((BTreeMap<Tuple3, Tuple2<Long, Long>>) this.pairKeyMap).subMap(
                 Fun.t3(pairKey, startHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(startHeight, Integer.MAX_VALUE) : null, null),
                 Fun.t3(pairKey, toEnd, Fun.HI())).values().iterator());
+    }
+
+    @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long startOrderID, long stopOrderID) {
+        if (this.pairKeyMap == null)
+            return null;
+
+        Long toEnd = stopOrderID > 0 ? Long.MAX_VALUE - stopOrderID : Long.MAX_VALUE;
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
+                // обратная сортировка поэтому все вычитаем и -1 для всех getSequence
+                Fun.t2(startOrderID > 0 ? Long.MAX_VALUE - startOrderID : null, null),
+                Fun.t2(toEnd, Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override

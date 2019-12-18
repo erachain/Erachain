@@ -83,7 +83,17 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     }
 
     @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(int startHeight, int stopHeight) {
+        return null;
+    }
+
+    @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(long have, long want, int startHeight, int stopHeight) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long startOrderID, long stopOrderID) {
         return null;
     }
 

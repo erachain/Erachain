@@ -29,10 +29,13 @@ public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
     @SuppressWarnings("unchecked")
     Trade getLastTrade(long have, long want);
 
+    List<Trade> getTradesByTimestamp(long startTimestamp, long stopTimestamp, int limit);
     List<Trade> getTradesByTimestamp(long have, long want, long startTimestamp, long stopTimestamp, int limit);
 
+    List<Trade> getTradesByHeight(int start, int stop, int limit);
     List<Trade> getTradesByHeight(long have, long want, int start, int stop, int limit);
 
+    List<Trade> getTradesByOrderID(long startOrderID, long stopOrderID, int limit);
     List<Trade> getTradesByOrderID(long have, long want, long startOrderID, long stopOrderID, int limit);
 
     BigDecimal getVolume24(long have, long want);
