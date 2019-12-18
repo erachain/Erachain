@@ -157,6 +157,24 @@ public class CompletedOrderMapImpl extends DBTabImpl<Long, Order> implements Com
     }
 
     @Override
+    public IteratorCloseable<Long> getAddressIterator(String address, Long fromOrder) {
+        return ((CompletedOrderSuit) map).getAddressIterator(address, fromOrder);
+    }
+
+    @Override
+    public Order get(Long id) {
+        Order order = super.get(id);
+        if (order != null) {
+            if (order.isFulfilled()) {
+                order.setStatus(Order.COMPLETED);
+            } else {
+                order.setStatus(Order.CANCELED);
+            }
+        }
+        return order;
+    }
+
+    @Override
     public void put(Order order) {
 
         if (BlockChain.CHECK_BUGS > 3

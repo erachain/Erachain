@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface OrderMap extends DBTab<Long, Order> {
 
@@ -30,6 +31,16 @@ public interface OrderMap extends DBTab<Long, Order> {
     List<Order> getOrders(long have, long want, int limit);
 
     List<Order> getOrdersForAddress(String address, Long have, Long want, int limit);
+
+    /**
+     * Тут не эффективноп ока так как Ключ в Ордерах активных ннадо делать чисто по Адресу - без ключей пары
+     *
+     * @param address
+     * @param fromOrder
+     * @param limit
+     * @return
+     */
+    Set<Long> getKeysForAddressFromID(String address, long fromOrder, int limit);
 
     List<Order> getOrdersForAddress(String address, int limit);
 

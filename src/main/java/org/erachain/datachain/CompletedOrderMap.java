@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.core.item.assets.Order;
 import org.erachain.dbs.DBTab;
+import org.erachain.dbs.IteratorCloseable;
 
 import java.util.List;
 
@@ -18,5 +19,6 @@ public interface CompletedOrderMap extends DBTab<Long, Order> {
 
     List<Order> getOrdersByHeight(long have, long want, int start, int stop, int limit);
 
+    IteratorCloseable<Long> getAddressIterator(String address, Long fromOrder);
 
 }

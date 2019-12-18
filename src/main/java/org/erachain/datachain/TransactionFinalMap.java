@@ -38,6 +38,8 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit);
 
+    List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit);
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending);

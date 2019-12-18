@@ -285,6 +285,34 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit) {
+
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Long> keys = new ArrayList<>();
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(address, type, fromID)) {
+            int counter = 0;
+            //Transaction item;
+            Long key;
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+                key = iterator.next();
+                //Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                //item = this.map.get(key);
+                //item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+                //txs.add(item);
+                keys.add(key);
+                counter++;
+            }
+        } catch (IOException e) {
+        }
+        return keys;
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending) {
 

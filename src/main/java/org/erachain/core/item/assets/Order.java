@@ -333,6 +333,15 @@ public class Order implements Comparable<Order> {
         return this.fulfilledHave.compareTo(this.amountHave) == 0;
     }
 
+    /**
+     * Пока еще не покусали
+     *
+     * @return
+     */
+    public boolean isNotTraded() {
+        return this.fulfilledHave.signum() == 0;
+    }
+
     public boolean isActive(DCSet dcSet) {
         return dcSet.getOrderMap().contains(id);
     }
@@ -347,6 +356,22 @@ public class Order implements Comparable<Order> {
 
     public BigDecimal getFulfilledWant() {
         return getFulfilledWant(this.fulfilledHave, this.price, this.wantAssetScale);
+    }
+
+    public String viewStatus() {
+        switch (status) {
+            case ACTIVE:
+                return "Active";
+            case FULFILLED:
+                return "Fulfilled";
+            case COMPLETED:
+                return "Completed";
+            case CANCELED:
+                return "Canceled";
+            case ORPHANED:
+                return "Orphaned";
+        }
+        return "UNKNOWN";
     }
 
     public String state() {
@@ -564,6 +589,7 @@ public class Order implements Comparable<Order> {
         order.put("leftHave", amountHave.subtract(fulfilledHave).toPlainString());
         order.put("price", this.price.toPlainString());
         order.put("status", this.status);
+        order.put("statusName", this.viewStatus());
 
         return order;
 

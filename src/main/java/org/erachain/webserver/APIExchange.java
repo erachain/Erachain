@@ -51,6 +51,11 @@ public class APIExchange {
                 "Get completed orders for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+
+        help.put("GET apiexchange/allordersbyaddress/{address}/{from}?limit=[limit]",
+                "get list of ALL orders (in CAP and completed) by address from OrderID. "
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+
         help.put("apiexchange/trades/[amountAssetKey]/[priceAssetKey]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades from timestamp for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
@@ -88,10 +93,11 @@ public class APIExchange {
 
 
     @GET
-    @Path("ordersbyaddress/{address}")
+    @Path("allordersbyaddress/{address}/{from}")
     // orders/1/2?imit=4
-    public Response getOrdersByAddress(@PathParam("address") String address,
-                                       @DefaultValue("20") @QueryParam("limit") Integer limit) {
+    public Response getAllOrdersByAddress(@PathParam("address") String address,
+                                          @PathParam("from") String fromOrder,
+                                          @DefaultValue("20") @QueryParam("limit") Integer limit) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
             if (limit > 50)
@@ -100,7 +106,7 @@ public class APIExchange {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TradeResource.getByAddress(address, limit))
+                .entity(TradeResource.getAllOrdersByAddress(address, fromOrder, limit))
                 .build();
     }
 
