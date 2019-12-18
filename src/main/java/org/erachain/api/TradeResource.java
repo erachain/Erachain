@@ -568,21 +568,20 @@ public class TradeResource {
         for (Long key : keys) {
             createOrder = (CreateOrderTransaction) finalMap.get(key);
 
-            order = createOrder.makeOrder();
-            if (ordersMap.contains(key)) {
+            if ((order = ordersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
                 if (order.isNotTraded()) {
                     order.setStatus(Order.ACTIVE);
                 } else {
                     order.setStatus(Order.FULFILLED);
                 }
-            } else if (BlockChain.CHECK_BUGS < 2 // ловим тут что ордер вообще нигде не попал а трнзакция есть
-                    || completedOrdersMap.contains(key)) {
+            } else if ((order = completedOrdersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
                 if (order.isFulfilled()) {
                     order.setStatus(Order.COMPLETED);
                 } else {
                     order.setStatus(Order.CANCELED);
                 }
             } else {
+                order = createOrder.makeOrder();
                 Long err = null;
                 err++;
             }
