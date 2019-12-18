@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.dbs.rocksDB.RockStoreIterator;
 import org.erachain.dbs.rocksDB.RockStoreIteratorFilter;
+import org.erachain.dbs.rocksDB.RockStoreIteratorStart;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
 import org.erachain.dbs.rocksDB.utils.ByteUtil;
@@ -721,23 +722,23 @@ public abstract class RocksDbDataSourceImpl implements RocksDbDataSource
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex) {
+    public RockStoreIterator indexIteratorFilter(boolean descending, byte[] filter, boolean isIndex) {
         return new RockStoreIteratorFilter(getIterator(), descending, isIndex, filter);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, byte[] start, byte[] stop, boolean isIndex) {
-        return new RockStoreIteratorFilter(getIterator(), descending, isIndex, start, stop);
+    public RockStoreIterator indexIteratorFilter(boolean descending, byte[] start, byte[] stop, boolean isIndex) {
+        return new RockStoreIteratorStart(getIterator(), descending, isIndex, start, stop);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex) {
+    public RockStoreIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] filter, boolean isIndex) {
         return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, isIndex, filter);
     }
 
     @Override
-    public RockStoreIteratorFilter indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] start, byte[] stop, boolean isIndex) {
-        return new RockStoreIteratorFilter(getIterator(columnFamilyHandle), descending, isIndex, start, stop);
+    public RockStoreIterator indexIteratorFilter(boolean descending, ColumnFamilyHandle columnFamilyHandle, byte[] start, byte[] stop, boolean isIndex) {
+        return new RockStoreIteratorStart(getIterator(columnFamilyHandle), descending, isIndex, start, stop);
     }
 
     @Override
