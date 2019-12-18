@@ -235,18 +235,23 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
 
     }
 
+    /**
+     * Так как тут основной индекс - он без обратной сортировки
+     *
+     * @param startHeight
+     * @param stopHeight
+     * @return
+     */
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(int startHeight, int stopHeight) {
 
         if (this.pairKeyMap == null)
             return null;
 
-        Long toEnd = stopHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, 0) : Long.MAX_VALUE;
-
         // так как тут обратный отсчет то вычитаем со старта еще и все номера транзакций
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
-                Fun.t2(startHeight > 0 ? Long.MAX_VALUE - Transaction.makeDBRef(startHeight, Integer.MAX_VALUE) : null, null),
-                Fun.t2(toEnd, Long.MAX_VALUE)).keySet().iterator());
+                Fun.t2(startHeight > 0 ? Transaction.makeDBRef(startHeight, 0) : null, null),
+                Fun.t2(stopHeight > 0 ? Transaction.makeDBRef(stopHeight, Integer.MAX_VALUE) : Long.MAX_VALUE, Long.MAX_VALUE)).keySet().iterator());
     }
 
     /**
@@ -273,15 +278,31 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
     }
 
     @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorFromID(long[] startTradeID) {
+        if (this.pairKeyMap == null)
+            return null;
+
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
+                // обратная сортировка поэтому все вычитаем и -1 для всех getSequence
+                Fun.t2(startTradeID == null ? null : startTradeID[0], startTradeID == null ? null : startTradeID[1]),
+                Fun.t2(Long.MAX_VALUE, Long.MAX_VALUE)).keySet().iterator());
+    }
+
+    /**
+     * Так как тут основной индекс - он без обратной сортировки
+     * @param startOrderID
+     * @param stopOrderID
+     * @return
+     */
+    @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long startOrderID, long stopOrderID) {
         if (this.pairKeyMap == null)
             return null;
 
-        Long toEnd = stopOrderID > 0 ? Long.MAX_VALUE - stopOrderID : Long.MAX_VALUE;
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) this.map).subMap(
                 // обратная сортировка поэтому все вычитаем и -1 для всех getSequence
-                Fun.t2(startOrderID > 0 ? Long.MAX_VALUE - startOrderID : null, null),
-                Fun.t2(toEnd, Long.MAX_VALUE)).keySet().iterator());
+                Fun.t2(startOrderID > 0 ? startOrderID : null, null),
+                Fun.t2(stopOrderID > 0 ? stopOrderID : Long.MAX_VALUE, Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override

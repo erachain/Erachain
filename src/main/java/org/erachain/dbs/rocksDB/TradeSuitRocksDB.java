@@ -198,20 +198,27 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
         return map.getIndexIteratorFilter(pairIndex.getColumnFamilyHandle(), filter, false, true);
     }
 
+    /**
+     * Так как тут основной индекс - он без обратной сортировки
+     *
+     * @param startHeight
+     * @param stopHeight
+     * @return
+     */
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairHeightIterator(int startHeight, int stopHeight) {
         byte[] startBytes;
         if (startHeight > 0) {
             startBytes = new byte[4];
-            System.arraycopy(Ints.toByteArray(Integer.MAX_VALUE - startHeight), 0, startBytes, 0, 4);
+            System.arraycopy(Ints.toByteArray(startHeight), 0, startBytes, 0, 4);
         } else {
-            startBytes = null;
+            startBytes = new byte[0];
         }
 
         byte[] stopBytes;
         if (stopHeight > 0) {
             stopBytes = new byte[8];
-            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - Transaction.makeDBRef(stopHeight, 0)), 0, stopBytes, 0, 8);
+            System.arraycopy(Longs.toByteArray(Transaction.makeDBRef(stopHeight, Integer.MAX_VALUE)), 0, stopBytes, 0, 8);
         } else {
             stopBytes = null;
         }
@@ -253,19 +260,39 @@ public class TradeSuitRocksDB extends DBMapSuit<Tuple2<Long, Long>, Trade> imple
     }
 
     @Override
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorFromID(long[] startTradeID) {
+        byte[] startBytes;
+        if (startTradeID != null) {
+            startBytes = new byte[16];
+            System.arraycopy(Longs.toByteArray(startTradeID[0]), 0, startBytes, 0, 8);
+            System.arraycopy(Longs.toByteArray(startTradeID[1]), 0, startBytes, 8, 8);
+        } else {
+            startBytes = new byte[0];
+        }
+
+        return map.getIndexIteratorFilter(startBytes, null, false, false);
+    }
+
+    /**
+     * Так как тут основной индекс - он без обратной сортировки
+     * @param startOrderID
+     * @param stopOrderID
+     * @return
+     */
+    @Override
     public IteratorCloseable<Tuple2<Long, Long>> getPairOrderIDIterator(long startOrderID, long stopOrderID) {
         byte[] startBytes;
         if (startOrderID > 0) {
             startBytes = new byte[8];
-            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - startOrderID), 0, startBytes, 0, 8);
+            System.arraycopy(Longs.toByteArray(startOrderID), 0, startBytes, 0, 8);
         } else {
-            startBytes = null;
+            startBytes = new byte[0];
         }
 
         byte[] stopBytes;
         if (stopOrderID > 0) {
             stopBytes = new byte[8];
-            System.arraycopy(Longs.toByteArray(Long.MAX_VALUE - stopOrderID), 0, stopBytes, 0, 8);
+            System.arraycopy(Longs.toByteArray(stopOrderID), 0, stopBytes, 0, 8);
             //stopBytes[24] = (byte) 255; // больше делаем 1 байт чтобы захватывать значения все Sequence
         } else {
             stopBytes = null;

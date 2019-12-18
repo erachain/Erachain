@@ -35,7 +35,9 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
         first = false;
       }
       if (first) {
-        dbIterator.seek(filter);
+        if (filter != null) {
+          dbIterator.seek(filter);
+        }
         first = false;
       }
       if (!(hasNext = dbIterator.isValid())) {
@@ -54,7 +56,7 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
     // hasNext = hasNext && new String(dbIterator.key()).startsWith(new String(filter));
 
     if (stop == null) {
-      return (hasNext = hasNext && areEqualMask(dbIterator.key(), filter));
+      return (hasNext = hasNext && filter == null || areEqualMask(dbIterator.key(), filter));
     } else {
       if (descending) {
         return (hasNext = hasNext && compareUnsignedAsMask(stop, dbIterator.key()) <= 0);

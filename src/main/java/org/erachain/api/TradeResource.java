@@ -385,6 +385,7 @@ public class TradeResource {
     @GET
     @Path("tradesfrom")
     public static String getTradesFrom(@QueryParam("height") Integer fromHeight,
+                                       @QueryParam("trade") String fromTrade,
                                        @QueryParam("order") String fromOrder,
                                        @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
                                        @DefaultValue("50") @QueryParam("limit") Integer limit) {
@@ -392,12 +393,14 @@ public class TradeResource {
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 
         List<Trade> listResult;
-        if (fromOrder != null) {
+        if (fromTrade != null) {
+            long[] startTradeID = Trade.parseID(fromTrade);
+            listResult = Controller.getInstance().getTradesFromTradeID(startTradeID, limit);
+        } else if (fromOrder != null) {
             Long startOrderID = Transaction.parseDBRef(fromOrder);
             if (startOrderID == null) {
                 startOrderID = Long.parseLong(fromOrder);
             }
-
             listResult = Controller.getInstance().getTradeByOrderID(startOrderID, limit);
 
         } else if (fromHeight != null) {

@@ -103,6 +103,17 @@ public class Trade {
         return timestamp; // + this.sequence;
     }
 
+    public static long[] parseID(String ordersID) {
+        try {
+            String[] strA = ordersID.split("/");
+            long orderIDinitiator = Transaction.parseDBRef(strA[0]);
+            long orderIDtarget = Transaction.parseDBRef(strA[1]);
+            return new long[]{orderIDinitiator, orderIDtarget};
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public JSONObject toJson(long keyForBuySell, boolean withCreators) {
 

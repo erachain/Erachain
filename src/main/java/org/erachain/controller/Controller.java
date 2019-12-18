@@ -2806,6 +2806,10 @@ public class Controller extends Observable {
         return dcSet.getTradeMap().getTradesByTimestamp(have, want, timestamp, 0, limit);
     }
 
+    public List<Trade> getTradesFromTradeID(long[] tradeID, int limit) {
+        return dcSet.getTradeMap().getTradesFromTradeID(tradeID, limit);
+    }
+
     public List<Trade> getTradeByOrderID(long orderID, int limit) {
         return dcSet.getTradeMap().getTradesByOrderID(orderID, 0, limit);
     }

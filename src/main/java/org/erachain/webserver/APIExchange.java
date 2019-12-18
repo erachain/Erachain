@@ -161,6 +161,7 @@ public class APIExchange {
     @GET
     @Path("tradesfrom")
     public Response getTradesFrom(@QueryParam("height") Integer fromHeight,
+                                  @QueryParam("trade") String fromTrade,
                                   @QueryParam("order") String fromOrder,
                                   @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
                                   @DefaultValue("50") @QueryParam("limit") Integer limit) {
@@ -175,7 +176,7 @@ public class APIExchange {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(TradeResource.getTradesFrom(fromHeight, fromOrder, fromTimestamp, limitInt))
+                .entity(TradeResource.getTradesFrom(fromHeight, fromTrade, fromOrder, fromTimestamp, limitInt))
                 .build();
     }
 

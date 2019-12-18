@@ -35,6 +35,10 @@ public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
     List<Trade> getTradesByHeight(int start, int stop, int limit);
     List<Trade> getTradesByHeight(long have, long want, int start, int stop, int limit);
 
+    List<Trade> getTradesFromTradeID(long[] startTradeID, int limit);
+
+    List<Trade> getTradesByTradeID(long[] startTradeID, int limit);
+
     List<Trade> getTradesByOrderID(long startOrderID, long stopOrderID, int limit);
     List<Trade> getTradesByOrderID(long have, long want, long startOrderID, long stopOrderID, int limit);
 
