@@ -198,7 +198,8 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(String address, Integer type, Long fromID) {
         if (fromID != null)
             return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
-                    Arrays.concatenate(address.getBytes(), Ints.toByteArray(type), Longs.toByteArray(fromID)), null, false, true);
+                    Arrays.concatenate(address.getBytes(), Ints.toByteArray(type), Longs.toByteArray(fromID)),
+                    Arrays.concatenate(address.getBytes(), Ints.toByteArray(type), Longs.toByteArray(Long.MAX_VALUE)), false, true);
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
                 Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), null, false, true);
 

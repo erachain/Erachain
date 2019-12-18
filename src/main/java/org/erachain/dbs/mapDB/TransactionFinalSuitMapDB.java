@@ -221,7 +221,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         return IteratorCloseableImpl.make(((BTreeMap<Fun.Tuple3, Long>) this.addressTypeKey).subMap(
                 Fun.t3(address, type, fromID),
-                Fun.t3(address, Fun.HI(), Fun.HI())).values().iterator());
+                Fun.t3(address, type, Fun.HI())).values().iterator());
     }
 
     @Override
