@@ -65,10 +65,10 @@ public class TradeResource {
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
-        help.put("GET trade/tradesfrom/[address]/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+        help.put("GET trade/tradesfrom/[address]/[have]/[want]?trade=[TradeID}&order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
                 "Get trades for amountAssetKey & priceAssetKey for creator [address], "
                         + "limit is count record. The number of trades is limited by input param, default 50."
-                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+                        + "Use Order ID as Block-seqNo. For example 103506-3. Use TradeID as Initiator_OrderID/Target_OrderID");
         help.put("GET trade/getbyaddress/[creator]?limit=[limit]",
                 "get list of orders in CAP by address");
         help.put("GET trade/getbyaddress/[creator]/[amountAssetKey]/[priceAssetKey]?limit=[limit]",

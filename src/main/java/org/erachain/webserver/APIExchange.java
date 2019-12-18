@@ -59,10 +59,10 @@ public class APIExchange {
         help.put("GET apiexchange/trades/[amountAssetKey]/[priceAssetKey]?timestamp=[timestamp]&limit=[limit]",
                 "Get trades from timestamp for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of transactions is limited by input param. Max 200, default 50.");
-        help.put("GET apiexchange/tradesfrom?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+        help.put("GET apiexchange/tradesfrom?trade=[TradeID]&order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
-                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+                        + "Use Order ID as Block-seqNo. For example 103506-3. Use TradeID as Initiator_OrderID/Target_OrderID");
         help.put("GET apiexchange/tradesfrom/[amountAssetKey]/[priceAssetKey]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
