@@ -122,7 +122,12 @@ public class BlockChain {
     //public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
     public static final int WIN_BLOCK_BROADCAST_WAIT_MS = 10000; //
     // задержка на включение в блок для хорошей сортировки
-    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = 1; // проверить наше цепочку по силе с окружающими
+
+    /**
+     * проверить цепочку по силе у соседей. Если поставить меньше 2 то будет проверять каждый блок, что иногда плохо
+     * Наверно оптимально 2-4 блока
+     */
+    public static final int CHECK_PEERS_WEIGHT_AFTER_BLOCKS = 3;
     // хранить неподтвержденные долше чем то время когда мы делаем обзор цепочки по силе
     public static final int ON_CONNECT_SEND_UNCONFIRMED_NEED_COUNT = 10;
 
