@@ -1903,25 +1903,31 @@ import java.util.*;
         validatedForkDB = null;
     }
 
+    private boolean isClosed;
     /**
      * Закрывает базу в котрой производилась проверка блока
      */
+
     public synchronized void close() {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
-                LOGGER.debug("validatedForkDB [" + heightBlock + "] is closed");
+                ///LOGGER.debug("validatedForkDB [" + heightBlock + "] is closed");
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
             }
             validatedForkDB = null;
         }
         transactions = null;
+        isClosed = true;
     }
 
     @Override
     protected void finalize() throws Throwable {
-        close();
+        if (!isClosed) {
+            close();
+            LOGGER.debug("validatedForkDB [" + heightBlock + "] is FINALIZED");
+        }
         super.finalize();
     }
 
