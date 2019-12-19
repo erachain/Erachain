@@ -1926,7 +1926,9 @@ import java.util.*;
     protected void finalize() throws Throwable {
         if (!isClosed) {
             close();
-            LOGGER.debug("validatedForkDB [" + heightBlock + "] is FINALIZED " + creator.getAddress());
+            if (BlockChain.CHECK_BUGS > 5) {
+                LOGGER.debug("validatedForkDB [" + heightBlock + "] is FINALIZED " + creator.getAddress());
+            }
         }
         super.finalize();
     }
