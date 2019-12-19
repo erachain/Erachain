@@ -1908,7 +1908,7 @@ import java.util.*;
      * Закрывает базу в котрой производилась проверка блока
      */
 
-    public synchronized void close() {
+    public void close() {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
