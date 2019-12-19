@@ -14,6 +14,7 @@ public class RockStoreIterator implements DBIterator {
   protected RocksIterator dbIterator;
   protected boolean descending;
   protected boolean first = true;
+  protected boolean isClosed;
 
   public RockStoreIterator(RocksIterator dbIterator, boolean descending, boolean isIndex) {
     this.dbIterator = dbIterator;
@@ -26,15 +27,24 @@ public class RockStoreIterator implements DBIterator {
   // нужно обязательно на нижний уровень передевать вызов иначе память кончается
   @Override
   public void close() {
-    dbIterator.close();
+    try {
+      dbIterator.close();
+    } catch (Exception e) {
+    }
+
+    isClosed = true;
+
   }
 
   // see https://github.com/facebook/rocksdb/wiki/RocksJava-Basics
   // нужно обязательно на нижний уровень передевать вызов иначе память кончается
   @Override
-  public void finalize() {
-    close();
-    logger.warn("FINALIZE used");
+  public void finalize() throws Throwable {
+    if (!isClosed) {
+      close();
+      logger.warn("FINALIZE used - " + dbIterator.getClass().getName());
+    }
+    super.finalize();
   }
 
   @Override
