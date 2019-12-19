@@ -1908,7 +1908,7 @@ import java.util.*;
      * Закрывает базу в котрой производилась проверка блока
      */
 
-    public void close() {
+    public synchronized void close() {
         if (validatedForkDB != null) {
             try {
                 validatedForkDB.close();
@@ -1926,7 +1926,7 @@ import java.util.*;
     protected void finalize() throws Throwable {
         if (!isClosed) {
             close();
-            LOGGER.debug("validatedForkDB [" + heightBlock + "] is FINALIZED");
+            LOGGER.debug("validatedForkDB [" + heightBlock + "] is FINALIZED " + creator.getAddress());
         }
         super.finalize();
     }
