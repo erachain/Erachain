@@ -217,6 +217,14 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     }
 
     @Override
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(String address, Integer type, Long fromID) {
+
+        return IteratorCloseableImpl.make(((BTreeMap<Fun.Tuple3, Long>) this.addressTypeKey).subMap(
+                Fun.t3(address, type, fromID),
+                Fun.t3(address, type, Fun.HI())).values().iterator());
+    }
+
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {

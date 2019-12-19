@@ -17,6 +17,8 @@ public interface TransactionFinalSuit {
 
     IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type);
 
+    IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(String address, Integer type, Long fromID);
+
     IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type);
 
     IteratorCloseable<Long> getIteratorByAddress(String address);

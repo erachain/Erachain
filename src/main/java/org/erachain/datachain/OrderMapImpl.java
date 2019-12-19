@@ -254,6 +254,41 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
+    public Set<Long> getKeysForAddressFromID(String address, long fromOrder, int limit) {
+
+        Set<Long> keys = new TreeSet<Long>();
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return keys;
+        }
+
+        try (IteratorCloseable<Long> iterator = ((OrderSuit) map).getAddressIterator(address)) {
+
+            //GET ALL ORDERS FOR KEYS
+            int counter = limit;
+            while (iterator.hasNext()) {
+
+                Long key = iterator.next();
+                if (fromOrder > 0 && key < fromOrder)
+                    continue;
+
+                Order order = this.get(key);
+
+                // MAY BE NULLS!!!
+                if (order != null)
+                    keys.add(key);
+
+                if (limit > 0 && --counter < 0)
+                    break;
+
+            }
+        } catch (IOException e) {
+        }
+
+        return keys;
+    }
+
+    @Override
     public List<Order> getOrdersForAddress(String address, int limit) {
 
         if (Controller.getInstance().onlyProtocolIndexing) {
@@ -283,6 +318,19 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
         return orders;
 
+    }
+
+    @Override
+    public Order get(Long id) {
+        Order order = super.get(id);
+        if (order != null) {
+            if (order.isNotTraded()) {
+                order.setStatus(Order.ACTIVE);
+            } else {
+                order.setStatus(Order.FULFILLED);
+            }
+        }
+        return order;
     }
 
     @Override

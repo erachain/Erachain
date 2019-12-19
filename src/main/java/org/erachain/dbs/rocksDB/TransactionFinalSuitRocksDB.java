@@ -3,6 +3,7 @@ package org.erachain.dbs.rocksDB;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
@@ -191,6 +192,17 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     public IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type) {
         ///return (Iterator) ((DBRocksDBTable) map).getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), false);
         return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(), Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), false, true);
+    }
+
+    @Override
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(String address, Integer type, Long fromID) {
+        if (fromID != null)
+            return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
+                    Arrays.concatenate(address.getBytes(), Ints.toByteArray(type), Longs.toByteArray(fromID)),
+                    Arrays.concatenate(address.getBytes(), Ints.toByteArray(type), Longs.toByteArray(Long.MAX_VALUE)), false, true);
+        return map.getIndexIteratorFilter(addressTypeTxs.getColumnFamilyHandle(),
+                Arrays.concatenate(address.getBytes(), Ints.toByteArray(type)), null, false, true);
+
     }
 
     @Override

@@ -218,6 +218,30 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
 
     /**
      * Get trades by timestamp. From Timestamp to deep.
+     *
+     * @param startTimestamp is time
+     * @param stopTimestamp
+     * @param limit
+     */
+    @Override
+    public List<Trade> getTradesByTimestamp(long startTimestamp, long stopTimestamp, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        // тут индекс не по времени а по номерам блоков как лонг
+        //int heightStart = Controller.getInstance().getMyHeight();
+        //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
+        int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getBlockOnTimestamp(startTimestamp);
+        int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getBlockOnTimestamp(stopTimestamp);
+
+        //RETURN
+        return getTradesByHeight(fromBlock, toBlock, limit);
+    }
+
+    /**
+     * Get trades by timestamp. From Timestamp to deep.
      * @param have      include
      * @param want      wish
      * @param startTimestamp is time
@@ -234,11 +258,76 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         // тут индекс не по времени а по номерам блоков как лонг
         //int heightStart = Controller.getInstance().getMyHeight();
         //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        int fromBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(startTimestamp);
-        int toBlock = Controller.getInstance().getBlockChain().getBlockOnTimestamp(stopTimestamp);
+        int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getBlockOnTimestamp(startTimestamp);
+        int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getBlockOnTimestamp(stopTimestamp);
 
         //RETURN
         return getTradesByHeight(have, want, fromBlock, toBlock, limit);
+    }
+
+    @Override
+    public List<Trade> getTradesFromTradeID(long[] startTradeID, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Trade> trades = new ArrayList<Trade>();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorFromID(startTradeID)) {
+
+            int counter = limit;
+            while (iterator.hasNext()) {
+                trades.add(this.get(iterator.next()));
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        } catch (IOException e) {
+        }
+
+        return trades;
+    }
+
+    @Override
+    public List<Trade> getTradesByTradeID(long[] startTradeID, int limit) {
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Trade> trades = new ArrayList<Trade>();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getIteratorFromID(startTradeID)) {
+
+            int counter = limit;
+            while (iterator.hasNext()) {
+                trades.add(this.get(iterator.next()));
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        } catch (IOException e) {
+        }
+
+        return trades;
+    }
+
+    @Override
+    public List<Trade> getTradesByOrderID(long startOrderID, long stopOrderID, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Trade> trades = new ArrayList<Trade>();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairOrderIDIterator(startOrderID, stopOrderID)) {
+
+            int counter = limit;
+            while (iterator.hasNext()) {
+                trades.add(this.get(iterator.next()));
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        } catch (IOException e) {
+        }
+
+        return  trades;
     }
 
     @Override
@@ -261,6 +350,31 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         }
 
         return  trades;
+    }
+
+    @Override
+    public List<Trade> getTradesByHeight(int start, int stop, int limit) {
+
+        if (Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Trade> trades = new ArrayList<Trade>();
+        try (IteratorCloseable<Tuple2<Long, Long>> iterator = ((TradeSuit) this.map).getPairHeightIterator(start, stop)) {
+            if (iterator == null)
+                return null;
+
+            int counter = limit;
+            while (iterator.hasNext()) {
+                trades.add(this.get(iterator.next()));
+                if (limit > 0 && --counter < 0)
+                    break;
+            }
+        } catch (IOException e) {
+        }
+
+        //RETURN
+        return trades;
     }
 
     @Override

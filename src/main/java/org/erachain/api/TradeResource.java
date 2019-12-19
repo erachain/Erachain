@@ -11,10 +11,8 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetMap;
-import org.erachain.datachain.OrderMap;
-import org.erachain.datachain.TransactionFinalMapImpl;
+import org.erachain.datachain.*;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.APIUtils;
@@ -30,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
@@ -66,14 +65,19 @@ public class TradeResource {
                 "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50."
                         + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
-        help.put("GET trade/tradesfrom/[address]/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+        help.put("GET trade/tradesfrom/[address]/[have]/[want]?trade=[TradeID}&order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
                 "Get trades for amountAssetKey & priceAssetKey for creator [address], "
                         + "limit is count record. The number of trades is limited by input param, default 50."
-                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+                        + "Use Order ID as Block-seqNo. For example 103506-3. Use TradeID as Initiator_OrderID/Target_OrderID");
         help.put("GET trade/getbyaddress/[creator]?limit=[limit]",
                 "get list of orders in CAP by address");
         help.put("GET trade/getbyaddress/[creator]/[amountAssetKey]/[priceAssetKey]?limit=[limit]",
                 "get list of orders in CAP by address for trade pair");
+
+        help.put("GET trade/allordersbyaddress/{address}/{from}?limit=[limit]",
+                "get list of ALL orders (in CAP and completed) by address from OrderID. "
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+
         help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
                 "Cancel Order");
 
@@ -379,12 +383,47 @@ public class TradeResource {
     }
 
     @GET
+    @Path("tradesfrom")
+    public static String getTradesFrom(@QueryParam("height") Integer fromHeight,
+                                       @QueryParam("trade") String fromTrade,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+
+        List<Trade> listResult;
+        if (fromTrade != null) {
+            long[] startTradeID = Trade.parseID(fromTrade);
+            listResult = Controller.getInstance().getTradesFromTradeID(startTradeID, limit);
+        } else if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+            listResult = Controller.getInstance().getTradeByOrderID(startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getTradeByHeight(fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getTradeByTimestamp(fromTimestamp * 1000, limit);
+        }
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade: listResult) {
+            arrayJSON.add(trade.toJson(0, true));
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
     @Path("tradesfrom/{have}/{want}")
     public static String getTradesFrom(@PathParam("have") Long have, @PathParam("want") Long want,
-                                              @QueryParam("height") Integer fromHeight,
-                                              @QueryParam("order") String fromOrder,
-                                              @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
-                                              @DefaultValue("50") @QueryParam("limit") Integer limit) {
+                                       @QueryParam("height") Integer fromHeight,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
         // DOES ASSETID EXIST
@@ -413,7 +452,7 @@ public class TradeResource {
         }
 
         JSONArray arrayJSON = new JSONArray();
-        for (Trade trade: listResult) {
+        for (Trade trade : listResult) {
             arrayJSON.add(trade.toJson(have, true));
         }
 
@@ -538,27 +577,122 @@ public class TradeResource {
     }
 
     @GET
-    @Path("getbyaddress/{address}")
-    public static String getByAddress(@PathParam("address") String address,
-                                      @DefaultValue("50") @QueryParam("limit") Integer limit) {
+    @Path("allordersbyaddress/{address}/{from}")
+    public static String getAllOrdersByAddress(@PathParam("address") String address,
+                                               @PathParam("from") String fromOrder,
+                                               @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
+        Long startOrderID = null;
+        if (fromOrder != null) {
+            startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+        }
+
+        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
+        CreateOrderTransaction createOrder;
+
+        List<Long> keys = finalMap.getTransactionsByAddressAndType(address, Transaction.CREATE_ORDER_TRANSACTION, startOrderID, limit);
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
-        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
-        Transaction createOrder;
+        CompletedOrderMap completedOrdersMap = DCSet.getInstance().getCompletedOrderMap();
 
+        Order order;
         JSONArray out = new JSONArray();
-        for (Order order : ordersMap.getOrdersForAddress(address, limit)) {
-            JSONObject orderJson = order.toJson();
-            Long key = order.getId();
-            createOrder = finalMap.get(key);
-            if (createOrder == null)
-                continue;
+        for (Long key : keys) {
+            createOrder = (CreateOrderTransaction) finalMap.get(key);
 
+            if ((order = ordersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
+                if (order.isNotTraded()) {
+                    order.setStatus(Order.ACTIVE);
+                } else {
+                    order.setStatus(Order.FULFILLED);
+                }
+            } else if ((order = completedOrdersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
+                if (order.isFulfilled()) {
+                    order.setStatus(Order.COMPLETED);
+                } else {
+                    order.setStatus(Order.CANCELED);
+                }
+            } else {
+                order = createOrder.makeOrder();
+                Long err = null;
+                err++;
+            }
+
+            JSONObject orderJson = order.toJson();
             orderJson.put("signature", Base58.encode(createOrder.getSignature()));
 
             out.add(orderJson);
 
+        }
+
+
+        return out.toJSONString();
+    }
+
+    /**
+     * В ordersMap.getKeysForAddressFromID неэффективно перебор до Откуда
+     *
+     * @param address
+     * @param fromOrder
+     * @param limit
+     * @return
+     */
+    @GET
+    @Path("allordersbyaddress_old/{address}/{from}")
+    public static String getAllOrdersByAddress_old(@PathParam("address") String address,
+                                                   @PathParam("from") String fromOrder,
+                                                   @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        Long startOrderID = null;
+        if (fromOrder != null) {
+            startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+        }
+
+        OrderMap ordersMap = DCSet.getInstance().getOrderMap();
+        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
+        CreateOrderTransaction createOrder;
+
+        // на самом деле не эффективно
+        Set<Long> keys = ordersMap.getKeysForAddressFromID(address, startOrderID, limit);
+
+        Order order;
+        JSONArray out = new JSONArray();
+        for (Long key : keys) {
+            createOrder = (CreateOrderTransaction) finalMap.get(key);
+
+            ///order = ordersMap.get(key);
+            order = createOrder.makeOrder();
+
+            JSONObject orderJson = order.toJson();
+            orderJson.put("signature", Base58.encode(createOrder.getSignature()));
+
+            out.add(orderJson);
+
+        }
+
+        CompletedOrderMap completedOrdersMap = DCSet.getInstance().getCompletedOrderMap();
+        try (IteratorCloseable<Long> completedIterator = completedOrdersMap.getAddressIterator(address, startOrderID)) {
+
+            Long key;
+            while (completedIterator.hasNext()) {
+                key = completedIterator.next();
+                createOrder = (CreateOrderTransaction) finalMap.get(key);
+
+                order = completedOrdersMap.get(key);
+
+                JSONObject orderJson = order.toJson();
+                orderJson.put("signature", Base58.encode(createOrder.getSignature()));
+
+                out.add(orderJson);
+
+            }
+        } catch (IOException e) {
         }
 
         return out.toJSONString();
