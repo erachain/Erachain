@@ -179,7 +179,7 @@ public class RocksDbDataSourceOptTransactedDBTest {
 
         // теперь в транзакцию будем закатывать
         DBRocksDBTableOptTransaction dbOptTrans = new DBRocksDBTableOptTransaction(NAME_TABLE,
-                (DBRocksDBTableDBOptTransacted) rocksDB, true);
+                rocksDB, true);
 
         countCommitTMP = 0;
         timeMillisBefore = System.currentTimeMillis();

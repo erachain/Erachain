@@ -2,6 +2,7 @@ package org.erachain.core.item.assets;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
@@ -19,6 +20,7 @@ import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 public class Order implements Comparable<Order> {
 
     //private static final MathContext rounding = new java.math.MathContext(12, RoundingMode.HALF_DOWN);
@@ -109,6 +111,18 @@ public class Order implements Comparable<Order> {
 
     public static Order getOrder(DCSet db, Long key) {
         if (db.getOrderMap().contains(key)) {
+            if (BlockChain.CHECK_BUGS > 2) {
+                Order order = db.getOrderMap().get(key);
+                if (order == null) {
+                    // тут странно - поидее ордер найден но когда берем - его нету
+                    // при этом при перезагрузке все находит норм - видимо он уже в исполненных
+                    // см issues/1145
+                    db.getOrderMap().contains(key); // повторим для отлова в дебаге
+                    logger.error("Order is LOST: " + Transaction.viewDBRef(key)
+                            + " - and  " + (db.getCompletedOrderMap().contains(key) ? " found in Completed" : " not exist in Completed"));
+                }
+                return order;
+            }
             return db.getOrderMap().get(key);
         }
 
@@ -224,6 +238,7 @@ public class Order implements Comparable<Order> {
     public static int calcPriceScale(int powerAmountHave, int wantScale, int addScale) {
         return powerAmountHave + (wantScale > 0 ? wantScale : 0) + addScale;
     }
+
     public static int calcPriceScale(BigDecimal amountHave, int wantScale, int addScale) {
         return calcPriceScale(Order.powerTen(amountHave), wantScale, addScale);
     }
@@ -393,6 +408,7 @@ public class Order implements Comparable<Order> {
         }
 
     }
+
     ///////// PRICE
     public BigDecimal getPrice() {
         return this.price;
@@ -412,54 +428,52 @@ public class Order implements Comparable<Order> {
 
     //PARSE/CONVERT
 
-	// forDB - use fulFill
-	public static Order parse(byte[] data) throws Exception
-	{
-		//CHECK IF CORRECT LENGTH
-		if(data.length != BASE_LENGTH)
-		{
-			throw new Exception("Data does not match order length");
-		}
+    // forDB - use fulFill
+    public static Order parse(byte[] data) throws Exception {
+        //CHECK IF CORRECT LENGTH
+        if(data.length != BASE_LENGTH) {
+            throw new Exception("Data does not match order length");
+        }
 
-		int position = 0;
+        int position = 0;
 
-		//READ ID
-		byte[] idBytes = Arrays.copyOfRange(data, position, position + ID_LENGTH);
+        //READ ID
+        byte[] idBytes = Arrays.copyOfRange(data, position, position + ID_LENGTH);
         long id = Longs.fromByteArray(idBytes);
-		position += ID_LENGTH;
+        position += ID_LENGTH;
 
-		//READ CREATOR
-		byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
-		Account creator = Account.makeAccountFromShort(creatorBytes);
-		position += CREATOR_LENGTH;
-
-		//READ HAVE
-		byte[] haveBytes = Arrays.copyOfRange(data, position, position + HAVE_LENGTH);
-		long haveKey = Longs.fromByteArray(haveBytes);
-		position += HAVE_LENGTH;
+        //READ CREATOR
+        byte[] creatorBytes = Arrays.copyOfRange(data, position, position + CREATOR_LENGTH);
+        Account creator = Account.makeAccountFromShort(creatorBytes);
+        position += CREATOR_LENGTH;
 
         //READ HAVE
-		byte[] wantBytes = Arrays.copyOfRange(data, position, position + WANT_LENGTH);
-		long wantKey = Longs.fromByteArray(wantBytes);
-		position += WANT_LENGTH;
+        byte[] haveBytes = Arrays.copyOfRange(data, position, position + HAVE_LENGTH);
+        long haveKey = Longs.fromByteArray(haveBytes);
+        position += HAVE_LENGTH;
+
+        //READ HAVE
+        byte[] wantBytes = Arrays.copyOfRange(data, position, position + WANT_LENGTH);
+        long wantKey = Longs.fromByteArray(wantBytes);
+        position += WANT_LENGTH;
 
         //READ HAVE SCALE
         byte scaleHave = Arrays.copyOfRange(data, position, position + 1)[0];
         position ++;
 
         //READ AMOUNT HAVE
-		byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), scaleHave);
-		position += AMOUNT_LENGTH;
+        byte[] amountHaveBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal amountHave = new BigDecimal(new BigInteger(amountHaveBytes), scaleHave);
+        position += AMOUNT_LENGTH;
 
         //READ WANT SCALE
         byte scaleWant = Arrays.copyOfRange(data, position, position + 1)[0];
         position ++;
 
         //READ AMOUNT WANT
-		byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
-		BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), scaleWant);
-		position += AMOUNT_LENGTH;
+        byte[] amountWantBytes = Arrays.copyOfRange(data, position, position + AMOUNT_LENGTH);
+        BigDecimal amountWant = new BigDecimal(new BigInteger(amountWantBytes), scaleWant);
+        position += AMOUNT_LENGTH;
 
         byte haveAssetScale = Arrays.copyOfRange(data, position, position + 1)[0];
         position ++;
@@ -471,9 +485,9 @@ public class Order implements Comparable<Order> {
         position ++;
 
         //READ FULFILLED HAVE
-		byte[] fulfilledHaveBytes = Arrays.copyOfRange(data, position, position + FULFILLED_LENGTH);
-		BigDecimal fulfilledHave = new BigDecimal(new BigInteger(fulfilledHaveBytes), scalefulfilledHave);
-		position += FULFILLED_LENGTH;
+        byte[] fulfilledHaveBytes = Arrays.copyOfRange(data, position, position + FULFILLED_LENGTH);
+        BigDecimal fulfilledHave = new BigDecimal(new BigInteger(fulfilledHaveBytes), scalefulfilledHave);
+        position += FULFILLED_LENGTH;
 
         //READ FULFILLED HAVE
         byte[] statusBytes = Arrays.copyOfRange(data, position, position + STATUS_LENGTH);
@@ -482,59 +496,55 @@ public class Order implements Comparable<Order> {
 
         return new Order(id, creator, haveKey, amountHave, haveAssetScale, fulfilledHave, wantKey, amountWant, wantAssetScale, status);
 
-	}
+    }
 
-	public byte[] toBytes()
-	{
-		byte[] data = new byte[0];
+    public byte[] toBytes() {
+        byte[] data = new byte[0];
 
-		//WRITE ID
-		byte[] idBytes = Longs.toByteArray(this.id);
-		byte[] fill = new byte[ID_LENGTH - idBytes.length];
-		idBytes = Bytes.concat(fill, idBytes);
-		data = Bytes.concat(data, idBytes);
+        //WRITE ID
+        byte[] idBytes = Longs.toByteArray(this.id);
+        byte[] fill = new byte[ID_LENGTH - idBytes.length];
+        idBytes = Bytes.concat(fill, idBytes);
+        data = Bytes.concat(data, idBytes);
 
-		//WRITE CREATOR
-		try
-		{
-			data = Bytes.concat(data , this.creator.getShortAddressBytes());
-		}
-		catch(Exception e)
-		{
-			//DECODE EXCEPTION
-		}
+        //WRITE CREATOR
+        try {
+            data = Bytes.concat(data , this.creator.getShortAddressBytes());
+        } catch(Exception e) {
+            //DECODE EXCEPTION
+        }
 
-		//WRITE HAVE KEY
-		byte[] haveBytes = Longs.toByteArray(this.haveAssetKey);
+        //WRITE HAVE KEY
+        byte[] haveBytes = Longs.toByteArray(this.haveAssetKey);
         // only for BIGInteger and BigDecimal it need:
-		//haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
-		data = Bytes.concat(data, haveBytes);
+        //haveBytes = Bytes.ensureCapacity(haveBytes, HAVE_LENGTH, 0);
+        data = Bytes.concat(data, haveBytes);
 
-		//WRITE WANT KEY
-		byte[] wantBytes = Longs.toByteArray(this.wantAssetKey);
-		// only for BIGInteger and BigDecimal it need:
+        //WRITE WANT KEY
+        byte[] wantBytes = Longs.toByteArray(this.wantAssetKey);
+        // only for BIGInteger and BigDecimal it need:
         // wantBytes = Bytes.ensureCapacity(wantBytes, WANT_LENGTH, 0);
-		data = Bytes.concat(data, wantBytes);
+        data = Bytes.concat(data, wantBytes);
 
         //WRITE AMOUNT HAVE SCALE
         data = Bytes.concat(data, new byte[]{(byte)this.amountHave.scale()});
 
         //WRITE AMOUNT HAVE
-		byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
-		fill = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
-		amountHaveBytes = Bytes.concat(fill, amountHaveBytes);
-		data = Bytes.concat(data, amountHaveBytes);
+        byte[] amountHaveBytes = this.amountHave.unscaledValue().toByteArray();
+        fill = new byte[AMOUNT_LENGTH - amountHaveBytes.length];
+        amountHaveBytes = Bytes.concat(fill, amountHaveBytes);
+        data = Bytes.concat(data, amountHaveBytes);
 
         //WRITE AMOUNT WANT SCALE
         data = Bytes.concat(data, new byte[]{(byte)this.amountWant.scale()});
 
         //WRITE AMOUNT WANT
-		byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
-		fill = new byte[AMOUNT_LENGTH - amountWantBytes.length];
-		amountWantBytes = Bytes.concat(fill, amountWantBytes);
-		data = Bytes.concat(data, amountWantBytes);
+        byte[] amountWantBytes = this.amountWant.unscaledValue().toByteArray();
+        fill = new byte[AMOUNT_LENGTH - amountWantBytes.length];
+        amountWantBytes = Bytes.concat(fill, amountWantBytes);
+        data = Bytes.concat(data, amountWantBytes);
 
-		// ASSETS SCALE
+        // ASSETS SCALE
         data = Bytes.concat(data, new byte[]{(byte)this.haveAssetScale});
         data = Bytes.concat(data, new byte[]{(byte)this.wantAssetScale});
 
@@ -548,22 +558,21 @@ public class Order implements Comparable<Order> {
         //WRITE AMOUNT HAVE SCALE
         data = Bytes.concat(data, new byte[]{(byte)this.fulfilledHave.scale()});
 
-		//WRITE FULFILLED HAVE
-		///fulfilledHaveBytes = this.fulfilledHave.unscaledValue().toByteArray();
-		fill = new byte[FULFILLED_LENGTH - fulfilledHaveBytes.length];
-		fulfilledHaveBytes = Bytes.concat(fill, fulfilledHaveBytes);
-		data = Bytes.concat(data, fulfilledHaveBytes);
+        //WRITE FULFILLED HAVE
+        ///fulfilledHaveBytes = this.fulfilledHave.unscaledValue().toByteArray();
+        fill = new byte[FULFILLED_LENGTH - fulfilledHaveBytes.length];
+        fulfilledHaveBytes = Bytes.concat(fill, fulfilledHaveBytes);
+        data = Bytes.concat(data, fulfilledHaveBytes);
 
         //WRITE STATUS
         data = Bytes.concat(data, new byte[]{(byte)this.status});
 
         return data;
-	}
+    }
 
-	public int getDataLength()
-	{
-		return BASE_LENGTH;
-	}
+    public int getDataLength() {
+        return BASE_LENGTH;
+    }
 
     public boolean isConfirmed() {
         return isConfirmed(DCSet.getInstance());
@@ -637,16 +646,16 @@ public class Order implements Comparable<Order> {
 
                 Transaction.viewDBRef(id).equals("39836-1")
 
-                //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
-                //|| height == 253841 // сработал NEW_FLOR 2-й
-                //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
-        //|| (this.haveAssetKey == 12L && this.wantAssetKey == 95L)
-                //|| (this.wantAssetKey == 95L && this.haveAssetKey == 12L)
-                //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
-                //Arrays.equals(Base58.decode("2GnkzTNDJtMgDHmKKxkZSQP95S7DesENCR2HRQFQHcspFCmPStz6yn4XEnpdW4BmSYW5dkML6xYZm1xv7JXfbfNz"), transaction.getSignature()
-                //this.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
-                //&& !db.isFork()
-                ) {
+            //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
+            //|| height == 253841 // сработал NEW_FLOR 2-й
+            //|| height == 255773 // тут мизерные остатки - // 70220 - 120.0000234 - обратный сработал
+            //|| (this.haveAssetKey == 12L && this.wantAssetKey == 95L)
+            //|| (this.wantAssetKey == 95L && this.haveAssetKey == 12L)
+            //Arrays.equals(Base58.decode("3PVq3fcMxEscaBLEYgmmJv9ABATPasYjxNMJBtzp4aKgDoqmLT9MASkhbpaP3RNPv8CECmUyH5sVQtEAux2W9quA"), transaction.getSignature())
+            //Arrays.equals(Base58.decode("2GnkzTNDJtMgDHmKKxkZSQP95S7DesENCR2HRQFQHcspFCmPStz6yn4XEnpdW4BmSYW5dkML6xYZm1xv7JXfbfNz"), transaction.getSignature()
+            //this.id.equals(new BigInteger(Base58.decode("4NxUYDifB8xuguu5gVkma4V1neseHXYXhFoougGDzq9m7VdZyn7hjWUYiN6M7vkj4R5uwnxauoxbrMaavRMThh7j")))
+            //&& !db.isFork()
+        ) {
             debug = true;
         }
 
@@ -756,7 +765,7 @@ public class Order implements Comparable<Order> {
 
             if (debug ||
                     Transaction.viewDBRef(id).equals("-178617-18")
-                        ) {
+            ) {
                 debug = true;
             }
 
@@ -864,7 +873,7 @@ public class Order implements Comparable<Order> {
             }
 
             if (tradeAmountForHave.compareTo(BigDecimal.ZERO) <= 0
-                || tradeAmountForWant.compareTo(BigDecimal.ZERO) <= 0) {
+                    || tradeAmountForWant.compareTo(BigDecimal.ZERO) <= 0) {
                 debug = true;
                 Long error = null;
                 error ++;
@@ -895,7 +904,7 @@ public class Order implements Comparable<Order> {
 
                 //////////////////////////// TRADE /////////////////
                 if (tradeAmountForHave.scale() > wantAssetScale
-                || tradeAmountForWant.scale() > haveAssetScale) {
+                        || tradeAmountForWant.scale() > haveAssetScale) {
                     Long error = null;
                     error ++;
                 }
@@ -1111,13 +1120,10 @@ public class Order implements Comparable<Order> {
 
     //COPY
     public Order copy() {
-		try
-		{
-			return parse(this.toBytes());
-		}
-		catch (Exception e)
-		{
-			return null;
-		}
+        try {
+            return parse(this.toBytes());
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -291,6 +291,9 @@ public class ItemAssetBalanceMapImplTest {
         }
     }
 
+    /**
+     * Тут нужно ключ СчитатьРазмер установить
+     */
     @Test
     public void assetIteratorAndReplace() {
         for (int dbs: TESTED_DBS) {

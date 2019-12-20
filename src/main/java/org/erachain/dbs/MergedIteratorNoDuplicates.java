@@ -26,6 +26,13 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
         itemComparator = null;
     }
 
+    /**
+     * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
+     * Правда в тестах вылетает ошибка доступа при закрытии - org.erachain.datachain.TradeMapImplTest#getTradesByTimestamp()
+     *
+     * @param iterators
+     * @param itemComparator
+     */
     public MergedIteratorNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
                                       final Comparator<? super T> itemComparator) {
         // A comparator that's used by the heap, allowing the heap
