@@ -25,11 +25,10 @@ import static org.junit.Assert.assertEquals;
 @Slf4j
 public class ItemAssetBalanceMapImplTest {
 
-    int[] TESTED_DBS = new int[]{DCSet.DBS_ROCK_DB, DCSet.DBS_MAP_DB, DCSet.DBS_NATIVE_MAP
-            ,DCSet.DBS_ROCK_DB};
+    int[] TESTED_DBS = new int[]{DCSet.DBS_ROCK_DB, DCSet.DBS_MAP_DB, DCSet.DBS_NATIVE_MAP};
 
     DCSet dcSet;
-    Account account1 = new Account("7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF");
+    Account account1 = new Account("76kos2Xe3KzhQ5K7HyKtWXF1kwNRWmTW9k");
     Account account2 = new Account("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS");
     Account account3 = new Account("7Ca34FCVKEgVy7ZZqRB41Wzj3aSFvtfvDp");
 
@@ -83,42 +82,46 @@ public class ItemAssetBalanceMapImplTest {
 
             init(dbs);
 
-            boolean found = map.contains(account1.getShortAddressBytes(), 2L);
+            try {
+                boolean found = map.contains(account1.getShortAddressBytes(), 2L);
 
-            assertEquals(found, false);
+                // нужно удалять папку с РоксДБ перед тестом иначе может там быть не пустая база
+                assertEquals(found, false);
 
-            map.put(account1.getShortAddressBytes(), 2L, balance1);
+                map.put(account1.getShortAddressBytes(), 2L, balance1);
 
-            // make SAME KEY as NEW OBJECT
-            found = map.contains(account1.getShortAddressBytes(), 2L);
+                // make SAME KEY as NEW OBJECT
+                found = map.contains(account1.getShortAddressBytes(), 2L);
 
-            assertEquals(found, true);
+                assertEquals(found, true);
 
-            // make SAME KEY as NEW OBJECT
-            found = map.contains(account1.getShortAddressBytes(), 3L);
+                // make SAME KEY as NEW OBJECT
+                found = map.contains(account1.getShortAddressBytes(), 3L);
 
-            assertEquals(found, false);
+                assertEquals(found, false);
 
-            // make SAME KEY as NEW OBJECT
-            found = map.contains(account2.getShortAddressBytes(), 2L);
+                // make SAME KEY as NEW OBJECT
+                found = map.contains(account2.getShortAddressBytes(), 2L);
 
-            assertEquals(found, false);
+                assertEquals(found, false);
 
-            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-                    balance = map.get(account1.getShortAddressBytes(), 2L);
+                Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                        balance = map.get(account1.getShortAddressBytes(), 2L);
 
-            assertEquals(balance1, balance);
+                assertEquals(balance1, balance);
 
 
-            assertEquals(Arrays.equals(account1.getShortAddressBytes(), ItemAssetBalanceMap.getShortAccountFromKey(account1.getShortAddressBytes())), true);
+                assertEquals(Arrays.equals(account1.getShortAddressBytes(), ItemAssetBalanceMap.getShortAccountFromKey(account1.getShortAddressBytes())), true);
 
-            Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(account1.getShortAddressBytes()));
+                Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(account1.getShortAddressBytes()));
 
-            assertEquals(Arrays.equals(account.getAddressBytes(), account1.getAddressBytes()), true);
-            assertEquals(Arrays.equals(account.getShortAddressBytes(), account1.getShortAddressBytes()), true);
-            assertEquals(account.getAddress(), account1.getAddress());
+                assertEquals(Arrays.equals(account.getAddressBytes(), account1.getAddressBytes()), true);
+                assertEquals(Arrays.equals(account.getShortAddressBytes(), account1.getShortAddressBytes()), true);
+                assertEquals(account.getAddress(), account1.getAddress());
 
-            dcSet.close();
+            } finally {
+                dcSet.close();
+            }
         }
     }
 
@@ -126,73 +129,76 @@ public class ItemAssetBalanceMapImplTest {
     public void addressIteratorSort() {
         for (int dbs : TESTED_DBS) {
             init(dbs);
+            try {
 
-            long assetKeyTMP = 0L;
+                long assetKeyTMP = 0L;
 
-            Random rand = new Random();
-            for (Account account: accounts) {
-                for (int i = 0; i < 100; i++) {
-                    long randLong = rand.nextLong();
-                    if (randLong < 0)
-                        randLong = -randLong;
+                Random rand = new Random();
+                for (Account account : accounts) {
+                    for (int i = 0; i < 100; i++) {
+                        long randLong = rand.nextLong();
+                        if (randLong < 0)
+                            randLong = -randLong;
 
-                    int assetKey = (int) randLong;
-                    if (assetKey < 0)
-                        assetKey = -assetKey;
+                        int assetKey = (int) randLong;
+                        if (assetKey < 0)
+                            assetKey = -assetKey;
 
-                    int randInt = rand.nextInt();
-                    BigDecimal balTest = new BigDecimal(randInt + "." + randLong);
-                    balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
-                    balTest = balTest.setScale(TransactionAmount.maxSCALE, RoundingMode.HALF_DOWN);
+                        int randInt = rand.nextInt();
+                        BigDecimal balTest = new BigDecimal(randInt + "." + randLong);
+                        balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
+                        balTest = balTest.setScale(TransactionAmount.maxSCALE, RoundingMode.HALF_DOWN);
 
-                    balTest = new BigDecimal(i - 5);
+                        balTest = new BigDecimal(i - 5);
 
-                    // account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
+                        // account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
 
-                    // создаем новые ключи
-                    byte[] key = Bytes.concat(account.getShortAddressBytes(), Longs.toByteArray(assetKey));
+                        // создаем новые ключи
+                        byte[] key = Bytes.concat(account.getShortAddressBytes(), Longs.toByteArray(assetKey));
 
-                    balance1 = new Fun.Tuple5<>(new Fun.Tuple2(balTest, balTest), balAB, balAC, balBD, balBD);
-                    //logger.info(balTest.toPlainString());
-                    map.set(key, balance1);
+                        balance1 = new Fun.Tuple5<>(new Fun.Tuple2(balTest, balTest), balAB, balAC, balBD, balBD);
+                        //logger.info(balTest.toPlainString());
+                        map.set(key, balance1);
+                    }
                 }
+
+                BigDecimal value;
+                Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                        balance = null;
+                Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                        balanceTmp;
+
+                Account testAccount = account2;
+                Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(testAccount);
+
+                int iteratorSize = 0;
+                for (byte[] key : assetKeysSet) {
+                    iteratorSize++;
+                    long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+                    byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(key);
+
+                    assertEquals(testAccount.equals(addressKey), true);
+
+                    balanceTmp = map.get(key);
+
+                    // Нужно положить их с отсутпом
+                    if (false) {
+                        logger.error("DBS: " + dbs + "  assetKey: " + assetKey
+                                + " acc: " + Crypto.getInstance().getAddressFromShort(addressKey) + " SET bal:"
+                                + balanceTmp.a.b);
+                    }
+
+                    if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
+                        logger.error("DBS: " + dbs + "  assetKey: " + assetKey);
+                        // всегда идем по возрастанию
+                        assertEquals(assetKeyTMP, assetKey);
+                    }
+                    assetKeyTMP = assetKey;
+                }
+
+            } finally {
+                dcSet.close();
             }
-
-            BigDecimal value;
-            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-                    balance = null;
-            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-                    balanceTmp;
-
-            Account testAccount = account2;
-            Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).accountKeys(testAccount);
-
-            int iteratorSize = 0;
-            for (byte[] key : assetKeysSet) {
-                iteratorSize++;
-                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
-                byte[] addressKey = ItemAssetBalanceMap.getShortAccountFromKey(key);
-
-                assertEquals(testAccount.equals(addressKey), true);
-
-                balanceTmp = map.get(key);
-
-                // Нужно положить их с отсутпом
-                if (false) {
-                    logger.error("DBS: " + dbs + "  assetKey: " + assetKey
-                            + " acc: " + Crypto.getInstance().getAddressFromShort(addressKey) + " SET bal:"
-                            + balanceTmp.a.b);
-                }
-
-                if (assetKeyTMP > 0 && assetKeyTMP > assetKey) {
-                    logger.error("DBS: " + dbs + "  assetKey: " + assetKey);
-                    // всегда идем по возрастанию
-                    assertEquals(assetKeyTMP, assetKey);
-                }
-                assetKeyTMP = assetKey;
-            }
-
-            dcSet.close();
 
         }
     }
@@ -200,93 +206,97 @@ public class ItemAssetBalanceMapImplTest {
     @Test
     public void assetIteratorSortBigDecimal() {
         for (int dbs: TESTED_DBS) {
+
             init(dbs);
 
-            long assetKey1 = 1L;
+            try {
+                long assetKey1 = 1L;
 
-            Random rand = new Random();
-            for (int i=0; i < 1000; i++) {
-                long randLong = rand.nextLong();
-                if (randLong < 0)
-                    randLong = -randLong;
+                Random rand = new Random();
+                for (int i = 0; i < 1000; i++) {
+                    long randLong = rand.nextLong();
+                    if (randLong < 0)
+                        randLong = -randLong;
 
-                int randInt = rand.nextInt();
-                BigDecimal balTest = new BigDecimal( randInt + "." + randLong);
-                balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
-                balTest = balTest.setScale(TransactionAmount.maxSCALE, RoundingMode.HALF_DOWN);
+                    int randInt = rand.nextInt();
+                    BigDecimal balTest = new BigDecimal(randInt + "." + randLong);
+                    balTest = balTest.movePointLeft(rand.nextInt(20) - 3);
+                    balTest = balTest.setScale(TransactionAmount.maxSCALE, RoundingMode.HALF_DOWN);
 
-                //balTest = new BigDecimal( i - 5);
+                    //balTest = new BigDecimal( i - 5);
 
-                Account account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
+                    Account account = new PublicKeyAccount(Crypto.getInstance().digest(Longs.toByteArray(randLong)));
 
-                // создаем новые ключи
-                byte[] key = Bytes.concat(account.getShortAddressBytes(), Longs.toByteArray(assetKey1));
+                    // создаем новые ключи
+                    byte[] key = Bytes.concat(account.getShortAddressBytes(), Longs.toByteArray(assetKey1));
 
-                balance1 = new Fun.Tuple5<>(new Fun.Tuple2(balTest, balTest), balAB, balAC, balBD, balBD);
-                //logger.info(balTest.toPlainString());
-                map.set(key, balance1);
+                    balance1 = new Fun.Tuple5<>(new Fun.Tuple2(balTest, balTest), balAB, balAC, balBD, balBD);
+                    //logger.info(balTest.toPlainString());
+                    map.set(key, balance1);
+                }
+
+                BigDecimal value;
+                Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                        balance = null;
+                Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                        balanceTmp;
+
+                Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1);
+                balance = null;
+                int iteratorSize = 0;
+                for (byte[] key : assetKeysSet) {
+                    iteratorSize++;
+                    long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+                    assertEquals(assetKey, assetKey1);
+                    balanceTmp = map.get(key);
+
+                    // Нужно положить их с отсутпом
+                    if (false && dbs == 2) {
+                        logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
+                                + balanceTmp.a.b);
+                    }
+
+                    if (balance != null && balanceTmp.a.b.compareTo(balance.a.b) > 0) {
+                        logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
+                                + balanceTmp.a.b);
+                        // всегда идем по возрастанию
+                        assertEquals(balanceTmp.a.b, balance.a.b);
+                    }
+                    balance = balanceTmp;
+                }
+
+                //////////////////
+                Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetIterator(assetKey1);
+
+                balance = null;
+                iteratorSize = 0;
+                while (assetKeys.hasNext()) {
+                    iteratorSize++;
+
+                    byte[] key = assetKeys.next();
+                    long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
+                    assertEquals(assetKey, assetKey1);
+                    balanceTmp = map.get(key);
+
+                    // Нужно положить их с отсутпом
+                    if (false && dbs == 2) {
+                        logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
+                                + balanceTmp.a.b);
+                    }
+
+                    if (balance != null && balanceTmp.a.b.compareTo(balance.a.b) > 0) {
+                        logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize);
+                        // всегда идем по возрастанию
+                        assertEquals(balanceTmp.a.b, balance.a.b);
+                    }
+                    balance = balanceTmp;
+
+                }
+                assertEquals(map.size(), iteratorSize);
+
+            } finally {
+                dcSet.close();
             }
-
-            BigDecimal value;
-            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-                    balance = null;
-            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-                    balanceTmp;
-
-            Collection<byte[]> assetKeysSet = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetKeys(assetKey1);
-            balance = null;
-            int iteratorSize = 0;
-            for (byte[] key: assetKeysSet) {
-                iteratorSize++;
-                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
-                assertEquals(assetKey, assetKey1);
-                balanceTmp = map.get(key);
-
-                // Нужно положить их с отсутпом
-                if (false && dbs == 2) {
-                    logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
-                            + balanceTmp.a.b);
-                }
-
-                if (balance != null && balanceTmp.a.b.compareTo(balance.a.b) > 0) {
-                    logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
-                            + balanceTmp.a.b);
-                    // всегда идем по возрастанию
-                    assertEquals(balanceTmp.a.b, balance.a.b);
-                }
-                balance = balanceTmp;
-            }
-
-            //////////////////
-            Iterator<byte[]> assetKeys = ((ItemAssetBalanceSuit) ((DBTabImpl) map).getSuit()).assetIterator(assetKey1);
-
-            balance = null;
-            iteratorSize = 0;
-            while (assetKeys.hasNext()) {
-                iteratorSize++;
-
-                byte[] key = assetKeys.next();
-                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(key);
-                assertEquals(assetKey, assetKey1);
-                balanceTmp = map.get(key);
-
-                // Нужно положить их с отсутпом
-                if (false && dbs == 2) {
-                    logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize + " SET bal:"
-                            + balanceTmp.a.b);
-                }
-
-                if (balance != null && balanceTmp.a.b.compareTo(balance.a.b) > 0) {
-                    logger.error("DBS: " + dbs + "  iteratorSize: " + iteratorSize);
-                    // всегда идем по возрастанию
-                    assertEquals(balanceTmp.a.b, balance.a.b);
-                }
-                balance = balanceTmp;
-
-            }
-            assertEquals(map.size(), iteratorSize);
-
-            dcSet.close();
 
         }
     }
@@ -297,9 +307,10 @@ public class ItemAssetBalanceMapImplTest {
     @Test
     public void assetIteratorAndReplace() {
         for (int dbs: TESTED_DBS) {
-            try {
-                init(dbs);
 
+            init(dbs);
+
+            try {
                 int size = map.size();
 
                 long assetKey1 = 1L;
@@ -451,10 +462,10 @@ public class ItemAssetBalanceMapImplTest {
     @Test
     public void addressIterator() {
         for (int dbs : TESTED_DBS) {
+
+            init(dbs);
+
             try {
-
-                init(dbs);
-
                 int size = map.size();
 
                 long assetKey1 = 1L;

@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.comm;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.BlockChain;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
@@ -96,11 +97,21 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
                 return writeBatch.getFromBatch(optionsDBcont, key) != null;
             }
 
-            // возможно что есть, проверим сначала в пакете
-            return writeBatch.getFromBatch(optionsDBcont, key) != null ||
-                    ////dbCore.get(key, containsBuff) != RocksDB.NOT_FOUND;
-                    /// быстрый поиск без получения данных
-                    dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
+            if (BlockChain.CHECK_BUGS > 5) {
+                // проверка правильности поиска
+                boolean found = writeBatch.getFromBatch(optionsDBcont, key) != null;
+                if (found)
+                    return true;
+                int valueFound = dbCore.get(optionsReadDBcont, key, containsBuff);
+                return valueFound != RocksDB.NOT_FOUND;
+
+            } else {
+                // возможно что есть, проверим сначала в пакете
+                return writeBatch.getFromBatch(optionsDBcont, key) != null ||
+                        ////dbCore.get(key, containsBuff) != RocksDB.NOT_FOUND;
+                        /// быстрый поиск без получения данных
+                        dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
+            }
 
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
