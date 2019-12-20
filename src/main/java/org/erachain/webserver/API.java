@@ -165,9 +165,11 @@ public class API {
     @GET
     @Path("firstblock")
     public Response getFirstBlock() {
-        Map out = new LinkedHashMap();
+        //Map out = new LinkedHashMap();
 
-        out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+        //JSONObject out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+
+        JSONObject out = dcSet.getBlockMap().get(1).toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -395,7 +397,8 @@ public class API {
         if (limit > 30)
             limit = 30;
 
-        Map out = new LinkedHashMap();
+        //Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -403,12 +406,12 @@ public class API {
             JSONArray array = new JSONArray();
             BlockMap blockMap = dcSet.getBlockMap();
             int max = blockMap.size();
-            for (int i = height; i < height + limit + 1; ++i) {
-                if (height >= max) {
+            for (int i = height; i < height + limit; i++) {
+                if (i > max) {
                     out.put("end", 1);
                     break;
                 }
-                array.add(blockMap.get(i));
+                array.add(blockMap.get(i).toJson());
             }
             out.put("blocks", array);
 
@@ -426,7 +429,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toString())
                 .build();
     }
 
@@ -446,8 +449,8 @@ public class API {
             JSONArray array = new JSONArray();
             BlocksHeadsMap blocksHeadsMap = dcSet.getBlocksHeadsMap();
             int max = dcSet.getBlockMap().size();
-            for (int i = height; i < height + limit + 1; ++i) {
-                if (height >= max) {
+            for (int i = height; i < height + limit; i++) {
+                if (i > max) {
                     out.put("end", 1);
                     break;
                 }
