@@ -115,16 +115,11 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
         }
         resetDbLock.readLock().lock();
         try {
-            if (true) {
-                if (writeBatch.getFromBatch(dbOptions, key) != null)
-                    return true;
-            } else {
-                if (deleted.contains(key))
-                    return false;
-                if (puts.containsKey(key))
-                    return true;
+            if (deleted.contains(key))
+                return false;
+            if (puts.containsKey(key))
+                return true;
 
-            }
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(key, inCache)) return false;
             // теперь ищем по настоящему - без получения данных
@@ -145,15 +140,12 @@ public class RocksDbDataSourceDBCommitAsBathDelPuts extends RocksDbDataSourceImp
         }
         resetDbLock.readLock().lock();
         try {
-            if (true) {
-                if (writeBatch.getFromBatch(columnFamilyHandle, dbOptions, key) != null)
-                    return true;
-            } else {
-                if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
-                    return false;
-                if (puts.containsKey(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
-                    return true;
-            }
+
+            if (deleted.contains(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
+                return false;
+            if (puts.containsKey(Bytes.concat(new byte[]{Ints.toByteArray(columnFamilyHandle.getID())[3]}, key)))
+                return true;
+
             // быстрая проверка - потенциально он может содержаться в базе?
             if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) return false;
             // теперь ищем по настоящему
