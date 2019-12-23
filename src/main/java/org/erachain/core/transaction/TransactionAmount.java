@@ -806,8 +806,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
                                         && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b
                                         .compareTo(this.amount.add(this.fee)) < 0) {
-                                    
-                                    if (height > 120000 || BlockChain.DEVELOP_USE)
+
+                                    if (height > BlockChain.ALL_BALANCES_OK_TO && !BlockChain.ERA_COMPU_ALL_UP)
                                         return NO_BALANCE;
                                     
                                     wrong = true;
