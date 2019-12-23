@@ -141,6 +141,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int NOT_HOLDABLE_ASSET = 172;
     public static final int NOT_SPENDABLE_ASSET = 173;
 
+    /**
+     * Прровека на коллизию ключа по подписи - проверяем только если усекаем его и нетпроверки на двойную трату -
+     * BlockChain#CHECK_DOUBLE_SPEND_DEEP
+     */
     public static final int KEY_COLLISION = 194;
 
     public static final int INVALID_MESSAGE_FORMAT = 195;
@@ -1306,7 +1310,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if (false &&  // теперь не проверяем так как люч сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+        if (false &&  // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
                 (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
                 && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
                 && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили

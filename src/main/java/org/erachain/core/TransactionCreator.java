@@ -991,7 +991,7 @@ public class TransactionCreator {
     public Integer afterCreate(Transaction transaction, int asDeal) {
         //CHECK IF PAYMENT VALID
 
-        if (false && // теперь не проверяем так как люч сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+        if (false && // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
                 this.fork.getTransactionTab().contains(transaction.getSignature())) {
             // если случилась коллизия по подписи усеченной
             // в базе неподтвержденных транзакций -то выдадим ошибку
