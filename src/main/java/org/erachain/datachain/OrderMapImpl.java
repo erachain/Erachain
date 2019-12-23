@@ -389,7 +389,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void put(Order order) {
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("1786-17-18")) {
             boolean debug = true;
         }
         this.put(order.getId(), order);
@@ -397,7 +397,7 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
 
     @Override
     public void delete(Order order) {
-        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("178617-18")) {
+        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(order.getId()).equals("178-617-18")) {
             boolean debug = true;
         }
         this.delete(order.getId());

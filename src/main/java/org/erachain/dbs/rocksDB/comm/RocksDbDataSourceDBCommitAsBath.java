@@ -1,6 +1,7 @@
 package org.erachain.dbs.rocksDB.comm;
 
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.BlockChain;
 import org.erachain.dbs.Transacted;
 import org.erachain.dbs.rocksDB.common.RocksDbSettings;
 import org.erachain.dbs.rocksDB.indexes.IndexDB;
@@ -90,18 +91,33 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            // быстрая проверка - потенциально он может содержаться в базе?
-            if (!dbCore.keyMayExist(key, inCache)) {
-                // тогда еще пакет проверим
-                return writeBatch.getFromBatch(optionsDBcont, key) != null;
+            if (true) {
+                return writeBatch.getFromBatchAndDB(dbCore, optionsReadDBcont, key) != null;
+            } else {
+                // так нельзя так как тут не будет учета удаленных в writeBatch
+
+                // быстрая проверка - потенциально он может содержаться в базе?
+                if (!dbCore.keyMayExist(key, inCache)) {
+                    // тогда еще пакет проверим
+                    return writeBatch.getFromBatch(optionsDBcont, key) != null;
+                }
+
+                if (BlockChain.CHECK_BUGS > 5) {
+                    // проверка правильности поиска
+                    boolean found = writeBatch.getFromBatch(optionsDBcont, key) != null;
+                    if (found)
+                        return true;
+                    int valueFound = dbCore.get(optionsReadDBcont, key, containsBuff);
+                    return valueFound != RocksDB.NOT_FOUND;
+
+                } else {
+                    // возможно что есть, проверим сначала в пакете
+                    return writeBatch.getFromBatch(optionsDBcont, key) != null ||
+                            ////dbCore.get(key, containsBuff) != RocksDB.NOT_FOUND;
+                            /// быстрый поиск без получения данных
+                            dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
+                }
             }
-
-            // возможно что есть, проверим сначала в пакете
-            return writeBatch.getFromBatch(optionsDBcont, key) != null ||
-                    ////dbCore.get(key, containsBuff) != RocksDB.NOT_FOUND;
-                    /// быстрый поиск без получения данных
-                    dbCore.get(optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
-
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {
@@ -117,16 +133,21 @@ public class RocksDbDataSourceDBCommitAsBath extends RocksDbDataSourceImpl imple
         }
         resetDbLock.readLock().lock();
         try {
-            // быстрая проверка - потенциально он может содержаться в базе?
-            if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
-                // тогда еще пакет проверим
-                return writeBatch.getFromBatch(columnFamilyHandle, optionsDBcont, key) != null;
-            }
+            if (true) {
+                return writeBatch.getFromBatchAndDB(dbCore, columnFamilyHandle, optionsReadDBcont, key) != null;
+            } else {
+                // так нельзя так как тут не будет учета удаленных в writeBatch
+                // быстрая проверка - потенциально он может содержаться в базе?
+                if (!dbCore.keyMayExist(columnFamilyHandle, key, inCache)) {
+                    // тогда еще пакет проверим
+                    return writeBatch.getFromBatch(columnFamilyHandle, optionsDBcont, key) != null;
+                }
 
-            // возможность что есть, все равно проверим
-            return writeBatch.getFromBatch(columnFamilyHandle, optionsDBcont, key) != null ||
-                    /// быстрый поиск без получения данных
-                    dbCore.get(columnFamilyHandle, optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
+                // возможность что есть, все равно проверим
+                return writeBatch.getFromBatch(columnFamilyHandle, optionsDBcont, key) != null ||
+                        /// быстрый поиск без получения данных
+                        dbCore.get(columnFamilyHandle, optionsReadDBcont, key, containsBuff) != RocksDB.NOT_FOUND;
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         } finally {

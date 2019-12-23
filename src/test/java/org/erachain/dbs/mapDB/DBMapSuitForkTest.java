@@ -56,7 +56,7 @@ public class DBMapSuitForkTest {
      * не удаляет одинаковые ключи
      */
     @Test
-    public void iteratorMergeDuplicates() {
+    public void iteratorMergeNoDuplicates() {
         Set<Long> list1 = new TreeSet<Long>() {{
             add(10L);
             add(112L);
@@ -71,15 +71,14 @@ public class DBMapSuitForkTest {
         Iterator<Long> iter1 = list1.iterator();
         Iterator<Long> iter2 = list2.iterator();
 
-        // тут будет просто сложение - все элементы войдут, даже повторение
-        Iterator<Long> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
+        MergedIteratorNoDuplicates<Long> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
 
         int count = 0;
         while (iterator.hasNext()) {
             Long key = iterator.next();
             count++;
         }
-        assertEquals(count, 5);
+        assertEquals(count, 4);
 
         /// оказывается итератор уже перебрали там и он в конце!
         iter1 = list1.iterator();
@@ -138,8 +137,9 @@ public class DBMapSuitForkTest {
             count++;
         }
         /// так же все сложит без удления дубляжей
-        assertEquals(count, 5);
+        ////assertEquals(count, 5);
 
+        iter2 = list2.iterator();
         count = 0;
         while (iter2.hasNext()) {
             Long key = iter2.next();
@@ -164,7 +164,7 @@ public class DBMapSuitForkTest {
     }
 
     @Test
-    public void iteratorMergeDuplicatesStop() {
+    public void iteratorMergeNoDuplicatesStop() {
         Set<Long> list1 = new TreeSet<Long>() {{
             add(10L);
             add(112L);
@@ -232,15 +232,16 @@ public class DBMapSuitForkTest {
         Iterator<Long> iter1 = list1.iterator();
         Iterator<Long> iter2 = list2.iterator();
 
-        // тут будет просто сложение - все элементы войдут, даже повторение
-        Iterator<Long> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
+        // тут будет просто сложение - все элементы войдут, даже повторение - если брать из Гугль библиотеки
+        // Мой Итератор уберет повторы
+        MergedIteratorNoDuplicates<Long> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iter1, iter2), Fun.COMPARATOR);
 
         int count = 0;
         while (iterator.hasNext()) {
             Long key = iterator.next();
             count++;
         }
-        assertEquals(count, 5);
+        assertEquals(count, 4);
 
         /// оказывается итератор уже перебрали там и он в конце!
         iter1 = list1.iterator();
@@ -289,6 +290,8 @@ public class DBMapSuitForkTest {
                 hashes.set(new byte[]{0, 0, 123, 12}, new byte[]{2, 1, 123, 12});
                 hashes.put(new byte[]{0, 0, 13, 12}, new byte[]{2, 41, 123, 12});
 
+                assertEquals(hashes.contains(new byte[]{0, 0, 123, 12}), true);
+                assertEquals(hashes.contains(new byte[]{0, 0, 0, 12}), false);
                 assertEquals(hashes.contains(new byte[]{0, 0, 13, 12}), true);
 
                 DCSet forkedDC = dcSet.fork();
@@ -315,6 +318,43 @@ public class DBMapSuitForkTest {
 
     @Test
     public void contains() {
+
+        for (int dbs : TESTED_DBS) {
+
+            try {
+                init(dbs);
+
+                HashesMap hashes = dcSet.getHashesMap();
+
+                hashes.set(new byte[]{0, 0, 123, 12}, new byte[]{2, 1, 123, 12});
+                hashes.put(new byte[]{0, 0, 13, 12}, new byte[]{2, 41, 123, 12});
+
+                assertEquals(hashes.contains(new byte[]{0, 0, 13, 12}), true);
+
+                DCSet forkedDC = dcSet.fork();
+                HashesMap forkedHashes = forkedDC.getHashesMap();
+
+                forkedHashes.put(new byte[]{0, 0, 13, 22}, new byte[]{2, 41, 123, 22});
+                assertEquals(hashes.contains(new byte[]{0, 0, 13, 22}), false);
+                assertEquals(forkedHashes.contains(new byte[]{0, 0, 13, 22}), true);
+
+                // in FORK DELETE
+                forkedHashes.delete(new byte[]{0, 0, 13, 22});
+
+                assertEquals(hashes.contains(new byte[]{0, 0, 13, 22}), false);
+                assertEquals(forkedHashes.contains(new byte[]{0, 0, 13, 22}), false);
+
+                forkedDC.writeToParent();
+                forkedDC.close();
+
+                // in PARENT NOT EXIST
+                assertEquals(hashes.contains(new byte[]{0, 0, 13, 22}), false);
+
+
+            } finally {
+                dcSet.close();
+            }
+        }
     }
 
     // TODO нужно проверить на дублирование ключей при сливе с родителем - поидее нельзя чтобы такое происходило
