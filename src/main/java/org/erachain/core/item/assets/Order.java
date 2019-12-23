@@ -120,8 +120,9 @@ public class Order implements Comparable<Order> {
                     db.getOrderMap().contains(key); // повторим для отлова в дебаге
                     logger.error("Order is LOST: " + Transaction.viewDBRef(key)
                             + " - and  " + (db.getCompletedOrderMap().contains(key) ? " found in Completed" : " not exist in Completed"));
+
+                    return db.getCompletedOrderMap().get(key);
                 }
-                return order;
             }
             return db.getOrderMap().get(key);
         }
