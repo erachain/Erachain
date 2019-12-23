@@ -51,7 +51,7 @@ public class DCSet extends DBASet {
     /**
      * Включает подсчет количество в основной таблице трнзакций или в Таблице с подписями
      */
-    static private boolean SIZE_ENABLE_IN_FINAL = false;
+    static private boolean SIZE_ENABLE_IN_FINAL = true;
 
     // эти настройки по умолчанию при ФАСТ режиме пойдут
 
