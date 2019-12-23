@@ -71,7 +71,7 @@ public class RocksDbDataSourceDBCommitAsBathTest {
                 assertEquals(mapTestDbs.contains(key3), true);
 
                 byte[] key4 = new byte[64];
-                System.arraycopy(new byte[]{0, 0, 13, 22}, 0 , key4, 0, 4);
+                System.arraycopy(new byte[]{0, 0, 13, 12}, 0, key4, 0, 4);
                 mapTestDbs.delete(key4);
 
                 assertEquals(mapTestDbs.contains(key4), false);
@@ -85,6 +85,71 @@ public class RocksDbDataSourceDBCommitAsBathTest {
             }
         }
     }
+
+    /**
+     * Перед запуском установить подсчет записей в этой таблице
+     */
+    @Test
+    public void size() {
+        for (int dbs : TESTED_DBS) {
+
+            try {
+                init(dbs);
+
+                // берем ту таблицу которая во всех СУБД реализована
+                TransactionFinalMapSigns mapTestDbs = dcSet.getTransactionFinalMapSigns();
+
+                if (mapTestDbs.size() < 0)
+                    assertEquals("Перед запуском установить подсчет записей в этой таблице", "");
+                int sizeGenesis = mapTestDbs.size();
+
+                byte[] key1 = new byte[64];
+                System.arraycopy(new byte[]{0, 0, 123, 12}, 0, key1, 0, 4);
+                mapTestDbs.set(key1, 12L);
+                assertEquals(sizeGenesis + 1, mapTestDbs.size());
+
+                byte[] key2 = new byte[64];
+                System.arraycopy(new byte[]{0, 0, 13, 12}, 0, key2, 0, 4);
+                mapTestDbs.put(key2, 123L);
+                assertEquals(sizeGenesis + 2, mapTestDbs.size());
+
+                byte[] key3 = new byte[64];
+                System.arraycopy(new byte[]{0, 0, 123, 12}, 0, key3, 0, 4);
+                assertEquals(mapTestDbs.contains(key3), true);
+
+                /// DELETE
+                byte[] key4 = new byte[64];
+                System.arraycopy(new byte[]{0, 0, 13, 12}, 0, key4, 0, 4);
+                mapTestDbs.delete(key4);
+
+                assertEquals(mapTestDbs.contains(key4), false);
+                assertEquals(sizeGenesis + 1, mapTestDbs.size());
+
+                dcSet.flush(0, true, false);
+
+                assertEquals(sizeGenesis + 1, mapTestDbs.size());
+
+                assertEquals(mapTestDbs.contains(key4), false);
+
+                /// REMOVE
+                byte[] key5 = new byte[64];
+                System.arraycopy(new byte[]{0, 0, 123, 12}, 0, key5, 0, 4);
+                mapTestDbs.remove(key5);
+
+                assertEquals(mapTestDbs.contains(key5), false);
+                assertEquals(sizeGenesis, mapTestDbs.size());
+
+                dcSet.flush(0, true, false);
+
+                assertEquals(sizeGenesis, mapTestDbs.size());
+
+
+            } finally {
+                dcSet.close();
+            }
+        }
+    }
+
 
     @Test
     public void delete() {
