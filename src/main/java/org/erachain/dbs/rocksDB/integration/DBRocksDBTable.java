@@ -319,7 +319,7 @@ public abstract class DBRocksDBTable<K, V> implements InnerDBTable
                 oldExist = dbSource.contains(keyBytes);
             }
 
-            if (oldExist) {
+            if (!oldExist) {
                 // быстро возьмем
                 sizeBytes = dbSource.get(columnFamilyFieldSize, optionsReadDBcont, SIZE_BYTE_KEY);
                 ///byte[] sizeBytes = dbSource.get(columnFamilyFieldSize, SIZE_BYTE_KEY);
