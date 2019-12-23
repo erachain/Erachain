@@ -31,7 +31,7 @@ import java.util.*;
 public class BlockChain {
 
     public static final int TESTS_VERS = 0; // not use TESTs - or a11 (as version)
-    public static final boolean DEVELOP_USE = true;
+    public static final boolean DEVELOP_USE = false;
 
     /**
      * Задает потолок цепочки
@@ -60,6 +60,8 @@ public class BlockChain {
      * и при этом разрешены транзакции только по времени за 1 блок.
      * Вдобавок если != 0 то проверки на коллизию ключа (подписи) в TransactionFinalMapSigns не проверяется,
      * что ускоряет работу но воявляется вероятность колллизии - поэтому можно там увеличить длинну ключа если тут != 0
+     * ! Вдобавок нужно понимать что если мы проверяем по времени трнзакции то 100% они уже будут иметь уникальные подписи
+     * и проверять на уникальность их в Финал не нужно (если нет слишком большой обрезки ключа)
      */
     public static final int CHECK_DOUBLE_SPEND_DEEP = TEST_DB > 0 ? -1 : 0;
 
