@@ -805,9 +805,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
                                         && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b
-                                        .compareTo(this.amount.add(this.fee)) < 0) {
+                                        .compareTo(this.amount.add(this.fee)) < 0
+                                        && !BlockChain.ERA_COMPU_ALL_UP
+                                ) {
 
-                                    if (height > BlockChain.ALL_BALANCES_OK_TO && !BlockChain.ERA_COMPU_ALL_UP)
+                                    /// если это девелоп то не проверяем ниже особые счета
+                                    if (BlockChain.DEVELOP_USE)
                                         return NO_BALANCE;
                                     
                                     wrong = true;
@@ -844,10 +847,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     }
                                     
                                 }
-                                
+
+                                // проверим баланс по КОМПУ
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
-                                        && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b.compareTo(this.fee) < 0) {
-                                    if (height > 41100 || BlockChain.DEVELOP_USE)
+                                        && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
+                                        && !BlockChain.ERA_COMPU_ALL_UP) {
+                                    if (BlockChain.DEVELOP_USE)
                                         return NOT_ENOUGH_FEE;
                                         
                                     // TODO: delete wrong check in new CHAIN
@@ -868,7 +873,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         !(asset.isOutsideType() && backward));
                                 
                                 if (amount.compareTo(forSale) > 0) {
-                                    if (height > 120000 || BlockChain.DEVELOP_USE)
+                                    if (BlockChain.DEVELOP_USE)
                                         return NO_BALANCE;
                                         
                                     // TODO: delete wrong check in new CHAIN
