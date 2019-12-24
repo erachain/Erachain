@@ -1234,7 +1234,7 @@ public class Synchronizer extends Thread {
             try {
 
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     break;
                 }
@@ -1245,6 +1245,10 @@ public class Synchronizer extends Thread {
                     continue;
 
                 timePoint = timeTmp;
+
+                // иначе просиходит сброс и синхронизация новая
+                if (blockGenerator.getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT)
+                    continue;
 
 
                 if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
