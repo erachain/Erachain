@@ -693,7 +693,7 @@ public class Order implements Comparable<Order> {
 
         /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
         if ((debug || BlockChain.CHECK_BUGS > 3) && !orders.isEmpty()) {
-            BigDecimal price = orders.get(0).getPrice();
+            BigDecimal price = orders.get(0).calcLeftPrice();
             Long timestamp = orders.get(0).getId();
             Long id = 0L;
             for (Order item: orders) {
@@ -713,7 +713,7 @@ public class Order implements Comparable<Order> {
                 }
                 // потому что сранивается потом обратная цена то тут должно быть возрастание
                 // и если не так то ошибка
-                int comp = price.compareTo(item.getPrice());
+                int comp = price.compareTo(item.calcLeftPrice());
                 if (comp > 0) {
                     // RISE ERROR
                     timestamp = null;
@@ -728,15 +728,15 @@ public class Order implements Comparable<Order> {
                     }
                 }
 
-                price = item.getPrice();
+                price = item.calcLeftPrice();
                 timestamp = item.getId();
             }
 
             List<Order> ordersAll = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, null);
-            price = orders.get(0).getPrice();
+            price = orders.get(0).calcLeftPrice();
             timestamp = orders.get(0).getId();
             for (Order item : ordersAll) {
-                int comp = price.compareTo(item.getPrice());
+                int comp = price.compareTo(item.calcLeftPrice()); // по остаткам цены());
                 if (comp > 0) {
                     // RISE ERROR
                     timestamp = null;
@@ -750,7 +750,7 @@ public class Order implements Comparable<Order> {
                         ++timestamp;
                     }
                 }
-                price = item.getPrice();
+                price = item.calcLeftPrice();
                 timestamp = item.getId();
             }
         }
@@ -790,11 +790,13 @@ public class Order implements Comparable<Order> {
 
             BigDecimal orderAmountHaveLeft;
             BigDecimal orderAmountWantLeft;
+
             // REVERSE
-            BigDecimal orderReversePrice = order.calcPriceReverse();
+            ////////// по остаткам цену берем!
+            BigDecimal orderReversePrice = order.calcLeftPriceReverse();
             // PRICE
-            ///BigDecimal orderPrice = Order.calcPrice(order.amountHave, order.amountWant, haveAssetScale);
-            BigDecimal orderPrice = order.price;
+            ////////// по остаткам цену берем!
+            BigDecimal orderPrice = order.calcLeftPrice(); ///order.price;
 
             Trade trade;
             BigDecimal tradeAmountForHave;
@@ -1125,7 +1127,7 @@ public class Order implements Comparable<Order> {
     @Override
     public int compareTo(Order order) {
         //COMPARE ONLY BY PRICE
-        int result = this.getPrice().compareTo(order.getPrice());
+        int result = this.calcLeftPrice().compareTo(order.calcLeftPrice());
         if (result != 0)
             return result;
 

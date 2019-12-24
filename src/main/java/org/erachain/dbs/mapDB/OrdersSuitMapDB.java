@@ -74,7 +74,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple4<>(value.getHaveAssetKey(), value.getWantAssetKey(),
-                                value.calcPrice(),
+                                value.calcLeftPrice(), // по остаткам цены
                                 value.getId());
                     }
                 });
@@ -194,7 +194,8 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             Order order = get(key);
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
-            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+            // причем берем по Остаткам Цену теперь
+            if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
                 break;
             }
         }

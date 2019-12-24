@@ -66,7 +66,7 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple4<>(value.getHaveAssetKey(), value.getWantAssetKey(),
-                                value.calcPrice(),
+                                value.calcLeftPrice(), // по сотткам считаем для сделок
                                 value.getId());
                     }
                 });
@@ -98,7 +98,8 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
             // в будущем new MergedIteratorNoDuplicates
             result.put(key, order);
             // сдесь хотя бы одну заявку с неподходящей вроде бы ценой нужно взять
-            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+            // причем берем по Остаткам Цену теперь
+            if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
                 break;
             }
         }
