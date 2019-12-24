@@ -146,9 +146,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                 if (asset != null) {
                     jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
                             + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
-                    if (title != null) {
-                        jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
-                    }
                 }
 
             }
@@ -172,6 +169,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                         jComboBox_Account.repaint();
                     }
 
+                    if (title != null) {
+                        jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+                    }
+
                     // set scale
                     int scale = 8;
                     if (asset != null) scale = asset.getScale();
@@ -179,8 +180,9 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                     // jTextArea_Account_Description.setText(asset.getDescription());
                     jScrollPane2.setViewportView(new AssetInfo(asset, false));
 
-                    jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                            + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+                    if (account != null)
+                        jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
+                                + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
 
                 }
 
@@ -222,7 +224,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         }
 
-        this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
+        ///this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
         this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
         this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
