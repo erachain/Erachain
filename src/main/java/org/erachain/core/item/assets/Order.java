@@ -259,6 +259,24 @@ public class Order implements Comparable<Order> {
         return calcPrice(amountHave, amountWant, wantAssetScale);
     }
 
+    /**
+     * Цена по остаткам ордера - для отображения на бирже чтобы люди видели реально цену исполнения заявки
+     *
+     * @return
+     */
+    public BigDecimal calcLeftPrice() {
+        return calcPrice(getAmountHaveLeft(), getAmountWantLeft(), wantAssetScale);
+    }
+
+    /**
+     * Цена по остаткам ордера - для отображения на бирже чтобы люди видели реально цену исполнения заявки
+     *
+     * @return
+     */
+    public BigDecimal calcLeftPriceReverse() {
+        return calcPrice(getAmountWantLeft(), getAmountHaveLeft(), haveAssetScale);
+    }
+
     public BigDecimal calcPriceReverse() {
         return calcPrice(amountWant, amountHave, haveAssetScale);
     }

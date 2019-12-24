@@ -475,14 +475,16 @@ public class CreateOrderPanel extends JPanel {
                 addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
                 txtPrice.setText(price.toPlainString());
                 addQueve(txtPrice);
-                total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_UP);
+                total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
                 txtAmountWant.setText(total.toPlainString());
+
             } else {
                 txtAmountHave.setText(amount.toPlainString());
                 addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
                 txtPrice.setText(price.toPlainString());
                 addQueve(txtPrice);
-                total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_UP);
+                /////////// Тут мы продаем - значит втречно рынку нужно большую цену дать
+                total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
                 txtAmountWant.setText(total.toPlainString());
             }
 

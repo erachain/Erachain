@@ -300,7 +300,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 if (e.getClickCount() == 2) {
 
                     if (row < sellOrdersTableModel.getRowCount()) {
-                        buyOrderPanel.calculateWant(order.getAmountHaveLeft(), order.getPrice(), true);
+                        buyOrderPanel.calculateWant(order.getAmountHaveLeft(), order.calcLeftPrice(), true);
                         ///buyOrderPanel.txtAmountHave.setText(order.getAmountHaveLeft().toPlainString()); buy
                         ///buyOrderPanel.txtPrice.setText(order.calcPrice().toPlainString());
 
@@ -343,7 +343,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                     buyOrdersMenu.getComponent(2).setEnabled(false);
 
                 if (e.getClickCount() == 2) {
-                    sellOrderPanel.calculateWant(order.getAmountWantLeft(), order.calcPriceReverse(), false);
+                    sellOrderPanel.calculateWant(order.getAmountWantLeft(), order.calcLeftPriceReverse(), false);
                     ///sellOrderPanel.txtAmountHave.setText(order.getAmountWantLeft().toPlainString()); sell
                     ///sellOrderPanel.txtPrice.setText(order.calcPriceReverse().toPlainString());
                 }
