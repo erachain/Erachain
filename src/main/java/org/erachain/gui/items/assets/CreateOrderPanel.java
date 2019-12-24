@@ -503,6 +503,28 @@ public class CreateOrderPanel extends JPanel {
 
     }
 
+    public synchronized void setFields(BigDecimal amountHave, BigDecimal price, BigDecimal amountWant) {
+
+        noUpdateFields = true;
+
+        try {
+
+            txtAmountHave.setText(amountHave.toPlainString());
+            addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
+            txtPrice.setText(price.toPlainString());
+            addQueve(txtPrice);
+            txtAmountWant.setText(amountWant.toPlainString());
+
+            sellButton.setEnabled(true);
+
+        } catch (Exception e) {
+            sellButton.setEnabled(false);
+        }
+
+        noUpdateFields = false;
+
+    }
+
     public void onSellClick(boolean buying) {
 
         // DISABLE
