@@ -1,7 +1,5 @@
 package org.erachain.gui.items.accounts;
 
-import java.math.BigDecimal;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
@@ -13,6 +11,8 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
+import java.math.BigDecimal;
+
 //import org.erachain.settings.Settings;
 
 @SuppressWarnings("serial")
@@ -20,10 +20,7 @@ import org.erachain.lang.Lang;
 public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Take on Hold", assetIn, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
-
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to take on hold issued asset %asset%, fill in this form")
-                .replace("%asset%", asset.viewName()));
+        super("Take on Hold", assetIn, "If You want to take on hold issued asset %asset%, fill in this form", TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
 
         //	icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Hold Asset"));
