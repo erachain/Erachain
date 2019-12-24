@@ -8,17 +8,17 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -603,7 +603,7 @@ public class CreateOrderPanel extends JPanel {
         }
 
         Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want,
-                amountHave.setScale(this.have.getScale(), RoundingMode.HALF_DOWN),
+                amountHave.setScale(this.have.getScale(), RoundingMode.HALF_UP),
                 amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
 
         String Status_text = "";
