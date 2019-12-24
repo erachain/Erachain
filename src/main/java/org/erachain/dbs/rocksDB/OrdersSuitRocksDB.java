@@ -67,7 +67,7 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                                 byteableLong.toBytesObject(order.getHaveAssetKey()),
                                 byteableLong.toBytesObject(order.getWantAssetKey()),
                                 //bgToBytes.toBytes(Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0)),
-                                bgToBytes.toBytes(order.getPrice()),
+                                bgToBytes.toBytes(order.calcLeftPrice()), // по остаткам цены
                                 byteableLong.toBytesObject(order.getId())
                         ),
                 result -> result
@@ -187,7 +187,8 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
             }
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
-            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+            // причем берем по Остаткам Цену теперь
+            if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
                 break;
             }
         }

@@ -1823,6 +1823,7 @@ public class Wallet extends Observable implements Observer {
         }
 
         //////////// PROCESS BLOCKS ////////////
+		DCSet dcSet = DCSet.getInstance();
 
         if (this.synchronizeStatus) {
             // идет синхронизация кошелька уже - не обрабатываем блоки тут
@@ -1842,7 +1843,7 @@ public class Wallet extends Observable implements Observer {
             }
 
             // CHECK BLOCK
-            this.orphanBlock(block);
+			this.orphanBlock(dcSet, block);
 
             //this.database.clearCache();
             //this.database.commit();

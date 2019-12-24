@@ -8,17 +8,17 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -472,19 +472,48 @@ public class CreateOrderPanel extends JPanel {
 
             if (buying) {
                 txtAmountHave.setText(amount.toPlainString());
-                addQueve(txtAmountHave);
+                addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
                 txtPrice.setText(price.toPlainString());
                 addQueve(txtPrice);
-                total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
+                /////////// Тут мы покупаем - значит втречно рынку нужно меньшую цену дать
+                total = price.multiply(amount)
+                        // точность от HAVE
+                        .setScale(have.getScale(), RoundingMode.HALF_DOWN);
                 txtAmountWant.setText(total.toPlainString());
+
             } else {
                 txtAmountHave.setText(amount.toPlainString());
                 addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
                 txtPrice.setText(price.toPlainString());
                 addQueve(txtPrice);
-                total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
+                /////////// Тут мы продаем - значит втречно рынку нужно большую цену дать
+                total = price.multiply(amount)
+                        // точность от WANT
+                        .setScale(want.getScale(), RoundingMode.HALF_UP);
                 txtAmountWant.setText(total.toPlainString());
             }
+
+            sellButton.setEnabled(true);
+
+        } catch (Exception e) {
+            sellButton.setEnabled(false);
+        }
+
+        noUpdateFields = false;
+
+    }
+
+    public synchronized void setFields(BigDecimal amountHave, BigDecimal price, BigDecimal amountWant) {
+
+        noUpdateFields = true;
+
+        try {
+
+            txtAmountHave.setText(amountHave.toPlainString());
+            addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
+            txtPrice.setText(price.toPlainString());
+            addQueve(txtPrice);
+            txtAmountWant.setText(amountWant.toPlainString());
 
             sellButton.setEnabled(true);
 
@@ -603,7 +632,7 @@ public class CreateOrderPanel extends JPanel {
         }
 
         Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want,
-                amountHave.setScale(this.have.getScale(), RoundingMode.HALF_DOWN),
+                amountHave.setScale(this.have.getScale(), RoundingMode.HALF_UP),
                 amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
 
         String Status_text = "";
