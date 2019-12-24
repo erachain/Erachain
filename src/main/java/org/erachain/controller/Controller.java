@@ -2502,6 +2502,8 @@ public class Controller extends Observable {
                 return this.dcSet.getItemTemplateMap();
             case ItemCls.PERSON_TYPE:
                 return this.dcSet.getItemPersonMap();
+            case ItemCls.POLL_TYPE:
+                return this.dcSet.getItemPollMap();
         }
         return null;
     }
