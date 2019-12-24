@@ -39,6 +39,7 @@ public class WalletUpdater extends MonitoredThread {
     }
 
     /**
+     * TODO сделать чтобы сюда приходило последовательное добавление блоков в кошелек или их синхронизация
      * @param pair
      */
     public boolean offerMessage(Pair<Boolean, Block> pair) {
