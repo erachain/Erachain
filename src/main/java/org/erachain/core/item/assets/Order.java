@@ -613,9 +613,15 @@ public class Order implements Comparable<Order> {
         order.put("wantAssetKey", this.wantAssetKey);
         order.put("amountHave", this.amountHave.toPlainString());
         order.put("amountWant", this.amountWant.toPlainString());
+        order.put("price", this.price.toPlainString());
+        order.put("priceReverse", calcPriceReverse().toPlainString());
+
         order.put("fulfilledHave", this.fulfilledHave.toPlainString());
         order.put("leftHave", amountHave.subtract(fulfilledHave).toPlainString());
-        order.put("price", this.price.toPlainString());
+
+        order.put("leftPrice", calcLeftPrice().toPlainString());
+        order.put("leftPriceReverse", calcLeftPriceReverse().toPlainString());
+
         order.put("status", this.status);
         order.put("statusName", this.viewStatus());
 

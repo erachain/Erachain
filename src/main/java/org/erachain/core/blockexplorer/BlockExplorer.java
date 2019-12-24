@@ -1214,12 +1214,14 @@ public class BlockExplorer {
             Order order = ordersHave.get(i);
             Map sellJSON = new LinkedHashMap();
 
-            sellJSON.put("price", order.getPrice().toPlainString());
+            /// цену берем по остаткам
+            sellJSON.put("price", order.calcLeftPrice().toPlainString());
             vol = order.getAmountHaveLeft(); //.b.b.subtract(order.b.c);
             sellJSON.put("amount", vol.toPlainString()); // getAmountHaveLeft
             sumAmount = sumAmount.add(vol);
 
-            sellJSON.put("sellingPrice", order.calcPriceReverse().toPlainString());
+            /// цену берем по остаткам
+            sellJSON.put("sellingPrice", order.calcLeftPriceReverse().toPlainString());
 
             //BigDecimal sellingAmount = Order.calcAmountWantLeft(order);
             BigDecimal sellingAmount = order.getAmountWantLeft();
@@ -1260,13 +1262,15 @@ public class BlockExplorer {
 
             Map buyJSON = new LinkedHashMap();
 
-            buyJSON.put("price", order.getPrice().toPlainString());
+            /// цену берем по остаткам
+            buyJSON.put("price", order.calcLeftPrice().toPlainString());
             vol = order.getAmountHaveLeft(); //.b.b.subtract(order.b.c);
             buyJSON.put("amount", vol.toPlainString()); // getAmountHaveLeft
 
             sumAmount = sumAmount.add(vol);
 
-            buyJSON.put("buyingPrice", order.calcPriceReverse().toPlainString());
+            /// цену берем по остаткам
+            buyJSON.put("buyingPrice", order.calcLeftPriceReverse().toPlainString());
 
             //BigDecimal buyingAmount = Order.calcAmountWantLeft(order);
             BigDecimal buyingAmount = order.getAmountWantLeft();
