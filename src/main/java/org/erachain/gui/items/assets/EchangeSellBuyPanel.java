@@ -89,7 +89,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         // lblTitle.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblTitle, labelGBC);
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             lblTitle.setVisible(false);
 
         // CREATE BUY LABEL
@@ -98,14 +98,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
                 .replace("%want%", this.want.toString()));
         // lblBuy.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblBuy, labelGBC);
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             lblBuy.setVisible(false);
 
         // CREATE SELL LABEL
 
         labelGBC.gridy = 0;
         labelGBC.gridx = 1;
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             labelGBC.gridx = 0;
 
         // CREATE TITLE LABEL
@@ -114,7 +114,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         // lblTitle1.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblTitle1, labelGBC);
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             lblTitle1.setVisible(false);
 
         labelGBC.gridy = 1;
@@ -124,14 +124,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         // lblSell.setFont(new Font("Serif", Font.PLAIN, 18));
         // jPanel_Trade.add(lblSell, labelGBC);
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             lblSell.setVisible(false);
 
         // CREATE BUY PANEL
         buyOrderPanel = new CreateOrderPanel(this.want, this.have, true, account);
         jPanel_Trade.add(buyOrderPanel, orderGBC);
         // buyOrderPanel.setBackground(Color.BLUE);
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             buyOrderPanel.setVisible(false);
 
         // CREATE SELL PANEL
@@ -142,14 +142,14 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         // sellOrderPanel.setBackground(Color.BLUE);
 
         orderGBC.fill = GridBagConstraints.BOTH;
-        if (action == "To sell") {
+        if (action != null && action.equals("To sell")) {
             orderGBC.gridx = 0;
             orderGBC.fill = GridBagConstraints.BOTH;
 
         }
 
         jPanel_Trade.add(sellOrderPanel, orderGBC);
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             sellOrderPanel.setVisible(false);
 
         // sellOrderPanel.setPreferredSize(new
@@ -167,17 +167,17 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         JLabel lblSellOrders = new JLabel(Lang.getInstance().translate("Sell Orders"));
         // lblSellOrders.setFont(new Font("Serif", Font.PLAIN, 18));
         jPanel_Trade.add(lblSellOrders, labelGBC);
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             lblSellOrders.setVisible(false);
 
         // CREATE BUY ORDERS LABEL
         labelGBC.gridx = 1;
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             labelGBC.gridx = 0;
         JLabel lblBuyOrders = new JLabel(Lang.getInstance().translate("Buy Orders"));
         // lblBuyOrders.setFont(new Font("Serif", Font.PLAIN, 18));
         jPanel_Trade.add(lblBuyOrders, labelGBC);
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             lblBuyOrders.setVisible(false);
 
         // CREATE SELL ORDERS TABLE
@@ -313,12 +313,12 @@ public class EchangeSellBuyPanel extends JTabbedPane {
 
         jPanel_Trade.add(sellScrollPane, tableGBC);
 
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             sellScrollPane.setVisible(false);
 
         // CREATE BUY ORDERS TABLE
         tableGBC.gridx = 1;
-        if (action == "To sell")
+        if (action != null && action.equals("To sell"))
             tableGBC.gridx = 0;
         this.buyOrdersTableModel = new BuyOrdersTableModel(this.want, this.have);
         final MTable buyOrdersTable = new MTable(this.buyOrdersTableModel);
@@ -426,7 +426,7 @@ public class EchangeSellBuyPanel extends JTabbedPane {
         JScrollPane buyScrollPane = new JScrollPane(buyOrdersTable);
         jPanel_Trade.add(buyScrollPane, tableGBC);
 
-        if (action == "Buy")
+        if (action != null && action.equals("Buy"))
             buyScrollPane.setVisible(false);
 
         addTab(Lang.getInstance().translate("Trade"), jPanel_Trade);
