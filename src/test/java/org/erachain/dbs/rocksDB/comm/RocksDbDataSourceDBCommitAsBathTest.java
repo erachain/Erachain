@@ -100,7 +100,7 @@ public class RocksDbDataSourceDBCommitAsBathTest {
                 TransactionFinalMapSigns mapTestDbs = dcSet.getTransactionFinalMapSigns();
 
                 if (mapTestDbs.size() < 0)
-                    assertEquals("Перед запуском установить подсчет записей в этой таблице", "");
+                    assertEquals("Перед запуском установить подсчет записей в этой таблице - datachain.DCSet.SIZE_ENABLE_IN_FINAL = false", "");
                 int sizeGenesis = mapTestDbs.size();
 
                 byte[] key1 = new byte[64];

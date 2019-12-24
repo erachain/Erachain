@@ -1307,6 +1307,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 //CHECK IF WE ARE NOT UP TO DATE
                 if (betterPeer != null || ctrl.needUpToDate()) {
 
+                    LOGGER.info("update by " + (betterPeer != null ? "better PEER: " + betterPeer : "controller status"));
+
                     if (ctrl.isOnStopping()) {
                         return;
                     }
