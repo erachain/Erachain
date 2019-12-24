@@ -156,7 +156,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             // MISSED MESSAGES
             missedMessagesTmp = Controller.getInstance().network.missedMessages.get();
             if (missedMessagesTmp > 0)
-                mess += " " + missedMessagesTmp + "-me";
+                mess += " " + missedMessagesTmp + "-ms";
 
             // MISSED SENDS
             missedMessagesTmp = Controller.getInstance().network.missedSendes.get();
