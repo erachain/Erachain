@@ -90,6 +90,11 @@ public interface IMap<T, U> {
 
     void rollback();
 
+    /**
+     * Нужно для восстановления локальных переменных после отката - из переменных Базы Данных
+     */
+    void afterRollback();
+
     void clearCache();
 
     void close();

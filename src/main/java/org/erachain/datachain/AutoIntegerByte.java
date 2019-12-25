@@ -112,4 +112,12 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
         return result;
     }
 
+    /**
+     * Если откатить базу данных то нужно и локальные значения сбросить
+     */
+    @Override
+    public void afterRollback() {
+        this.key = atomicKey.get();
+    }
+
 }

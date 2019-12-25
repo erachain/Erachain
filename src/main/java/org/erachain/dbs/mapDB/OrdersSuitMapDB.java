@@ -192,6 +192,10 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             }
 
             Order order = get(key);
+            if (order == null) {
+                Long err = null;
+                //err++;
+            }
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
             // причем берем по Остаткам Цену теперь

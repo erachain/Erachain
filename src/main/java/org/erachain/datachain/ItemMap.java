@@ -74,7 +74,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     @Override
     public int size() {
-        return (int)key;
+        return (int) key;
     }
 
     public void setLastKey(long key) {
@@ -114,13 +114,13 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         this.nameKey = database.createTreeSet(name + "_name_keys").comparator(Fun.COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
-        Bind.secondaryKeys((BTreeMap)map, this.nameKey,
+        Bind.secondaryKeys((BTreeMap) map, this.nameKey,
                 new Fun.Function2<String[], Long, ItemCls>() {
                     @Override
                     public String[] run(Long key, ItemCls item) {
                         // see https://regexr.com/
                         String[] keys = item.getName().toLowerCase().split(DCSet.SPLIT_CHARS);
-                        for (int i=0; i < keys.length; ++i) {
+                        for (int i = 0; i < keys.length; ++i) {
                             if (keys[i].length() > CUT_NAME_INDEX) {
                                 keys[i] = keys[i].substring(0, CUT_NAME_INDEX);
                             }
@@ -133,7 +133,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     @SuppressWarnings("unchecked")
     protected void createIndexes() {
-        if (Controller.getInstance().onlyProtocolIndexing){
+        if (Controller.getInstance().onlyProtocolIndexing) {
             // NOT USE SECONDARY INDEXES
             return;
         }
@@ -270,7 +270,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         } else {
             // поиск целиком
 
-            stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+            stepFilter = stepFilter.substring(0, stepFilter.length() - 1);
 
             if (stepFilter.length() > CUT_NAME_INDEX) {
                 stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
@@ -324,6 +324,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
      * а не как фильтр. Иначе слово принимаем как фильтр на диаппазон
      * и его длинна должна быть не мнее 5-ти символов. Например:
      * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
+     *
      * @param filter
      * @param offset
      * @param limit
@@ -360,7 +361,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
 
-        if (filter == null || filter.isEmpty()){
+        if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
         }
 
@@ -387,7 +388,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit) {
 
-        if (filter == null || filter.isEmpty()){
+        if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
         }
 
@@ -409,7 +410,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     }
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-        return ((BTreeMap)map).subMap(fromKey, toKey).values();
+        return ((BTreeMap) map).subMap(fromKey, toKey).values();
     }
 
     public NavigableMap<Long, ItemCls> getOwnerItems(String ownerPublicKey) {
@@ -424,4 +425,11 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         return updated;
     }
 
+    /**
+     * Если откатить базу данных то нужно и локальные значения сбросить
+     */
+    @Override
+    public void afterRollback() {
+        this.key = atomicKey.get();
+    }
 }
