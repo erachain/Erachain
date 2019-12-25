@@ -66,8 +66,13 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                         org.bouncycastle.util.Arrays.concatenate(
                                 byteableLong.toBytesObject(order.getHaveAssetKey()),
                                 byteableLong.toBytesObject(order.getWantAssetKey()),
+
+                                // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
+                                // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
+                                /////value.calcLeftPrice(),
+                                bgToBytes.toBytes(order.getPrice()),
                                 //bgToBytes.toBytes(Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0)),
-                                bgToBytes.toBytes(order.calcLeftPrice()), // по остаткам цены
+
                                 byteableLong.toBytesObject(order.getId())
                         ),
                 result -> result

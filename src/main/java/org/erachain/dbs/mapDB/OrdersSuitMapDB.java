@@ -4,7 +4,9 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.datachain.OrderSuit;
@@ -74,7 +76,12 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple4<>(value.getHaveAssetKey(), value.getWantAssetKey(),
-                                value.calcLeftPrice(), // по остаткам цены
+
+                                // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
+                                // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
+                                /////value.calcLeftPrice(),
+                                value.getPrice(),
+
                                 value.getId());
                     }
                 });
@@ -115,7 +122,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple4<>(value.getWantAssetKey(), value.getHaveAssetKey(),
-                                value.calcPrice(),
+                                value.getPrice(),
                                 value.getId());
                     }
                 });
@@ -193,7 +200,11 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
 
             Order order = get(key);
             if (order == null) {
+                String refDB = Transaction.viewDBRef(key); // 176395-2
+                Order getOrder = this.map.get(key);
+                order = get(key);
                 Long err = null;
+                continue;
                 //err++;
             }
             result.put(key, order);
@@ -205,6 +216,22 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
         }
 
         return result;
+    }
+
+    @Override
+    public void delete(Long key) {
+        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(key).equals("176395-2")) {
+            boolean debug = true;
+        }
+        super.delete(key);
+    }
+
+    @Override
+    public Order remove(Long key) {
+        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(key).equals("176395-2")) {
+            boolean debug = true;
+        }
+        return super.remove(key);
     }
 
 }

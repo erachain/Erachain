@@ -383,7 +383,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
             //	jPanel3.add(jTextField_Owner_Sign, gridBagConstraints);
         }
 
-        jLabel_Creator.setText(Lang.getInstance().translate("Registrant:") + ":");
+        jLabel_Creator.setText(Lang.getInstance().translate("Registrar") + ":");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = gridy++;
