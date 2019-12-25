@@ -1337,7 +1337,8 @@ public class API {
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
-            itemJson.add(order.getPrice());
+            itemJson.add(order.calcLeftPrice());
+            itemJson.add(order.getAmountWantLeft());
 
             arraySell.add(itemJson);
 
@@ -1348,7 +1349,8 @@ public class API {
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
-            itemJson.add(order.calcPriceReverse()); // REVERSE
+            itemJson.add(order.calcLeftPriceReverse()); // REVERSE
+            itemJson.add(order.getAmountWantLeft());
 
             arrayBuy.add(itemJson);
 

@@ -265,6 +265,9 @@ public class Order implements Comparable<Order> {
      * @return
      */
     public BigDecimal calcLeftPrice() {
+        if (getAmountHaveLeft().signum() == 0)
+            return price;
+
         return calcPrice(getAmountHaveLeft(), getAmountWantLeft(), wantAssetScale);
     }
 
@@ -274,6 +277,9 @@ public class Order implements Comparable<Order> {
      * @return
      */
     public BigDecimal calcLeftPriceReverse() {
+        if (getAmountHaveLeft().signum() == 0)
+            return calcPriceReverse();
+
         return calcPrice(getAmountWantLeft(), getAmountHaveLeft(), haveAssetScale);
     }
 
