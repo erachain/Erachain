@@ -69,8 +69,9 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
 
                                 // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
                                 // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
-                                /////value.calcLeftPrice(),
-                                bgToBytes.toBytes(order.getPrice()),
+                                bgToBytes.toBytes(order.calcLeftPrice()),
+                                //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
+                                /////bgToBytes.toBytes(order.getPrice()),
                                 //bgToBytes.toBytes(Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0)),
 
                                 byteableLong.toBytesObject(order.getId())

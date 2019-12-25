@@ -79,8 +79,8 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
 
                                 // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
                                 // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
-                                /////value.calcLeftPrice(),
-                                value.getPrice(),
+                                value.calcLeftPrice(),
+                                //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
 
                                 value.getId());
                     }

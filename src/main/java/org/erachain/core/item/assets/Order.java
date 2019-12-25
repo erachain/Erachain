@@ -954,14 +954,17 @@ public class Order implements Comparable<Order> {
                 //ADD TRADE TO DATABASE
                 tradesMap.put(trade);
 
+                /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас измениится
+                /// то сперва удалим Ордер - до изменения Остатокв и цены по Остаткам
+                /// тогда можно ключи делать по цене на Остатки
+                //REMOVE FROM ORDERS
+                ordersMap.delete(order);
+
                 //UPDATE FULFILLED HAVE
                 order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // this.amountHave));
                 this.setFulfilledHave(this.getFulfilledHave().add(tradeAmountForWant)); //this.amountWant));
 
                 if (order.isFulfilled()) {
-                    //REMOVE FROM ORDERS
-                    ordersMap.delete(order);
-
                     //ADD TO COMPLETED ORDERS
                     completedMap.put(order);
                 } else {
@@ -971,12 +974,10 @@ public class Order implements Comparable<Order> {
                         order.dcSet = dcSet;
                         order.processOnUnresolved(block, transaction);
 
-                        //REMOVE FROM ORDERS
-                        ordersMap.delete(order);
-
                         //ADD TO COMPLETED ORDERS
                         completedMap.put(order);
                     } else {
+                        // тут цена по сотаткам поменяется
                         ordersMap.put(order);
                     }
                 }
@@ -1079,6 +1080,10 @@ public class Order implements Comparable<Order> {
             // - на всякий случай удалим его в любом случае
             completedMap.delete(target);
 
+            //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
+            /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
+            ordersMap.delete(target);
+
             //REVERSE FULFILLED
             target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
             thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
@@ -1106,8 +1111,13 @@ public class Order implements Comparable<Order> {
 
         }
 
-        //REMOVE ORDER FROM DATABASE
-        ordersMap.delete(this);
+        //// тут нужно получить остатки все из текущего состояния иначе индексы по измененой цене с остатков не удалятся
+        /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
+        Order thisOrder = ordersMap.get(id);
+        if (thisOrder != null) {
+            //REMOVE ORDER FROM DATABASE
+            ordersMap.delete(thisOrder);
+        }
 
         //REMOVE HAVE
         // GET HAVE LEFT - if it CANCELWED by INCREMENT close
