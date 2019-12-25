@@ -2,7 +2,6 @@ package org.erachain.datachain;
 
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.dbs.DBTab;
@@ -171,7 +170,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         return item;
     }
 
-    public long add(ItemCls item) {
+    public long incrementPut(ItemCls item) {
         // INCREMENT ATOMIC KEY IF EXISTS
         if (atomicKey != null) {
             atomicKey.incrementAndGet();
@@ -188,11 +187,15 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         return key;
     }
 
-    public ItemCls remove(long key) {
+    public ItemCls decrementRemove(long key) {
 
         if (key != this.key) {
-            Long error = null;
-            error++;
+            LOGGER.error("delete KEY: " + key + " != map.value.key: " + this.key);
+
+            if (key > this.key) {
+                Long error = null;
+                error++;
+            }
         }
 
         ItemCls old = super.remove(key);
@@ -213,14 +216,12 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         return old;
     }
 
-    public void delete(long key) {
+    public void decrementDelete(long key) {
 
         if (key != this.key) {
             LOGGER.error("delete KEY: " + key + " != map.value.key: " + this.key);
-            if (key > this.key)
-                return;
 
-            if (BlockChain.CHECK_BUGS < 3) {
+            if (key > this.key) {
                 Long error = null;
                 error++;
             }
