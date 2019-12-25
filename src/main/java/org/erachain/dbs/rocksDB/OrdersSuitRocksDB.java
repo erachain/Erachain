@@ -3,7 +3,6 @@ package org.erachain.dbs.rocksDB;
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.OrderSuit;
@@ -184,13 +183,6 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
             }
 
             Order order = get(key);
-            if (BlockChain.CHECK_BUGS > 0 &&
-                    // почемуто выскакивало за диаппазон пары
-                    (true || order.getHaveAssetKey() != have || order.getWantAssetKey() != want)
-            ) {
-                Long error = null;
-                ++error;
-            }
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
             // причем берем по Остаткам Цену теперь

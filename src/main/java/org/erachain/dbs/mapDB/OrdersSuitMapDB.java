@@ -199,14 +199,6 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             }
 
             Order order = get(key);
-            if (order == null) {
-                String refDB = Transaction.viewDBRef(key); // 176395-2
-                Order getOrder = this.map.get(key);
-                order = get(key);
-                Long err = null;
-                ///continue;
-                err++;
-            }
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
             // причем берем по Остаткам Цену теперь
