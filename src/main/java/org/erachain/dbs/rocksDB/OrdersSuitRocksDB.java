@@ -186,8 +186,8 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
             Order order = get(key);
             if (BlockChain.CHECK_BUGS > 0 &&
                     // почемуто выскакивало за диаппазон пары
-                    (order.getHaveAssetKey() != have
-                            || order.getWantAssetKey() != want)) {
+                    (true || order.getHaveAssetKey() != have || order.getWantAssetKey() != want)
+            ) {
                 Long error = null;
                 ++error;
             }
