@@ -114,10 +114,16 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
                 this.setLast(key.a, currentForgingValue);
             } else if (currentForgingValue.a < lastPoint.a) {
                 // тут ошибка
-                LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + key + " " + currentForgingValue);
-                Long i = null;
-                i++;
-                //assert(currentForgingValue.a >= lastPoint.a);
+                if (BlockChain.ERA_COMPU_ALL_UP) {
+                    // так как непонятно когда генерация начнется в этом случае - игнорируем такую ситуацию
+                    super.delete(new Tuple2(key.a, lastPoint.a));
+                    this.setLast(key.a, currentForgingValue);
+                } else {
+                    LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + key + " " + currentForgingValue);
+                    Long i = null;
+                    i++;
+                    //assert(currentForgingValue.a >= lastPoint.a);
+                }
             } else {
                 // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
                 // просто нужно обновить новое значение кующей величины
