@@ -204,8 +204,8 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                 Order getOrder = this.map.get(key);
                 order = get(key);
                 Long err = null;
-                continue;
-                //err++;
+                ///continue;
+                err++;
             }
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
