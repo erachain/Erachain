@@ -212,21 +212,21 @@ public class CreateOrderPanel extends JPanel {
             public void changedUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtPrice, buying);
+                calculateAmounts(txtPrice, buying, true);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtPrice, buying);
+                calculateAmounts(txtPrice, buying, true);
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtPrice, buying);
+                calculateAmounts(txtPrice, buying, true);
             }
         });
 
@@ -254,21 +254,21 @@ public class CreateOrderPanel extends JPanel {
             public void changedUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountWant, buying);
+                calculateAmounts(txtAmountWant, buying, true);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountWant, buying);
+                calculateAmounts(txtAmountWant, buying, true);
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountWant, buying);
+                calculateAmounts(txtAmountWant, buying, true);
             }
         });
 
@@ -286,21 +286,21 @@ public class CreateOrderPanel extends JPanel {
             public void changedUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountHave, buying);
+                calculateAmounts(txtAmountHave, buying, true);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountHave, buying);
+                calculateAmounts(txtAmountHave, buying, true);
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountHave, buying);
+                calculateAmounts(txtAmountHave, buying, true);
             }
         });
 
@@ -399,11 +399,13 @@ public class CreateOrderPanel extends JPanel {
      */
 
     //нужно отдельно цену считаь для подстановок извне
-    public synchronized void calculateAmounts(MDecimalFormatedTextField editedField, boolean buying) {
+    public synchronized void calculateAmounts(MDecimalFormatedTextField editedField, boolean buying, boolean recurse) {
 
-        noUpdateFields = true;
+        if (recurse) {
+            noUpdateFields = true;
 
-        addQueve(editedField);
+            addQueve(editedField);
+        }
 
         try {
 
@@ -411,7 +413,8 @@ public class CreateOrderPanel extends JPanel {
             BigDecimal price;
             BigDecimal total;
 
-            if (notQueved(txtAmountWant)) {
+            if (recurse && notQueved(txtAmountWant)
+                    || !recurse && queve[1].equals(txtAmountWant)) {
                 amount = new BigDecimal(txtAmountHave.getText());
                 price = new BigDecimal(txtPrice.getText());
                 if (buying) {
@@ -421,7 +424,8 @@ public class CreateOrderPanel extends JPanel {
                 }
                 txtAmountWant.setText(total.toPlainString());
 
-            } else if (notQueved(txtPrice)) {
+            } else if (recurse && notQueved(txtPrice)
+                    || !recurse && queve[1].equals(txtPrice)) {
                 amount = new BigDecimal(txtAmountHave.getText());
                 total = new BigDecimal(txtAmountWant.getText());
                 if (buying) {
@@ -431,7 +435,8 @@ public class CreateOrderPanel extends JPanel {
                 }
                 txtPrice.setText(price.toPlainString());
 
-            } else if (notQueved(txtAmountHave)) {
+            } else if (recurse && notQueved(txtAmountHave)
+                    || !recurse && queve[1].equals(txtAmountHave)) {
                 total = new BigDecimal(txtAmountWant.getText());
                 price = new BigDecimal(txtPrice.getText());
                 if (buying) {
@@ -442,23 +447,30 @@ public class CreateOrderPanel extends JPanel {
                 txtAmountHave.setText(amount.toPlainString());
             }
 
-
         } catch (Exception e) {
             sellButton.setEnabled(false);
         }
 
-        try {
-            BigDecimal value = new BigDecimal(editedField.getText());
-            if (value.signum() <= 0) {
-                sellButton.setEnabled(false);
-            } else {
-                sellButton.setEnabled(true);
+        if (recurse) {
+
+            if (queve[1] != null) {
+                // так же пересчитать еще и поле второе для точности
+                calculateAmounts(queve[1], buying, false);
             }
-        } catch (Exception e) {
-            sellButton.setEnabled(false);
-        }
 
-        noUpdateFields = false;
+            try {
+                BigDecimal value = new BigDecimal(editedField.getText());
+                if (value.signum() <= 0) {
+                    sellButton.setEnabled(false);
+                } else {
+                    sellButton.setEnabled(true);
+                }
+            } catch (Exception e) {
+                sellButton.setEnabled(false);
+            }
+
+            noUpdateFields = false;
+        }
 
     }
 
