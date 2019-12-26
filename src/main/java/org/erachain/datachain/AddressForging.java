@@ -155,6 +155,11 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
             return null;
         }
 
+        boolean debug;
+        if (BlockChain.CHECK_BUGS > 1 && key.a.equals("785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E")) {
+            debug = true; // *** Block[322065] WIN_VALUE not in BASE RULES 0 Creator: 785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E
+        }
+
         // удалять можно только если последняя точка совпадает с удаляемой
         // иначе нельзя - так как может быть несколько удалений в один блок
         Tuple2<Integer, Integer> lastPoint = getLast(key.a);
