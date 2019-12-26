@@ -142,15 +142,15 @@ function person(data) {
         output += '<br>';
     }
 
-    output += '<a href="?person=' + data.key + get_lang() + '"><h3 style="display:inline;">';
-    if (false && data.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.icon + '" style="width:50px;" />';
-    output += getAssetName2(data.key, data.name) + '</h3></a>';
+    output += '<h3><a href="?person=' + data.key + get_lang() + '"><h3 style="display:inline;">';
+    if (false && data.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.icon + '" style="width:50px;" /> ';
+    output += data.name + '</a></h3>';
+
+    output += '<h4> [ <input id="key1" name="person" size="4" type="text" value="' + data.key + '" class="" style="font-size: 1em;"'
+                   + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
+    output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a></h4>';
 
     output += '<br>';
-
-    //output += '<b>' + data.label_Key + ':</b> ' + data.key;
-    output += data.label_Key + ': ' +'<a href=?person=' + data.key + get_lang() + '><b>' + data.key + '</b></a>, &nbsp&nbsp';
-    output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
 
     output += '<h5>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
     if ('deathday' in data) {

@@ -79,18 +79,15 @@ function template(data) {
         output += '<br>';
     }
 
-    output += '<a href="?template=' + data.template.key + get_lang() + '"><h3 style="display:inline;">';
-    if (data.template.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.template.icon + '" style="width:50px;" />';
-    output += getAssetName2(data.template.key, data.template.name) + '</h3></a>';
+    output += '<h3 style="display:inline;"><a href="?template=' + data.template.key + get_lang() + '">';
+    if (data.template.icon.length > 0) output += '<img src="data:image/gif;base64,' + data.template.icon + '" style="width:50px;"/> ';
+    output += data.template.name + '</a></h3>';
 
-    output += '<br>';
-
-    //output += '<b>' + data.template.label_Key + ':</b> ' + data.template.key;
-    output += data.label_Key + ': ' +'<a href=?template=' + data.template.key + get_lang() + '><b>' + data.template.key + '</b></a>, &nbsp&nbsp';
-    output += data.template.Label_seqNo + ': ' +'<a href=?tx=' + data.template.seqNo + get_lang() + '><b>' + data.template.seqNo + '</b></a><br>';
+    output += '<h4> [ <input id="key1" name="template" size="4" type="text" value="' + data.template.key + '" class="" style="font-size: 1em;"'
+                   + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
+    output += data.template.Label_seqNo + ': ' +'<a href=?tx=' + data.template.seqNo + get_lang() + '><b>' + data.template.seqNo + '</b></a></h4>';
 
     output += '<br><br>';
-
 
     output += '<b>' + data.label_Creator + ':</b> <a href=?address=' + data.template.owner + get_lang() + '>' + data.template.owner + '</a>';
 

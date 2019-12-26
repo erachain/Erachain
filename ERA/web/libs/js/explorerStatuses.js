@@ -71,15 +71,13 @@ function status(data) {
         output += '<br>';
     }
 
-    output += '<a href="?status=' + data.status.key + get_lang() + '"><h3 style="display:inline;">';
-    if (data.status.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.status.icon + '" style="width:50px;" />';
-    output += getAssetName2(data.status.key, data.status.name) + '</h3></a>';
+    output += '<h3 style="display:inline;"><a href="?status=' + data.status.key + get_lang() + '">';
+    if (data.status.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.status.icon + '" style="width:50px;" /> ';
+    output += data.status.name + '</a></h3>';
 
-    output += '<br>';
-
-    //output += '<b>' + data.status.label_Key + ':</b> ' + data.status.key;
-    output += data.label_Key + ': ' +'<a href=?status=' + data.status.key + get_lang() + '><b>' + data.status.key + '</b></a>, &nbsp&nbsp';
-    output += data.status.Label_seqNo + ': ' +'<a href=?tx=' + data.status.seqNo + get_lang() + '><b>' + data.status.seqNo + '</b></a><br>';
+    output += '<h4> [ <input id="key1" name="status" size="4" type="text" value="' + data.status.key + '" class="" style="font-size: 1em;"'
+                   + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
+    output += data.status.Label_seqNo + ': ' +'<a href=?tx=' + data.status.seqNo + get_lang() + '><b>' + data.status.seqNo + '</b></a></h4>';
 
     output += '<br><br>';
 

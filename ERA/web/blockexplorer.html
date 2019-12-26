@@ -926,20 +926,19 @@ button.white-bgc[disabled]:focus,
             output += '<tr><td align=left>';
             output += '<table><tr>';
 
+
             if (data.asset.this.image.length > 0) {
                 output += '<td><img src="data:image/gif;base64,' + data.asset.this.image + '" width = "350" /></td><td style ="padding-left:20px">';
                 output += '<br>';
             }
 
-            output += '<a href="?asset=' + data.asset.this.key + get_lang() + '"><h3 style="display:inline;">';
-            if (data.asset.this.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" />';
-            output += getAssetName2(data.asset.this.key, data.asset.this.name) + '</h3></a>';
+            output += '<h3><a href="?asset=' + data.asset.this.key + get_lang() + '">';
+            if (data.asset.this.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" /> ';
+            output += data.asset.this.name + '</a></h3>';
 
-            output += '<br>';
-
-            //output += '<b>' + data.asset.label_Key + ':</b> ' + data.asset.this.key;
-            output += data.asset.label_Key + ': ' +'<a href=?asset=' + data.asset.this.key + get_lang() + '><b>' + data.asset.this.key + '</b></a>, &nbsp&nbsp';
-            output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a><br>';
+            output += '<h4> [ <input id="key1" name="asset" size="4" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
+                           + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
+            output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a></h4>';
 
             output += '<br>';
 
@@ -2158,11 +2157,13 @@ button.white-bgc[disabled]:focus,
             return params;
         }
 
-        function buttonSearch() {
-            if (document.getElementById("key1")) {
-                var pars = document.getElementById("key1").getAttribute("name") + '=' + document.getElementById("key1").value.trim();
-                if (document.getElementById("key2")) {
-                    pars += '&' + document.getElementById("key2").getAttribute("name") + '=' + document.getElementById("key2").value.trim();
+        function buttonSearch(elem=null) {
+            if (elem != null) {
+                if (elem.id == "key2") {
+                    var pars = document.getElementById("key1").getAttribute("name") + '=' + document.getElementById("key1").value.trim();
+                    pars += '&' + elem.getAttribute("name") + '=' + elem.value.trim();
+                } else {
+                var pars = elem.getAttribute("name") + '=' + elem.value.trim();
                 }
 
                 document.location.href = '?' + pars + get_lang();
