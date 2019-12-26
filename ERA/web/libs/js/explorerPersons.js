@@ -198,7 +198,7 @@ function person(data) {
 
         for (key in data.statuses) {
             output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">'
-                + '<img src="data:image/gif;base64,' + data.statuses[key].status_icon + '" wi-dth = "1em"/> '
+                + '<img src="data:image/gif;base64,' + data.statuses[key].status_icon + '" style="width:3em;"/> '
                 + data.statuses[key].status_name
                 + '<td>' + data.statuses[key].status_period
                 + '<td><a href ="?address=' + data.statuses[key].status_creator + get_lang() + '">' + data.statuses[key].status_creator_name + '</a><tr>';

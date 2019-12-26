@@ -33,7 +33,7 @@ function templates(data) {
         var item = data.pageItems[i];
         output += '<tr><td><a href="?template=' + item.key + get_lang() + '">' + item.key + ': ';
         if (item.icon.length > 0)
-            output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
+            output += '<img src="data:image/gif;base64,' + item.icon + '" style="width:2em;" /> ';
         output += '<b>' + escapeHtml(item.name) + '</b></a></td>';
         output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
 
