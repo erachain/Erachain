@@ -32,6 +32,8 @@ function templates(data) {
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr><td><a href="?template=' + item.key + get_lang() + '">' + item.key + ': ';
+        if (item.icon.length > 0)
+            output += '<img src="data:image/gif;base64,' + item.icon + '" style="width:2em;" /> ';
         output += '<b>' + escapeHtml(item.name) + '</b></a></td>';
         output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
 
@@ -58,28 +60,34 @@ function templates(data) {
 
 function template(data) {
 
-    var output = '';
-
-    if (data.hasOwnProperty('error')) {
-        return '<h2>' + data.error + '</h2>';
-    }
+    var output = "";
 
     output += lastBlock(data.lastBlock);
 
-    output += '<table width="1280" border=0><tr><td align=left><br>';
+    if (data.hasOwnProperty('error')) {
+        output += '<br><h5>' + data.error + '</h5>';
 
-    output += '<h3 style="display:inline;">' + data.label_Template + ':</h3>';
+        return output;
+    }
 
-    //output += '<h3 style="display:inline;"> | </h3>';
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output += '<tr><td align=left>';
+    output += '<table><tr>';
+
+    if (data.template.image.length > 0) {
+        output += '<td><img src="data:image/gif;base64,' + data.template.image + '" width = "350" /></td><td style ="padding-left:20px">';
+        output += '<br>';
+    }
 
     output += '<a href="?template=' + data.template.key + get_lang() + '"><h3 style="display:inline;">';
+    if (data.template.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.template.icon + '" style="width:50px;" />';
     output += getAssetName2(data.template.key, data.template.name) + '</h3></a>';
 
-    output += '<br><br>';
+    output += '<br>';
 
-    //output += '<b>' + data.label_Key + ':</b> ' + data.template.key;
+    //output += '<b>' + data.template.label_Key + ':</b> ' + data.template.key;
     output += data.label_Key + ': ' +'<a href=?template=' + data.template.key + get_lang() + '><b>' + data.template.key + '</b></a>, &nbsp&nbsp';
-    output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
+    output += data.template.Label_seqNo + ': ' +'<a href=?tx=' + data.template.seqNo + get_lang() + '><b>' + data.template.seqNo + '</b></a><br>';
 
     output += '<br><br>';
 

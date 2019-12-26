@@ -28,6 +28,8 @@ function polls(data){
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr><td><a href="?poll=' + item.key + get_lang() + '">' + item.key + ': ';
+        if (item.icon.length > 0)
+            output += '<img src="data:image/gif;base64,' + item.icon + '" style="width:2em;" /> ';
         output += '<b>' + escapeHtml(item.name) + '</b></a></td>';
         output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
         output += '<td>' + item.totalVotes + '</td>';
@@ -51,29 +53,41 @@ function polls(data){
 
 function poll(data) {
 
-    var output = '';
-
-    if (data.hasOwnProperty('error')) {
-        return '<h2>' + data.error + '</h2>';
-    }
+    var output = "";
 
     output += lastBlock(data.lastBlock);
 
+    if (data.hasOwnProperty('error')) {
+        output += '<br><h5>' + data.error + '</h5>';
 
-    output += '<table width="1280" border=0><tr><td align=left><br>';
+        return output;
+    }
+
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output += '<tr><td align=left>';
+    output += '<table><tr>';
+
+    if (data.poll.image.length > 0) {
+        output += '<td><img src="data:image/gif;base64,' + data.poll.image + '" width = "350" /></td><td style ="padding-left:20px">';
+        output += '<br>';
+    }
+
+    output += '<a href="?poll=' + data.poll.key + get_lang() + '"><h3 style="display:inline;">';
+    if (data.poll.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.poll.icon + '" style="width:50px;" />';
+    output += getAssetName2(data.poll.key, data.poll.name) + '</h3></a>';
+
+    output += '<br>';
+
+    //output += '<b>' + data.poll.label_Key + ':</b> ' + data.poll.key;
+    //output += data.label_Key + ': ' +'<a href=?poll=' + data.poll.key + get_lang() + '><b>' + data.poll.key + '</b></a>, &nbsp&nbsp';
+
 
     output += '<h3 style="display:inline;"><b>' + data.label_Poll + ':</b>';
 
     output += ' [ <input id="key1" name="poll" size="4" type="text" value="' + data.poll.key + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) buttonSearch()"> ] ';
 
-    output += data.label_Key + ': ' +'<a href=?poll=' + data.poll.key + get_lang() + '><b>' + data.poll.key + '</b></a>, &nbsp&nbsp';
-    output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
-
-    //output += getAssetName2(data.poll.key, data.poll.name) + '</a></h3>';
-    output += data.poll.name + '</a></h3>';
-
-    output += '<br><br>';
+    output += data.poll.Label_seqNo + ': ' +'<a href=?tx=' + data.poll.seqNo + get_lang() + '><b>' + data.poll.seqNo + '</b></a><br>';
 
     output += '<h4 style="display:inline;"><b>' + data.label_Asset + ':</b>';
     output += ' [ <input id="key2" name="asset" size="4" type="text" value="' + data.assetKey + '" class="" style="font-size: 1em;"'
@@ -90,6 +104,10 @@ function poll(data) {
     output += fformat(data.poll.description);
 
     output += '<hl>';
+
+    output += '</td>';
+    output += '</tr>';
+    output += '</table>';
 
     output += '<table width="1280" border=0><tr><td align=left><br>';
     output += '<table width=80% BORDER=0 cellpadding=10 cellspacing=0 class="table table-striped" style="border: 1px solid #ddd;">';

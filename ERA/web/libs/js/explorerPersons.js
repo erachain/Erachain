@@ -126,16 +126,32 @@ function person_status(data) {
 function person(data) {
 
     var output = lastBlock(data.lastBlock);
+
+    if (data.hasOwnProperty('error')) {
+        output += '<br><h5>' + data.error + '</h5>';
+
+        return output;
+    }
+
     output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
     output += '<tr><td align=left>';
-    output += '<table><tr><td>';
+    output += '<table><tr>';
 
+    if (data.image.length > 0) {
+        output += '<td><img src="data:image/gif;base64,' + data.image + '" width = "350" /></td><td style ="padding-left:20px">';
+        output += '<br>';
+    }
 
-    output += '<img src="data:image/gif;base64,' + data.img + '" width = "350" /></td><td style ="padding-left:20px">';
-    output += data.Label_key + ': ' +'<a href=?person=' + data.key + get_lang() + '><b>' + data.key + '</b></a>, &nbsp&nbsp';
+    output += '<a href="?person=' + data.key + get_lang() + '"><h3 style="display:inline;">';
+    if (false && data.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.icon + '" style="width:50px;" />';
+    output += getAssetName2(data.key, data.name) + '</h3></a>';
+
+    output += '<br>';
+
+    //output += '<b>' + data.label_Key + ':</b> ' + data.key;
+    output += data.label_Key + ': ' +'<a href=?person=' + data.key + get_lang() + '><b>' + data.key + '</b></a>, &nbsp&nbsp';
     output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
 
-    output += '<h4>' + data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b></h4>';
     output += '<h5>' + data.Label_born + ': &nbsp&nbsp<b> ' + data.birthday + '</b>';
     if ('deathday' in data) {
         output += ', &nbsp&nbsp ' + data.Label_dead + ': &nbsp&nbsp<b> ' + data.deathday + '</b>'
@@ -181,7 +197,9 @@ function person(data) {
            + data.Label_Status_table_status + '<td><b>' + data.Label_Status_table_period + '<td><b>' + data.Label_Status_table_appointing + '<tr>';
 
         for (key in data.statuses) {
-            output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">' + data.statuses[key].status_name
+            output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">'
+                + '<img src="data:image/gif;base64,' + data.statuses[key].status_icon + '" style="width:3em;"/> '
+                + data.statuses[key].status_name
                 + '<td>' + data.statuses[key].status_period
                 + '<td><a href ="?address=' + data.statuses[key].status_creator + get_lang() + '">' + data.statuses[key].status_creator_name + '</a><tr>';
         }
