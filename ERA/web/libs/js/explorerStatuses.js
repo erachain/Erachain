@@ -27,6 +27,8 @@ function statuses(data){
     for (var i in data.pageItems) {
         var item = data.pageItems[i];
         output += '<tr><td><a href="?status=' + item.key + get_lang() + '">' + item.key + ': ';
+        if (item.icon.length > 0)
+            output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
         output += '<b>' + escapeHtml(item.name) + '</b></a></td>';
         output += '<td>' + escapeHtml(item.description.substr(0, 100)) + '</td>';
 
@@ -50,31 +52,36 @@ function statuses(data){
 
 function status(data) {
 
-    var output = '';
-
-    if (data.hasOwnProperty('error')) {
-        return '<h2>' + data.error + '</h2>';
-    }
+    var output = "";
 
     output += lastBlock(data.lastBlock);
 
-    output += '<table width="1280" border=0><tr><td align=left><br>';
+    if (data.hasOwnProperty('error')) {
+        output += '<br><h5>' + data.error + '</h5>';
 
-    output += '<h3 style="display:inline;">' + data.label_Status + ':</h3>';
+        return output;
+    }
 
-    //output += '<h3 style="display:inline;"> | </h3>';
+    output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+    output += '<tr><td align=left>';
+    output += '<table><tr>';
+
+    if (data.status.image.length > 0) {
+        output += '<td><img src="data:image/gif;base64,' + data.status.image + '" width = "350" /></td><td style ="padding-left:20px">';
+        output += '<br>';
+    }
 
     output += '<a href="?status=' + data.status.key + get_lang() + '"><h3 style="display:inline;">';
+    if (data.status.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.status.icon + '" style="width:50px;" />';
     output += getAssetName2(data.status.key, data.status.name) + '</h3></a>';
 
-    output += '<br><br>';
+    output += '<br>';
 
-    //output += '<b>' + data.label_Key + ':</b> ' + data.status.key;
+    //output += '<b>' + data.status.label_Key + ':</b> ' + data.status.key;
     output += data.label_Key + ': ' +'<a href=?status=' + data.status.key + get_lang() + '><b>' + data.status.key + '</b></a>, &nbsp&nbsp';
-    output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
+    output += data.status.Label_seqNo + ': ' +'<a href=?tx=' + data.status.seqNo + get_lang() + '><b>' + data.status.seqNo + '</b></a><br>';
 
     output += '<br><br>';
-
 
     output += '<b>' + data.label_Creator + ':</b> <a href=?address=' + data.status.owner + get_lang() + '>' + data.status.owner + '</a>';
 
