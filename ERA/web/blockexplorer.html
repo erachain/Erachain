@@ -924,6 +924,12 @@ button.white-bgc[disabled]:focus,
 
             output += '<table width="1280" border=0><tr><td align=left><br>';
 
+            output += '<img src="data:image/gif;base64,' + data.image + '" width = "350" /></td><td style ="padding-left:20px">';
+            if (data.asset.this.image.length > 0) {
+                output += '<td><img src="data:image/gif;base64,' + data.asset.this.image + '" width = "350" /></td><td style ="padding-left:20px">';
+                output += '<br>';
+            }
+
             output += '<h3 style="display:inline;">' + data.asset.label_Asset + ':</h3>';
 
             output += '<a href="?asset=' + data.asset.this.key + get_lang() + '"><h3 style="display:inline;">';
@@ -938,8 +944,8 @@ button.white-bgc[disabled]:focus,
 
             output += '<br>';
 
-            if (data.asset.this.img.length > 0) {
-                output += '<img src="data:image/gif;base64,' + data.asset.this.img + '" style=" max-width: 100%;" />';
+            if (data.asset.this.image.length > 0) {
+                output += '<img src="data:image/gif;base64,' + data.asset.this.image + '" style=" max-width: 100%;" />';
                 output += '<br>';
             }
 

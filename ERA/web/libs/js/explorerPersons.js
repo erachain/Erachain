@@ -128,11 +128,12 @@ function person(data) {
     var output = lastBlock(data.lastBlock);
     output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
     output += '<tr><td align=left>';
-    output += '<table><tr><td>';
+    output += '<table><tr>';
 
-
-    output += '<img src="data:image/gif;base64,' + data.img + '" width = "350" /></td><td style ="padding-left:20px">';
-    output += data.Label_key + ': ' +'<a href=?person=' + data.key + get_lang() + '><b>' + data.key + '</b></a>, &nbsp&nbsp';
+    output += '<td><img src="data:image/gif;base64,' + data.image + '" width = "350" /></td><td style ="padding-left:20px">';
+    output += data.Label_key + ': ' +'<a href=?person=' + data.key + get_lang() + '><b>' + data.key + '</b>';
+    if (data.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.icon + '" style="width:50px;" />';
+    output += '</a>, &nbsp&nbsp';
     output += data.Label_seqNo + ': ' +'<a href=?tx=' + data.seqNo + get_lang() + '><b>' + data.seqNo + '</b></a><br>';
 
     output += '<h4>' + data.Label_name + ': &nbsp&nbsp <b>' + data.name + '</b></h4>';
@@ -181,7 +182,9 @@ function person(data) {
            + data.Label_Status_table_status + '<td><b>' + data.Label_Status_table_period + '<td><b>' + data.Label_Status_table_appointing + '<tr>';
 
         for (key in data.statuses) {
-            output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">' + data.statuses[key].status_name
+            output += '<tr ><td ><a href ="?person=' + data.key + '&status=' + data.statuses[key].status_key + get_lang() + '">'
+                + '<img src="data:image/gif;base64,' + data.statuses[key].status_icon + '" wi-dth = "1em"/> '
+                + data.statuses[key].status_name
                 + '<td>' + data.statuses[key].status_period
                 + '<td><a href ="?address=' + data.statuses[key].status_creator + get_lang() + '">' + data.statuses[key].status_creator_name + '</a><tr>';
         }

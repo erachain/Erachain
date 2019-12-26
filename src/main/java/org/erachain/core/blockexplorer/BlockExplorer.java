@@ -398,7 +398,7 @@ public class BlockExplorer {
                     }
                 }
             } else {
-                output.putAll(jsonQueryPerson(info.getQueryParameters().getFirst("person")));
+                output.putAll(jsonQueryItemPerson(info.getQueryParameters().getFirst("person")));
             }
 
             ///////////////////// POLLS ////////////////////////
@@ -407,7 +407,7 @@ public class BlockExplorer {
             output.put("type", "polls");
             output.putAll(jsonQueryPages(PollCls.class, start, pageSize));
         } else if (info.getQueryParameters().containsKey("poll")) {
-            output.putAll(jsonQueryPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
+            output.putAll(jsonQueryItemPoll(Long.valueOf(info.getQueryParameters().getFirst("poll")),
                     info.getQueryParameters().getFirst("asset")));
 
             //////////////////////////// ASSETS //////////////////////////
@@ -424,7 +424,7 @@ public class BlockExplorer {
         } else if (info.getQueryParameters().containsKey("asset")) {
             if (info.getQueryParameters().get("asset").size() == 1) {
                 try {
-                    output.put("asset", jsonQueryAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
+                    output.put("asset", jsonQueryItemAsset(Long.valueOf((info.getQueryParameters().getFirst("asset")))));
                 } catch (Exception e) {
                     output.put("error", e.getMessage());
                     logger.error(e.getMessage(), e);
@@ -499,7 +499,7 @@ public class BlockExplorer {
         }
         // template
         else if (info.getQueryParameters().containsKey("template")) {
-            output.putAll(jsonQueryTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
+            output.putAll(jsonQueryItemTemplate(Long.valueOf(info.getQueryParameters().getFirst("template"))));
         }
 
         ////////////////////// STATUSES ///////////////////////
@@ -510,7 +510,7 @@ public class BlockExplorer {
         }
         // status
         else if (info.getQueryParameters().containsKey("status")) {
-            output.putAll(jsonQueryStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
+            output.putAll(jsonQueryItemStatus(Long.valueOf(info.getQueryParameters().getFirst("status"))));
         }
 
         ///////////////////////////// ORDER ///////////////
@@ -618,8 +618,26 @@ public class BlockExplorer {
         return output;
     }
 
+    private Tuple2<Map, Transaction> itemBase(ItemCls item) {
+        Map map = new LinkedHashMap();
+        map.put("key", item.getKey());
+        map.put("icon", Base64.encodeBase64String(item.getIcon()));
+        map.put("image", Base64.encodeBase64String(item.getImage()));
+        map.put("name", item.getName());
+        map.put("description", item.viewDescription());
+        map.put("owner", item.getOwner().getAddress());
 
-    public Map jsonQueryPoll(Long pollKey, String assetStr) {
+        map.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
+        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(item.getReference());
+        map.put("seqNo", Transaction.viewDBRef(txSeqNo));
+        Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
+        map.put("tx_timestamp", transaction.getTimestamp());
+        map.put("tx_creator", transaction.getCreator().getAddress());
+
+        return new Tuple2<Map, Transaction>(map, transaction);
+    }
+
+    public Map jsonQueryItemPoll(Long pollKey, String assetStr) {
 
         output.put("type", "poll");
         output.put("search", "polls");
@@ -642,19 +660,14 @@ public class BlockExplorer {
         output.put("assetName", asset.getName());
 
         PollCls poll = (PollCls) dcSet.getItemPollMap().get(pollKey);
+
+        Map pollJSON = itemBase(poll).a;
+
+        pollJSON.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
+
         List<String> options = poll.getOptions();
         int optionsSize = options.size();
 
-        Map pollJSON = new LinkedHashMap();
-        pollJSON.put("key", poll.getKey());
-        pollJSON.put("name", poll.getName());
-        pollJSON.put("description", poll.getDescription());
-        pollJSON.put("owner", poll.getOwner().getAddress());
-        pollJSON.put("totalVotes", poll.getTotalVotes(DCSet.getInstance()).toPlainString());
-
-        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
-        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(poll.getReference());
-        output.put("seqNo", Transaction.viewDBRef(txSeqNo));
 
         Tuple4<Integer, long[], BigDecimal, BigDecimal[]> votes = poll.votesWithPersons(dcSet, assetKey, 0);
 
@@ -832,7 +845,7 @@ public class BlockExplorer {
         return all;
     }
 
-    public Map jsonQueryAsset(long key) {
+    public Map jsonQueryItemAsset(long key) {
 
         output.put("type", "asset");
         output.put("search", "assets");
@@ -846,40 +859,23 @@ public class BlockExplorer {
 
         AssetCls asset = Controller.getInstance().getAsset(key);
 
-        Map assetJSON = new LinkedHashMap();
+        Map assetJSON = itemBase(asset).a;
 
-        assetJSON.put("key", asset.getKey());
-        assetJSON.put("name", asset.getName());
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            /// redefine
             assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
-        } else {
-            assetJSON.put("description ", asset.viewDescription());
         }
-        assetJSON.put("owner", asset.getOwner().getAddress());
+
         assetJSON.put("quantity", NumberAsString.formatAsString(asset.getQuantity()));
         assetJSON.put("released", NumberAsString.formatAsString(asset.getReleased(dcSet)));
 
         assetJSON.put("scale", asset.getScale());
 
-        assetJSON.put("key", asset.getKey());
-        assetJSON.put("name", asset.getName());
         assetJSON.put("operations", orders.size() + trades.size());
-        if (asset.getKey() > 0 && asset.getKey() < 1000) {
-            assetJSON.put("description", Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj));
-        } else {
-            assetJSON.put("description", asset.viewDescription());
-        }
-        assetJSON.put("owner", asset.getOwner().getAddress());
-        assetJSON.put("scale", asset.getScale());
-        assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
-        assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
-        assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
-        assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
 
-        Long blocNoSeqNo = dcSet.getTransactionFinalMapSigns().get(asset.getReference());
-        Transaction transaction = dcSet.getTransactionFinalMap().get(blocNoSeqNo);
-        assetJSON.put("seqNo", Transaction.viewDBRef(blocNoSeqNo));
-        assetJSON.put("timestamp", transaction.getTimestamp());
+        assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
+
+        assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
 
         output.put("this", assetJSON);
 
@@ -1538,7 +1534,7 @@ public class BlockExplorer {
         assetJSON.put("scale", asset.getScale());
         assetJSON.put("assetType", Lang.getInstance().translateFromLangObj(asset.viewAssetType(), langObj));
         assetJSON.put("assetTypeFull", Lang.getInstance().translateFromLangObj(asset.viewAssetTypeFull(), langObj));
-        assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
+        ///assetJSON.put("img", Base64.encodeBase64String(asset.getImage()));
         assetJSON.put("icon", Base64.encodeBase64String(asset.getIcon()));
         List<Order> orders = dcSet
                 .getOrderMap().getOrders(asset.getKey());
@@ -1548,18 +1544,17 @@ public class BlockExplorer {
         assetsJSON.put(asset.getKey(), assetJSON);
     }
 
-    private Map jsonQueryPerson(String first) {
+    private Map jsonQueryItemPerson(String first) {
         output.put("type", "person");
         output.put("search", "persons");
 
-        Map output = new LinkedHashMap();
         PersonCls person = (PersonCls) dcSet.getItemPersonMap().get(new Long(first));
         if (person == null) {
             return null;
         }
 
-        byte[] b = person.getImage();
-        String a = Base64.encodeBase64String(b);
+        Tuple2<Map, Transaction> itemBase = itemBase(person);
+        Map output = itemBase.a;
 
         output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
@@ -1571,13 +1566,6 @@ public class BlockExplorer {
         output.put("Label_total_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
         output.put("Label_description", Lang.getInstance().translateFromLangObj("Description", langObj));
 
-        output.put("img", a);
-        output.put("key", person.getKey());
-
-        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
-        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(person.getReference());
-        output.put("seqNo", Transaction.viewDBRef(txSeqNo));
-
         output.put("creator", person.getOwner().getAddress());
         if (person.getOwner().getPerson() != null) {
             output.put("creator_key", person.getOwner().getPerson().b.getKey());
@@ -1587,7 +1575,8 @@ public class BlockExplorer {
             output.put("creator_name", "");
         }
 
-        Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
+        // уже есть в карте это значение
+        Transaction transaction = itemBase.b;
         output.put("registrar", transaction.getCreator().getAddress());
         if (transaction.getCreator().getPerson() != null) {
             output.put("registrar_key", transaction.getCreator().getPerson().b.getKey());
@@ -1597,14 +1586,12 @@ public class BlockExplorer {
             output.put("registrar_name", "");
         }
 
-        output.put("name", person.getName());
         output.put("birthday", person.getBirthdayStr());
         if (!person.isAlive(0L)) {
             output.put("deathday", person.getDeathdayStr());
             output.put("Label_dead", Lang.getInstance().translateFromLangObj("Deathday", langObj));
 
         }
-        output.put("description", person.getDescription());
 
         String gender = Lang.getInstance().translateFromLangObj("Man", langObj);
         if (person.getGender() == 0) {
@@ -1618,25 +1605,27 @@ public class BlockExplorer {
 
         // statuses
 
-        Map statusesJSON = new LinkedHashMap();
+        JSONArray statusesJSON = new JSONArray();
 
-        WebPersonStatusesModel statusModel = new WebPersonStatusesModel(person.getKey());
-        int rowCount = statusModel.getRowCount();
-        if (rowCount > 0) {
+        ///WebPersonStatusesModel statusModel = new WebPersonStatusesModel(person.getKey());
+        TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = dcSet.getPersonStatusMap().get(person.getKey());
+        if (!statuses.isEmpty()) {
 
             output.put("Label_statuses", Lang.getInstance().translateFromLangObj("Statuses", langObj));
             output.put("Label_Status_table_status", Lang.getInstance().translateFromLangObj("Status", langObj));
             output.put("Label_Status_table_period", Lang.getInstance().translateFromLangObj("Period", langObj));
             output.put("Label_Status_table_appointing", Lang.getInstance().translateFromLangObj("Appointing", langObj));
 
-
-            for (int i = 0; i < rowCount; i++) {
+            for (Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>> item : StatusCls.getSortedItems(statuses)) {
                 Map statusJSON = new LinkedHashMap();
-                statusJSON.put("status_key", statusModel.getValueAt(i, WebPersonStatusesModel.COLUMN_STATUS_KEY));
-                statusJSON.put("status_name", statusModel.getValueAt(i, WebPersonStatusesModel.COLUMN_STATUS_NAME));
-                statusJSON.put("status_period", statusModel.getValueAt(i, WebPersonStatusesModel.COLUMN_PERIOD));
+                StatusCls status = item.b;
 
-                Account creator = (Account) statusModel.getValueAt(i, WebPersonStatusesModel.COLUMN_MAKER_ACCOUNT);
+                statusJSON.put("status_key", item.a);
+                statusJSON.put("status_icon", Base64.encodeBase64String(status.getIcon()));
+                statusJSON.put("status_name", status.viewName());
+                statusJSON.put("status_period", StatusCls.viewPeriod(item.c.a, item.c.b));
+
+                Account creator = status.getOwner();
                 if (creator != null) {
                     statusJSON.put("status_creator", creator.getAddress());
                     if (creator.isPerson()) {
@@ -1649,7 +1638,7 @@ public class BlockExplorer {
                     statusJSON.put("status_creator_name", "GENESIS");
                 }
 
-                statusesJSON.put(i, statusJSON);
+                statusesJSON.add(statusJSON);
             }
 
             output.put("statuses", statusesJSON);
@@ -2805,7 +2794,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryTemplate(Long key) {
+    public Map jsonQueryItemTemplate(Long key) {
 
         output.put("type", "template");
         output.put("search", "templates");
@@ -2814,16 +2803,7 @@ public class BlockExplorer {
 
         TemplateCls template = (TemplateCls) dcSet.getItemTemplateMap().get(key);
 
-        Map templateJSON = new LinkedHashMap();
-        templateJSON.put("key", template.getKey());
-        templateJSON.put("name", template.getName());
-        templateJSON.put("description", template.getDescription());
-        templateJSON.put("owner", template.getOwner().getAddress());
-
-        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
-        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(template.getReference());
-        output.put("seqNo", Transaction.viewDBRef(txSeqNo));
-
+        Map templateJSON = itemBase(template).a;
         output.put("template", templateJSON);
 
         output.put("label_Template", Lang.getInstance().translateFromLangObj("Template", langObj));
@@ -2834,7 +2814,7 @@ public class BlockExplorer {
         return output;
     }
 
-    public Map jsonQueryStatus(Long key) {
+    public Map jsonQueryItemStatus(Long key) {
 
         output.put("type", "status");
         output.put("search", "statuses");
@@ -2843,15 +2823,7 @@ public class BlockExplorer {
 
         StatusCls status = (StatusCls) dcSet.getItemStatusMap().get(key);
 
-        Map statusJSON = new LinkedHashMap();
-        statusJSON.put("key", status.getKey());
-        statusJSON.put("name", status.getName());
-        statusJSON.put("description", status.getDescription());
-        statusJSON.put("owner", status.getOwner().getAddress());
-
-        output.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
-        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(status.getReference());
-        output.put("seqNo", Transaction.viewDBRef(txSeqNo));
+        Map statusJSON = itemBase(status).a;
 
         statusJSON.put("unique", status.isUnique());
 
