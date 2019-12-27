@@ -675,7 +675,7 @@ public class Order implements Comparable<Order> {
                 //|| height == 255992
                 ///Transaction.viewDBRef(id).equals("15057-1")
 
-                Transaction.viewDBRef(id).equals("39836-1")
+                Transaction.viewDBRef(id).equals("776446-1")
 
             //|| height == 133232 // - здесь хвостики какието у сделки с 1 в последнем знаке
             //|| height == 253841 // сработал NEW_FLOR 2-й
@@ -795,7 +795,7 @@ public class Order implements Comparable<Order> {
             index++;
 
             if (debug ||
-                    Transaction.viewDBRef(id).equals("-178617-18")
+                    Transaction.viewDBRef(id).equals("776446-1")
             ) {
                 debug = true;
             }
@@ -908,6 +908,7 @@ public class Order implements Comparable<Order> {
             if (tradeAmountForHave.compareTo(BigDecimal.ZERO) <= 0
                     || tradeAmountForWant.compareTo(BigDecimal.ZERO) <= 0) {
                 debug = true;
+                logger.error("Order is EMPTY: " + orderREF);
                 Long error = null;
                 error ++;
             }
@@ -1053,7 +1054,7 @@ public class Order implements Comparable<Order> {
     public void orphan(Block block) {
 
         if (BlockChain.CHECK_BUGS > 3 &&
-                Transaction.viewDBRef(id).equals("178617-18")
+                Transaction.viewDBRef(id).equals("776446-1")
         ) {
             boolean debug = false;
         }
