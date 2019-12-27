@@ -3137,15 +3137,15 @@ public class BlockExplorer {
                     template.getName() + "<br>" + Lang.getInstance().translateFromLangObj("Encrypted", langObj));
         }
 
-        output.put("creator", trans.getCreator().getPersonAsString());
+        output.put("creator", trans.getCreator().getAddress());
 
         Tuple2<Integer, PersonCls> personItem = trans.getCreator().getPerson();
+        output.put("creator_name", trans.getCreator().getPersonAsString());
+
         if (personItem != null) {
             output.put("creator_key", personItem.b.getKey());
-            output.put("creator_name", personItem.b.getName());
         } else {
             output.put("creator_key", "");
-            output.put("creator_name", "");
         }
 
         //output.put("date", df.format(new Date(trans.getTimestamp())).toString());
