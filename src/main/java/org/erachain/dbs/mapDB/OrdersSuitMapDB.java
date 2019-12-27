@@ -74,15 +74,15 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                         Order>() {
                     @Override
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
-                            Long key, Order value) {
-                        return new Fun.Tuple4<>(value.getHaveAssetKey(), value.getWantAssetKey(),
+                            Long key, Order order) {
+                        return new Fun.Tuple4<>(order.getHaveAssetKey(), order.getWantAssetKey(),
 
                                 // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
                                 // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
-                                value.calcLeftPrice(),
+                                key > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice(),
                                 //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
 
-                                value.getId());
+                                order.getId());
                     }
                 });
 
