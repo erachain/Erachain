@@ -627,14 +627,20 @@ public class BlockExplorer {
         map.put("description", item.viewDescription());
         map.put("owner", item.getOwner().getAddress());
 
-        map.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
-        long txSeqNo = dcSet.getTransactionFinalMapSigns().get(item.getReference());
-        map.put("seqNo", Transaction.viewDBRef(txSeqNo));
-        Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
-        map.put("tx_timestamp", transaction.getTimestamp());
-        map.put("tx_creator", transaction.getCreator().getAddress());
+        if (item.getReference() != null) {
+            map.put("Label_seqNo", Lang.getInstance().translateFromLangObj("seqNo", langObj));
+            long txSeqNo = dcSet.getTransactionFinalMapSigns().get(item.getReference());
+            map.put("seqNo", Transaction.viewDBRef(txSeqNo));
+            Transaction transaction = dcSet.getTransactionFinalMap().get(txSeqNo);
+            map.put("tx_timestamp", transaction.getTimestamp());
+            if (transaction.getCreator() == null) {
+                map.put("tx_creator", transaction.getCreator());
+                map.put("tx_creator_person", transaction.viewCreator());
+            }
+            return new Tuple2<Map, Transaction>(map, transaction);
+        }
 
-        return new Tuple2<Map, Transaction>(map, transaction);
+        return new Tuple2<Map, Transaction>(map, null);
     }
 
     public Map jsonQueryItemPoll(Long pollKey, String assetStr) {

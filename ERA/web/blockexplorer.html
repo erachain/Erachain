@@ -938,13 +938,18 @@ button.white-bgc[disabled]:focus,
 
             output += '<h4> [ <input id="key1" name="asset" size="4" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
                            + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
-            output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a></h4>';
 
-            output += '<br>';
+            if (data.asset.this.hasOwnProperty('seqNo')) {
+                output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a></h4>';
 
-            output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
+                output += '<br>';
 
-            output += '<br>';
+                output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
+
+                output += '<br>';
+            } else {
+                output += '</h4>';
+            }
 
             output += '<b>' + data.asset.label_AssetType + ':</b> ' + data.asset.this.assetType;
 
