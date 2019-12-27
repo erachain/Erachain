@@ -259,6 +259,30 @@ public class Order implements Comparable<Order> {
         return calcPrice(amountHave, amountWant, wantAssetScale);
     }
 
+    /**
+     * Цена по остаткам ордера - для отображения на бирже чтобы люди видели реально цену исполнения заявки
+     *
+     * @return
+     */
+    public BigDecimal calcLeftPrice() {
+        if (getAmountHaveLeft().signum() == 0)
+            return price;
+
+        return calcPrice(getAmountHaveLeft(), getAmountWantLeft(), wantAssetScale);
+    }
+
+    /**
+     * Цена по остаткам ордера - для отображения на бирже чтобы люди видели реально цену исполнения заявки
+     *
+     * @return
+     */
+    public BigDecimal calcLeftPriceReverse() {
+        if (getAmountHaveLeft().signum() == 0)
+            return calcPriceReverse();
+
+        return calcPrice(getAmountWantLeft(), getAmountHaveLeft(), haveAssetScale);
+    }
+
     public BigDecimal calcPriceReverse() {
         return calcPrice(amountWant, amountHave, haveAssetScale);
     }
@@ -595,9 +619,15 @@ public class Order implements Comparable<Order> {
         order.put("wantAssetKey", this.wantAssetKey);
         order.put("amountHave", this.amountHave.toPlainString());
         order.put("amountWant", this.amountWant.toPlainString());
+        order.put("price", this.price.toPlainString());
+        order.put("priceReverse", calcPriceReverse().toPlainString());
+
         order.put("fulfilledHave", this.fulfilledHave.toPlainString());
         order.put("leftHave", amountHave.subtract(fulfilledHave).toPlainString());
-        order.put("price", this.price.toPlainString());
+
+        order.put("leftPrice", calcLeftPrice().toPlainString());
+        order.put("leftPriceReverse", calcLeftPriceReverse().toPlainString());
+
         order.put("status", this.status);
         order.put("statusName", this.viewStatus());
 
@@ -674,8 +704,8 @@ public class Order implements Comparable<Order> {
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPriceReverse);
 
         /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
-        if ((debug || BlockChain.CHECK_BUGS > 3) && !orders.isEmpty()) {
-            BigDecimal price = orders.get(0).getPrice();
+        if (this.id > BlockChain.LEFT_PRICE_HEIGHT_SEQ && (debug || BlockChain.CHECK_BUGS > 3) && !orders.isEmpty()) {
+            BigDecimal price = orders.get(0).calcLeftPrice();
             Long timestamp = orders.get(0).getId();
             Long id = 0L;
             for (Order item: orders) {
@@ -695,7 +725,7 @@ public class Order implements Comparable<Order> {
                 }
                 // потому что сранивается потом обратная цена то тут должно быть возрастание
                 // и если не так то ошибка
-                int comp = price.compareTo(item.getPrice());
+                int comp = price.compareTo(item.calcLeftPrice());
                 if (comp > 0) {
                     // RISE ERROR
                     timestamp = null;
@@ -710,15 +740,15 @@ public class Order implements Comparable<Order> {
                     }
                 }
 
-                price = item.getPrice();
+                price = item.calcLeftPrice();
                 timestamp = item.getId();
             }
 
             List<Order> ordersAll = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, null);
-            price = orders.get(0).getPrice();
+            price = orders.get(0).calcLeftPrice();
             timestamp = orders.get(0).getId();
             for (Order item : ordersAll) {
-                int comp = price.compareTo(item.getPrice());
+                int comp = price.compareTo(item.calcLeftPrice()); // по остаткам цены());
                 if (comp > 0) {
                     // RISE ERROR
                     timestamp = null;
@@ -732,7 +762,7 @@ public class Order implements Comparable<Order> {
                         ++timestamp;
                     }
                 }
-                price = item.getPrice();
+                price = item.calcLeftPrice();
                 timestamp = item.getId();
             }
         }
@@ -772,11 +802,13 @@ public class Order implements Comparable<Order> {
 
             BigDecimal orderAmountHaveLeft;
             BigDecimal orderAmountWantLeft;
+
             // REVERSE
-            BigDecimal orderReversePrice = order.calcPriceReverse();
+            ////////// по остаткам цену берем!
+            BigDecimal orderReversePrice = this.id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPriceReverse() : order.calcPriceReverse();
             // PRICE
-            ///BigDecimal orderPrice = Order.calcPrice(order.amountHave, order.amountWant, haveAssetScale);
-            BigDecimal orderPrice = order.price;
+            ////////// по остаткам цену берем!
+            BigDecimal orderPrice = this.id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.price;
 
             Trade trade;
             BigDecimal tradeAmountForHave;
@@ -922,14 +954,17 @@ public class Order implements Comparable<Order> {
                 //ADD TRADE TO DATABASE
                 tradesMap.put(trade);
 
+                /// так как у нас Индексы высчитываются по плавающей цене для остатков и она сейчас измениится
+                /// то сперва удалим Ордер - до изменения Остатокв и цены по Остаткам
+                /// тогда можно ключи делать по цене на Остатки
+                //REMOVE FROM ORDERS
+                ordersMap.delete(order);
+
                 //UPDATE FULFILLED HAVE
                 order.setFulfilledHave(order.getFulfilledHave().add(tradeAmountForHave)); // this.amountHave));
                 this.setFulfilledHave(this.getFulfilledHave().add(tradeAmountForWant)); //this.amountWant));
 
                 if (order.isFulfilled()) {
-                    //REMOVE FROM ORDERS
-                    ordersMap.delete(order);
-
                     //ADD TO COMPLETED ORDERS
                     completedMap.put(order);
                 } else {
@@ -939,12 +974,10 @@ public class Order implements Comparable<Order> {
                         order.dcSet = dcSet;
                         order.processOnUnresolved(block, transaction);
 
-                        //REMOVE FROM ORDERS
-                        ordersMap.delete(order);
-
                         //ADD TO COMPLETED ORDERS
                         completedMap.put(order);
                     } else {
+                        // тут цена по сотаткам поменяется
                         ordersMap.put(order);
                     }
                 }
@@ -1047,6 +1080,10 @@ public class Order implements Comparable<Order> {
             // - на всякий случай удалим его в любом случае
             completedMap.delete(target);
 
+            //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
+            /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
+            ordersMap.delete(target);
+
             //REVERSE FULFILLED
             target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
             thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
@@ -1074,8 +1111,13 @@ public class Order implements Comparable<Order> {
 
         }
 
-        //REMOVE ORDER FROM DATABASE
-        ordersMap.delete(this);
+        //// тут нужно получить остатки все из текущего состояния иначе индексы по измененой цене с остатков не удалятся
+        /// поэтому смотрим что есть в таблице и если есть то его грузим с ценой по остаткам той что в базе
+        Order thisOrder = ordersMap.get(id);
+        if (thisOrder != null) {
+            //REMOVE ORDER FROM DATABASE
+            ordersMap.delete(thisOrder);
+        }
 
         //REMOVE HAVE
         // GET HAVE LEFT - if it CANCELWED by INCREMENT close
@@ -1107,7 +1149,7 @@ public class Order implements Comparable<Order> {
     @Override
     public int compareTo(Order order) {
         //COMPARE ONLY BY PRICE
-        int result = this.getPrice().compareTo(order.getPrice());
+        int result = this.calcLeftPrice().compareTo(order.calcLeftPrice());
         if (result != 0)
             return result;
 

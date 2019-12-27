@@ -138,9 +138,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     
     // GETTERS/SETTERS
 
+
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
-        
+
+        if (BlockChain.CHECK_BUGS > 3 && viewDBRef(dbRef).equals("18165-1")) {
+            boolean debug;
+            debug = true;
+        }
         if (this.amount != null && dcSet != null) {
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
@@ -999,8 +1004,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         // BACKWARD - CONFISCATE
         boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
-        
-        // ASSET ACTIONS PROCESS
+
+        // ASSET ACTIONS PROCESS - 18165-1
         if (this.asset.isOutsideType()) {
             if (actionType == ACTION_SEND && backward) {
                 // UPDATE SENDER

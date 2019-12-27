@@ -180,6 +180,10 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     }
 
     @Override
+    public void afterRollback() {
+    }
+
+    @Override
     public void clearCache() {
         map.clearCache();
     }

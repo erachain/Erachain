@@ -4,7 +4,9 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.OrderSerializer;
 import org.erachain.datachain.OrderSuit;
@@ -72,10 +74,15 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                         Order>() {
                     @Override
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
-                            Long key, Order value) {
-                        return new Fun.Tuple4<>(value.getHaveAssetKey(), value.getWantAssetKey(),
-                                value.calcPrice(),
-                                value.getId());
+                            Long key, Order order) {
+                        return new Fun.Tuple4<>(order.getHaveAssetKey(), order.getWantAssetKey(),
+
+                                // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
+                                // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
+                                key > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice(),
+                                //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
+
+                                order.getId());
                     }
                 });
 
@@ -115,7 +122,7 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
                     public Fun.Tuple4<Long, Long, BigDecimal, Long> run(
                             Long key, Order value) {
                         return new Fun.Tuple4<>(value.getWantAssetKey(), value.getHaveAssetKey(),
-                                value.calcPrice(),
+                                value.getPrice(),
                                 value.getId());
                     }
                 });
@@ -194,12 +201,29 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
             Order order = get(key);
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
-            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+            // причем берем по Остаткам Цену теперь
+            if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
                 break;
             }
         }
 
         return result;
+    }
+
+    @Override
+    public void delete(Long key) {
+        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(key).equals("176395-2")) {
+            boolean debug = true;
+        }
+        super.delete(key);
+    }
+
+    @Override
+    public Order remove(Long key) {
+        if (BlockChain.CHECK_BUGS > 3 && Transaction.viewDBRef(key).equals("176395-2")) {
+            boolean debug = true;
+        }
+        return super.remove(key);
     }
 
 }

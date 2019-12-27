@@ -94,7 +94,7 @@ public class IssueAssetTransactionTest {
             k = 0;
             do {
                 key = assetMap.size();
-                AssetCls item = (AssetCls) assetMap.remove(key);
+                AssetCls item = (AssetCls) assetMap.decrementRemove(key);
             } while (++k < step >> 1);
 
             k = 0;
@@ -132,7 +132,7 @@ public class IssueAssetTransactionTest {
             k = 0;
             do {
                 key = assetMapForked.size();
-                AssetCls item = (AssetCls) assetMapForked.remove(key);
+                AssetCls item = (AssetCls) assetMapForked.decrementRemove(key);
             } while (++k < step >> 1);
 
             if (false) {

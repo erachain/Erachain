@@ -316,7 +316,7 @@ public class TradeResource {
             json.put("creator", order.getCreator().getAddress());
             json.put("amount", order.getAmountHaveLeft().toPlainString());
             json.put("total", order.getAmountWantLeft().toPlainString());
-            json.put("price", order.getPrice().toPlainString());
+            json.put("price", order.calcLeftPrice().toPlainString());
             arrayHave.add(json);
         }
         result.put("have", arrayHave);
@@ -330,7 +330,7 @@ public class TradeResource {
             // get REVERSE price and AMOUNT
             json.put("amount", order.getAmountWantLeft().toPlainString());
             json.put("total", order.getAmountHaveLeft().toPlainString());
-            json.put("price", order.calcPriceReverse().toPlainString());
+            json.put("price", order.calcLeftPriceReverse().toPlainString());
             arrayWant.add(json);
         }
         result.put("want", arrayWant);

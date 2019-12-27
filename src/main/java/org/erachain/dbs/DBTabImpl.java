@@ -361,6 +361,11 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
 
     @Override
     public void rollback() { map.rollback(); }
+
+    @Override
+    public void afterRollback() {
+    }
+
     /////////////////
 ///////////////
 

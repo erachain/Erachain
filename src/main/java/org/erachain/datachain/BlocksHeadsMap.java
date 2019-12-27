@@ -135,4 +135,12 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
         return updated;
     }
 
+    /**
+     * Если откатить базу данных то нужно и локальные значения сбросить
+     */
+    @Override
+    public void afterRollback() {
+        this.fullWeight = fullWeightVar.get();
+    }
+
 }

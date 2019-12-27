@@ -3565,6 +3565,9 @@ public class Controller extends Observable {
 
         String pass = null;
 
+        // default
+        databaseSystem = DCSet.DBS_MAP_DB;
+
         for (String arg : args) {
             if (arg.equals("-cli")) {
                 cli = true;

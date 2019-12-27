@@ -160,8 +160,11 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : DEVELOP_USE ? 444340 + 1 : 261406 + 1; //260120;
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : DEVELOP_USE ? 425555 : 600000;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : DEVELOP_USE ? 800000 : 600000;
+    public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;
+    public static final int LEFT_PRICE_HEIGHT = TEST_DB > 0 ? 0 : CANCEL_ORDERS_ALL_VALID;
+    public static final long LEFT_PRICE_HEIGHT_SEQ = TEST_DB > 0 ? 0 : Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
+
 
     public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0? 0 : DEVELOP_USE? 0 : 44666;
 
@@ -781,7 +784,7 @@ public class BlockChain {
      */
     public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
 
-        if (forgingBalance < MIN_GENERATING_BALANCE) {
+        if (forgingBalance < MIN_GENERATING_BALANCE && height > ALL_BALANCES_OK_TO) {
             return 0l;
         }
 
@@ -805,7 +808,7 @@ public class BlockChain {
         }
 
         if (forgingBalance < BlockChain.MIN_GENERATING_BALANCE) {
-            if (!DEVELOP_USE && !ERA_COMPU_ALL_UP && !Controller.getInstance().isTestNet())
+            if (height > ALL_BALANCES_OK_TO)
                 return 0l;
             forgingBalance = BlockChain.MIN_GENERATING_BALANCE;
         }
