@@ -704,7 +704,7 @@ public class Order implements Comparable<Order> {
         List<Order> orders = ordersMap.getOrdersForTradeWithFork(this.wantAssetKey, this.haveAssetKey, thisPriceReverse);
 
         /// ЭТО ПРОВЕРКА на правильную сортировку - все пашет
-        if ((debug || BlockChain.CHECK_BUGS > 3) && !orders.isEmpty()) {
+        if (this.id > BlockChain.LEFT_PRICE_HEIGHT_SEQ && (debug || BlockChain.CHECK_BUGS > 3) && !orders.isEmpty()) {
             BigDecimal price = orders.get(0).calcLeftPrice();
             Long timestamp = orders.get(0).getId();
             Long id = 0L;
@@ -805,10 +805,10 @@ public class Order implements Comparable<Order> {
 
             // REVERSE
             ////////// по остаткам цену берем!
-            BigDecimal orderReversePrice = order.calcLeftPriceReverse();
+            BigDecimal orderReversePrice = this.id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPriceReverse() : order.calcPriceReverse();
             // PRICE
             ////////// по остаткам цену берем!
-            BigDecimal orderPrice = order.calcLeftPrice(); ///order.price;
+            BigDecimal orderPrice = this.id > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.price;
 
             Trade trade;
             BigDecimal tradeAmountForHave;
