@@ -105,7 +105,7 @@ public class RSendResource {
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
                 assetKey, true,
                 amount, needAmount,
-                title, message, encoding, encrypt);
+                title, message, encoding, encrypt, 0);
 
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -232,7 +232,7 @@ public class RSendResource {
         Pair<Integer, Transaction> result = cntr.make_R_Send(creatorStr, null, recipientStr, feePowStr,
                 assetKey, true,
                 amountStr, needAmount,
-                title, message, encoding, encrypt);
+                title, message, encoding, encrypt, 0);
 
         Transaction transaction = result.getB();
         if (transaction == null) {
@@ -402,7 +402,7 @@ public class RSendResource {
                                 0, recipient,
                                 2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
-                                new byte[]{(byte) 1});
+                                new byte[]{(byte) 1}, 0);
 
                         if (cnt.isOnStopping())
                             return;
@@ -592,7 +592,7 @@ public class RSendResource {
                                 0, recipient,
                                 2l, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
                                 (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), encryptMessage,
-                                new byte[]{(byte) 1});
+                                new byte[]{(byte) 1}, 0);
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
                         // CLEAR for HEAP
@@ -737,6 +737,7 @@ public class RSendResource {
 
             HashSet<Long> usedPersons = new HashSet<>();
             boolean needAmount = true;
+            long timestampThis = NTP.getTime() - 10000L;
 
             try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(forAssetKey)) {
                 while (iterator.hasNext()) {
@@ -798,7 +799,7 @@ public class RSendResource {
                         Pair<Integer, Transaction> result = cntr.make_R_Send(null, account, recipientStr, feePow,
                                 assetKey, true,
                                 sendAmount, needAmount,
-                                title, null, 0, false);
+                                title, null, 0, false, timestampThis++);
 
                         Transaction transaction = result.getB();
                         if (transaction == null) {

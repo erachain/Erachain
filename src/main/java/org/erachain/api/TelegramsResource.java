@@ -384,7 +384,7 @@ public class TelegramsResource {
         try {
             transaction = cntr.r_Send(
                     account, feePow, recipient, assetKey, amount,
-                    title, messageBytes, isTextByte, encrypted);
+                    title, messageBytes, isTextByte, encrypted, 0);
         } catch (Exception e) {
             out.put("status_code", Transaction.INVALID_RETURN);
             out.put("error_message", e.getMessage());

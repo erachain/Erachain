@@ -777,7 +777,7 @@ public class TransactionsResource {
         try {
             transaction = Controller.getInstance().r_Send(
                     Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
-                    head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
+                    head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted, 0);
             // test result = new Pair<Transaction, Integer>(null,
             // Transaction.VALIDATE_OK);
             if (transaction == null)
