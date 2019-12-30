@@ -190,6 +190,10 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
+    public Set<String> getPubKeys(DCSet dcSet) {
+        return dcSet.getPersonAddressMap().getItems(this.getKey(dcSet)).keySet();
+    }
+
     public static BigDecimal getBalance(long personKey, long assetKey, int pos) {
 
         Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();

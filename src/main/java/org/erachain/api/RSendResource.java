@@ -5,17 +5,24 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
+import org.erachain.datachain.PersonAddressMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -657,6 +665,158 @@ public class RSendResource {
 
         out.put("delay", test2Delay);
         LOGGER.info("r_send/test2 STARTED for delay: " + test2Delay);
+
+        return out.toJSONString();
+
+    }
+
+    /**
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1044/2?amount=0.001&title=probe-multi&password=123
+     *
+     * @param fromAddress
+     * @param assetKey
+     * @param forAssetKey
+     * @param position
+     * @param amount
+     * @param test
+     * @param feePow
+     * @param koeff
+     * @param title
+     * @param password
+     * @return
+     */
+    @GET
+    @Path("multisend/{fromAddress}/{assetKey}/{forAssetKey}")
+    public String multiSend(@PathParam("fromAddress") String fromAddress, @PathParam("assetKey") long assetKey, @PathParam("forAssetKey") long forAssetKey,
+                            @DefaultValue("1") @QueryParam("position") Integer position,
+                            @DefaultValue("0") @QueryParam("amount") BigDecimal amount,
+                            @DefaultValue("true") @QueryParam("test") Boolean test,
+                            @DefaultValue("0") @QueryParam("feePow") Integer feePow,
+                            @DefaultValue("1") @QueryParam("koeff") BigDecimal koeff,
+                            @QueryParam("title") String title,
+                            @DefaultValue("false") @QueryParam("onlyperson") Boolean onlyPerson,
+                            @QueryParam("password") String password) {
+
+        if (!BlockChain.DEVELOP_USE
+                && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
+        )
+            return "not LOCAL && not DEVELOP";
+
+        APIUtils.askAPICallAllowed(password, "GET multisend\n ", request, true);
+
+        JSONObject out = new JSONObject();
+        JSONArray outResult = new JSONArray();
+        Controller cntr = Controller.getInstance();
+
+        Fun.Tuple2<Account, String> accResult = Account.tryMakeAccount(fromAddress);
+        if (accResult.b != null) {
+            out.put("error", -123);
+            out.put("error_message", accResult);
+            return out.toJSONString();
+        }
+
+        Account account = accResult.a;
+
+        BigDecimal totalSendAmount = BigDecimal.ZERO;
+
+        DCSet dcSet = DCSet.getInstance();
+        ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
+        PersonAddressMap personAddresses = dcSet.getPersonAddressMap();
+
+        byte[] key;
+        Crypto crypto = Crypto.getInstance();
+        Fun.Tuple2<BigDecimal, BigDecimal> balance;
+
+        int count = 0;
+        BigDecimal totalFee = BigDecimal.ZERO;
+
+        HashSet<Long> usedPersons = new HashSet<>();
+
+        try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(assetKey)) {
+            while (iterator.hasNext()) {
+                key = iterator.next();
+
+                try {
+
+                    balance = Account.getBalanceInPosition(balancesMap.get(key), position);
+
+                    // пустые не берем
+                    if (balance.a.signum() == 0 && balance.b.signum() == 0)
+                        continue;
+
+                    // только тем у кого положительный баланс
+                    if (balance.b.signum() <= 0)
+                        continue;
+
+                    BigDecimal sendAmount;
+                    if (amount.signum() > 0) {
+                        sendAmount = amount;
+                    } else {
+                        sendAmount = BigDecimal.ZERO;
+                    }
+
+                    if (!koeff.equals(BigDecimal.ONE)) {
+                        sendAmount = sendAmount.add(balance.b.multiply(koeff));
+                    }
+
+                    JSONArray resultOne = new JSONArray();
+                    String recipientStr = crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key));
+
+                    if (onlyPerson) {
+                        Account recipient = new Account(recipientStr);
+                        Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration = recipient.getPersonDuration(dcSet);
+                        if (addressDuration == null)
+                            continue;
+                        if (usedPersons.contains(addressDuration.a))
+                            continue;
+                    }
+
+                    resultOne.add(recipientStr);
+                    resultOne.add(sendAmount.toPlainString());
+
+
+                    boolean needAmount = false;
+                    Pair<Integer, Transaction> result = cntr.make_R_Send(null, account, recipientStr, feePow,
+                            forAssetKey, true,
+                            sendAmount, true,
+                            title, null, 0, false);
+
+                    Transaction transaction = result.getB();
+                    if (transaction == null) {
+                        resultOne.add(OnDealClick.resultMess(result.getA()));
+                    } else {
+
+                        int validate = cntr.getTransactionCreator().afterCreate(transaction,
+                                // если проба то не шлем в реальности
+                                test ? Transaction.FOR_PACK : Transaction.FOR_NETWORK);
+
+                        if (validate != Transaction.VALIDATE_OK) {
+                            resultOne.add(OnDealClick.resultMess(validate));
+                        } else {
+                            totalSendAmount = totalSendAmount.add(transaction.getAmount());
+                            totalFee = totalFee.add(transaction.getFee());
+                            count++;
+                        }
+                    }
+
+                    outResult.add(resultOne);
+
+                } catch (java.lang.ArrayIndexOutOfBoundsException e) {
+                    LOGGER.error("Wrong key raw: " + Base58.encode(key));
+                }
+            }
+
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+
+        out.put("results", outResult);
+        out.put("count", count);
+        out.put("totalFee", totalFee.toPlainString());
+        out.put("totalSendAmount", totalSendAmount.toPlainString());
+
+        if (test)
+            out.put("status", "TEST");
 
         return out.toJSONString();
 
