@@ -149,7 +149,7 @@ public class TestRecPerson {
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         person.setReference(ownerSignature);
-        dcSet.getItemPersonMap().add(person);
+        dcSet.getItemPersonMap().incrementPut(person);
         long keyRegistrar = person.getKey(dcSet);
 
         ownerSignature = new byte[64];
@@ -158,7 +158,7 @@ public class TestRecPerson {
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
         person.setReference(ownerSignature);
-        dcSet.getItemPersonMap().add(person);
+        dcSet.getItemPersonMap().incrementPut(person);
         long keyCertifier = person.getKey(dcSet);
 
         // внесем его как удостовренную персону

@@ -385,4 +385,8 @@ public abstract class DBMapSuit<T, U> extends DBSuitImpl<T, U> {
     @Override
     public void rollback() {}
 
+    @Override
+    public void afterRollback() {
+    }
+
 }

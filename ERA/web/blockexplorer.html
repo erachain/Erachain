@@ -922,30 +922,34 @@ button.white-bgc[disabled]:focus,
                 return output;
             }
 
-            output += '<table width="1280" border=0><tr><td align=left><br>';
+            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+            output += '<tr><td align=left>';
+            output += '<table><tr>';
 
-            output += '<h3 style="display:inline;">' + data.asset.label_Asset + ':</h3>';
 
-            output += '<a href="?asset=' + data.asset.this.key + get_lang() + '"><h3 style="display:inline;">';
-            if (data.asset.this.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" />';
-            output += getAssetName2(data.asset.this.key, data.asset.this.name) + '</h3></a>';
-
-            output += '<br>';
-
-            //output += '<b>' + data.asset.label_Key + ':</b> ' + data.asset.this.key;
-            output += data.asset.label_Key + ': ' +'<a href=?asset=' + data.asset.this.key + get_lang() + '><b>' + data.asset.this.key + '</b></a>, &nbsp&nbsp';
-            output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a><br>';
-
-            output += '<br>';
-
-            if (data.asset.this.img.length > 0) {
-                output += '<img src="data:image/gif;base64,' + data.asset.this.img + '" style=" max-width: 100%;" />';
+            if (data.asset.this.image.length > 0) {
+                output += '<td><img src="data:image/gif;base64,' + data.asset.this.image + '" width = "350" /></td><td style ="padding-left:20px">';
                 output += '<br>';
             }
 
-            output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
+            output += '<h3><a href="?asset=' + data.asset.this.key + get_lang() + '">';
+            if (data.asset.this.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" /> ';
+            output += data.asset.this.name + '</a></h3>';
 
-            output += '<br>';
+            output += '<h4> [ <input id="key1" name="asset" size="4" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
+                           + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
+
+            if (data.asset.this.hasOwnProperty('seqNo')) {
+                output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a></h4>';
+
+                output += '<br>';
+
+                output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
+
+                output += '<br>';
+            } else {
+                output += '</h4>';
+            }
 
             output += '<b>' + data.asset.label_AssetType + ':</b> ' + data.asset.this.assetType;
 
@@ -963,7 +967,9 @@ button.white-bgc[disabled]:focus,
 
             output += '<b> ' + data.asset.label_Released + ':</b> ' + addCommas(data.asset.this.released) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 
-            output += '<br>';
+            output += '</td>';
+            output += '</tr>';
+            output += '</table>';
 
             if (data.asset.this.key != 0) {
                 assetUrl = '&asset=' + data.asset.this.key;
@@ -2105,7 +2111,7 @@ button.white-bgc[disabled]:focus,
                 output += '<td> <a href=?asset=' + item.key + get_lang() + '>';
                 output += '<b>' + item.key + '</b>: ';
                 if (item.icon.length > 0)
-                    output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
+                    output += '<img src="data:image/gif;base64,' + item.icon + '"  style="width:2em;" /> ';
 
                 output += escapeHtml(item.name);
                 output += '</a>';
@@ -2156,11 +2162,13 @@ button.white-bgc[disabled]:focus,
             return params;
         }
 
-        function buttonSearch() {
-            if (document.getElementById("key1")) {
-                var pars = document.getElementById("key1").getAttribute("name") + '=' + document.getElementById("key1").value.trim();
-                if (document.getElementById("key2")) {
-                    pars += '&' + document.getElementById("key2").getAttribute("name") + '=' + document.getElementById("key2").value.trim();
+        function buttonSearch(elem=null) {
+            if (elem != null) {
+                if (elem.id == "key2") {
+                    var pars = document.getElementById("key1").getAttribute("name") + '=' + document.getElementById("key1").value.trim();
+                    pars += '&' + elem.getAttribute("name") + '=' + elem.value.trim();
+                } else {
+                var pars = elem.getAttribute("name") + '=' + elem.value.trim();
                 }
 
                 document.location.href = '?' + pars + get_lang();

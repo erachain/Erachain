@@ -95,7 +95,7 @@ public class BuyOrdersTableModel extends TimerTableModelCls<Order> implements Ob
 
                 //BigDecimal price = Order.calcPrice(order.getAmountWant(), order.getAmountHave());
                 // TODO: в новой версии нужно сделать везде +Scale = 0 - иначе несостыкоавка в процессинге ордера - там то 0
-                BigDecimal price = order.calcPriceReverse();
+                BigDecimal price = order.calcLeftPriceReverse();
                 amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
 
                 if (isMine)

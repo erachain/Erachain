@@ -5,6 +5,12 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.datachain.ItemStatusMap;
+import org.mapdb.Fun;
+
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public abstract class StatusCls extends ItemCls {
 
@@ -47,6 +53,81 @@ public abstract class StatusCls extends ItemCls {
 
     public IssueItemMap getDBIssueMap(DCSet db) {
         return db.getIssueStatusMap();
+    }
+
+    static SimpleDateFormat formatDate = new SimpleDateFormat("dd.MM.yyyy"); // HH:mm");
+
+    public static String viewPeriod(Long dteStart, Long dteEnd) {
+        String from_date_str;
+        String to_date_str;
+
+        boolean startIs = true;
+        boolean endIs = true;
+
+        if (dteStart == null || dteStart == Long.MIN_VALUE) {
+            from_date_str = "-> ";
+            startIs = false;
+        } else from_date_str = formatDate.format(new Date(dteStart));
+
+        if (dteEnd == null || dteEnd == Long.MAX_VALUE) {
+            to_date_str = " ->";
+            endIs = false;
+        } else to_date_str = formatDate.format(new Date(dteEnd));
+
+        return !startIs && !endIs ? "" :
+                from_date_str + (startIs && endIs ? " - " : "") + to_date_str;
+
+    }
+
+    public static ArrayList<Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>>>
+    getSortedItems(TreeMap<Long, Stack<Fun.Tuple5<Long, Long, byte[], Integer, Integer>>> statuses) {
+
+        ArrayList<Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>>> statusesItems
+                = new ArrayList<Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>>>();
+
+        if (statuses == null || statuses.isEmpty())
+            return statusesItems;
+
+        ItemStatusMap statusesMap = DCSet.getInstance().getItemStatusMap();
+
+        for (long statusKey : statuses.keySet()) {
+            Stack<Fun.Tuple5<Long, Long, byte[], Integer, Integer>> statusStack = statuses.get(statusKey);
+            if (statusStack == null || statusStack.isEmpty()) {
+                continue;
+            }
+
+            StatusCls status = (StatusCls) statusesMap.get(statusKey);
+            if (status.isUnique()) {
+                // UNIQUE - only on TOP of STACK
+                statusesItems.add(new Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, status, statusStack.peek()));
+            } else {
+                for (Fun.Tuple5<Long, Long, byte[], Integer, Integer> statusItem : statusStack) {
+                    statusesItems.add(new Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>>(statusKey, status, statusItem));
+                }
+            }
+
+            Comparator<Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>>> comparator = new Comparator<Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>>>() {
+                public int compare(Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>> c1, Fun.Tuple3<Long, StatusCls, Fun.Tuple5<Long, Long, byte[], Integer, Integer>> c2) {
+                    if (c1.c.d > c2.c.d)
+                        return 1;
+                    else if (c1.c.d < c2.c.d)
+                        return -1;
+
+                    if (c1.c.e > c2.c.e)
+                        return 1;
+                    else if (c1.c.e < c2.c.e)
+                        return -1;
+
+                    return 0;
+                }
+            };
+
+            Collections.sort(statusesItems, comparator);
+
+        }
+
+        return statusesItems;
+
     }
 
 }

@@ -248,6 +248,16 @@ public abstract class ItemCls implements ExplorerJsonLine {
                 ) {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
+            } else if (BlockChain.CHECK_BUGS > 0
+                    && !(BlockChain.DEVELOP_USE &&
+                    (Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
+                            || Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW"))) // see issue/1149
+            ) {
+                LOGGER.error("Asset item not found for REFERENCE: " + Base58.encode(this.reference));
+                if (BlockChain.CHECK_BUGS > 3) {
+                    Long error = null;
+                    error++;
+                }
             }
         }
         return this.key;
@@ -572,7 +582,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
                 // IF this not GENESIS issue - start from startKey
                 dbMap.setLastKey(startKey);
             }
-            newKey = dbMap.add(this);
+            newKey = dbMap.incrementPut(this);
 
         }
 
@@ -589,8 +599,11 @@ public abstract class ItemCls implements ExplorerJsonLine {
         long thisKey = this.getKey(db);
 
         if (thisKey > startKey) {
-            this.getDBMap(db).delete(thisKey);
+            this.getDBMap(db).decrementDelete(thisKey);
         } else {
+            if (BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
+                thisKey = this.getKey(db);
+            }
             this.getDBMap(db).delete(thisKey);
         }
 

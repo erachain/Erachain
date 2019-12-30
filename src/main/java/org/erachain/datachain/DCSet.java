@@ -1709,7 +1709,13 @@ public class DCSet extends DBASet {
         }
 
         this.database.rollback();
+
         getBlockMap().resetLastBlockSignature();
+
+        for (DBTab tab : tables) {
+            tab.afterRollback();
+        }
+
         this.actions = 0l;
         this.outUses();
     }

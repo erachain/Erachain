@@ -8,6 +8,7 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.CancelOrderTransaction;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
@@ -95,13 +96,13 @@ public class TradeResource {
     /**
      * send and broadcast GET
      *
-     * @param creatorStr address in wallet
-     * @param haveKey    haveKey
-     * @param priceAssetKey    priceAssetKey
-     * @param haveAmount haveAmount or head
-     * @param wantAmount wantAmount
-     * @param feePower   fee Power
-     * @param password   password
+     * @param creatorStr    address in wallet
+     * @param haveKey       haveKey
+     * @param priceAssetKey priceAssetKey
+     * @param haveAmount    haveAmount or head
+     * @param wantAmount    wantAmount
+     * @param feePower      fee Power
+     * @param password      password
      * @return JSON row
      *
      * <h2>Example request</h2>
@@ -309,20 +310,20 @@ public class TradeResource {
         JSONObject result = new JSONObject();
 
         JSONArray arrayHave = new JSONArray();
-        for (Order order: haveOrders) {
+        for (Order order : haveOrders) {
             JSONObject json = order.toJson();
             json.put("id", order.getId());
             json.put("seqNo", Transaction.viewDBRef(order.getId()));
             json.put("creator", order.getCreator().getAddress());
             json.put("amount", order.getAmountHaveLeft().toPlainString());
             json.put("total", order.getAmountWantLeft().toPlainString());
-            json.put("price", order.getPrice().toPlainString());
+            json.put("price", order.calcLeftPrice().toPlainString());
             arrayHave.add(json);
         }
         result.put("have", arrayHave);
 
         JSONArray arrayWant = new JSONArray();
-        for (Order order: wantOrders) {
+        for (Order order : wantOrders) {
             JSONObject json = new JSONObject();
             json.put("id", order.getId());
             json.put("seqNo", Transaction.viewDBRef(order.getId()));
@@ -330,7 +331,7 @@ public class TradeResource {
             // get REVERSE price and AMOUNT
             json.put("amount", order.getAmountWantLeft().toPlainString());
             json.put("total", order.getAmountHaveLeft().toPlainString());
-            json.put("price", order.calcPriceReverse().toPlainString());
+            json.put("price", order.calcLeftPriceReverse().toPlainString());
             arrayWant.add(json);
         }
         result.put("want", arrayWant);
@@ -375,7 +376,7 @@ public class TradeResource {
         List<Trade> listResult = Controller.getInstance().getTradeByTimestamp(have, want, timestamp * 1000, limit);
 
         JSONArray arrayJSON = new JSONArray();
-        for (Trade trade: listResult) {
+        for (Trade trade : listResult) {
             arrayJSON.add(trade.toJson(have, false));
         }
 
@@ -410,7 +411,7 @@ public class TradeResource {
         }
 
         JSONArray arrayJSON = new JSONArray();
-        for (Trade trade: listResult) {
+        for (Trade trade : listResult) {
             arrayJSON.add(trade.toJson(0, true));
         }
 
@@ -705,6 +706,7 @@ public class TradeResource {
 
     /**
      * GET trade/test1/0.85/1000
+     *
      * @param probability
      * @param delay
      * @param password
@@ -744,7 +746,7 @@ public class TradeResource {
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();
-        for (Account crestor: test1Creators) {
+        for (Account crestor : test1Creators) {
             counters.put(crestor.getAddress(), 0L);
         }
 
@@ -786,7 +788,7 @@ public class TradeResource {
 
                 // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
                 if (test1probability < 1 && test1probability > 0) {
-                    int rrr = random.nextInt((int) (100.0 / test1probability) );
+                    int rrr = random.nextInt((int) (100.0 / test1probability));
                     if (rrr > 100) {
                         try {
                             Thread.sleep(this.test1Delay);
@@ -830,7 +832,7 @@ public class TradeResource {
 
                     if (orders.size() / test1Creators.size() >= 5) {
                         // если уже много ордеров на один счет то попробуем удалить какие-то
-                        for (String txSign: orders.keySet()) {
+                        for (String txSign : orders.keySet()) {
 
                             Transaction orderCreateTx = dcSet.getTransactionFinalMap().get(Base58.decode(txSign));
                             if (orderCreateTx == null) {
@@ -844,7 +846,7 @@ public class TradeResource {
                                 counter = counters.get(address);
 
                                 PrivateKeyAccount privateKey = null;
-                                for (PrivateKeyAccount crestor: test1Creators) {
+                                for (PrivateKeyAccount crestor : test1Creators) {
                                     if (crestor.equals(orderCreateTx.getCreator())) {
                                         privateKey = crestor;
                                         break;
@@ -993,4 +995,44 @@ public class TradeResource {
 
     }
 
+    /// get trade/testcancelorder/7K8eqCRon1NKxnWn9o7dfbkTkL9zNEKCzR - see issue/1149
+    @GET
+    @Path("testcancelorder/{address}")
+    public String testCancelOrder(@PathParam("address") String address) {
+
+        TransactionFinalMapImpl txMap = DCSet.getInstance().getTransactionFinalMap();
+        OrderMap orderMap = DCSet.getInstance().getOrderMap();
+
+        try (IteratorCloseable<Long> iterator = DCSet.getInstance().getTransactionFinalMap()
+                .findTransactionsKeys(null, address, null,
+                        0, 0, Transaction.CANCEL_ORDER_TRANSACTION,
+                        0, false, 0, 0)) {
+
+            String result = "";
+            Transaction cancelOrder;
+            Long key;
+            Order order;
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                cancelOrder = txMap.get(key);
+                if (cancelOrder == null) {
+                    result += "\n Cancel Order not FOUND: " + Transaction.viewDBRef(key);
+                }
+
+                order = orderMap.get(((CancelOrderTransaction) cancelOrder).getOrderID());
+                if (order != null) {
+                    result += "\n Canceled by " + Transaction.viewDBRef(key)
+                            + " Order is ACTIVE! - " + Transaction.viewDBRef(((CancelOrderTransaction) cancelOrder).getOrderID());
+                }
+            }
+
+            if (!result.isEmpty()) {
+                LOGGER.error(result);
+                return "see log";
+            }
+        } catch (IOException e) {
+        }
+
+        return "OK";
+    }
 }

@@ -66,8 +66,15 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
                         org.bouncycastle.util.Arrays.concatenate(
                                 byteableLong.toBytesObject(order.getHaveAssetKey()),
                                 byteableLong.toBytesObject(order.getWantAssetKey()),
+
+                                // по остаткам цены НЕЛЬЗЯ! так как при изменении цены после покусывания стрый ключ не находится!
+                                // и потом при поиске по итераторы находятся эти неудалившиеся ключи!
+                                //// теперь можно - в Обработке ордера сделал решение этой проблемы value.getPrice(),
+                                // и включим это после переключения
+                                bgToBytes.toBytes(aLong > BlockChain.LEFT_PRICE_HEIGHT_SEQ ? order.calcLeftPrice() : order.getPrice()),
+                                /////bgToBytes.toBytes(order.getPrice()),
                                 //bgToBytes.toBytes(Order.calcPrice(order.getAmountHave(), order.getAmountWant(), 0)),
-                                bgToBytes.toBytes(order.getPrice()),
+
                                 byteableLong.toBytesObject(order.getId())
                         ),
                 result -> result
@@ -178,16 +185,10 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
             }
 
             Order order = get(key);
-            if (BlockChain.CHECK_BUGS > 0 &&
-                    // почемуто выскакивало за диаппазон пары
-                    (order.getHaveAssetKey() != have
-                            || order.getWantAssetKey() != want)) {
-                Long error = null;
-                ++error;
-            }
             result.put(key, order);
             // сдесь ходябы одну заявку с неподходящей вроде бы ценой нужно взять
-            if (stopPrice != null && order.getPrice().compareTo(stopPrice) > 0) {
+            // причем берем по Остаткам Цену теперь
+            if (stopPrice != null && order.calcLeftPrice().compareTo(stopPrice) > 0) {
                 break;
             }
         }

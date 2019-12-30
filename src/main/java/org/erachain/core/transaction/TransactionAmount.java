@@ -11,7 +11,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -138,9 +137,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     
     // GETTERS/SETTERS
 
+
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
-        
+
+        if (BlockChain.CHECK_BUGS > 3 && viewDBRef(dbRef).equals("18165-1")) {
+            boolean debug;
+            debug = true;
+        }
         if (this.amount != null && dcSet != null) {
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
@@ -245,7 +249,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public String viewTypeName() {
         if (this.amount == null || this.amount.signum() == 0)
-            return Lang.getInstance().translate("LETTER");
+            return "LETTER";
         
         if (this.isBackward()) {
             return "backward";
@@ -999,8 +1003,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         // BACKWARD - CONFISCATE
         boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
-        
-        // ASSET ACTIONS PROCESS
+
+        // ASSET ACTIONS PROCESS - 18165-1
         if (this.asset.isOutsideType()) {
             if (actionType == ACTION_SEND && backward) {
                 // UPDATE SENDER

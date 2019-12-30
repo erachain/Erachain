@@ -126,6 +126,6 @@ public class AssetsResource {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryAsset(assetAsLong));
+        return JSONValue.toJSONString(BlockExplorer.getInstance().jsonQueryItemAsset(assetAsLong));
     }
 }

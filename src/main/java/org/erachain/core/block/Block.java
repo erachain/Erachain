@@ -1484,10 +1484,11 @@ import java.util.*;
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
 
+            Tuple2<Integer, Integer> forgingPoint = creator.getLastForgingData(dcSet);
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue
                 + " Creator: " + this.creator.getAddress());
             LOGGER.debug("*** forging Value: " + this.forgingValue
-                + " creator Data: " + creator.getForgingData(dcSet, heightBlock)
+                    + " creator DataPoint: " + creator.getForgingData(dcSet, forgingPoint == null ? heightBlock : forgingPoint.a)
                 + " creator LAST Data: " + creator.getLastForgingData(dcSet));
             return false;
         }

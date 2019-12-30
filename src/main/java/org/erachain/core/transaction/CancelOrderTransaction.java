@@ -72,7 +72,13 @@ public class CancelOrderTransaction extends Transaction {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
 
         Long createDBRef = this.dcSet.getTransactionFinalMapSigns().get(this.orderSignature);
-        //Transaction createOrder = this.dcSet.getTransactionMap().get(this.orderSignature);
+        if (createDBRef == null && blockHeight > BlockChain.CANCEL_ORDERS_ALL_VALID) {
+            LOGGER.error("ORDER transaction not found: " + Base58.encode(this.orderSignature));
+            if (BlockChain.CHECK_BUGS > 8) {
+                Long error = null;
+                error++;
+            }
+        }
         this.orderID = createDBRef;
 
     }
@@ -278,6 +284,13 @@ public class CancelOrderTransaction extends Transaction {
         //UPDATE CREATOR
         super.process(block, asDeal);
 
+        if (this.orderID == null) {
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+                return;
+            Long error = null;
+            error++;
+        }
+
         // TODO - CANCEL для транзакции в том же блоке???
         //Transaction createOrder = this.dcSet.getTransactionFinalMap().get(this.orderSignature);
         //Tuple2<Integer, Integer> dbRefTuple2 = createOrder.getHeightSeqNo();
@@ -286,7 +299,10 @@ public class CancelOrderTransaction extends Transaction {
         Order order = this.dcSet.getOrderMap().get(this.orderID);
 
         if (order == null) {
-            return;
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+                return;
+            Long error = null;
+            error++;
         }
 
         process_it(this.dcSet, order);
@@ -315,11 +331,25 @@ public class CancelOrderTransaction extends Transaction {
         // ORPHAN
         super.orphan(block, asDeal);
 
+        if (this.orderID == null) {
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+                return;
+            Long error = null;
+            error++;
+        }
+
         //REMOVE ORDER DATABASE
         Order order = this.dcSet.getCompletedOrderMap().get(this.orderID);
 
         if (order == null) {
-           return;
+            if (height < BlockChain.CANCEL_ORDERS_ALL_VALID)
+                return;
+            Long error = null;
+            error++;
+        }
+
+        if (Transaction.viewDBRef(this.orderID).equals("776446-1")) {
+            boolean debug = true;
         }
 
         orphan_it(this.dcSet, order);
