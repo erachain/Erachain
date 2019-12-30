@@ -671,16 +671,16 @@ public class RSendResource {
     }
 
     /**
-     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1044/2?amount=0.001&title=probe-multi&password=123
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&password=123
      *
-     * @param fromAddress
-     * @param assetKey
-     * @param forAssetKey
-     * @param position
-     * @param amount
-     * @param test
+     * @param fromAddress my address in Wallet
+     * @param assetKey asset Key that send
+     * @param forAssetKey asset key of holders test
+     * @param position test balance position. 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other
+     * @param amount absolute amount to send
+     * @param test defaule - true. test=false - real send
      * @param feePow
-     * @param koeff
+     * @param koeff koefficient for amount in balance position of forAssetKey
      * @param title
      * @param password
      * @return
@@ -731,6 +731,7 @@ public class RSendResource {
         BigDecimal totalFee = BigDecimal.ZERO;
 
         HashSet<Long> usedPersons = new HashSet<>();
+        boolean needAmount = true;
 
         try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(assetKey)) {
             while (iterator.hasNext()) {
@@ -748,6 +749,24 @@ public class RSendResource {
                     if (balance.b.signum() <= 0)
                         continue;
 
+                    String recipientStr = crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key));
+
+                    Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
+                    if (onlyPerson) {
+                        // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
+                        // - он и будет выбран куда 1 раз пошлем актив свой
+                        Account recipient = new Account(recipientStr);
+                        addressDuration = recipient.getPersonDuration(dcSet);
+                        if (addressDuration == null)
+                            continue;
+                        if (usedPersons.contains(addressDuration.a))
+                            continue;
+                    } else {
+                        addressDuration = null;
+                    }
+
+                    JSONArray resultOne = new JSONArray();
+
                     BigDecimal sendAmount;
                     if (amount.signum() > 0) {
                         sendAmount = amount;
@@ -759,26 +778,13 @@ public class RSendResource {
                         sendAmount = sendAmount.add(balance.b.multiply(koeff));
                     }
 
-                    JSONArray resultOne = new JSONArray();
-                    String recipientStr = crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key));
-
-                    if (onlyPerson) {
-                        Account recipient = new Account(recipientStr);
-                        Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration = recipient.getPersonDuration(dcSet);
-                        if (addressDuration == null)
-                            continue;
-                        if (usedPersons.contains(addressDuration.a))
-                            continue;
-                    }
-
                     resultOne.add(recipientStr);
                     resultOne.add(sendAmount.toPlainString());
 
 
-                    boolean needAmount = false;
                     Pair<Integer, Transaction> result = cntr.make_R_Send(null, account, recipientStr, feePow,
                             forAssetKey, true,
-                            sendAmount, true,
+                            sendAmount, needAmount,
                             title, null, 0, false);
 
                     Transaction transaction = result.getB();
@@ -793,9 +799,14 @@ public class RSendResource {
                         if (validate != Transaction.VALIDATE_OK) {
                             resultOne.add(OnDealClick.resultMess(validate));
                         } else {
+                            // УСПЕХ! учтем все
                             totalSendAmount = totalSendAmount.add(transaction.getAmount());
                             totalFee = totalFee.add(transaction.getFee());
                             count++;
+                            if (onlyPerson) {
+                                // учтем что такой персоне давали
+                                usedPersons.add(addressDuration.a);
+                            }
                         }
                     }
 
