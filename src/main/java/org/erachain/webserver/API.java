@@ -67,6 +67,7 @@ public class API {
 
         Map help = new LinkedHashMap();
 
+        help.put("see /apiasset", "Help for assets API");
         help.put("see /apidocuments", "Help for documents API");
         help.put("see /apiperson", "Help for person API");
         help.put("see /apipoll", "Help for polls API");
