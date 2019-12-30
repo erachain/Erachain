@@ -671,7 +671,7 @@ public class RSendResource {
     }
 
     /**
-     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&password=123
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486000&password=123
      *
      * @param fromAddress my address in Wallet
      * @param assetKey asset Key that send
@@ -680,6 +680,7 @@ public class RSendResource {
      * @param amount absolute amount to send
      * @param test defaule - true. test=false - real send
      * @param feePow
+     * @param activeAfter timestamp after that is filter
      * @param koeff koefficient for amount in balance position of forAssetKey
      * @param title
      * @param password
@@ -692,6 +693,7 @@ public class RSendResource {
                             @DefaultValue("0") @QueryParam("amount") BigDecimal amount,
                             @DefaultValue("true") @QueryParam("test") Boolean test,
                             @DefaultValue("0") @QueryParam("feePow") Integer feePow,
+                            @DefaultValue("0") @QueryParam("activeafter") Long activeAfter,
                             @DefaultValue("1") @QueryParam("koeff") BigDecimal koeff,
                             @QueryParam("title") String title,
                             @DefaultValue("false") @QueryParam("onlyperson") Boolean onlyPerson,
@@ -765,6 +767,14 @@ public class RSendResource {
                                 continue;
                         } else {
                             addressDuration = null;
+                        }
+
+                        if (activeAfter > 0) {
+                            // на счете должна быть активность после TIMESTAMP
+                            Account recipient = new Account(recipientStr);
+                            long[] lastTimestamp = recipient.getLastTimestamp(dcSet);
+                            if (lastTimestamp == null || lastTimestamp[0] < activeAfter)
+                                continue;
                         }
 
                         JSONArray resultOne = new JSONArray();

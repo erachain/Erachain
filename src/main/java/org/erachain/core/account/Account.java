@@ -782,6 +782,12 @@ public class Account {
         return this.getLastTimestamp(DCSet.getInstance());
     }
 
+    /**
+     * account.address -> LAST[TX.timestamp + TX.dbRef]
+     *
+     * @param dcSet
+     * @return
+     */
     public long[] getLastTimestamp(DCSet dcSet) {
         if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
             return null;
