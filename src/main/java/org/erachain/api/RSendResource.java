@@ -672,6 +672,7 @@ public class RSendResource {
 
     /**
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486000&password=123
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/2/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1546300800000&password=1
      *
      * @param fromAddress my address in Wallet
      * @param assetKey asset Key that send
@@ -737,7 +738,7 @@ public class RSendResource {
             HashSet<Long> usedPersons = new HashSet<>();
             boolean needAmount = true;
 
-            try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(assetKey)) {
+            try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(forAssetKey)) {
                 while (iterator.hasNext()) {
                     key = iterator.next();
 
@@ -795,13 +796,20 @@ public class RSendResource {
 
 
                         Pair<Integer, Transaction> result = cntr.make_R_Send(null, account, recipientStr, feePow,
-                                forAssetKey, true,
+                                assetKey, true,
                                 sendAmount, needAmount,
                                 title, null, 0, false);
 
                         Transaction transaction = result.getB();
                         if (transaction == null) {
                             resultOne.add(OnDealClick.resultMess(result.getA()));
+
+                            if (test) {
+                                // просчитаем тоже даже если ошибка
+                                totalSendAmount = totalSendAmount.add(sendAmount);
+                                count++;
+                            }
+
                         } else {
 
                             int validate = cntr.getTransactionCreator().afterCreate(transaction,
@@ -810,12 +818,7 @@ public class RSendResource {
 
                             if (validate != Transaction.VALIDATE_OK) {
                                 resultOne.add(OnDealClick.resultMess(validate));
-                                if (test) {
-                                    // просчитаем тоже даже если ошибка
-                                    totalSendAmount = totalSendAmount.add(transaction.getAmount());
-                                    totalFee = totalFee.add(transaction.getFee());
-                                    count++;
-                                }
+
                             } else {
                                 // УСПЕХ! учтем все
                                 totalSendAmount = totalSendAmount.add(transaction.getAmount());
