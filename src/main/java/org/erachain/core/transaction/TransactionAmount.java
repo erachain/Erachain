@@ -11,7 +11,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -250,7 +249,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public String viewTypeName() {
         if (this.amount == null || this.amount.signum() == 0)
-            return Lang.getInstance().translate("LETTER");
+            return "LETTER";
         
         if (this.isBackward()) {
             return "backward";
