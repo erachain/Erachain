@@ -153,8 +153,6 @@ public class AssetsResource {
                                      @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
         ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
-        //BigDecimal total = BigDecimal.ZERO;
-        //BigDecimal totalNeg = BigDecimal.ZERO;
         byte[] key;
         Crypto crypto = Crypto.getInstance();
         Fun.Tuple2<BigDecimal, BigDecimal> balance;
