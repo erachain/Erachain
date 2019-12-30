@@ -810,6 +810,12 @@ public class RSendResource {
 
                             if (validate != Transaction.VALIDATE_OK) {
                                 resultOne.add(OnDealClick.resultMess(validate));
+                                if (test) {
+                                    // просчитаем тоже даже если ошибка
+                                    totalSendAmount = totalSendAmount.add(transaction.getAmount());
+                                    totalFee = totalFee.add(transaction.getFee());
+                                    count++;
+                                }
                             } else {
                                 // УСПЕХ! учтем все
                                 totalSendAmount = totalSendAmount.add(transaction.getAmount());
