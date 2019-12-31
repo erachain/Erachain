@@ -844,12 +844,13 @@ public class RSendResource {
             }
 
             out.put("results", outResult);
-            out.put("count", count);
-            out.put("totalFee", totalFee.toPlainString());
-            out.put("totalSendAmount", totalSendAmount.toPlainString());
+            out.put("_asset", assetKey);
+            out.put("_count", count);
+            out.put("_totalFee", totalFee.toPlainString());
+            out.put("_totalSendAmount", totalSendAmount.toPlainString());
 
             if (test)
-                out.put("status", "TEST");
+                out.put("_status", "TEST");
 
             return out.toJSONString();
 
