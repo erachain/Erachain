@@ -93,8 +93,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.21.01 DBS";
-    public static String buildTime = "2019-09-18 13:33:33 UTC";
+    public static String version = "4.21.01 beta";
+    public static String buildTime = "2019-12-31 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -2536,6 +2536,8 @@ public class Controller extends Observable {
                 return this.dcSet.getItemTemplateMap();
             case ItemCls.PERSON_TYPE:
                 return this.dcSet.getItemPersonMap();
+            case ItemCls.POLL_TYPE:
+                return this.dcSet.getItemPollMap();
         }
         return null;
     }
