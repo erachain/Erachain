@@ -446,6 +446,24 @@ public class Account {
         return null;
     }
 
+    static public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
+                                                                      int position) {
+        switch (position) {
+            case TransactionAmount.ACTION_SEND:
+                return balance.a;
+            case TransactionAmount.ACTION_DEBT:
+                return balance.b;
+            case TransactionAmount.ACTION_HOLD:
+                return balance.c;
+            case TransactionAmount.ACTION_SPEND:
+                return balance.d;
+            case TransactionAmount.ACTION_PLEDGE:
+                return balance.e;
+        }
+
+        return null;
+    }
+
 
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
             long key) {
@@ -764,6 +782,12 @@ public class Account {
         return this.getLastTimestamp(DCSet.getInstance());
     }
 
+    /**
+     * account.address -> LAST[TX.timestamp + TX.dbRef]
+     *
+     * @param dcSet
+     * @return
+     */
     public long[] getLastTimestamp(DCSet dcSet) {
         if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
             return null;

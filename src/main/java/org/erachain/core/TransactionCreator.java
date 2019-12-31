@@ -730,13 +730,13 @@ public class TransactionCreator {
 
     public Transaction r_Send(PrivateKeyAccount creator,
                               Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
-                              byte[] encryptMessage) {
+                              byte[] encryptMessage, long timestamp_in) {
 
         this.checkUpdate();
 
         Transaction messageTx;
 
-        long timestamp = NTP.getTime();
+        long timestamp = timestamp_in > 0 ? timestamp_in : NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
         //messageTx = new RSend(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);

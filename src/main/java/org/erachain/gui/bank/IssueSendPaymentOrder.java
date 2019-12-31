@@ -12,13 +12,13 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.mails.MailInfo;
-import org.erachain.gui.library.*;
+import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.Converter;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
 import java.awt.*;
@@ -234,7 +234,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
                 Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recipient, key,
-                null, head, messageBytes, isTextByte, encrypted);
+                null, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);
 

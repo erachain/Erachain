@@ -3154,7 +3154,7 @@ public class Controller extends Observable {
 
     public Pair<Integer, Transaction> make_R_Send(String creatorStr, Account creator, String recipientStr,
                                                   int feePow, long assetKey, boolean checkAsset, BigDecimal amount, boolean needAmount,
-                                                  String title, String message, int messagecode, boolean encrypt) {
+                                                  String title, String message, int messagecode, boolean encrypt, long timestamp) {
 
         Controller cnt = Controller.getInstance();
 
@@ -3268,20 +3268,20 @@ public class Controller extends Observable {
 
         // CREATE RSend
         return new Pair<Integer, Transaction>(Transaction.VALIDATE_OK, this.r_Send(privateKeyAccount, feePow, recipient,
-                assetKey, amount, title, messageBytes, isTextByte, encrypted));
+                assetKey, amount, title, messageBytes, isTextByte, encrypted, timestamp));
 
     }
 
     public Transaction r_Send(PrivateKeyAccount sender, int feePow, Account recipient, long key, BigDecimal amount) {
-        return this.r_Send(sender, feePow, recipient, key, amount, "", null, null, null);
+        return this.r_Send(sender, feePow, recipient, key, amount, "", null, null, null, 0);
     }
 
     public Transaction r_Send(PrivateKeyAccount sender, int feePow,
                               Account recipient, long key, BigDecimal amount, String title, byte[] message, byte[] isText,
-                              byte[] encryptMessage) {
+                              byte[] encryptMessage, long timestamp) {
         synchronized (this.transactionCreator) {
             return this.transactionCreator.r_Send(sender, recipient, key, amount, feePow, title, message, isText,
-                    encryptMessage);
+                    encryptMessage, timestamp);
         }
     }
 

@@ -2,7 +2,7 @@ function tx(data) {
     var output = '<table width="1280" border=0><tr><td align=left>';
     if (data.body.hasOwnProperty('head')) {
         output += data.body.head + '<br>';
-        output += '<b>' + data.body.timestampLabel + '</b>: ' + convertTimestamp(data.body.timestamp, true) + '<br>';
+        output += '<b>' + data.body.timestampLabel + '</b>: ' + convertTimestamp(data.body.timestamp, true) + ' / ' + data.body.timestamp + '<br>';
     }
     if (data.body.hasOwnProperty('body')) {
         var body = data.body.body;

@@ -92,10 +92,12 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         initComponents(message);
 
-        if (asset == null)
-            this.jLabel_Title.setText(Lang.getInstance().translate(title));
-        else
-            this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+        if (title != null) {
+            if (asset == null)
+                this.jLabel_Title.setText(Lang.getInstance().translate(title));
+            else
+                this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+        }
 
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
