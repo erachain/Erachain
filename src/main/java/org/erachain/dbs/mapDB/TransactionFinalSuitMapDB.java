@@ -132,20 +132,18 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.addressTypeKey,
                 new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
                     @Override
-                    public Tuple2<String, Integer>[] run(Long key, Transaction val) {
-                        List<Tuple2<String, Integer>> recps = new ArrayList<Tuple2<String, Integer>>();
-                        Integer type = val.getType();
-                        for (Account acc : val.getInvolvedAccounts()) {
-                            // TODO: make unique key??  + val.viewTimestamp()
-                            recps.add(new Tuple2<String, Integer>(acc.getAddress(), type));
+                    public Tuple2<String, Integer>[] run(Long key, Transaction transaction) {
+                        List<Tuple2<String, Integer>> accounts = new ArrayList<Tuple2<String, Integer>>();
+                        Integer type = transaction.getType();
+                        for (Account acc : transaction.getInvolvedAccounts()) {
+                            // TODO: make unique key??  + transaction.viewTimestamp()
+                            accounts.add(new Tuple2<String, Integer>(acc.getAddress(), type));
                         }
 
-                        // Tuple2<Integer, String>[] ret = (Tuple2<Integer,
-                        // String>[]) new Object[ recps.size() ];
-                        Tuple2<String, Integer>[] ret = (Tuple2<String, Integer>[])
-                                Array.newInstance(Tuple2.class, recps.size());
-                        ret = recps.toArray(ret);
-                        return ret;
+                        Tuple2<String, Integer>[] result = (Tuple2<String, Integer>[])
+                                Array.newInstance(Tuple2.class, accounts.size());
+                        result = accounts.toArray(result);
+                        return result;
                     }
                 });
 
@@ -185,12 +183,21 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 .makeOrGet();
 
         createIndex(BIDIRECTION_ADDRESS_INDEX, addressBiIndex, descendingaddressBiIndex,
-                new Fun.Function2<Tuple2<Long, Long>,
+                new Fun.Function2<Tuple2<Long, Long>[],
                 Long, Transaction>() {
             @Override
-            public Tuple2<Long, Long> run(Long key, Transaction transaction) {
-                return new Tuple2<Long, Long>(Longs.fromByteArray(transaction.getCreator().getShortAddressBytes()),
-                        transaction.getDBRef());
+            public Tuple2<Long, Long>[] run(Long key, Transaction transaction) {
+                List<Tuple2<Long, Long>> accounts = new ArrayList<Tuple2<Long, Long>>();
+                for (Account acc : transaction.getInvolvedAccounts()) {
+                    // TODO: make unique key??  + val.viewTimestamp()
+                    accounts.add(new Tuple2<Long, Long>(Longs.fromByteArray(transaction.getCreator().getShortAddressBytes()),
+                            transaction.getDBRef()));
+                }
+
+                Tuple2<Long, Long>[] result = (Tuple2<Long, Long>[])
+                        Array.newInstance(Tuple2.class, accounts.size());
+                result = accounts.toArray(result);
+                return result;
             }
         });
 

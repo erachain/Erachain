@@ -785,6 +785,85 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    public List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit, boolean noForge) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Transaction> txs = new ArrayList<>();
+
+        if (offset + limit < 0) {
+            // надо отмотать назад - то есть нашли точку и в обратном направлении пропускаем
+            //
+            int offsetHere = -(offset + limit);
+            try (IteratorCloseable iterator = getBiDirectionAddressIterator(address, fromSeqNo,
+                    false, 0, 0)) {
+                Transaction item;
+                Long key;
+                int skipped = 0;
+                while (iterator.hasNext() && (limit == -1 || limit > 0)) {
+                    key = (Long) iterator.next();
+                    item = this.map.get(key);
+                    if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
+                        RCalculated tx = (RCalculated) item;
+                        String mess = tx.getMessage();
+                        if (mess != null && mess.equals("forging")) {
+                            continue;
+                        }
+                    }
+
+                    if (offsetHere > 0 && skipped++ < offsetHere) {
+                        continue;
+                    }
+
+                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                    item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+                    --limit;
+
+                    // обратный отсчет в списке
+                    txs.add(0, item);
+                }
+            } catch (IOException e) {
+            }
+
+        } else {
+
+            try (IteratorCloseable iterator = getBiDirectionAddressIterator(address, fromSeqNo, true, 0, 0)) {
+                Transaction item;
+                Long key;
+                int skipped = 0;
+                while (iterator.hasNext() && (limit == -1 || limit > 0)) {
+                    key = (Long) iterator.next();
+                    item = this.map.get(key);
+                    if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
+                        RCalculated tx = (RCalculated) item;
+                        String mess = tx.getMessage();
+                        if (mess != null && mess.equals("forging")) {
+                            continue;
+                        }
+                    }
+
+                    if (offset > 0 && skipped++ < offset) {
+                        continue;
+                    }
+
+                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                    item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+                    --limit;
+
+                    txs.add(item);
+                }
+            } catch (IOException e) {
+            }
+        }
+        return txs;
+    }
+
+    @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public byte[] getSignature(int hight, int seg) {
 

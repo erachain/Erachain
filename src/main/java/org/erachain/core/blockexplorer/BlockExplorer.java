@@ -88,7 +88,6 @@ public class BlockExplorer {
                 param = Long.valueOf((info.getQueryParameters().getFirst(name)));
             } catch (Exception e) {
                 logger.debug(info.getQueryParameters().toString());
-                return 1000;
             }
         }
         return param;
@@ -2605,7 +2604,61 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryAddress(String address, int start, UriInfo info) {
+    public Map jsonQueryAddress(String address, int start1, UriInfo info) {
+
+        output.put("type", "address");
+        output.put("search", "addresses");
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
+        output.put("search_message", address);
+
+        Object forge = info == null ? false : info.getQueryParameters().getFirst("forge");
+        boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
+                || forge.toString().toLowerCase().equals("1"));
+
+        Long fromID = Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID"));
+        Long offset = checkAndGetLongParam(info, 0L, "offset");
+        int intOffest;
+        if (offset == null) {
+            intOffest = 0;
+        } else {
+            intOffest = (int)(long) offset;
+        }
+
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(address,
+                fromID, intOffest, 25, !useForge);
+
+        LinkedHashMap output = new LinkedHashMap();
+        output.put("address", address);
+
+        Account acc = new Account(address);
+        Tuple2<Integer, PersonCls> person = acc.getPerson();
+
+        if (person != null) {
+            output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+            output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
+            output.put("person", person.b.getName());
+            output.put("person_key", person.b.getKey());
+
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = acc.getBalance(AssetCls.LIA_KEY);
+            output.put("registered", balabce_LIA.a.b.toPlainString());
+            output.put("certified", balabce_LIA.b.b.toPlainString());
+            output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
+            output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
+        }
+
+        output.put("label_account", Lang.getInstance().translateFromLangObj("Account", langObj));
+
+        // balance assets from
+        output.put("Balance", balanceJSON(new Account(address)));
+
+        // Transactions view
+        transactionsJSON(output, acc, transactions, 0, pageSize,
+                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" ));
+
+        return output;
+    }
+
+    public Map jsonQueryAddress_old(String address, int start, UriInfo info) {
 
         output.put("type", "address");
         output.put("search", "addresses");
@@ -3468,9 +3521,6 @@ public class BlockExplorer {
         }
 
     }
-
-
-//  todo Gleb -----------------------------------------------------------------------------------------------------------
 
     public void transactionsJSON(LinkedHashMap output, Account account, List<Transaction> transactions, int fromIndex, int pageSize,
                                  String title) {
