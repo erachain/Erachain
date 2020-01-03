@@ -343,7 +343,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         // берем индекс с обратным отсчетом
                         getIndex(BIDIRECTION_ADDRESS_INDEX, descending)
                             // задаем границы, так как он обратный границы меняем местами
-                            .subSet(Fun.t2(addressKey, fromSeqNo == null? Long.MAX_VALUE : fromSeqNo),
+                            .subSet(Fun.t2(addressKey, fromSeqNo == null || fromSeqNo.equals(0L)? Long.MAX_VALUE : fromSeqNo),
                                     Fun.t2(addressKey, 0L)).iterator()));
             return result;
         }

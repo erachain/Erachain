@@ -2615,7 +2615,6 @@ public class BlockExplorer {
         boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
                 || forge.toString().toLowerCase().equals("1"));
 
-        Long fromID = Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID"));
         Long offset = checkAndGetLongParam(info, 0L, "offset");
         int intOffest;
         if (offset == null) {
@@ -2624,8 +2623,18 @@ public class BlockExplorer {
             intOffest = (int)(long) offset;
         }
 
+        Long fromID = Transaction.parseDBRef(info.getQueryParameters().getFirst("seqNo"));
+        if (fromID != null && fromID.equals(0L) && intOffest < 0) {
+            // это значит нужно скакнуть в самый низ
+        }
+
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(address,
-                fromID, intOffest, 25, !useForge);
+                fromID, intOffest, pageSize, !useForge);
+
+        if (!transactions.isEmpty()) {
+            // включим ссылки на листыние вниз
+            output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+        }
 
         LinkedHashMap output = new LinkedHashMap();
         output.put("address", address);
@@ -2651,9 +2660,11 @@ public class BlockExplorer {
         // balance assets from
         output.put("Balance", balanceJSON(new Account(address)));
 
-        // Transactions view
-        transactionsJSON(output, acc, transactions, 0, pageSize,
+        // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
+        transactionsJSON(output, acc, transactions, 0, 0,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" ));
+
+        output.put("useoffset", true);
 
         return output;
     }

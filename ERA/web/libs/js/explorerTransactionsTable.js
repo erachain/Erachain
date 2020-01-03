@@ -29,6 +29,39 @@ function makePageUri(page, linkName) {
     return uri;
 }
 
+function makePageUri2(seqNo, offset) {
+    // parse url
+    var urlParams;
+    var match,
+        pl = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) {
+            return decodeURIComponent(s.replace(pl, " "));
+        },
+        query = window.location.search.substring(1);
+
+    urlParams = {};
+    while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
+
+    urlParams['seqNo'] = seqNo;
+    urlParams['offset'] = offset;
+
+    var uri = '';
+
+    for (var paramKey in urlParams) {
+        if (uri === '') {
+            uri += '?';
+        } else {
+            uri += '&';
+        }
+
+        uri += paramKey + '=' + encodeURIComponent(urlParams[paramKey]);
+    }
+
+    return uri;
+}
+
 function pagesComponent(data) {
     var output = '';
 
@@ -52,6 +85,34 @@ function pagesComponent2(data) {
     var listSize = data.listSize;
     var pageSize = data.pageSize;
     var start = data.start;
+
+    if (data.hasOwnProperty('useoffset')) {
+        // в начало прыгнуть
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, 0) + '"><b><span class="glyphicon glyphicon-fast-backward"></span></b></a>';
+        if (data.hasOwnProperty('fromSeqNo')) {
+            var fromSeqNo = data.fromSeqNo;
+            // это не самое начало значит можно скакать вверх
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(fromSeqNo, -pageSize) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(fromSeqNo, 0) + '"><b> ' + fromSeqNo + ' </b></a>';
+        }
+
+        if (data.hasOwnProperty('toSeqNo')) {
+            var toSeqNo = data.toSeqNo;
+            // листнуть ниже
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
+            // в конец прыгнуть
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
+        } else if (listSize > 0) {
+            data.Transactions.transactions
+            var toSeqNo = data.toSeqNo;
+            // листнуть ниже
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
+            // в конец прыгнуть
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
+        }
+
+        return output;
+    }
 
     if (data.hasOwnProperty('start')) {
         start = data.start;

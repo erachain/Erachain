@@ -794,8 +794,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         List<Transaction> txs = new ArrayList<>();
 
-        if (offset + limit < 0) {
-            // надо отмотать назад - то есть нашли точку и в обратном направлении пропускаем
+        if (offset + limit <= 0) {
+            // надо отмотать назад (ввеох) - то есть нашли точку и в обратном направлении пропускаем
             //
             int offsetHere = -(offset + limit);
             try (IteratorCloseable<Long> iterator = getBiDirectionAddressIterator(address, fromSeqNo,
