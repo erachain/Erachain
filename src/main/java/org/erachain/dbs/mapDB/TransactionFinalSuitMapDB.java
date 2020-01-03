@@ -172,30 +172,32 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     }
                 });
 
+        Fun.Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
+                //UnsignedBytes.lexicographicalComparator()
+                Fun.COMPARATOR);
+
         // BI-DIrectional INDEX - for blockexplorer
         NavigableSet<Integer> addressBiIndex = database.createTreeSet("address_txs")
-                .comparator(Fun.TUPLE2_COMPARATOR)
+                .comparator(comparator)
                 .counterEnable()
                 .makeOrGet();
 
         NavigableSet<Integer> descendingaddressBiIndex = database.createTreeSet("address_txs_descending")
-                .comparator(new ReverseComparator(Fun.TUPLE2_COMPARATOR))
+                .comparator(new ReverseComparator(comparator))
                 .makeOrGet();
 
-        createIndex(BIDIRECTION_ADDRESS_INDEX, addressBiIndex, descendingaddressBiIndex,
-                new Fun.Function2<Tuple2<Long, Long>[],
+        createIndexes(BIDIRECTION_ADDRESS_INDEX, addressBiIndex, descendingaddressBiIndex,
+                new Fun.Function2<Long[],
                 Long, Transaction>() {
             @Override
-            public Tuple2<Long, Long>[] run(Long key, Transaction transaction) {
-                List<Tuple2<Long, Long>> accounts = new ArrayList<Tuple2<Long, Long>>();
-                for (Account acc : transaction.getInvolvedAccounts()) {
-                    // TODO: make unique key??  + val.viewTimestamp()
-                    accounts.add(new Tuple2<Long, Long>(Longs.fromByteArray(transaction.getCreator().getShortAddressBytes()),
-                            transaction.getDBRef()));
+            public Long[] run(Long key, Transaction transaction) {
+                List<Long> accounts = new ArrayList<Long>();
+                for (Account account : transaction.getInvolvedAccounts()) {
+                    accounts.add(Longs.fromByteArray(account.getShortAddressBytes()));
                 }
 
-                Tuple2<Long, Long>[] result = (Tuple2<Long, Long>[])
-                        Array.newInstance(Tuple2.class, accounts.size());
+                Long[] result = (Long[])
+                        Array.newInstance(Long.class, accounts.size());
                 result = accounts.toArray(result);
                 return result;
             }
@@ -331,12 +333,32 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending) {
         Long addressKey = Longs.fromByteArray(Crypto.getInstance().getShortBytesFromAddress(address));
 
-        if (descending)
-            return IteratorCloseableImpl.make(((NavigableMap)getIndex(BIDIRECTION_ADDRESS_INDEX, descending))
-                    .subMap(new Tuple2<>(addressKey, null), new Tuple2<>(addressKey, fromSeqNo)).values().iterator());
+        if (descending) {
+            // fromSeqNo == null ? Fun.HI() : fromSeqNo
+            NavigableSet result1 = getIndex(BIDIRECTION_ADDRESS_INDEX, descending);
+            SortedSet result2 = result1.subSet(Fun.t2(addressKey, Fun.HI()),
+                    Fun.t2(addressKey, fromSeqNo == null ? 0L : fromSeqNo));
 
-        return IteratorCloseableImpl.make(((NavigableMap)getIndex(BIDIRECTION_ADDRESS_INDEX, descending))
-                .subMap(new Tuple2<>(addressKey, fromSeqNo), new Tuple2<>(addressKey, Fun.HI())).values().iterator());
+            IteratorCloseable result =
+                    // делаем закрываемый Итератор
+                    IteratorCloseableImpl.make(
+                    // только ключи берем из Tuple2
+                    new org.erachain.datachain.IndexIterator<>(
+                            // берем индекс с обратным отсчетом
+                            ((NavigableSet) getIndex(BIDIRECTION_ADDRESS_INDEX, descending))
+                    // задаем границы, так как он обратный границы меняем местами
+                    .subSet(Fun.t2(addressKey, fromSeqNo == null? Fun.HI() : fromSeqNo),
+                            Fun.t2(addressKey, 0L)).iterator()));
+            return result;
+        }
+
+        IteratorCloseable result = IteratorCloseableImpl.make(
+                // только ключи берем из Tuple2
+                new org.erachain.datachain.IndexIterator<>(
+                    ((NavigableSet<Tuple2<?, Long>>) getIndex(BIDIRECTION_ADDRESS_INDEX, descending))
+                        .subSet(Fun.t2(addressKey, fromSeqNo), Fun.t2(addressKey, Fun.HI())).iterator()));
+
+        return result;
     }
 
 }

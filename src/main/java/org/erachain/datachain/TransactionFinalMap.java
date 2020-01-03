@@ -82,7 +82,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     IteratorCloseable<Long> findTransactionsKeys(String address, String sender, String recipient, int minHeight,
                                                  int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
-    IteratorCloseable getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit);
+    IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit);
 
     List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit, boolean noForge);
 

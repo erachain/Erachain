@@ -772,7 +772,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public IteratorCloseable getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit) {
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
@@ -798,13 +798,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // надо отмотать назад - то есть нашли точку и в обратном направлении пропускаем
             //
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable iterator = getBiDirectionAddressIterator(address, fromSeqNo,
+            try (IteratorCloseable<Long> iterator = getBiDirectionAddressIterator(address, fromSeqNo,
                     false, 0, 0)) {
                 Transaction item;
                 Long key;
                 int skipped = 0;
                 while (iterator.hasNext() && (limit == -1 || limit > 0)) {
-                    key = (Long) iterator.next();
+                    key = iterator.next();
                     item = this.map.get(key);
                     if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated tx = (RCalculated) item;
@@ -831,12 +831,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         } else {
 
-            try (IteratorCloseable iterator = getBiDirectionAddressIterator(address, fromSeqNo, true, 0, 0)) {
+            try (IteratorCloseable<Long> iterator = getBiDirectionAddressIterator(address, fromSeqNo, true, 0, 0)) {
                 Transaction item;
                 Long key;
                 int skipped = 0;
                 while (iterator.hasNext() && (limit == -1 || limit > 0)) {
-                    key = (Long) iterator.next();
+                    key = iterator.next();
                     item = this.map.get(key);
                     if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated tx = (RCalculated) item;
