@@ -92,23 +92,28 @@ function pagesComponent2(data) {
         if (data.hasOwnProperty('fromSeqNo')) {
             var fromSeqNo = data.fromSeqNo;
             // это не самое начало значит можно скакать вверх
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(fromSeqNo, -pageSize) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
-            output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri(fromSeqNo, 0) + '"><b> ' + fromSeqNo + ' </b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -listSize) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri2(fromSeqNo, 0) + '"><b> ' + fromSeqNo + ' </b></a>';
+        } else if (params.hasOwnProperty('seqNo')) {
+            var fromSeqNo = params.seqNo;
+            // это не самое начало значит можно скакать вверх
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -listSize) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri2(fromSeqNo, 0) + '"><b> ' + fromSeqNo + ' </b></a>';
         }
 
         if (data.hasOwnProperty('toSeqNo')) {
             var toSeqNo = data.toSeqNo;
             // листнуть ниже
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
             // в конец прыгнуть
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, -listSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
         } else if (listSize > 0) {
             data.Transactions.transactions
             var toSeqNo = data.toSeqNo;
             // листнуть ниже
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
             // в конец прыгнуть
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
         }
 
         return output;
