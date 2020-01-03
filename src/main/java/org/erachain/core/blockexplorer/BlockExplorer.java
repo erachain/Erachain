@@ -1700,7 +1700,7 @@ public class BlockExplorer {
                 accountsJSON.put(i++, accountJSON);
 
                 List<Transaction> issuedPersons = transactionsMap.getTransactionsByAddressAndType(address,
-                        Transaction.ISSUE_PERSON_TRANSACTION, 200);
+                        Transaction.ISSUE_PERSON_TRANSACTION, 200, 0);
                 if (issuedPersons != null) {
                     myIssuePersons.addAll(issuedPersons);
                 }

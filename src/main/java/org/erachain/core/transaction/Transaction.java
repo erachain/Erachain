@@ -831,6 +831,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         return this.dbRef;
     }
 
+    public byte[] getDBRefAsBytes() {
+        return Longs.toByteArray(this.dbRef);
+    }
+
     // reference in Map - or as signatire or as BlockHeight + seqNo
     public byte[] getDBRef(DCSet db) {
         if (this.getConfirmations(db) < BlockChain.MAX_ORPHAN) {

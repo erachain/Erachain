@@ -3,9 +3,11 @@ package org.erachain.dbs.mapDB;
 //04/01 +- 
 
 import com.google.common.collect.*;
+import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
@@ -14,6 +16,7 @@ import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
+import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -48,6 +51,7 @@ import java.util.*;
 @Slf4j
 public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit {
 
+    public static final int BIDIRECTION_ADDRESS_INDEX = 1;
     private static int CUT_NAME_INDEX = 12;
 
     @SuppressWarnings("rawtypes")
@@ -169,6 +173,27 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         return keys;
                     }
                 });
+
+        // BI-DIrectional INDEX - for blockexplorer
+        NavigableSet<Integer> addressBiIndex = database.createTreeSet("address_txs")
+                .comparator(Fun.TUPLE2_COMPARATOR)
+                .counterEnable()
+                .makeOrGet();
+
+        NavigableSet<Integer> descendingaddressBiIndex = database.createTreeSet("address_txs_descending")
+                .comparator(new ReverseComparator(Fun.TUPLE2_COMPARATOR))
+                .makeOrGet();
+
+        createIndex(BIDIRECTION_ADDRESS_INDEX, addressBiIndex, descendingaddressBiIndex,
+                new Fun.Function2<Tuple2<Long, Long>,
+                Long, Transaction>() {
+            @Override
+            public Tuple2<Long, Long> run(Long key, Transaction transaction) {
+                return new Tuple2<Long, Long>(Longs.fromByteArray(transaction.getCreator().getShortAddressBytes()),
+                        transaction.getDBRef());
+            }
+        });
+
     }
 
     @Override
@@ -285,6 +310,26 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
 
         }
+    }
+
+    /**
+     * Нужно для пролистывания по адресу в обоих направлениях - для блокэксплорера
+     * TODO: тут ключ по адресу обрезан до 8-ми байт и возможны совпадения - поидее нужно увеличить длинну
+     * @param address
+     * @param fromSeqNo
+     * @param descending
+     * @return
+     */
+    @Override
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending) {
+        Long addressKey = Longs.fromByteArray(Crypto.getInstance().getShortBytesFromAddress(address));
+
+        if (descending)
+            return IteratorCloseableImpl.make(((NavigableMap)getIndex(BIDIRECTION_ADDRESS_INDEX, descending))
+                    .subMap(new Tuple2<>(addressKey, null), new Tuple2<>(addressKey, fromSeqNo)).values().iterator());
+
+        return IteratorCloseableImpl.make(((NavigableMap)getIndex(BIDIRECTION_ADDRESS_INDEX, descending))
+                .subMap(new Tuple2<>(addressKey, fromSeqNo), new Tuple2<>(addressKey, Fun.HI())).values().iterator());
     }
 
 }

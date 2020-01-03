@@ -82,6 +82,12 @@ public class Crypto {
         return getAddressFromShort(ADDRESS_VERSION, addressShort);
     }
 
+    public byte[] getShortBytesFromAddress(String address) {
+        byte[] bytes = Base58.decode(address);
+        return Arrays.copyOfRange(bytes, 1, bytes.length - 4);
+    }
+
+
     public String getAddressFromShort(byte[] addressShort) {
         return Base58.encode(getAddressFromShort(ADDRESS_VERSION, addressShort));
     }

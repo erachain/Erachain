@@ -80,7 +80,7 @@ public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
 
         for (String address : addresses.keySet()) {
             myIssuePersons.addAll(transactionFinalMap.getTransactionsByAddressAndType(address,
-                    Transaction.ISSUE_PERSON_TRANSACTION, 0));
+                    Transaction.ISSUE_PERSON_TRANSACTION, 0, 0));
         }
 
         for (Transaction myIssuePerson : myIssuePersons) {

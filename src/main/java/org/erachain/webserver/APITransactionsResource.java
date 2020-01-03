@@ -305,7 +305,7 @@ public class APITransactionsResource {
         Integer type;
         try {
             type = Integer.valueOf(type1);
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, type, 1000);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, type, 1000, 0);
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block

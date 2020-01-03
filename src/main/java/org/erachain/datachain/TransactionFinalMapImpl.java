@@ -223,13 +223,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    public List<Transaction> getTransactionsBySender(String address) {
-        return getTransactionsBySender(address, 0);
-    }
-
-    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsBySender(String address, int limit) {
+    public List<Transaction> getTransactionsBySender(String address, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -258,7 +253,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit) {
+    public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -285,7 +280,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit) {
+    public List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -773,6 +768,20 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Iterators.advance(iterator, offset);
 
         return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public IteratorCloseable getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(address, fromSeqNo, descending);
+        Iterators.advance(iterator, offset);
+
+        return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
+
     }
 
     @Override
