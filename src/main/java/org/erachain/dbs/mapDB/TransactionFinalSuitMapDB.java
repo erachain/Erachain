@@ -12,6 +12,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.IndexIterator;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
@@ -334,29 +335,28 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         Long addressKey = Longs.fromByteArray(Crypto.getInstance().getShortBytesFromAddress(address));
 
         if (descending) {
-            // fromSeqNo == null ? Fun.HI() : fromSeqNo
-            NavigableSet result1 = getIndex(BIDIRECTION_ADDRESS_INDEX, descending);
-            SortedSet result2 = result1.subSet(Fun.t2(addressKey, Fun.HI()),
-                    Fun.t2(addressKey, fromSeqNo == null ? 0L : fromSeqNo));
-
             IteratorCloseable result =
-                    // делаем закрываемый Итератор
-                    IteratorCloseableImpl.make(
+                // делаем закрываемый Итератор
+                IteratorCloseableImpl.make(
                     // только ключи берем из Tuple2
-                    new org.erachain.datachain.IndexIterator<>(
-                            // берем индекс с обратным отсчетом
-                            ((NavigableSet) getIndex(BIDIRECTION_ADDRESS_INDEX, descending))
-                    // задаем границы, так как он обратный границы меняем местами
-                    .subSet(Fun.t2(addressKey, fromSeqNo == null? Fun.HI() : fromSeqNo),
-                            Fun.t2(addressKey, 0L)).iterator()));
+                    new IndexIterator<>(
+                        // берем индекс с обратным отсчетом
+                        getIndex(BIDIRECTION_ADDRESS_INDEX, descending)
+                            // задаем границы, так как он обратный границы меняем местами
+                            .subSet(Fun.t2(addressKey, fromSeqNo == null? Long.MAX_VALUE : fromSeqNo),
+                                    Fun.t2(addressKey, 0L)).iterator()));
             return result;
         }
 
-        IteratorCloseable result = IteratorCloseableImpl.make(
-                // только ключи берем из Tuple2
-                new org.erachain.datachain.IndexIterator<>(
-                    ((NavigableSet<Tuple2<?, Long>>) getIndex(BIDIRECTION_ADDRESS_INDEX, descending))
-                        .subSet(Fun.t2(addressKey, fromSeqNo), Fun.t2(addressKey, Fun.HI())).iterator()));
+        IteratorCloseable result =
+                // делаем закрываемый Итератор
+                IteratorCloseableImpl.make(
+                        // только ключи берем из Tuple2
+                        new IndexIterator<>(
+                                getIndex(BIDIRECTION_ADDRESS_INDEX, descending)
+                                    // задаем границы, так как он обратный границы меняем местами
+                                    .subSet(Fun.t2(addressKey, fromSeqNo == null? 0L : fromSeqNo),
+                                            Fun.t2(addressKey, Long.MAX_VALUE)).iterator()));
 
         return result;
     }
