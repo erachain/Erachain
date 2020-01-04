@@ -253,7 +253,8 @@ public abstract class ItemCls implements ExplorerJsonLine {
                     (Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
                             || Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW"))) // see issue/1149
             ) {
-                LOGGER.error("Asset item not found for REFERENCE: " + Base58.encode(this.reference));
+                // zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH
+                LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
                 if (BlockChain.CHECK_BUGS > 3) {
                     Long error = null;
                     error++;

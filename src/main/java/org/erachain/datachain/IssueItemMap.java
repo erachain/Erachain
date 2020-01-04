@@ -2,7 +2,10 @@ package org.erachain.datachain;
 
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.transaction.Transaction;
+import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
+import org.mapdb.Hasher;
+import org.mapdb.SerializerBase;
 
 import java.util.TreeMap;
 
@@ -25,6 +28,26 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
 
     public IssueItemMap(IssueItemMap parent, DCSet dcSet) {
         super(parent, dcSet);
+    }
+
+    @Override
+    public void openMap() {
+        //OPEN MAP
+        if (true) {
+            // более быстро работает
+            map = database.createHashMap(this.getClass().getName())
+                    //.keySerializer(BTreeKeySerializer.BASIC)
+                    //.comparator(UnsignedBytes.lexicographicalComparator())
+                    .keySerializer(SerializerBase.BYTE_ARRAY)
+                    .hasher(Hasher.BYTE_ARRAY)
+                    .valueSerializer(SerializerBase.LONG)
+                    .makeOrGet();
+        } else {
+            map = database.createTreeMap(this.getClass().getName())
+                    .keySerializer(BTreeKeySerializer.BASIC)
+                    .comparator(UnsignedBytes.lexicographicalComparator())
+                    .makeOrGet();
+        }
     }
 
     protected void createIndexes() {
