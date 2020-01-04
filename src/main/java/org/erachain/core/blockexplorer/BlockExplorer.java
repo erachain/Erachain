@@ -2661,7 +2661,7 @@ public class BlockExplorer {
         output.put("Balance", balanceJSON(new Account(address)));
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
-        transactionsJSON(output, acc, transactions, 0, 0,
+        transactionsJSON(output, acc, transactions, 0, pageSize,
                 Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" ));
 
         output.put("useoffset", true);

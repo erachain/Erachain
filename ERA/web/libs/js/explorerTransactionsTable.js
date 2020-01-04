@@ -44,12 +44,22 @@ function makePageUri2(seqNo, offset) {
     while (match = search.exec(query))
         urlParams[decode(match[1])] = decode(match[2]);
 
-    urlParams['seqNo'] = seqNo;
-    urlParams['offset'] = offset;
+    if (seqNo == 0)
+        urlParams['seqNo'] = null;
+    else
+        urlParams['seqNo'] = seqNo;
+
+    if (offset == 0)
+        urlParams['offset'] = null;
+    else
+        urlParams['offset'] = offset;
 
     var uri = '';
 
     for (var paramKey in urlParams) {
+        if (urlParams[paramKey] == null)
+        continue;
+
         if (uri === '') {
             uri += '?';
         } else {
@@ -82,20 +92,19 @@ function pagesComponent(data) {
 function pagesComponent2(data) {
     var output = '';
 
-    var listSize = data.listSize;
-    var pageSize = data.pageSize;
+    var listSize = 0 + data.listSize;
+    var pageSize = 0 + data.pageSize;
     var start = data.start;
 
     if (data.hasOwnProperty('useoffset')) {
         // в начало прыгнуть
         output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, 0) + '"><b><span class="glyphicon glyphicon-fast-backward"></span></b></a>';
+        if (listSize < pageSize) {
+                return output;
+        }
+
         if (data.hasOwnProperty('fromSeqNo')) {
             var fromSeqNo = data.fromSeqNo;
-            // это не самое начало значит можно скакать вверх
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -listSize) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
-            output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri2(fromSeqNo, 0) + '"><b> ' + fromSeqNo + ' </b></a>';
-        } else if (params.hasOwnProperty('seqNo')) {
-            var fromSeqNo = params.seqNo;
             // это не самое начало значит можно скакать вверх
             output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -listSize) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
             output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri2(fromSeqNo, 0) + '"><b> ' + fromSeqNo + ' </b></a>';
@@ -105,16 +114,10 @@ function pagesComponent2(data) {
             var toSeqNo = data.toSeqNo;
             // листнуть ниже
             output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
-            // в конец прыгнуть
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, -listSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
-        } else if (listSize > 0) {
-            data.Transactions.transactions
-            var toSeqNo = data.toSeqNo;
-            // листнуть ниже
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
-            // в конец прыгнуть
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
         }
+
+        // в конец прыгнуть
+        output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, -pageSize) + '"><b><span class="glyphicon glyphicon-fast-forward"></span></b></a>';
 
         return output;
     }
