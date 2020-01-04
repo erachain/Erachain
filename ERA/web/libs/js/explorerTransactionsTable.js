@@ -58,7 +58,7 @@ function makePageUri2(seqNo, offset) {
 
     for (var paramKey in urlParams) {
         if (urlParams[paramKey] == null)
-        continue;
+            continue;
 
         if (uri === '') {
             uri += '?';
@@ -103,12 +103,14 @@ function pagesComponent2(data) {
                 return output;
         }
 
-        if (data.hasOwnProperty('fromSeqNo')) {
-            var fromSeqNo = data.fromSeqNo;
+        var fromSeqNo = data.fromSeqNo;
+        if (fromSeqNo != null) {
             // это не самое начало значит можно скакать вверх
-            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -listSize) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
-            output += '&emsp; <a class="button ll-blue-bgc active" href="' + makePageUri2(fromSeqNo, 0) + '"><b> ' + fromSeqNo + ' </b></a>';
+            output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -pageSize - 1) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
         }
+
+        output += '&emsp; [ <input size="6" type="text" value="' + (fromSeqNo == null? 'seqNo' : fromSeqNo) + '" class="" style="font-size: 1em;"'
+                   + ' onkeydown="if (event.keyCode == 13) document.location = makePageUri2(this.value.trim(), 0)"> ] ';
 
         if (data.hasOwnProperty('toSeqNo')) {
             var toSeqNo = data.toSeqNo;

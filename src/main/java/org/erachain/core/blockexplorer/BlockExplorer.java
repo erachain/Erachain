@@ -2633,6 +2633,7 @@ public class BlockExplorer {
 
         if (!transactions.isEmpty()) {
             // включим ссылки на листыние вниз
+            output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
             output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
         }
 
