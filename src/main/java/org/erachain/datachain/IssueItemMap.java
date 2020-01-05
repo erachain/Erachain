@@ -1,12 +1,15 @@
 package org.erachain.datachain;
 
 import com.google.common.primitives.UnsignedBytes;
+import org.erachain.core.BlockChain;
+import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Hasher;
 import org.mapdb.SerializerBase;
 
+import java.util.Arrays;
 import java.util.TreeMap;
 
 /**
@@ -71,7 +74,20 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
         put(transaction.getSignature(), key);
     }
 
+    //
     public void delete(Transaction transaction) {
         delete(transaction.getSignature());
     }
+
+    byte[] checkSign = Base58.decode("3gK1L3pLsRCUbyXbfqDujTrsaZGWocBT58easGe1Gy6fgt43UMbULkX3C46utuWyVStwivisZxQzeiv2HEjB4r7h");
+    @Override
+    public void delete(byte[] signature) {
+        if(BlockChain.CHECK_BUGS > 3
+            && Arrays.equals(checkSign, signature)) {
+            boolean debug = true;
+        }
+        super.delete(signature);
+    }
+
+
 }
