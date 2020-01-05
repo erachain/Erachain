@@ -17,7 +17,6 @@ public class ItemSerializer implements Serializer<ItemCls>, Serializable {
     private int type;
 
     public ItemSerializer(int type) {
-        super();
         this.type = type;
     }
 

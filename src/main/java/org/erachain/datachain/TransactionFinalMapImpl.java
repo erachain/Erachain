@@ -58,7 +58,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     private static int CUT_NAME_INDEX = 12;
 
     public TransactionFinalMapImpl(int dbsUsed, DCSet databaseSet, DB database, boolean sizeEnable) {
-        super(dbsUsed, databaseSet, database, sizeEnable);
+        super(dbsUsed, databaseSet, database, sizeEnable, null, null);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_TRANSACTION_TYPE);

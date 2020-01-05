@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.core.item.ItemCls;
 import org.mapdb.DB;
 
 /**
@@ -9,7 +10,7 @@ import org.mapdb.DB;
 public class IssueStatusMap extends IssueItemMap {
 
     public IssueStatusMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, ItemCls.STATUS_TYPE);
     }
 
     public IssueStatusMap(IssueStatusMap parent, DCSet dcSet) {

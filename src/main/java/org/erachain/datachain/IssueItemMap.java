@@ -3,7 +3,9 @@ package org.erachain.datachain;
 import com.google.common.primitives.UnsignedBytes;
 import org.erachain.core.BlockChain;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.serializer.ItemSerializer;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 import org.mapdb.Hasher;
@@ -25,8 +27,8 @@ import java.util.TreeMap;
  */
 public abstract class IssueItemMap extends DCUMap<byte[], Long> {
 
-    public IssueItemMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+    public IssueItemMap(DCSet databaseSet, DB database, int type) {
+        super(databaseSet, database, ItemCls.getItemTypeName(type), new ItemSerializer(type));
     }
 
     public IssueItemMap(IssueItemMap parent, DCSet dcSet) {
@@ -38,7 +40,7 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
         //OPEN MAP
         if (true) {
             // более быстро работает
-            map = database.createHashMap(this.getClass().getName())
+            map = database.createHashMap(TAB_NAME + "_ref")
                     //.keySerializer(BTreeKeySerializer.BASIC)
                     //.comparator(UnsignedBytes.lexicographicalComparator())
                     .keySerializer(SerializerBase.BYTE_ARRAY)
@@ -46,7 +48,7 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
                     .valueSerializer(SerializerBase.LONG)
                     .makeOrGet();
         } else {
-            map = database.createTreeMap(this.getClass().getName())
+            map = database.createTreeMap(TAB_NAME + "_ref")
                     .keySerializer(BTreeKeySerializer.BASIC)
                     .comparator(UnsignedBytes.lexicographicalComparator())
                     .makeOrGet();

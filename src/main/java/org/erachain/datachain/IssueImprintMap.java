@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.core.item.ItemCls;
 import org.mapdb.DB;
 
 /**
@@ -9,7 +10,7 @@ import org.mapdb.DB;
 public class IssueImprintMap extends IssueItemMap {
 
     public IssueImprintMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, ItemCls.IMPRINT_TYPE);
     }
 
     public IssueImprintMap(IssueImprintMap parent, DCSet dcSet) {

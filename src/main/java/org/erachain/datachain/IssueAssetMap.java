@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import org.erachain.core.item.ItemCls;
 import org.mapdb.DB;
 
 /**
@@ -8,7 +9,7 @@ import org.mapdb.DB;
 public class IssueAssetMap extends IssueItemMap {
 
     public IssueAssetMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, ItemCls.ASSET_TYPE);
     }
 
     public IssueAssetMap(IssueAssetMap parent, DCSet dcSet) {

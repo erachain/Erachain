@@ -231,6 +231,30 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public static String getItemTypeName(int itemType) {
+        switch (itemType) {
+            case ItemCls.ASSET_TYPE:
+                return "ASSET";
+            case ItemCls.IMPRINT_TYPE:
+                return "IMPRINT";
+            case ItemCls.PERSON_TYPE:
+                return "PERSON";
+            case ItemCls.POLL_TYPE:
+                return "POLL"; // Opinion
+            case ItemCls.UNION_TYPE:
+                return "UNION";
+            case ItemCls.STATEMENT_TYPE:
+                return "STATEMENT"; // TeXT
+            case ItemCls.STATUS_TYPE:
+                return "STATUS";
+            case ItemCls.TEMPLATE_TYPE:
+                return "TEMPLATE"; // TeMPLATE
+            default:
+                return null;
+
+        }
+    }
+
+    public static String getItemTypeChar2(int itemType) {
         return "@" + getItemTypeChar(itemType);
     }
 

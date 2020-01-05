@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.FilteredByStringArray;
+import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
@@ -24,7 +25,6 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     protected Atomic.Long atomicKey;
     protected long key;
-    protected String name;
 
     protected BTreeMap ownerKeyMap;
 
@@ -34,11 +34,10 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     //private NavigableSet<Fun.Tuple2<String, Long>> nameDescendingIndex;
 
 
-    public ItemMap(DCSet databaseSet, DB database, String name) {
-        super(databaseSet, database);
+    public ItemMap(DCSet databaseSet, DB database, int type) {
+        super(databaseSet, database, ItemCls.getItemTypeName(type), new ItemSerializer(type));
 
-        atomicKey = database.getAtomicLong(name + "_key");
-        this.name = name;
+        atomicKey = database.getAtomicLong(TAB_NAME + "_key");
         key = atomicKey.get();
 
         makeOtherKeys(database);
@@ -46,9 +45,8 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     }
 
     public ItemMap(DCSet databaseSet, DB database,
-                   // int type,
-                   String name, int observeReset, int observeAdd, int observeRemove, int observeList) {
-        this(databaseSet, database, name);
+                   int type, int observeReset, int observeAdd, int observeRemove, int observeList) {
+        this(databaseSet, database, type);
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
                 this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
@@ -66,6 +64,16 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
     public ItemMap(ItemMap parent, DCSet dcSet) {
         super(parent, dcSet);
         key = parent.getLastKey();
+    }
+
+    // type+name not initialized yet! - it call as Super in New
+    @SuppressWarnings("unchecked")
+    public void openMap() {
+        //OPEN MAP
+        map = database.createTreeMap(TAB_NAME)
+                .valueSerializer(TAB_SERIALIZER)
+                .makeOrGet();
+
     }
 
     public long getLastKey() {
@@ -99,7 +107,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
         }
 
         //PAIR KEY
-        this.ownerKeyMap = database.createTreeMap(name + "_owner_item_key")
+        this.ownerKeyMap = database.createTreeMap(TAB_NAME + "_owner_item_key")
                 //.comparator(Fun.TUPLE3_COMPARATOR)
                 .makeOrGet();
 
@@ -111,7 +119,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
             }
         });
 
-        this.nameKey = database.createTreeSet(name + "_name_keys").comparator(Fun.COMPARATOR).makeOrGet();
+        this.nameKey = database.createTreeSet(TAB_NAME + "_name_keys").comparator(Fun.COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
         Bind.secondaryKeys((BTreeMap) map, this.nameKey,
