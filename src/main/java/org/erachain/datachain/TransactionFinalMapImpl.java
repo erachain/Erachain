@@ -794,16 +794,17 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         List<Transaction> txs = new ArrayList<>();
 
-        if (offset + limit <= 0) {
+        if (offset < 0) {
             // надо отмотать назад (ввеох) - то есть нашли точку и в обратном направлении пропускаем
-            //
+            // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
             try (IteratorCloseable<Long> iterator = getBiDirectionAddressIterator(address, fromSeqNo,
                     false, 0, 0)) {
                 Transaction item;
                 Long key;
                 int skipped = 0;
-                while (iterator.hasNext() && (limit == -1 || limit > 0)) {
+                int count = 0;
+                while (iterator.hasNext() && (limit <= 0 || count < limit)) {
                     key = iterator.next();
                     item = this.map.get(key);
                     if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
@@ -821,11 +822,20 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
                     item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
-                    --limit;
+                    count++;
 
                     // обратный отсчет в списке
                     txs.add(0, item);
                 }
+
+                if (limit > 0 && count < limit) {
+                    // сюда пришло значит не полный список - дополним его
+                    for (Transaction transaction: getTransactionsByAddressFromID(address,
+                            fromSeqNo, 1, limit - count, noForge)) {
+                        txs.add(transaction);
+                    }
+                }
+
             } catch (IOException e) {
             }
 

@@ -99,9 +99,6 @@ function pagesComponent2(data) {
     if (data.hasOwnProperty('useoffset')) {
         // в начало прыгнуть
         output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(0, 0) + '"><b><span class="glyphicon glyphicon-fast-backward"></span></b></a>';
-        if (listSize < pageSize) {
-                return output;
-        }
 
         var fromSeqNo = data.fromSeqNo;
         if (fromSeqNo != null) {
@@ -109,11 +106,11 @@ function pagesComponent2(data) {
             output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(fromSeqNo, -pageSize - 1) + '"><b><span class="glyphicon glyphicon-triangle-left"></span></b></a>';
         }
 
-        output += '&emsp; [ <input size="6" type="text" value="' + (fromSeqNo == null? 'seqNo' : fromSeqNo) + '" class="" style="font-size: 1em;"'
+        output += '&emsp; [ <input size="10" type="text" value="' + (fromSeqNo == null? 'seqNo' : fromSeqNo) + '" class="" style="font-size: 1em;"'
                    + ' onkeydown="if (event.keyCode == 13) document.location = makePageUri2(this.value.trim(), 0)"> ] ';
 
-        if (data.hasOwnProperty('toSeqNo')) {
-            var toSeqNo = data.toSeqNo;
+        var toSeqNo = data.toSeqNo;
+        if (toSeqNo != null) {
             // листнуть ниже
             output += '&emsp; <a class="button ll-blue-bgc" href="' + makePageUri2(toSeqNo, 1) + '"><b><span class="glyphicon glyphicon-triangle-right"></span></b></a>';
         }

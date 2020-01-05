@@ -2623,7 +2623,8 @@ public class BlockExplorer {
             intOffest = (int)(long) offset;
         }
 
-        Long fromID = Transaction.parseDBRef(info.getQueryParameters().getFirst("seqNo"));
+        String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
+        Long fromID = Transaction.parseDBRef(fromSeqNoStr);
         if (fromID != null && fromID.equals(0L) && intOffest < 0) {
             // это значит нужно скакнуть в самый низ
         }
@@ -2631,10 +2632,18 @@ public class BlockExplorer {
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(address,
                 fromID, intOffest, pageSize, !useForge);
 
-        if (!transactions.isEmpty()) {
-            // включим ссылки на листыние вниз
-            output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
-            output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+        if (transactions.isEmpty()) {
+            output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
+        } else {
+            // включим ссылки на листание вверх
+            if (true || intOffest >= 0 || transactions.size() >= pageSize) {
+                output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+            }
+
+            if (true || !((fromID == null || fromID.equals(0L)) && intOffest < 0)) {
+                // это не самый конец - включим листание вниз
+                output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+            }
         }
 
         LinkedHashMap output = new LinkedHashMap();
