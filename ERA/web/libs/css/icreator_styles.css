@@ -401,7 +401,8 @@ button.white-bgc[disabled]:focus,
     color: chartreuse;
 }
 
-td { // for MarkDown tables
+/* for MarkDown tables */
+td {
     padding: 1px 5px !important;
     flex-wrap: nowrap !important;
     white-space: nowrap !important;
