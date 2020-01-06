@@ -51,6 +51,7 @@ public class WebTransactionsHTML {
 
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
+        boolean wiped = transaction.isWiped();
         tt.add(transaction);
         LinkedHashMap json = new LinkedHashMap();
         BlockExplorer.getInstance().transactionsJSON(json, null, tt, 0, BlockExplorer.pageSize, "tx");
@@ -70,12 +71,18 @@ public class WebTransactionsHTML {
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
+        if (wiped) {
+            out += "<BR><b>" + Lang.getInstance().translateFromLangObj("WIPED", langObj) + ": </b>" + "true";
+        }
         out += "<br> ";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
 
         output.put("head", out);
         output.put("timestampLabel", Lang.getInstance().translateFromLangObj("Date", langObj));
         output.put("timestamp", transaction.getTimestamp());
+
+        if (wiped)
+            return output;
 
         int type = transaction.getType();
         switch (type) {

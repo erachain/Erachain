@@ -268,13 +268,17 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public long resolveKey(DCSet db) {
+
+        if (BlockChain.isWiped(this.reference))
+            return 0L;
+
         if (this.key == 0 // & this.reference != null
                 ) {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
             } else if (BlockChain.CHECK_BUGS > 0
-                    && !(BlockChain.DEVELOP_USE &&
-                    (Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
+                    && !(BlockChain.DEVELOP_USE
+                        && (Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
                             || Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW"))) // see issue/1149
             ) {
                 // zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH
@@ -285,6 +289,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
                 }
             }
         }
+
         return this.key;
     }
 

@@ -1059,6 +1059,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (this.height > 0) {
                 transaction.put("height", this.height);
                 transaction.put("sequence", this.seqNo);
+                if (isWiped()) {
+                    transaction.put("wiped", true);
+                }
             }
         }
 
@@ -1179,14 +1182,8 @@ public abstract class Transaction implements ExplorerJsonLine {
     public abstract int getDataLength(int forDeal, boolean withSignature);
 
     // PROCESS/ORPHAN
-
     public boolean isWiped() {
-        for (byte[] wiped : BlockChain.WIPED_RECORDS) {
-            if (Arrays.equals(this.signature, wiped)) {
-                return true;
-            }
-        }
-        return false;
+        return BlockChain.isWiped(this.signature);
     }
 
     public boolean isSignatureValid(DCSet dcSet) {

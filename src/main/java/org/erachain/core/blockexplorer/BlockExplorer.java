@@ -1652,6 +1652,7 @@ public class BlockExplorer {
         // accounts
 
         Map accountsJSON = new LinkedHashMap();
+
         List<Transaction> myIssuePersons = new ArrayList<Transaction>();
 
         // НОВЫЙ ЛАД - без Обсерверов и Модели
@@ -1745,9 +1746,13 @@ public class BlockExplorer {
             for (Transaction myIssuePerson : myIssuePersons) {
                 Map myPersonJSON = new LinkedHashMap();
                 IssueItemRecord record = (IssueItemRecord) myIssuePerson;
-                ItemCls item = record.getItem();
+                if (record.isWiped())
+                    continue;
 
-                myPersonJSON.put("key", item.getKey());
+                ItemCls item = record.getItem();
+                logger.warn(item.getName());
+
+                myPersonJSON.put("key", item.getKey(dcSet));
                 myPersonJSON.put("name", item.getName());
 
                 myPersonJSON.put("seqNo", myIssuePerson.viewHeightSeq());
@@ -3570,6 +3575,10 @@ public class BlockExplorer {
                 }
 
                 for (Transaction transaction : transactionList) {
+
+                    if (false && // покажем все
+                            transaction.isWiped())
+                        continue;
 
                     transaction.setDC(dcSet);
 
