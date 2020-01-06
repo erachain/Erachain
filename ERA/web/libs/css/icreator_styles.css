@@ -400,3 +400,9 @@ button.white-bgc[disabled]:focus,
     animation: pulsate 1.5s linear infinite;
     color: chartreuse;
 }
+
+td { // for MarkDown tables
+    padding: 1px 5px !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+}
