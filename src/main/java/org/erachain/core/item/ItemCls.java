@@ -231,6 +231,30 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public static String getItemTypeName(int itemType) {
+        switch (itemType) {
+            case ItemCls.ASSET_TYPE:
+                return "ASSET";
+            case ItemCls.IMPRINT_TYPE:
+                return "IMPRINT";
+            case ItemCls.PERSON_TYPE:
+                return "PERSON";
+            case ItemCls.POLL_TYPE:
+                return "POLL"; // Opinion
+            case ItemCls.UNION_TYPE:
+                return "UNION";
+            case ItemCls.STATEMENT_TYPE:
+                return "STATEMENT"; // TeXT
+            case ItemCls.STATUS_TYPE:
+                return "STATUS";
+            case ItemCls.TEMPLATE_TYPE:
+                return "TEMPLATE"; // TeMPLATE
+            default:
+                return null;
+
+        }
+    }
+
+    public static String getItemTypeChar2(int itemType) {
         return "@" + getItemTypeChar(itemType);
     }
 
@@ -244,22 +268,28 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public long resolveKey(DCSet db) {
+
+        if (BlockChain.isWiped(this.reference))
+            return 0L;
+
         if (this.key == 0 // & this.reference != null
                 ) {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
             } else if (BlockChain.CHECK_BUGS > 0
-                    && !(BlockChain.DEVELOP_USE &&
-                    (Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
+                    && !(BlockChain.DEVELOP_USE
+                        && (Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
                             || Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW"))) // see issue/1149
             ) {
-                LOGGER.error("Asset item not found for REFERENCE: " + Base58.encode(this.reference));
+                // zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH
+                LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
                 if (BlockChain.CHECK_BUGS > 3) {
                     Long error = null;
                     error++;
                 }
             }
         }
+
         return this.key;
     }
 

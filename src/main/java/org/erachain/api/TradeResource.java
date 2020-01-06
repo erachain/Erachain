@@ -594,7 +594,7 @@ public class TradeResource {
         TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
         CreateOrderTransaction createOrder;
 
-        List<Long> keys = finalMap.getTransactionsByAddressAndType(address, Transaction.CREATE_ORDER_TRANSACTION, startOrderID, limit);
+        List<Long> keys = finalMap.getTransactionsByAddressAndType(address, Transaction.CREATE_ORDER_TRANSACTION, startOrderID, limit, 0);
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
         CompletedOrderMap completedOrdersMap = DCSet.getInstance().getCompletedOrderMap();

@@ -29,16 +29,14 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     @SuppressWarnings({"unchecked", "rawtypes"})
     List<Transaction> getTransactionsByBlock(Integer block, int offset, int limit);
 
-    List<Transaction> getTransactionsBySender(String address);
-
     @SuppressWarnings({"unchecked", "rawtypes"})
-    List<Transaction> getTransactionsBySender(String address, int limit);
+    List<Transaction> getTransactionsBySender(String address, int limit, int offset);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit);
+    List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit, int offset);
 
-    List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit);
+    List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit, int offset);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
@@ -84,7 +82,10 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     IteratorCloseable<Long> findTransactionsKeys(String address, String sender, String recipient, int minHeight,
                                                  int maxHeight, int type, int service, boolean desc, int offset, int limit);
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit);
+
+    List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit, boolean noForge);
+
     byte[] getSignature(int hight, int seg);
 
     Transaction getRecord(String refStr);

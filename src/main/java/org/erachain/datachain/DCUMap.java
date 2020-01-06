@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.database.DBASet;
 import org.mapdb.DB;
+import org.mapdb.Serializer;
 
 /**
  * суперкласс для таблиц цепочки блоков с функционалом Форканья (см. fork()
@@ -14,6 +15,10 @@ import org.mapdb.DB;
 
  */
 public abstract class DCUMap<T, U> extends org.erachain.dbs.DCUMapImpl<T, U> {
+
+    public DCUMap(DBASet databaseSet, DB database, String tabName, Serializer tabSerializer) {
+        super(databaseSet, database, tabName, tabSerializer, false);
+    }
 
     public DCUMap(DBASet databaseSet, DB database) {
         super(databaseSet, database, false);

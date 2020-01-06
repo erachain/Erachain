@@ -19,7 +19,7 @@ import static org.erachain.database.IDB.*;
 public class TransactionFinalMapSignsImpl extends DBTabImpl<byte[], Long> implements TransactionFinalMapSigns {
 
     public TransactionFinalMapSignsImpl(int dbs, DCSet databaseSet, DB database, boolean sizeEnable) {
-        super(dbs, databaseSet, database, sizeEnable);
+        super(dbs, databaseSet, database, sizeEnable, null, null);
     }
 
     public TransactionFinalMapSignsImpl(int dbs, TransactionFinalMapSigns parent, DCSet dcSet, boolean sizeEnable) {

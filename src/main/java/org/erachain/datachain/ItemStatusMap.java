@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
 import org.erachain.core.item.ItemCls;
-import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
@@ -12,13 +11,9 @@ import org.mapdb.DB;
  */
 public class ItemStatusMap extends ItemMap {
 
-    static final String NAME = "item_statuses";
-    private static final int TYPE = ItemCls.STATUS_TYPE;
-
     public ItemStatusMap(DCSet databaseSet, DB database) {
         super(databaseSet, database,
-                NAME,
-                ObserverMessage.RESET_STATUS_TYPE,
+                ItemCls.STATUS_TYPE, ObserverMessage.RESET_STATUS_TYPE,
                 ObserverMessage.ADD_STATUS_TYPE,
                 ObserverMessage.REMOVE_STATUS_TYPE,
                 ObserverMessage.LIST_STATUS_TYPE
@@ -27,14 +22,6 @@ public class ItemStatusMap extends ItemMap {
 
     public ItemStatusMap(ItemStatusMap parent, DCSet dcSet) {
         super(parent, dcSet);
-    }
-
-    // type+name not initialized yet! - it call as Super in New
-    public void openMap() {
-        //OPEN MAP
-        map = database.createTreeMap(NAME)
-                .valueSerializer(new ItemSerializer(TYPE))
-                .makeOrGet();
     }
 
 }

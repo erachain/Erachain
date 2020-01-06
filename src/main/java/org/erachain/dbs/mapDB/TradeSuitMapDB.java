@@ -171,7 +171,7 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         Map uncastedMap = map;
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
                 Fun.t2(order.getId(), null),
-                Fun.t2(order.getId(), Fun.HI())).keySet().iterator());
+                Fun.t2(order.getId(), Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override
@@ -180,7 +180,7 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
         Map uncastedMap = map;
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
                 Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).keySet().iterator());
+                Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override

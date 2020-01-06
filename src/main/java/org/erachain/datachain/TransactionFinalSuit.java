@@ -23,4 +23,6 @@ public interface TransactionFinalSuit {
 
     IteratorCloseable<Long> getIteratorByAddress(String address);
 
-}
+    IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending);
+
+    }

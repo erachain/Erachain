@@ -1,7 +1,6 @@
 package org.erachain.datachain;
 
-import com.google.common.primitives.UnsignedBytes;
-import org.mapdb.BTreeKeySerializer;
+import org.erachain.core.item.ItemCls;
 import org.mapdb.DB;
 
 /**
@@ -11,20 +10,11 @@ import org.mapdb.DB;
 public class IssueUnionMap extends IssueItemMap {
 
     public IssueUnionMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+        super(databaseSet, database, ItemCls.UNION_TYPE);
     }
 
     public IssueUnionMap(IssueUnionMap parent, DCSet dcSet) {
         super(parent, dcSet);
-    }
-
-    @Override
-    public void openMap() {
-        //OPEN MAP
-        map = database.createTreeMap("union_OrphanData")
-                .keySerializer(BTreeKeySerializer.BASIC)
-                .comparator(UnsignedBytes.lexicographicalComparator())
-                .makeOrGet();
     }
 
 }

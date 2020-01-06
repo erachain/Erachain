@@ -58,7 +58,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     private static int CUT_NAME_INDEX = 12;
 
     public TransactionFinalMapImpl(int dbsUsed, DCSet databaseSet, DB database, boolean sizeEnable) {
-        super(dbsUsed, databaseSet, database, sizeEnable);
+        super(dbsUsed, databaseSet, database, sizeEnable, null, null);
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_TRANSACTION_TYPE);
@@ -223,13 +223,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
-    public List<Transaction> getTransactionsBySender(String address) {
-        return getTransactionsBySender(address, 0);
-    }
-
-    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsBySender(String address, int limit) {
+    public List<Transaction> getTransactionsBySender(String address, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -258,7 +253,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit) {
+    public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -285,7 +280,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit) {
+    public List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -773,6 +768,109 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Iterators.advance(iterator, offset);
 
         return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
+    }
+
+    @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(address, fromSeqNo, descending);
+        Iterators.advance(iterator, offset);
+
+        return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
+
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    // TODO ERROR - not use PARENT MAP and DELETED in FORK
+    public List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit, boolean noForge) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Transaction> txs = new ArrayList<>();
+
+        if (offset < 0) {
+            // надо отмотать назад (ввеох) - то есть нашли точку и в обратном направлении пропускаем
+            // и по пути сосздаем список обратный что нашли по обратнму итератору
+            int offsetHere = -(offset + limit);
+            try (IteratorCloseable<Long> iterator = getBiDirectionAddressIterator(address, fromSeqNo,
+                    false, 0, 0)) {
+                Transaction item;
+                Long key;
+                int skipped = 0;
+                int count = 0;
+                while (iterator.hasNext() && (limit <= 0 || count < limit)) {
+                    key = iterator.next();
+                    item = this.map.get(key);
+                    if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
+                        RCalculated tx = (RCalculated) item;
+                        String mess = tx.getMessage();
+                        if (mess != null && mess.equals("forging")) {
+                            continue;
+                        }
+                    }
+
+                    if (offsetHere > 0 && skipped++ < offsetHere) {
+                        continue;
+                    }
+
+                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                    item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+                    count++;
+
+                    // обратный отсчет в списке
+                    txs.add(0, item);
+                }
+
+                if (limit > 0 && count < limit) {
+                    // сюда пришло значит не полный список - дополним его
+                    for (Transaction transaction: getTransactionsByAddressFromID(address,
+                            fromSeqNo, 1, limit - count, noForge)) {
+                        txs.add(transaction);
+                    }
+                }
+
+            } catch (IOException e) {
+            }
+
+        } else {
+
+            try (IteratorCloseable<Long> iterator = getBiDirectionAddressIterator(address, fromSeqNo, true, 0, 0)) {
+                Transaction item;
+                Long key;
+                int skipped = 0;
+                while (iterator.hasNext() && (limit == -1 || limit > 0)) {
+                    key = iterator.next();
+                    item = this.map.get(key);
+                    if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
+                        RCalculated tx = (RCalculated) item;
+                        String mess = tx.getMessage();
+                        if (mess != null && mess.equals("forging")) {
+                            continue;
+                        }
+                    }
+
+                    if (offset > 0 && skipped++ < offset) {
+                        continue;
+                    }
+
+                    Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                    item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+                    --limit;
+
+                    txs.add(item);
+                }
+            } catch (IOException e) {
+            }
+        }
+        return txs;
     }
 
     @Override

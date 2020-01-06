@@ -88,7 +88,6 @@ public class BlockExplorer {
                 param = Long.valueOf((info.getQueryParameters().getFirst(name)));
             } catch (Exception e) {
                 logger.debug(info.getQueryParameters().toString());
-                return 1000;
             }
         }
         return param;
@@ -1653,6 +1652,7 @@ public class BlockExplorer {
         // accounts
 
         Map accountsJSON = new LinkedHashMap();
+
         List<Transaction> myIssuePersons = new ArrayList<Transaction>();
 
         // НОВЫЙ ЛАД - без Обсерверов и Модели
@@ -1700,7 +1700,7 @@ public class BlockExplorer {
                 accountsJSON.put(i++, accountJSON);
 
                 List<Transaction> issuedPersons = transactionsMap.getTransactionsByAddressAndType(address,
-                        Transaction.ISSUE_PERSON_TRANSACTION, 200);
+                        Transaction.ISSUE_PERSON_TRANSACTION, 200, 0);
                 if (issuedPersons != null) {
                     myIssuePersons.addAll(issuedPersons);
                 }
@@ -1746,9 +1746,13 @@ public class BlockExplorer {
             for (Transaction myIssuePerson : myIssuePersons) {
                 Map myPersonJSON = new LinkedHashMap();
                 IssueItemRecord record = (IssueItemRecord) myIssuePerson;
-                ItemCls item = record.getItem();
+                if (record.isWiped())
+                    continue;
 
-                myPersonJSON.put("key", item.getKey());
+                ItemCls item = record.getItem();
+                logger.warn(item.getName());
+
+                myPersonJSON.put("key", item.getKey(dcSet));
                 myPersonJSON.put("name", item.getName());
 
                 myPersonJSON.put("seqNo", myIssuePerson.viewHeightSeq());
@@ -2605,7 +2609,82 @@ public class BlockExplorer {
     }
 
     @SuppressWarnings({"serial", "static-access"})
-    public Map jsonQueryAddress(String address, int start, UriInfo info) {
+    public Map jsonQueryAddress(String address, int start1, UriInfo info) {
+
+        output.put("type", "address");
+        output.put("search", "addresses");
+        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
+        output.put("search_message", address);
+
+        Object forge = info == null ? false : info.getQueryParameters().getFirst("forge");
+        boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
+                || forge.toString().toLowerCase().equals("1"));
+
+        Long offset = checkAndGetLongParam(info, 0L, "offset");
+        int intOffest;
+        if (offset == null) {
+            intOffest = 0;
+        } else {
+            intOffest = (int)(long) offset;
+        }
+
+        String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
+        Long fromID = Transaction.parseDBRef(fromSeqNoStr);
+        if (fromID != null && fromID.equals(0L) && intOffest < 0) {
+            // это значит нужно скакнуть в самый низ
+        }
+
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(address,
+                fromID, intOffest, pageSize, !useForge);
+
+        if (transactions.isEmpty()) {
+            output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
+        } else {
+            // включим ссылки на листание вверх
+            if (true || intOffest >= 0 || transactions.size() >= pageSize) {
+                output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+            }
+
+            if (true || !((fromID == null || fromID.equals(0L)) && intOffest < 0)) {
+                // это не самый конец - включим листание вниз
+                output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+            }
+        }
+
+        LinkedHashMap output = new LinkedHashMap();
+        output.put("address", address);
+
+        Account acc = new Account(address);
+        Tuple2<Integer, PersonCls> person = acc.getPerson();
+
+        if (person != null) {
+            output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
+            output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
+            output.put("person", person.b.getName());
+            output.put("person_key", person.b.getKey());
+
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = acc.getBalance(AssetCls.LIA_KEY);
+            output.put("registered", balabce_LIA.a.b.toPlainString());
+            output.put("certified", balabce_LIA.b.b.toPlainString());
+            output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
+            output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
+        }
+
+        output.put("label_account", Lang.getInstance().translateFromLangObj("Account", langObj));
+
+        // balance assets from
+        output.put("Balance", balanceJSON(new Account(address)));
+
+        // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
+        transactionsJSON(output, acc, transactions, 0, pageSize,
+                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" ));
+
+        output.put("useoffset", true);
+
+        return output;
+    }
+
+    public Map jsonQueryAddress_old(String address, int start, UriInfo info) {
 
         output.put("type", "address");
         output.put("search", "addresses");
@@ -3469,9 +3548,6 @@ public class BlockExplorer {
 
     }
 
-
-//  todo Gleb -----------------------------------------------------------------------------------------------------------
-
     public void transactionsJSON(LinkedHashMap output, Account account, List<Transaction> transactions, int fromIndex, int pageSize,
                                  String title) {
         LinkedHashMap outputTXs = new LinkedHashMap();
@@ -3499,6 +3575,10 @@ public class BlockExplorer {
                 }
 
                 for (Transaction transaction : transactionList) {
+
+                    if (false && // покажем все
+                            transaction.isWiped())
+                        continue;
 
                     transaction.setDC(dcSet);
 
