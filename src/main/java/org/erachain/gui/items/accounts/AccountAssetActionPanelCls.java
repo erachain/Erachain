@@ -444,13 +444,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         if (result == Transaction.VALIDATE_OK) {
             //RESET FIELDS
 
-            if (amount != null && amount.compareTo(BigDecimal.ZERO) != 0) //IF MORE THAN ZERO
-            {
-                this.jTextField_Amount.setText("0");
-            }
-
-            this.jTextArea_Description.setText("");
-
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"),
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
         } else {
