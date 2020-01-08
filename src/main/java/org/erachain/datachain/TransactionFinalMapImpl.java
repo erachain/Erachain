@@ -57,8 +57,6 @@ import static org.erachain.database.IDB.DBS_ROCK_DB;
 @Slf4j
 public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implements TransactionFinalMap {
 
-    private static int CUT_NAME_INDEX = 12;
-
     public TransactionFinalMapImpl(int dbsUsed, DCSet databaseSet, DB database, boolean sizeEnable) {
         super(dbsUsed, databaseSet, database, sizeEnable, null, null);
 

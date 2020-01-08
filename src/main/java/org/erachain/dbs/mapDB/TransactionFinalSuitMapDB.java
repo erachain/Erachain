@@ -3,7 +3,6 @@ package org.erachain.dbs.mapDB;
 //04/01 +- 
 
 import com.google.common.collect.*;
-import com.google.common.primitives.Longs;
 import com.google.common.primitives.SignedBytes;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
@@ -13,6 +12,7 @@ import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IndexIterator;
+import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
@@ -96,11 +96,13 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.creatorKey, new Function2<byte[], Long, Transaction>() {
             @Override
-            public byte[] run(Long key, Transaction val) {
-                Account account = val.getCreator();
+            public byte[] run(Long key, Transaction transaction) {
+                Account account = transaction.getCreator();
                 if (account == null)
                     return null;
-                return account.getShortAddressBytes();
+                byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                return addressKey;
             }
         });
 
@@ -122,7 +124,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         byte[][] keys = new byte[size][];
                         int count = 0;
                         for (Account recipient: recipients) {
-                            keys[count++] = recipient.getShortAddressBytes();
+                            byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                            System.arraycopy(recipient.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            keys[count++] = addressKey;
                         }
                         return keys;
                     }
@@ -138,9 +142,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     public Tuple2<byte[], Integer>[] run(Long key, Transaction transaction) {
                         List<Tuple2<byte[], Integer>> accounts = new ArrayList<Tuple2<byte[], Integer>>();
                         Integer type = transaction.getType();
-                        for (Account acc : transaction.getInvolvedAccounts()) {
-                            // TODO: make unique key??  + transaction.viewTimestamp()
-                            accounts.add(new Tuple2<byte[], Integer>(acc.getShortAddressBytes(), type));
+                        for (Account account : transaction.getInvolvedAccounts()) {
+                            byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                            System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            accounts.add(new Tuple2<byte[], Integer>(addressKey, type));
                         }
 
                         Tuple2<byte[], Integer>[] result = (Tuple2<byte[], Integer>[])
@@ -197,8 +202,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             public byte[][] run(Long key, Transaction transaction) {
                 List<byte[]> accounts = new ArrayList<byte[]>();
                 for (Account account : transaction.getInvolvedAccounts()) {
-                    ///accounts.add(Longs.fromByteArray(account.getShortAddressBytes()));
-                    accounts.add(account.getShortAddressBytes());
+                    byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                    System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+                    accounts.add(addressKey);
                 }
 
                 byte[][] result = (byte[][])
@@ -233,7 +240,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort) {
-        Iterable keys = Fun.filter(this.recipientKey, addressShort);
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        Iterable keys = Fun.filter(this.recipientKey, addressKey);
         Iterator iter = keys.iterator();
         return new IteratorCloseableImpl(iter);
     }
@@ -241,7 +251,10 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort) {
-        Iterable keys = Fun.filter(this.creatorKey, addressShort);
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        Iterable keys = Fun.filter(this.creatorKey, addressKey);
         Iterator iter = keys.iterator();
         return new IteratorCloseableImpl(iter);
     }
@@ -249,25 +262,32 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo) {
-        return IteratorCloseableImpl.make(this.creatorKey.subSet(Fun.t2(addressShort, fromSeqNo),
-                Fun.t2(addressShort, Fun.HI())).iterator());
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        return IteratorCloseableImpl.make(this.creatorKey.subSet(Fun.t2(addressKey, fromSeqNo),
+                Fun.t2(addressKey, Fun.HI())).iterator());
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type) {
-        Iterable keys = Fun.filter(this.addressTypeKey, new Tuple2<byte[], Integer>(addressShort, type));
-        Iterator iter = keys.iterator();
-        return new IteratorCloseableImpl(iter);
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        Iterable keys = Fun.filter(this.addressTypeKey, new Tuple2<byte[], Integer>(addressKey, type));
+        return IteratorCloseableImpl.make(keys.iterator());
     }
 
     @Override
     public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         return IteratorCloseableImpl.make(((BTreeMap<Fun.Tuple3, Long>) this.addressTypeKey).subMap(
-                Fun.t3(addressShort, type, fromID),
-                Fun.t3(addressShort, type, Fun.HI())).values().iterator());
+                Fun.t3(addressKey, type, fromID),
+                Fun.t3(addressKey, type, Fun.HI())).values().iterator());
     }
 
     @Override
@@ -293,10 +313,12 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     // скорость сортировки в том или ином случае может быть разная - нужны ТЕСТЫ на 3 варианта работы
     // TODO need benchmark tests
     public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         if (true) {
-            Iterable senderKeys = Fun.filter(this.creatorKey, addressShort);
-            Iterable recipientKeys = Fun.filter(this.recipientKey, addressShort);
+            Iterable senderKeys = Fun.filter(this.creatorKey, addressKey);
+            Iterable recipientKeys = Fun.filter(this.recipientKey, addressKey);
 
             if (true) {
                 Set<Long> treeKeys = new TreeSet<>();
@@ -317,9 +339,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
             // ТУТ СОРТИООВКА не в ту тсорону получается
 
-            Iterable senderKeys = Fun.filter(this.creatorKey, addressShort);
+            Iterable senderKeys = Fun.filter(this.creatorKey, addressKey);
             Iterator<Long> senderKeysIterator = senderKeys.iterator();
-            Iterable recipientKeys = Fun.filter(this.recipientKey, addressShort);
+            Iterable recipientKeys = Fun.filter(this.recipientKey, addressKey);
             Iterators.removeAll(senderKeysIterator, (Collection) recipientKeys);
 
             // заново возьмем итератор а тот прошелся весь до конца уже
@@ -343,7 +365,8 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
      */
     @Override
     public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
-        Long addressKey = Longs.fromByteArray(addressShort);
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         if (descending) {
             IteratorCloseable result =

@@ -10,6 +10,10 @@ import java.util.Collection;
 import java.util.List;
 
 public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredByStringArray {
+
+    int CUT_NAME_INDEX = 12;
+    int ADDRESS_KEY_LEN = 10;
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     void delete(Integer height);
 
