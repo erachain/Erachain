@@ -88,9 +88,13 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             // NOT USE SECONDARY INDEXES
             return;
 
+        Fun.Tuple2Comparator<byte[], Long> comparatorAddressT2 = new Fun.Tuple2Comparator<byte[], Long>(
+                SignedBytes.lexicographicalComparator(),
+                Fun.COMPARATOR);
+
         this.creatorKey = database.createTreeSet("creator_txs")
-                //.comparator(Fun.COMPARATOR) - for String
-                .comparator(SignedBytes.lexicographicalComparator())
+                .comparator(comparatorAddressT2) // - for Tuple2 String
+                //.comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
@@ -98,28 +102,32 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             @Override
             public byte[] run(Long key, Transaction transaction) {
                 Account account = transaction.getCreator();
-                if (account == null)
-                    return null;
+                if (account == null) {
+                    /// так как вторичный ключ тут даже с Null будет создан как Tuple2(null, primaryKey) и
+                    /// SignedBytes.lexicographicalComparator тогда вызывает ошибку - поэтому выдаем не пустой массив
+                    return new byte[0];
+                }
+
                 byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+
                 System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
                 return addressKey;
             }
         });
 
         this.recipientKey = database.createTreeSet("recipient_txs")
-                //.comparator(Fun.COMPARATOR) - for String
-                .comparator(SignedBytes.lexicographicalComparator())
+                .comparator(comparatorAddressT2) // - for Tuple2 String
+                //.comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.recipientKey,
                 new Function2<byte[][], Long, Transaction>() {
                     @Override
-                    public byte[][] run(Long key, Transaction val) {
-
+                    public byte[][] run(Long key, Transaction transaction) {
                         // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                        val.setDC((DCSet) databaseSet);
+                        transaction.setDC((DCSet) databaseSet);
 
-                        HashSet<Account> recipients = val.getRecipientAccounts();
+                        HashSet<Account> recipients = transaction.getRecipientAccounts();
                         int size = recipients.size();
                         byte[][] keys = new byte[size][];
                         int count = 0;
@@ -132,8 +140,15 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     }
                 });
 
+        Fun.Tuple2Comparator<Fun.Tuple2Comparator<byte[], Integer>, Long> comparatorAddressType
+                = new Fun.Tuple2Comparator<Fun.Tuple2Comparator<byte[], Integer>, Long>(
+                    new Fun.Tuple2Comparator(
+                        SignedBytes.lexicographicalComparator(),
+                        Fun.COMPARATOR),
+                Fun.COMPARATOR);
+
         this.addressTypeKey = database.createTreeSet("address_type_txs")
-                .comparator(Fun.TUPLE2_COMPARATOR)
+                .comparator(comparatorAddressType)
                 .makeOrGet();
 
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.addressTypeKey,
@@ -155,16 +170,18 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     }
                 });
 
-        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.TUPLE2_COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.titleKey,
                 new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
                     @Override
-                    public Tuple2<String, Integer>[] run(Long key, Transaction val) {
-                        String title = val.getTitle();
-                        if (title == null || title.isEmpty() || title.equals(""))
-                            return null;
+                    public Tuple2<String, Integer>[] run(Long key, Transaction transaction) {
+                        String title = transaction.getTitle();
+                        if (title == null || title.isEmpty() || title.equals("")) {
+                            // нужно возвращать не null что бы сработал Компаратор нормально
+                            return new Tuple2[0];
+                        }
 
                         // see https://regexr.com/
                         String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
@@ -173,26 +190,21 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                             if (tokens[i].length() > CUT_NAME_INDEX) {
                                 tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
                             }
-                            keys[i] = new Tuple2<String, Integer>(tokens[i], val.getType());
+                            keys[i] = new Tuple2<String, Integer>(tokens[i], transaction.getType());
                         }
 
                         return keys;
                     }
                 });
 
-        Fun.Tuple2Comparator<byte[], Long> comparator = new Fun.Tuple2Comparator<byte[], Long>(
-                ///Fun.COMPARATOR,
-                SignedBytes.lexicographicalComparator(),
-                Fun.COMPARATOR);
-
         // BI-DIrectional INDEX - for blockexplorer
         NavigableSet<Integer> addressBiIndex = database.createTreeSet("address_txs")
-                .comparator(comparator)
+                .comparator(comparatorAddressT2)
                 .counterEnable()
                 .makeOrGet();
 
         NavigableSet<Integer> descendingaddressBiIndex = database.createTreeSet("address_txs_descending")
-                .comparator(new ReverseComparator(comparator))
+                .comparator(new ReverseComparator(comparatorAddressT2))
                 .makeOrGet();
 
         createIndexes(BIDIRECTION_ADDRESS_INDEX, addressBiIndex, descendingaddressBiIndex,
@@ -200,17 +212,17 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 Long, Transaction>() {
             @Override
             public byte[][] run(Long key, Transaction transaction) {
-                List<byte[]> accounts = new ArrayList<byte[]>();
-                for (Account account : transaction.getInvolvedAccounts()) {
+                HashSet<Account> accounts = transaction.getInvolvedAccounts();
+                int size = accounts.size();
+                byte[][] result = new byte[size][];
+                int count = 0;
+                for (Account account : accounts) {
                     byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
                     System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-                    accounts.add(addressKey);
+                    result[count++] = addressKey;
                 }
 
-                byte[][] result = (byte[][])
-                        Array.newInstance(Long.class, accounts.size());
-                result = accounts.toArray(result);
                 return result;
             }
         });
