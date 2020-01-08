@@ -11,7 +11,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.PersonAddressMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
@@ -33,6 +33,8 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Path("r_send")
@@ -58,6 +60,7 @@ public class RSendResource {
                 "make RAW for SEND asset amount and mail");
         help.put("GET r_send/test1/{delay}?password={password}",
                 "Stert test; dekay = 0 - stop");
+        // multisend/{fromAddress}/{assetKey}/{forAssetKey}
 
         return StrJSonFine.convert(help);
     }
@@ -671,8 +674,8 @@ public class RSendResource {
     }
 
     /**
-     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486000&password=123
-     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/2/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1546300800000&password=1
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486&password=123
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1546300800&activebefore=2019-12-31 23:59&password=1
      *
      * @param fromAddress my address in Wallet
      * @param assetKey asset Key that send
@@ -681,7 +684,8 @@ public class RSendResource {
      * @param amount absolute amount to send
      * @param test defaule - true. test=false - real send
      * @param feePow
-     * @param activeAfter timestamp after that is filter
+     * @param activeAfterStr timestamp after that is filter - yyyy-MM-dd hh:mm or timestamp(sec)
+     * @param activeBeforeStr timestamp before that is filter - yyyy-MM-dd hh:mm or timestamp(sec)
      * @param koeff koefficient for amount in balance position of forAssetKey
      * @param title
      * @param password
@@ -694,24 +698,66 @@ public class RSendResource {
                             @DefaultValue("0") @QueryParam("amount") BigDecimal amount,
                             @DefaultValue("true") @QueryParam("test") Boolean test,
                             @DefaultValue("0") @QueryParam("feePow") Integer feePow,
-                            @DefaultValue("0") @QueryParam("activeafter") Long activeAfter,
+                            @DefaultValue("0") @QueryParam("activeafter") String activeAfterStr,
+                            @DefaultValue("0") @QueryParam("activebefore") String activeBeforeStr,
                             @DefaultValue("1") @QueryParam("koeff") BigDecimal koeff,
                             @QueryParam("title") String title,
                             @DefaultValue("false") @QueryParam("onlyperson") Boolean onlyPerson,
                             @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE
+        if (!test && !BlockChain.DEVELOP_USE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
             return "not LOCAL && not DEVELOP";
 
-        // так как тут может очень долго работать то откроем на долго
-        APIUtils.askAPICallAllowed(password, "GET multisend\n ", request, false);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        Long activeAfter;
+        try {
+            Date parsedDate = dateFormat.parse(activeAfterStr);
+            Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+            activeAfter = timestamp.getTime() / 1000; // in sec
+        } catch(Exception e) {
+            try {
+                activeAfter = Long.parseLong(activeAfterStr);
+            } catch (Exception e1) {
+                activeAfter = null;
+            }
+        }
+
+        Long activeBefore;
+        try {
+            Date parsedDate = dateFormat.parse(activeBeforeStr);
+            Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
+            activeBefore = timestamp.getTime() / 1000; // in sec
+        } catch(Exception e) {
+            try {
+                activeBefore = Long.parseLong(activeBeforeStr);
+            } catch (Exception e1) {
+                activeBefore = null;
+            }
+        }
+
+        Controller cntr = Controller.getInstance();
+        BlockChain chain = cntr.getBlockChain();
+
+        // преобразуем в seqNo
+        long fromSeqNo = 0;
+        if (activeAfter != null && activeAfter > 0) {
+            fromSeqNo = Transaction.makeDBRef(chain.getBlockOnTimestamp(activeAfter * 1000), 0);
+        }
+        long toSeqNo = 0;
+        if (activeBefore != null && activeBefore > 0) {
+            toSeqNo = Transaction.makeDBRef(chain.getBlockOnTimestamp(activeBefore * 1000), 0);
+        }
+
+        if (!test) {
+            // так как тут может очень долго работать то откроем на долго
+            APIUtils.askAPICallAllowed(password, "GET multisend\n ", request, false);
+        }
         try {
 
             JSONObject out = new JSONObject();
             JSONArray outResult = new JSONArray();
-            Controller cntr = Controller.getInstance();
 
             Fun.Tuple2<Account, String> accResult = Account.tryMakeAccount(fromAddress);
             if (accResult.b != null) {
@@ -726,7 +772,7 @@ public class RSendResource {
 
             DCSet dcSet = DCSet.getInstance();
             ItemAssetBalanceMap balancesMap = dcSet.getAssetBalanceMap();
-            PersonAddressMap personAddresses = dcSet.getPersonAddressMap();
+            TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
 
             byte[] key;
             Crypto crypto = Crypto.getInstance();
@@ -746,10 +792,6 @@ public class RSendResource {
                     try {
 
                         balance = Account.getBalanceInPosition(balancesMap.get(key), position);
-
-                        // пустые не берем
-                        if (balance.a.signum() == 0 && balance.b.signum() == 0)
-                            continue;
 
                         // только тем у кого положительный баланс
                         if (balance.b.signum() <= 0)
@@ -771,11 +813,23 @@ public class RSendResource {
                             addressDuration = null;
                         }
 
-                        if (activeAfter > 0) {
-                            // на счете должна быть активность после TIMESTAMP
-                            Account recipient = new Account(recipientStr);
-                            long[] lastTimestamp = recipient.getLastTimestamp(dcSet);
-                            if (lastTimestamp == null || lastTimestamp[0] < activeAfter)
+                        /// если задано то проверим - входит ли в в диаппазон
+                        // - собранные блоки учитываем? да - иначе долго будет делать поиск
+                        if (fromSeqNo > 0) {
+                            // на счете должна быть активность после fromSeqNo - и обратный отсчет по итератору этому берем
+                            List<Transaction> txsFind = txMap.getTransactionsByAddressFromID(recipientStr, fromSeqNo,
+                                    0, -1, false, false);
+                            if (txsFind.isEmpty())
+                                continue;
+                            // если полный диаппазон задан то проверим вхождение
+                            if (toSeqNo > 0 && txsFind.get(0).getDBRef() > toSeqNo) {
+                                continue;
+                            }
+                        } else if (toSeqNo > 0) {
+                            // на счете должна быть активность до fromSeqNo
+                            List<Transaction> txsFind = txMap.getTransactionsByAddressFromID(recipientStr, fromSeqNo,
+                                    0, 1, false, false);
+                            if (txsFind.isEmpty())
                                 continue;
                         }
 
@@ -843,14 +897,14 @@ public class RSendResource {
                 LOGGER.error(e.getMessage(), e);
             }
 
-            out.put("results", outResult);
-            out.put("_asset", assetKey);
-            out.put("_count", count);
-            out.put("_totalFee", totalFee.toPlainString());
-            out.put("_totalSendAmount", totalSendAmount.toPlainString());
+            out.put("_results", outResult);
+            out.put("asset", assetKey);
+            out.put("count", count);
+            out.put("totalFee", totalFee.toPlainString());
+            out.put("totalSendAmount", totalSendAmount.toPlainString());
 
             if (test)
-                out.put("_status", "TEST");
+                out.put("status", "TEST");
 
             return out.toJSONString();
 

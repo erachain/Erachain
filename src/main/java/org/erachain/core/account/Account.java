@@ -47,6 +47,7 @@ import java.util.TreeMap;
  */
 public class Account {
 
+    public static final int ADDRESS_SHORT_LENGTH = 20;
     public static final int ADDRESS_LENGTH = 25;
     // private static final long ERA_KEY = Transaction.RIGHTS_KEY;
     private static final long FEE_KEY = Transaction.FEE_KEY;
@@ -69,7 +70,7 @@ public class Account {
     }
 
     public Account(byte[] addressBytes) {
-        if (addressBytes.length == ADDRESS_LENGTH - 5) {
+        if (addressBytes.length == ADDRESS_SHORT_LENGTH) {
             // AS SHORT BYTES
             this.shortBytes = addressBytes;
             this.bytes = Crypto.getInstance().getAddressFromShortBytes(addressBytes);
@@ -79,7 +80,7 @@ public class Account {
             this.shortBytes = Arrays.copyOfRange(addressBytes, 1, this.bytes.length - 4);
 
         } else {
-            assert(addressBytes.length == 25);
+            assert(addressBytes.length == ADDRESS_LENGTH);
         }
 
         /// make on demand this.address = Base58.encode(bytes);

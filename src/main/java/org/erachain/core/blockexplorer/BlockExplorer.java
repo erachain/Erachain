@@ -2635,7 +2635,7 @@ public class BlockExplorer {
         }
 
         List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(address,
-                fromID, intOffest, pageSize, !useForge);
+                fromID, intOffest, pageSize, !useForge, true);
 
         if (transactions.isEmpty()) {
             output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу

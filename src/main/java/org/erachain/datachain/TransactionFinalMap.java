@@ -84,7 +84,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit);
 
-    List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit, boolean noForge);
+    List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit, boolean noForge, boolean fillFullPage);
 
     byte[] getSignature(int hight, int seg);
 

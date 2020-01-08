@@ -230,7 +230,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorBySender(address)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(address)) {
             List<Transaction> txs = new ArrayList<>();
             int counter = 0;
             Transaction item;
@@ -685,7 +685,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
-        IteratorCloseable<Long> senderKeys = null;
+        IteratorCloseable<Long> creatorKeys = null;
         IteratorCloseable<Long> recipientKeys = null;
 
         if (address != null) {
@@ -699,13 +699,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         if (sender != null) {
             if (type != 0) {
-                //senderKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
-                senderKeys = ((TransactionFinalSuit)map).getIteratorByAddressAndType(sender, type);
+                //creatorKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
+                creatorKeys = ((TransactionFinalSuit)map).getIteratorByAddressAndType(sender, type);
             } else {
-                //senderKeys = Fun.filter(this.senderKey, sender);
+                //creatorKeys = Fun.filter(this.senderKey, sender);
                 //int sizeS = Iterators.size(((TransactionFinalSuit)map).getIteratorBySender(sender));
 
-                senderKeys = ((TransactionFinalSuit)map).getIteratorBySender(sender);
+                creatorKeys = ((TransactionFinalSuit)map).getIteratorByCreator(sender);
             }
         }
 
@@ -722,14 +722,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         IteratorCloseable<Long> iterator;
         if (address != null || sender != null && recipient != null) {
-            // просто добавляет в конец iterator = Iterators.concat(senderKeys, recipientKeys);
-            // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR).iterator();
+            // просто добавляет в конец iterator = Iterators.concat(creatorKeys, recipientKeys);
+            // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR).iterator();
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
             // поэтому нужно удалить дубли
-            iterator = new MergedIteratorNoDuplicates(ImmutableList.of(senderKeys, recipientKeys), Fun.COMPARATOR);
+            iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR);
 
         } else if (sender != null) {
-            iterator = senderKeys;
+            iterator = creatorKeys;
         } else if (recipient != null) {
             iterator = recipientKeys;
         } else {
@@ -787,19 +787,22 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit, boolean noForge) {
+    public List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit,
+                                                            boolean noForge, boolean fillFullPage) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Transaction> txs = new ArrayList<>();
 
-        if (offset < 0) {
-            // надо отмотать назад (ввеох) - то есть нашли точку и в обратном направлении пропускаем
+        if (offset < 0 || limit < 0) {
+            if (limit < 0)
+                limit = -limit;
+
+            // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<Long> iterator = getBiDirectionAddressIterator(address, fromSeqNo,
-                    false, 0, 0)) {
+            try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(address, fromSeqNo, false)) {
                 Transaction item;
                 Long key;
                 int skipped = 0;
@@ -828,10 +831,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     txs.add(0, item);
                 }
 
-                if (limit > 0 && count < limit) {
+                if (fillFullPage && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
                     for (Transaction transaction: getTransactionsByAddressFromID(address,
-                            fromSeqNo, 1, limit - count, noForge)) {
+                            fromSeqNo, 1, limit - count, noForge, false)) {
                         txs.add(transaction);
                     }
                 }
@@ -841,7 +844,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         } else {
 
-            try (IteratorCloseable<Long> iterator = getBiDirectionAddressIterator(address, fromSeqNo, true, 0, 0)) {
+            try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(address, fromSeqNo, true)) {
                 Transaction item;
                 Long key;
                 int skipped = 0;
