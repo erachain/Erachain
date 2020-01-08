@@ -83,7 +83,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         if (account != null) {
             // ИЩЕМ по СЧЕТУ
-            list = ((TransactionFinalMap)map).getTransactionsByAddressLimit(account.getAddress(), 1000, true);
+            list = ((TransactionFinalMap)map).getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true);
 
         } else {
 

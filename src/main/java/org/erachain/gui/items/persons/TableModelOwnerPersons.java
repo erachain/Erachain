@@ -1,5 +1,6 @@
 package org.erachain.gui.items.persons;
 
+import org.erachain.core.account.Account;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.IssueItemRecord;
 import org.erachain.core.transaction.Transaction;
@@ -79,7 +80,7 @@ public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
         List<Transaction> myIssuePersons = new ArrayList<Transaction>();
 
         for (String address : addresses.keySet()) {
-            myIssuePersons.addAll(transactionFinalMap.getTransactionsByAddressAndType(address,
+            myIssuePersons.addAll(transactionFinalMap.getTransactionsByAddressAndType(Account.makeShortBytes(address),
                     Transaction.ISSUE_PERSON_TRANSACTION, 0, 0));
         }
 

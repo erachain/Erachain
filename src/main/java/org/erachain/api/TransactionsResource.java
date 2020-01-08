@@ -343,7 +343,7 @@ public class TransactionsResource {
     @Path("recipient/{address}/limit/{limit}")
     public String getTransactionsByRecipient(@PathParam("address") String address, @PathParam("limit") int limit) {
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(address, limit);
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(Account.makeShortBytes(address), limit);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());
         }
@@ -478,7 +478,7 @@ public class TransactionsResource {
     public String getTransactionsBySender(@PathParam("address") String address, @PathParam("limit") int limit) {
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender(address, limit, 0);
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByCreator(Account.makeShortBytes(address), limit, 0);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());
         }
@@ -493,7 +493,7 @@ public class TransactionsResource {
                                                   @PathParam("limit") int limit) {
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address,
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address),
                 type, limit, 0);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());

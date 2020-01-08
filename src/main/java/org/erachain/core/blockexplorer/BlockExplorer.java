@@ -1699,13 +1699,13 @@ public class BlockExplorer {
 
                 accountsJSON.put(i++, accountJSON);
 
-                List<Transaction> issuedPersons = transactionsMap.getTransactionsByAddressAndType(address,
+                Account account = new Account(address);
+                List<Transaction> issuedPersons = transactionsMap.getTransactionsByAddressAndType(account.getShortAddressBytes(),
                         Transaction.ISSUE_PERSON_TRANSACTION, 200, 0);
                 if (issuedPersons != null) {
                     myIssuePersons.addAll(issuedPersons);
                 }
 
-                Account account = new Account(address);
                 Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
                         = account.getBalance(AssetCls.ERA_KEY);
 
@@ -2634,7 +2634,7 @@ public class BlockExplorer {
             // это значит нужно скакнуть в самый низ
         }
 
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(address,
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(Account.makeShortBytes(address),
                 fromID, intOffest, pageSize, !useForge, true);
 
         if (transactions.isEmpty()) {
@@ -2696,7 +2696,7 @@ public class BlockExplorer {
                 || forge.toString().toLowerCase().equals("1"));
 
         int limit = 100;
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(address, limit, !useForge);
+        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), limit, !useForge);
         LinkedHashMap output = new LinkedHashMap();
         output.put("address", address);
 

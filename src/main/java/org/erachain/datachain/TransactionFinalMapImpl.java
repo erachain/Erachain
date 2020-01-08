@@ -9,7 +9,9 @@ import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.ArbitraryTransaction;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
@@ -156,19 +158,23 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
+    public List<Transaction> getTransactionsByRecipient(byte[] addressShort) {
+        return getTransactionsByRecipient(addressShort, 0);
+    }
+
     public List<Transaction> getTransactionsByRecipient(String address) {
-        return getTransactionsByRecipient(address, 0);
+        return getTransactionsByRecipient(Account.makeShortBytes(address), 0);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByRecipient(String address, int limit) {
+    public List<Transaction> getTransactionsByRecipient(byte[] addressShort, int limit) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByRecipient(address)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByRecipient(addressShort)) {
             List<Transaction> txs = new ArrayList<>();
             int counter = 0;
             Transaction item;
@@ -224,13 +230,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsBySender(String address, int limit, int offset) {
+    public List<Transaction> getTransactionsByCreator(byte[] addressShort, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(address)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort)) {
             List<Transaction> txs = new ArrayList<>();
             int counter = 0;
             Transaction item;
@@ -250,17 +256,21 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
     }
 
+    public List<Transaction> getTransactionsByCreator(String address, int limit, int offset) {
+        return getTransactionsByCreator(Account.makeShortBytes(address), limit, offset);
+    }
+
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit, int offset) {
+    public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(address, type)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndType(addressShort, type)) {
             int counter = 0;
             Transaction item;
             Long key;
@@ -277,17 +287,20 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
         return txs;
     }
+    public List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit, int offset) {
+        return getTransactionsByAddressAndType(Account.makeShortBytes(address), type, limit, offset);
+    }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit, int offset) {
+    public List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Long> keys = new ArrayList<>();
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(address, type, fromID)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, fromID)) {
             int counter = 0;
             //Transaction item;
             Long key;
@@ -535,24 +548,24 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable getIteratorByAddress(String address) {
+    public IteratorCloseable getIteratorByAddress(byte[] addressShort) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        return ((TransactionFinalSuit)map).getIteratorByAddress(address);
+        return ((TransactionFinalSuit)map).getIteratorByAddress(addressShort);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge) {
+    public List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = getIteratorByAddress(address)) {
+        try (IteratorCloseable iterator = getIteratorByAddress(addressShort)) {
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == -1 || limit > 0)) {
@@ -578,14 +591,18 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return txs;
     }
 
+    public List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge) {
+        return getTransactionsByAddressLimit(Account.makeShortBytes(address), limit, noForge);
+    }
+
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public int getTransactionsByAddressCount(String address) {
+    public int getTransactionsByAddressCount(byte[] addressShort) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return 0;
         }
-        try (IteratorCloseable iterator = getIteratorByAddress(address)) {
+        try (IteratorCloseable iterator = getIteratorByAddress(addressShort)) {
             return Iterators.size(iterator);
         } catch (IOException e) {
             return 0;
@@ -595,14 +612,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, String address) {
+    public Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, byte[] addressShort) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         //Iterable keys = Fun.filter(this.recipientKey, address);
         //Iterator iter = keys.iterator();
-        try (IteratorCloseable iterator = ((TransactionFinalSuit)map).getIteratorByRecipient(address)) {
+        try (IteratorCloseable iterator = ((TransactionFinalSuit)map).getIteratorByRecipient(addressShort)) {
             int prevKey = startHeight;
             while (iterator.hasNext()) {
                 Long key = (Long) iterator.next();
@@ -667,7 +684,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     /**
      * @param address
-     * @param sender
+     * @param creator
      * @param recipient
      * @param minHeight
      * @param maxHeight
@@ -680,7 +697,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      */
     @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public IteratorCloseable findTransactionsKeys(String address, String sender, String recipient, final int minHeight,
+    public IteratorCloseable findTransactionsKeys(String address, String creator, String recipient, final int minHeight,
                                                   final int maxHeight, int type, final int service, boolean desc, int offset, int limit) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -689,46 +706,49 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         IteratorCloseable<Long> recipientKeys = null;
 
         if (address != null) {
-            sender = address;
+            creator = address;
             recipient = address;
         }
 
-        if (sender == null && recipient == null) {
+        if (creator == null && recipient == null) {
             return IteratorCloseableImpl.make(new TreeSet<Long>().iterator());
         }
 
-        if (sender != null) {
+        if (creator != null) {
             if (type != 0) {
-                //creatorKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(sender, type));
-                creatorKeys = ((TransactionFinalSuit)map).getIteratorByAddressAndType(sender, type);
+                //creatorKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(creator, type));
+                creatorKeys = ((TransactionFinalSuit)map)
+                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(creator), type);
             } else {
-                //creatorKeys = Fun.filter(this.senderKey, sender);
-                //int sizeS = Iterators.size(((TransactionFinalSuit)map).getIteratorBySender(sender));
+                //creatorKeys = Fun.filter(this.senderKey, creator);
+                //int sizeS = Iterators.size(((TransactionFinalSuit)map).getIteratorBySender(creator));
 
-                creatorKeys = ((TransactionFinalSuit)map).getIteratorByCreator(sender);
+                creatorKeys = ((TransactionFinalSuit)map)
+                        .getIteratorByCreator(Crypto.getInstance().getShortBytesFromAddress(creator));
             }
         }
 
         if (recipient != null) {
             if (type != 0) {
                 //recipientKeys = Fun.filter(this.typeKey, new Tuple2<String, Integer>(recipient, type));
-                recipientKeys = ((TransactionFinalSuit)map).getIteratorByAddressAndType(recipient, type);
+                recipientKeys = ((TransactionFinalSuit)map)
+                        .getIteratorByAddressAndType(Crypto.getInstance().getShortBytesFromAddress(recipient), type);
             } else {
                 //int sizeR = Iterators.size(((TransactionFinalSuit)map).getIteratorByRecipient(recipient));
                 //recipientKeys = Fun.filter(this.recipientKey, recipient);
-                recipientKeys = ((TransactionFinalSuit)map).getIteratorByRecipient(recipient);
+                recipientKeys = ((TransactionFinalSuit)map).getIteratorByRecipient(Crypto.getInstance().getShortBytesFromAddress(recipient));
             }
         }
 
         IteratorCloseable<Long> iterator;
-        if (address != null || sender != null && recipient != null) {
+        if (address != null || creator != null && recipient != null) {
             // просто добавляет в конец iterator = Iterators.concat(creatorKeys, recipientKeys);
             // вызывает ошибку преобразования типов iterator = Iterables.mergeSorted((Iterable) ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR).iterator();
             // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
             // поэтому нужно удалить дубли
             iterator = new MergedIteratorNoDuplicates(ImmutableList.of(creatorKeys, recipientKeys), Fun.COMPARATOR);
 
-        } else if (sender != null) {
+        } else if (creator != null) {
             iterator = creatorKeys;
         } else if (recipient != null) {
             iterator = recipientKeys;
@@ -777,7 +797,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(address, fromSeqNo, descending);
+        IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map)
+                .getBiDirectionAddressIterator(Crypto.getInstance().getShortBytesFromAddress(address), fromSeqNo, descending);
         Iterators.advance(iterator, offset);
 
         return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
@@ -787,7 +808,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit,
+    public List<Transaction> getTransactionsByAddressFromID(byte[] addressShort, Long fromSeqNo, int offset, int limit,
                                                             boolean noForge, boolean fillFullPage) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -802,7 +823,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
             // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
-            try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(address, fromSeqNo, false)) {
+            try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromSeqNo, false)) {
                 Transaction item;
                 Long key;
                 int skipped = 0;
@@ -833,7 +854,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
                 if (fillFullPage && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
-                    for (Transaction transaction: getTransactionsByAddressFromID(address,
+                    for (Transaction transaction: getTransactionsByAddressFromID(addressShort,
                             fromSeqNo, 1, limit - count, noForge, false)) {
                         txs.add(transaction);
                     }
@@ -844,7 +865,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         } else {
 
-            try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(address, fromSeqNo, true)) {
+            try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getBiDirectionAddressIterator(addressShort, fromSeqNo, true)) {
                 Transaction item;
                 Long key;
                 int skipped = 0;

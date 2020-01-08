@@ -797,14 +797,13 @@ public class RSendResource {
                         if (balance.b.signum() <= 0)
                             continue;
 
-                        String recipientStr = crypto.getAddressFromShort(ItemAssetBalanceMap.getShortAccountFromKey(key));
+                        byte[] recipentShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
 
                         Fun.Tuple4<Long, Integer, Integer, Integer> addressDuration;
                         if (onlyPerson) {
                             // так как тут сортировка по убыванию значит первым встретится тот счет на котром больше всего актива
                             // - он и будет выбран куда 1 раз пошлем актив свой
-                            Account recipient = new Account(recipientStr);
-                            addressDuration = recipient.getPersonDuration(dcSet);
+                            addressDuration = dcSet.getAddressPersonMap().getItem(recipentShort);
                             if (addressDuration == null)
                                 continue;
                             if (usedPersons.contains(addressDuration.a))
@@ -817,7 +816,7 @@ public class RSendResource {
                         // - собранные блоки учитываем? да - иначе долго будет делать поиск
                         if (fromSeqNo > 0) {
                             // на счете должна быть активность после fromSeqNo - и обратный отсчет по итератору этому берем
-                            List<Transaction> txsFind = txMap.getTransactionsByAddressFromID(recipientStr, fromSeqNo,
+                            List<Transaction> txsFind = txMap.getTransactionsByAddressFromID(recipentShort, fromSeqNo,
                                     0, -1, false, false);
                             if (txsFind.isEmpty())
                                 continue;
@@ -827,7 +826,7 @@ public class RSendResource {
                             }
                         } else if (toSeqNo > 0) {
                             // на счете должна быть активность до fromSeqNo
-                            List<Transaction> txsFind = txMap.getTransactionsByAddressFromID(recipientStr, fromSeqNo,
+                            List<Transaction> txsFind = txMap.getTransactionsByAddressFromID(recipentShort, fromSeqNo,
                                     0, 1, false, false);
                             if (txsFind.isEmpty())
                                 continue;
@@ -846,6 +845,7 @@ public class RSendResource {
                             sendAmount = sendAmount.add(balance.b.multiply(koeff));
                         }
 
+                        String recipientStr = Crypto.getInstance().getAddressFromShort(recipentShort);
                         resultOne.add(recipientStr);
                         resultOne.add(sendAmount.toPlainString());
 
