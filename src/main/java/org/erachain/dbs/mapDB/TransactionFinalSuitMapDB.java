@@ -243,9 +243,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-         return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
-                .subMap(Transaction.makeDBRef(height, 0),
-                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
+         return IteratorCloseableImpl.make(((BTreeMap<Long, Transaction>) map)
+                 .subMap(Transaction.makeDBRef(height, 0),
+                         Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
 
     }
 
@@ -257,7 +257,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         Iterable keys = Fun.filter(this.recipientKey, addressKey);
         Iterator iter = keys.iterator();
-        return new IteratorCloseableImpl(iter);
+        return IteratorCloseableImpl.make(iter);
     }
 
     @Override
@@ -268,7 +268,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         Iterable keys = Fun.filter(this.creatorKey, addressKey);
         Iterator iter = keys.iterator();
-        return new IteratorCloseableImpl(iter);
+        return IteratorCloseableImpl.make(iter);
     }
 
     @Override
@@ -277,8 +277,8 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        return IteratorCloseableImpl.make(this.creatorKey.subSet(Fun.t2(addressKey, fromSeqNo),
-                Fun.t2(addressKey, Fun.HI())).iterator());
+        return IteratorCloseableImpl.make(new IndexIterator(this.creatorKey.subSet(Fun.t2(addressKey, fromSeqNo),
+                Fun.t2(addressKey, Fun.HI())).iterator()));
     }
 
     @Override

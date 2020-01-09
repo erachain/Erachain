@@ -240,6 +240,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             Transaction item;
             Long key;
             while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
                 key = (Long) iterator.next();
                 Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
                 item = this.map.get(key);
@@ -256,6 +260,61 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     public List<Transaction> getTransactionsByCreator(String address, int limit, int offset) {
         return getTransactionsByCreator(Account.makeShortBytes(address), limit, offset);
+    }
+
+    public List<Transaction> getTransactionsByCreator(byte[] addressShort, Long fromID, int limit, int offset) {
+
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        try (IteratorCloseable iterator = ((TransactionFinalSuit) map).getIteratorByCreator(addressShort, fromID)) {
+            List<Transaction> txs = new ArrayList<>();
+            int counter = 0;
+            Transaction item;
+            Long key;
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
+                key = (Long) iterator.next();
+                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                item = this.map.get(key);
+                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+                txs.add(item);
+                counter++;
+            }
+            return txs;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public List<Transaction> getTransactionsByCreator(String address, Long fromID, int limit, int offset) {
+        return getTransactionsByCreator(Account.makeShortBytes(address), fromID, limit, offset);
+    }
+
+    /**
+     * Поиск активности данного счета по Созданным трнзакция за данный промежуток времени
+     *
+     * @param addressShort
+     * @param fromSeqNo
+     * @param toSeqNo
+     * @return
+     */
+    public boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, Long toSeqNo) {
+        // на счете должна быть активность после fromSeqNo
+        List<Transaction> txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
+        if (txsFind.isEmpty())
+            return false;
+        // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
+        if (fromSeqNo != null && txsFind.get(0).getDBRef() > toSeqNo) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override

@@ -112,9 +112,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     Integer type = transaction.getType();
                     List<byte[]> addressesTypes = new ArrayList<>();
                     for (Account account : transaction.getInvolvedAccounts()) {
-                        byte[] key = new byte[Account.ADDRESS_SHORT_LENGTH + 1];
-                        System.arraycopy(account.getShortAddressBytes(), 0, key, 0, Account.ADDRESS_SHORT_LENGTH);
-                        key[Account.ADDRESS_SHORT_LENGTH] = (byte)(int) type;
+                        byte[] key = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + 1];
+                        System.arraycopy(account.getShortAddressBytes(), 0, key, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                        key[TransactionFinalMap.ADDRESS_KEY_LEN] = (byte) (int) type;
                         addressesTypes.add(key);
                     }
                     return addressesTypes;

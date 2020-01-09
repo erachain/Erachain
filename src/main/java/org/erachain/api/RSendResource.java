@@ -715,10 +715,10 @@ public class RSendResource {
         try {
             Date parsedDate = dateFormat.parse(activeAfterStr);
             Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-            activeAfter = timestamp.getTime() / 1000; // in sec
+            activeAfter = timestamp.getTime();
         } catch(Exception e) {
             try {
-                activeAfter = Long.parseLong(activeAfterStr);
+                activeAfter = Long.parseLong(activeAfterStr) * 1000L;
             } catch (Exception e1) {
                 activeAfter = null;
             }
@@ -728,10 +728,10 @@ public class RSendResource {
         try {
             Date parsedDate = dateFormat.parse(activeBeforeStr);
             Timestamp timestamp = new java.sql.Timestamp(parsedDate.getTime());
-            activeBefore = timestamp.getTime() / 1000; // in sec
+            activeBefore = timestamp.getTime();
         } catch(Exception e) {
             try {
-                activeBefore = Long.parseLong(activeBeforeStr);
+                activeBefore = Long.parseLong(activeBeforeStr) * 1000L;
             } catch (Exception e1) {
                 activeBefore = null;
             }
@@ -741,13 +741,13 @@ public class RSendResource {
         BlockChain chain = cntr.getBlockChain();
 
         // преобразуем в seqNo
-        long fromSeqNo = 0;
+        Long fromSeqNo = null;
         if (activeAfter != null && activeAfter > 0) {
-            fromSeqNo = Transaction.makeDBRef(chain.getBlockOnTimestamp(activeAfter * 1000), 0);
+            fromSeqNo = Transaction.makeDBRef(chain.getBlockOnTimestamp(activeAfter), 0);
         }
-        long toSeqNo = 0;
+        Long toSeqNo = null;
         if (activeBefore != null && activeBefore > 0) {
-            toSeqNo = Transaction.makeDBRef(chain.getBlockOnTimestamp(activeBefore * 1000), 0);
+            toSeqNo = Transaction.makeDBRef(chain.getBlockOnTimestamp(activeBefore), 0);
         }
 
         if (!test) {
@@ -814,21 +814,10 @@ public class RSendResource {
 
                         /// если задано то проверим - входит ли в в диаппазон
                         // - собранные блоки учитываем? да - иначе долго будет делать поиск
-                        if (fromSeqNo > 0) {
-                            // на счете должна быть активность после fromSeqNo - и обратный отсчет по итератору этому берем
-                            List<Transaction> txsFind = txMap.getTransactionsByAddressFromID(recipentShort, fromSeqNo,
-                                    0, -1, false, false);
-                            if (txsFind.isEmpty())
-                                continue;
-                            // если полный диаппазон задан то проверим вхождение
-                            if (toSeqNo > 0 && txsFind.get(0).getDBRef() > toSeqNo) {
-                                continue;
-                            }
-                        } else if (toSeqNo > 0) {
-                            // на счете должна быть активность до fromSeqNo
-                            List<Transaction> txsFind = txMap.getTransactionsByAddressFromID(recipentShort, fromSeqNo,
-                                    0, 1, false, false);
-                            if (txsFind.isEmpty())
+                        if (fromSeqNo != null || toSeqNo != null) {
+                            // на счете должна быть активность в заданном диаппазоне
+
+                            if (!txMap.isCreatorWasActive(recipentShort, fromSeqNo, toSeqNo))
                                 continue;
                         }
 
