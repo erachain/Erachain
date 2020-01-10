@@ -60,7 +60,7 @@ public class ATAPIPlatformImpl extends ATAPIImpl {
 
         int atTxs = dcSet.getATTransactionMap().getATTransactions(startHeight).size();
 
-        Long tx = dcSet.getTransactionFinalMap().getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxs : 0, account.getAddress());
+        Long tx = dcSet.getTransactionFinalMap().getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxs : 0, account.getShortAddressBytes());
         Tuple2<Integer, Integer> pair = Transaction.parseDBRef(tx);
 
         if (forkHeight > 0) {
@@ -70,7 +70,7 @@ public class ATAPIPlatformImpl extends ATAPIImpl {
             Long txp = ((TransactionFinalMap) dcSet.getTransactionFinalMap()
                     //.getParentMap() было в DCU - сечас нету в TAB & SUIT
             )
-                    .getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxsp : 0, account.getAddress());
+                    .getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxsp : 0, account.getShortAddressBytes());
             Tuple2<Integer, Integer> pairP = Transaction.parseDBRef(txp);
             if (atTxTp != null && (txp == null || atTxTp.a <= pairP.a) && atTxTp.a < forkHeight) {
                 ATTransaction atTx = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).get(atTxTp);

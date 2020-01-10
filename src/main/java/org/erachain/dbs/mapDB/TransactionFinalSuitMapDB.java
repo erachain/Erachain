@@ -3,16 +3,16 @@ package org.erachain.dbs.mapDB;
 //04/01 +- 
 
 import com.google.common.collect.*;
-import com.google.common.primitives.Longs;
+import com.google.common.primitives.SignedBytes;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IndexIterator;
+import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
@@ -56,7 +56,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     private static int CUT_NAME_INDEX = 12;
 
     @SuppressWarnings("rawtypes")
-    private NavigableSet senderKey;
+    private NavigableSet creatorKey;
     @SuppressWarnings("rawtypes")
     private NavigableSet recipientKey;
     @SuppressWarnings("rawtypes")
@@ -64,11 +64,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @SuppressWarnings("rawtypes")
     private NavigableSet titleKey;
-
-    //@SuppressWarnings("rawtypes")
-    //private NavigableSet block_Key;
-    // private NavigableSet <Tuple2<String,Tuple2<Integer,
-    // Integer>>>signature_key;
 
     public TransactionFinalSuitMapDB(DBASet databaseSet, DB database, boolean sizeEnable) {
         super(databaseSet, database, logger, sizeEnable, null);
@@ -93,71 +88,100 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             // NOT USE SECONDARY INDEXES
             return;
 
-        this.senderKey = database.createTreeSet("sender_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        Fun.Tuple2Comparator<byte[], Long> comparatorAddressT2 = new Fun.Tuple2Comparator<byte[], Long>(
+                SignedBytes.lexicographicalComparator(),
+                Fun.COMPARATOR);
+
+        this.creatorKey = database.createTreeSet("creator_txs")
+                .comparator(comparatorAddressT2) // - for Tuple2 String
+                //.comparator(SignedBytes.lexicographicalComparator())
+                .makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
-        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.senderKey, new Function2<String, Long, Transaction>() {
+        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.creatorKey, new Function2<byte[], Long, Transaction>() {
             @Override
-            public String run(Long key, Transaction val) {
-                Account account = val.getCreator();
-                if (account == null)
-                    return "";
-                // make UNIQUE key??  + val.viewTimestamp()
-                return account.getAddress();
+            public byte[] run(Long key, Transaction transaction) {
+                Account account = transaction.getCreator();
+                if (account == null) {
+                    /// так как вторичный ключ тут даже с Null будет создан как Tuple2(null, primaryKey) и
+                    /// SignedBytes.lexicographicalComparator тогда вызывает ошибку - поэтому выдаем не пустой массив
+                    return new byte[0];
+                }
+
+                byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+
+                System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                return addressKey;
             }
         });
 
-        this.recipientKey = database.createTreeSet("recipient_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.recipientKey = database.createTreeSet("recipient_txs")
+                .comparator(comparatorAddressT2) // - for Tuple2 String
+                //.comparator(SignedBytes.lexicographicalComparator())
+                .makeOrGet();
 
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.recipientKey,
-                new Function2<String[], Long, Transaction>() {
+                new Function2<byte[][], Long, Transaction>() {
                     @Override
-                    public String[] run(Long key, Transaction val) {
-                        List<String> recps = new ArrayList<String>();
-
+                    public byte[][] run(Long key, Transaction transaction) {
                         // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
-                        val.setDC((DCSet) databaseSet);
+                        transaction.setDC((DCSet) databaseSet);
 
-                        for (Account acc : val.getRecipientAccounts()) {
-                            // make UNIQUE key??  + val.viewTimestamp()
-                            recps.add(acc.getAddress());
+                        HashSet<Account> recipients = transaction.getRecipientAccounts();
+                        int size = recipients.size();
+                        byte[][] keys = new byte[size][];
+                        int count = 0;
+                        for (Account recipient: recipients) {
+                            byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                            System.arraycopy(recipient.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            keys[count++] = addressKey;
                         }
-                        String[] ret = new String[recps.size()];
-                        ret = recps.toArray(ret);
-                        return ret;
+                        return keys;
                     }
                 });
 
-        this.addressTypeKey = database.createTreeSet("address_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        Fun.Tuple2Comparator<Fun.Tuple2Comparator<byte[], Integer>, Long> comparatorAddressType
+                = new Fun.Tuple2Comparator<Fun.Tuple2Comparator<byte[], Integer>, Long>(
+                    new Fun.Tuple2Comparator(
+                        SignedBytes.lexicographicalComparator(),
+                        Fun.COMPARATOR),
+                Fun.COMPARATOR);
+
+        this.addressTypeKey = database.createTreeSet("address_type_txs")
+                .comparator(comparatorAddressType)
+                .makeOrGet();
 
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.addressTypeKey,
-                new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
+                new Function2<Tuple2<byte[], Integer>[], Long, Transaction>() {
                     @Override
-                    public Tuple2<String, Integer>[] run(Long key, Transaction transaction) {
-                        List<Tuple2<String, Integer>> accounts = new ArrayList<Tuple2<String, Integer>>();
+                    public Tuple2<byte[], Integer>[] run(Long key, Transaction transaction) {
+                        List<Tuple2<byte[], Integer>> accounts = new ArrayList<Tuple2<byte[], Integer>>();
                         Integer type = transaction.getType();
-                        for (Account acc : transaction.getInvolvedAccounts()) {
-                            // TODO: make unique key??  + transaction.viewTimestamp()
-                            accounts.add(new Tuple2<String, Integer>(acc.getAddress(), type));
+                        for (Account account : transaction.getInvolvedAccounts()) {
+                            byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                            System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                            accounts.add(new Tuple2<byte[], Integer>(addressKey, type));
                         }
 
-                        Tuple2<String, Integer>[] result = (Tuple2<String, Integer>[])
+                        Tuple2<byte[], Integer>[] result = (Tuple2<byte[], Integer>[])
                                 Array.newInstance(Tuple2.class, accounts.size());
                         result = accounts.toArray(result);
                         return result;
                     }
                 });
 
-        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.TUPLE2_COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.titleKey,
                 new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
                     @Override
-                    public Tuple2<String, Integer>[] run(Long key, Transaction val) {
-                        String title = val.getTitle();
-                        if (title == null || title.isEmpty() || title.equals(""))
-                            return null;
+                    public Tuple2<String, Integer>[] run(Long key, Transaction transaction) {
+                        String title = transaction.getTitle();
+                        if (title == null || title.isEmpty() || title.equals("")) {
+                            // нужно возвращать не null что бы сработал Компаратор нормально
+                            return new Tuple2[0];
+                        }
 
                         // see https://regexr.com/
                         String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
@@ -166,40 +190,39 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                             if (tokens[i].length() > CUT_NAME_INDEX) {
                                 tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
                             }
-                            keys[i] = new Tuple2<String, Integer>(tokens[i], val.getType());
+                            keys[i] = new Tuple2<String, Integer>(tokens[i], transaction.getType());
                         }
 
                         return keys;
                     }
                 });
 
-        Fun.Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
-                //UnsignedBytes.lexicographicalComparator()
-                Fun.COMPARATOR);
-
         // BI-DIrectional INDEX - for blockexplorer
         NavigableSet<Integer> addressBiIndex = database.createTreeSet("address_txs")
-                .comparator(comparator)
+                .comparator(comparatorAddressT2)
                 .counterEnable()
                 .makeOrGet();
 
         NavigableSet<Integer> descendingaddressBiIndex = database.createTreeSet("address_txs_descending")
-                .comparator(new ReverseComparator(comparator))
+                .comparator(new ReverseComparator(comparatorAddressT2))
                 .makeOrGet();
 
         createIndexes(BIDIRECTION_ADDRESS_INDEX, addressBiIndex, descendingaddressBiIndex,
-                new Fun.Function2<Long[],
+                new Fun.Function2<byte[][],
                 Long, Transaction>() {
             @Override
-            public Long[] run(Long key, Transaction transaction) {
-                List<Long> accounts = new ArrayList<Long>();
-                for (Account account : transaction.getInvolvedAccounts()) {
-                    accounts.add(Longs.fromByteArray(account.getShortAddressBytes()));
+            public byte[][] run(Long key, Transaction transaction) {
+                HashSet<Account> accounts = transaction.getInvolvedAccounts();
+                int size = accounts.size();
+                byte[][] result = new byte[size][];
+                int count = 0;
+                for (Account account : accounts) {
+                    byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                    System.arraycopy(account.getShortAddressBytes(), 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+                    result[count++] = addressKey;
                 }
 
-                Long[] result = (Long[])
-                        Array.newInstance(Long.class, accounts.size());
-                result = accounts.toArray(result);
                 return result;
             }
         });
@@ -220,43 +243,63 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getBlockIterator(Integer height) {
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-         return new IteratorCloseableImpl(((BTreeMap<Long, Transaction>) map)
-                .subMap(Transaction.makeDBRef(height, 0),
-                        Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
+         return IteratorCloseableImpl.make(((BTreeMap<Long, Transaction>) map)
+                 .subMap(Transaction.makeDBRef(height, 0),
+                         Transaction.makeDBRef(height, Integer.MAX_VALUE)).keySet().iterator());
 
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorByRecipient(String address) {
-        Iterable keys = Fun.filter(this.recipientKey, address);
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        Iterable keys = Fun.filter(this.recipientKey, addressKey);
         Iterator iter = keys.iterator();
-        return new IteratorCloseableImpl(iter);
+        return IteratorCloseableImpl.make(iter);
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorBySender(String address) {
-        Iterable keys = Fun.filter(this.senderKey, address);
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        Iterable keys = Fun.filter(this.creatorKey, addressKey);
         Iterator iter = keys.iterator();
-        return new IteratorCloseableImpl(iter);
+        return IteratorCloseableImpl.make(iter);
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        return IteratorCloseableImpl.make(new IndexIterator(this.creatorKey.subSet(Fun.t2(addressKey, fromSeqNo),
+                Fun.t2(addressKey, Fun.HI())).iterator()));
     }
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type) {
-        Iterable keys = Fun.filter(this.addressTypeKey, new Tuple2<String, Integer>(address, type));
-        Iterator iter = keys.iterator();
-        return new IteratorCloseableImpl(iter);
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        Iterable keys = Fun.filter(this.addressTypeKey, new Tuple2<byte[], Integer>(addressKey, type));
+        return IteratorCloseableImpl.make(keys.iterator());
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(String address, Integer type, Long fromID) {
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        return IteratorCloseableImpl.make(((BTreeMap<Fun.Tuple3, Long>) this.addressTypeKey).subMap(
-                Fun.t3(address, type, fromID),
-                Fun.t3(address, type, Fun.HI())).values().iterator());
+        return IteratorCloseableImpl.make(new IndexIterator(this.addressTypeKey.subSet(
+                Fun.t2(Fun.t2(addressKey, type), fromID),
+                Fun.t2(Fun.t2(addressKey, type), Fun.HI())).iterator()));
     }
 
     @Override
@@ -281,11 +324,13 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     // скорость сортировки в том или ином случае может быть разная - нужны ТЕСТЫ на 3 варианта работы
     // TODO need benchmark tests
-    public IteratorCloseable<Long> getIteratorByAddress(String address) {
+    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         if (true) {
-            Iterable senderKeys = Fun.filter(this.senderKey, address);
-            Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+            Iterable senderKeys = Fun.filter(this.creatorKey, addressKey);
+            Iterable recipientKeys = Fun.filter(this.recipientKey, addressKey);
 
             if (true) {
                 Set<Long> treeKeys = new TreeSet<>();
@@ -306,9 +351,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
             // ТУТ СОРТИООВКА не в ту тсорону получается
 
-            Iterable senderKeys = Fun.filter(this.senderKey, address);
+            Iterable senderKeys = Fun.filter(this.creatorKey, addressKey);
             Iterator<Long> senderKeysIterator = senderKeys.iterator();
-            Iterable recipientKeys = Fun.filter(this.recipientKey, address);
+            Iterable recipientKeys = Fun.filter(this.recipientKey, addressKey);
             Iterators.removeAll(senderKeysIterator, (Collection) recipientKeys);
 
             // заново возьмем итератор а тот прошелся весь до конца уже
@@ -325,14 +370,15 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     /**
      * Нужно для пролистывания по адресу в обоих направлениях - для блокэксплорера
      * TODO: тут ключ по адресу обрезан до 8-ми байт и возможны совпадения - поидее нужно увеличить длинну
-     * @param address
+     * @param addressShort
      * @param fromSeqNo
      * @param descending
      * @return
      */
     @Override
-    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending) {
-        Long addressKey = Longs.fromByteArray(Crypto.getInstance().getShortBytesFromAddress(address));
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
+        byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
         if (descending) {
             IteratorCloseable result =

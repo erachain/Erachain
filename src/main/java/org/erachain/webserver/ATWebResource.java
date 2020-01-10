@@ -61,11 +61,11 @@ public class ATWebResource {
     }
 
     public String getIncTxCount(String atId) {
-        return String.valueOf(DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(atId).size());
+        return String.valueOf(DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(Account.makeShortBytes(atId)).size());
     }
 
     public List<Transaction> getIncomingTransactions(String atId) {
-        return DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(atId);
+        return DCSet.getInstance().getTransactionFinalMap().getTransactionsByRecipient(Account.makeShortBytes(atId));
     }
 
     public List<ATTransaction> getOutgoingTransactions(String atId) {
@@ -172,7 +172,7 @@ public class ATWebResource {
     }
 
     public List<Transaction> getMessageTransactions(String address) {
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, Transaction.SEND_ASSET_TRANSACTION, 50, 0);
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address), Transaction.SEND_ASSET_TRANSACTION, 50, 0);
         return txs;
 
     }

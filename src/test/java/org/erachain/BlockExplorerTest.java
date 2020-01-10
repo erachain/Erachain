@@ -263,7 +263,7 @@ public class BlockExplorerTest {
 
         stopwatchAll = new Stopwatch();
         all.clear();
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 0 , 0));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByCreator("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 0 , 0));
 
         for (Object transaction : all) {
             LOGGER.error(Base58.encode(((Transaction) transaction).getSignature()));

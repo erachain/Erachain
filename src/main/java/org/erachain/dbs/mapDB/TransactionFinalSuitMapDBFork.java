@@ -75,22 +75,27 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByRecipient(String address) {
+    public IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort) {
         return null;
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorBySender(String address) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort) {
         return null;
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type) {
+    public IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo) {
         return null;
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(String address, Integer type, Long fromID) {
+    public IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type) {
+        return null;
+    }
+
+    @Override
+    public IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID) {
         return null;
     }
 
@@ -100,12 +105,12 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByAddress(String address) {
+    public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort) {
         return null;
     }
 
     @Override
-    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
         return null;
     }
 }

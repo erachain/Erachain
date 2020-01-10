@@ -99,19 +99,19 @@ public class NamesResource {
 
             HashSet<Name> names = new HashSet<>();
 
-            for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, Transaction.REGISTER_NAME_TRANSACTION, 0, 0)) {
+            for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.REGISTER_NAME_TRANSACTION, 0, 0)) {
                 if (((RegisterNameTransaction) transaction).getName().getOwner().getAddress().equals(address)) {
                     names.add(((RegisterNameTransaction) transaction).getName());
                 }
             }
 
-            for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, Transaction.UPDATE_NAME_TRANSACTION, 0, 0)) {
+            for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.UPDATE_NAME_TRANSACTION, 0, 0)) {
                 if (((UpdateNameTransaction) transaction).getName().getOwner().getAddress().equals(address)) {
                     names.add(((UpdateNameTransaction) transaction).getName());
                 }
             }
 
-            for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, Transaction.BUY_NAME_TRANSACTION, 0, 0)) {
+            for (Transaction transaction : DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.BUY_NAME_TRANSACTION, 0, 0)) {
                 if (((BuyNameTransaction) transaction).getNameSale().getName().getOwner().getAddress().equals(address)) {
                     names.add(((BuyNameTransaction) transaction).getNameSale().getName());
                 }

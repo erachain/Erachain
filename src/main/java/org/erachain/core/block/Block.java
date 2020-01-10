@@ -2205,8 +2205,8 @@ import java.util.*;
                 //PROCESS
                 if (transaction.isWiped()
                         || BlockChain.DEVELOP_USE && heightBlock > 473600 && heightBlock < 493700
-                                && transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION
-                        ) {
+                        && transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION
+                ) {
                     //UPDATE REFERENCE OF SENDER
                     transaction.getCreator().setLastTimestamp(
                             new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
@@ -2245,7 +2245,7 @@ import java.util.*;
                 if (cnt.isOnStopping())
                     throw new Exception("on stoping");
 
-                ///logger.debug("[" + seqNo + "] try finalMap.set" );
+                ///LOGGER.debug("[" + seqNo + "] try finalMap.set" + transaction );
                 timerStart = System.currentTimeMillis();
                 finalMap.put(key, transaction);
                 timerFinalMap_set += System.currentTimeMillis() - timerStart;

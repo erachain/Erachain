@@ -11,18 +11,19 @@ public interface TransactionFinalSuit {
 
     IteratorCloseable<Long> getBlockIterator(Integer height);
 
-    IteratorCloseable<Long> getIteratorByRecipient(String address);
+    IteratorCloseable<Long> getIteratorByRecipient(byte[] addressShort);
 
-    IteratorCloseable<Long> getIteratorBySender(String address);
+    IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort);
+    IteratorCloseable<Long> getIteratorByCreator(byte[] addressShort, Long fromSeqNo);
 
-    IteratorCloseable<Long> getIteratorByAddressAndType(String address, Integer type);
+    IteratorCloseable<Long> getIteratorByAddressAndType(byte[] addressShort, Integer type);
 
-    IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(String address, Integer type, Long fromID);
+    IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID);
 
     IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type);
 
-    IteratorCloseable<Long> getIteratorByAddress(String address);
+    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort);
 
-    IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending);
+    IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending);
 
     }

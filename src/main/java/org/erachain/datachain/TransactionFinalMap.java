@@ -10,6 +10,10 @@ import java.util.Collection;
 import java.util.List;
 
 public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredByStringArray {
+
+    int CUT_NAME_INDEX = 12;
+    int ADDRESS_KEY_LEN = 10;
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     void delete(Integer height);
 
@@ -19,10 +23,10 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     Transaction get(Integer height, Integer seq);
 
-    List<Transaction> getTransactionsByRecipient(String address);
+    List<Transaction> getTransactionsByRecipient(byte[] addressShort);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    List<Transaction> getTransactionsByRecipient(String address, int limit);
+    List<Transaction> getTransactionsByRecipient(byte[] addressShort, int limit);
 
     Collection<Transaction> getTransactionsByBlock(Integer block);
 
@@ -30,13 +34,15 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
     List<Transaction> getTransactionsByBlock(Integer block, int offset, int limit);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    List<Transaction> getTransactionsBySender(String address, int limit, int offset);
+    List<Transaction> getTransactionsByCreator(byte[] addressShort, int limit, int offset);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    List<Transaction> getTransactionsByAddressAndType(String address, Integer type, int limit, int offset);
+    List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, int limit, int offset);
 
-    List<Long> getTransactionsByAddressAndType(String address, Integer type, Long fromID, int limit, int offset);
+    List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset);
+
+    List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset, boolean onlyCreator);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
@@ -56,19 +62,19 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    IteratorCloseable<Long> getIteratorByAddress(String address);
+    IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    List<Transaction> getTransactionsByAddressLimit(String address, int limit, boolean noForge);
+    List<Transaction> getTransactionsByAddressLimit(byte[] addressShort, int limit, boolean noForge);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    int getTransactionsByAddressCount(String address);
+    int getTransactionsByAddressCount(byte[] addressShort);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, String address);
+    Long getTransactionsAfterTimestamp(int startHeight, int numOfTx, byte[] addressShort);
 
     @SuppressWarnings("rawtypes")
     List<Transaction> findTransactions(String address, String sender, String recipient, int minHeight,
@@ -84,7 +90,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending, int offset, int limit);
 
-    List<Transaction> getTransactionsByAddressFromID(String address, Long fromSeqNo, int offset, int limit, boolean noForge);
+    List<Transaction> getTransactionsByAddressFromID(byte[] addressShort, Long fromSeqNo, int offset, int limit, boolean noForge, boolean fillFullPage);
 
     byte[] getSignature(int hight, int seg);
 
