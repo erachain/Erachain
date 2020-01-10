@@ -297,9 +297,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         byte[] addressKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
         System.arraycopy(addressShort, 0, addressKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
 
-        return IteratorCloseableImpl.make(((BTreeMap<Fun.Tuple3, Long>) this.addressTypeKey).subMap(
-                Fun.t3(addressKey, type, fromID),
-                Fun.t3(addressKey, type, Fun.HI())).values().iterator());
+        return IteratorCloseableImpl.make(new IndexIterator(this.addressTypeKey.subSet(
+                Fun.t2(Fun.t2(addressKey, type), fromID),
+                Fun.t2(Fun.t2(addressKey, type), Fun.HI())).iterator()));
     }
 
     @Override

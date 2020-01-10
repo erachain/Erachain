@@ -42,6 +42,8 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     List<Long> getKeysByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset);
 
+    List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset);
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending);

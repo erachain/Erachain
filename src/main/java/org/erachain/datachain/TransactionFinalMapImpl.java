@@ -304,9 +304,15 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      * @param toSeqNo
      * @return
      */
-    public boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, Long toSeqNo) {
+    public boolean isCreatorWasActive(byte[] addressShort, Long fromSeqNo, int typeTX, Long toSeqNo) {
         // на счете должна быть активность после fromSeqNo
-        List<Transaction> txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
+        List<Transaction> txsFind;
+        if (typeTX == 0) {
+            txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
+        } else {
+            txsFind = getTransactionsByAddressAndType(addressShort, typeTX, fromSeqNo, 1, 0);
+        }
+
         if (txsFind.isEmpty())
             return false;
         // если полный диаппазон задан то проверим вхождение - он может быть и отрицательным
@@ -333,6 +339,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             Long key;
             while (iterator.hasNext() && (limit == 0 || counter < limit)) {
                 key = (Long) iterator.next();
+
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
+
+
                 Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
                 item = this.map.get(key);
                 item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -363,6 +376,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             Long key;
             while (iterator.hasNext() && (limit == 0 || counter < limit)) {
                 key = iterator.next();
+
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
+
                 //Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
                 //item = this.map.get(key);
                 //item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
@@ -374,6 +393,39 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         } catch (IOException e) {
         }
         return keys;
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset) {
+
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        List<Transaction> transactions = new ArrayList<>();
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByAddressAndTypeFrom(addressShort, type, fromID)) {
+            int counter = 0;
+            Transaction item;
+            Long key;
+            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
+                key = iterator.next();
+
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
+
+                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                item = this.map.get(key);
+                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
+
+                transactions.add(item);
+                counter++;
+            }
+        } catch (IOException e) {
+        }
+        return transactions;
     }
 
     @Override

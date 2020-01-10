@@ -60,9 +60,10 @@ public class RSendResource {
                 "make RAW for SEND asset amount and mail");
         help.put("GET r_send/test1/{delay}?password={password}",
                 "Start test; dekay = 0 - stop");
-        help.put("GET multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&koeff=1&title=&onlyperson=false&password=",
+        help.put("GET multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&password=",
                 "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
                         + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"
+                        + " greatequal=0 - if set balance in position must be great or equal this amount, activeTypeTX=0 - if set test activity on this type transactions,"
                         + " title=, onlyperson - get only personalized addresses, password=");
         //
 
@@ -679,18 +680,20 @@ public class RSendResource {
 
     /**
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486&password=123
-     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1546300800&activebefore=2019-12-31 23:59&password=1
+     * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=2018-01-01 00:00&activebefore=2019-01-01 00:00&greatequal=0&activetypetx=24&password=1
      *
-     * @param fromAddress my address in Wallet
-     * @param assetKey asset Key that send
-     * @param forAssetKey asset key of holders test
-     * @param position test balance position. 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other
-     * @param amount absolute amount to send
-     * @param test defaule - true. test=false - real send
+     * @param fromAddress     my address in Wallet
+     * @param assetKey        asset Key that send
+     * @param forAssetKey     asset key of holders test
+     * @param amount          absolute amount to send
+     * @param position        test balance position. 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other
+     * @param greatEqual      test balance is great or equal
+     * @param test            default - true. test=false - real send
      * @param feePow
-     * @param activeAfterStr timestamp after that is filter - yyyy-MM-dd hh:mm or timestamp(sec)
-     * @param activeBeforeStr timestamp before that is filter - yyyy-MM-dd hh:mm or timestamp(sec)
-     * @param koeff koefficient for amount in balance position of forAssetKey
+     * @param activeAfterStr  timestamp after that is filter - yyyy-MM-dd hh:mm or timestamp(sec)
+     * @param activeBeforeStr timestamp before that is filter - yyyy-MM-dd hh:mm or timestamp(sec) activetypetx
+     * @param activeTypeTX    if set - test only that type transactions
+     * @param koeff           koefficient for amount in balance position of forAssetKey
      * @param title
      * @param password
      * @return
@@ -699,11 +702,13 @@ public class RSendResource {
     @Path("multisend/{fromAddress}/{assetKey}/{forAssetKey}")
     public String multiSend(@PathParam("fromAddress") String fromAddress, @PathParam("assetKey") long assetKey, @PathParam("forAssetKey") long forAssetKey,
                             @DefaultValue("1") @QueryParam("position") Integer position,
+                            @DefaultValue("0") @QueryParam("greatequal") BigDecimal greatEqual, // больше или равно чем
                             @DefaultValue("0") @QueryParam("amount") BigDecimal amount,
                             @DefaultValue("true") @QueryParam("test") Boolean test,
                             @DefaultValue("0") @QueryParam("feePow") Integer feePow,
                             @DefaultValue("0") @QueryParam("activeafter") String activeAfterStr,
                             @DefaultValue("0") @QueryParam("activebefore") String activeBeforeStr,
+                            @DefaultValue("0") @QueryParam("activetypetx") int activeTypeTX, // активность по заданному типу транзакции
                             @DefaultValue("1") @QueryParam("koeff") BigDecimal koeff,
                             @QueryParam("title") String title,
                             @DefaultValue("false") @QueryParam("onlyperson") Boolean onlyPerson,
@@ -797,8 +802,8 @@ public class RSendResource {
 
                         balance = Account.getBalanceInPosition(balancesMap.get(key), position);
 
-                        // только тем у кого положительный баланс
-                        if (balance.b.signum() <= 0)
+                        // только тем у кого положительный баланс и больше чем задано
+                        if (balance.b.compareTo(greatEqual) < 0)
                             continue;
 
                         byte[] recipentShort = ItemAssetBalanceMap.getShortAccountFromKey(key);
@@ -819,9 +824,8 @@ public class RSendResource {
                         /// если задано то проверим - входит ли в в диаппазон
                         // - собранные блоки учитываем? да - иначе долго будет делать поиск
                         if (fromSeqNo != null || toSeqNo != null) {
-                            // на счете должна быть активность в заданном диаппазоне
-
-                            if (!txMap.isCreatorWasActive(recipentShort, fromSeqNo, toSeqNo))
+                            // на счете должна быть активность в заданном диаппазоне для данного типа
+                            if (!txMap.isCreatorWasActive(recipentShort, fromSeqNo, activeTypeTX, toSeqNo))
                                 continue;
                         }
 
