@@ -60,10 +60,11 @@ public class RSendResource {
                 "make RAW for SEND asset amount and mail");
         help.put("GET r_send/test1/{delay}?password={password}",
                 "Start test; dekay = 0 - stop");
-        help.put("GET multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&password=",
+        help.put("GET multisend/{fromAddress}/{assetKey}/{forAssetKey}?position=1&amount=0&test=true&feePow=0&activeafter=[date]&activebefore=[date]&greatequal=[amount]&koeff=1&title=&onlyperson=false&selfpay=false&password=",
                 "Muli-send from Address [fromAddress] the asset [assetKey] by filter: Who has positive balance by asset [forAssetKey] where "
                         + " position - balance position for test, amount and koeff: sensed AMOUNT = amount + koeff * BALANCE, test - set false for real send or true for statistics, activeafter and activebefore - check activity for address in format: [timestamp_in_sec | YYYY-MM-DD HH:MM],"
                         + " greatequal=0 - if set balance in position must be great or equal this amount, activeTypeTX=0 - if set test activity on this type transactions,"
+                        + "selfPay=true - if set pay to self address too. Default = true"
                         + " title=, onlyperson - get only personalized addresses, password=");
         //
 
@@ -688,6 +689,7 @@ public class RSendResource {
      * @param amount          absolute amount to send
      * @param position        test balance position. 1 - Own, 2 - Credit, 3 - Hold, 4 - Spend, 5 - Other
      * @param greatEqual      test balance is great or equal
+     * @param selfPay         if set - pay to self address too. Default = true
      * @param test            default - true. test=false - real send
      * @param feePow
      * @param activeAfterStr  timestamp after that is filter - yyyy-MM-dd hh:mm or timestamp(sec)
@@ -705,6 +707,7 @@ public class RSendResource {
                             @DefaultValue("0") @QueryParam("greatequal") BigDecimal greatEqual, // больше или равно чем
                             @DefaultValue("0") @QueryParam("amount") BigDecimal amount,
                             @DefaultValue("true") @QueryParam("test") Boolean test,
+                            @DefaultValue("true") @QueryParam("selfpay") Boolean selfPay,
                             @DefaultValue("0") @QueryParam("feePow") Integer feePow,
                             @DefaultValue("0") @QueryParam("activeafter") String activeAfterStr,
                             @DefaultValue("0") @QueryParam("activebefore") String activeBeforeStr,
@@ -775,7 +778,7 @@ public class RSendResource {
                 return out.toJSONString();
             }
 
-            Account account = accResult.a;
+            Account accountFrom = accResult.a;
 
             BigDecimal totalSendAmount = BigDecimal.ZERO;
 
@@ -797,6 +800,10 @@ public class RSendResource {
             try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(forAssetKey)) {
                 while (iterator.hasNext()) {
                     key = iterator.next();
+                    if (!selfPay && accountFrom.equals(key)) {
+                        // сами себе не платим?
+                        continue;
+                    }
 
                     try {
 
@@ -847,7 +854,7 @@ public class RSendResource {
                         resultOne.add(sendAmount.toPlainString());
 
 
-                        Pair<Integer, Transaction> result = cntr.make_R_Send(null, account, recipientStr, feePow,
+                        Pair<Integer, Transaction> result = cntr.make_R_Send(null, accountFrom, recipientStr, feePow,
                                 assetKey, true,
                                 sendAmount, needAmount,
                                 title, null, 0, false, timestampThis++);

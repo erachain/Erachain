@@ -310,7 +310,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         if (typeTX == 0) {
             txsFind = getTransactionsByCreator(addressShort, fromSeqNo, 1, 0);
         } else {
-            txsFind = getTransactionsByAddressAndType(addressShort, typeTX, fromSeqNo, 1, 0);
+            txsFind = getTransactionsByAddressAndType(addressShort, typeTX, fromSeqNo, 1, 0, true);
         }
 
         if (txsFind.isEmpty())
@@ -397,7 +397,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset) {
+    public List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset, boolean onlyCreator) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -411,13 +411,18 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             while (iterator.hasNext() && (limit == 0 || counter < limit)) {
                 key = iterator.next();
 
+                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
+                item = this.map.get(key);
+                if (onlyCreator && item.getCreator() != null && !item.getCreator().equals(addressShort)) {
+                    // пропустим всех кто не создатель
+                    continue;
+                }
+
                 if (offset > 0) {
                     offset--;
                     continue;
                 }
 
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item = this.map.get(key);
                 item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
                 transactions.add(item);
