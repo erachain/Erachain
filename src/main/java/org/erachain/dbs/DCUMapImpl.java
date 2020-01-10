@@ -9,10 +9,7 @@ import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.mapdb.BTreeMap;
-import org.mapdb.Bind;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.mapdb.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +39,10 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     public DCUMapImpl(DBASet databaseSet) {
         super(databaseSet);
+    }
+
+    public DCUMapImpl(DBASet databaseSet, DB database, String tabName, Serializer tabSerializer, boolean sizeEnable) {
+        super(databaseSet, database, tabName, tabSerializer, sizeEnable);
     }
 
     public DCUMapImpl(DBASet databaseSet, DB database, boolean sizeEnable) {

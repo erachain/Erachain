@@ -1,8 +1,13 @@
 package org.erachain.datachain;
 
 import com.google.common.primitives.UnsignedBytes;
+import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.serializer.ItemSerializer;
+import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
+import org.mapdb.Hasher;
+import org.mapdb.SerializerBase;
 
 import java.util.TreeMap;
 
@@ -19,12 +24,32 @@ import java.util.TreeMap;
  */
 public abstract class IssueItemMap extends DCUMap<byte[], Long> {
 
-    public IssueItemMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
+    public IssueItemMap(DCSet databaseSet, DB database, int type) {
+        super(databaseSet, database, ItemCls.getItemTypeName(type), new ItemSerializer(type));
     }
 
     public IssueItemMap(IssueItemMap parent, DCSet dcSet) {
         super(parent, dcSet);
+    }
+
+    @Override
+    public void openMap() {
+        //OPEN MAP
+        if (true) {
+            // более быстро работает
+            map = database.createHashMap(TAB_NAME + "_ref")
+                    //.keySerializer(BTreeKeySerializer.BASIC)
+                    //.comparator(UnsignedBytes.lexicographicalComparator())
+                    .keySerializer(SerializerBase.BYTE_ARRAY)
+                    .hasher(Hasher.BYTE_ARRAY)
+                    .valueSerializer(SerializerBase.LONG)
+                    .makeOrGet();
+        } else {
+            map = database.createTreeMap(TAB_NAME + "_ref")
+                    .keySerializer(BTreeKeySerializer.BASIC)
+                    .comparator(UnsignedBytes.lexicographicalComparator())
+                    .makeOrGet();
+        }
     }
 
     protected void createIndexes() {
@@ -48,7 +73,9 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
         put(transaction.getSignature(), key);
     }
 
+    //
     public void delete(Transaction transaction) {
         delete(transaction.getSignature());
     }
+
 }

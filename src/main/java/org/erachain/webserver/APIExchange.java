@@ -95,6 +95,23 @@ public class APIExchange {
                 .build();
     }
 
+    @GET
+    @Path("ordersbyaddress/{creator}/{amountAssetKey}/{priceAssetKey}")
+    public Response getOrdersByAddress(@PathParam("creator") String address,
+                                       @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))) {
+            if (limit > 50)
+                limit = 50;
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(TradeResource.getOrdersByAddress(address, haveKey, priceAssetKey, limit))
+                .build();
+    }
+
 
     @GET
     @Path("allordersbyaddress/{address}/{from}")

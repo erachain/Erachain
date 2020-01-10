@@ -7,6 +7,7 @@ import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.datachain.DCSet;
@@ -38,17 +39,19 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 {
 
     private static final int CUT_NAME_INDEX = 12;
+    public static int ADDRESS_KEY_LEN = 10;
+
     private final String NAME_TABLE = "TRANSACTION_FINAL_TABLE";
     private final String senderTransactionsIndexName = "senderTxs";
     private final String recipientTransactionsIndexName = "recipientTxs";
     private final String addressTypeTransactionsIndexName = "addressTypeTxs";
     private final String titleTypeTransactionsIndexName = "titleTypeTxs";
 
-
     SimpleIndexDB<Long, Transaction, String> senderTxs;
     ListIndexDB<Long, Transaction, String> recipientTxs;
     ListIndexDB<Long, Transaction, Fun.Tuple2<String, Integer>> addressTypeTxs;
     ArrayIndexDB<Long, Transaction, Fun.Tuple2<String, Integer>> titleTypeTxs;
+    ListIndexDB<Long, Transaction, byte[]> addressBiDirectionTxs;
 
     public TransactionFinalSuitRocksDB(DBASet databaseSet, DB database, boolean sizeEnable) {
         super(databaseSet, database, logger, sizeEnable);
@@ -147,10 +150,31 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         }
         );
 
+        addressBiDirectionTxs = new ListIndexDB<>("addressBiDirectionTXIndex",
+                (aLong, transaction) -> {
+
+                    // NEED set DCSet for calculate getRecipientAccounts in RVouch for example
+                    transaction.setDC((DCSet) databaseSet);
+
+                    List<byte[]> secondaryKeys = new ArrayList<>();
+                    for (Account account : transaction.getInvolvedAccounts()) {
+                        byte[] secondaryKey = new byte[ADDRESS_KEY_LEN + 8];
+                        System.arraycopy(account.getShortAddressBytes(), 0, secondaryKey, 0, ADDRESS_KEY_LEN);
+                        System.arraycopy(transaction.getDBRefAsBytes(), 0, secondaryKey, ADDRESS_KEY_LEN, 8);
+
+                        secondaryKeys.add(secondaryKey);
+                    }
+                    return secondaryKeys;
+                },
+                (result) -> result
+        );
+
         indexes.add(senderTxs);
         indexes.add(recipientTxs);
         indexes.add(addressTypeTxs);
         indexes.add(titleTypeTxs);
+        indexes.add(addressBiDirectionTxs);
+
     }
 
     // TODO  dbCore.deleteRange(beg, end);
@@ -237,6 +261,26 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         // а тут уже оьбратный порядок дать
         return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
+
+    }
+
+    @Override
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending) {
+        byte[] fromKey;
+        byte[] addressKey = Crypto.getInstance().getShortBytesFromAddress(address);
+        if (fromSeqNo == null) {
+            // ищем все с самого начала для данного адреса
+            fromKey = new byte[ADDRESS_KEY_LEN];
+            System.arraycopy(addressKey, 0, fromKey, 0, ADDRESS_KEY_LEN);
+        } else {
+            // используем полный ключ для начального поиска
+            fromKey = new byte[ADDRESS_KEY_LEN + 8];
+            System.arraycopy(addressKey, 0, fromKey, 0, ADDRESS_KEY_LEN);
+            System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, ADDRESS_KEY_LEN, 8);
+        }
+
+        return map.getIndexIteratorFilter(addressBiDirectionTxs.getColumnFamilyHandle(),
+                fromKey, descending, true);
 
     }
 

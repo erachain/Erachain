@@ -172,7 +172,7 @@ public class ATWebResource {
     }
 
     public List<Transaction> getMessageTransactions(String address) {
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, Transaction.SEND_ASSET_TRANSACTION, 50);
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address, Transaction.SEND_ASSET_TRANSACTION, 50, 0);
         return txs;
 
     }

@@ -3,17 +3,21 @@ package org.erachain.dbs.mapDB;
 //04/01 +- 
 
 import com.google.common.collect.*;
+import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
+import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
 import org.erachain.database.serializer.TransactionSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.IndexIterator;
 import org.erachain.datachain.TransactionFinalSuit;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.dbs.MergedIteratorNoDuplicates;
+import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeKeySerializer.BasicKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.Bind;
@@ -48,6 +52,7 @@ import java.util.*;
 @Slf4j
 public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit {
 
+    public static final int BIDIRECTION_ADDRESS_INDEX = 1;
     private static int CUT_NAME_INDEX = 12;
 
     @SuppressWarnings("rawtypes")
@@ -128,20 +133,18 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.addressTypeKey,
                 new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
                     @Override
-                    public Tuple2<String, Integer>[] run(Long key, Transaction val) {
-                        List<Tuple2<String, Integer>> recps = new ArrayList<Tuple2<String, Integer>>();
-                        Integer type = val.getType();
-                        for (Account acc : val.getInvolvedAccounts()) {
-                            // TODO: make unique key??  + val.viewTimestamp()
-                            recps.add(new Tuple2<String, Integer>(acc.getAddress(), type));
+                    public Tuple2<String, Integer>[] run(Long key, Transaction transaction) {
+                        List<Tuple2<String, Integer>> accounts = new ArrayList<Tuple2<String, Integer>>();
+                        Integer type = transaction.getType();
+                        for (Account acc : transaction.getInvolvedAccounts()) {
+                            // TODO: make unique key??  + transaction.viewTimestamp()
+                            accounts.add(new Tuple2<String, Integer>(acc.getAddress(), type));
                         }
 
-                        // Tuple2<Integer, String>[] ret = (Tuple2<Integer,
-                        // String>[]) new Object[ recps.size() ];
-                        Tuple2<String, Integer>[] ret = (Tuple2<String, Integer>[])
-                                Array.newInstance(Tuple2.class, recps.size());
-                        ret = recps.toArray(ret);
-                        return ret;
+                        Tuple2<String, Integer>[] result = (Tuple2<String, Integer>[])
+                                Array.newInstance(Tuple2.class, accounts.size());
+                        result = accounts.toArray(result);
+                        return result;
                     }
                 });
 
@@ -169,6 +172,38 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                         return keys;
                     }
                 });
+
+        Fun.Tuple2Comparator<Long, Long> comparator = new Fun.Tuple2Comparator<Long, Long>(Fun.COMPARATOR,
+                //UnsignedBytes.lexicographicalComparator()
+                Fun.COMPARATOR);
+
+        // BI-DIrectional INDEX - for blockexplorer
+        NavigableSet<Integer> addressBiIndex = database.createTreeSet("address_txs")
+                .comparator(comparator)
+                .counterEnable()
+                .makeOrGet();
+
+        NavigableSet<Integer> descendingaddressBiIndex = database.createTreeSet("address_txs_descending")
+                .comparator(new ReverseComparator(comparator))
+                .makeOrGet();
+
+        createIndexes(BIDIRECTION_ADDRESS_INDEX, addressBiIndex, descendingaddressBiIndex,
+                new Fun.Function2<Long[],
+                Long, Transaction>() {
+            @Override
+            public Long[] run(Long key, Transaction transaction) {
+                List<Long> accounts = new ArrayList<Long>();
+                for (Account account : transaction.getInvolvedAccounts()) {
+                    accounts.add(Longs.fromByteArray(account.getShortAddressBytes()));
+                }
+
+                Long[] result = (Long[])
+                        Array.newInstance(Long.class, accounts.size());
+                result = accounts.toArray(result);
+                return result;
+            }
+        });
+
     }
 
     @Override
@@ -285,6 +320,45 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
 
         }
+    }
+
+    /**
+     * Нужно для пролистывания по адресу в обоих направлениях - для блокэксплорера
+     * TODO: тут ключ по адресу обрезан до 8-ми байт и возможны совпадения - поидее нужно увеличить длинну
+     * @param address
+     * @param fromSeqNo
+     * @param descending
+     * @return
+     */
+    @Override
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending) {
+        Long addressKey = Longs.fromByteArray(Crypto.getInstance().getShortBytesFromAddress(address));
+
+        if (descending) {
+            IteratorCloseable result =
+                // делаем закрываемый Итератор
+                IteratorCloseableImpl.make(
+                    // только ключи берем из Tuple2
+                    new IndexIterator<>(
+                        // берем индекс с обратным отсчетом
+                        getIndex(BIDIRECTION_ADDRESS_INDEX, descending)
+                            // задаем границы, так как он обратный границы меняем местами
+                            .subSet(Fun.t2(addressKey, fromSeqNo == null || fromSeqNo.equals(0L)? Long.MAX_VALUE : fromSeqNo),
+                                    Fun.t2(addressKey, 0L)).iterator()));
+            return result;
+        }
+
+        IteratorCloseable result =
+                // делаем закрываемый Итератор
+                IteratorCloseableImpl.make(
+                        // только ключи берем из Tuple2
+                        new IndexIterator<>(
+                                getIndex(BIDIRECTION_ADDRESS_INDEX, descending)
+                                    // задаем границы, так как он обратный границы меняем местами
+                                    .subSet(Fun.t2(addressKey, fromSeqNo == null? 0L : fromSeqNo),
+                                            Fun.t2(addressKey, Long.MAX_VALUE)).iterator()));
+
+        return result;
     }
 
 }

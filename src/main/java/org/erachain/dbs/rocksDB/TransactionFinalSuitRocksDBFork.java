@@ -78,4 +78,9 @@ public class TransactionFinalSuitRocksDBFork extends DBMapSuitFork<Long, Transac
         return null;
     }
 
+    @Override
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(String address, Long fromSeqNo, boolean descending) {
+        return null;
+    }
+
 }

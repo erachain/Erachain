@@ -7,6 +7,7 @@ import org.erachain.database.SortableList;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
+import org.mapdb.Serializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,9 @@ import java.util.*;
 public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
+
+    protected final String TAB_NAME;
+    protected final Serializer TAB_SERIALIZER;
 
     public int DESCENDING_SHIFT_INDEX = 10000;
 
@@ -42,10 +46,14 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     protected Map<Integer, Integer> observableData;
 
     public DBTabImpl() {
+        TAB_NAME = null;
+        TAB_SERIALIZER = null;
         databaseSet.addTable(this);
     }
 
     public DBTabImpl(DBASet databaseSet) {
+        TAB_NAME = null;
+        TAB_SERIALIZER = null;
 
         this.databaseSet = databaseSet;
         databaseSet.addTable(this);
@@ -55,11 +63,13 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         }
     }
 
-    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database, boolean sizeEnable) {
+    public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database, boolean sizeEnable, String tabName, Serializer serializer) {
         this.dbsUsed = dbsUsed;
         this.databaseSet = databaseSet;
         this.database = database;
         this.sizeEnable = sizeEnable;
+        TAB_NAME = tabName;
+        TAB_SERIALIZER = serializer;
         databaseSet.addTable(this);
 
         //OPEN MAP
@@ -72,11 +82,15 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
     }
 
     public DBTabImpl(int dbsUsed, DBASet databaseSet, DB database) {
-        this(dbsUsed, databaseSet, database, false);
+        this(dbsUsed, databaseSet, database, false, null, null);
+    }
+
+    public DBTabImpl(DBASet databaseSet, DB database, String tabName, Serializer tabSerializer, boolean sizeEnable) {
+        this(IDB.DBS_MAP_DB, databaseSet, database, sizeEnable, tabName, tabSerializer);
     }
 
     public DBTabImpl(DBASet databaseSet, DB database, boolean sizeEnable) {
-        this(IDB.DBS_MAP_DB, databaseSet, database, sizeEnable);
+        this(IDB.DBS_MAP_DB, databaseSet, database, sizeEnable, null, null);
     }
 
     /**
@@ -91,6 +105,9 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         this.database = databaseSet.database;
         this.sizeEnable = sizeEnable;
         this.parent = parent;
+        TAB_NAME = ((DBTabImpl) parent).TAB_NAME;
+        TAB_SERIALIZER = ((DBTabImpl) parent).TAB_SERIALIZER;
+
         databaseSet.addTable(this);
 
         // OPEN MAP
@@ -112,6 +129,8 @@ public abstract class DBTabImpl<T, U> extends Observable implements DBTab<T, U> 
         this.databaseSet = databaseSet;
         this.database = databaseSet.database;
         this.parent = parent;
+        TAB_NAME = ((DBTabImpl) parent).TAB_NAME;
+        TAB_SERIALIZER = ((DBTabImpl) parent).TAB_SERIALIZER;
         this.sizeEnable = sizeEnable;
         databaseSet.addTable(this);
 

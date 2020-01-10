@@ -202,7 +202,7 @@ public class BlockExplorerTest {
 
         List<Transaction> transactions = new ArrayList<Transaction>();
         for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", type, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", type, 0, 0));
         }
 
         Map<String, Boolean> signatures = new LinkedHashMap<String, Boolean>();
@@ -222,7 +222,7 @@ public class BlockExplorerTest {
 
         transactions = new ArrayList<Transaction>();
         for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", type, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", type, 0, 0));
         }
 
         signatures = new LinkedHashMap<String, Boolean>();
@@ -244,7 +244,7 @@ public class BlockExplorerTest {
 
         transactions = new ArrayList<Transaction>();
         for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", type, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", type, 0, 0));
         }
 
         for (Transaction transaction : transactions) {
@@ -263,7 +263,7 @@ public class BlockExplorerTest {
 
         stopwatchAll = new Stopwatch();
         all.clear();
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 0 , 0));
 
         for (Object transaction : all) {
             LOGGER.error(Base58.encode(((Transaction) transaction).getSignature()));

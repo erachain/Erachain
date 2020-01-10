@@ -312,26 +312,20 @@ public class TradeResource {
         JSONArray arrayHave = new JSONArray();
         for (Order order : haveOrders) {
             JSONObject json = order.toJson();
-            json.put("id", order.getId());
-            json.put("seqNo", Transaction.viewDBRef(order.getId()));
-            json.put("creator", order.getCreator().getAddress());
-            json.put("amount", order.getAmountHaveLeft().toPlainString());
-            json.put("total", order.getAmountWantLeft().toPlainString());
-            json.put("price", order.calcLeftPrice().toPlainString());
+            json.put("pairAmount", order.getAmountHaveLeft().toPlainString());
+            json.put("pairTotal", order.getAmountWantLeft().toPlainString());
+            json.put("pairPrice", order.calcLeftPrice().toPlainString());
             arrayHave.add(json);
         }
         result.put("have", arrayHave);
 
         JSONArray arrayWant = new JSONArray();
         for (Order order : wantOrders) {
-            JSONObject json = new JSONObject();
-            json.put("id", order.getId());
-            json.put("seqNo", Transaction.viewDBRef(order.getId()));
-            json.put("creator", order.getCreator().getAddress());
+            JSONObject json = order.toJson();
             // get REVERSE price and AMOUNT
-            json.put("amount", order.getAmountWantLeft().toPlainString());
-            json.put("total", order.getAmountHaveLeft().toPlainString());
-            json.put("price", order.calcLeftPriceReverse().toPlainString());
+            json.put("pairAmount", order.getAmountWantLeft().toPlainString());
+            json.put("pairTotal", order.getAmountHaveLeft().toPlainString());
+            json.put("pairPrice", order.calcLeftPriceReverse().toPlainString());
             arrayWant.add(json);
         }
         result.put("want", arrayWant);
@@ -550,10 +544,10 @@ public class TradeResource {
     }
 
     @GET
-    @Path("getbyaddress/{creator}/{amountAssetKey}/{priceAssetKey}")
-    public String getByAddressPair(@PathParam("creator") String address,
-                                   @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey,
-                                   @DefaultValue("50") @QueryParam("limit") Integer limit) {
+    @Path("ordersbyaddress/{creator}/{amountAssetKey}/{priceAssetKey}")
+    public static String getOrdersByAddress(@PathParam("creator") String address,
+                                            @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey,
+                                            @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
@@ -594,7 +588,7 @@ public class TradeResource {
         TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
         CreateOrderTransaction createOrder;
 
-        List<Long> keys = finalMap.getTransactionsByAddressAndType(address, Transaction.CREATE_ORDER_TRANSACTION, startOrderID, limit);
+        List<Long> keys = finalMap.getTransactionsByAddressAndType(address, Transaction.CREATE_ORDER_TRANSACTION, startOrderID, limit, 0);
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
         CompletedOrderMap completedOrdersMap = DCSet.getInstance().getCompletedOrderMap();
