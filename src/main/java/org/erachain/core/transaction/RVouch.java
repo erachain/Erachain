@@ -226,12 +226,8 @@ public class RVouch extends Transaction {
 
     }
 
-    //@Override
     @Override
     public int isValid(int asDeal, long flags) {
-
-        if (BlockChain.TEST_DB_TXS_OFF)
-            return VALIDATE_OK;
 
         if (this.vouchHeight < 2) {
             //CHECK HEIGHT - not 0 and NOT GENESIS
@@ -299,7 +295,7 @@ public class RVouch extends Transaction {
                         amount,
                         listNew
                 );
-        this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
+        this.dcSet.getVouchRecordMap().put(recordKey, valueNew);
 
     }
 
@@ -322,7 +318,7 @@ public class RVouch extends Transaction {
                         value.a.subtract(this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, this.dcSet)),
                         listNew
                 );
-        this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
+        this.dcSet.getVouchRecordMap().put(recordKey, valueNew);
 
     }
 

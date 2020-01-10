@@ -50,7 +50,7 @@ public class TestRecGenesisPerson2 {
     private void initIssue(boolean toProcess) {
 
         //CREATE EMPTY MEMORY DATABASE
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         dbPA = db.getPersonAddressMap();
         dbAP = db.getAddressPersonMap();
         dbPS = db.getPersonStatusMap();

@@ -299,7 +299,7 @@ public class APIUtils {
         // SEND ASSET PAYMENT
         Transaction transaction = Controller.getInstance().r_Send(account, feePow, new Account(recipient),
                 asset.getKey(DCSet.getInstance()), bdAmount, title,
-                message, isText, isEncrypted);
+                message, isText, isEncrypted, 0);
         
         boolean confirmed = true;
         if (Gui.isGuiStarted()) {

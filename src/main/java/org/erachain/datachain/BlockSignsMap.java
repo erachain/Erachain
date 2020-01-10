@@ -5,8 +5,6 @@ import org.erachain.core.block.Block;
 import org.mapdb.DB;
 import org.mapdb.SerializerBase;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -16,45 +14,54 @@ import java.util.TreeMap;
  * ключ: подпись блока<br>
  * занчение: номер блока (высота, height)<br>
  */
-public class BlockSignsMap extends DCMap<Long, Integer> {
+public class BlockSignsMap extends DCUMap<Long, Integer> {
+
+    static final boolean SIZE_ENABLE = true;
 
     public BlockSignsMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
-
+        super(databaseSet, database, SIZE_ENABLE);
     }
 
     public BlockSignsMap(BlockSignsMap parent, DCSet dcSet) {
-        super(parent, dcSet);
+        super(parent, dcSet, SIZE_ENABLE);
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Long, Integer> getMap(DB database) {
+    public void openMap() {
+
+        sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу
+
         //OPEN HASH MAP
         //
-        return database.createHashMap("height")
+        map = database.createHashMap("height")
                 .keySerializer(SerializerBase.LONG)
                 .valueSerializer(SerializerBase.INTEGER)
 
                 // .comparator(UnsignedBytes.lexicographicalComparator()) // for byte[] KEYS
                 // or from MapDB .comparator(Fun.BYTE_ARRAY_COMPARATOR)
 
-                .counterEnable() // used in datachain.DCSet.DCSet(org.mapdb.DB, boolean, boolean, boolean)
+                .counterEnable() // used for count blocks in Chain
                 .makeOrGet();
     }
 
-    @Override
-    protected Map<Long, Integer> getMemoryMap() {
+    protected void getMemoryMap() {
         //return new TreeMap<long[], Integer>(UnsignedBytes.lexicographicalComparator()); // for byte[] KEYS
-        return new TreeMap<Long, Integer>();
+        map = new TreeMap<Long, Integer>();
     }
 
-    @Override
-    protected Integer getDefaultValue() {
-        return null;
+    public Block getBlock(byte[] signature) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        Integer value = this.get(key);
+        if (value == null)
+            return null;
+
+        return ((DCSet)this.databaseSet).getBlockMap().getAndProcess(value);
+
     }
 
     public boolean contains(byte[] signature) {
@@ -76,27 +83,29 @@ public class BlockSignsMap extends DCMap<Long, Integer> {
         return this.get(key);
     }
 
+    public Integer remove(byte[] signature) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        return this.remove(key);
+    }
+
     public void delete(byte[] signature) {
         Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
                 signature[4], signature[5], signature[6], signature[7]);
         this.delete(key);
     }
 
-    public Block getBlock(byte[] signature) {
-        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
-                signature[4], signature[5], signature[6], signature[7]);
-        Integer value = this.get(key);
-        if (value == null)
-            return null;
-
-        return ((DCSet)this.databaseSet).getBlockMap().get(value);
-
-    }
-
     public boolean set(byte[] signature, Integer height) {
         Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
                 signature[4], signature[5], signature[6], signature[7]);
         return this.set(key, height);
+
+    }
+
+    public void put(byte[] signature, Integer height) {
+        Long key = Longs.fromBytes(signature[0], signature[1], signature[2], signature[3],
+                signature[4], signature[5], signature[6], signature[7]);
+        this.put(key, height);
 
     }
 

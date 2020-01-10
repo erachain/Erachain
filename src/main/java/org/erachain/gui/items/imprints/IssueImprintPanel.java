@@ -34,7 +34,7 @@ public class IssueImprintPanel extends JPanel {
     private JTextField txtCreditor;
     private JTextField txtAmount;
     private JButton issueButton;
-    private IssueImprintPanel th;
+    //private IssueImprintPanel th;
     private JTextArea txtDescription;
 
     public IssueImprintPanel() {
@@ -50,7 +50,7 @@ public class IssueImprintPanel extends JPanel {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon64.png"));
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
 //		this.setIconImages(icons);
-        th = this;
+        //th = this;
         //LAYOUT
         this.setLayout(new GridBagLayout());
 
@@ -334,8 +334,8 @@ public class IssueImprintPanel extends JPanel {
             //	int s = JOptionPane.showConfirmDialog(MainFrame.getInstance(), text, Lang.getInstance().translate("Issue Asset"),  JOptionPane.YES_NO_OPTION);
 
             IssueConfirmDialog dd = new IssueConfirmDialog(MainFrame.getInstance(), true, result,
-                    text, (int) (th.getWidth() / 1.2), (int) (th.getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
-            dd.setLocationRelativeTo(th);
+                    text, (int) (getWidth() / 1.2), (int) (getHeight() / 1.2), Status_text, Lang.getInstance().translate("Confirmation Transaction"));
+            dd.setLocationRelativeTo(this);
             dd.setVisible(true);
 
             //	JOptionPane.OK_OPTION

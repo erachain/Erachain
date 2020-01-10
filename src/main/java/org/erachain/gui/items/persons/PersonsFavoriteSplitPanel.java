@@ -23,13 +23,11 @@ import java.net.URL;
 
 public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private PersonsFavoriteSplitPanel th;
+    //private PersonsFavoriteSplitPanel th;
 
     public PersonsFavoriteSplitPanel() {
         super(new FavoritePersonsTableModel(), "PersonsFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
-
-        th = this;
 
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
@@ -37,7 +35,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, (PersonCls) th.itemTableSelected, null));
+                        null, null, (PersonCls) itemTableSelected, null));
 
             }
         });
@@ -47,7 +45,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) th.itemTableSelected));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) itemTableSelected));
             }
         });
 
@@ -62,7 +60,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 @SuppressWarnings("unused")
-                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) th.itemTableSelected);
+                PersonSetStatusDialog fm = new PersonSetStatusDialog((PersonCls) itemTableSelected);
 
             }
         });
@@ -75,7 +73,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
 
                 @SuppressWarnings("unused")
-                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) th.itemTableSelected, th.itemTableSelected.getOwner());
+                PersonConfirmDialog fm = new PersonConfirmDialog((PersonCls) itemTableSelected, itemTableSelected.getOwner());
 
             }
         });
@@ -86,7 +84,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                PersonCls per = (PersonCls) th.itemTableSelected;
+                PersonCls per = (PersonCls) itemTableSelected;
                 byte[] ref = per.getReference();
                 Transaction transaction = Transaction.findByDBRef(DCSet.getInstance(), ref);
                 int blockNo = transaction.getBlockHeight();
@@ -108,7 +106,7 @@ public class PersonsFavoriteSplitPanel extends ItemSplitPanel {
                 try {
                     URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
                             + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
-                            + "?person=" + th.itemTableSelected.getKey()));
+                            + "?person=" + itemTableSelected.getKey()));
                 } catch (MalformedURLException e1) {
                     logger.error(e1.getMessage(), e1);
                 }

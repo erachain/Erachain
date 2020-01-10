@@ -97,7 +97,7 @@ public class SendTableModel extends JTable implements Observer {
         }
 
         for (Account account : Controller.getInstance().getAccounts()) {
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SEND_ASSET_TRANSACTION, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
         }
 
         for (Transaction messagetx : transactions) {
@@ -586,7 +586,7 @@ public class SendTableModel extends JTable implements Observer {
 
         public int getConfirmations() {
 
-            if (DCSet.getInstance().getTransactionMap().contains(this.signature)) {
+            if (DCSet.getInstance().getTransactionTab().contains(this.signature)) {
                 return 0;
             } else {
                 Transaction tx = Controller.getInstance().getTransaction(this.signature);

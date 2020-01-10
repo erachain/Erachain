@@ -95,7 +95,7 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
             asset_Key = asset.getKey();
         }
 
-        List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(this.account.getAddress(), 1000, true);
+        List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(this.account.getShortAddressBytes(), 1000, true);
 
 
         this.transactions_Asset.clear();

@@ -2,20 +2,20 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
-import org.erachain.database.DBMap;
 import org.erachain.database.serializer.BlockHeadSerializer;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DCUMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
-import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
+import java.io.IOException;
 import java.util.*;
 
 /*
@@ -27,7 +27,7 @@ import java.util.*;
  * maker
  */
 
-public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead> {
+public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
     // нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
     public static final int TIMESTAMP_INDEX = 1;
     public static final int GENERATOR_INDEX = 2;
@@ -52,104 +52,110 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
         DEFAULT_INDEX = TIMESTAMP_INDEX;
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_LIST_BLOCK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_BLOCK_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_BLOCK_TYPE);
         }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
 
         //TIMESTAMP INDEX
-        NavigableSet<Tuple2<Long, Tuple2<String, String>>> timestampIndex = database.createTreeSet("blocks_index_timestamp")
+        NavigableSet<Integer> timestampIndex = database.createTreeSet("blocks_index_timestamp")
                 .comparator(Fun.COMPARATOR)
                 .counterEnable()
                 .makeOrGet();
 
-        NavigableSet<Tuple2<Long, Tuple2<String, String>>> descendingTimestampIndex = database.createTreeSet("blocks_index_timestamp_descending")
+        NavigableSet<Integer> descendingTimestampIndex = database.createTreeSet("blocks_index_timestamp_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Integer, Tuple2<String, String>,
+        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Integer, Integer,
                 Block.BlockHead>() {
             @Override
-            public Integer run(Tuple2<String, String> key, Block.BlockHead value) {
+            public Integer run(Integer key, Block.BlockHead value) {
                 return value.heightBlock;
             }
         });
 
+        // TODO это все лишние индексы, только в РПС используются для статистики
+        /* это все не используемые индексы которые нафиг не нужны в кошельке - чисто для статистики
+        удалить бы их - чтобы не тормозили лишний раз
+        */
+
         //GENERATOR INDEX
-        NavigableSet<Tuple2<String, Tuple2<String, String>>> generatorIndex = database.createTreeSet("blocks_index_generator")
+        NavigableSet<String> generatorIndex = database.createTreeSet("blocks_index_generator")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<String, Tuple2<String, String>>> descendingGeneratorIndex = database.createTreeSet("blocks_index_generator_descending")
+        NavigableSet<String> descendingGeneratorIndex = database.createTreeSet("blocks_index_generator_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(GENERATOR_INDEX, generatorIndex, descendingGeneratorIndex, new Fun.Function2<String, Tuple2<String, String>, Block.BlockHead>() {
+        createIndex(GENERATOR_INDEX, generatorIndex, descendingGeneratorIndex, new Fun.Function2<String, Integer, Block.BlockHead>() {
             @Override
-            public String run(Tuple2<String, String> key, Block.BlockHead value) {
-                return key.a;
+            public String run(Integer key, Block.BlockHead value) {
+                return value.creator.getAddress();
             }
         });
 
         //BALANCE INDEX
-        NavigableSet<Tuple2<Integer, Tuple2<String, String>>> balanceIndex = database.createTreeSet("blocks_index_balance")
+        NavigableSet<Integer> balanceIndex = database.createTreeSet("blocks_index_balance")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<Integer, Tuple2<String, String>>> descendingBalanceIndex = database.createTreeSet("blocks_index_balance_descending")
+        NavigableSet<Integer> descendingBalanceIndex = database.createTreeSet("blocks_index_balance_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Tuple2<String, String>, Block.BlockHead>() {
+        createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
             @Override
-            public Integer run(Tuple2<String, String> key, Block.BlockHead value) {
+            public Integer run(Integer key, Block.BlockHead value) {
                 return value.forgingValue;
             }
         });
 
         //TRANSACTIONS INDEX
-        NavigableSet<Tuple2<Integer, Tuple2<String, String>>> transactionsIndex = database.createTreeSet("blocks_index_transactions")
+        NavigableSet<Integer> transactionsIndex = database.createTreeSet("blocks_index_transactions")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<Integer, Tuple2<String, String>>> descendingTransactionsIndex = database.createTreeSet("blocks_index_transactions_descending")
+        NavigableSet<Integer> descendingTransactionsIndex = database.createTreeSet("blocks_index_transactions_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(TRANSACTIONS_INDEX, transactionsIndex, descendingTransactionsIndex, new Fun.Function2<Integer, Tuple2<String, String>, Block.BlockHead>() {
+        createIndex(TRANSACTIONS_INDEX, transactionsIndex, descendingTransactionsIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
             @Override
-            public Integer run(Tuple2<String, String> key, Block.BlockHead value) {
+            public Integer run(Integer key, Block.BlockHead value) {
                 return value.transactionsCount;
             }
         });
 
         //FEE INDEX
-        NavigableSet<Tuple2<BigDecimal, Tuple2<String, String>>> feeIndex = database.createTreeSet("blocks_index_fee")
+        NavigableSet<Long> feeIndex = database.createTreeSet("blocks_index_fee")
                 .comparator(Fun.COMPARATOR)
                 .makeOrGet();
 
-        NavigableSet<Tuple2<BigDecimal, Tuple2<String, String>>> descendingFeeIndex = database.createTreeSet("blocks_index_fee_descending")
+        NavigableSet<Long> descendingFeeIndex = database.createTreeSet("blocks_index_fee_descending")
                 .comparator(new ReverseComparator(Fun.COMPARATOR))
                 .makeOrGet();
 
-        createIndex(FEE_INDEX, feeIndex, descendingFeeIndex, new Fun.Function2<Long, Tuple2<String, String>, Block.BlockHead>() {
+        createIndex(FEE_INDEX, feeIndex, descendingFeeIndex, new Fun.Function2<Long, Integer, Block.BlockHead>() {
             @Override
-            public Long run(Tuple2<String, String> key, Block.BlockHead value) {
+            public Long run(Integer key, Block.BlockHead value) {
                 return value.totalFee;
             }
         });
+
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Block.BlockHead> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("blocks")
-                .keySerializer(BTreeKeySerializer.TUPLE2) /// ТУТ тоже переделать на стандартный серилиазотор
+        map = database.createTreeMap("blocks")
+                ///.keySerializer(BTreeKeySerializer.) /// ТУТ тоже переделать на стандартный серилиазотор
                 .valueSerializer(new BlockHeadSerializer())
                 .valuesOutsideNodesEnable()
                 .counterEnable()
@@ -157,33 +163,30 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Block.BlockHead> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, Block.BlockHead>(Fun.TUPLE2_COMPARATOR);
-    }
-
-    @Override
-    protected Block.BlockHead getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        map = new TreeMap<>();
     }
 
     public Block.BlockHead getLast() {
 
-        List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<Pair<Account, Block.BlockHead>>();
+        try (IteratorCloseable<Integer> iterator = this.getIterator(TIMESTAMP_INDEX, true)) {
+            if (!iterator.hasNext())
+                return null;
 
-        Iterator<Tuple2<String, String>> iterator = this.getIterator(TIMESTAMP_INDEX, true);
-        if (!iterator.hasNext())
+            return this.get(iterator.next());
+        } catch (IOException e) {
+            e.printStackTrace();
             return null;
-
-        return this.get(iterator.next());
+        }
     }
 
     // TODO - SORT by HEIGHT !!!
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Block.BlockHead> get(Account account, int limit) {
-        List<Block.BlockHead> blocks = new ArrayList<Block.BlockHead>();
+        List<Block.BlockHead> blocks = new ArrayList<>();
 
         try {
-            Map<Tuple2<String, String>, Block.BlockHead> accountBlocks = ((BTreeMap) this.map).subMap(
+            Map<Integer, Block.BlockHead> accountBlocks = ((BTreeMap) this.map).subMap(
                     Fun.t2(account.getAddress(), null),
                     Fun.t2(account.getAddress(), Fun.HI()));
 
@@ -204,7 +207,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     public List<Pair<Account, Block.BlockHead>> get(List<Account> accounts, int limit) {
-        List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<Pair<Account, Block.BlockHead>>();
+        List<Pair<Account, Block.BlockHead>> blocks = new ArrayList<>();
 
         try {
             //FOR EACH ACCOUNTS
@@ -226,18 +229,18 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void delete(Account account) {
         //GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
-        Map<Tuple2<String, String>, Block> accountBlocks = ((BTreeMap) this.map).subMap(
+        Map<Integer, Block> accountBlocks = ((BTreeMap) this.map).subMap(
                 Fun.t2(account.getAddress(), null),
                 Fun.t2(account.getAddress(), Fun.HI()));
 
         //DELETE TRANSACTIONS
-        for (Tuple2<String, String> key : accountBlocks.keySet()) {
+        for (Integer key : accountBlocks.keySet()) {
             delete(key);
         }
     }
 
     public void delete(Block.BlockHead block) {
-        delete(new Tuple2<String, String>(block.creator.getAddress(), new String(block.signature)));
+        delete(block.heightBlock);
     }
 
     public void deleteAll(List<Account> accounts) {
@@ -247,9 +250,7 @@ public class BlocksHeadMap extends DBMap<Tuple2<String, String>, Block.BlockHead
     }
 
     public boolean add(Block.BlockHead block) {
-        boolean result = this.set(new Tuple2<String, String>(block.creator.getAddress(),
-                new String(block.signature)), block);
-        return result;
+        return this.set(block.heightBlock, block);
     }
 
     public void addAll(Map<Account, List<Block.BlockHead>> blocks) {

@@ -228,7 +228,7 @@ public class StatementsTableModelMy extends AbstractTableModel implements Observ
         }
 
         for (Account account : Controller.getInstance().getAccounts()) {
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION, 0));//.SEND_ASSET_TRANSACTION, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SIGN_NOTE_TRANSACTION, 0, 0));//.SEND_ASSET_TRANSACTION, 0));
         }
 
         HashSet<Transaction> col = new HashSet<Transaction>(transactions);

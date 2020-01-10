@@ -5,7 +5,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.json.simple.JSONObject;

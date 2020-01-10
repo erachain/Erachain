@@ -11,14 +11,14 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetVenture;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.settings.Settings;
+import org.erachain.utils.Pair;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-import org.erachain.settings.Settings;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -50,7 +50,7 @@ public class BlockExplorerTest {
                 .make();
 
         //CREATE INSTANCE
-        return new DCSet(dbFile, database, false, false, false);
+        return new DCSet(dbFile, database, false, false, false, 0);
     }
 
     public void maxBalance() {
@@ -138,7 +138,7 @@ public class BlockExplorerTest {
             List<String> listaddr = new ArrayList<>();
             listaddr.add(addr);
 
-            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr.get(0), 1, true);
+            Map<Object, Map> output = BlockExplorer.getInstance().jsonQueryAddress(listaddr.get(0), 1, null);
 
             Map<Long, String> totalBalance = (Map<Long, String>) output.get("balance").get("total");
 
@@ -202,7 +202,7 @@ public class BlockExplorerTest {
 
         List<Transaction> transactions = new ArrayList<Transaction>();
         for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", type, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QPVknSmwDryB98Hh8xB7E6U75dGFYwNkJ4", type, 0, 0));
         }
 
         Map<String, Boolean> signatures = new LinkedHashMap<String, Boolean>();
@@ -222,7 +222,7 @@ public class BlockExplorerTest {
 
         transactions = new ArrayList<Transaction>();
         for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", type, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QYsLsfwMRBPnunmuWmFkM4hvGsfooY8ssU", type, 0, 0));
         }
 
         signatures = new LinkedHashMap<String, Boolean>();
@@ -244,7 +244,7 @@ public class BlockExplorerTest {
 
         transactions = new ArrayList<Transaction>();
         for (int type = 1; type <= 23; type++) {  // 17 - The number of transaction types. 23 - for the future
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", type, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", type, 0, 0));
         }
 
         for (Transaction transaction : transactions) {
@@ -263,7 +263,7 @@ public class BlockExplorerTest {
 
         stopwatchAll = new Stopwatch();
         all.clear();
-        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsBySender("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ"));
+        all.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByCreator("QRZ5Ggk6o5wwEgzL4Wo3xmueXuDEgwLeyQ", 0 , 0));
 
         for (Object transaction : all) {
             LOGGER.error(Base58.encode(((Transaction) transaction).getSignature()));
@@ -310,7 +310,7 @@ public class BlockExplorerTest {
 
 
         // CHECK IF IN TRANSACTION DATABASE
-        return DCSet.getInstance().getTransactionMap().get(signature);
+        return DCSet.getInstance().getTransactionTab().get(signature);
     }
 
     public class BalancesBlocksComparator implements Comparator<Pair<Block, BigDecimal>> {

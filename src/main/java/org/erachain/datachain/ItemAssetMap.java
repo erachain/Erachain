@@ -5,11 +5,8 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
-import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-
-import java.util.Map;
 
 //import database.serializer.AssetSerializer;
 
@@ -20,30 +17,14 @@ import java.util.Map;
  */
 public class ItemAssetMap extends ItemMap {
 
-    // private Atomic.Long atomicKey;
-    // private long key;
-    static final String NAME = "item_assets";
-    static final int TYPE = ItemCls.ASSET_TYPE;
-
     public ItemAssetMap(DCSet databaseSet, DB database) {
         super(databaseSet, database,
-                // TYPE,
-                NAME, ObserverMessage.RESET_ASSET_TYPE, ObserverMessage.ADD_ASSET_TYPE,
+                ItemCls.ASSET_TYPE, ObserverMessage.RESET_ASSET_TYPE, ObserverMessage.ADD_ASSET_TYPE,
                 ObserverMessage.REMOVE_ASSET_TYPE, ObserverMessage.LIST_ASSET_TYPE);
     }
 
     public ItemAssetMap(ItemAssetMap parent, DCSet dcSet) {
         super(parent, dcSet);
-    }
-
-    // type+name not initialized yet! - it call as Super in New
-    protected Map<Long, ItemCls> getMap(DB database) {
-
-        // OPEN MAP
-        return database.createTreeMap(NAME).valueSerializer(new ItemSerializer(TYPE))
-                // .valueSerializer(new AssetSerializer())
-                // key instead size - .counterEnable()
-                .makeOrGet();
     }
 
     public boolean contains(Long key) {

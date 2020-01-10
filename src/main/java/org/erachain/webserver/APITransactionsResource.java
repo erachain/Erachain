@@ -214,9 +214,9 @@ public class APITransactionsResource {
                     .entity(ff.toJSONString()).build();
         }
 
-        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address, 1000, true);
+        result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true);
         if (unconfirmed)
-            result.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address));
+            result.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
         JSONArray array = new JSONArray();
         for (Transaction transaction : result) {
@@ -258,9 +258,9 @@ public class APITransactionsResource {
             limit = 20;
         List<Transaction> transs = new ArrayList<Transaction>();
 
-        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address, 1000, true);
+        List<Transaction> trans = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true);
         if (unconfirmed)
-            trans.addAll(DCSet.getInstance().getTransactionMap().getTransactionsByAddressFast100(address));
+            trans.addAll(DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address));
 
         Collections.sort(trans, new TransactionTimestampComparator().reversed());
         for (Transaction tr : trans) {
@@ -305,11 +305,11 @@ public class APITransactionsResource {
         Integer type;
         try {
             type = Integer.valueOf(type1);
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address, type, 1000);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(Account.makeShortBytes(address), type, 1000, 0);
 
         } catch (NumberFormatException e) {
             // TODO Auto-generated catch block
-            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(address, 1000, true);
+            result = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), 1000, true);
             // e.printStackTrace();
         }
 
@@ -379,7 +379,7 @@ public class APITransactionsResource {
         JSONArray array = new JSONArray();
         DCSet dcSet = DCSet.getInstance();
 
-        List<Transaction> transaction = dcSet.getTransactionMap().getIncomedTransactions(address, type,
+        List<Transaction> transaction = dcSet.getTransactionTab().getIncomedTransactions(address, type,
                 timestamp, count, descending);
 
         for (Transaction record : transaction) {
@@ -395,7 +395,7 @@ public class APITransactionsResource {
     public Response getByBlock(@QueryParam("block") int blockNo) {
         JSONObject ff = new JSONObject();
 
-        Block block = DCSet.getInstance().getBlockMap().get(blockNo);
+        Block block = DCSet.getInstance().getBlockMap().getAndProcess(blockNo);
         if (block == null) {
             ff.put("error", "block not found");
             return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
@@ -445,7 +445,7 @@ public class APITransactionsResource {
         }
 
         if (unconfirmed) {
-            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionMap().findTransactions(address, sender,
+            List<Transaction> resultUnconfirmed = DCSet.getInstance().getTransactionTab().findTransactions(address, sender,
                     recipient, type, desc, 0, limit, 0);
             for (Transaction trans : resultUnconfirmed) {
                 array.add(trans.toJson());

@@ -55,7 +55,7 @@ public class BalanceFromAssets extends AbstractTableModel implements Observer {
             balances = Controller.getInstance().getBalances(account); //.getBalances(key);
             for (int ib = 0; this.balances.size() > ib; ib++) {
                 Pair item = this.balances.get(ib);
-                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey((byte[])item.getA());
+                long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey((byte[]) item.getA());
                 Tuple5 balance = (Tuple5)item.getB();
                 if (BlockChain.ERA_COMPU_ALL_UP) {
                     balance = account.balanceAddDEVAmount(assetKey, balance);

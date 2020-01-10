@@ -1,7 +1,8 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
@@ -9,7 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-import java.util.*;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public abstract class TimerTableModelCls<U> extends AbstractTableModel implements Observer {
@@ -37,7 +40,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected int step = 50;
     protected long size = 0;
 
-    protected DBMap map;
+    protected DBTabImpl map;
     protected Logger logger;
 
     public TimerTableModelCls(String[] columnNames, boolean descending) {
@@ -46,7 +49,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, boolean descending) {
+    public TimerTableModelCls(DBTabImpl map, String[] columnNames, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -60,7 +63,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+    public TimerTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -68,7 +71,7 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
+    public TimerTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
         logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
@@ -137,11 +140,12 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         ObserverMessage message = (ObserverMessage) arg;
 
         if (message.getType() == ADD_EVENT
-                        || message.getType() == DELETE_EVENT) {
+                || message.getType() == DELETE_EVENT) {
             needUpdate = true;
         } else if (message.getType() == LIST_EVENT
-                    || message.getType() == RESET_EVENT
-                    || message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+                || message.getType() == RESET_EVENT) {
+            needUpdate = true;
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
             needUpdate = false;
             getInterval();
             this.fireTableDataChanged();
@@ -149,14 +153,14 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     //public abstract void getIntervalThis(int startBack, int endBack);
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
     }
 
     public int getMapDefaultIndex() {
         if (map == null)
             return 0;
 
-        return map.DEFAULT_INDEX;
+        return map.getDefaultIndex();
     }
 
     public long getMapSize() {
@@ -175,9 +179,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
         if (descending) {
             long startBack = -getMapSize() + start;
-            getIntervalThis(startBack, startBack + step);
+            getIntervalThis(startBack, step);
         } else {
-            getIntervalThis(start, start + step);
+             getIntervalThis(start, step);
         }
 
     }
@@ -193,10 +197,10 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
         if (map != null) {
 
-            RESET_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_RESET);
-            LIST_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_LIST);
-            ADD_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_ADD);
-            DELETE_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+            RESET_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_RESET);
+            LIST_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_LIST);
+            ADD_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_ADD);
+            DELETE_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_REMOVE);
 
             map.addObserver(this);
         }

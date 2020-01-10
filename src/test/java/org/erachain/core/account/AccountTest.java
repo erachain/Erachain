@@ -1,5 +1,6 @@
 package org.erachain.core.account;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.transaction.GenesisTransferAssetTransaction;
 import org.erachain.core.transaction.Transaction;
@@ -10,7 +11,7 @@ import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class AccountTest {
 
@@ -19,7 +20,7 @@ public class AccountTest {
     Account account;
 
     void init() {
-        db = DCSet.createEmptyHardDatabaseSet();
+        db = DCSet.createEmptyHardDatabaseSet(0);
         gb = new GenesisBlock();
 
         try {
@@ -37,8 +38,13 @@ public class AccountTest {
 
         account = ((GenesisTransferAssetTransaction)gb.getTransactions().get(100)).getRecipient();
         long[] time = account.getLastTimestamp(db);
-        Fun.Tuple2<Integer, Integer> point = account.getLastForgingData(db);
+
+        // MAKE COPY hoe hasCode() check
+        Account newAccount = new Account(account.getAddress());
+        Fun.Tuple2<Integer, Integer> point = newAccount.getLastForgingData(db);
         assertEquals(point != null, true);
+        long[] reference = newAccount.getLastTimestamp(db);
+        assertEquals(reference != null, true);
     }
 
     @Test
@@ -62,13 +68,14 @@ public class AccountTest {
         assertEquals(((BigDecimal)balance2.a).intValue(), 323980);
         assertEquals(((BigDecimal)balance2.b).intValue(), 331417);
 
-        ItemAssetBalanceMap map = db.getAssetBalanceAccountingMap();
-        map.reset();
+        ItemAssetBalanceMap map = db.getAssetBalanceMap();
+        map.clear();
 
         Fun.Tuple2 balance3 = account.getBalance(db, Transaction.RIGHTS_KEY, 1);
 
         assertEquals(((BigDecimal)balance3.a).intValue(), 0);
-        assertEquals(((BigDecimal)balance3.b).intValue(), 0);
+        assertEquals(((BigDecimal) balance3.b).intValue(), BlockChain.ERA_COMPU_ALL_UP ?
+                account.addDEVAmount(Transaction.RIGHTS_KEY).intValue() : 0);
 
     }
 }

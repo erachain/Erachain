@@ -6,8 +6,6 @@ import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.core.block.Block;
 import org.erachain.core.block.BlockFactory;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
 
 import java.util.Arrays;
 

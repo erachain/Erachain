@@ -44,7 +44,7 @@ public class NameStorageTest {
     public void setup() {
         //Ed25519.load();
 
-        databaseSet = DCSet.createEmptyDatabaseSet();
+        databaseSet = DCSet.createEmptyDatabaseSet(0);
 
         // CREATE KNOWN ACCOUNT
         byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -401,7 +401,7 @@ public class NameStorageTest {
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction);
 
         assertEquals(
                 "first",
@@ -421,7 +421,7 @@ public class NameStorageTest {
 
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction2);
 
         assertEquals(
                 "first second",
@@ -464,7 +464,7 @@ public class NameStorageTest {
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction);
 
         // After first tx
         // Profenable:yes
@@ -485,7 +485,7 @@ public class NameStorageTest {
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction2);
 
         // After second tx
         // Profenable:yes
@@ -506,7 +506,7 @@ public class NameStorageTest {
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction3);
 
         // After second tx
         // Profenable:yes
@@ -570,7 +570,7 @@ public class NameStorageTest {
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction);
 
         // After first tx
         // Profenable:yes
@@ -591,7 +591,7 @@ public class NameStorageTest {
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction2);
 
         // After second tx
         // Profenable:yes
@@ -612,7 +612,7 @@ public class NameStorageTest {
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction3);
 
         // After third tx
         // Profenable:yes
@@ -693,7 +693,7 @@ public class NameStorageTest {
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction);
 
         // After first tx
         // Profenable:yes
@@ -714,7 +714,7 @@ public class NameStorageTest {
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction2);
 
         // After second tx
         // Profenable:yes
@@ -735,7 +735,7 @@ public class NameStorageTest {
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction3);
 
         // After third tx
         // Profenable:yes

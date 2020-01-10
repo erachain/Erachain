@@ -1,11 +1,8 @@
 package org.erachain.datachain;
 
 import org.erachain.core.item.ItemCls;
-import org.erachain.database.serializer.ItemSerializer;
-import org.mapdb.DB;
 import org.erachain.utils.ObserverMessage;
-
-import java.util.Map;
+import org.mapdb.DB;
 
 /**
  * Хранение активов.<br>
@@ -14,14 +11,9 @@ import java.util.Map;
  */
 public class ItemUnionMap extends ItemMap {
 
-    static final String NAME = "item_unions";
-    static final int TYPE = ItemCls.UNION_TYPE;
-
     public ItemUnionMap(DCSet databaseSet, DB database) {
         super(databaseSet, database,
-                //TYPE,
-                NAME,
-                ObserverMessage.RESET_UNION_TYPE,
+                ItemCls.UNION_TYPE, ObserverMessage.RESET_UNION_TYPE,
                 ObserverMessage.ADD_UNION_TYPE,
                 ObserverMessage.REMOVE_UNION_TYPE,
                 ObserverMessage.LIST_UNION_TYPE
@@ -31,16 +23,6 @@ public class ItemUnionMap extends ItemMap {
 
     public ItemUnionMap(ItemUnionMap parent, DCSet dcSet) {
         super(parent, dcSet);
-    }
-
-    // type+name not initialized yet! - it call as Super in New
-    protected Map<Long, ItemCls> getMap(DB database) {
-
-        //OPEN MAP
-        return database.createTreeMap(NAME)
-                .valueSerializer(new ItemSerializer(TYPE))
-                //.valueSerializer(new AssetSerializer())
-                .makeOrGet();
     }
 
 }

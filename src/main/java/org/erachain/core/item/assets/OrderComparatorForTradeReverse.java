@@ -1,12 +1,6 @@
 package org.erachain.core.item.assets;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Comparator;
-
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple5;
 
 /**
  * Sorts Orders by price and TIMESTAMP for resolve exchange
@@ -18,7 +12,7 @@ public class OrderComparatorForTradeReverse implements Comparator<Order> {
     @Override
     public int compare(Order order1, Order order2) {
 
-        int compare = order1.getPrice().compareTo(order2.getPrice());
+        int compare = order1.calcLeftPrice().compareTo(order2.calcLeftPrice());
         if (compare != 0)
             return -compare;
 

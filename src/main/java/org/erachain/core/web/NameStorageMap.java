@@ -1,41 +1,36 @@
 package org.erachain.core.web;
 
-import org.erachain.datachain.DCMap;
-import org.erachain.datachain.DCSet;
 import org.apache.commons.lang3.StringUtils;
+import org.erachain.datachain.DCSet;
+import org.erachain.datachain.DCUMap;
 import org.mapdb.DB;
 import org.mapdb.DB.BTreeMapMaker;
 
 import java.util.*;
 
-public class NameStorageMap extends DCMap<String, Map<String, String>> {
+public class NameStorageMap extends DCUMap<String, Map<String, String>> {
 
     public NameStorageMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
 
-    public NameStorageMap(DCMap<String, Map<String, String>> parent) {
+    public NameStorageMap(DCUMap<String, Map<String, String>> parent) {
         super(parent, null);
     }
 
     @Override
-    protected Map<String, Map<String, String>> getMap(DB database) {
+    public void openMap() {
         // OPEN MAP
         BTreeMapMaker createTreeMap = database.createTreeMap("NameStorageMap");
-        return createTreeMap.makeOrGet();
+        map = createTreeMap.makeOrGet();
     }
 
     @Override
-    protected Map<String, Map<String, String>> getMemoryMap() {
-        return new HashMap<String, Map<String, String>>();
+    protected void getMemoryMap() {
+        map = new HashMap<String, Map<String, String>>();
     }
 
-    @Override
-    protected Map<String, String> getDefaultValue() {
-        return null;
-    }
-
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     public void add(String name, String key, String value) {
@@ -46,7 +41,7 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
 
         keyValueMap.put(key, value);
 
-        this.set(name, keyValueMap);
+        this.put(name, keyValueMap);
     }
 
     public void addListEntries(String name, String key,
@@ -72,7 +67,7 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
 
         keyValueMap.put(key, joinedResults);
 
-        this.set(name, keyValueMap);
+        this.put(name, keyValueMap);
     }
 
     public void removeListEntries(String name, String key,
@@ -101,7 +96,7 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
         }
 
 
-        this.set(name, keyValueMap);
+        this.put(name, keyValueMap);
     }
 
     public void remove(String name, String key) {
@@ -109,7 +104,7 @@ public class NameStorageMap extends DCMap<String, Map<String, String>> {
         if (keyValueMap != null) {
             keyValueMap.remove(key);
         }
-        this.set(name, keyValueMap);
+        this.put(name, keyValueMap);
     }
 
     public String getOpt(String name, String key) {

@@ -15,7 +15,6 @@ import org.mapdb.Fun.Tuple5;
 
 import java.math.BigDecimal;
 import java.util.Observable;
-import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class AccountsNameTableModel extends SortedListTableModelCls<String, Tuple2<String, String>> implements ObserverWaiter {
@@ -141,7 +140,7 @@ public class AccountsNameTableModel extends SortedListTableModelCls<String, Tupl
 
     @Override
     public void getInterval() {
-        this.listSorted = new SortableList<String, Tuple2<String, String>>(map, map.getKeys());
+        this.listSorted = new SortableList<String, Tuple2<String, String>>(map, map.keySet());
         this.listSorted.sort();
     }
 

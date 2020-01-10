@@ -1,25 +1,21 @@
 package org.erachain.gui.items.accounts;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
-import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 ////////
 
@@ -133,11 +129,12 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
         if (this.sender == null || this.asset == null)
             return;
 
+        /// WALLET addesses
         Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
 
         list = new ArrayList<>();
@@ -242,7 +239,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             trr.key = createOrder.getKey();
             trr.owner = createOrder.getCreator();
             trr.transaction = createOrder;
-            trr.amount = createOrder.getAmount();
+            trr.amount = createOrder.getAmount().negate();
             trr.recipient = "" + createOrder.getWantKey();
             trr.title = ""+ createOrder.getAmountWant().toPlainString();
 

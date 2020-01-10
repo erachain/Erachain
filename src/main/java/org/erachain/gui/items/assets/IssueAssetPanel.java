@@ -12,8 +12,8 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.TypeOfImage;
 import org.erachain.gui.library.AddImageLabel;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.library.Library;
+import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
@@ -321,7 +321,7 @@ public class IssueAssetPanel extends JPanel {
                     + "[" + asset.getKey() + "]" + Lang.getInstance().translate("Name") + ":&nbsp;" + asset.viewName() + "<br>"
                     + Lang.getInstance().translate("Quantity") + ":&nbsp;" + asset.getQuantity().toString() + "<br>"
                     + Lang.getInstance().translate("Asset Type") + ":&nbsp;"
-                    + Lang.getInstance().translate(asset.viewAssetType() + "") + "<br>"
+                    + Lang.getInstance().translate(asset.viewAssetTypeFull() + "") + "<br>"
                     + Lang.getInstance().translate("Scale") + ":&nbsp;" + asset.getScale() + "<br>"
                     + Lang.getInstance().translate("Description") + ":<br>";
             if (asset.getKey() > 0 && asset.getKey() < 1000) {

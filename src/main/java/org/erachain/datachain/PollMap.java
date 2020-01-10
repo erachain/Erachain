@@ -1,25 +1,24 @@
 package org.erachain.datachain;
 
 import org.erachain.core.voting.Poll;
-import org.erachain.database.DBMap;
 import org.erachain.database.serializer.PollSerializer;
-import org.mapdb.DB;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Deprecated
-public class PollMap extends DCMap<String, Poll> {
+public class PollMap extends DCUMap<String, Poll> {
 
     public PollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_POLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_POLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_POLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_POLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_POLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_POLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_POLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_POLL_TYPE);
         }
     }
 
@@ -27,7 +26,7 @@ public class PollMap extends DCMap<String, Poll> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         //VOTES INDEX
 		/*final NavigableSet<Tuple2<BigDecimal, String>> namesIndex = database.createTreeSet("polls_index_votes")
 				.comparator(Fun.COMPARATOR)
@@ -62,22 +61,16 @@ public class PollMap extends DCMap<String, Poll> {
     }
 
     @Override
-    protected Map<String, Poll> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("polls")
+        map = database.createTreeMap("polls")
                 .valueSerializer(new PollSerializer())
-                .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<String, Poll> getMemoryMap() {
-        return new HashMap<String, Poll>();
-    }
-
-    @Override
-    protected Poll getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        map = new HashMap<String, Poll>();
     }
 
     public boolean contains(Poll poll) {
@@ -85,7 +78,7 @@ public class PollMap extends DCMap<String, Poll> {
     }
 
     public void add(Poll poll) {
-        this.set(poll.getName(), poll);
+        this.put(poll.getName(), poll);
     }
 
     public void delete(Poll poll) {

@@ -11,7 +11,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -138,9 +137,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     
     // GETTERS/SETTERS
 
+
     public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
         super.setDC(dcSet, asDeal, blockHeight, seqNo);
-        
+
+        if (BlockChain.CHECK_BUGS > 3 && viewDBRef(dbRef).equals("18165-1")) {
+            boolean debug;
+            debug = true;
+        }
         if (this.amount != null && dcSet != null) {
             this.asset = this.dcSet.getItemAssetMap().get(this.getAbsKey());
         }
@@ -245,7 +249,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     @Override
     public String viewTypeName() {
         if (this.amount == null || this.amount.signum() == 0)
-            return Lang.getInstance().translate("LETTER");
+            return "LETTER";
         
         if (this.isBackward()) {
             return "backward";
@@ -436,10 +440,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     //@Override // - fee + balance - calculate here
     private static long pointLogg;
     public int isValid(int asDeal, boolean isPerson, long flags) {
-        
-        for (byte[] valid_item : VALID_REC) {
-            if (Arrays.equals(this.signature, valid_item)) {
-                return VALIDATE_OK;
+
+        if (false) {
+            for (byte[] valid_item : VALID_REC) {
+                if (Arrays.equals(this.signature, valid_item)) {
+                    return VALIDATE_OK;
+                }
             }
         }
 
@@ -465,23 +471,43 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         // CHECK IF REFERENCE IS OK
         if (asDeal > Transaction.FOR_PACK) {
-            long[] reference = this.creator.getLastTimestamp(dcSet);
-            if (reference != null && reference[0] >= this.timestamp
-                    // при откатах для нового счета который первый раз сделал транзакцию
-                    // из нулевого баланса - Референс будеть ошибочный
-                    // поэтому отключим эту проверку тут
-                    && !BlockChain.DEVELOP_USE
-                    ) {
-
-                if (height > 0 || BlockChain.CHECK_BUGS > 7
-                        || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
-                    pointLogg = System.currentTimeMillis();
-                    LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
-                            + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                            + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+            if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+                /// вообще не проверяем в тесте
+                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    if (true || BlockChain.CHECK_BUGS > 1)
+                        LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    return INVALID_TIMESTAMP;
+                }
+            } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    if (BlockChain.CHECK_BUGS > 1)
+                        LOGGER.debug(" diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    return INVALID_TIMESTAMP;
                 }
 
-                return INVALID_TIMESTAMP;
+            } else {
+                long[] reference = this.creator.getLastTimestamp(dcSet);
+                if (reference != null && reference[0] >= this.timestamp
+                        // при откатах для нового счета который первый раз сделал транзакцию
+                        // из нулевого баланса - Референс будеть ошибочный
+                        // поэтому отключим эту проверку тут
+                        && !BlockChain.DEVELOP_USE
+                ) {
+
+                    if (height > 0 || BlockChain.CHECK_BUGS > 7
+                            || BlockChain.CHECK_BUGS > 1 && System.currentTimeMillis() - pointLogg > 1000) {
+                        if (BlockChain.TEST_DB == 0) {
+                            pointLogg = System.currentTimeMillis();
+                            if (BlockChain.CHECK_BUGS > 1)
+                                LOGGER.debug("INVALID TIME!!! REFERENCE: " + viewCreator() + " " + DateTimeFormat.timestamptoString(reference[0])
+                                    + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                    + " BLOCK time diff: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - this.timestamp));
+                        }
+                    }
+                    return INVALID_TIMESTAMP;
+                }
             }
         }
 
@@ -783,9 +809,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_BALANCE) == 0
                                         && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b
-                                        .compareTo(this.amount.add(this.fee)) < 0) {
-                                    
-                                    if (height > 120000 || BlockChain.DEVELOP_USE)
+                                        .compareTo(this.amount.add(this.fee)) < 0
+                                        && !BlockChain.ERA_COMPU_ALL_UP
+                                ) {
+
+                                    /// если это девелоп то не проверяем ниже особые счета
+                                    if (BlockChain.DEVELOP_USE)
                                         return NO_BALANCE;
                                     
                                     wrong = true;
@@ -822,10 +851,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                     }
                                     
                                 }
-                                
+
+                                // проверим баланс по КОМПУ
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
-                                        && this.creator.getBalance(dcSet, FEE_KEY,  ACTION_SEND).b.compareTo(this.fee) < 0) {
-                                    if (height > 41100 || BlockChain.DEVELOP_USE)
+                                        && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
+                                        && !BlockChain.ERA_COMPU_ALL_UP) {
+                                    if (BlockChain.DEVELOP_USE)
                                         return NOT_ENOUGH_FEE;
                                         
                                     // TODO: delete wrong check in new CHAIN
@@ -846,7 +877,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         !(asset.isOutsideType() && backward));
                                 
                                 if (amount.compareTo(forSale) > 0) {
-                                    if (height > 120000 || BlockChain.DEVELOP_USE)
+                                    if (BlockChain.DEVELOP_USE)
                                         return NO_BALANCE;
                                         
                                     // TODO: delete wrong check in new CHAIN
@@ -941,8 +972,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         }
 
         // так как мы не лезем в супер класс то тут проверим тоже ее
-        if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
-                && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
+        if (false && // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+                (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
+                && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;
         }
@@ -970,8 +1003,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         // BACKWARD - CONFISCATE
         boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
-        
-        // ASSET ACTIONS PROCESS
+
+        // ASSET ACTIONS PROCESS - 18165-1
         if (this.asset.isOutsideType()) {
             if (actionType == ACTION_SEND && backward) {
                 // UPDATE SENDER

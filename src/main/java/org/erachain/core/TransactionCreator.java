@@ -1,6 +1,7 @@
 package org.erachain.core;
 
 import com.google.common.primitives.Bytes;
+import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -29,13 +30,19 @@ import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Pair;
 import org.erachain.utils.TransactionTimestampComparator;
+import org.mapdb.DB;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 /**
@@ -44,8 +51,10 @@ import java.util.*;
  *
  * TODO: - поидее его надо перенести в модуль Кошелек - ибо без кошелька он не будет пахать.
  */
+@Slf4j
 public class TransactionCreator {
     private DCSet fork;
+    DB database;
     private Block lastBlock;
     private int blockHeight;
     private int seqNo;
@@ -68,10 +77,14 @@ public class TransactionCreator {
 
     private synchronized void updateFork() {
         //CREATE NEW FORK
-        if (this.fork != null) {
-            this.fork.close();
+        if (this.database != null) {
+            // закроем сам файл базы - закрывать DCSet.fork - не нужно - он сам очистится
+            this.database.close();
         }
-        this.fork = DCSet.getInstance().fork();
+
+        // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+        this.database = DCSet.makeDBinMemory();
+        this.fork = DCSet.getInstance().fork(database);
 
         //UPDATE LAST BLOCK
         this.lastBlock = Controller.getInstance().getLastBlock();
@@ -80,31 +93,41 @@ public class TransactionCreator {
 
         //SCAN UNCONFIRMED TRANSACTIONS FOR TRANSACTIONS WHERE ACCOUNT IS CREATOR OF
         ///List<Transaction> transactions = (List<Transaction>)this.fork.getTransactionMap().getValuesAll();
-        TransactionMap transactionMap = this.fork.getTransactionMap();
+        TransactionMap transactionTab = this.fork.getTransactionTab();
         List<Transaction> accountTransactions = new ArrayList<Transaction>();
         Transaction transaction;
 
-        if (true) {
+        if (false) {
+            // У форка нет вторичных индексов поэтому этот вариант не покатит
             for (Account account: Controller.getInstance().getAccounts()) {
-                Iterable<Long> keys = transactionMap.findTransactionsKeys(account.getAddress(), null, null,
-                        0, false, 0, 0, 0L);
-                Iterator<Long> iterator = keys.iterator();
-                while (iterator.hasNext()) {
-                    transaction = transactionMap.get(iterator.next());
+                try (IteratorCloseable<Long> iterator = transactionTab.findTransactionsKeys(account.getAddress(), null, null,
+                        0, false, 0, 0, 0L)) {
+                    while (iterator.hasNext()) {
+                        transaction = transactionTab.get(iterator.next());
                         accountTransactions.add(transaction);
+                    }
+                } catch (java.lang.Throwable e) {
+                    if (e instanceof java.lang.IllegalAccessError) {
+                        // налетели на закрытую таблицу
+                    } else {
+                        logger.error(e.getMessage(), e);
+                    }
                 }
             }
 
         } else {
-            // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX - в ФОРОКЕ он ПУСТОЙ!
-            Iterator<Long> iterator = transactionMap.getIterator(TransactionMap.TIMESTAMP_INDEX, false);
-            List<Account> accountMap = Controller.getInstance().getAccounts();
+            // здесь нужен протокольный итератор!
 
-            while (iterator.hasNext()) {
-                transaction = transactionMap.get(iterator.next());
-                if (accountMap.contains(transaction.getCreator())) {
-                    accountTransactions.add(transaction);
+            try (IteratorCloseable<Long> iterator = transactionTab.getIterator()) {
+                List<Account> accountMap = Controller.getInstance().getAccounts();
+
+                while (iterator.hasNext()) {
+                    transaction = transactionTab.get(iterator.next());
+                    if (accountMap.contains(transaction.getCreator())) {
+                        accountTransactions.add(transaction);
+                    }
                 }
+            } catch (IOException e) {
             }
         }
 
@@ -114,26 +137,34 @@ public class TransactionCreator {
         //VALIDATE AND PROCESS THOSE TRANSACTIONS IN FORK for recalc last reference
         for (Transaction transactionAccount : accountTransactions) {
 
-            transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
-            if (!transactionAccount.isSignatureValid(this.fork)) {
-                //THE TRANSACTION BECAME INVALID LET
-                this.fork.getTransactionMap().delete(transactionAccount);
-            } else {
-                if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0l) == Transaction.VALIDATE_OK) {
-                    transactionAccount.process(null, Transaction.FOR_NETWORK);
-                } else {
+            try {
+                transactionAccount.setDC(this.fork, Transaction.FOR_NETWORK, this.blockHeight, ++this.seqNo);
+                if (!transactionAccount.isSignatureValid(this.fork)) {
                     //THE TRANSACTION BECAME INVALID LET
-                    this.fork.getTransactionMap().delete(transactionAccount);
+                    this.fork.getTransactionTab().delete(transactionAccount);
+                } else {
+                    if (transactionAccount.isValid(Transaction.FOR_NETWORK, 0l) == Transaction.VALIDATE_OK) {
+                        transactionAccount.process(null, Transaction.FOR_NETWORK);
+                    } else {
+                        //THE TRANSACTION BECAME INVALID LET
+                        this.fork.getTransactionTab().delete(transactionAccount);
+                    }
+                    // CLEAR for HEAP
+                    transactionAccount.setDC(null);
                 }
-                // CLEAR for HEAP
-                transactionAccount.setDC(null);
+            } catch (java.lang.Throwable e) {
+                if (e instanceof java.lang.IllegalAccessError) {
+                    // налетели на закрытую таблицу
+                } else {
+                    logger.error(e.getMessage(), e);
+                }
             }
         }
     }
 
     public DCSet getFork() {
         if (this.fork == null) {
-            this.fork = DCSet.getInstance().fork();
+            updateFork();
         }
         return this.fork;
     }
@@ -424,15 +455,23 @@ public class TransactionCreator {
         if (forIssue) {
 
             // IF has not DUPLICATE in UNCONFIRMED RECORDS
-            TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
-            for (Transaction record : unconfirmedMap.getValues()) {
-                if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
-                    if (record instanceof IssuePersonRecord) {
-                        IssuePersonRecord issuePerson = (IssuePersonRecord) record;
-                        if (issuePerson.getItem().getName().equals(fullName)) {
-                            return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+            TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionTab();
+            try {
+                for (Transaction record : unconfirmedMap.values()) {
+                    if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
+                        if (record instanceof IssuePersonRecord) {
+                            IssuePersonRecord issuePerson = (IssuePersonRecord) record;
+                            if (issuePerson.getItem().getName().equals(fullName)) {
+                                return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+                            }
                         }
                     }
+                }
+            } catch (java.lang.Throwable e) {
+                if (e instanceof java.lang.IllegalAccessError) {
+                    // налетели на закрытую таблицу
+                } else {
+                    logger.error(e.getMessage(), e);
                 }
             }
         }
@@ -479,15 +518,23 @@ public class TransactionCreator {
         this.checkUpdate();
 
         // IF has not DUPLICATE in UNCONFIRMED RECORDS
-        TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionMap();
-        for (Transaction record : unconfirmedMap.getValues()) {
-            if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
-                if (record instanceof IssuePersonRecord) {
-                    IssuePersonRecord issuePerson = (IssuePersonRecord) record;
-                    if (issuePerson.getItem().getName().equals(human.getName())) {
-                        return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+        TransactionMap unconfirmedMap = DCSet.getInstance().getTransactionTab();
+        try {
+            for (Transaction record : unconfirmedMap.values()) {
+                if (record.getType() == Transaction.ISSUE_PERSON_TRANSACTION) {
+                    if (record instanceof IssuePersonRecord) {
+                        IssuePersonRecord issuePerson = (IssuePersonRecord) record;
+                        if (issuePerson.getItem().getName().equals(human.getName())) {
+                            return new Pair<Transaction, Integer>(null, Transaction.ITEM_DUPLICATE);
+                        }
                     }
                 }
+            }
+        } catch (java.lang.Throwable e) {
+            if (e instanceof java.lang.IllegalAccessError) {
+                // налетели на закрытую таблицу
+            } else {
+                logger.error(e.getMessage(), e);
             }
         }
 
@@ -683,13 +730,13 @@ public class TransactionCreator {
 
     public Transaction r_Send(PrivateKeyAccount creator,
                               Account recipient, long key, BigDecimal amount, int feePow, String title, byte[] message, byte[] isText,
-                              byte[] encryptMessage) {
+                              byte[] encryptMessage, long timestamp_in) {
 
         this.checkUpdate();
 
         Transaction messageTx;
 
-        long timestamp = NTP.getTime();
+        long timestamp = timestamp_in > 0 ? timestamp_in : NTP.getTime();
 
         //CREATE MESSAGE TRANSACTION
         //messageTx = new RSend(creator, (byte)feePow, recipient, key, amount, head, message, isText, encryptMessage, timestamp, 0l);
@@ -944,7 +991,8 @@ public class TransactionCreator {
     public Integer afterCreate(Transaction transaction, int asDeal) {
         //CHECK IF PAYMENT VALID
 
-        if (this.fork.getTransactionMap().contains(transaction.getSignature())) {
+        if (false && // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+                this.fork.getTransactionTab().contains(transaction.getSignature())) {
             // если случилась коллизия по подписи усеченной
             // в базе неподтвержденных транзакций -то выдадим ошибку
             return Transaction.KEY_COLLISION;

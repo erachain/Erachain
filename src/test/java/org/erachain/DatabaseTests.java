@@ -62,7 +62,7 @@ public class DatabaseTests {
     // INIT PERSONS
     private void init() {
 
-        dcSet = DCSet.createEmptyDatabaseSet();
+        dcSet = DCSet.createEmptyDatabaseSet(0);
 
         gb = new GenesisBlock();
         try {
@@ -116,7 +116,7 @@ public class DatabaseTests {
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
 
-        //assertEquals(dcSet.getItemPersonMap().getKeys().toString(), "");
+        //assertEquals(dcSet.getItemPersonMap().keySet().toString(), "");
         //assertEquals(dcSet.getItemPersonMap().getValuesAll().toString(), "");
         //CREATE FORK
         DCSet fork = dcSet.fork();
@@ -129,10 +129,10 @@ public class DatabaseTests {
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
+        //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).keySet().toString(), "");
 
         //SET BALANCE
-        dcSet.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        dcSet.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
@@ -147,7 +147,7 @@ public class DatabaseTests {
         assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get(seed, 1L));
 
         //SET BALANCE IN FORK
-        fork.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        fork.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
@@ -166,7 +166,7 @@ public class DatabaseTests {
         DCSet fork2 = fork.fork();
 
         //SET BALANCE IN FORK2
-        fork2.getAssetBalanceMap().set(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        fork2.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
@@ -204,7 +204,7 @@ public class DatabaseTests {
         }
 
         ItemAssetMap dbMap = dcSet.getItemAssetMap();
-        Collection<ItemCls> assets = dbMap.getValues();
+        Collection<ItemCls> assets = dbMap.values();
         for (ItemCls asset : assets) {
             //Asset asset = DLSet.getInstance().getAssetMap().get(key);
             AssetCls aa = (AssetCls) asset;
@@ -215,8 +215,8 @@ public class DatabaseTests {
             //db.add(asset);
         }
 
-        dbMap.add(dbMap.get(1l));
-        LOGGER.info("keys " + dbMap.getKeys());
+        dbMap.incrementPut(dbMap.get(1l));
+        LOGGER.info("keys " + dbMap.keySet());
 
         //Collection<Asset> issues = DLSet.getInstance().getIssueAssetMap.getValuesAll();
 
@@ -238,7 +238,7 @@ public class DatabaseTests {
         long key = asset.getKey(dcSet);
 
         ItemAssetMap assetDB = dcSet.getItemAssetMap();
-        Collection<ItemCls> assets = assetDB.getValues();
+        Collection<ItemCls> assets = assetDB.values();
         for (ItemCls asset_2 : assets) {
             AssetCls aa = (AssetCls) asset_2;
             LOGGER.info(aa.toString() + " getQuantity " + aa.getQuantity());

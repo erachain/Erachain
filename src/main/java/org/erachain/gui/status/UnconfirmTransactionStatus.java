@@ -30,7 +30,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
     public UnconfirmTransactionStatus() {
         super("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 0/usec");
 
-        map = DCSet.getInstance().getTransactionMap();
+        map = DCSet.getInstance().getTransactionTab();
         counter = map.size();
 
         map.addObserver(this);
@@ -98,17 +98,17 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_ADD_BLOCK_TYPE:
-                needUpdate = true;
-                return;
             case ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE:
                 needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_RESET_BLOCK_TYPE:
+            case ObserverMessage.LIST_UNC_TRANSACTION_TYPE:
+            case ObserverMessage.RESET_UNC_TRANSACTION_TYPE:
                 counter = 0;
-                needUpdate = false;
-                refresh();
+                needUpdate = true;
                 return;
             case ObserverMessage.GUI_REPAINT:
+                // только тут запускаем пеперисовку - чтобы она основные процессы не тормозила
                 if (needUpdate) {
                     needUpdate = false;
                     refresh();
@@ -117,12 +117,14 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
         }
     }
 
+    long resetPoint = 0;
     private void refresh() {
 
         String mess;
 
-        if (counter < 0) {
+        if (counter < 0 || System.currentTimeMillis() - resetPoint > 300000) {
             counter = map.size();
+            resetPoint = System.currentTimeMillis();
         }
 
         if (counter > 0) {
@@ -142,7 +144,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 mess += " " + missedMessagesTmp + "-tg";
 
             // MISSED TRANSACTIONS
-            missedMessagesTmp = Controller.getInstance().network.missedTransactions.get();
+            missedMessagesTmp = Controller.getInstance().transactionsPool.missedTransactions;
             if (missedMessagesTmp > 0)
                 mess += " " + missedMessagesTmp + "-tx";
 
@@ -154,7 +156,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             // MISSED MESSAGES
             missedMessagesTmp = Controller.getInstance().network.missedMessages.get();
             if (missedMessagesTmp > 0)
-                mess += " " + missedMessagesTmp + "-me";
+                mess += " " + missedMessagesTmp + "-ms";
 
             // MISSED SENDS
             missedMessagesTmp = Controller.getInstance().network.missedSendes.get();

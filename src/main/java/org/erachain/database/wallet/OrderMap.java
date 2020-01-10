@@ -3,10 +3,10 @@ package org.erachain.database.wallet;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.Order;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
-import org.erachain.database.IDB;
+import org.erachain.database.DBASet;
 import org.erachain.database.serializer.LongAndOrderSerializer;
 import org.erachain.datachain.DCSet;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
@@ -16,6 +16,7 @@ import org.mapdb.Fun.Tuple2;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /*
  * Tuple4
@@ -37,33 +38,35 @@ Tuple3
  */
 public class OrderMap extends AutoKeyDBMap<Tuple2<String, Long>, Tuple2<Long, Order>> {
 
-    public OrderMap(IDB databaseSet, DB database) {
+    public OrderMap(DBASet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_LIST_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_ORDER_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_ORDER_TYPE);
         }
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    public void openMap() {
+        //OPEN MAP
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<String, Long>, Tuple2<Long, Order>> getMap(DB database) {
-        //OPEN MAP
-        return this.openMap(database);
-    }
-
-    @Override
-    protected Map<Tuple2<String, Long>, Tuple2<Long, Order>> getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
+    protected void getMemoryMap() {
 
         //OPEN MAP
-        return this.openMap(database);
+        if (true) {
+            map = new TreeMap<Tuple2<String, Long>, Tuple2<Long, Order>>(Fun.TUPLE2_COMPARATOR);
+        } else {
+            /// нет смысла новую базу создавать -- ее же надо потом закрывать!
+            // возможно тут и была неболшьшая утечка
+            DB database = DBMaker.newMemoryDB().make();
+            map = this.openMap(database);
+        }
     }
 
     private Map<Tuple2<String, Long>, Tuple2<Long, Order>> openMap(DB database) {

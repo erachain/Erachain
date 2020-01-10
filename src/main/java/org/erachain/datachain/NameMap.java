@@ -5,11 +5,10 @@ import org.erachain.database.serializer.NameSerializer;
 import org.mapdb.DB;
 
 import java.util.HashMap;
-import java.util.Map;
 
 //import org.erachain.database.DLSet;
 
-public class NameMap extends DCMap<String, Name> {
+public class NameMap extends DCUMap<String, Name> {
 
     public NameMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -19,25 +18,20 @@ public class NameMap extends DCMap<String, Name> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<String, Name> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("names")
+        map = database.createTreeMap("names")
                 .valueSerializer(new NameSerializer())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<String, Name> getMemoryMap() {
-        return new HashMap<String, Name>();
-    }
-
-    @Override
-    protected Name getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        map = new HashMap<String, Name>();
     }
 
     public boolean contains(Name name) {
@@ -45,7 +39,7 @@ public class NameMap extends DCMap<String, Name> {
     }
 
     public void add(Name name) {
-        this.set(name.getName(), name);
+        this.put(name.getName(), name);
     }
 
     public void delete(Name name) {

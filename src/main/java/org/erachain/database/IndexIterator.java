@@ -8,11 +8,9 @@ import java.util.NavigableSet;
 public class IndexIterator<T> implements Iterator<T> {
 
     private Iterator<Tuple2<?, T>> iterator;
-    private int index;
 
     public IndexIterator(NavigableSet<Tuple2<?, T>> set) {
         this.iterator = set.iterator();
-        this.index = 0;
     }
 
     @Override
@@ -22,7 +20,6 @@ public class IndexIterator<T> implements Iterator<T> {
 
     @Override
     public T next() {
-        this.index++;
         return this.iterator.next().b;
     }
 

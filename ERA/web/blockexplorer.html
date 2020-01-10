@@ -729,11 +729,9 @@ button.white-bgc[disabled]:focus,
             output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="900">';
             output += '<tr><td align=center>';
 
-            output += data.Label_Total_coins_in_the_system + ': ' +
-                addCommas(data.allTotal) + ' ' + getAssetName(data.assetKey, data.assetName) + '<br>';
-            output += data.Label_minus + ' ' + addCommas(data.allinOrders) +
-                ' ' + getAssetName(data.assetKey, data.assetName) + ' ' + data.Label_in_order + '= ' +
-                addCommas(data.all) + ' ' + getAssetName(data.assetKey, data.assetName) + '<br>';
+            output += data.Label_Total_coins_in_the_system + ': <b>' + addCommas(data.total) + '</b>, '
+                + data.Label_in_order + ': <b>' + addCommas(data.allinOrders) + '</b>, '
+                + data.Label_Released + ': <b>' + addCommas(data.released) + '</b><br>';
 
 
             if (data.limit == -1) {
@@ -760,7 +758,7 @@ button.white-bgc[disabled]:focus,
                 }
                 table += '<td>' + addCommas(item.balance);
                 table += '<td>' + addCommas(item.in_OWN);
-                table += '<td>' + ((item.in_OWN / data.allTotal) * 100).toFixed(2) + "%";
+                table += '<td>' + ((item.in_OWN / data.total) * 100).toFixed(2) + "%";
             }
             table += '</table>';
 
@@ -924,44 +922,54 @@ button.white-bgc[disabled]:focus,
                 return output;
             }
 
-            output += '<table width="1280" border=0><tr><td align=left><br>';
-
-            output += '<h3 style="display:inline;">' + data.asset.label_Asset + ':</h3>';
-
-            output += '<a href="?asset=' + data.asset.this.key + get_lang() + '"><h3 style="display:inline;">';
-            if (data.asset.this.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" />';
-            output += getAssetName2(data.asset.this.key, data.asset.this.name) + '</h3></a>';
-
-            output += '<br><br>';
-
-            output += '<b>' + data.asset.label_Key + ':</b> ' + data.asset.this.key;
-
-            output += '<br><br>';
-
-            if (data.asset.this.img.length > 0) output += '<img src="data:image/gif;base64,' + data.asset.this.img + '" style=" max-width: 100%;" />';
-
-            output += '<br><br>';
-
-            output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
-
-            output += '<br><br>';
+            output += '<table id=blocks BORDER=0 cellpadding=15 cellspacing=0 width="1180">';
+            output += '<tr><td align=left>';
+            output += '<table><tr>';
 
 
-            output += '<b>' + data.asset.label_Description + ':</b> ' + fformat(data.asset.this.description);
+            if (data.asset.this.image.length > 0) {
+                output += '<td><img src="data:image/gif;base64,' + data.asset.this.image + '" width = "350" /></td><td style ="padding-left:20px">';
+                output += '<br>';
+            }
 
-            output += '<br><br>';
+            output += '<h3><a href="?asset=' + data.asset.this.key + get_lang() + '">';
+            if (data.asset.this.icon.length > 0) output += ' <img src="data:image/gif;base64,' + data.asset.this.icon + '" style="width:50px;" /> ';
+            output += data.asset.this.name + '</a></h3>';
 
-            output += '<b>' + data.asset.label_Scale + ':</b> ' + data.asset.this.scale;
+            output += '<h4> [ <input id="key1" name="asset" size="4" type="text" value="' + data.asset.this.key + '" class="" style="font-size: 1em;"'
+                           + ' onkeydown="if (event.keyCode == 13) buttonSearch(this)"> ] ';
 
-            output += '<br><br>';
+            if (data.asset.this.hasOwnProperty('seqNo')) {
+                output += data.asset.Label_seqNo + ': ' +'<a href=?tx=' + data.asset.this.seqNo + get_lang() + '><b>' + data.asset.this.seqNo + '</b></a></h4>';
+
+                output += '<br>';
+
+                output += '<b>' + data.asset.label_Creator + ':</b> <a href=?address=' + data.asset.this.owner + get_lang() + '>' + data.asset.this.owner + '</a>';
+
+                output += '<br>';
+            } else {
+                output += '</h4>';
+            }
 
             output += '<b>' + data.asset.label_AssetType + ':</b> ' + data.asset.this.assetType;
 
-            output += '<br><br>';
+            output += '<br>';
+
+            output += '<b>' + data.asset.label_Description + ':</b> ' + fformat(data.asset.this.description);
+
+            output += '<br>';
 
             output += '<b> ' + data.asset.label_Quantity + ':</b> ' + addCommas(data.asset.this.quantity) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
+            output += '<br>';
+            output += '<b>' + data.asset.label_Scale + ':</b> ' + data.asset.this.scale;
 
-            output += '<br><br>';
+            output += '<br>';
+
+            output += '<b> ' + data.asset.label_Released + ':</b> ' + addCommas(data.asset.this.released) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
+
+            output += '</td>';
+            output += '</tr>';
+            output += '</table>';
 
             if (data.asset.this.key != 0) {
                 assetUrl = '&asset=' + data.asset.this.key;
@@ -969,9 +977,9 @@ button.white-bgc[disabled]:focus,
                 assetUrl = '';
             }
 
-            output += '<b>' + data.asset.label_Holders + ':</b> <a href=?top=allnotzero' + assetUrl + get_lang() + '>' + data.asset.label_View + '</a>';
+            output += '<b>' + data.asset.label_Holders + ':</b> <a href=?top=all' + assetUrl + get_lang() + '>' + data.asset.label_View + '</a>';
 
-            output += '<br><br>';
+            output += '<br>';
 
             output += '<h3>' + data.asset.label_Available_pairs + '</h3>';
 
@@ -985,38 +993,24 @@ button.white-bgc[disabled]:focus,
                 output += '<tr>';
 
                 output += '<td><b>';
-                output += '<a href="?asset=' + data.asset.this.key + '&asset=' + key + get_lang() + '">';
-                output += getAssetName2(data.asset.this.key, data.asset.this.name);
-                output += '/' + getAssetName2(key, data.asset.pairs[key].assetName);
+                output += '<a href="?asset=' + key + get_lang() + '">';
+                output += getAssetName2(key, data.asset.pairs[key].assetName);
 
                 output += '<td>' + data.asset.pairs[key].openOrdersCount;
 
                 output += '<td nowrap>';
-                if (data.asset.pairs[key].ordersPriceVolume == '0.00000000') {
-                    output += '<font color=#e1e1e1>' + addCommas(data.asset.pairs[key].ordersPriceVolume) + ' ' + getAssetNameMiniGrey(key, data.asset.pairs[key].assetName) + '</font>';
-                } else {
-                    output += '<font color=black>' + addCommas(data.asset.pairs[key].ordersPriceVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName) + '</font>';
-                }
+                output += '<a href="?asset=' + data.asset.this.key + '&asset=' + key + get_lang() + '"><b>'
+                output += addCommas(data.asset.pairs[key].last);
+                output += '</b></a> / <a href="?asset=' + key + '&asset=' + data.asset.this.key + get_lang() + '"><b>'
+                output += addCommas(data.asset.pairs[key].lastReverse) + '</b></a><br>';
 
-                if (data.asset.pairs[key].ordersAmountVolume == '0.00000000') {
-                    output += '<br><font color="#e0e0e0">' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMiniGrey(data.asset.this.key, data.asset.this.name) + '</font>';
-                } else {
-                    output += '<br><font color=black>' + addCommas(data.asset.pairs[key].ordersAmountVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name) + '</font>';
-                }
+                output += addCommas(data.asset.pairs[key].ordersPriceVolume) + ' / ' + addCommas(data.asset.pairs[key].ordersAmountVolume);
 
                 output += '<td>' + data.asset.pairs[key].tradesCount;
 
                 output += '<td nowrap>';
-                if (data.asset.pairs[key].tradeAmountVolume == '0.00000000') {
-                    output += '<font color=#e1e1e1>' + addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMiniGrey(key, data.asset.pairs[key].assetName);
-                } else {
-                    output += '<font color=black>' + addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName);
-                }
-                if (data.asset.pairs[key].tradesPriceVolume == '0.00000000') {
-                    output += '<br><font color=#e1e1e1>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMiniGrey(data.asset.this.key, data.asset.this.name);
-                } else {
-                    output += '<br><font color=black>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
-                }
+                output += addCommas(data.asset.pairs[key].tradeAmountVolume) + ' ' + getAssetNameMini(key, data.asset.pairs[key].assetName);
+                output += '<br>' + addCommas(data.asset.pairs[key].tradesPriceVolume) + ' ' + getAssetNameMini(data.asset.this.key, data.asset.this.name);
 
                 output += '<td>' + escapeHtml(data.asset.pairs[key].description.substr(0, 100));
             }
@@ -1036,9 +1030,14 @@ button.white-bgc[disabled]:focus,
 
             output += lastBlock(data.lastBlock);
 
-            output += '<h3 style="display:inline;">' + data.label_Trades + ' </h3>';
+            output += '';
+
+            output += '<h3 style="display:inline;"><a href="?asset=' + data.assetWant + '&asset=' + data.assetHave + get_lang()
+                + '"><img src="img/exchange.png" style="width:1em"></a> '
+                + data.label_Trades + '</h3> ';
+
             output += '<a href="?asset=' + data.assetHave + '&asset=' + data.assetWant + get_lang() + '"><h3 style="display:inline;">';
-            output += getAssetName2(data.assetHave, data.assetHaveName) + '/';
+            output += getAssetName2(data.assetHave, data.assetHaveName) + ' / ';
             output += getAssetName2(data.assetWant, data.assetWantName) + '</h3></a>';
 
             output += '<br>';
@@ -1501,9 +1500,9 @@ button.white-bgc[disabled]:focus,
                         output += data[i].trade.initiatorTxSeqNo + '/' + data[i].trade.targetTxSeqNo + '</a></td>';
 
                         output += '<td><a href=?order=' + data[i].trade.initiatorTxSeqNo + get_lang() + '>';
-                        output += data[i].trade.targetTxSeqNo + '</a> ';
+                        output += data[i].trade.initiatorTxSeqNo + '</a> ';
                         output += '<td><a href=?order=' + data[i].trade.targetTxSeqNo + get_lang() + '>';
-                        output += data[i].trade.initiatorTxSeqNo + '</a></td>';
+                        output += data[i].trade.targetTxSeqNo + '</a></td>';
 
                         output += '<td align=right width=250>Height: <a href=?block=' + data[i].trade.height + get_lang() + '>' + data[i].trade.height + '</a>';
                         output += ' / confirmations: ' + data[i].trade.confirmations + '</td>';
@@ -2112,7 +2111,7 @@ button.white-bgc[disabled]:focus,
                 output += '<td> <a href=?asset=' + item.key + get_lang() + '>';
                 output += '<b>' + item.key + '</b>: ';
                 if (item.icon.length > 0)
-                    output += '<img src="data:image/gif;base64,' + item.icon + '" width="30" /> ';
+                    output += '<img src="data:image/gif;base64,' + item.icon + '"  style="width:2em;" /> ';
 
                 output += escapeHtml(item.name);
                 output += '</a>';
@@ -2163,11 +2162,13 @@ button.white-bgc[disabled]:focus,
             return params;
         }
 
-        function buttonSearch() {
-            if (document.getElementById("key1")) {
-                var pars = document.getElementById("key1").getAttribute("name") + '=' + document.getElementById("key1").value.trim();
-                if (document.getElementById("key2")) {
-                    pars += '&' + document.getElementById("key2").getAttribute("name") + '=' + document.getElementById("key2").value.trim();
+        function buttonSearch(elem=null) {
+            if (elem != null) {
+                if (elem.id == "key2") {
+                    var pars = document.getElementById("key1").getAttribute("name") + '=' + document.getElementById("key1").value.trim();
+                    pars += '&' + elem.getAttribute("name") + '=' + elem.value.trim();
+                } else {
+                var pars = elem.getAttribute("name") + '=' + elem.value.trim();
                 }
 
                 document.location.href = '?' + pars + get_lang();

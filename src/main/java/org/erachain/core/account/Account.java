@@ -1,6 +1,7 @@
 package org.erachain.core.account;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -16,8 +17,9 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.OrderMap;
-import org.erachain.datachain.ReferenceMap;
+import org.erachain.datachain.OrderMapImpl;
+import org.erachain.datachain.ReferenceMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
@@ -28,9 +30,13 @@ import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
 
 //import org.erachain.core.crypto.Base64;
 
@@ -41,6 +47,7 @@ import java.util.*;
  */
 public class Account {
 
+    public static final int ADDRESS_SHORT_LENGTH = 20;
     public static final int ADDRESS_LENGTH = 25;
     // private static final long ERA_KEY = Transaction.RIGHTS_KEY;
     private static final long FEE_KEY = Transaction.FEE_KEY;
@@ -52,7 +59,7 @@ public class Account {
     protected byte[] bytes;
     protected byte[] shortBytes;
     // private long generatingBalance; //used for forging balance
-    Tuple4<Long, Integer, Integer, Integer> personDuration;
+    // нельзя тут запминать так как при откате данные не будут очищены Tuple4<Long, Integer, Integer, Integer> personDuration;
     Tuple2<Integer, PersonCls> person;
     int viewBalancePosition = 0;
 
@@ -63,7 +70,7 @@ public class Account {
     }
 
     public Account(byte[] addressBytes) {
-        if (addressBytes.length == ADDRESS_LENGTH - 5) {
+        if (addressBytes.length == ADDRESS_SHORT_LENGTH) {
             // AS SHORT BYTES
             this.shortBytes = addressBytes;
             this.bytes = Crypto.getInstance().getAddressFromShortBytes(addressBytes);
@@ -73,10 +80,10 @@ public class Account {
             this.shortBytes = Arrays.copyOfRange(addressBytes, 1, this.bytes.length - 4);
 
         } else {
-            assert(addressBytes.length == 25);
+            assert(addressBytes.length == ADDRESS_LENGTH);
         }
 
-        this.address = Base58.encode(bytes);
+        /// make on demand this.address = Base58.encode(bytes);
     }
 
     public static byte[] makeShortBytes(String address) {
@@ -208,25 +215,28 @@ public class Account {
 
         if (true) {
             // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
-            for (byte[] mapKey: map.getKeys()) {
-                if (map.getAssetKeyFromKey(mapKey) == key) {
+            for (byte[] mapKey: map.keySet()) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == key) {
                     ballance = map.get(mapKey);
-                    values.put(map.getShortAccountFromKey(mapKey), ballance.a.b);
+                    values.put(ItemAssetBalanceMap.getShortAccountFromKey(mapKey), ballance.a.b);
                 }
             }
 
         } else {
 
             // здесь нужен протокольный итератор! его нету у балансов поэтому через перебор ключей
-            Iterator<byte[]> iterator = map.getIterator(0, true);
+            try (IteratorCloseable<byte[]> iterator = map.getIterator(0, true)) {
 
-            byte[] iteratorKey;
-            while (iterator.hasNext()) {
-                iteratorKey = iterator.next();
-                if (map.getAssetKeyFromKey(iteratorKey) == key) {
-                    ballance = map.get(iteratorKey);
-                    values.put(map.getShortAccountFromKey(iteratorKey), ballance.a.b);
+                byte[] bytesKey;
+                while (iterator.hasNext()) {
+                    bytesKey = iterator.next();
+                    if (ItemAssetBalanceMap.getAssetKeyFromKey(bytesKey) == key) {
+                        ballance = map.get(bytesKey);
+                        values.put(ItemAssetBalanceMap.getShortAccountFromKey(bytesKey), ballance.a.b);
+                    }
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
         }
@@ -242,15 +252,18 @@ public class Account {
 
     public static Map<byte[], BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<byte[], BigDecimal> values) {
 
-        OrderMap map = dcSet.getOrderMap();
-        Iterator<Long> iterator = map.getIterator(0, true);
+        OrderMapImpl map = dcSet.getOrderMap();
         Order order;
-        while (iterator.hasNext()) {
-            order = map.get(iterator.next());
-            if (order.getHaveAssetKey() == key) {
-                byte[] address = order.getCreator().getShortAddressBytes();
-                values.put(address, values.get(address).add(order.getAmountHave()));
+        try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
+            while (iterator.hasNext()) {
+                order = map.get(iterator.next());
+                if (order.getHaveAssetKey() == key) {
+                    byte[] address = order.getCreator().getShortAddressBytes();
+                    values.put(address, values.get(address).add(order.getAmountHave()));
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         DCSet dcParent = dcSet.getParent();
@@ -325,6 +338,9 @@ public class Account {
      */
 
     public String getAddress() {
+        if (address == null) {
+            this.address = Base58.encode(bytes);
+        }
         return address;
     }
 
@@ -431,6 +447,24 @@ public class Account {
         return null;
     }
 
+    static public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
+                                                                      int position) {
+        switch (position) {
+            case TransactionAmount.ACTION_SEND:
+                return balance.a;
+            case TransactionAmount.ACTION_DEBT:
+                return balance.b;
+            case TransactionAmount.ACTION_HOLD:
+                return balance.c;
+            case TransactionAmount.ACTION_SPEND:
+                return balance.d;
+            case TransactionAmount.ACTION_PLEDGE:
+                return balance.e;
+        }
+
+        return null;
+    }
+
 
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
             long key) {
@@ -443,7 +477,7 @@ public class Account {
         BigDecimal ownVol = balance.a.b;
 
         if (!BlockChain.DEVELOP_USE && !BlockChain.ERA_COMPU_ALL_UP && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
-            int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
+            int[][] item = BlockChain.FREEZED_BALANCES.get(this.getAddress());
             if (item != null) {
                 if (item[0][0] < 0) {
                     return BigDecimal.ZERO;
@@ -526,9 +560,9 @@ public class Account {
 
     // Добавляем величины для тестовых режимов
     public BigDecimal addDEVAmount(long key) {
-        if (key == 1)
+        if (BlockChain.ERA_COMPU_ALL_UP && key == 1)
             return BigDecimal.valueOf(( 512000 + 500 * this.getShortAddressBytes()[10]) >> 6);
-        else if (key == 2)
+        else if (BlockChain.ERA_COMPU_ALL_UP && key == 2)
             return new BigDecimal("100.0");
 
         return BigDecimal.ZERO;
@@ -560,8 +594,8 @@ public class Account {
         if (key < 0)
             key = -key;
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getShortAddressBytes(), key);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                balance = db.getAssetBalanceMap().get(getShortAddressBytes(), key);
         if (BlockChain.ERA_COMPU_ALL_UP) {
             return balanceAddDEVAmount(key, balance);
         }
@@ -667,15 +701,15 @@ public class Account {
                     balance.e);
         }
 
-        map.set(getShortAddressBytes(), absKey, balance);
+        map.put(getShortAddressBytes(), absKey, balance);
 
         ////////////// DEBUG TOTAL COMPU
         // несотыковка из-за ордеров на бирже
         if (false && absKey == 2l && this.equals("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS")) {
-            Collection<byte[]> addrs = db.getAssetBalanceMap().getKeys();
+            Collection<byte[]> addrs = db.getAssetBalanceMap().keySet();
             BigDecimal total = BigDecimal.ZERO;
             for (byte[] mapKey : addrs) {
-                if (map.getAssetKeyFromKey(mapKey) == 2l) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == 2l) {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
                             map.get(mapKey);
 
@@ -744,16 +778,35 @@ public class Account {
     }
 
     public long[] getLastTimestamp() {
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
+            return null;
         return this.getLastTimestamp(DCSet.getInstance());
     }
 
+    /**
+     * account.address -> LAST[TX.timestamp + TX.dbRef]
+     *
+     * @param dcSet
+     * @return
+     */
     public long[] getLastTimestamp(DCSet dcSet) {
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
+            return null;
         return dcSet.getReferenceMap().get(shortBytes);
     }
 
     public void setLastTimestamp(long[] currentPoint, DCSet dcSet) {
 
-        ReferenceMap map = dcSet.getReferenceMap();
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
+            return;
+
+        ReferenceMapImpl map = dcSet.getReferenceMap();
+
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            // SET NEW REFERENCE
+            map.put(shortBytes, currentPoint);
+            return;
+        }
 
         // GET CURRENT REFERENCE
         long[] reference = map.get(shortBytes);
@@ -763,17 +816,26 @@ public class Account {
 
         if (reference != null) {
             // set NEW LAST TIMESTAMP as REFERENCE
-            map.set(keyCurrentPoint, reference);
+            map.put(keyCurrentPoint, reference);
         }
 
         // SET NEW REFERENCE
-        map.set(shortBytes, currentPoint);
+        map.put(shortBytes, currentPoint);
 
     }
 
     public void removeLastTimestamp(DCSet dcSet) {
 
-        ReferenceMap map = dcSet.getReferenceMap();
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+            return;
+        }
+
+        ReferenceMapImpl map = dcSet.getReferenceMap();
+
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            map.delete(shortBytes);
+            return;
+        }
 
         // GET LAST TIMESTAMP
         long[] lastPoint = map.get(shortBytes);
@@ -786,12 +848,12 @@ public class Account {
 
         // GET REFERENCE
         // DELETE TIMESTAMP - REFERENCE
-        long[] reference = map.delete(keyPrevPoint);
+        long[] reference = map.remove(keyPrevPoint);
         if (reference == null) {
             map.delete(shortBytes);
         } else {
-            // SET OLD REFERENCE
-            map.set(shortBytes, reference);
+            // PUT OLD REFERENCE
+            map.put(shortBytes, reference);
         }
     }
 
@@ -932,16 +994,16 @@ public class Account {
 
     @Override
     public int hashCode() {
-        return address.hashCode();
+        return Ints.fromByteArray(shortBytes);
     }
 
     // EQUALS
     @Override
     public boolean equals(Object b) {
         if (b instanceof Account) {
-            return this.address.equals(((Account) b).getAddress());
+            return Arrays.equals(this.shortBytes, ((Account) b).getShortAddressBytes());
         } else if (b instanceof String) {
-            return this.address.equals(b);
+            return this.getAddress().equals(b);
         } else if (b instanceof byte[]) {
             byte[] bs = (byte[]) b;
             if (bs.length == ADDRESS_LENGTH) {
@@ -954,12 +1016,20 @@ public class Account {
         return false;
     }
 
-    public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
-        if (this.personDuration == null) {
-            this.personDuration =  db.getAddressPersonMap().getItem(address);
+    //public void resetPersonDuration() {
+    //    this.personDuration = null;
+    //}
 
-        }
-        return this.personDuration;
+    public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
+        //    if (this.personDuration == null) {
+        //        нельзя использовать старые значения так как при откатах они не будут чиститься
+        //        this.personDuration = db.getAddressPersonMap().getItem(shortBytes);
+        //    }
+
+        //return this.personDuration;
+
+        return db.getAddressPersonMap().getItem(shortBytes);
+
     }
 
     public boolean isPerson(DCSet dcSet, int forHeight) {
@@ -1055,7 +1125,7 @@ public class Account {
 
     // previous forging block or changed ERA volume
     public Tuple2<Integer, Integer> getForgingData(DCSet db, int height) {
-        return db.getAddressForging().get(this.address, height);
+        return db.getAddressForging().get(getAddress(), height);
     }
     /*
      * public void setLastForgingData(DCSet db, int height) { getAddressForging
@@ -1064,25 +1134,25 @@ public class Account {
      */
 
     public void setForgingData(DCSet db, int height, int forgingBalance) {
-        db.getAddressForging().set(this.address, height, forgingBalance);
+        db.getAddressForging().putAndProcess(getAddress(), height, forgingBalance);
     }
 
     public void delForgingData(DCSet db, int height) {
-        db.getAddressForging().delete(this.address, height);
+        db.getAddressForging().deleteAndProcess(getAddress(), height);
     }
 
     public Tuple2<Integer, Integer> getLastForgingData(DCSet db) {
-        return db.getAddressForging().getLast(this.address);
+        return db.getAddressForging().getLast(getAddress());
     }
 
     public Tuple2<String, String> getName() {
 
-        return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(this.getAddress());
+        return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(getAddress());
 
     }
 
     public int getAccountNo() {
-        return Controller.getInstance().wallet.database.getAccountMap().getAccountNo(this.address);
+        return Controller.getInstance().wallet.database.getAccountMap().getAccountNo(getAddress());
     }
 
 }

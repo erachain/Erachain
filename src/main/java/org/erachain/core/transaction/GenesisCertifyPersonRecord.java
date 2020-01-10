@@ -155,7 +155,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         // SET PERSON ADDRESS - end date as timestamp
         Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, Integer.MAX_VALUE, blockIndex, transactionIndex);
         Tuple3<Integer, Integer, Integer> itemA1 = new Tuple3<Integer, Integer, Integer>(0, blockIndex, transactionIndex);
-        this.dcSet.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
+        this.dcSet.getAddressPersonMap().addItem(this.recipient.getShortAddressBytes(), itemA);
         this.dcSet.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 
         //UPDATE REFERENCE OF RECIPIENT
@@ -169,7 +169,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         //db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
 
         //UPDATE RECIPIENT
-        this.dcSet.getAddressPersonMap().removeItem(this.recipient.getAddress());
+        this.dcSet.getAddressPersonMap().removeItem(this.recipient.getShortAddressBytes());
         this.dcSet.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
 
         //UPDATE REFERENCE OF CREATOR

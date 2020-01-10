@@ -222,7 +222,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
             txtSign.setText(
                     person.isSignatureValid(DCSet.getInstance()) ? Base58.encode(person.getOwnerSignature())
-                            : Lang.getInstance().translate("Wrong signaryte for data owner"));
+                            : Lang.getInstance().translate("Wrong signature for data owner"));
             txtPublicKey.setText(Base58.encode(person.getOwner().getPublicKey()));
 
         });

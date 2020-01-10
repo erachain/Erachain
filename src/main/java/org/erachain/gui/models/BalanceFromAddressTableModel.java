@@ -5,7 +5,6 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
@@ -60,7 +59,7 @@ public class BalanceFromAddressTableModel extends AbstractTableModel implements 
                     continue;
                 }
 
-                Long assetKey =  ItemAssetBalanceMap.getAssetKeyFromKey(balance.getA());
+                Long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(balance.getA());
                 tableBalance1.add(new Pair(account, new Pair(assetKey, balance.getB())));
                 assetKeys.add(assetKey);
             }

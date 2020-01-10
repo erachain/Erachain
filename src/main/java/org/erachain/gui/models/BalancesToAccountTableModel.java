@@ -3,7 +3,7 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.database.SortableList;
-import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
@@ -73,7 +73,7 @@ public class BalancesToAccountTableModel extends AbstractTableModel implements O
         }
 
         Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> aRow = this.balances.get(row);
-        Account account = new Account(DCSet.getInstance().getAssetBalanceMap().getShortAccountFromKey(aRow.getA()));
+        Account account = new Account(ItemAssetBalanceMap.getShortAccountFromKey(aRow.getA()));
 
         switch (column) {
             case COLUMN_ADDRESS:

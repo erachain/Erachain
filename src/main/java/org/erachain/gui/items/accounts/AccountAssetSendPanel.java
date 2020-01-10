@@ -20,10 +20,7 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
     public boolean noRecive;
 
     public AccountAssetSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super("Send", assetIn, balancePosition, accountFrom, accountTo, message);
-
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to send asset %asset%, fill in this form").
-                replace("%asset%", asset.viewName()));
+        super("Send", assetIn, "If You want to send asset %asset%, fill in this form", balancePosition, accountFrom, accountTo, message);
 
         //  icon.setIcon(null);
 
@@ -48,7 +45,7 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
                 Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
-                amount, head, messageBytes, isTextByte, encrypted);
+                amount, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);
 

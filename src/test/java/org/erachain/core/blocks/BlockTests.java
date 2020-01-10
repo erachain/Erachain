@@ -62,7 +62,7 @@ public class BlockTests {
 
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         cntrl = Controller.getInstance();
         cntrl.initBlockChain(db);
         blockChain = cntrl.getBlockChain();
@@ -157,7 +157,7 @@ public class BlockTests {
     @Test
     public void validateGenesisBlock() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
 
         //CHECK IF VALID
