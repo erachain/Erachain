@@ -1,35 +1,25 @@
 package org.erachain.gui;
 
-import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import org.erachain.core.BlockChain;
-import org.erachain.gui.library.FileChooser;
-import org.erachain.gui.library.MenuExchange;
-import org.erachain.gui2.MainPanel;
-import org.json.simple.JSONObject;
-
 import org.erachain.controller.Controller;
+import org.erachain.gui.library.FileChooser;
 import org.erachain.gui.library.MenuDeals;
+import org.erachain.gui.library.MenuExchange;
 import org.erachain.gui.library.MenuFiles;
 import org.erachain.gui.status.StatusPanel;
+import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.SaveStrToFile;
+import org.json.simple.JSONObject;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.util.List;
+import java.util.*;
 
 @SuppressWarnings("serial")
 public class MainFrame extends JFrame implements Observer {
@@ -45,7 +35,7 @@ public class MainFrame extends JFrame implements Observer {
     private StatusPanel statusPanel;
     private javax.swing.JTabbedPane jTabbedPane1;
     // End of variables declaration
-    private MainFrame th;
+    //private MainFrame th;
 
     private MainFrame() {
 
@@ -57,7 +47,7 @@ public class MainFrame extends JFrame implements Observer {
                     + Settings.getInstance().getGenesisStamp());
         }
 
-        th = this;
+        //th = this;
         //    this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);
         Controller.getInstance().addObserver(this);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -153,10 +143,10 @@ public class MainFrame extends JFrame implements Observer {
                 // TODO Auto-generated method stub
                 // read settings
                 // You can still stop closing if you want to
-                int res = JOptionPane.showConfirmDialog(th, Lang.getInstance().translate("Are you sure you want to close?"), Lang.getInstance().translate("Close?"), JOptionPane.YES_NO_OPTION);
+                int res = JOptionPane.showConfirmDialog(instance, Lang.getInstance().translate("Are you sure you want to close?"), Lang.getInstance().translate("Close?"), JOptionPane.YES_NO_OPTION);
                 if (res != 0) return;
                 closeFrame();
-                th.dispose();
+                dispose();
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -332,7 +322,7 @@ public class MainFrame extends JFrame implements Observer {
         settingsJSONbuf = Settings.getInstance().getJSONObject();
         if (settingsJSONbuf.containsKey("Main_Frame_Setting"))
             settingsJSON = (JSONObject) settingsJSONbuf.get("Main_Frame_Setting");
-        if (th.getExtendedState() != MAXIMIZED_BOTH) {
+        if (getExtendedState() != MAXIMIZED_BOTH) {
             settingsJSON.put("Main_Frame_is_Max", "false");
             settingsJSON.put("Main_Frame_Height", getHeight() + ""); // высота
             settingsJSON.put("Main_Frame_Width", getWidth() + ""); // длина

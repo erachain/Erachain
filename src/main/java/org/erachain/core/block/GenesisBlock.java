@@ -1,19 +1,10 @@
 package org.erachain.core.block;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.mapdb.Fun.Tuple2;
-
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -26,18 +17,20 @@ import org.erachain.core.item.statuses.Status;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.Template;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.core.transaction.GenesisCertifyPersonRecord;
-import org.erachain.core.transaction.GenesisIssueAssetTransaction;
-import org.erachain.core.transaction.GenesisIssueStatusRecord;
-import org.erachain.core.transaction.GenesisIssueTemplateRecord;
-import org.erachain.core.transaction.GenesisTransferAssetTransaction;
-import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+
 //import org.erachain.core.item.assets.AssetCls;
 
 public class GenesisBlock extends Block {
@@ -169,7 +162,7 @@ public class GenesisBlock extends Block {
                     ////
                     Arrays.asList("7Mr6qTY2vN1int3Byo6NmZQDRmH7zuLEZ7", "1800"),
                     Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
-                    Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
+                    Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"), // двойная запись она по сингнатуре не ищется - 1-43 - 1-44
                     Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", "43.84966285"),
                     Arrays.asList("7A9FFw3mQfDrP9y8WCifrZ3pvsKwerkMLr", "1289.69596627"),
                     Arrays.asList("7QqeSR442vstwcf5Hzm3t2pWgqupQNxRTv", "257.93919325"),
@@ -750,7 +743,7 @@ public class GenesisBlock extends Block {
         if (false) {
             AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
             item.setReference(this.signature);
-            dcSet.getItemAssetMap().set(AssetCls.LIA_KEY, item);
+            dcSet.getItemAssetMap().put(AssetCls.LIA_KEY, item);
         }
 
     }
@@ -758,7 +751,7 @@ public class GenesisBlock extends Block {
     public void orphan(DCSet dcSet) throws Exception {
 
         if (false)
-            dcSet.getItemAssetMap().delete(AssetCls.LIA_KEY);
+            dcSet.getItemAssetMap().remove(AssetCls.LIA_KEY);
 
         super.orphan(dcSet);
 

@@ -1,21 +1,18 @@
 package org.erachain.gui.items.persons;
 
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.IssueItemRecord;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemPersonMap;
 import org.erachain.datachain.PersonAddressMap;
 import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun;
-import org.mapdb.Fun.Tuple2;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+import java.util.TreeMap;
 
 @SuppressWarnings("serial")
 public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
@@ -74,7 +71,7 @@ public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
         list = new ArrayList<>();
 
@@ -82,7 +79,7 @@ public class TableModelOwnerPersons extends TimerTableModelCls<PersonCls> {
         List<Transaction> myIssuePersons = new ArrayList<Transaction>();
 
         for (String address : addresses.keySet()) {
-            myIssuePersons.addAll(transactionFinalMap.getTransactionsByTypeAndAddress(address,
+            myIssuePersons.addAll(transactionFinalMap.getTransactionsByAddressAndType(address,
                     Transaction.ISSUE_PERSON_TRANSACTION, 0));
         }
 

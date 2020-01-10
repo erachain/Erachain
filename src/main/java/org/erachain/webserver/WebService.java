@@ -22,6 +22,7 @@ public class WebService {
         s.add(API.class);
         s.add(WebResource.class);
         s.add(APITransactionsResource.class);
+        s.add(APIAsset.class);
         s.add(APIExchange.class);
         s.add(APITelegramsResource.class);
         s.add(APIPerson.class);

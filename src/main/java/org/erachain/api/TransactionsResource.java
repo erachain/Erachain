@@ -178,7 +178,7 @@ public class TransactionsResource {
     public String getNetworkTransactions(@PathParam("address") String address) {
         // TODO ошибку выдает
         //List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactionsByAddressFast100(address);
-        List<Transaction> transactions = DCSet.getInstance().getTransactionMap().getTransactionsByAddress(address);
+        List<Transaction> transactions = DCSet.getInstance().getTransactionTab().getTransactionsByAddress(address);
 
         JSONArray array = new JSONArray();
 
@@ -201,7 +201,7 @@ public class TransactionsResource {
 
         DCSet dcSet = DCSet.getInstance();
 
-        for (Transaction record : dcSet.getTransactionMap().getIncomedTransactions(address, type, from, count, descending)) {
+        for (Transaction record : dcSet.getTransactionTab().getIncomedTransactions(address, type, from, count, descending)) {
             record.setDC(dcSet);
             array.add(record.toJson());
         }
@@ -493,7 +493,7 @@ public class TransactionsResource {
                                                   @PathParam("limit") int limit) {
 
         JSONArray array = new JSONArray();
-        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(address,
+        List<Transaction> txs = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(address,
                 type, limit);
         for (Transaction transaction : txs) {
             array.add(transaction.toJson());
@@ -777,7 +777,7 @@ public class TransactionsResource {
         try {
             transaction = Controller.getInstance().r_Send(
                     Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), 0, recip, asset1, amount,
-                    head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted);
+                    head, message.getBytes(Charset.forName("UTF-8")), isTextByte, encrypted, 0);
             // test result = new Pair<Transaction, Integer>(null,
             // Transaction.VALIDATE_OK);
             if (transaction == null)

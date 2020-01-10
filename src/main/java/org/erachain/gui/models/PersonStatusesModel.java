@@ -1,20 +1,13 @@
 package org.erachain.gui.models;
 
-import javafx.util.Pair;
-import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemStatusMap;
-import org.erachain.datachain.KKPersonStatusMap;
-import org.erachain.lang.Lang;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple5;
-import org.erachain.utils.ObserverMessage;
 
-import javax.swing.table.AbstractTableModel;
-import javax.validation.constraints.Null;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -133,7 +126,7 @@ public class PersonStatusesModel extends TimerTableModelCls<Tuple2<Long, Tuple5<
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
         TreeMap<Long, Stack<Tuple5<Long, Long, byte[], Integer, Integer>>> statuses = dcSet.getPersonStatusMap().get(itemKey);
 
         list = new ArrayList<Tuple2<Long, Tuple5<Long, Long, byte[], Integer, Integer>>>();

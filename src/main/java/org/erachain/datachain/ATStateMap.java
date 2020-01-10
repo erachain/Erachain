@@ -3,13 +3,16 @@ package org.erachain.datachain;
 import org.erachain.at.ATConstants;
 import org.erachain.controller.Controller;
 import org.erachain.core.crypto.Base58;
-import org.mapdb.*;
+import org.mapdb.BTreeMap;
+import org.mapdb.Bind;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.util.*;
 
 //Integer -> blockHeight (f.e 0 -> 1000 -> 2000 if we keep state every 1000s blocks), byte[] -> atId , byte[] stateBytes
-public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
+public class ATStateMap extends DCUMap<Tuple2<Integer, String>, byte[]> {
 
     @SuppressWarnings("rawtypes")
     private NavigableSet allATStates;
@@ -22,18 +25,17 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple2<Integer, String>, byte[]> getMap(DB database) {
-        return this.openMap(database);
+    public void openMap() {
+        map = this.openMap(database);
     }
 
     @Override
-    protected Map<Tuple2<Integer, String>, byte[]> getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-        return this.openMap(database);
+    protected void getMemoryMap() {
+        openMap();
     }
 
 
@@ -67,7 +69,7 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
         //Height to store state
         int height = (int) ((Math.round(blockHeight) / ATConstants.STATE_STORE_DISTANCE) + 1) * ATConstants.STATE_STORE_DISTANCE;
 
-        this.set(new Tuple2<Integer, String>(height, Base58.encode(atId)), stateBytes);
+        this.put(new Tuple2<Integer, String>(height, Base58.encode(atId)), stateBytes);
     }
 
     //get the list of states stored at block height. use for roll back
@@ -122,18 +124,13 @@ public class ATStateMap extends DCMap<Tuple2<Integer, String>, byte[]> {
 
         //DELETE
         for (Tuple2 key : keys) {
-            this.delete(key);
+            this.remove(key);
         }
 
         // in .deleted
         if (false && this.parent != null) {
             ((DCSet)this.parent.getDBSet()).getATStateMap().deleteStatesAfter(blockHeight);
         }
-    }
-
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
     }
 
 }

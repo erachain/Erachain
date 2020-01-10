@@ -67,7 +67,7 @@ public class TestRecSendMovable {
     // INIT ASSETS
     private void init(boolean withIssue) {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         cntrl = Controller.getInstance();
         cntrl.initBlockChain(db);
         bchain = cntrl.getBlockChain();

@@ -57,7 +57,7 @@ public class TelegramAnswerMessage extends Message {
         // read telegram
         json = new JSONObject();
 
-        Set<String> telegramKeys = Controller.getInstance().telegramStore.database.getTelegramsMap().getKeys();
+        Set<String> telegramKeys = Controller.getInstance().telegramStore.database.getTelegramsMap().keySet();
         // add List
         for(String key:telegramKeys){
             // senders

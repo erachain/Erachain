@@ -4,8 +4,6 @@ import com.google.common.primitives.UnsignedBytes;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.Map;
-
 /**
  * see datachain.IssueItemMap
  */
@@ -21,12 +19,12 @@ public class IssuePollMap extends IssueItemMap {
     }
 
     @Override
-    protected Map<byte[], Long> getMap(DB database) {
+    public void openMap() {
+
         //OPEN MAP
-        return database.createTreeMap("poll_OrphanData")
+        map = database.createTreeMap("poll_OrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
-                .counterEnable()
                 .makeOrGet();
     }
 

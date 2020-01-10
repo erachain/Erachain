@@ -4,8 +4,8 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.ItemCls;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
 import org.erachain.database.serializer.LongItemSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
@@ -41,32 +41,36 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         this.type = type;
         this.name = name;
 
+        // Теперь задаем БАЗУ
+        this.database = database;
+
         // ИМЯ и ТИП заданы, создаем карту и ИНдексы
-        map = getMap(database);
+        openMap();
 
         makeAutoKey(database, (Bind.MapWithModificationListener)map, name + "_wak");
 
-        this.createIndexes(database);
+        this.createIndexes();
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
-            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
-            this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+            observableData = new HashMap<Integer, Integer>(8, 1);
+            this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
+            this.observableData.put(DBTab.NOTIFY_LIST, observeList);
+            this.observableData.put(DBTab.NOTIFY_ADD, observeAdd);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
         }
     }
 
     //@SuppressWarnings({ "unchecked", "rawtypes" })
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
         if (this.name == null)
-            return null;
+            return;
 
-        return database.createTreeMap(this.name)
+        map = database.createTreeMap(this.name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new LongItemSerializer(this.type))
                 .counterEnable()
@@ -74,13 +78,8 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple2<Long, ItemCls>> getMemoryMap() {
-        return new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
-    }
-
-    @Override
-    protected Tuple2<Long, ItemCls> getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, ItemCls>>(Fun.TUPLE2_COMPARATOR);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -93,6 +92,7 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
                     Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
 
             //GET ITERATOR
+            // TODO Closeable добавить потом
             Iterator<Tuple2<Long, ItemCls>> iterator = accountItems.values().iterator();
 
             while (iterator.hasNext()) {
@@ -155,9 +155,9 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
 	}
 	*/
 
-    public boolean add(Account account, long refDB, ItemCls item) {
-        return this.set(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
-                refDB), new Tuple2<Long, ItemCls>(null, item));
+    public void add(Account account, long refDB, ItemCls item) {
+        this.put(new Tuple2<Long, Long>(Longs.fromByteArray(account.getShortAddressBytes()),
+                refDB), new Tuple2<Long, ItemCls>(item.getKey(), item));
     }
 	
 	/*

@@ -2,7 +2,6 @@ package org.erachain.gui.items.imprints;
 
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.imprints.ImprintCls;
-import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
@@ -17,12 +16,12 @@ import java.awt.event.ActionListener;
 
 public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
-    private ImprintsFavoriteSplitPanel th;
+    //private ImprintsFavoriteSplitPanel th;
 
     public ImprintsFavoriteSplitPanel() {
         super(new FavoriteImprintsTableModel(), "PersonsFavoriteSplitPanel");
         this.setName(Lang.getInstance().translate("Favorite Persons"));
-        th = this;
+        //th = this;
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
@@ -30,21 +29,21 @@ public class ImprintsFavoriteSplitPanel extends ItemSplitPanel {
             public void actionPerformed(ActionEvent e) {
                 //new AccountSendDialog(null, null, null, (PersonCls) th.itemMenu);
                 MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
-                        null, null, (PersonCls) th.itemTableSelected, null));
+                        null, itemTableSelected.getOwner(), null, null));
 
             }
         });
 
-        th.menuTable.add(vsend_Coins_Item);
+        menuTable.add(vsend_Coins_Item);
         JMenuItem send_Mail_Item = new JMenuItem(Lang.getInstance().translate("Send Mail"));
         send_Mail_Item.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new MailSendPanel(null, null, (PersonCls) th.itemTableSelected));
+                MainPanel.getInstance().insertTab(new MailSendPanel(null, itemTableSelected.getOwner(), null));
             }
         });
 
-        th.menuTable.add(send_Mail_Item);
+        menuTable.add(send_Mail_Item);
     }
 
     // show details

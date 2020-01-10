@@ -57,10 +57,10 @@ function exchange(data){
 
         output += '<td><a href=?asset=' + trade.assetHaveKey + '&asset=' + trade.assetWantKey + '>' + getShortNameBlanked(trade.assetHaveName) + '/' + getShortNameBlanked(trade.assetWantName) + '</a>';
 
-        output += '<td><a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
+        output += '<td>';
 
         // отобрадает что это создатель актива действует
-        if (trade.initiatorCreator_addr == data.assetWantOwner) {
+        if (trade.initiatorCreator_addr == trade.assetWantOwner) {
             if (trade.type != 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {
@@ -68,36 +68,35 @@ function exchange(data){
             }
         }
 
+        output += '<a href=?address=' + trade.initiatorCreator_addr + '>' + cutBlank(trade.initiatorCreator, 20) + '</a>';
+
         if (trade.type == 'sell') {
-                    output += '<td align=right>' + addCommas(trade.amountHave);
-                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            output += '<td align=right>' + addCommas(trade.amountHave);
+            //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
 
-                    if (trade.unchecked == true) {}
-                    else {
-                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
-                            + '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
-                        ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                    }
-
-                    //output += '<td>' + addCommas(trade.amountWant);
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-            } else {
-                    output += '<td align=right>' + addCommas(trade.amountHave);
-                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-
-                    if (trade.unchecked == true) {}
-                    else {
-                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
-                            + '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
-                        //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
-                    }
-
-                    //output += '<td>' + addCommas(trade.amountWant);
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += '<td align=left>';
+            if (trade.unchecked == true) {}
+            else {
+                output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>';
             }
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
+
+        } else {
+            output += '<td align=right>' + addCommas(trade.amountHave);
+
+            output += '<td align=left>';
+            if (trade.unchecked == true) {}
+            else {
+                output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>';
+            }
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
+
+        }
+
+        output += '<td>';
 
         // отобрадает что это создатель актива действует
-        if (trade.targetCreator_addr == data.assetWantOwner) {
+        if (trade.targetCreator_addr == trade.assetHaveOwner) {
             if (trade.type == 'sell') {
                 output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen"></span>';
             } else {
@@ -105,9 +104,7 @@ function exchange(data){
             }
         }
 
-        output += '<td><a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
-
-        //output += '<td>' + addCommas(trade.amountWant);
+        output += '<a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
 
     }
 
@@ -193,32 +190,26 @@ function order(data){
         }
 
         if (trade.type == 'sell') {
-                    output += '<td align=right>' + addCommas(trade.amountHave);
-                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
+            output += '<td align=right>' + addCommas(trade.amountHave);
 
-                    if (trade.unchecked == true) {}
-                    else {
-                        output += '<td align=left><span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>'
-                            + '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
-                        ///output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-                    }
-
-                    //output += '<td>' + addCommas(trade.amountWant);
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
-            } else {
-                    output += '<td align=right>' + addCommas(trade.amountHave);
-                    //output += ' ' + getAssetNameMini(data.assetHave, data.assetHaveName);
-
-                    if (trade.unchecked == true) {}
-                    else {
-                        output += '<td align=left><span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>'
-                            + '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
-                        //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName) + '';
-                    }
-
-                    //output += '<td>' + addCommas(trade.amountWant);
-                    //output += ' ' + getAssetNameMini(data.assetWant, data.assetWantName);
+            output += '<td align=left>';
+            if (trade.unchecked == true) {}
+            else {
+                output += '<span class="glyphicon glyphicon-arrow-down" style="color:crimson; font-size:1.2em"></span>';
             }
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realReversePrice) + '</span>';
+
+        } else {
+            output += '<td align=right>' + addCommas(trade.amountHave);
+
+            output += '<td align=left>';
+            if (trade.unchecked == true) {}
+            else {
+                output += '<span class="glyphicon glyphicon-arrow-up" style="color:limegreen; font-size:1.2em"></span>';
+            }
+            output += '<span style="font-size:1.1em">' + addCommas(trade.realPrice) + '</span>';
+
+        }
 
         // отобрадает что это создатель актива действует
         if (trade.targetCreator_addr == data.assetWantOwner) {
@@ -230,8 +221,6 @@ function order(data){
         }
 
         output += '<td><a href=?address=' + trade.targetCreator_addr + '>' + cutBlank(trade.targetCreator, 20) + '</a>';
-
-        //output += '<td>' + addCommas(trade.amountWant);
 
     }
 

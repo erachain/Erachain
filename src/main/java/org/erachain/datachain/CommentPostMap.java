@@ -4,52 +4,46 @@ import com.google.common.primitives.SignedBytes;
 import org.mapdb.DB;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Get the parent post for a comment (the blogpost that was commented)
  *
  * @author Skerberus
  */
-public class CommentPostMap extends DCMap<byte[], byte[]> {
+public class CommentPostMap extends DCUMap<byte[], byte[]> {
 
     public CommentPostMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public CommentPostMap(DCMap<byte[], byte[]> parent) {
+    public CommentPostMap(DCUMap<byte[], byte[]> parent) {
         super(parent, null);
     }
 
     @Override
-    protected Map<byte[], byte[]> getMap(DB database) {
+    public void openMap() {
 
-        return database.createTreeMap("CommentPostMapTree")
+        map = database.createTreeMap("CommentPostMapTree")
                 .comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
     }
 
     public void add(byte[] signatureOfComment, byte[] signatureOfBlogPost) {
-        set(signatureOfComment, signatureOfBlogPost);
+        put(signatureOfComment, signatureOfBlogPost);
     }
 
-    public void remove(byte[] signatureOfComment) {
-        delete(signatureOfComment);
-    }
-
-    @Override
-    protected Map<byte[], byte[]> getMemoryMap() {
-        return new HashMap<>();
+    public void delete(byte[] signatureOfComment) {
+        this.delete(signatureOfComment);
     }
 
     @Override
-    protected byte[] getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        map = new HashMap<>();
     }
 
     @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 }
 

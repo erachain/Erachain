@@ -1,24 +1,24 @@
 package org.erachain.datachain;
 
 import org.erachain.core.crypto.Base58;
-import org.erachain.database.DBMap;
-import org.mapdb.BTreeKeySerializer;
+import org.erachain.dbs.DBTab;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * учет времени последней транзакции данного вида, посланной со счета.
- * Используется для проверки валидности транзакций.
- * Если ключ создан без времени, то хранит ссылку на последнюютранзакцию с этого счета
+ * Учет времени последней транзакции данного вида, посланной со счета - на подобие как сделан
+ * учет последней трнзакции сл счета без учета типа трнзакции - ReferenceMap,
+ * - для быстрого поиска записей данного вида для данного счета.
+ * Пока не используется ни где.
+ * Если ключ создан без времени, то хранит ссылку на последнюю транзакцию с этого счета
  * Ключ - счет (20 байт) + время (Long)
  * Значение  - массив байтов
- * Используется как супер класс для AddressStatementRefs (которая сейчас не используется?) - видимо для быстрого поиска записей данного вида для данного счета
+ * Используется как супер класс для AddressStatementRefs (которая сейчас не используется?)
  */
-public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
+public abstract class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[]> {
     protected String name;
 
     public AddressItemRefs(DCSet databaseSet, DB database, String name,
@@ -28,10 +28,10 @@ public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
         this.name = name;
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
-            this.observableData.put(DBMap.NOTIFY_LIST, observeList);
-            this.observableData.put(DBMap.NOTIFY_ADD, observeAdd);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+            this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
+            this.observableData.put(DBTab.NOTIFY_LIST, observeList);
+            this.observableData.put(DBTab.NOTIFY_ADD, observeAdd);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
         }
 
     }
@@ -41,37 +41,31 @@ public class AddressItemRefs extends DCMap<Tuple2<byte[], Long>, byte[]> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple2<byte[], Long>, byte[]> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("address_" + this.name + "_refs")
+        map = database.createTreeMap("address_" + this.name + "_refs")
                 //.keySerializer(BTreeKeySerializer.TUPLE2)
                 //.comparator(UnsignedBytes.lexicographicalComparator())
                 .comparator(new Fun.Tuple2Comparator(Fun.BYTE_ARRAY_COMPARATOR, Fun.COMPARATOR)) // - for Tuple2<byte[]m byte[]>
-                .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<Tuple2<byte[], Long>, byte[]> getMemoryMap() {
+    protected void getMemoryMap() {
         //return new TreeMap<Tuple2<byte[], Long>, byte[]>(UnsignedBytes.lexicographicalComparator());
-        return new TreeMap<Tuple2<byte[], Long>, byte[]>();
-    }
-
-    @Override
-    protected byte[] getDefaultValue() {
-        return null;
+        map = new TreeMap<Tuple2<byte[], Long>, byte[]>();
     }
 
     public byte[] get(String address, Long key) {
         return this.get(new Tuple2<byte[], Long>(Base58.decode(address), key));
     }
 
-    public void set(String address, Long key, byte[] ref) {
-        this.set(new Tuple2<byte[], Long>(Base58.decode(address), key), ref);
+    public void put(String address, Long key, byte[] ref) {
+        this.put(new Tuple2<byte[], Long>(Base58.decode(address), key), ref);
     }
 
     public void delete(String address, Long key) {

@@ -33,11 +33,11 @@ public class MyAssetsTab extends SplitPanel {
      */
     WalletItemAssetsTableModel assetsModel;
     RowSorter<WalletItemAssetsTableModel> sorter;
-    private MyAssetsTab th;
+    //private MyAssetsTab th;
 
     public MyAssetsTab() {
         super("MyAssetsTab");
-        th = this;
+        //th = this;
         this.setName(Lang.getInstance().translate("My Assets"));
         searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
@@ -466,8 +466,8 @@ public class MyAssetsTab extends SplitPanel {
             if (asset == null) return;
             //AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
             //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
-            int div = th.jSplitPanel.getDividerLocation();
-            int or = th.jSplitPanel.getOrientation();
+            int div = jSplitPanel.getDividerLocation();
+            int or = jSplitPanel.getOrientation();
             AssetInfo info_panel = new AssetInfo(asset, false);
             //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);

@@ -420,7 +420,7 @@ public abstract class ArbitraryTransaction extends Transaction {
         if (signatureOfBlogPostOpt != null) {
             db.getPostCommentMap().remove(signatureOfBlogPostOpt,
                     signatureOfComment);
-            db.getCommentPostMap().remove(signatureOfComment);
+            db.getCommentPostMap().delete(signatureOfComment);
 
         }
     }

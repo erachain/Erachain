@@ -2,10 +2,8 @@ package org.erachain.network.message;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-import com.sun.org.apache.xerces.internal.util.SynchronizedSymbolTable;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
-import org.erachain.network.Peer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +17,7 @@ public class SignaturesMessage extends Message {
     private static final int DATA_LENGTH = 4;
 
     static Logger LOGGER = LoggerFactory.getLogger(SignaturesMessage.class.getName());
-    private static boolean loggerOn = BlockChain.CHECK_BUGS > 5;
+    private static boolean loggerOn = BlockChain.CHECK_BUGS > 5 && false;
 
     private List<byte[]> signatures;
 
@@ -94,12 +92,6 @@ public class SignaturesMessage extends Message {
 
         //ADD CHECKSUM
         data = Bytes.concat(super.toBytes(), this.generateChecksum(data), data);
-
-        try {
-            SignaturesMessage test = parse(data);
-        } catch (Exception e) {
-            String eee = e.getMessage();
-        }
 
         return data;
     }

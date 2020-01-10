@@ -12,6 +12,7 @@ import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.ATTransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.mapdb.Fun.Tuple2;
@@ -66,7 +67,10 @@ public class ATAPIPlatformImpl extends ATAPIImpl {
             Tuple2<Integer, Integer> atTxTp = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).getNextATTransaction(startHeight, numOfTx, account.getAddress());
             int atTxsp = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).getATTransactions(startHeight).size();
 
-            Long txp = ((TransactionFinalMap) dcSet.getTransactionFinalMap().getParentMap()).getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxsp : 0, account.getAddress());
+            Long txp = ((TransactionFinalMap) dcSet.getTransactionFinalMap()
+                    //.getParentMap() было в DCU - сечас нету в TAB & SUIT
+            )
+                    .getTransactionsAfterTimestamp(startHeight, (numOfTx > atTxs) ? numOfTx - atTxsp : 0, account.getAddress());
             Tuple2<Integer, Integer> pairP = Transaction.parseDBRef(txp);
             if (atTxTp != null && (txp == null || atTxTp.a <= pairP.a) && atTxTp.a < forkHeight) {
                 ATTransaction atTx = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).get(atTxTp);
@@ -76,7 +80,9 @@ public class ATAPIPlatformImpl extends ATAPIImpl {
 
             } else if (txp != null && pairP.a < forkHeight) {
                 atTxs = ((ATTransactionMap) dcSet.getATTransactionMap().getParent()).getATTransactions(pairP.a).size();
-                Transaction transaction = ((TransactionFinalMap) dcSet.getTransactionFinalMap().getParentMap()).get(txp);
+                Transaction transaction = ((TransactionFinalMapImpl) dcSet.getTransactionFinalMap()
+                        //.getParentMap() было в DCU - сечас нету в TAB & SUIT
+                ).get(txp);
 
                 long txAmount = getAmount((Transaction) transaction, new Account(Base58.encode(state.getId())), state.getHeight());
 

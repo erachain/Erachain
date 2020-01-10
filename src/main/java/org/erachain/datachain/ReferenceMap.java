@@ -1,54 +1,6 @@
 package org.erachain.datachain;
 
-import com.google.common.primitives.UnsignedBytes;
-import org.mapdb.DB;
-import org.mapdb.Hasher;
-import org.mapdb.SerializerBase;
+import org.erachain.dbs.DBTab;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-
-/**
- * seek reference to tx_Parent by address+timestamp
- * account.address -> LAST[TX.timestamp + TX.dbRef]
- * account.address + TX.timestamp -> PARENT[TX.timestamp + TX.dbRef]
- *
- */
-public class ReferenceMap extends DCMap<byte[], long[]> {
-
-    public ReferenceMap(DCSet databaseSet, DB database) {
-        super(databaseSet, database);
-    }
-
-    public ReferenceMap(ReferenceMap parent, DCSet dcSet) {
-        super(parent, dcSet);
-    }
-
-    @Override
-    protected Map<byte[], long[]> getMap(DB database) {
-        //OPEN MAP
-        return database.createHashMap("references")
-                .keySerializer(SerializerBase.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
-                // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
-                .hasher(Hasher.BYTE_ARRAY) // ОЧЕНЬ ВАЖНО! иначе работатьт не будет поиск с байтами
-                // проверка в org.erachain.core.account.AccountTest.setLastTimestamp
-                .counterEnable()
-                .makeOrGet();
-    }
-
-    @Override
-    protected Map<byte[], long[]> getMemoryMap() {
-        return new TreeMap<>(UnsignedBytes.lexicographicalComparator());
-    }
-
-    protected void createIndexes(DB database) {
-    }
-
-    @Override
-    protected long[] getDefaultValue() {
-        // NEED for toByte for not referenced accounts
-        return null;
-    }
-
+public interface ReferenceMap extends DBTab<byte[], long[]> {
 }

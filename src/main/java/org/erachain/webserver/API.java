@@ -67,12 +67,17 @@ public class API {
 
         Map help = new LinkedHashMap();
 
+        help.put("see /apiasset", "Help for assets API");
         help.put("see /apidocuments", "Help for documents API");
         help.put("see /apiperson", "Help for person API");
         help.put("see /apipoll", "Help for polls API");
         help.put("see /apitelegrams", "Help for telegrams API");
         help.put("see /apiexchange", "Help for exchange API");
         help.put("see /apirecords", "Help for transactions API");
+
+        help.put("*** BALANCE SYSTEM ***", "");
+        help.put("bal 1", "Balance Components - {Total_Income, Remaining_Balance]");
+        help.put("bal 2", "Balances Array - [Balance in Own, Balance in Debt, Balance on Hold, Balance of Consumer]");
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
@@ -124,6 +129,7 @@ public class API {
 
         help.put("*** PERSON ***", "");
         help.put("GET Person Height", "personheight");
+        help.put("GET Person Key by PubKey of Owner", "personkeybyownerpublickey/{publickey}");
         help.put("GET Person", "person/{key}");
         help.put("GET Person Data", "persondata/{key}");
         help.put("GET Person Key by Address", "personkeybyaddress/{address}");
@@ -244,7 +250,7 @@ public class API {
             ++step;
             Integer heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
             if (heightWT != null && heightWT > 0) {
-                out = dcSet.getBlockMap().get(heightWT + 1).toJson();
+                out = dcSet.getBlockMap().getAndProcess(heightWT + 1).toJson();
             } else {
                 out.put("message", "signature not found");
             }
@@ -342,7 +348,6 @@ public class API {
     }
 
     @GET
-    // 		this.getIterator(23, true)
     @Path("blockbyheight2/{height}")
     public Response blockByHeight2(@PathParam("height") String heightStr) {
 
@@ -411,7 +416,7 @@ public class API {
                     out.put("end", 1);
                     break;
                 }
-                array.add(blockMap.get(i).toJson());
+                array.add(blockMap.getAndProcess(i));
             }
             out.put("blocks", array);
 
@@ -1177,17 +1182,11 @@ public class API {
     public Response asset(@PathParam("key") long key) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        // DOES ASSETID EXIST
-        if (!map.contains(key)) {
-            throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_ASSET_NOT_EXIST);
-        }
 
         AssetCls asset = (AssetCls) map.get(key);
         if (asset == null) {
-
-
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
         }
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -1202,14 +1201,12 @@ public class API {
     public Response assetData(@PathParam("key") long key) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        // DOES ASSETID EXIST
-        if (!map.contains(key)) {
-            throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_ASSET_NOT_EXIST);
-        }
 
         AssetCls asset = (AssetCls) map.get(key);
+        if (asset == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -1337,22 +1334,24 @@ public class API {
         */
 
         JSONArray arraySell = new JSONArray();
-        List<Order> orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        List<Order> orders = this.dcSet.getOrderMap().getOrdersForTrade(have, want, false);
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
-            itemJson.add(order.getPrice());
+            itemJson.add(order.calcLeftPrice());
+            itemJson.add(order.getAmountWantLeft());
 
             arraySell.add(itemJson);
 
         }
 
         JSONArray arrayBuy = new JSONArray();
-        orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, false);
+        orders = this.dcSet.getOrderMap().getOrdersForTrade(want, have, false);
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
-            itemJson.add(order.calcPriceReverse()); // REVERSE
+            itemJson.add(order.calcLeftPriceReverse()); // REVERSE
+            itemJson.add(order.getAmountWantLeft());
 
             arrayBuy.add(itemJson);
 
@@ -1559,7 +1558,7 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
@@ -1678,7 +1677,7 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
         //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
 
         if (personItem == null) {

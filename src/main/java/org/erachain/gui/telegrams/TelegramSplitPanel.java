@@ -569,7 +569,7 @@ public void onSendClick() {
    // CREATE TX MESSAGE
     Transaction transaction = Controller.getInstance().r_Send(
             Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
-            amount, head, messageBytes, isTextByte, encrypted);
+            amount, head, messageBytes, isTextByte, encrypted, 0);
     
     Controller.getInstance().broadcastTelegram(transaction, true);
        

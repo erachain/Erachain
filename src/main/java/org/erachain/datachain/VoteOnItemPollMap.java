@@ -1,6 +1,6 @@
 package org.erachain.datachain;
 
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.BTreeMap;
@@ -13,7 +13,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 /**
- * Храним выбор голосующего по Сущности Голования
+ * Храним выбор голосующего по Сущности Голосования
  * POLL KEY + OPTION KEY + ACCOUNT SHORT = result Transaction reference (BlockNo + SeqNo)
  * byte[] - un CORAMPABLE
  *
@@ -23,16 +23,16 @@ import java.util.*;
  * TODO: передлать короткий Счет на байты
  * TODO: передаьт Тупле 2 на Лонг - на ссылку сразу как ключ для поиска транзакции
  */
-public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
+public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> {
 
     public VoteOnItemPollMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_VOTEPOLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOTEPOLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOTEPOLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOTEPOLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_VOTEPOLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_VOTEPOLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_VOTEPOLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOTEPOLL_TYPE);
         }
 
     }
@@ -41,26 +41,20 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
         super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("vote_item_poll")
+        map = database.createTreeMap("vote_item_poll")
                 .keySerializer(BTreeKeySerializer.TUPLE3)
-                .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>> getMemoryMap() {
-        return new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
-    }
-
-    @Override
-    protected Stack<Tuple2<Integer, Integer>> getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple3<Long, Integer, BigInteger>, Stack<Tuple2<Integer, Integer>>>();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -155,7 +149,9 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
 
         Stack<Tuple2<Integer, Integer>> new_stack;
 
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             new_stack = stack;
         else {
             // !!!! NEEED .clone() !!!
@@ -164,7 +160,7 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
         }
 
         new_stack.push(value);
-        this.set(key, stack);
+        this.put(key, stack);
     }
 
     public Tuple2<Integer, Integer> getItem(long pollKey, int optionKey, BigInteger accountShort) {
@@ -181,7 +177,9 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
             return null;
 
         Stack<Tuple2<Integer, Integer>> new_stack;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             new_stack = stack;
         else {
             // !!!! NEEED .clone() !!!
@@ -191,7 +189,7 @@ public class VoteOnItemPollMap extends DCMap<Tuple3<Long, Integer, BigInteger>, 
 
         Tuple2<Integer, Integer> itemRemoved = new_stack.pop();
 
-        this.set(key, new_stack);
+        this.put(key, new_stack);
 
         return itemRemoved;
 

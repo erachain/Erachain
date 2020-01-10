@@ -2,8 +2,9 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.voting.Poll;
-import org.erachain.database.DBMap;
 import org.erachain.database.serializer.PollSerializer;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
+public class PollMap extends DCUMapImpl<Tuple2<String, String>, Poll> {
     public static final int NAME_INDEX = 1;
     public static final int CREATOR_INDEX = 2;
     static Logger LOGGER = LoggerFactory.getLogger(PollMap.class.getName());
@@ -26,15 +27,15 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
         super(dWSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_POLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_POLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_POLL_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_POLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_POLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_LIST_POLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_POLL_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_POLL_TYPE);
         }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         //NAME INDEX
         NavigableSet<Tuple2<String, Tuple2<String, String>>> nameIndex = database.createTreeSet("polls_index_name")
                 .comparator(Fun.COMPARATOR)
@@ -69,9 +70,9 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Poll> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("polls")
+        map = database.createTreeMap("polls")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new PollSerializer())
                 .counterEnable()
@@ -79,13 +80,8 @@ public class PollMap extends DBMap<Tuple2<String, String>, Poll> {
     }
 
     @Override
-    protected Map<Tuple2<String, String>, Poll> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, Poll>(Fun.TUPLE2_COMPARATOR);
-    }
-
-    @Override
-    protected Poll getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<String, String>, Poll>(Fun.TUPLE2_COMPARATOR);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

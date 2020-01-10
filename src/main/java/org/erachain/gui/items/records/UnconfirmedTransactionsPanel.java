@@ -207,7 +207,7 @@ public class UnconfirmedTransactionsPanel extends JPanel
                 int row = record_stpit.jTableJScrollPanelLeftPanel.getSelectedRow();
                 row = record_stpit.jTableJScrollPanelLeftPanel.convertRowIndexToModel(row);
                 Transaction trans = transactionsModel.getItem(row);
-                DCSet.getInstance().getTransactionMap().delete(trans);
+                DCSet.getInstance().getTransactionTab().delete(trans);
 
             }
         });

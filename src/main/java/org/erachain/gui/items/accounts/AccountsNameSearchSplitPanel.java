@@ -429,7 +429,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
                             JSONObject ss = (JSONObject) inJSON.get(a);
                             Object a1 = ss.get("name");
                             Object a2 = ss.get("json");
-                            db.set(a, new Tuple2(ss.get("name"), ss.get("json")));
+                            db.put(a, new Tuple2(ss.get("name"), ss.get("json")));
                         }
 
                         // while (it.hasNext()){

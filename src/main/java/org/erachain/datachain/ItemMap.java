@@ -3,8 +3,8 @@ package org.erachain.datachain;
 import com.google.common.collect.Iterables;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.database.DBMap;
 import org.erachain.database.FilteredByStringArray;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.Pair;
 import org.mapdb.*;
 
@@ -16,7 +16,7 @@ import java.util.*;
  * ключ: номер, с самоувеличением
  * Значение: Сущность
  */
-public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredByStringArray<Long> {
+public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredByStringArray<Long> {
 
     //private static Logger logger;
 
@@ -51,14 +51,14 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
         this(databaseSet, database, name);
         if (databaseSet.isWithObserver()) {
             if (observeReset > 0)
-                this.observableData.put(DBMap.NOTIFY_RESET, observeReset);
+                this.observableData.put(DBTab.NOTIFY_RESET, observeReset);
             if (observeList > 0)
-                this.observableData.put(DBMap.NOTIFY_LIST, observeList);
+                this.observableData.put(DBTab.NOTIFY_LIST, observeList);
             if (observeAdd > 0) {
-                observableData.put(DBMap.NOTIFY_ADD, observeAdd);
+                observableData.put(DBTab.NOTIFY_ADD, observeAdd);
             }
             if (observeRemove > 0) {
-                observableData.put(DBMap.NOTIFY_REMOVE, observeRemove);
+                observableData.put(DBTab.NOTIFY_REMOVE, observeRemove);
             }
         }
     }
@@ -74,7 +74,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
 
     @Override
     public int size() {
-        return (int)key;
+        return (int) key;
     }
 
     public void setLastKey(long key) {
@@ -114,13 +114,13 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
         this.nameKey = database.createTreeSet(name + "_name_keys").comparator(Fun.COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
-        Bind.secondaryKeys((BTreeMap)map, this.nameKey,
+        Bind.secondaryKeys((BTreeMap) map, this.nameKey,
                 new Fun.Function2<String[], Long, ItemCls>() {
                     @Override
                     public String[] run(Long key, ItemCls item) {
                         // see https://regexr.com/
                         String[] keys = item.getName().toLowerCase().split(DCSet.SPLIT_CHARS);
-                        for (int i=0; i < keys.length; ++i) {
+                        for (int i = 0; i < keys.length; ++i) {
                             if (keys[i].length() > CUT_NAME_INDEX) {
                                 keys[i] = keys[i].substring(0, CUT_NAME_INDEX);
                             }
@@ -132,8 +132,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
 
 
     @SuppressWarnings("unchecked")
-    protected void createIndexes(DB database) {
-        if (Controller.getInstance().onlyProtocolIndexing){
+    protected void createIndexes() {
+        if (Controller.getInstance().onlyProtocolIndexing) {
             // NOT USE SECONDARY INDEXES
             return;
         }
@@ -156,13 +156,8 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
     }
 
     @Override
-    protected Map<Long, ItemCls> getMemoryMap() {
-        return new TreeMap<Long, ItemCls>();
-    }
-
-    @Override
-    protected ItemCls getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        map = new TreeMap<Long, ItemCls>();
     }
 
     public ItemCls get(Long key) {
@@ -175,7 +170,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
         return item;
     }
 
-    public long add(ItemCls item) {
+    public long incrementPut(ItemCls item) {
         // INCREMENT ATOMIC KEY IF EXISTS
         if (atomicKey != null) {
             atomicKey.incrementAndGet();
@@ -186,13 +181,52 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
         item.setKey(key);
 
         // INSERT WITH NEW KEY
-        set(key, item);
+        put(key, item);
 
         // RETURN KEY
         return key;
     }
 
-    public void remove(long key) {
+    public ItemCls decrementRemove(long key) {
+
+        if (key != this.key) {
+            LOGGER.error("delete KEY: " + key + " != map.value.key: " + this.key);
+
+            if (key > this.key) {
+                Long error = null;
+                error++;
+            }
+        }
+
+        ItemCls old = super.remove(key);
+
+        if (this.key != key) {
+            // it is not top of STACK (for UNIQUE items with short NUM)
+            return old;
+        }
+        // delete on top STACK
+
+        if (atomicKey != null) {
+            atomicKey.decrementAndGet();
+        }
+
+        // DECREMENT KEY
+        --this.key;
+
+        return old;
+    }
+
+    public void decrementDelete(long key) {
+
+        if (key != this.key) {
+            LOGGER.error("delete KEY: " + key + " != map.value.key: " + this.key);
+
+            if (key > this.key) {
+                Long error = null;
+                error++;
+            }
+        }
+
         super.delete(key);
 
         if (this.key != key) {
@@ -236,7 +270,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
         } else {
             // поиск целиком
 
-            stepFilter = stepFilter.substring(0, stepFilter.length() -1);
+            stepFilter = stepFilter.substring(0, stepFilter.length() - 1);
 
             if (stepFilter.length() > CUT_NAME_INDEX) {
                 stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
@@ -290,6 +324,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
      * а не как фильтр. Иначе слово принимаем как фильтр на диаппазон
      * и его длинна должна быть не мнее 5-ти символов. Например:
      * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
+     *
      * @param filter
      * @param offset
      * @param limit
@@ -326,7 +361,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
 
-        if (filter == null || filter.isEmpty()){
+        if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
         }
 
@@ -353,7 +388,7 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<ItemCls> getByFilterAsArray(String filter, int offset, int limit) {
 
-        if (filter == null || filter.isEmpty()){
+        if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
         }
 
@@ -375,11 +410,26 @@ public abstract class ItemMap extends DCMap<Long, ItemCls> implements FilteredBy
     }
 
     public Collection<Long> getFromToKeys(long fromKey, long toKey) {
-        return ((BTreeMap)map).subMap(fromKey, toKey).values();
+        return ((BTreeMap) map).subMap(fromKey, toKey).values();
     }
 
     public NavigableMap<Long, ItemCls> getOwnerItems(String ownerPublicKey) {
         return this.ownerKeyMap.subMap(ownerPublicKey, ownerPublicKey);
     }
 
+    @Override
+    public boolean writeToParent() {
+        boolean updated = super.writeToParent();
+        ((ItemMap) parent).atomicKey.set(this.key);
+        ((ItemMap) parent).key = this.key;
+        return updated;
+    }
+
+    /**
+     * Если откатить базу данных то нужно и локальные значения сбросить
+     */
+    @Override
+    public void afterRollback() {
+        this.key = atomicKey.get();
+    }
 }

@@ -8,30 +8,30 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
+import org.erachain.core.transaction.CancelOrderTransaction;
+import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetMap;
-import org.erachain.datachain.OrderMap;
-import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.utils.Pair;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import org.erachain.datachain.*;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
+import org.erachain.ntp.NTP;
+import org.erachain.utils.APIUtils;
+import org.erachain.utils.Pair;
+import org.erachain.utils.StrJSonFine;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
-import org.erachain.utils.APIUtils;
-import org.erachain.utils.StrJSonFine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
 import java.util.*;
 
 @Path("trade")
@@ -48,18 +48,37 @@ public class TradeResource {
         Map<String, String> help = new LinkedHashMap<String, String>();
         help.put("GET trade/rater/[start/stop]",
                 "Start Rater: 1 - start, 0 - stop");
-        help.put("GET trade/create/[creator]/[haveKey]/[wantKey]/[haveAmount]/[wantAmount]?feePow=[feePow]&password=[password]",
+        help.put("GET trade/create/[creator]/[amountAssetKey]/[priceAssetKey]/[haveAmount]/[wantAmount]?feePow=[feePow]&password=[password]",
                 "make and broadcast CreateOrder");
-        help.put("GET trade/get/[signature]",
-                "Get Order");
-        help.put("GET trade/orders/[have]/[want]?limit=[limit]",
-                "Get tradeorders for HaveKey & WantKey, "
+        help.put("GET trade/get/[seqNo|signature]",
+                "Get Order by seqNo or Signature. For example: 4321-2");
+        help.put("GET trade/ordersbook/[have]/[want]?limit=[limit]",
+                "Get active orders in orderbook for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 20.");
+        help.put("GET trade/completedordersfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get completed orders for amountAssetKey & priceAssetKey, "
+                        + "limit is count record. The number of orders is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
         help.put("GET trade/trades/[have]/[want]?timestamp=[timestamp]&limit=[limit]",
-                "Get trades for HaveKey & WantKey, "
+                "Get trades for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of trades is limited by input param, default 50.");
-        help.put("GET trade/getbyaddress/[creator]/[haveKey]/[wantKey]",
+        help.put("GET trade/tradesfrom/[have]/[want]?order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get trades for amountAssetKey & priceAssetKey, "
+                        + "limit is count record. The number of trades is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+        help.put("GET trade/tradesfrom/[address]/[have]/[want]?trade=[TradeID}&order=[orderID]&height=[height]&time=[timestamp]&limit=[limit]",
+                "Get trades for amountAssetKey & priceAssetKey for creator [address], "
+                        + "limit is count record. The number of trades is limited by input param, default 50."
+                        + "Use Order ID as Block-seqNo. For example 103506-3. Use TradeID as Initiator_OrderID/Target_OrderID");
+        help.put("GET trade/getbyaddress/[creator]?limit=[limit]",
                 "get list of orders in CAP by address");
+        help.put("GET trade/getbyaddress/[creator]/[amountAssetKey]/[priceAssetKey]?limit=[limit]",
+                "get list of orders in CAP by address for trade pair");
+
+        help.put("GET trade/allordersbyaddress/{address}/{from}?limit=[limit]",
+                "get list of ALL orders (in CAP and completed) by address from OrderID. "
+                        + "Use Order ID as Block-seqNo or Long. For example 103506-3 or 928735142671");
+
         help.put("GET trade/cancel/[creator]/[signature]?password=[password]",
                 "Cancel Order");
 
@@ -77,13 +96,13 @@ public class TradeResource {
     /**
      * send and broadcast GET
      *
-     * @param creatorStr address in wallet
-     * @param haveKey    haveKey
-     * @param wantKey    wantKey
-     * @param haveAmount haveAmount or head
-     * @param wantAmount wantAmount
-     * @param feePower   fee Power
-     * @param password   password
+     * @param creatorStr    address in wallet
+     * @param haveKey       haveKey
+     * @param priceAssetKey priceAssetKey
+     * @param haveAmount    haveAmount or head
+     * @param wantAmount    wantAmount
+     * @param feePower      fee Power
+     * @param password      password
      * @return JSON row
      *
      * <h2>Example request</h2>
@@ -92,9 +111,9 @@ public class TradeResource {
      * {}
      */
     @GET
-    @Path("create/{creator}/{haveKey}/{wantKey}/{haveAmount}/{wantAmount}")
+    @Path("create/{creator}/{haveKey}/{priceAssetKey}/{haveAmount}/{wantAmount}")
     public String sendGet(@PathParam("creator") String creatorStr,
-                          @PathParam("haveKey") Long haveKey, @PathParam("wantKey") Long wantKey,
+                          @PathParam("haveKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey,
                           /// STRING for AMOUNT!!! SCALE is GOOD
                           @PathParam("haveAmount") BigDecimal haveAmount, @PathParam("wantAmount") BigDecimal wantAmount,
                           @DefaultValue("0") @QueryParam("feePow") Long feePower, @QueryParam("password") String password) {
@@ -113,7 +132,7 @@ public class TradeResource {
         if (haveAsset == null)
             throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
 
-        AssetCls wantAsset = cntr.getAsset(wantKey);
+        AssetCls wantAsset = cntr.getAsset(priceAssetKey);
         if (wantAsset == null)
             throw ApiErrorFactory.getInstance().createError(Transaction.ITEM_ASSET_NOT_EXIST);
 
@@ -142,33 +161,47 @@ public class TradeResource {
 
     @GET
     @Path("get/{signature}")
-    public String get(@PathParam("signature") String signatureStr) {
+    public static String getOrder(@PathParam("signature") String signatureStr) {
 
-        byte[] signature;
+        Long orderID;
         try {
-            signature = Base58.decode(signatureStr);
+            orderID = Transaction.parseDBRef(signatureStr);
         } catch (Exception e) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+            orderID = null;
         }
 
-        if (DCSet.getInstance().getTransactionMap().contains(signature)) {
-            JSONObject out = new JSONObject();
-            out.put("unconfirmed", true);
-            return out.toJSONString();
+        if (orderID == null) {
+            byte[] signature;
+            try {
+                signature = Base58.decode(signatureStr);
+            } catch (Exception e1) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_SIGNATURE);
+            }
+
+            if (DCSet.getInstance().getTransactionTab().contains(signature)) {
+                JSONObject out = new JSONObject();
+                out.put("unconfirmed", true);
+                return out.toJSONString();
+            }
+
+            Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
+            if (key == null) {
+                throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
+            }
+
+            orderID = key;
+
         }
 
-        Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
-        if (key == null) {
-            throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
-        }
-
-        Long orderID = key;
         if (DCSet.getInstance().getOrderMap().contains(orderID)) {
             JSONObject out = DCSet.getInstance().getOrderMap().get(orderID).toJson();
             out.put("active", true);
             return out.toJSONString();
         } else {
             Order order = DCSet.getInstance().getCompletedOrderMap().get(orderID);
+            if (order == null)
+                throw ApiErrorFactory.getInstance().createError(Transaction.ORDER_DOES_NOT_EXIST);
+
             JSONObject out = order.toJson();
             if (order.isFulfilled()) {
                 out.put("completed", true);
@@ -217,7 +250,7 @@ public class TradeResource {
 
         Controller cntr = Controller.getInstance();
 
-        if (!DCSet.getInstance().getTransactionMap().contains(signature)) {
+        if (!DCSet.getInstance().getTransactionTab().contains(signature)) {
             // ЕСЛИ нет его в неподтвержденных то пытаемся найти в действующих
             Long key = DCSet.getInstance().getTransactionFinalMapSigns().get(signature);
             if (key == null) {
@@ -252,10 +285,10 @@ public class TradeResource {
     }
 
     @GET
-    @Path("orders/{have}/{want}")
+    @Path("ordersbook/{have}/{want}")
     // orders/1/2?imit=4
-    public static String getOrders(@PathParam("have") Long have, @PathParam("want") Long want,
-                                   @DefaultValue("20") @QueryParam("limit") Long limit) {
+    public static String getOrdersBook(@PathParam("have") Long have, @PathParam("want") Long want,
+                                       @DefaultValue("20") @QueryParam("limit") Long limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
 
@@ -277,20 +310,20 @@ public class TradeResource {
         JSONObject result = new JSONObject();
 
         JSONArray arrayHave = new JSONArray();
-        for (Order order: haveOrders) {
-            JSONObject json = new JSONObject();
+        for (Order order : haveOrders) {
+            JSONObject json = order.toJson();
             json.put("id", order.getId());
             json.put("seqNo", Transaction.viewDBRef(order.getId()));
             json.put("creator", order.getCreator().getAddress());
             json.put("amount", order.getAmountHaveLeft().toPlainString());
             json.put("total", order.getAmountWantLeft().toPlainString());
-            json.put("price", order.getPrice().toPlainString());
+            json.put("price", order.calcLeftPrice().toPlainString());
             arrayHave.add(json);
         }
         result.put("have", arrayHave);
 
         JSONArray arrayWant = new JSONArray();
-        for (Order order: wantOrders) {
+        for (Order order : wantOrders) {
             JSONObject json = new JSONObject();
             json.put("id", order.getId());
             json.put("seqNo", Transaction.viewDBRef(order.getId()));
@@ -298,13 +331,13 @@ public class TradeResource {
             // get REVERSE price and AMOUNT
             json.put("amount", order.getAmountWantLeft().toPlainString());
             json.put("total", order.getAmountHaveLeft().toPlainString());
-            json.put("price", order.calcPriceReverse().toPlainString());
+            json.put("price", order.calcLeftPriceReverse().toPlainString());
             arrayWant.add(json);
         }
         result.put("want", arrayWant);
 
-        result.put("haveKey", have);
-        result.put("wantKey", want);
+        result.put("amountAssetKey", have);
+        result.put("priceAssetKey", want);
         result.put("limited", limitInt);
 
         return result.toJSONString();
@@ -327,7 +360,7 @@ public class TradeResource {
     // /trades/1/2?timestamp=3&limit=4
     public static String getTradesFromTimestamp(@PathParam("have") Long have, @PathParam("want") Long want,
                                                 @DefaultValue("0") @QueryParam("timestamp") Long timestamp,
-                                                @DefaultValue("50") @QueryParam("limit") Long limit) {
+                                                @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
         // DOES ASSETID EXIST
@@ -340,29 +373,195 @@ public class TradeResource {
                     Transaction.ITEM_ASSET_NOT_EXIST);
         }
 
-        int limitInt = limit.intValue();
-        List<Trade> listResult = Controller.getInstance().getTradeByTimestmp(have, want, timestamp, limitInt);
+        List<Trade> listResult = Controller.getInstance().getTradeByTimestamp(have, want, timestamp * 1000, limit);
 
         JSONArray arrayJSON = new JSONArray();
-        for (Trade trade: listResult) {
-            arrayJSON.add(trade.toJson(have));
+        for (Trade trade : listResult) {
+            arrayJSON.add(trade.toJson(have, false));
         }
 
         return arrayJSON.toJSONString();
     }
 
     @GET
-    @Path("getbyaddress/{creator}/{haveKey}/{wantKey}")
-    public String cancel(@PathParam("creator") String address,
-                         @PathParam("haveKey") Long haveKey, @PathParam("wantKey") Long wantKey) {
+    @Path("tradesfrom")
+    public static String getTradesFrom(@QueryParam("height") Integer fromHeight,
+                                       @QueryParam("trade") String fromTrade,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+
+        List<Trade> listResult;
+        if (fromTrade != null) {
+            long[] startTradeID = Trade.parseID(fromTrade);
+            listResult = Controller.getInstance().getTradesFromTradeID(startTradeID, limit);
+        } else if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+            listResult = Controller.getInstance().getTradeByOrderID(startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getTradeByHeight(fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getTradeByTimestamp(fromTimestamp * 1000, limit);
+        }
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade : listResult) {
+            arrayJSON.add(trade.toJson(0, true));
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
+    @Path("tradesfrom/{have}/{want}")
+    public static String getTradesFrom(@PathParam("have") Long have, @PathParam("want") Long want,
+                                       @QueryParam("height") Integer fromHeight,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        List<Trade> listResult;
+        if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+
+            listResult = Controller.getInstance().getTradeByOrderID(have, want, startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getTradeByHeight(have, want, fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getTradeByTimestamp(have, want, fromTimestamp * 1000, limit);
+        }
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade : listResult) {
+            arrayJSON.add(trade.toJson(have, true));
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
+    @Path("tradesfrom/{address}/{have}/{want}")
+    public static String getTradesAddressFrom(@PathParam("address") String address, @PathParam("have") Long have, @PathParam("want") Long want,
+                                              @QueryParam("height") Integer fromHeight,
+                                              @QueryParam("order") String fromOrder,
+                                              @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                              @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        List<Trade> listResult;
+        if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+
+            listResult = Controller.getInstance().getTradeByOrderID(have, want, startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getTradeByHeight(have, want, fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getTradeByTimestamp(have, want, fromTimestamp * 1000, limit);
+        }
+
+        DCSet dcSet = DCSet.getInstance();
+        JSONArray arrayJSON = new JSONArray();
+        for (Trade trade : listResult) {
+            Order initiator = trade.getInitiatorOrder(dcSet);
+            Order target = trade.getTargetOrder(dcSet);
+            if (initiator.getCreator().equals(address) || target.getCreator().equals(address)) {
+                arrayJSON.add(trade.toJson(have, true));
+            }
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
+    @Path("completedordersfrom/{have}/{want}")
+    public static String getOrdersFrom(@PathParam("have") Long have, @PathParam("want") Long want,
+                                       @QueryParam("height") Integer fromHeight,
+                                       @QueryParam("order") String fromOrder,
+                                       @DefaultValue("0") @QueryParam("time") Long fromTimestamp,
+                                       @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        List<Order> listResult;
+        if (fromOrder != null) {
+            Long startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+
+            listResult = Controller.getInstance().getOrdersByOrderID(have, want, startOrderID, limit);
+
+        } else if (fromHeight != null) {
+            listResult = Controller.getInstance().getOrdersByHeight(have, want, fromHeight, limit);
+        } else {
+            listResult = Controller.getInstance().getOrdersByTimestamp(have, want, fromTimestamp * 1000, limit);
+        }
+
+        JSONArray arrayJSON = new JSONArray();
+        for (Order order : listResult) {
+            arrayJSON.add(order.toJson());
+        }
+
+        return arrayJSON.toJSONString();
+    }
+
+    @GET
+    @Path("getbyaddress/{creator}/{amountAssetKey}/{priceAssetKey}")
+    public String getByAddressPair(@PathParam("creator") String address,
+                                   @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey,
+                                   @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
-        TransactionFinalMap finalMap = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
         Transaction createOrder;
 
         JSONArray out = new JSONArray();
-        for( Order order: ordersMap.getOrdersForAddress(address, haveKey, wantKey)) {
+        for (Order order : ordersMap.getOrdersForAddress(address, haveKey, priceAssetKey, 0)) {
             JSONObject orderJson = order.toJson();
             Long key = order.getId();
             createOrder = finalMap.get(key);
@@ -378,6 +577,128 @@ public class TradeResource {
         return out.toJSONString();
     }
 
+    @GET
+    @Path("allordersbyaddress/{address}/{from}")
+    public static String getAllOrdersByAddress(@PathParam("address") String address,
+                                               @PathParam("from") String fromOrder,
+                                               @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        Long startOrderID = null;
+        if (fromOrder != null) {
+            startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+        }
+
+        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
+        CreateOrderTransaction createOrder;
+
+        List<Long> keys = finalMap.getTransactionsByAddressAndType(address, Transaction.CREATE_ORDER_TRANSACTION, startOrderID, limit);
+
+        OrderMap ordersMap = DCSet.getInstance().getOrderMap();
+        CompletedOrderMap completedOrdersMap = DCSet.getInstance().getCompletedOrderMap();
+
+        Order order;
+        JSONArray out = new JSONArray();
+        for (Long key : keys) {
+            createOrder = (CreateOrderTransaction) finalMap.get(key);
+
+            if ((order = ordersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
+                if (order.isNotTraded()) {
+                    order.setStatus(Order.ACTIVE);
+                } else {
+                    order.setStatus(Order.FULFILLED);
+                }
+            } else if ((order = completedOrdersMap.get(key)) != null) { // обновим данные об ордере - fulfilled
+                if (order.isFulfilled()) {
+                    order.setStatus(Order.COMPLETED);
+                } else {
+                    order.setStatus(Order.CANCELED);
+                }
+            } else {
+                order = createOrder.makeOrder();
+                Long err = null;
+                err++;
+            }
+
+            JSONObject orderJson = order.toJson();
+            orderJson.put("signature", Base58.encode(createOrder.getSignature()));
+
+            out.add(orderJson);
+
+        }
+
+
+        return out.toJSONString();
+    }
+
+    /**
+     * В ordersMap.getKeysForAddressFromID неэффективно перебор до Откуда
+     *
+     * @param address
+     * @param fromOrder
+     * @param limit
+     * @return
+     */
+    @GET
+    @Path("allordersbyaddress_old/{address}/{from}")
+    public static String getAllOrdersByAddress_old(@PathParam("address") String address,
+                                                   @PathParam("from") String fromOrder,
+                                                   @DefaultValue("50") @QueryParam("limit") Integer limit) {
+
+        Long startOrderID = null;
+        if (fromOrder != null) {
+            startOrderID = Transaction.parseDBRef(fromOrder);
+            if (startOrderID == null) {
+                startOrderID = Long.parseLong(fromOrder);
+            }
+        }
+
+        OrderMap ordersMap = DCSet.getInstance().getOrderMap();
+        TransactionFinalMapImpl finalMap = DCSet.getInstance().getTransactionFinalMap();
+        CreateOrderTransaction createOrder;
+
+        // на самом деле не эффективно
+        Set<Long> keys = ordersMap.getKeysForAddressFromID(address, startOrderID, limit);
+
+        Order order;
+        JSONArray out = new JSONArray();
+        for (Long key : keys) {
+            createOrder = (CreateOrderTransaction) finalMap.get(key);
+
+            ///order = ordersMap.get(key);
+            order = createOrder.makeOrder();
+
+            JSONObject orderJson = order.toJson();
+            orderJson.put("signature", Base58.encode(createOrder.getSignature()));
+
+            out.add(orderJson);
+
+        }
+
+        CompletedOrderMap completedOrdersMap = DCSet.getInstance().getCompletedOrderMap();
+        try (IteratorCloseable<Long> completedIterator = completedOrdersMap.getAddressIterator(address, startOrderID)) {
+
+            Long key;
+            while (completedIterator.hasNext()) {
+                key = completedIterator.next();
+                createOrder = (CreateOrderTransaction) finalMap.get(key);
+
+                order = completedOrdersMap.get(key);
+
+                JSONObject orderJson = order.toJson();
+                orderJson.put("signature", Base58.encode(createOrder.getSignature()));
+
+                out.add(orderJson);
+
+            }
+        } catch (IOException e) {
+        }
+
+        return out.toJSONString();
+    }
+
     private static long test1Delay = 0;
     private static float test1probability = 0;
     private static Thread threadTest1;
@@ -385,6 +706,7 @@ public class TradeResource {
 
     /**
      * GET trade/test1/0.85/1000
+     *
      * @param probability
      * @param delay
      * @param password
@@ -424,7 +746,7 @@ public class TradeResource {
 
         // запомним счетчики для счетов
         HashMap<String, Long> counters = new HashMap<String, Long>();
-        for (Account crestor: test1Creators) {
+        for (Account crestor : test1Creators) {
             counters.put(crestor.getAddress(), 0L);
         }
 
@@ -466,7 +788,7 @@ public class TradeResource {
 
                 // если есть вероятногсть по если не влазим в нее то просто ожидание и пропуск ходя
                 if (test1probability < 1 && test1probability > 0) {
-                    int rrr = random.nextInt((int) (100.0 / test1probability) );
+                    int rrr = random.nextInt((int) (100.0 / test1probability));
                     if (rrr > 100) {
                         try {
                             Thread.sleep(this.test1Delay);
@@ -491,7 +813,7 @@ public class TradeResource {
 
                         // check all created orders
                         for (PrivateKeyAccount account : test1Creators) {
-                            List<Order> addressOrders = dcSet.getOrderMap().getOrdersForAddress(account.getAddress(), haveStart.getKey(), wantStart.getKey());
+                            List<Order> addressOrders = dcSet.getOrderMap().getOrdersForAddress(account.getAddress(), haveStart.getKey(), wantStart.getKey(), 0);
                             for (Order order : addressOrders) {
                                 Transaction createTx = dcSet.getTransactionFinalMap().get(order.getId());
                                 if (createTx != null) {
@@ -510,7 +832,7 @@ public class TradeResource {
 
                     if (orders.size() / test1Creators.size() >= 5) {
                         // если уже много ордеров на один счет то попробуем удалить какие-то
-                        for (String txSign: orders.keySet()) {
+                        for (String txSign : orders.keySet()) {
 
                             Transaction orderCreateTx = dcSet.getTransactionFinalMap().get(Base58.decode(txSign));
                             if (orderCreateTx == null) {
@@ -524,7 +846,7 @@ public class TradeResource {
                                 counter = counters.get(address);
 
                                 PrivateKeyAccount privateKey = null;
-                                for (PrivateKeyAccount crestor: test1Creators) {
+                                for (PrivateKeyAccount crestor : test1Creators) {
                                     if (crestor.equals(orderCreateTx.getCreator())) {
                                         privateKey = crestor;
                                         break;
@@ -588,43 +910,61 @@ public class TradeResource {
 
                         address = creator.getAddress();
                         counter = counters.get(address);
-                        transaction = cnt.createOrder(creator,
-                                have, want, haveAmount, wantAmount, 0);
 
                         if (cnt.isOnStopping())
                             return;
-                    }
 
-                    Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
-                    // CLEAR for HEAP
-                    transaction.setDC(null);
+                        if (false) {
+                            transaction = cnt.createOrder(creator,
+                                    have, want, haveAmount, wantAmount, 0);
 
-                    // CHECK VALIDATE MESSAGE
-                    if (result == Transaction.VALIDATE_OK) {
-                        orders.put(transaction.viewSignature(), address);
-                        counters.put(address, counter + 1);
+                            Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
+                            // CLEAR for HEAP
+                            transaction.setDC(null);
 
-                    } else {
-                        if (result == Transaction.NO_BALANCE
-                                || result == Transaction.NOT_ENOUGH_FEE
-                        ) {
+                            // CHECK VALIDATE MESSAGE
+                            if (result == Transaction.VALIDATE_OK) {
+                                orders.put(transaction.viewSignature(), address);
+                                counters.put(address, counter + 1);
 
-                            try {
-                                Thread.sleep(1);
-                            } catch (InterruptedException e) {
-                                break;
+                            } else {
+                                if (result == Transaction.NO_BALANCE
+                                        || result == Transaction.NOT_ENOUGH_FEE
+                                ) {
+
+                                    try {
+                                        Thread.sleep(1);
+                                    } catch (InterruptedException e) {
+                                        break;
+                                    }
+
+                                    continue;
+                                }
+
+                                // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
+                                try {
+                                    Thread.sleep(10000);
+                                } catch (InterruptedException e) {
+                                    break;
+                                }
+                                continue;
                             }
+                        } else {
 
-                            continue;
+                            long time = NTP.getTime();
+
+                            //CREATE ORDER TRANSACTION
+                            transaction = new CreateOrderTransaction(creator, have.getKey(), want.getKey(),
+                                    haveAmount, wantAmount, (byte) 0, time, 0l);
+
+                            transaction.sign(creator, Transaction.FOR_NETWORK);
+
+                            // карта сбрасывается иногда при очистке, поэтому надо брать свежую всегда
+                            cnt.transactionsPool.offerMessage(transaction);
+                            cnt.broadcastTransaction(transaction);
+
                         }
 
-                        // not work in Threads - logger.info("TEST1: " + OnDealClick.resultMess(result));
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
-                        continue;
                     }
 
                     try {
@@ -639,6 +979,7 @@ public class TradeResource {
                     // not see in Thread - logger.error(e10.getMessage(), e10);
                     String error = e10.getMessage();
                     error += "";
+                } catch (Throwable e10) {
                 }
 
             } while (true);
@@ -654,4 +995,44 @@ public class TradeResource {
 
     }
 
+    /// get trade/testcancelorder/7K8eqCRon1NKxnWn9o7dfbkTkL9zNEKCzR - see issue/1149
+    @GET
+    @Path("testcancelorder/{address}")
+    public String testCancelOrder(@PathParam("address") String address) {
+
+        TransactionFinalMapImpl txMap = DCSet.getInstance().getTransactionFinalMap();
+        OrderMap orderMap = DCSet.getInstance().getOrderMap();
+
+        try (IteratorCloseable<Long> iterator = DCSet.getInstance().getTransactionFinalMap()
+                .findTransactionsKeys(null, address, null,
+                        0, 0, Transaction.CANCEL_ORDER_TRANSACTION,
+                        0, false, 0, 0)) {
+
+            String result = "";
+            Transaction cancelOrder;
+            Long key;
+            Order order;
+            while (iterator.hasNext()) {
+                key = iterator.next();
+                cancelOrder = txMap.get(key);
+                if (cancelOrder == null) {
+                    result += "\n Cancel Order not FOUND: " + Transaction.viewDBRef(key);
+                }
+
+                order = orderMap.get(((CancelOrderTransaction) cancelOrder).getOrderID());
+                if (order != null) {
+                    result += "\n Canceled by " + Transaction.viewDBRef(key)
+                            + " Order is ACTIVE! - " + Transaction.viewDBRef(((CancelOrderTransaction) cancelOrder).getOrderID());
+                }
+            }
+
+            if (!result.isEmpty()) {
+                LOGGER.error(result);
+                return "see log";
+            }
+        } catch (IOException e) {
+        }
+
+        return "OK";
+    }
 }

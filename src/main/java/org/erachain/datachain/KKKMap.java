@@ -1,13 +1,11 @@
 package org.erachain.datachain;
 
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
 import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -21,7 +19,7 @@ import java.util.TreeMap;
  *
  * TODO: передлать подпись на Long
  */
-public class KKKMap extends DCMap<
+public class KKKMap extends DCUMap<
         Tuple2<Long, Long>, // item1 Key + item2 Key
         TreeMap<Long, // item3 Key
                 Stack<Tuple3<
@@ -41,10 +39,10 @@ public class KKKMap extends DCMap<
         this.name = name;
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, observerMessage_reset);
-            this.observableData.put(DBMap.NOTIFY_LIST, observerMessage_list);
-            this.observableData.put(DBMap.NOTIFY_ADD, observerMessage_add);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, observerMessage_remove);
+            this.observableData.put(DBTab.NOTIFY_RESET, observerMessage_reset);
+            this.observableData.put(DBTab.NOTIFY_LIST, observerMessage_list);
+            this.observableData.put(DBTab.NOTIFY_ADD, observerMessage_add);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, observerMessage_remove);
         }
 
     }
@@ -54,29 +52,26 @@ public class KKKMap extends DCMap<
     }
 
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        BTreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> map = database.createTreeMap(name)
+        map = database.createTreeMap(name)
                 .keySerializer(BTreeKeySerializer.TUPLE2)
-                .counterEnable()
                 .makeOrGet();
 
-        //RETURN
-        return map;
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>> getMemoryMap() {
+    protected void getMemoryMap() {
         // HashMap ?
-        return new TreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>>();
+        map = new TreeMap<Tuple2<Long, Long>, TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>>();
     }
 
     @Override
-    protected TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> getDefaultValue() {
+    public TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> getDefaultValue() {
         return new TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>>();
     }
 
@@ -88,7 +83,9 @@ public class KKKMap extends DCMap<
         TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 
         TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -102,7 +99,9 @@ public class KKKMap extends DCMap<
             stack.push(item);
             value_new.put(itemKey, stack);
         } else {
-            if (this.parent == null) {
+            if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                    // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                    && this.parent == null) {
                 stack.push(item);
                 value_new.put(itemKey, stack);
             } else {
@@ -113,7 +112,7 @@ public class KKKMap extends DCMap<
             }
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
 
     }
 
@@ -135,7 +134,9 @@ public class KKKMap extends DCMap<
         TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value = this.get(key);
 
         TreeMap<Long, Stack<Tuple3<Long, Integer, byte[]>>> value_new;
-        if (this.parent == null)
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null)
             value_new = value;
         else {
             // !!!! NEEED .clone() !!!
@@ -146,7 +147,9 @@ public class KKKMap extends DCMap<
         Stack<Tuple3<Long, Integer, byte[]>> stack = value_new.get(itemKey);
         if (stack == null || stack.isEmpty()) return;
 
-        if (this.parent == null) {
+        if (false // походу если КЭШ используется там будет такая же ошибка и поэтому надо всегда делать новый объект
+                // иначе новое ззначение может передать свои значения в другую обработку после форка базы
+                && this.parent == null) {
             stack.pop();
             value_new.put(itemKey, stack);
         } else {
@@ -156,7 +159,7 @@ public class KKKMap extends DCMap<
             value_new.put(itemKey, stack_new);
         }
 
-        this.set(key, value_new);
+        this.put(key, value_new);
 
     }
 

@@ -27,26 +27,26 @@ public class PeerManager extends MonitoredThread {
     }
 
     public List<Peer> getBestPeers() {
-        return Controller.getInstance().getDBSet().getPeerMap().getBestPeers(Settings.getInstance().getMaxSentPeers() << 2, false);
+        return Controller.getInstance().getDLSet().getPeerMap().getBestPeers(Settings.getInstance().getMaxSentPeers() << 2, false);
     }
 
     public void addPeer(Peer peer, int banForMinutes) {
         //ADD TO DATABASE
         if (!Controller.getInstance().isOnStopping()) {
             try {
-                Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, banForMinutes);
+                Controller.getInstance().getDLSet().getPeerMap().addPeer(peer, banForMinutes);
             } catch (Exception e) {
 
                 // TODO понять почему произошла ошибка https://lab.erachain.org/erachain/Erachain/issues/669
                 LOGGER.error(e.getMessage(), e);
                 LOGGER.error("try delete error peer");
                 try {
-                    Controller.getInstance().getDBSet().getPeerMap().delete(peer.getAddress().getAddress());
+                    Controller.getInstance().getDLSet().getPeerMap().delete(peer.getAddress().getAddress());
                 } catch (Exception eIO) {
                     LOGGER.error(eIO.getMessage(), eIO);
                     LOGGER.error("try reCreateDB");
                     try {
-                        Controller.getInstance().getDBSet().close();
+                        Controller.getInstance().getDLSet().close();
                         Controller.getInstance().reCreateDB();
                     } catch (Exception eIO2) {
                         LOGGER.error(eIO.getMessage(), eIO2);
@@ -59,7 +59,7 @@ public class PeerManager extends MonitoredThread {
     }
 
     public boolean isBanned(Peer peer) {
-        return Controller.getInstance().getDBSet().getPeerMap().isBanned(peer.getAddress());
+        return Controller.getInstance().getDLSet().getPeerMap().isBanned(peer.getAddress());
     }
 
     private void processPeers(Peer peerTest) {

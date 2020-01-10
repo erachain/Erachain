@@ -141,6 +141,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int NOT_HOLDABLE_ASSET = 172;
     public static final int NOT_SPENDABLE_ASSET = 173;
 
+    /**
+     * Прровека на коллизию ключа по подписи - проверяем только если усекаем его и нетпроверки на двойную трату -
+     * BlockChain#CHECK_DOUBLE_SPEND_DEEP
+     */
     public static final int KEY_COLLISION = 194;
 
     public static final int INVALID_MESSAGE_FORMAT = 195;
@@ -370,6 +374,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected long timestamp;
     protected PublicKeyAccount creator;
 
+    /**
+     * если да то значит взята из Пула трнзакций и на двойную трату проверялась
+     */
+    public boolean checkedByPool;
+
     // need for genesis
     protected Transaction(byte type, String type_name) {
         this.typeBytes = new byte[]{type, 0, 0, 0}; // for GENESIS
@@ -419,7 +428,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public boolean trueEquals(Object transaction) {
-        if (transaction instanceof Transaction)
+        if (transaction == null)
+            return false;
+        else if (transaction instanceof Transaction)
             return Arrays.equals(this.toBytes(FOR_NETWORK, true),
                     ((Transaction) transaction).toBytes(FOR_NETWORK, true));
         return false;
@@ -436,7 +447,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             // soft or hard confirmations
             key = db.getTransactionFinalMapSigns().get(dbRef);
             if (key == null) {
-                return db.getTransactionMap().get(dbRef);
+                return db.getTransactionTab().get(dbRef);
             }
         } else {
             int heightBlock = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
@@ -876,6 +887,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     }
 
+    public static int parseDBRefHeight(long dbRef) {
+        return (int) (dbRef >> 32);
+    }
+
     public boolean addCalculated(Block block, Account creator, long assetKey, BigDecimal amount,
                                  String message) {
 
@@ -1224,16 +1239,38 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // CHECK IF REFERENCE IS OK
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
-        if (asDeal > Transaction.FOR_MYPACK) {
-            long[] reference = this.creator.getLastTimestamp(dcSet);
-            if (reference != null && reference[0] >= this.timestamp
-                    && height > BlockChain.VERS_4_11
-                    && (!BlockChain.DEVELOP_USE || height < 495000)) {
-                LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
-                        + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                        + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+        if (asDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
+            if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+                /// вообще не проверяем в тесте
+                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    if (BlockChain.CHECK_BUGS > 0)
+                        LOGGER.debug("diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    return INVALID_TIMESTAMP;
+                }
+            } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    if (BlockChain.CHECK_BUGS > 0)
+                        LOGGER.debug("diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    return INVALID_TIMESTAMP;
+                }
 
-                return INVALID_TIMESTAMP;
+            } else {
+                long[] reference = this.creator.getLastTimestamp(dcSet);
+                if (reference != null && reference[0] >= this.timestamp
+                        && height > BlockChain.VERS_4_11
+                        && (!BlockChain.DEVELOP_USE || height > 776575 // issues/1149
+                )) {
+                    if (BlockChain.TEST_DB == 0) {
+                        if (BlockChain.CHECK_BUGS > 1)
+                            LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
+                                + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                    }
+
+                    return INVALID_TIMESTAMP;
+                }
             }
         }
 
@@ -1273,7 +1310,11 @@ public abstract class Transaction implements ExplorerJsonLine {
             }
         }
 
-        if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+        if (false &&  // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+                (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
+                && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
+                && this.signature != null
                 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;
@@ -1419,7 +1460,8 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public void orphan(Block block, int asDeal) {
 
-        if (false
+        if (BlockChain.CHECK_BUGS > 1
+                && viewHeightSeq().equals("628853-1")
                 //Base58.encode(this.signature)
                 //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
                 ) {
@@ -1470,7 +1512,12 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public abstract boolean isInvolved(Account account);
 
+    // TODO перевести все на проверку height
+    // Это используется только в ГУУИ поэтому по высоте можно делать точно
     public boolean isConfirmed(DCSet db) {
+        if (height > 0)
+            return true;
+
         if (this.getType() == Transaction.CALCULATED_TRANSACTION) {
             // USE referenced transaction
             return db.getTransactionFinalMap().contains(this.reference);
@@ -1481,21 +1528,20 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public int getConfirmations(int chainHeight) {
 
-        if (this.height == 0) {
+        if (this.height == 0)
             return 0;
-        } else {
-            return chainHeight - this.height;
-        }
+
+        return 1 + chainHeight - this.height;
     }
 
     public int getConfirmations(DCSet db) {
 
         // CHECK IF IN UNCONFIRMED TRANSACTION
 
-        if (this.height > 0)
-            return 1 + db.getBlockMap().size() - this.height;
+        if (this.height == 0)
+            return 0;
 
-        return 0;
+        return 1 + db.getBlockMap().size() - this.height;
 
     }
 

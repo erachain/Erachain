@@ -12,21 +12,24 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.gui.Gui;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
 import org.erachain.utils.BigDecimalStringComparator;
 import org.erachain.utils.Converter;
 import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class WebTransactionsHTML {
     private static WebTransactionsHTML instance;
@@ -470,8 +473,12 @@ public class WebTransactionsHTML {
         String out = "";
         IssueUnionRecord unionIssue = (IssueUnionRecord) transaction;
         UnionCls union = (UnionCls) unionIssue.getItem();
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
-                + unionIssue.getItem().getName() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
+        //        + unionIssue.getItem().getName() + "<br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj)
+                + ":</b> <a href=?union=" + union.getKey()
+                + get_Lang(langObj) + ">" + union.viewName() + "</a><br>";
+
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
         //        + unionIssue.getItem().getDescription() + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Birthday", langObj) + ":</b> "
@@ -485,8 +492,11 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         IssueStatusRecord statusIssue = (IssueStatusRecord) transaction;
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
-                + statusIssue.getItem().getName() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
+        //        + statusIssue.getItem().getName() + "<br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj)
+                + ":</b> <a href=?status=" + statusIssue.getItem().getKey()
+                + get_Lang(langObj) + ">" + statusIssue.getItem().viewName() + "</a><br>";
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
         //        + statusIssue.getItem().getDescription() + "<br>";
 
@@ -497,8 +507,12 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         IssueTemplateRecord templateIssue = (IssueTemplateRecord) transaction;
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
-                + templateIssue.getItem().getName() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
+        //        + templateIssue.getItem().getName() + "<br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj)
+                + ":</b> <a href=?template=" + templateIssue.getItem().getKey()
+                + get_Lang(langObj) + ">" + templateIssue.getItem().viewName() + "</a><br>";
+
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
         //        + templateIssue.getItem().getDescription() + "<br>";
 
@@ -509,8 +523,11 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         IssueImprintRecord imprintIssue = (IssueImprintRecord) transaction;
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
-                + imprintIssue.getItem().getName() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
+        //        + imprintIssue.getItem().getName() + "<br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj)
+                + ":</b> <a href=?imprint=" + imprintIssue.getItem().getKey()
+                + get_Lang(langObj) + ">" + imprintIssue.getItem().viewName() + "</a><br>";
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
         //        + imprintIssue.getItem().getDescription() + "<br>";
 
@@ -617,7 +634,7 @@ public class WebTransactionsHTML {
         if (vouchesItem == null || vouchesItem.b.isEmpty())
             return "";
 
-        TransactionFinalMap map = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
 
         String out = "<b>" + Lang.getInstance().translateFromLangObj("Certified", langObj) + ":</b> ";
 
@@ -708,7 +725,7 @@ public class WebTransactionsHTML {
         }
 
 
-        TransactionFinalMap map = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
         String out;
 
         if (vouchesItem.b.size() == 1) {

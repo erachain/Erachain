@@ -104,7 +104,7 @@ public class ConnectionCreator extends MonitoredThread {
                 Thread.sleep(100);
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(94);
+                Controller.getInstance().stopAll(194);
                 break;
             } catch (InterruptedException e) {
                 break;
@@ -158,7 +158,7 @@ public class ConnectionCreator extends MonitoredThread {
                 Thread.sleep(100);
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(96);
+                Controller.getInstance().stopAll(156);
                 break;
             } catch (InterruptedException e) {
                 break;

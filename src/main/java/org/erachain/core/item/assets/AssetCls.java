@@ -10,8 +10,7 @@ import org.erachain.datachain.ItemMap;
 import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 
-import javax.swing.*;
-import java.io.File;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -249,7 +248,8 @@ public abstract class AssetCls extends ItemCls {
 
     public abstract Long getQuantity();
 
-    public abstract Long getTotalQuantity(DCSet dc);
+    public abstract BigDecimal getReleased();
+    public abstract BigDecimal getReleased(DCSet dc);
 
 	/*
 	public boolean isDivisible() {
@@ -693,7 +693,9 @@ public abstract class AssetCls extends ItemCls {
         JSONObject json =super.jsonForExplorerPage(langObj);
         json.put("assetTypeKey", this.assetType);
         json.put("assetTypeName", viewAssetType());
-        json.put("quantity", getTotalQuantity(DCSet.getInstance()));
+        json.put("assetTypeNameFull", viewAssetTypeFull());
+        json.put("quantity", getQuantity());
+        json.put("released", getReleased());
         json.put("scale", scale);
         json.put("orders", getOperations(DCSet.getInstance()));
 

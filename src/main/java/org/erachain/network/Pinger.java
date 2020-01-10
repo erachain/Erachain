@@ -97,7 +97,7 @@ public class Pinger extends Thread {
         }
 
         //logger.info("PING " + this.peer);
-        Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
+        Controller.getInstance().getDLSet().getPeerMap().addPeer(peer, 0);
 
         if (response.getType() == Message.HWEIGHT_TYPE) {
             HWeightMessage hWeightMessage = (HWeightMessage) response;

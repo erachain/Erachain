@@ -1,24 +1,29 @@
 package org.erachain.database;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.erachain.utils.ObserverMessage;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DBTabImpl;
+import org.erachain.dbs.IteratorCloseable;
+import org.erachain.dbs.IteratorCloseableImpl;
 import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Observer
+public class SortableList<T, U> extends AbstractList<Pair<T, U>> implements Closeable
 {
 
     static Logger LOGGER = LoggerFactory.getLogger(SortableList.class.getName());
-    private DBMap<T, U> db;
+    private DBTab<T, U> db;
     private int index;
     private boolean descending;
     private int position;
-    private Iterator<T> iterator;
+    private IteratorCloseable<T> iterator;
     private Pattern pattern;
     private int size;
     private Pair<T, U> lastValue;
@@ -26,19 +31,19 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
     private List<String> additionalFilterFields;
 
 
-    public SortableList(DBMap<T, U> db) {
+    public SortableList(DBTabImpl<T, U> db) {
         this.db = db;
 
         //LOAD DEFAULT ITERATOR
         this.index = db.DEFAULT_INDEX;
         this.size = db.size();
         this.descending = false;
-        this.iterator = this.filter(db.getIterator(db.DEFAULT_INDEX, this.descending));
+        this.iterator = IteratorCloseableImpl.make(this.filter(db.getIterator(db.DEFAULT_INDEX, this.descending)));
         this.position = 0;
         additionalFilterFields = new ArrayList<String>();
     }
 
-    public SortableList(DBMap<T, U> db, Collection<T> keys) {
+    public SortableList(DBTabImpl<T, U> db, Collection<T> keys) {
         this.db = db;
         this.keys = keys;
 
@@ -46,21 +51,24 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
         this.index = db.DEFAULT_INDEX;
         this.size = keys.size();
         this.descending = false;
-        this.iterator = keys.iterator();
+        this.iterator = IteratorCloseableImpl.make(keys.iterator());
         this.position = 0;
         additionalFilterFields = new ArrayList<String>();
     }
 
-    public static SortableList makeSortableList(DBMap map, boolean descending, int limit) {
-
-        // обрезаем полный список в базе до 1000
-        Iterator iterator = map.getIterator(map.DEFAULT_INDEX, descending);
+    public static SortableList makeSortableList(DBTabImpl map, boolean descending, int limit) {
 
         List keys = new ArrayList<Object>();
 
-        int i = 0;
-        while (iterator.hasNext() && i++ < limit) {
-            keys.add(iterator.next());
+        // обрезаем полный список в базе до 1000
+        try (IteratorCloseable iterator = map.getIterator(map.DEFAULT_INDEX, descending)) {
+
+            int i = 0;
+            while (iterator.hasNext() && i++ < limit) {
+                keys.add(iterator.next());
+            }
+
+        } catch (IOException e) {
         }
 
         return new SortableList(map, keys);
@@ -94,9 +102,16 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
         if (i < this.position) {
             //RESET ITERATOR
             if (this.keys != null) {
-                this.iterator = this.filter(this.keys.iterator());
+                // старый итератор закроем чтобы освободить память в РоксДБ
+                try (IteratorCloseable oldIterator = this.iterator) {
+                    this.iterator = IteratorCloseableImpl.make(this.keys.iterator());
+                } catch (IOException e) {
+                }
             } else {
-                this.iterator = this.filter(this.db.getIterator(this.index, this.descending));
+                try (IteratorCloseable oldIterator = this.iterator; IteratorCloseable newIterator = this.db.getIterator(index, descending)) {
+                    this.iterator = IteratorCloseableImpl.make(this.filter(newIterator));
+                } catch (IOException e) {
+                }
             }
 
             this.position = 0;
@@ -137,10 +152,18 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
     public void sort() {
         if (this.keys != null) {
             this.size = this.keys.size();
-            this.iterator = this.keys.iterator();
+            // старый итератор закроем чтобы освободить память в РоксДБ
+            try (IteratorCloseable oldIterator = this.iterator) {
+                this.iterator = IteratorCloseableImpl.make(this.keys.iterator());
+            } catch (IOException e) {
+            }
         } else {
             this.size = db.size();
-            this.iterator = this.filter(this.db.getIterator(index, descending));
+            // старый итератор закроем чтобы освободить память в РоксДБ
+            try (IteratorCloseable oldIterator = this.iterator; IteratorCloseable newIterator = this.db.getIterator(index, descending)) {
+                this.iterator = IteratorCloseableImpl.make(this.filter(newIterator));
+            } catch (IOException e) {
+            }
         }
 
         this.position = 0;
@@ -245,7 +268,7 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
             }
 
             this.size = keys.size();
-            return (Iterator<T>) keys.iterator();
+            return keys.iterator();
         }
 
         return iterator;
@@ -266,5 +289,18 @@ public class SortableList<T, U> extends AbstractList<Pair<T, U>>// implements Ob
             additionalFilterFields.add(fieldname);
         }
     }
-    
+
+    @Override
+    public void close() {
+        try {
+            iterator.close();
+        } catch (IOException e) {
+
+        }
+    }
+
+    @Override
+    public void finalize() {
+        close();
+    }
 }

@@ -11,6 +11,7 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -29,7 +30,7 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
 
     public TradesTableModel(AssetCls have, AssetCls want) {
 
-        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Amount", "Price", "Total"}, true);
+        super(DCSet.getInstance().getTradeMap(), new String[]{"Timestamp", "Amount", "Price", "Total"}, false);
 
         this.have = have;
         this.want = want;
@@ -145,9 +146,9 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
-        this.list = ((TradeMap)map).getTrades(haveKey, wantKey,0,300);
+        this.list = ((TradeMap) map).getTrades(haveKey, wantKey, (int) start, limit);
 
     }
 
@@ -162,14 +163,37 @@ public class TradesTableModel extends TimerTableModelCls<Trade> implements Obser
                 || type == ObserverMessage.REMOVE_TRADE_TYPE
         ) {
 
-            Trade trade = (Trade) message.getValue();
-            long haveKey = trade.getHaveKey();
-            long wantKey = trade.getWantKey();
-            if (!(haveKey == this.haveKey && wantKey == this.wantKey)
-                    && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
+            Object object = message.getValue();
+            if (object instanceof Trade) {
+                Trade trade = (Trade) message.getValue();
+                long haveKey = trade.getHaveKey();
+                long wantKey = trade.getWantKey();
+                if (!(haveKey == this.haveKey && wantKey == this.wantKey)
+                        && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
+                    return;
+                }
+
+                this.needUpdate = true;
+                return;
+
+            } else if (object instanceof Fun.Tuple2) {
+                // Сработал ордер или отменили значит он удалился но еще не добавлся в Исполненые
+                // Поэтому просто ищем тутт по ID
+                Fun.Tuple2<Long, Long> key = (Fun.Tuple2<Long, Long>) object;
+                for (Trade trade : list) {
+                    if (trade.getInitiator().equals(key.a)
+                            && trade.getTarget().equals(key.b)) {
+                        this.needUpdate = true;
+                        return;
+                    }
+                }
+                // not found
+                return;
+            } else {
                 return;
             }
 
+        } else if (type == ObserverMessage.LIST_TRADE_TYPE) {
             this.needUpdate = true;
             return;
 

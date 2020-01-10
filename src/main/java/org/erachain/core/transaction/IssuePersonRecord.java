@@ -252,7 +252,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
-        if (!BlockChain.ANONIM_SERT_USE
+        if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
                 && !BlockChain.DEVELOP_USE && !creator.isPerson(dcSet, height)) {
             long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
@@ -286,7 +286,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         // которая еще не удостоверена вообще
         // но надо понимать что тут будет только последняя запись создания персоны и номер на нее
         // used in org.erachain.webserver.API.getPersonKeyByOwnerPublicKey
-        this.dcSet.getIssuePersonMap().set(makerBytes, person.getKey());
+        this.dcSet.getIssuePersonMap().put(makerBytes, person.getKey());
 
         if (person.isMustBeSigned()) {
             // for quick search public keys by address - use PUB_KEY from Person DATA owner

@@ -2,10 +2,9 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,10 +27,10 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
 
         super(map, columnNames, column_AutoHeight, descending);
 
-        RESET_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_RESET);
-        LIST_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_LIST);
-        ADD_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_ADD);
-        REMOVE_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+        RESET_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_RESET);
+        LIST_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_LIST);
+        ADD_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_ADD);
+        REMOVE_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_REMOVE);
 
         addObservers();
 
@@ -76,10 +75,10 @@ public abstract class WalletAutoKeyTableModel<T, U> extends WalletSortedTableMod
     }
 
     @Override
-    public void getIntervalThis(long startBack, long endBack) {
+    public void getIntervalThis(long startBack, int limit) {
 
         // тут могут быть пустые элементы - пропустим их
-        Collection<T> keys = ((AutoKeyDBMap)map).getFromToKeys(startBack, endBack);
+        Collection<T> keys = ((AutoKeyDBMap) map).getFromToKeys(startBack, limit);
         listSorted = new SortableList<T, U>(map, keys);
 
     }

@@ -5,18 +5,20 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.AutoKeyDBMap;
-import org.erachain.database.DBMap;
 import org.erachain.database.serializer.LongAndTransactionSerializer;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
-import org.mapdb.*;
+import org.mapdb.BTreeKeySerializer;
+import org.mapdb.BTreeMap;
+import org.mapdb.DB;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.List;
 
 /**
  * Транзакции относящиеся к моим счетам. Сюда же записываться должны и неподтвержденные<br>
@@ -41,15 +43,15 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
         super(dWSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TRANSACTION_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_TRANSACTION_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_LIST_TRANSACTION_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TRANSACTION_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE);
         }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         //TIMESTAMP INDEX
         NavigableSet<Tuple2<Long, Tuple2<Long, Long>>> timestampIndex = database.createTreeSet("transactions_index_timestamp")
                 .comparator(Fun.COMPARATOR)
@@ -112,22 +114,22 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        BTreeMap map = database.createTreeMap("transactions")
+        BTreeMap mapTree = database.createTreeMap("transactions")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .valueSerializer(new LongAndTransactionSerializer())
                 .counterEnable()
                 .makeOrGet();
 
-        makeAutoKey(database, map, "dw_transactions");
+        makeAutoKey(database, mapTree, "dw_transactions");
 
-        return map;
+        this.map = mapTree;
     }
 
     @Override
-    protected Map<Tuple2<Long, Long>, Tuple2<Long, Transaction>> getMemoryMap() {
-        return new TreeMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<Long, Long>, Tuple2<Long, Transaction>>(Fun.TUPLE2_COMPARATOR);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

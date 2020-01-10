@@ -366,6 +366,8 @@ public class Peer extends MonitoredThread {
                 break;
             }
 
+            MessageFactory messageFactory = MessageFactory.getInstance();
+            byte[] messageMagicChain = Controller.getInstance().getMessageMagic();
             while (this.runed && this.network.run) {
 
                 //READ FIRST 4 BYTES
@@ -404,9 +406,9 @@ public class Peer extends MonitoredThread {
                     break;
                 }
 
-                if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
+                if (!Arrays.equals(messageMagic, messageMagicChain)) {
                     //ERROR and BAN
-                    ban(3600, "parse - received message with wrong magic");
+                    ban(30, "parse - received message with wrong magic");
                     break;
                 }
 
@@ -414,7 +416,7 @@ public class Peer extends MonitoredThread {
                 //PROCESS NEW MESSAGE
                 Message message;
                 try {
-                    message = MessageFactory.getInstance().parse(this, in);
+                    message = messageFactory.parse(this, in);
                 } catch (java.net.SocketTimeoutException timeOut) {
                     ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
                     break;
@@ -644,14 +646,14 @@ public class Peer extends MonitoredThread {
     }
 
     public boolean isBad() {
-        return Controller.getInstance().getDBSet().getPeerMap().isBad(this.getAddress());
+        return Controller.getInstance().getDLSet().getPeerMap().isBad(this.getAddress());
     }
 
     public boolean isBanned() {
-        return Controller.getInstance().getDBSet().getPeerMap().isBanned(address.getAddress());
+        return Controller.getInstance().getDLSet().getPeerMap().isBanned(address.getAddress());
     }
     public int getBanMinutes() {
-        return Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(this);
+        return Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(this);
     }
 
     /**

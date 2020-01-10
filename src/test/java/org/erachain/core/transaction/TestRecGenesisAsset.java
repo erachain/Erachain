@@ -44,7 +44,7 @@ public class TestRecGenesisAsset {
     private void initIssue(boolean toProcess) {
 
         //CREATE EMPTY MEMORY DATABASE
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
 
         //CREATE ASSET
         asset = GenesisBlock.makeAsset(0);

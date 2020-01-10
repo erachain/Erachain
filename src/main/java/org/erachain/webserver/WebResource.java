@@ -83,7 +83,7 @@ public class WebResource {
             "17_message_in.png", "17_message_out.png", "asset_trade.png",
             "at_tx_in.png", "at_tx_out.png", "grleft.png", "grright.png",
             "redleft.png", "redright.png", "bar.gif", "bar_left.gif",
-            "bar_right.gif", "locked.png", "unlocked.png"};
+            "bar_right.gif", "locked.png", "unlocked.png", "exchange.png"};
 
     public static String selectTitleOpt(Document htmlDoc) {
         String title = selectFirstElementOpt(htmlDoc, "title");
@@ -128,7 +128,7 @@ public class WebResource {
         }
 
         NameStorageMap nameStorageMap = DCSet.getInstance().getNameStorageMap();
-        Set<String> keys = nameStorageMap.getKeys();
+        Set<String> keys = nameStorageMap.keySet();
 
         for (String name : keys) {
             Profile profileOpt = Profile.getProfileOpt(name);
@@ -445,13 +445,13 @@ public class WebResource {
     public Response doDeleteUnconfirmedTxs() {
 
         DCSet dcSet = DCSet.getInstance();
-        Collection<Transaction> values = dcSet.getTransactionMap().getValues();
+        Collection<Transaction> values = dcSet.getTransactionTab().values();
 
         List<PrivateKeyAccount> privateKeyAccounts = Controller.getInstance().getPrivateKeyAccounts();
 
         for (Transaction transaction : values) {
             if (privateKeyAccounts.contains(transaction.getCreator())) {
-                dcSet.getTransactionMap().delete(transaction);
+                dcSet.getTransactionTab().delete(transaction);
             }
         }
 

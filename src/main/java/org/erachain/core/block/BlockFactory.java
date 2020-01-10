@@ -1,7 +1,6 @@
 package org.erachain.core.block;
 
 import com.google.common.primitives.Ints;
-import org.erachain.core.account.PublicKeyAccount;
 
 import java.util.Arrays;
 
@@ -22,6 +21,11 @@ public class BlockFactory {
     }
 
     public Block parse(byte[] data, int height) throws Exception {
+        if (true)
+            return Block.parse(data, height);
+
+        ///////// OLD VERSION
+
         //READ VERSION
         byte[] versionBytes = Arrays.copyOfRange(data, 0, Block.VERSION_LENGTH);
         int version = Ints.fromByteArray(versionBytes);

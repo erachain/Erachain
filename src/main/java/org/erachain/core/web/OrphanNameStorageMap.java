@@ -1,44 +1,39 @@
 package org.erachain.core.web;
 
 import com.google.common.primitives.SignedBytes;
-import org.erachain.datachain.DCMap;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.DCUMap;
 import org.mapdb.DB;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
+public class OrphanNameStorageMap extends DCUMap<byte[], Map<String, String>> {
 
     public OrphanNameStorageMap(DCSet dcSet, DB database) {
         super(dcSet, database);
     }
 
-    public OrphanNameStorageMap(DCMap<byte[], Map<String, String>> parent) {
+    public OrphanNameStorageMap(DCUMap<byte[], Map<String, String>> parent) {
         super(parent, null);
     }
 
     @Override
-    protected Map<byte[], Map<String, String>> getMap(DB database) {
+    public void openMap() {
 
-        return database.createTreeMap("OrphanNameStorageMap")
+        map = database.createTreeMap("OrphanNameStorageMap")
                 .comparator(SignedBytes.lexicographicalComparator())
                 .makeOrGet();
 
     }
 
     @Override
-    protected Map<byte[], Map<String, String>> getMemoryMap() {
-        return new HashMap<byte[], Map<String, String>>();
+    protected void getMemoryMap() {
+        map = new HashMap<byte[], Map<String, String>>();
     }
 
     @Override
-    protected Map<String, String> getDefaultValue() {
-        return null;
-    }
-
-    @Override
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     public void add(byte[] txAndName, String key, String value) {
@@ -49,7 +44,7 @@ public class OrphanNameStorageMap extends DCMap<byte[], Map<String, String>> {
 
         keyValueMap.put(key, value);
 
-        this.set(txAndName, keyValueMap);
+        this.put(txAndName, keyValueMap);
 
     }
 

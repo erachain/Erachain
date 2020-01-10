@@ -18,7 +18,6 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
  * основной класс модуля Сети
@@ -26,8 +25,18 @@ import java.util.stream.Collectors;
 public class Network extends Observable {
 
     private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = 1024 << (3 + Controller.HARD_WORK);
-    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = 1024 << (1 + Controller.HARD_WORK >> 1);
+    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = 256 + BlockChain.MAX_BLOCK_SIZE_GEN;
     private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = 128 >> (Controller.HARD_WORK >> 1);
+
+    /**
+     * Если включено то при входящем запросе на коннект от пира, который уже на связи
+     * разрываем текущий коннект и пересоздаем на новый входящий. Таким обраом если под одним IP
+     * будет к нам стучасять несколько отдельных нод то каждая из них будет забирать себе соединение.
+     * Но на самом деле сначала происходит обрыв на некотрое время - поэтому кодна нод мало - это плохо.
+     * Так что лучше не включать. И зачем разрывать - по-новой слать транзакции накладно.
+     */
+    private static final boolean BREAK_PEER_ON_NEW_INCOME = false;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Network.class.getSimpleName());
 
     private Controller controller;
@@ -47,7 +56,6 @@ public class Network extends Observable {
 
     public AtomicLong missedSendes = new AtomicLong(0);
     public AtomicLong missedTelegrams = new AtomicLong(0);
-    public AtomicLong missedTransactions = new AtomicLong(0);
     public AtomicLong missedWinBlocks = new AtomicLong(0);
     public AtomicLong missedMessages = new AtomicLong(0);
 
@@ -336,7 +344,7 @@ public class Network extends Observable {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
         if (!controller.isOnStopping()) {
-            knownPeers = controller.getDBSet().getPeerMap().getBestPeers(
+            knownPeers = controller.getDLSet().getPeerMap().getBestPeers(
                     0, true);
         }
 
@@ -398,8 +406,8 @@ public class Network extends Observable {
         return this.telegramer.deleteForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter) {
-        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter);
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
+        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes);
     }
     //public TelegramMessage getTelegram64(String signature) {
     //	return this.telegramer.getTelegram64(signature);
@@ -431,8 +439,13 @@ public class Network extends Observable {
             //CHECK IF ADDRESS IS THE SAME
             if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
 
-                if (knownPeer.isUsed()) {
-                    knownPeer.close("before accept anew");
+                if (knownPeer.isUsed() || knownPeer.isOnUsed()) {
+                    if (BREAK_PEER_ON_NEW_INCOME) {
+                        knownPeer.close("before accept anew");
+                    } else {
+                        /// зачем разрывать - поновой слать транзакции накладн - используем его же
+                        return knownPeer;
+                    }
                 }
                 // IF PEER not USED and not onUSED
                 knownPeer.connect(socket, this, "connected by restore!!! ");
@@ -468,11 +481,7 @@ public class Network extends Observable {
         Long key = TelegramMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledTelegramMessages.addHandledItem(key, sender, forThisPeer)) {
-            return true;
-        }
-
-        return false;
+        return this.handledTelegramMessages.addHandledItem(key, sender, forThisPeer);
 
     }
 
@@ -482,11 +491,7 @@ public class Network extends Observable {
         Long key = TransactionMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledTransactionMessages.addHandledItem(key, sender, forThisPeer)) {
-            return true;
-        }
-
-        return false;
+        return this.handledTransactionMessages.addHandledItem(key, sender, forThisPeer);
 
     }
 
@@ -497,11 +502,7 @@ public class Network extends Observable {
         Integer key = BlockWinMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledWinBlockMessages.addHandledItem(key, sender, forThisPeer)) {
-            return true;
-        }
-
-        return false;
+        return this.handledWinBlockMessages.addHandledItem(key, sender, forThisPeer);
 
     }
 
@@ -569,25 +570,29 @@ public class Network extends Observable {
 
             case Message.TELEGRAM_TYPE:
 
-                this.telegramer.offerMessage(message);
+                if (telegramer != null)
+                    this.telegramer.offerMessage(message);
 
                 return;
 
             case Message.TRANSACTION_TYPE:
 
-                controller.transactionsPool.offerMessage(message);
+                if (controller.transactionsPool != null)
+                    controller.transactionsPool.offerMessage(message);
 
                 return;
 
             case Message.WIN_BLOCK_TYPE:
 
-                controller.winBlockSelector.offerMessage(message);
+                if (controller.winBlockSelector != null)
+                    controller.winBlockSelector.offerMessage(message);
 
                 return;
 
             case Message.GET_BLOCK_TYPE:
 
-                controller.blockRequester.offerMessage(message);
+                if (controller.blockRequester != null)
+                    controller.blockRequester.offerMessage(message);
 
                 return;
 

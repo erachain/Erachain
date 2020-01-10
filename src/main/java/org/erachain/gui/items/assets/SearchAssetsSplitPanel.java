@@ -24,7 +24,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
      */
     private static final long serialVersionUID = 1L;
     //private static ItemAssetsTableModel tableModelItemAssets = ;
-    private SearchAssetsSplitPanel th;
+    ///private SearchAssetsSplitPanel th;
 
 
     public SearchAssetsSplitPanel(boolean search_and_exchange) {
@@ -61,7 +61,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls)th.itemTableSelected, null, "", ""));
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "", ""));
 
             }
         });
@@ -69,7 +69,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) th.itemTableSelected, null, "Buy", ""));
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""));
 
             }
         });
@@ -78,7 +78,7 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(th.itemTableSelected.getReference());
+                Transaction trans = db.getTransactionFinalMap().get(itemTableSelected.getReference());
 
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
