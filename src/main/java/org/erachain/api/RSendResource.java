@@ -709,7 +709,7 @@ public class RSendResource {
                             @DefaultValue("0") @QueryParam("activeafter") String activeAfterStr,
                             @DefaultValue("0") @QueryParam("activebefore") String activeBeforeStr,
                             @DefaultValue("0") @QueryParam("activetypetx") int activeTypeTX, // активность по заданному типу транзакции
-                            @DefaultValue("1") @QueryParam("koeff") BigDecimal koeff,
+                            @DefaultValue("0") @QueryParam("koeff") BigDecimal koeff,
                             @QueryParam("title") String title,
                             @DefaultValue("false") @QueryParam("onlyperson") Boolean onlyPerson,
                             @QueryParam("password") String password) {
@@ -838,7 +838,7 @@ public class RSendResource {
                             sendAmount = BigDecimal.ZERO;
                         }
 
-                        if (!koeff.equals(BigDecimal.ONE)) {
+                        if (koeff.signum() > 0) {
                             sendAmount = sendAmount.add(balance.b.multiply(koeff));
                         }
 
