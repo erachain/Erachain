@@ -161,7 +161,7 @@ public class BlockChain {
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : DEVELOP_USE ? 800000 : 600000;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : DEVELOP_USE ? 800000 : 609155;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам
