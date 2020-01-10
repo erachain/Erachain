@@ -544,10 +544,10 @@ public class TradeResource {
     }
 
     @GET
-    @Path("getbyaddress/{creator}/{amountAssetKey}/{priceAssetKey}")
-    public String getByAddressPair(@PathParam("creator") String address,
-                                   @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey,
-                                   @DefaultValue("50") @QueryParam("limit") Integer limit) {
+    @Path("ordersbyaddress/{creator}/{amountAssetKey}/{priceAssetKey}")
+    public static String getOrdersByAddress(@PathParam("creator") String address,
+                                            @PathParam("amountAssetKey") Long haveKey, @PathParam("priceAssetKey") Long priceAssetKey,
+                                            @DefaultValue("50") @QueryParam("limit") Integer limit) {
 
 
         OrderMap ordersMap = DCSet.getInstance().getOrderMap();
