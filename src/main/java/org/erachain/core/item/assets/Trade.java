@@ -126,8 +126,13 @@ public class Trade {
         trade.put("timestamp", Controller.getInstance().blockChain.getTimestamp(height));
 
         trade.put("sequence", sequence);
-        if (keyForBuySell == haveKey) {
-            trade.put("type", "sell");
+
+        if (keyForBuySell == 0 || keyForBuySell == haveKey) {
+
+            if (keyForBuySell != 0) {
+                // задана пара и направление можно давать
+                trade.put("type", "sell");
+            }
 
             trade.put("haveKey", haveKey);
             trade.put("wantKey", wantKey);
