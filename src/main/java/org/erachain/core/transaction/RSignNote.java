@@ -8,9 +8,9 @@ import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
+import org.erachain.core.crypto.Base64;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.lang.Lang;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
@@ -576,12 +576,12 @@ public class RSignNote extends Transaction implements Itemable {
         //ADD CREATOR/SERVICE/DATA
         if (data != null && data.length > 0) {
 
-            //ADD CREATOR/SERVICE/DATA
-            if (this.isText() && !this.isEncrypted()) {
+            if (getVersion() == 0 && this.isText() && !this.isEncrypted()) {
                 transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
             } else {
-                transaction.put("data", Base58.encode(this.data));
+                transaction.put("data", Base64.encode(this.data));
             }
+
             transaction.put("encrypted", this.isEncrypted());
             transaction.put("isText", this.isText());
         }
