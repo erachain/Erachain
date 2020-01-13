@@ -2,6 +2,7 @@ package org.erachain.core.item.assets;
 
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
@@ -38,6 +39,8 @@ public class OrderTest {
     int[] TESTED_DBS = new int[]{
             IDB.DBS_MAP_DB,
             IDB.DBS_ROCK_DB};
+
+    int height;
 
     Long releaserReference = null;
     long ERM_KEY = Transaction.RIGHTS_KEY;
@@ -77,6 +80,9 @@ public class OrderTest {
         } catch (Throwable e) {
         }
 
+        BlockChain.CHECK_BUGS = 10;
+        height = BlockChain.ALL_BALANCES_OK_TO + 2;
+
         dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
         gb = new GenesisBlock();
 
@@ -106,8 +112,8 @@ public class OrderTest {
         assetA = new AssetVenture(new GenesisBlock().getCreator(), "AAA", icon, image, ".", 0, 8, 50000L);
 
         issueAssetTransaction = new IssueAssetTransaction(accountA, assetA, (byte) 0, timestamp++, 0l, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-        issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+        issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
 
         keyA = issueAssetTransaction.getAssetKey(dcSet);
         balanceA = accountA.getBalance(dcSet, keyA);
@@ -115,8 +121,8 @@ public class OrderTest {
         assetB = new AssetVenture(new GenesisBlock().getCreator(), "BBB", icon, image, ".", 0, 8, 50000L);
         issueAssetTransaction = new IssueAssetTransaction(accountB, assetB, (byte) 0, timestamp++,
                 0L, new byte[64]);
-        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
-        issueAssetTransaction.process(null,Transaction.FOR_NETWORK);
+        issueAssetTransaction.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
+        issueAssetTransaction.process(null, Transaction.FOR_NETWORK);
         keyB = issueAssetTransaction.getAssetKey(dcSet);
 
         // CREATE ORDER TRANSACTION
@@ -177,7 +183,7 @@ public class OrderTest {
                     orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
                     iterator = ordersMap.getIterator(0, false);
@@ -223,7 +229,7 @@ public class OrderTest {
                         new BigDecimal("10"),
                         new BigDecimal("10"), (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountB, Transaction.FOR_NETWORK);
-                orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.setDC(forkDC, Transaction.FOR_NETWORK, height, ++seqNo);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
 
                 ordersMap = forkDC.getOrderMap();
@@ -331,7 +337,7 @@ public class OrderTest {
                     orderCreation = new CreateOrderTransaction(accountA, assetB.getKey(dcSet), assetA.getKey(dcSet), amountBuy,
                             amountSell, (byte) 0, timestamp++, 0L);
                     orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                    orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
                     orderCreation.process(null, Transaction.FOR_NETWORK);
 
                 }
@@ -420,7 +426,7 @@ public class OrderTest {
                 orderCreation = new CreateOrderTransaction(accountA, have, want, amountBuy,
                         amountSell, (byte) 0, timestamp++, 0L);
                 orderCreation.sign(accountA, Transaction.FOR_NETWORK);
-                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, 2, ++seqNo);
+                orderCreation.setDC(dcSet, Transaction.FOR_NETWORK, height, ++seqNo);
                 orderCreation.process(null, Transaction.FOR_NETWORK);
 
             }
