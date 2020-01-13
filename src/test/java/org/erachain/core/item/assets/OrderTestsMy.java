@@ -3576,6 +3576,8 @@ public class OrderTestsMy {
                 Long orderID = orderCreation.makeOrder().getId();
                 dcSet.getTransactionFinalMapSigns().put(orderCreation.getSignature(), orderID);
 
+                timestamp++;
+
                 // CREATE CANCEL ORDER
                 // Long time = maker.getLastReference(dcSet);
                 CancelOrderTransaction cancelOrderTransaction = new CancelOrderTransaction(accountA, orderCreation.getSignature(), FEE_POWER,
