@@ -269,7 +269,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
     public long resolveKey(DCSet db) {
 
-        if (BlockChain.isWiped(this.reference))
+        if (this.reference == null || BlockChain.isWiped(this.reference))
             return 0L;
 
         if (this.key == 0 // & this.reference != null
