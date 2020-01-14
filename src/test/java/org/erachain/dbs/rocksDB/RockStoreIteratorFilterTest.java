@@ -1,6 +1,5 @@
 package org.erachain.dbs.rocksDB;
 
-import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -10,6 +9,7 @@ import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IDB;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -85,6 +85,7 @@ public class RockStoreIteratorFilterTest {
 
             init(IDB.DBS_ROCK_DB);
 
+            TransactionFinalMapImpl txMap = dcSet.getTransactionFinalMap();
             String address = "7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW";
             Account recipientAcc = new Account(address);
             BigDecimal amount_asset = new BigDecimal("1");
@@ -94,17 +95,17 @@ public class RockStoreIteratorFilterTest {
             RSend assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
             assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
-            dcSet.getTransactionFinalMap().put(assetTransfer);
+            txMap.put(assetTransfer);
 
             assetTransfer = new RSend(accountB, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
             assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
-            dcSet.getTransactionFinalMap().put(assetTransfer);
+            txMap.put(assetTransfer);
 
             assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
             assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
-            dcSet.getTransactionFinalMap().put(assetTransfer);
+            txMap.put(assetTransfer);
 
 
             String address2 = "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC";
@@ -114,20 +115,35 @@ public class RockStoreIteratorFilterTest {
             assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc2, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
             assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
-            dcSet.getTransactionFinalMap().put(assetTransfer);
+            txMap.put(assetTransfer);
 
             assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
             assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
             assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
-            dcSet.getTransactionFinalMap().put(assetTransfer);
+            txMap.put(assetTransfer);
 
-            IteratorCloseable<Long> iterator = dcSet.getTransactionFinalMap().getBiDirectionAddressIterator(
+            IteratorCloseable<Long> iterator = txMap.getBiDirectionAddressIterator(
                     address, null, false, 0, 5);
-            assertEquals(2, Iterators.size(iterator));
 
-            iterator = dcSet.getTransactionFinalMap().getBiDirectionAddressIterator(
+            int count = 0;
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                Transaction transaction = txMap.get(key);
+                assertEquals(true, transaction.isInvolved(recipientAcc));
+                count++;
+            }
+            assertEquals(count, 2);
+
+            iterator = txMap.getBiDirectionAddressIterator(
                     address, null, true, 0, 5);
-            assertEquals(2, Iterators.size(iterator));
+            count = 0;
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                Transaction transaction = txMap.get(key);
+                assertEquals(true, transaction.isInvolved(recipientAcc));
+                count++;
+            }
+            assertEquals(count, 2);
 
         } finally {
             dcSet.close();
