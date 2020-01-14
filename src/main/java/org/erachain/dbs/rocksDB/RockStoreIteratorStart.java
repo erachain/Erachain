@@ -42,6 +42,8 @@ public final class RockStoreIteratorStart extends RockStoreIterator {
             if (first) {
                 if (startKey != null) {
                     dbIterator.seek(startKey);
+                } else {
+                    dbIterator.seekToFirst();
                 }
                 first = false;
             }

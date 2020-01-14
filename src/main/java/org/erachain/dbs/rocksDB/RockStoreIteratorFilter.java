@@ -41,6 +41,8 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
       if (first) {
         if (filter != null) {
           dbIterator.seek(filter);
+        } else {
+          dbIterator.seekToFirst();
         }
         first = false;
       }
@@ -56,7 +58,7 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
       }
     }
 
-    return hasNext = hasNext && areEqualMask(dbIterator.key(), filter);
+    return hasNext = hasNext && (filter == null || areEqualMask(dbIterator.key(), filter));
 
   }
 
