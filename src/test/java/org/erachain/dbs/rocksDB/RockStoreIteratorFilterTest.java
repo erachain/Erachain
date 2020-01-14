@@ -1,5 +1,6 @@
 package org.erachain.dbs.rocksDB;
 
+import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
@@ -122,28 +123,68 @@ public class RockStoreIteratorFilterTest {
             assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
             txMap.put(assetTransfer);
 
+            Account findAccount = recipientAcc;
+            String findAddress = findAccount.getAddress();
             IteratorCloseable<Long> iterator = txMap.getBiDirectionAddressIterator(
-                    address, null, false, 0, 5);
+                    findAddress, null, false, 0, 5);
 
             int count = 0;
             while (iterator.hasNext()) {
                 Long key = iterator.next();
                 Transaction transaction = txMap.get(key);
-                assertEquals(true, transaction.isInvolved(recipientAcc));
+                assertEquals(true, transaction.isInvolved(findAccount));
                 count++;
             }
             assertEquals(count, 2);
 
             iterator = txMap.getBiDirectionAddressIterator(
-                    address, null, true, 0, 5);
+                    findAddress, null, true, 0, 5);
             count = 0;
             while (iterator.hasNext()) {
                 Long key = iterator.next();
                 Transaction transaction = txMap.get(key);
-                assertEquals(true, transaction.isInvolved(recipientAcc));
+                assertEquals(true, transaction.isInvolved(findAccount));
                 count++;
             }
             assertEquals(count, 2);
+
+            ////////////
+
+            findAccount = accountB;
+            findAddress = findAccount.getAddress();
+            iterator = txMap.getBiDirectionAddressIterator(
+                    findAddress, null, false, 0, 5);
+
+            count = 0;
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                Transaction transaction = txMap.get(key);
+                assertEquals(true, transaction.isInvolved(findAccount));
+                count++;
+            }
+            assertEquals(count, 3);
+
+            iterator = txMap.getBiDirectionAddressIterator(
+                    findAddress, null, true, 0, 5);
+            count = 0;
+            while (iterator.hasNext()) {
+                Long key = iterator.next();
+                Transaction transaction = txMap.get(key);
+                assertEquals(true, transaction.isInvolved(findAccount));
+                count++;
+            }
+            assertEquals(count, 2);
+
+            findAccount = null;
+            findAddress = null;
+            iterator = txMap.getBiDirectionAddressIterator(
+                    findAddress, null, false, 0, 5);
+
+            assertEquals(Iterators.size(iterator), 5);
+
+            iterator = txMap.getBiDirectionAddressIterator(
+                    findAddress, null, true, 0, 5);
+            assertEquals(Iterators.size(iterator), 5);
 
         } finally {
             dcSet.close();

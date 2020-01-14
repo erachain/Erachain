@@ -308,20 +308,21 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @Override
     public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
         byte[] fromKey;
-        if (fromSeqNo == null || fromSeqNo == 0) {
-            // ищем все с самого начала для данного адреса
-            fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-            System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+        if (addressShort != null) {
+            if (fromSeqNo == null || fromSeqNo == 0) {
+                // ищем все с самого начала для данного адреса
+                fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+                System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+            } else {
+                // используем полный ключ для начального поиска
+                fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
+                System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+                System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
+            }
         } else {
-            // используем полный ключ для начального поиска
-            fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
-            System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-            System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
+            fromKey = null;
         }
 
-        if (descending) {
-            fromKey[fromKey.length - 1]++;
-        }
         return map.getIndexIteratorFilter(addressBiDirectionTxs.getColumnFamilyHandle(),
                 fromKey, descending, true);
 

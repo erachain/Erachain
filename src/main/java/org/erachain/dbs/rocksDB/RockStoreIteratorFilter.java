@@ -22,13 +22,22 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
     boolean hasNext = false;
     try {
       if (jumpToLast) {
-        dbIterator.seekForPrev(filter);
+        if (filter != null) {
+          dbIterator.seek(filter);
+
+          dbIterator.next();
+
+        } else {
+          dbIterator.seekToLast();
+        }
         jumpToLast = false;
         first = false;
       }
       if (first) {
         if (filter != null) {
           dbIterator.seek(filter);
+        } else {
+          dbIterator.seekToFirst();
         }
         first = false;
       }

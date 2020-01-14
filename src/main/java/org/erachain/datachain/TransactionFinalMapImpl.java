@@ -912,7 +912,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map)
-                .getBiDirectionAddressIterator(Crypto.getInstance().getShortBytesFromAddress(address), fromSeqNo, descending);
+                .getBiDirectionAddressIterator(address == null ? null : Crypto.getInstance().getShortBytesFromAddress(address), fromSeqNo, descending);
         Iterators.advance(iterator, offset);
 
         return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
