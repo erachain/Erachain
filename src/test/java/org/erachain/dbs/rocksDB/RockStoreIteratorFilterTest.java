@@ -173,7 +173,7 @@ public class RockStoreIteratorFilterTest {
                 assertEquals(true, transaction.isInvolved(findAccount));
                 count++;
             }
-            assertEquals(count, 2);
+            assertEquals(count, 3);
 
             findAccount = null;
             findAddress = null;

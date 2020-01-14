@@ -23,9 +23,14 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
     try {
       if (jumpToLast) {
         if (filter != null) {
-          dbIterator.seek(filter);
 
-          dbIterator.next();
+          // тут нужно взять кранее верхнее значени и найти нижнее первое
+          // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
+          int length = filter.length;
+          byte[] prevFilter = new byte[length + 1];
+          System.arraycopy(filter, 0, prevFilter, 0, length);
+          prevFilter[length] = (byte) 255;
+          dbIterator.seekForPrev(prevFilter);
 
         } else {
           dbIterator.seekToLast();
@@ -36,8 +41,6 @@ public final class RockStoreIteratorFilter extends RockStoreIterator {
       if (first) {
         if (filter != null) {
           dbIterator.seek(filter);
-        } else {
-          dbIterator.seekToFirst();
         }
         first = false;
       }
