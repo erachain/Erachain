@@ -176,13 +176,13 @@ public class RockStoreIteratorFilterTest {
             assertEquals(count, 3);
 
             iterator = txMap.getBiDirectionAddressIterator(
-                    null, null, false, 0, 55);
+                    null, null, false, 0, 0);
 
-            assertEquals(Iterators.size(iterator), 55);
+            assertEquals(Iterators.size(iterator), 265);
 
             iterator = txMap.getBiDirectionAddressIterator(
-                    null, null, true, 0, 55);
-            assertEquals(Iterators.size(iterator), 55);
+                    null, null, true, 0, 0);
+            assertEquals(Iterators.size(iterator), 265);
 
         } finally {
             dcSet.close();
