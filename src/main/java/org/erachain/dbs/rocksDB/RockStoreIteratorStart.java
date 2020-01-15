@@ -25,17 +25,11 @@ public final class RockStoreIteratorStart extends RockStoreIterator {
         try {
             if (jumpToLast) {
                 if (startKey != null) {
-
-                    // тут нужно взять кранее верхнее значени и найти нижнее первое
-                    // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
-                    int length = startKey.length;
-                    byte[] prevFilter = new byte[length + 1];
-                    System.arraycopy(startKey, 0, prevFilter, 0, length);
-                    prevFilter[length] = (byte) 255;
-                    dbIterator.seekForPrev(prevFilter);
+                    dbIterator.seekForPrev(startKey);
                 } else {
                     dbIterator.seekToLast();
                 }
+
                 jumpToLast = false;
                 first = false;
             }
