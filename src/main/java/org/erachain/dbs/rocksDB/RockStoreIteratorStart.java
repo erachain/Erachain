@@ -24,13 +24,20 @@ public final class RockStoreIteratorStart extends RockStoreIterator {
         boolean hasNext = false;
         try {
             if (jumpToLast) {
-                dbIterator.seekForPrev(startKey);
+                if (startKey != null) {
+                    dbIterator.seekForPrev(startKey);
+                } else {
+                    dbIterator.seekToLast();
+                }
+
                 jumpToLast = false;
                 first = false;
             }
             if (first) {
                 if (startKey != null) {
                     dbIterator.seek(startKey);
+                } else {
+                    dbIterator.seekToFirst();
                 }
                 first = false;
             }

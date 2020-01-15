@@ -912,7 +912,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map)
-                .getBiDirectionAddressIterator(Crypto.getInstance().getShortBytesFromAddress(address), fromSeqNo, descending);
+                .getBiDirectionAddressIterator(address == null ? null : Crypto.getInstance().getShortBytesFromAddress(address), fromSeqNo, descending);
         Iterators.advance(iterator, offset);
 
         return limit > 0 ? IteratorCloseableImpl.make(Iterators.limit(iterator, limit)) : iterator;
@@ -966,10 +966,10 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     txs.add(0, item);
                 }
 
-                if (fillFullPage && limit > 0 && count < limit) {
+                if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
                     // сюда пришло значит не полный список - дополним его
-                    for (Transaction transaction: getTransactionsByAddressFromID(addressShort,
-                            fromSeqNo, 1, limit - count, noForge, false)) {
+                    for (Transaction transaction : getTransactionsByAddressFromID(addressShort,
+                            fromSeqNo, 0, limit - count, noForge, false)) {
                         txs.add(transaction);
                     }
                 }
@@ -983,7 +983,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 Transaction item;
                 Long key;
                 int skipped = 0;
-                while (iterator.hasNext() && (limit == -1 || limit > 0)) {
+                int count = 0;
+                while (iterator.hasNext() && (limit <= 0 || count < limit)) {
                     key = iterator.next();
                     item = this.map.get(key);
                     if (noForge && item.getType() == Transaction.CALCULATED_TRANSACTION) {
@@ -1001,10 +1002,21 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
                     item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
 
-                    --limit;
+                    count++;
 
                     txs.add(item);
                 }
+
+                if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
+                    // сюда пришло значит не полный список - дополним его
+                    int index = 0;
+                    int limitLeft = limit - count;
+                    for (Transaction transaction : getTransactionsByAddressFromID(addressShort,
+                            fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, noForge, false)) {
+                        txs.add(index++, transaction);
+                    }
+                }
+
             } catch (IOException e) {
             }
         }

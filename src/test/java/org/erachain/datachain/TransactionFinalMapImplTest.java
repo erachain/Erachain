@@ -179,7 +179,69 @@ public class TransactionFinalMapImplTest {
                 dcSet.close();
             }
         }
+    }
 
+    @Test
+    public void getTransactionsByAddressFromID() {
+
+        for (int dbs : TESTED_DBS) {
+
+            try {
+                init(dbs);
+
+                int seqNo = 1;
+
+                String address = "7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW";
+                Account recipientAcc = new Account(address);
+                BigDecimal amount_asset = new BigDecimal("1");
+
+                RSend assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
+                assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
+
+                assetTransfer = new RSend(accountB, FEE_POWER, recipientAcc, 1, amount_asset, timestamp++, 0L);
+                assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
+
+                assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
+                assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
+
+
+                String address2 = "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC";
+                Account recipientAcc2 = new Account(address2);
+                amount_asset = new BigDecimal("10");
+
+                assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc2, 1, amount_asset, timestamp++, 0L);
+                assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
+
+                assetTransfer = new RSend(accountB, FEE_POWER, accountA, 1, amount_asset, timestamp++, 0L);
+                assetTransfer.sign(accountB, Transaction.FOR_NETWORK);
+                assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                dcSet.getTransactionFinalMap().put(assetTransfer);
+
+                List<Transaction> find = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(
+                        recipientAcc.getShortAddressBytes(), null, 0, 5, false, true);
+
+                // .size сбрасывает Итератор на конец списка
+                assertEquals(2, find.size());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByAddressFromID(
+                        recipientAcc.getShortAddressBytes(), null, 0, 5, false, false);
+
+                // .size сбрасывает Итератор на конец списка
+                assertEquals(2, find.size());
+
+
+            } finally {
+                dcSet.close();
+            }
+        }
 
     }
 }

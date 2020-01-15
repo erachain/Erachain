@@ -80,7 +80,6 @@ public class APIExchange {
 
     @GET
     @Path("ordersbook/{have}/{want}")
-    // orders/1/2?imit=4
     public Response getOrdersBook(@PathParam("have") Long have, @PathParam("want") Long want,
                                   @DefaultValue("20") @QueryParam("limit") Long limit) {
 
@@ -115,7 +114,6 @@ public class APIExchange {
 
     @GET
     @Path("allordersbyaddress/{address}/{from}")
-    // orders/1/2?imit=4
     // TODO нужно сделать тесты на проверку потерянных ордеров - есть трнзакция создания а его нету ни в одной таблице
     public Response getAllOrdersByAddress(@PathParam("address") String address,
                                           @PathParam("from") String fromOrder,
