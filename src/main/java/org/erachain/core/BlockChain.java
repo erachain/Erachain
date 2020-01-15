@@ -594,7 +594,7 @@ public class BlockChain {
         }
 
         int height = dcSet.getBlockSignsMap().size();
-        if (height == 0)
+        if (height <= 0)
         // process genesis block
         {
             if (dcSet_in == null && dcSet.getBlockMap().getLastBlockSignature() != null) {
