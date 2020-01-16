@@ -61,7 +61,7 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (genesisTimestamp != Settings.DEFAULT_MAINNET_STAMP) {
+        if (false && genesisTimestamp != Settings.DEFAULT_MAINNET_STAMP) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS
@@ -89,13 +89,17 @@ public class GenesisBlock extends Block {
 				 */
 
 
-                //CREATE ISSUE PERSON TRANSACTION
-                //this.addTransaction(new GenesisIssuePersonRecord(user));
+                if (false) {
+                    //CREATE ISSUE PERSON TRANSACTION
+                    ////this.addTransaction(new GenesisIssuePersonRecord(user));
 
-                // CERTIFY PERSON
-                transactions.add(new GenesisCertifyPersonRecord(recipient, nonce++));
+                    // CERTIFY PERSON
+                    // TODO: тут ошибка сериализации транзакции - поидее нужно проверить и чтобы она работала
+                    // а лучше разрешить создание персон и так
+                    transactions.add(new GenesisCertifyPersonRecord(recipient, nonce++));
 
-                this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address + " / POST addresses " + Base58.encode(accountSeed);
+                    this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address + " / POST addresses " + Base58.encode(accountSeed);
+                }
 
                 // SEND GENESIS ASSETS
                 transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));

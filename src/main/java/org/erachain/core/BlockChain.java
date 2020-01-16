@@ -585,7 +585,7 @@ public class BlockChain {
             dcSet = DCSet.getInstance();
         }
 
-        if (Settings.getInstance().isTestnet()) {
+        if (DEVELOP_USE) {
             LOGGER.info(genesisBlock.getTestNetInfo());
         }
 
