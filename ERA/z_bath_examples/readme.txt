@@ -5,6 +5,9 @@ Copy bath-file to root folder for use it.
 
 Start Commands
 
+-testnet[=genesis_timestamp]
+Start in TestNET mode and set Genesis Block Timestamp (in millis).
+
 -cli
 start as Command Line Interpretator.
 

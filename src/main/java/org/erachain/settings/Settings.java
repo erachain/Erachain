@@ -31,6 +31,10 @@ import java.util.concurrent.locks.ReentrantLock;
 // import org.slf4j.LoggerFactory;
 
 public class Settings {
+
+    public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
+    public static final long DEFAULT_TESTNET_STAMP = 1511164500000L; // default for developers test net
+
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
@@ -65,7 +69,7 @@ public class Settings {
     //GUI CONSOLE
     private static final boolean DEFAULT_GUI_CONSOLE_ENABLED = true;
     //WEB
-    private static final String DEFAULT_WEB_ALLOWED = BlockChain.DEVELOP_USE? ";" : "127.0.0.1";
+    private static final String DEFAULT_WEB_ALLOWED = "127.0.0.1";
     private static final boolean DEFAULT_WEB_ENABLED = true;
     // 19 03
     //GUI
@@ -195,7 +199,7 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (BlockChain.DEVELOP_USE ? "peers-dev.json" : "peers.json");
+        return this.userPath + (isTestnet() ? "peers-dev.json" : "peers.json");
     }
 
     public String getWalletDir() {
@@ -525,7 +529,7 @@ public class Settings {
     }
 
     public boolean isTestnet() {
-        return this.getGenesisStamp() != BlockChain.DEFAULT_MAINNET_STAMP;
+        return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
     }
 
     public long getGenesisStamp() {
@@ -538,7 +542,7 @@ public class Settings {
                     this.genesisStamp = ((Long) this.settingsJSON.get("testnetstamp")).longValue();
                 }
             } else {
-                this.genesisStamp = BlockChain.DEFAULT_MAINNET_STAMP;
+                this.genesisStamp = DEFAULT_MAINNET_STAMP;
             }
         }
 
@@ -737,7 +741,8 @@ public class Settings {
             }
 
             //RETURN
-            return DEFAULT_WEB_ALLOWED.split(";");
+            return (BlockChain.DEVELOP_USE ? ";" : DEFAULT_WEB_ALLOWED).split(";");
+
         } catch (Exception e) {
             //RETURN EMPTY LIST
             return new String[0];

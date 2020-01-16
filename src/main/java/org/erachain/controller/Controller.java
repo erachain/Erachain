@@ -3,6 +3,7 @@ package org.erachain.controller;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.PropertyConfigurator;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.api.ApiClient;
 import org.erachain.api.ApiService;
@@ -66,6 +67,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.TrayIcon.MessageType;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -100,23 +102,11 @@ public class Controller extends Observable {
     public static final char GROUPING_SEPARATOR = '`';
     // IF new abilities is made - new license insert in CHAIN and set this KEY
     public static final long LICENSE_VERS = 107; // version of LICENSE
-    public static HashMap<String, Long> LICENSE_LANG_REFS = BlockChain.DEVELOP_USE ?
-            new HashMap<String, Long>(3, 1) {
-                {
-                    put("en", Transaction.makeDBRef(148450, 1));
-                    put("ru", Transaction.makeDBRef(191502, 1));
-                }
-            } :
-            new HashMap<String, Long>(3, 1) {
-                {
-                    put("en", Transaction.makeDBRef(159719, 1));
-                    put("ru", Transaction.makeDBRef(159727, 1));
-                }
-            };
+    public static HashMap<String, Long> LICENSE_LANG_REFS;
 
     public static TreeMap<String, Tuple2<BigDecimal, String>> COMPU_RATES = new TreeMap();
 
-    public static final String APP_NAME = BlockChain.DEVELOP_USE ? "Erachain-dev" : "Erachain";
+    public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 1 << 23;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
@@ -186,10 +176,32 @@ public class Controller extends Observable {
     /**
      * see org.erachain.datachain.DCSet#BLOCKS_MAP
      */
-    public int databaseSystem;
+    public int databaseSystem = -1;
+
+    Controller() {
+        instance.LICENSE_LANG_REFS = Settings.getInstance().isTestnet() ?
+                new HashMap<String, Long>(3, 1) {
+                    {
+                        put("en", Transaction.makeDBRef(148450, 1));
+                        put("ru", Transaction.makeDBRef(191502, 1));
+                    }
+                } :
+                new HashMap<String, Long>(3, 1) {
+                    {
+                        put("en", Transaction.makeDBRef(159719, 1));
+                        put("ru", Transaction.makeDBRef(159727, 1));
+                    }
+                };
+        APP_NAME = "Erachain";
+
+    }
 
     public static String getVersion() {
         return version;
+    }
+
+    public String getApplicationName() {
+        return APP_NAME + (Settings.getInstance().isTestnet() ? " TestNet " : " ") + "v." + version;
     }
 
     public static String getBuildDateTimeString() {
@@ -200,7 +212,7 @@ public class Controller extends Observable {
         return DateTimeFormat.timestamptoString(buildTimestamp, "yyyy-MM-dd", "UTC");
     }
 
-    public static long getBuildTimestamp() {
+    public long getBuildTimestamp() {
         if (buildTimestamp == 0) {
             Date date = new Date();
             //// URL resource =
@@ -213,12 +225,12 @@ public class Controller extends Observable {
             Path p = null;
             BasicFileAttributes attr = null;
             try {
-                f = new File(Controller.APP_NAME.toLowerCase() + ".jar");
+                f = new File(APP_NAME.toLowerCase() + ".jar");
                 p = f.toPath();
                 attr = Files.readAttributes(p, BasicFileAttributes.class);
             } catch (Exception e1) {
                 try {
-                    f = new File(Controller.APP_NAME.toLowerCase() + ".exe");
+                    f = new File(APP_NAME.toLowerCase() + ".exe");
                     p = f.toPath();
                     attr = Files.readAttributes(p, BasicFileAttributes.class);
                 } catch (Exception e2) {
@@ -300,6 +312,7 @@ public class Controller extends Observable {
             if (Settings.getInstance().isTestnet()) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
+                this.messageMagic = Message.MAINNET_MAGIC;
             } else {
                 this.messageMagic = Message.MAINNET_MAGIC;
             }
@@ -3567,6 +3580,20 @@ public class Controller extends Observable {
 
         String pass = null;
 
+        // init SETTINGS FIRST
+        Settings.getInstance();
+
+        // init BlockChain then
+        String log4JPropertyFile = "resources/log4j" + (Settings.getInstance().isTestnet() ? "-dev" : "") + ".properties";
+        Properties p = new Properties();
+
+        try {
+            p.load(new FileInputStream(log4JPropertyFile));
+            PropertyConfigurator.configure(p);
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+
         // default
         databaseSystem = DCSet.DBS_MAP_DB;
 
@@ -3668,7 +3695,7 @@ public class Controller extends Observable {
                 continue;
             }
             if (arg.equals("-testnet")) {
-                Settings.getInstance().setGenesisStamp(System.currentTimeMillis());
+                Settings.getInstance().setGenesisStamp(Settings.DEFAULT_TESTNET_STAMP);
                 continue;
             }
             if (arg.startsWith("-testnet=") && arg.length() > 9) {
@@ -3676,14 +3703,19 @@ public class Controller extends Observable {
                     long testnetstamp = Long.parseLong(arg.substring(9));
 
                     if (testnetstamp == 0) {
-                        testnetstamp = System.currentTimeMillis();
+                        testnetstamp = 1511164500000l;
                     }
 
                     Settings.getInstance().setGenesisStamp(testnetstamp);
                 } catch (Exception e) {
-                    Settings.getInstance().setGenesisStamp(BlockChain.DEFAULT_MAINNET_STAMP);
+                    Settings.getInstance().setGenesisStamp(Settings.DEFAULT_MAINNET_STAMP);
                 }
             }
+        }
+
+        // default DataBase System
+        if (databaseSystem < 0) {
+            databaseSystem = DCSet.DBS_MAP_DB;
         }
 
         if (noCalculated)
@@ -3724,8 +3756,8 @@ public class Controller extends Observable {
                 }
 
                 LOGGER.info(Lang.getInstance().translate("Starting %app%")
-                        .replace("%app%", Lang.getInstance().translate(Controller.APP_NAME)));
-                LOGGER.info(version + Lang.getInstance().translate(" build ")
+                        .replace("%app%", Lang.getInstance().translate(APP_NAME) + (Settings.getInstance().isTestnet() ? " TestNET " : "")));
+                LOGGER.info(getVersion() + Lang.getInstance().translate(" build ")
                         + buildTime);
 
                 this.setChanged();

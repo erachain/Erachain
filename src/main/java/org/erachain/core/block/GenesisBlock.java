@@ -61,7 +61,7 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (genesisTimestamp != BlockChain.DEFAULT_MAINNET_STAMP) {
+        if (genesisTimestamp != Settings.DEFAULT_MAINNET_STAMP) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS

@@ -32,7 +32,6 @@ import java.util.*;
 public class BlockChain {
 
     public static final int TESTS_VERS = 0; // not use TESTs - or a11 (as version)
-    public static final boolean DEVELOP_USE = true;
 
     /**
      * Задает потолок цепочки
@@ -73,11 +72,6 @@ public class BlockChain {
     public static PrivateKeyAccount[] TEST_DB_ACCOUNTS = TEST_DB == 0 ? null : new PrivateKeyAccount[1000];
     public static final boolean NOT_CHECK_SIGNS = TEST_DB > 0 && false;
 
-    /**
-     * set uo all balances ERA to 10000 and COMPU to 100
-     */
-    public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || TEST_DB > 0;
-
     static public int CHECK_BUGS = TEST_DB > 0 ? 0 : 5;
 
     /**
@@ -88,16 +82,18 @@ public class BlockChain {
     public static final boolean PERSON_SEND_PROTECT = true;
     //public static final int BLOCK_COUNT = 10000; // max count Block (if =<0 to the moon)
 
-    public static final int TESTNET_PORT = TEST_DB > 0? 9005 : DEVELOP_USE ? 9065 : 9045;
-    public static final int MAINNET_PORT = TEST_DB > 0? 9006 : DEVELOP_USE ? 9066 : 9046;
+    public static final boolean DEVELOP_USE = Controller.getInstance().isTestNet();
 
-    public static final int DEFAULT_WEB_PORT = TEST_DB > 0? 9007 : DEVELOP_USE ? 9067 : 9047;
-    public static final int DEFAULT_RPC_PORT = TEST_DB > 0? 9008 : DEVELOP_USE ? 9068 : 9048;
+    /**
+     * set uo all balances ERA to 10000 and COMPU to 100
+     */
+    public static final boolean ERA_COMPU_ALL_UP = DEVELOP_USE || TEST_DB > 0;
 
-    //TESTNET
-    //   1486444444444l
-    //	 1487844444444   1509434273     1509434273
-    public static final long DEFAULT_MAINNET_STAMP = DEVELOP_USE ? 1511164500000l : 1487844793333l;
+    public static final int TESTNET_PORT = TEST_DB > 0 ? 9006 : 9066;
+    public static final int MAINNET_PORT = TEST_DB > 0 ? 9006 : 9046;
+
+    public static final int DEFAULT_WEB_PORT = TEST_DB > 0 ? 9007 : DEVELOP_USE ? 9067 : 9047;
+    public static final int DEFAULT_RPC_PORT = TEST_DB > 0 ? 9008 : DEVELOP_USE ? 9068 : 9048;
 
     public static final String DEFAULT_EXPLORER = "explorer.erachain.org";
 
@@ -177,8 +173,8 @@ public class BlockChain {
 
     public static final int VERS_4_12 = TEST_DB > 0? 0 : DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
-    public static final int VERS_30SEC = TEST_DB > 0? 0 : DEVELOP_USE ? 471000 : 280785; //	2019-09-17 12:01:13
-    public static final long VERS_30SEC_TIME = DEFAULT_MAINNET_STAMP + (long)VERS_30SEC * (DEVELOP_USE? 120L :288L);
+    public static final int VERS_30SEC = TEST_DB > 0 ? 0 : DEVELOP_USE ? 471000 : 280785; //	2019-09-17 12:01:13
+    public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * (DEVELOP_USE ? 120L : 288L);
 
     public static final int DEVELOP_FORGING_START = 100;
 
