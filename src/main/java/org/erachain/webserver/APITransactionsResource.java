@@ -39,6 +39,8 @@ public class APITransactionsResource {
                 Lang.getInstance().translate("Get Record by sigmature."));
         help.put("apirecords/getbynumber/{height-sequence}",
                 "GET Record by Height and Sequence");
+        help.put("apirecords/getsignature/{height-sequence}",
+                "GET Record Signature by Height and Sequence");
         help.put("apirecords/incomingfromblock/{address}/{blockStart}?type={type}",
                 Lang.getInstance().translate("Get Incoming Records for Address from {blockStart}. Filter by type. Limit checked blocks = 2000 or 100 found records. If blocks not end at height - NEXT parameter was set."));
         help.put("apirecords/getbyaddress?address={address}&asset={asset}&recordType={recordType}&unconfirmed=true",
@@ -131,6 +133,47 @@ public class APITransactionsResource {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(StrJSonFine.convert(out))
                 .build();
+    }
+
+    // getsignature
+    @GET
+    @Path("getsignature/{number}")
+    public Response getSignByNumber(@PathParam("number") String numberStr) {
+
+        int step = 1;
+
+        try {
+
+            String[] strA = numberStr.split("\\-");
+            int height = Integer.parseInt(strA[0]);
+            int seq = Integer.parseInt(strA[1]);
+
+            ++step;
+            Transaction record = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
+
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(record.viewSignature())
+                    .build();
+
+        } catch (Exception e) {
+
+            Map out = new LinkedHashMap();
+            out.put("error", step);
+            if (step == 1)
+                out.put("message", "height-sequence error, use integer-integer value");
+            else if (step == 2)
+                out.put("message", "record not found");
+            else
+                out.put("message", e.getMessage());
+
+            return Response.status(200)
+                    .header("Content-Type", "application/json; charset=utf-8")
+                    .header("Access-Control-Allow-Origin", "*")
+                    .entity(StrJSonFine.convert(out))
+                    .build();
+        }
     }
 
     /**

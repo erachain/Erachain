@@ -403,6 +403,11 @@ import java.util.*;
 
     public JSONObject jsonForExplorerPage(JSONObject langObj) {
         JSONObject blockJSON = new JSONObject();
+        if (blockHead == null) {
+            // LOAD HEAD
+            loadHeadMind((DCSet) DCSet.getInstance());
+        }
+
         blockJSON.put("height", heightBlock);
         blockJSON.put("signature", Base58.encode(signature));
         blockJSON.put("generator", creator.getAddress());
