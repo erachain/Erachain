@@ -4,16 +4,13 @@ import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun.Tuple2;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("serial")
@@ -102,29 +99,9 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 // ИЩЕМ по Заголовку
                 DCSet dcSet = DCSet.getInstance();
 
-                Pair<String, IteratorCloseable<Long>> result = dcSet.getTransactionFinalMap().getKeysIteratorByFilterAsArray(filter, start, step);
+                list = ((FilteredByStringArray)dcSet.getTransactionFinalMap())
+                        .getKeysByFilterAsArray(filter, start, step);
 
-                if (result.getA() != null) {
-                    findMessage = result.getA();
-                    return;
-                } else {
-                    findMessage = "";
-                }
-
-                try (IteratorCloseable iterator = result.getB()) {
-
-                    Transaction item;
-                    Long key;
-
-                    list = new ArrayList<>();
-
-                    while (iterator.hasNext()) {
-                        key = (Long) iterator.next();
-                        item = (Transaction) map.get(key);
-                        list.add(item);
-                    }
-                } catch (IOException e) {
-                }
             }
         }
 

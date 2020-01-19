@@ -308,15 +308,21 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     public IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
 
         String filterLower = filter.toLowerCase();
-        Iterable keys = Fun.filter(this.titleKey,
-                new Tuple2<String, Integer>(filterLower,
-                        type==0?0:type), true,
-                new Tuple2<String, Integer>(asFilter?
-                        filterLower + new String(new byte[]{(byte)255}) : filterLower,
-                        type==0?Integer.MAX_VALUE:type), true);
 
-        Iterator iter = keys.iterator();
-        return new IteratorCloseableImpl(iter);
+        if (true) {
+            return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
+                    Fun.t2(Fun.t2(filterLower, type != 0 ? type : Integer.MIN_VALUE), null),
+                    Fun.t2(Fun.t2(filterLower, type != 0 ? type : Integer.MAX_VALUE), Fun.HI())).iterator()));
+        } else {
+            Iterable keys = Fun.filter(this.titleKey,
+                    new Tuple2<String, Integer>(filterLower,
+                            type == 0 ? Integer.MIN_VALUE : type), true,
+                    new Tuple2<String, Integer>(asFilter ?
+                            filterLower + new String(new byte[]{(byte) 255}) : filterLower,
+                            type == 0 ? Integer.MAX_VALUE : type), true);
+
+            return new IteratorCloseableImpl(keys.iterator());
+        }
     }
 
     @Override

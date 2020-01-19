@@ -670,7 +670,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String getTitle() {
-        return null;
+        return viewTypeName();
     }
 
     /*

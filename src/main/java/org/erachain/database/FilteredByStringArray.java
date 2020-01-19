@@ -6,4 +6,4 @@ public interface FilteredByStringArray<T> {
 
     List<T> getKeysByFilterAsArray(String filter, int offset, int limit);
 
-    }
+}

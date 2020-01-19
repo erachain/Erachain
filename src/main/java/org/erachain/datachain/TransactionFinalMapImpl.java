@@ -1,7 +1,5 @@
 package org.erachain.datachain;
 
-//04/01 +- 
-
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
@@ -433,230 +431,163 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return transactions;
     }
 
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending) {
+    /**
+     * Если слово заканчивается на "!" - то поиск полностью слова
+     * или если оно короче чем MIN_WORLD_INDEX, иначе поиск по началу
+     * @param words
+     * @return
+     */
+    public Pair<String, Boolean>[] stepFilter(String[] words) {
 
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
+        Pair[] result = new Pair[words.length];
+        String word;
+        for (int i = 0; i < words.length; i++) {
+            word = words[i];
+            if (word.endsWith("!")) {
+                // принудительно поставили в конце "ПОИСК слова ПОЛНОСТЬЮ"
+                word = word.substring(0, word.length() - 1);
 
-        List<Transaction> txs = new ArrayList<>();
-        try (IteratorCloseable iterator = ((TransactionFinalSuit)map).getIteratorByTitleAndType(filter, true, type)) {
-
-            int counter = 0;
-            Transaction item;
-            Long key;
-            while (iterator.hasNext() && (limit == 0 || counter < limit)) {
-                key = (Long) iterator.next();
-                Tuple2<Integer, Integer> pair = Transaction.parseDBRef(key);
-                item = this.map.get(key);
-                item.setDC((DCSet) databaseSet, Transaction.FOR_NETWORK, pair.a, pair.b);
-
-                txs.add(item);
-                counter++;
-            }
-        } catch (IOException e) {
-        }
-        return txs;
-    }
-
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getKeysByTitleAndType(String filter, Integer type, int offset, int limit) {
-
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
-
-        IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map).getIteratorByTitleAndType(filter, true, type);
-
-        if (offset > 0)
-            Iterators.advance(iterator, offset);
-
-        if (limit > 0)
-            iterator = IteratorCloseableImpl.limit(iterator, limit);
-
-        return iterator;
-
-    }
-
-    @Override
-    public Pair<Integer, IteratorCloseable<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray) {
-
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
-
-        IteratorCloseable iterator;
-
-        String stepFilter = filterArray[step];
-        if (!stepFilter.endsWith("!")) {
-            // это сокращение для диаппазона
-            if (stepFilter.length() < 5) {
-                // ошибка - ищем как полное слово
-                //keys = Fun.filter(this.titleKey,
-                //        new Tuple2<String, Integer>(stepFilter, 0), true,
-                //        new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
-                iterator = ((TransactionFinalSuit)map).getIteratorByTitleAndType(stepFilter, false, 0);
+                if (word.length() > CUT_NAME_INDEX) {
+                    word = word.substring(0, CUT_NAME_INDEX);
+                }
+                result[i] = new Pair(word, false);
 
             } else {
-
-                if (stepFilter.length() > CUT_NAME_INDEX) {
-                    stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
+                if (word.length() < WHOLE_WORLD_LENGTH) {
+                    result[i] = new Pair<>(word, false);
+                } else {
+                    if (word.length() > CUT_NAME_INDEX) {
+                        word = word.substring(0, CUT_NAME_INDEX);
+                    }
+                    result[i] = new Pair<>(word, true);
                 }
-
-                // поиск диаппазона
-                //keys = Fun.filter(this.titleKey,
-                //        new Tuple2<String, Integer>(stepFilter, 0), true,
-                //        new Tuple2<String, Integer>(stepFilter + new String(new byte[]{(byte) 254}), Integer.MAX_VALUE), true);
-                iterator = ((TransactionFinalSuit)map).getIteratorByTitleAndType(stepFilter, true, 0);
-
             }
-
-        } else {
-            // поиск целиком
-
-            stepFilter = stepFilter.substring(0, stepFilter.length() -1);
-
-            if (stepFilter.length() > CUT_NAME_INDEX) {
-                stepFilter = stepFilter.substring(0, CUT_NAME_INDEX);
-            }
-
-            //keys = Fun.filter(this.titleKey,
-            //        new Tuple2<String, Integer>(stepFilter, 0), true,
-            //        new Tuple2<String, Integer>(stepFilter, Integer.MAX_VALUE), true);
-            iterator = ((TransactionFinalSuit)map).getIteratorByTitleAndType(stepFilter, false, 0);
         }
-
-        if (step > 0) {
-
-            // погнали в РЕКУРСИЮ
-            Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(--step, filterArray);
-
-            if (result.getA() > 0) {
-                return result;
-            }
-
-            // в рекурсии все хорошо - соберем ключи
-            ///Iterator<Long> rescurseIterator = result.getB();
-            ///iterator = Iterators.concat(iterator, rescurseIterator);
-            // а этот Итератор.mergeSorted - он дублирует повторяющиеся значения индекса (( и делает пересортировку асинхронно - то есть тоже не ахти то что нужно
-            iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
-            ////Iterable<Long> mergedIterable = Iterables.mergeSorted((Iterable) ImmutableList.of(iterator, result.getB()), Fun.COMPARATOR);
-            ////iterator = mergedIterable.iterator();
-
-
-            return new Pair<>(0, iterator);
-
-        } else {
-
-            return new Pair<Integer, IteratorCloseable<Long>>(0, iterator);
-
-        }
-
+        return result;
     }
+
 
     /**
      * Делает поиск по нескольким ключам по Заголовкам и если ключ с ! - надо найти только это слово
      * а не как фильтр. Иначе слово принимаем как фильтр на диаппазон
      * и его длинна должна быть не мнее 5-ти символов. Например:
      * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
-     * @param filter
+     * @param filter string of words
+     * @param type transaction Type = 0 for all
      * @param offset
      * @param limit
      * @return
      */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public Pair<String, IteratorCloseable<Long>> getKeysIteratorByFilterAsArray(String filter, int offset, int limit) {
-
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
-
-        String[] filterArray = filter.toLowerCase().split(DCSet.SPLIT_CHARS);
-
-        Pair<Integer, IteratorCloseable<Long>> result = getKeysByFilterAsArrayRecurse(filterArray.length - 1, filterArray);
-        if (result.getA() > 0) {
-            return new Pair<>("Error: filter key at " + (result.getA() - 1000) + "pos has length < 5", null);
-        }
-
-        IteratorCloseable<Long> iterator = result.getB();
-
-        if (offset > 0)
-            Iterators.advance(iterator, offset);
-
-        if (limit > 0)
-            iterator = IteratorCloseableImpl.limit(iterator, limit);
-
-        return new Pair<>(null, iterator);
-
-    }
-
-    // get list items in name substring str
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
+    public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int offset, int limit) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
         if (filter == null || filter.isEmpty()){
-            return new ArrayList<>();
-        }
-
-        Pair<String, IteratorCloseable<Long>> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
-        if (resultKeys.getA() != null) {
-            return new ArrayList<>();
-        }
-
-        List<Long> result = new ArrayList<>();
-
-        try (IteratorCloseable<Long> iterator = resultKeys.getB()) {
-
-            while (iterator.hasNext()) {
-                Long key = iterator.next();
-                Transaction item = get(key);
-                if (item != null)
-                    result.add(key);
-            }
-        } catch (IOException e) {
-        }
-        return result;
-    }
-
-    // get list items in name substring str
-    @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getByFilterAsArray(String filter, int offset, int limit) {
-
-        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
-            return null;
-        }
-
-        if (filter == null || filter.isEmpty()){
-            return new ArrayList<>();
-        }
-
-        Pair<String, IteratorCloseable<Long>> resultKeys = getKeysIteratorByFilterAsArray(filter, offset, limit);
-        if (resultKeys.getA() != null) {
             return new ArrayList<>();
         }
 
         List<Transaction> result = new ArrayList<>();
 
-        try (IteratorCloseable<Long> iterator = resultKeys.getB()) {
+        String[] filterArray = filter.toLowerCase().split(DCSet.SPLIT_CHARS);
+        Pair<String, Boolean>[] words = stepFilter(filterArray);
 
+        // сперва выберем самый короткий набор
+        // TODO нужно еще отсортировать по длинне слов - самые длинные сперва проверять - они короче список дадут поидее
+
+        int betterSize = LIMIT_FIND_TITLE;
+        int tmpSize;
+        int betterIndex = 0;
+        for (int i = 0; i < words.length; i++) {
+            try (IteratorCloseable iterator = ((TransactionFinalSuit)map)
+                    .getIteratorByTitleAndType(words[i].getA(), words[i].getB(), type)) {
+                // ограничим максимальный перебор - иначе может затормозить
+                tmpSize = Iterators.size(Iterators.limit(iterator, LIMIT_FIND_TITLE));
+                if (tmpSize < betterSize) {
+                    betterSize = tmpSize;
+                    betterIndex = i;
+                }
+            } catch (IOException e) {
+            }
+        }
+
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit)map)
+                .getIteratorByTitleAndType(words[betterIndex].getA(), words[betterIndex].getB(), type)) {
+
+            Long key;
+            Transaction transaction;
+            boolean txChecked;
+            boolean wordChecked;
             while (iterator.hasNext()) {
-                Transaction item = get(iterator.next());
-                result.add(item);
+                key = iterator.next();
+                transaction = get(key);
+                if (transaction == null)
+                    continue;
+
+                // теперь проверим все слова в Заголовке
+                String[] titleArray = transaction.getTitle().toLowerCase().split(DCSet.SPLIT_CHARS);
+
+                if (titleArray.length < words.length)
+                    continue;
+
+                Pair<String, Boolean>[] txWords = stepFilter(titleArray);
+                txChecked = true;
+                for (int i = 0; i < words.length; i++) {
+                    if (i == betterIndex) {
+                        // это слово уже проверено - так как по нему индекс уже построен и мы по нему идем
+                        continue;
+                    }
+
+                    wordChecked = false;
+                    for (int k = 0; k < txWords.length; k++) {
+                        if (txWords[k].getA().startsWith(words[i].getA())) {
+                            wordChecked = true;
+                            break;
+                        }
+                    }
+                    if (!wordChecked) {
+                        txChecked = false;
+                        break;
+                    }
+                }
+
+                if (!txChecked)
+                    continue;
+
+                if (offset > 0) {
+                    offset--;
+                    continue;
+                }
+
+                if (limit > 0) {
+                    if (--limit == 0)
+                        break;
+                }
+
+                result.add(transaction);
             }
         } catch (IOException e) {
         }
 
         return result;
+    }
+
+    @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Transaction> getKeysByFilterAsArray(String filter, int offset, int limit) {
+
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+
+        if (filter == null || filter.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return getTransactionsByTitleAndType(filter, 0, offset, limit);
     }
 
     @Override

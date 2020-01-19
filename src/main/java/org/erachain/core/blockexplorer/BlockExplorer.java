@@ -2534,20 +2534,7 @@ public class BlockExplorer {
         int size = 200;
         List<Transaction> transactions;
         if (filterStr != null) {
-            //transactions = map.getTransactionsByTitleAndType(filterStr, null, size, true);
-            Pair<String, IteratorCloseable<Long>> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
-            if (pair.getA() != null) {
-                output.put("error", pair.getA());
-                return;
-            }
-
-            transactions = new ArrayList<>();
-            try (IteratorCloseable iterator = pair.getB()) {
-                while (iterator.hasNext()) {
-                    transactions.add(map.get((Long) iterator.next()));
-                }
-            } catch (IOException e) {
-            }
+            transactions = ((FilteredByStringArray)map).getKeysByFilterAsArray(filterStr, 0, size);
 
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
