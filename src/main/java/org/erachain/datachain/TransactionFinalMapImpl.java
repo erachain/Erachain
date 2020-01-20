@@ -466,6 +466,29 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return result;
     }
 
+    public int getTransactionsByTitleBetterIndex(Pair<String, Boolean>[] words, Long fromSeqNo, boolean descending) {
+
+        // сперва выберем самый короткий набор
+        // TODO нужно еще отсортировать по длинне слов - самые длинные сперва проверять - они короче список дадут поидее
+
+        int betterSize = LIMIT_FIND_TITLE;
+        int tmpSize;
+        int betterIndex = 0;
+        for (int i = 0; i < words.length; i++) {
+            try (IteratorCloseable iterator = ((TransactionFinalSuit) map)
+                    .getIteratorByTitle(words[i].getA(), words[i].getB(), fromSeqNo, descending)) {
+                // ограничим максимальный перебор - иначе может затормозить
+                tmpSize = Iterators.size(Iterators.limit(iterator, LIMIT_FIND_TITLE));
+                if (tmpSize < betterSize) {
+                    betterSize = tmpSize;
+                    betterIndex = i;
+                }
+            } catch (IOException e) {
+            }
+        }
+
+        return betterIndex;
+    }
 
     /**
      * Делает поиск по нескольким ключам по Заголовкам и если ключ с ! - надо найти только это слово
@@ -498,23 +521,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Pair<String, Boolean>[] words = stepFilter(filterArray);
 
         // сперва выберем самый короткий набор
-        // TODO нужно еще отсортировать по длинне слов - самые длинные сперва проверять - они короче список дадут поидее
+        int betterIndex = getTransactionsByTitleBetterIndex(words, fromSeqNo, descending);
 
-        int betterSize = LIMIT_FIND_TITLE;
-        int tmpSize;
-        int betterIndex = 0;
-        for (int i = 0; i < words.length; i++) {
-            try (IteratorCloseable iterator = ((TransactionFinalSuit) map)
-                    .getIteratorByTitle(words[i].getA(), words[i].getB(), fromSeqNo, descending)) {
-                // ограничим максимальный перебор - иначе может затормозить
-                tmpSize = Iterators.size(Iterators.limit(iterator, LIMIT_FIND_TITLE));
-                if (tmpSize < betterSize) {
-                    betterSize = tmpSize;
-                    betterIndex = i;
-                }
-            } catch (IOException e) {
-            }
-        }
+        return getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, descending);
+    }
+
+    public List<Transaction> getTransactionsByTitleFromBetter(Pair<String, Boolean>[] words, int betterIndex, Long fromSeqNo, int offset, int limit, boolean descending) {
+
+        List<Transaction> result = new ArrayList<>();
 
         try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map)
                 .getIteratorByTitle(words[betterIndex].getA(), words[betterIndex].getB(), fromSeqNo, descending)) {
@@ -589,8 +603,67 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return new ArrayList<>();
         }
 
-        return getTransactionsByTitle(filter, fromSeqNo, offset, limit, descending);
+        //return getTransactionsByTitle(filter, fromSeqNo, offset, limit, descending);
+        return getTransactionsByTitleFromID(filter, fromSeqNo, offset, limit, true);
     }
+
+    //@Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public List<Transaction> getTransactionsByTitleFromID(String filter, Long fromSeqNo, int offset, int limit, boolean fillFullPage) {
+        if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
+            return null;
+        }
+        if (filter == null || filter.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Transaction> txs = new ArrayList<>();
+
+        String[] filterArray = filter.toLowerCase().split(DCSet.SPLIT_CHARS);
+        Pair<String, Boolean>[] words = stepFilter(filterArray);
+
+        // сперва выберем самый короткий набор
+        int betterIndex = getTransactionsByTitleBetterIndex(words, fromSeqNo, !false);
+
+        if (offset < 0 || limit < 0) {
+            if (limit < 0)
+                limit = -limit;
+
+            // надо отмотать назад (вверх) - то есть нашли точку и в обратном направлении пропускаем
+            // и по пути сосздаем список обратный что нашли по обратнму итератору
+            int offsetHere = -(offset + limit);
+
+            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, !false);
+            int count = txs.size();
+
+            if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
+                // сюда пришло значит не полный список - дополним его
+                for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
+                        fromSeqNo, 0, limit - count, !false)) {
+                    txs.add(transaction);
+                }
+            }
+
+
+        } else {
+
+            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, !true);
+            int count = txs.size();
+
+            if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
+                // сюда пришло значит не полный список - дополним его
+                int index = 0;
+                int limitLeft = limit - count;
+                for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
+                        fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, !false)) {
+                    txs.add(index++, transaction);
+                }
+            }
+
+        }
+        return txs;
+    }
+
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -600,7 +673,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return null;
         }
 
-        return ((TransactionFinalSuit)map).getIteratorByAddress(addressShort);
+        return ((TransactionFinalSuit) map).getIteratorByAddress(addressShort);
     }
 
     @Override

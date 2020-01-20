@@ -2533,20 +2533,20 @@ public class BlockExplorer {
                 || forge.toString().toLowerCase().equals("1"));
 
         TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
-        int size = 200;
-        List<Transaction> transactions;
+        boolean needFound = true;
+
+        List<Transaction> transactions = new ArrayList<>();
         if (filterStr != null) {
-            transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
-                    0, size, false);
 
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
                     String[] strA = filterStr.split("\\-");
                     int height = Integer.parseInt(strA[0]);
                     int seq = Integer.parseInt(strA[1]);
-                    Transaction one = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
+                    Transaction one = map.get(height, seq);
                     if (one != null) {
                         transactions.add(one);
+                        needFound = false;
                     }
                 } catch (Exception e1) {
                 }
@@ -2554,41 +2554,79 @@ public class BlockExplorer {
             } else {
                 try {
                     byte[] signature = Base58.decode(filterStr);
-                    Transaction one = DCSet.getInstance().getTransactionFinalMap().get(signature);
+                    Transaction one = map.get(signature);
                     if (one != null) {
                         transactions.add(one);
+                        needFound = false;
                     }
                 } catch (Exception e2) {
                 }
             }
 
-        } else {
-            // берем все с перебором с последней
-            transactions = new ArrayList<>();
-            try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
-                int counter = size;
-                //if (useForge) counter <<=1;
-                while (iterator.hasNext() && counter > 0) {
+        }
 
-                    Transaction transaction = map.get(iterator.next());
-                    if (transaction == null)
-                        continue;
+        if (needFound) {
+            if (true) {
 
-                    if (!useForge && transaction.getType() == Transaction.CALCULATED_TRANSACTION
-                            && ((RCalculated) transaction).getMessage().equals("forging"))
-                        continue;
-
-                    transactions.add(transaction);
-                    counter--;
+                Long offset = checkAndGetLongParam(info, 0L, "offset");
+                int intOffest;
+                if (offset == null) {
+                    intOffest = 0;
+                } else {
+                    intOffest = (int) (long) offset;
                 }
-            } catch (IOException e) {
 
+                String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
+                Long fromID = Transaction.parseDBRef(fromSeqNoStr);
+                if (fromID != null && fromID.equals(0L) && intOffest < 0) {
+                    // это значит нужно скакнуть в самый низ
+                }
+
+                transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
+                        intOffest, pageSize, false);
+
+                if (transactions.isEmpty()) {
+                    output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
+                } else {
+                    // включим ссылки на листание вверх
+                    if (true || intOffest >= 0 || transactions.size() >= pageSize) {
+                        output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                    }
+
+                    if (true || !((fromID == null || fromID.equals(0L)) && intOffest < 0)) {
+                        // это не самый конец - включим листание вниз
+                        output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+                    }
+                }
+
+            } else {
+                try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
+                    int counter = pageSize;
+                    //if (useForge) counter <<=1;
+                    while (iterator.hasNext() && counter > 0) {
+
+                        Transaction transaction = map.get(iterator.next());
+                        if (transaction == null)
+                            continue;
+
+                        if (!useForge && transaction.getType() == Transaction.CALCULATED_TRANSACTION
+                                && ((RCalculated) transaction).getMessage().equals("forging"))
+                            continue;
+
+                        transactions.add(transaction);
+                        counter--;
+                    }
+                } catch (IOException e) {
+
+                }
             }
         }
 
-        // Transactions view
-        transactionsJSON(output, null, transactions, start, pageSize,
-                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + size));
+        // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
+        transactionsJSON(output, null, transactions, 0, pageSize,
+                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", ""));
+
+        output.put("useoffset", true);
 
     }
 
@@ -2644,8 +2682,14 @@ public class BlockExplorer {
         LinkedHashMap output = new LinkedHashMap();
         output.put("address", address);
 
-        Account acc = new Account(address);
-        Tuple2<Integer, PersonCls> person = acc.getPerson();
+        Account account = new Account(address);
+        Tuple2<Integer, PersonCls> person = account.getPerson();
+
+        // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
+        transactionsJSON(output, account, transactions, 0, pageSize,
+                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", ""));
+
+        output.put("useoffset", true);
 
         if (person != null) {
             output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
@@ -2653,7 +2697,7 @@ public class BlockExplorer {
             output.put("person", person.b.getName());
             output.put("person_key", person.b.getKey());
 
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = acc.getBalance(AssetCls.LIA_KEY);
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = account.getBalance(AssetCls.LIA_KEY);
             output.put("registered", balabce_LIA.a.b.toPlainString());
             output.put("certified", balabce_LIA.b.b.toPlainString());
             output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
@@ -2664,12 +2708,6 @@ public class BlockExplorer {
 
         // balance assets from
         output.put("Balance", balanceJSON(new Account(address)));
-
-        // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
-        transactionsJSON(output, acc, transactions, 0, pageSize,
-                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" ));
-
-        output.put("useoffset", true);
 
         return output;
     }
