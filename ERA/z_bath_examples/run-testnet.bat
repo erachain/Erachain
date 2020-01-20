@@ -1,8 +1,9 @@
 @ECHO OFF
 set app=erachain
-set jpars=-Xms1024%m
+set jpars=-Xms512m
+
+// USE new TESTNET chain
 set pars=-testnet
-rem -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m
 
 
 IF EXIST java (

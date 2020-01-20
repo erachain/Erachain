@@ -4,6 +4,7 @@ set xms=512
 set xmx=1024
 set mms=256
 set jpars=
+// USE DEVELOP chain
 set pars=-testnet=1511164500000
 rem set jpars=-Dlog4j.configuration=file:log4j-dev.properties
 
