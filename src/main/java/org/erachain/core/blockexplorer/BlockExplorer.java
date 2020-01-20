@@ -197,7 +197,7 @@ public class BlockExplorer {
         return result;
     }
 
-    public Map jsonQuerySearchPages(Class type, String search, int start, int pageSize) throws WrongSearchException, Exception {
+    public Map jsonQuerySearchPages(UriInfo info, Class type, String search, int start, int pageSize) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
         List<Object> keys = new ArrayList();
@@ -224,7 +224,8 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, , 0, 100, false, );
+                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
+                        start, pageSize, false);
             }
         } catch (Exception e) {
             logger.error("Wrong search while process assets... ", e.getMessage());
@@ -312,27 +313,27 @@ public class BlockExplorer {
                         break;
                     case "persons":
                         //search persons
-                        output.putAll(jsonQuerySearchPages(PersonCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, PersonCls.class, search, (int) start, pageSize));
                         break;
                     case "assets":
                         //search assets
-                        output.putAll(jsonQuerySearchPages(AssetCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, (int) start, pageSize));
                         break;
                     case "statuses":
                         //search statuses
-                        output.putAll(jsonQuerySearchPages(StatusCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, StatusCls.class, search, (int) start, pageSize));
                         break;
                     case "templates":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(TemplateCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, TemplateCls.class, search, (int) start, pageSize));
                         break;
                     case "polls":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(PollCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, PollCls.class, search, (int) start, pageSize));
                         break;
                     case "blocks":
                         //search block
-                        output.putAll(jsonQuerySearchPages(Block.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, Block.class, search, (int) start, pageSize));
                         break;
                     case "top":
                         output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
@@ -2534,7 +2535,8 @@ public class BlockExplorer {
         int size = 200;
         List<Transaction> transactions;
         if (filterStr != null) {
-            transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, , 0, size, false, );
+            transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
+                    0, size, false);
 
             if (Base58.isExtraSymbols(filterStr)) {
                 try {

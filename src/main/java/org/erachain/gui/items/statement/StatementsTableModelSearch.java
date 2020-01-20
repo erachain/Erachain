@@ -74,14 +74,14 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
         fireTableDataChanged();
     }
 
-    public void setFilterByName(String filter) {
+    public void setFilterByName(String filter, Long fromID) {
 
         clear();
 
         DCSet dcSet = DCSet.getInstance();
 
         list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                .getKeysByFilterAsArray(filter, , start, step, false, );
+                .getKeysByFilterAsArray(filter, fromID, start, step, false);
 
         fireTableDataChanged();
 

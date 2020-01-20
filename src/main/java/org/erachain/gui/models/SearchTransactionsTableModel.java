@@ -69,7 +69,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
     }
 
-    public void find(String filter) {
+    public void find(String filter, Long fromID) {
 
         clear();
 
@@ -100,7 +100,7 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 DCSet dcSet = DCSet.getInstance();
 
                 list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                        .getKeysByFilterAsArray(filter, , start, step, false, );
+                        .getKeysByFilterAsArray(filter, fromID, start, step, false);
 
             }
         }
