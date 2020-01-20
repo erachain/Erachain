@@ -280,7 +280,7 @@ public class ConnectionCreator extends MonitoredThread {
             //SLEEP
             int counter = network.getActivePeersCounter(true);
             if (counter == 0
-                    || counter < 6 && !BlockChain.DEVELOP_USE)
+                    || counter < 6 && !Settings.getInstance().isTestnet())
                 continue;
 
             int needMinConnections = Settings.getInstance().getMinConnections();
@@ -295,7 +295,7 @@ public class ConnectionCreator extends MonitoredThread {
 
             try {
                 if (counter < needMinConnections)
-                    Thread.sleep(BlockChain.DEVELOP_USE ? 5000 : 5000);
+                    Thread.sleep(Settings.getInstance().isTestnet() ? 5000 : 5000);
                 else
                     Thread.sleep(10000);
             } catch (java.lang.OutOfMemoryError e) {

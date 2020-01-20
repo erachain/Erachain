@@ -1,11 +1,9 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.FundTokensComboBoxModel;
@@ -22,8 +20,6 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.Style;
-import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -133,7 +129,7 @@ public class WithdrawExchange extends JPanel {
 
             jsonObject = (JSONObject) JSONValue.parse(inputText);
 
-            if (BlockChain.DEVELOP_USE) {
+            if (Settings.getInstance().isTestnet()) {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 

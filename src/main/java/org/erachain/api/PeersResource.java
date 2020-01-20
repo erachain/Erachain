@@ -2,7 +2,6 @@ package org.erachain.api;
 // 30/03
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.database.PeerMap.PeerInfo;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
@@ -267,7 +266,7 @@ public class PeersResource {
     @Path("/testghw/{address}")
     public String testHW(@PathParam("address") String address) {
 
-        if (!BlockChain.DEVELOP_USE)
+        if (!Settings.getInstance().isTestnet())
             return "not develop";
 
         List<Peer> activePeers = Controller.getInstance().getActivePeers();

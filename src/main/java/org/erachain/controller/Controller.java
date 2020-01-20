@@ -1437,7 +1437,7 @@ public class Controller extends Observable {
             }
         }
 
-        if (false && BlockChain.DEVELOP_USE) {
+        if (false && Settings.getInstance().isTestnet()) {
             try {
                 synchronizer.checkBadBlock(peer);
             } catch (Exception e) {
@@ -3695,7 +3695,7 @@ public class Controller extends Observable {
                 continue;
             }
             if (arg.equals("-testnet")) {
-                Settings.getInstance().setGenesisStamp(Settings.DEFAULT_TESTNET_STAMP);
+                Settings.getInstance().setGenesisStamp(NTP.getTime());
                 continue;
             }
             if (arg.startsWith("-testnet=") && arg.length() > 9) {

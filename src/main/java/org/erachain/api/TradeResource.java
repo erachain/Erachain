@@ -1,7 +1,6 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
@@ -16,6 +15,7 @@ import org.erachain.datachain.*;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -708,7 +708,7 @@ public class TradeResource {
     @Path("test1/{probability}/{delay}")
     public String test1(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE
+        if (!Settings.getInstance().isTestnet()
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
             return "not LOCAL && not DEVELOP";

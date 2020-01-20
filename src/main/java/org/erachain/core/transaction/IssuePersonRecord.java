@@ -162,7 +162,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
 	@Override
 	public boolean hasPublicText() {
-        return !BlockChain.ANONIM_SERT_USE && !BlockChain.DEVELOP_USE;
+        return !BlockChain.ANONIM_SERT_USE;
 	}
 
     @Override
@@ -225,6 +225,7 @@ public class IssuePersonRecord extends IssueItemRecord {
                 }
             } else if (person.getImage().length < person.getMINimageLenght()) {
                 // 2998-1 - трнзакция забаненая
+                // TODO удалить это в новой цепочке
                 if (!(BlockChain.DEVELOP_USE && height < 300000)
                         && !(!BlockChain.DEVELOP_USE && height == 2998)) {
                     return Transaction.INVALID_IMAGE_LENGTH_MIN;
@@ -253,7 +254,7 @@ public class IssuePersonRecord extends IssueItemRecord {
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
-                && !BlockChain.DEVELOP_USE && !creator.isPerson(dcSet, height)) {
+                && !creator.isPerson(dcSet, height)) {
             long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
                 // FIRST Persons only by ME

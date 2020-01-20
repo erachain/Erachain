@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
-    public static final long DEFAULT_TESTNET_STAMP = 1511164500000L; // default for developers test net
+    public static final long DEFAULT_DEV_NET_STAMP = 1511164500000L; // default for developers test net
 
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
@@ -360,7 +360,7 @@ public class Settings {
         try {
 
             File file = new File(this.userPath
-                    + (BlockChain.DEVELOP_USE ? "peers-trusted-dev.json" : "peers-trusted.json"));
+                    + (Settings.getInstance().isTestnet() ? "peers-trusted-test.json" : "peers-trusted.json"));
 
             //CREATE FILE IF IT DOESNT EXIST
             if (file.exists()) {
@@ -393,7 +393,7 @@ public class Settings {
             List<Peer> knownPeers = new ArrayList<>();
             JSONArray peersArray = new JSONArray();
 
-            if (!BlockChain.DEVELOP_USE) {
+            if (!Settings.getInstance().isTestnet()) {
                 try {
                     JSONArray peersArraySettings = (JSONArray) this.settingsJSON.get("knownpeers");
 
@@ -430,7 +430,7 @@ public class Settings {
 
             knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 
-            if (!BlockChain.DEVELOP_USE && (knownPeers.isEmpty() || loadPeersFromInternet)) {
+            if (!Settings.getInstance().isTestnet() && (knownPeers.isEmpty() || loadPeersFromInternet)) {
                 knownPeers.addAll(getKnownPeersFromInternet());
             }
 
@@ -530,6 +530,10 @@ public class Settings {
 
     public boolean isTestnet() {
         return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
+    }
+
+    public boolean isDevnet() {
+        return this.getGenesisStamp() == DEFAULT_DEV_NET_STAMP;
     }
 
     public long getGenesisStamp() {
@@ -741,7 +745,7 @@ public class Settings {
             }
 
             //RETURN
-            return (BlockChain.DEVELOP_USE ? ";" : DEFAULT_WEB_ALLOWED).split(";");
+            return (Settings.getInstance().isTestnet() ? ";" : DEFAULT_WEB_ALLOWED).split(";");
 
         } catch (Exception e) {
             //RETURN EMPTY LIST

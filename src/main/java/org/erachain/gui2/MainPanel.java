@@ -1,22 +1,5 @@
 package org.erachain.gui2;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.Enumeration;
-
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTree;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-
-import org.erachain.core.BlockChain;
 import org.erachain.gui.Wallets.WalletsManagerSplitPanel;
 import org.erachain.gui.bank.IssueSendPaymentOrder;
 import org.erachain.gui.bank.MyOrderPaimentsSplitPanel;
@@ -63,8 +46,21 @@ import org.erachain.gui.library.MSplitPane;
 import org.erachain.gui.telegrams.ALLTelegramPanel;
 import org.erachain.gui.telegrams.TelegramSplitPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.Enumeration;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -452,7 +448,7 @@ public class MainPanel extends javax.swing.JPanel {
                 insertTab(Lang.getInstance().translate("Search Statuses"), new SearchStatusesSplitPanel());
                 return;
             }
-            if (BlockChain.DEVELOP_USE) {
+            if (Settings.getInstance().isTestnet()) {
                 if (str.equals(Lang.getInstance().translate("My Unions")) || str.equals("MyUnionsTab")) {
                     insertTab(Lang.getInstance().translate("My Unions"), new MyUnionsTab());
                     return;
@@ -559,7 +555,7 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
             }
 
-            if (BlockChain.DEVELOP_USE) {
+            if (Settings.getInstance().isTestnet()) {
                 if (str.equals(Lang.getInstance().translate("Wallets Manager"))
                         || str.equals("WalletsManagerSplitPanel")) {
                     insertTab(Lang.getInstance().translate("Wallets Manager"), new WalletsManagerSplitPanel());

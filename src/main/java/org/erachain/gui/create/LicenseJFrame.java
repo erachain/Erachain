@@ -1,8 +1,13 @@
 package org.erachain.gui.create;
 
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
+import com.sun.pdfview.PagePanel;
+import org.erachain.controller.Controller;
+import org.erachain.gui.library.MPDFView;
+import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -10,19 +15,6 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import org.erachain.core.BlockChain;
-
-import com.sun.pdfview.PagePanel;
-
-import org.erachain.controller.Controller;
-import org.erachain.gui.library.MPDFView;
-import org.erachain.lang.Lang;
 
 /**
  * An example of using the PagePanel class to show PDFs. For more advanced usage
@@ -79,11 +71,10 @@ public class LicenseJFrame extends JDialog {
         icons.add(Toolkit.getDefaultToolkit().getImage("images/icons/icon128.png"));
         this.setIconImages(icons);
         //
-        okButton.setEnabled(BlockChain.DEVELOP_USE);
-      //  okCheckBox.setEnabled(BlockChain.DEVELOP_USE);
-        
+        okButton.setEnabled(Settings.getInstance().isTestnet());
+
         okCheckBox.addActionListener(new ActionListener() {
-            
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 // TODO Auto-generated method stub

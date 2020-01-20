@@ -871,7 +871,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     if (BlockChain.TEST_DB == 0 && forgingStatus == ForgingStatus.FORGING_WAIT
                             && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 1) < NTP.getTime()
-                            || (BlockChain.ERA_COMPU_ALL_UP || BlockChain.DEVELOP_USE) && height < 100
+                            || BlockChain.ERA_COMPU_ALL_UP && height < 100
                             || height < 10)) {
 
                         setForgingStatus(ForgingStatus.FORGING);

@@ -26,6 +26,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -2422,7 +2423,7 @@ public class BlockExplorer {
         List<Pair<Long, Long>> list = new ArrayList<>();
         HashSet<Pair<Long, Long>> pairsSet = new HashSet<>();
 
-        if (BlockChain.DEVELOP_USE) {
+        if (Settings.getInstance().isTestnet()) {
             list.add(new Pair<Long, Long>(1L, 2L));
         } else {
             list.add(new Pair<Long, Long>(12L, 92L));
@@ -2431,7 +2432,7 @@ public class BlockExplorer {
             list.add(new Pair<Long, Long>(1L, 12L));
             list.add(new Pair<Long, Long>(1L, 92L));
             list.add(new Pair<Long, Long>(1L, 95L));
-            list.add(new Pair<Long, Long>(1L, 1010L ));
+            list.add(new Pair<Long, Long>(1L, 1010L));
             list.add(new Pair<Long, Long>(2L, 12L));
             list.add(new Pair<Long, Long>(2L, 92L));
             list.add(new Pair<Long, Long>(2L, 95L));
