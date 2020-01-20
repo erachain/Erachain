@@ -43,11 +43,11 @@ Not store calculated transactions in DB. Make speed up
 Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it si complex DB for fast speed (default)
 
 -testnet[=TIMESTAMP]
--testnet - set genesis Timestamp = current Date and -nonet if ON and 9045 port
+-testnet - set genesis Timestamp = current Date and -nonet is ON and use 9045 port
 -testnet=1511164500000 - set genesis Timestamp = DEVELOP chain on 9066 port
 -testnet=... tesnet chain on port 9045
 
--notnet
+-nonet
 No use Network
 
 example foe Windows:

@@ -3713,7 +3713,7 @@ public class Controller extends Observable {
                     Settings.getInstance().setGenesisStamp(Settings.DEFAULT_MAINNET_STAMP);
                 }
             }
-            if (arg.equals("-notnet")) {
+            if (arg.equals("-nonet")) {
                 useNet = false;
                 continue;
             }
