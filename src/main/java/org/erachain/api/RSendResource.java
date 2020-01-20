@@ -15,6 +15,7 @@ import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -326,7 +327,7 @@ public class RSendResource {
     @Path("test1/{probability}/{delay}")
     public String test1(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE
+        if (!Settings.getInstance().isTestnet()
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
             return "not LOCAL && not DEVELOP";
@@ -509,7 +510,7 @@ public class RSendResource {
     @Path("test2/{probability}/{delay}")
     public String test2(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (!BlockChain.DEVELOP_USE
+        if (!Settings.getInstance().isTestnet()
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
             return "not LOCAL && not DEVELOP";
@@ -717,7 +718,7 @@ public class RSendResource {
                             @DefaultValue("false") @QueryParam("onlyperson") Boolean onlyPerson,
                             @QueryParam("password") String password) {
 
-        if (!test && !BlockChain.DEVELOP_USE
+        if (!test && !Settings.getInstance().isTestnet()
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
             return "not LOCAL && not DEVELOP";

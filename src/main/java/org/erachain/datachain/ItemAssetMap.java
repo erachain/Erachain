@@ -1,10 +1,10 @@
 package org.erachain.datachain;
 
-import org.erachain.core.BlockChain;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
+import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
 
@@ -28,7 +28,7 @@ public class ItemAssetMap extends ItemMap {
     }
 
     public boolean contains(Long key) {
-        if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
+        if (Settings.getInstance().isTestnet() && key > 100 && key < 1000) {
             return true;
         } else {
             return super.contains(key);
@@ -39,10 +39,10 @@ public class ItemAssetMap extends ItemMap {
     public AssetCls get(Long key) {
 
         AssetCls item;
-        if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
+        if (Settings.getInstance().isTestnet() && key > 100 && key < 1000) {
             switch (key.intValue()) {
 
-                case (int)AssetCls.LIA_KEY:
+                case (int) AssetCls.LIA_KEY:
                     item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                             AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
                     item = null;

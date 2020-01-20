@@ -1,9 +1,9 @@
 package org.erachain.network;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.message.*;
+import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -18,7 +18,7 @@ import java.util.concurrent.BlockingQueue;
 public class MessagesProcessor extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
-    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
+    private static final boolean LOG_UNCONFIRMED_PROCESS = Settings.getInstance().isTestnet() ? true : false;
     private boolean runned;
 
     private Network network;

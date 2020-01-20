@@ -512,7 +512,7 @@ public class TestRecPerson {
                         sertifiedPublicKeys,
                         356, timestamp);
                 personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 4);
-                if (!BlockChain.DEVELOP_USE) {
+                if (!Settings.getInstance().isTestnet()) {
                     assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
                 }
 
@@ -1016,7 +1016,7 @@ public class TestRecPerson {
                 assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
                 // in FORK
                 //CHECK BALANCE RECIPIENT
-                if (BlockChain.DEVELOP_USE)
+                if (Settings.getInstance().isTestnet())
                     assertEquals(oil_amount_diff.add(userAccount1.addDEVAmount(FEE_KEY)), userAccount1.getBalanceUSE(FEE_KEY, fork));
                 else
                     assertEquals(oil_amount_diff, userAccount1.getBalanceUSE(FEE_KEY, fork));

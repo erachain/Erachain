@@ -1,21 +1,25 @@
 @ECHO OFF
-set app=erachain-dev
-set xms=256
-set xmx=512
-set pars=-pass=1
-set jpars=-Dlog4j.configuration=file:log4j-dev.properties
+set app=erachain
+set xms=512
+set xmx=1024
+set mms=256
+set jpars=
+
+// USE DEVELOP chain
+set pars=-testnet=1511164500000 -pass=1
+
 
 IF EXIST java (
-	set run=java
-	goto continue
+	start "%app%" java -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m -XX:MaxMetaspaceSize=%mms%m %jpars% -jar %app%.jar %pars%
+	rem EXIT /b
 )
 
 REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome" >nul 2>nul || ( GOTO NOTFOUND1 )
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	set run="%JAVAHOME%\bin\java.exe"
-	goto continue
+	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m %jpars% -jar %app%.jar %pars%
+	EXIT /b
 )
 
 :NOTFOUND1
@@ -24,8 +28,8 @@ REG QUERY "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.7" /v "
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.7" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	set run="%JAVAHOME%\bin\java.exe"
-	goto continue
+	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m %jpars% -jar %app%.jar %pars%
+	EXIT /b
 )
 
 :NOTFOUND2
@@ -34,8 +38,8 @@ REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome" >n
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	set run="%JAVAHOME%\bin\java.exe"
-	goto continue
+	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m %jpars% -jar %app%.jar %pars%
+	EXIT /b
 )
 
 :NOTFOUND3
@@ -44,15 +48,9 @@ REG QUERY "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.8" /v "
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\WOW6432NODE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
 
 IF EXIST "%JAVAHOME%\bin\java.exe" (
-	set run="%JAVAHOME%\bin\java.exe"
-	goto continue
+	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m %jpars% -jar %app%.jar %pars%
+	EXIT /b
 )
-
-:continue
-%run% -Xms%xms%m %jpars% -Xmx%xmx%m -jar %app%.jar %pars%
-timeout /t 30
-goto continue
-
 	
 :NOTFOUND4
 

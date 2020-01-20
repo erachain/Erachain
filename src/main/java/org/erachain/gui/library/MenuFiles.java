@@ -1,7 +1,6 @@
 package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.*;
@@ -10,10 +9,10 @@ import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.settings.SettingsFrame;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.erachain.settings.Settings;
 import org.erachain.utils.URLViewer;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,6 @@ import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -250,7 +248,7 @@ public class MenuFiles extends JMenu {
 
             }
         });
-        if (BlockChain.DEVELOP_USE) add(writeTransItem);
+        if (Settings.getInstance().isTestnet()) add(writeTransItem);
 
         //WEB SERVER
         webServerItem = new JMenuItem(Lang.getInstance().translate("Decentralized Web server"));

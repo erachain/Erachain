@@ -11,6 +11,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.datachain.DCSet;
+import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONObject;
@@ -493,7 +494,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         // при откатах для нового счета который первый раз сделал транзакцию
                         // из нулевого баланса - Референс будеть ошибочный
                         // поэтому отключим эту проверку тут
-                        && !BlockChain.DEVELOP_USE
+                        && !BlockChain.ERA_COMPU_ALL_UP
                 ) {
 
                     if (height > 0 || BlockChain.CHECK_BUGS > 7
@@ -728,7 +729,10 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                             && this.creator.getBalanceUSE(absKey, this.dcSet)
                                             .compareTo(this.amount) < 0) {
 
-                                        if ((!BlockChain.DEVELOP_USE && height > 120000) || height > 239800)
+                                        if ((!BlockChain.DEVELOP_USE && height > 120000) // в боевой
+                                                || BlockChain.DEVELOP_USE && height > 239800 // в девелопе
+                                                || Settings.getInstance().isTestnet() && height > 0 // в тестовой
+                                        )
                                             return NO_BALANCE;
                                     }
 
@@ -814,7 +818,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 ) {
 
                                     /// если это девелоп то не проверяем ниже особые счета
-                                    if (BlockChain.DEVELOP_USE)
+                                    if (Settings.getInstance().isTestnet())
                                         return NO_BALANCE;
                                     
                                     wrong = true;
@@ -856,7 +860,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                 if ((flags & Transaction.NOT_VALIDATE_FLAG_FEE) == 0
                                         && this.creator.getBalance(dcSet, FEE_KEY, ACTION_SEND).b.compareTo(this.fee) < 0
                                         && !BlockChain.ERA_COMPU_ALL_UP) {
-                                    if (BlockChain.DEVELOP_USE)
+                                    if (Settings.getInstance().isTestnet())
                                         return NOT_ENOUGH_FEE;
                                         
                                     // TODO: delete wrong check in new CHAIN
@@ -877,7 +881,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                         !(asset.isOutsideType() && backward));
                                 
                                 if (amount.compareTo(forSale) > 0) {
-                                    if (BlockChain.DEVELOP_USE)
+                                    if (Settings.getInstance().isTestnet())
                                         return NO_BALANCE;
                                         
                                     // TODO: delete wrong check in new CHAIN

@@ -10,6 +10,7 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
+import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 
@@ -404,14 +405,16 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (this.haveAsset == null || this.wantAsset == null)
             return ITEM_ASSET_NOT_EXIST;
 
-        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting() && !BlockChain.DEVELOP_USE) {
+        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()
+                // TODO походу тут уже есть кривые записи и эту проверку надо убрать при новом Деве
+                && !BlockChain.DEVELOP_USE) {
 
             return INVALID_ACCOUNTING_PAIR;
         }
-        
+
         if (this.wantAsset.isInsideBonus() ^ this.haveAsset.isInsideBonus()) {
             if (this.height < BlockChain.VERS_4_12 || this.haveKey != AssetCls.FEE_KEY && this.wantKey != AssetCls.FEE_KEY)
-            return INVALID_ECXHANGE_PAIR;
+                return INVALID_ECXHANGE_PAIR;
         }
 
         long haveKey = this.haveKey;
@@ -430,19 +433,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         int height = this.getBlockHeightByParentOrLast(this.dcSet);
 
         // CHECK IF ASSETS NOT THE SAME
-        if (haveKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE
-            // && wantKey != FEE_KEY
-                ) {
-            // haveKey ERA
-            if (height > BlockChain.FREEZE_FROM
-                    && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
-                // LOCK ERA sell
-                return INVALID_CREATOR;
-            }
-        }
-
         if (haveKey == wantKey) {
             return HAVE_EQUALS_WANT;
+        }
+
+        if (haveKey == RIGHTS_KEY && !Settings.getInstance().isTestnet()
+                && height > BlockChain.FREEZE_FROM
+                && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
+            // LOCK ERA sell
+            return INVALID_CREATOR;
         }
 
         // CHECK IF AMOUNT POSITIVE

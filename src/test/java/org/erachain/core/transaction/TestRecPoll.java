@@ -13,6 +13,7 @@ import org.erachain.core.voting.PollOption;
 import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -81,8 +82,8 @@ public class TestRecPoll {
     @Before
     public void init() {
 
-        if (BlockChain.DEVELOP_USE == false)
-            fail("You need change the key 'BlockChain.DEVELOP_USE=true'");
+        if (!Settings.getInstance().isTestnet())
+            fail("You need switch key '-testnet'");
 
         if (BlockChain.TESTS_VERS == 0)
             fail("You need change key 'BlockChain.TESTS_VERS' to current version");
@@ -173,7 +174,7 @@ public class TestRecPoll {
         //CREATE INVALID ISSUE POLL - INVALID POLLALIZE
         issuePollTransaction = new IssuePollRecord(userAccount1, poll, FEE_POWER, timestamp, 0l, new byte[64]);
         issuePollTransaction.setDC(db, Transaction.FOR_NETWORK, 1, 1);
-        if (!BlockChain.DEVELOP_USE)
+        if (!Settings.getInstance().isTestnet())
             assertEquals(Transaction.NOT_ENOUGH_FEE, issuePollTransaction.isValid(Transaction.FOR_NETWORK, flags));
         // ADD FEE
         userAccount1.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
@@ -316,7 +317,7 @@ public class TestRecPoll {
         issuePollTransaction.orphan(gb, Transaction.FOR_NETWORK);
 
         //CHECK BALANCE ISSUER
-        if (!BlockChain.DEVELOP_USE)
+        if (!Settings.getInstance().isTestnet())
             assertEquals(BlockChain.MAJOR_ERA_BALANCE_BD, certifier.getBalanceUSE(ERM_KEY, db));
         assertEquals(BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), certifier.getBalanceUSE(FEE_KEY, db));
 
