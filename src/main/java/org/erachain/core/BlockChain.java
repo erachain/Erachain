@@ -254,7 +254,7 @@ public class BlockChain {
      */
     final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.00005");
     /**
-     * Если цена сделки после скидывания в нее сотатка ордера-цели не выйдет за это ограничени то скидываем в сделку.
+     * Если сыграло INITIATOR_PRICE_DIFF_LIMIT и цена сделки после скидывания в нее остатка ордера-цели не выйдет за это ограничени то скидываем в сделку.
      * Инача отдаем обратно
      */
     ///final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("2.0").scaleByPowerOfTen(-(BlockChain.TRADE_PRECISION - 1));
