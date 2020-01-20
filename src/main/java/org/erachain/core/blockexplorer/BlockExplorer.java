@@ -1046,6 +1046,7 @@ public class BlockExplorer {
 
         output.put("label_Fulfilled", Lang.getInstance().translateFromLangObj("Fulfilled", langObj));
         output.put("label_LeftHave", Lang.getInstance().translateFromLangObj("Left Have", langObj));
+        output.put("label_LeftPrice", Lang.getInstance().translateFromLangObj("Left Price", langObj));
         output.put("label_table_LastTrades", Lang.getInstance().translateFromLangObj("Last Trades", langObj));
         output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
         output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
@@ -2566,7 +2567,7 @@ public class BlockExplorer {
         }
 
         if (needFound) {
-            if (true) {
+            if (filterStr != null) {
 
                 Long offset = checkAndGetLongParam(info, 0L, "offset");
                 int intOffest;

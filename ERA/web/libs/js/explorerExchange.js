@@ -148,11 +148,12 @@ function order(data){
     output += data.label_table_have + '</b>: <a href=?asset=' + data.assetHaveKey + get_lang() + '><b>' + data.assetHaveName + '</b></a><br>';
     output += data.label_Volume + ': <b>' + addCommas(data.order.amountHave) + '</b><br>';
     output += data.label_Price + ': <b>' + addCommas(data.order.price) + '</b><br>';
-    output += data.label_table_want + ': <a href=?asset=' + data.assetWantKey + get_lang() + '><b>' + data.assetWantName + '</b></a><br>';
-    output += data.label_Fulfilled + ': <b>' + addCommas(data.order.fulfilledHave) + '</b><br>';
-    output += data.label_LeftHave + ': <b>' + addCommas(data.order.leftHave) + '</b><br>';
     output += data.label_Total_Cost + ': <b>' + addCommas(data.order.amountWant) + '</b><br>';
+    output += data.label_table_want + ': <a href=?asset=' + data.assetWantKey + get_lang() + '><b>' + data.assetWantName + '</b></a><br>';
     output += data.label_Creator + ': <a href="?address=' + data.creator + '">' + data.creator_person + '</a><br>';
+    //output += data.label_Fulfilled + ': <b>' + addCommas(data.order.fulfilledHave) + '</b><br>';
+    output += data.label_LeftHave + ': <b>' + addCommas(data.order.leftHave) + '</b><br>';
+    output += data.label_LeftPrice + ': <b>' + addCommas(data.order.leftPrice) + '</b><br>';
 
     output += '</p>';
 

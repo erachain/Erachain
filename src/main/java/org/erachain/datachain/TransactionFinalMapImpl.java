@@ -623,7 +623,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Pair<String, Boolean>[] words = stepFilter(filterArray);
 
         // сперва выберем самый короткий набор
-        int betterIndex = getTransactionsByTitleBetterIndex(words, fromSeqNo, !false);
+        int betterIndex = getTransactionsByTitleBetterIndex(words, fromSeqNo, false);
 
         if (offset < 0 || limit < 0) {
             if (limit < 0)
@@ -633,13 +633,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
 
-            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, !false);
+            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, false);
             int count = txs.size();
 
             if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
                 // сюда пришло значит не полный список - дополним его
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
-                        fromSeqNo, 0, limit - count, !false)) {
+                        fromSeqNo, 0, limit - count, false)) {
                     txs.add(transaction);
                 }
             }
@@ -647,7 +647,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         } else {
 
-            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, !true);
+            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, true);
             int count = txs.size();
 
             if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
@@ -655,7 +655,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 int index = 0;
                 int limitLeft = limit - count;
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
-                        fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, !false)) {
+                        fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
                     txs.add(index++, transaction);
                 }
             }
