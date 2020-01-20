@@ -310,7 +310,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         String filterLower = filter.toLowerCase();
         String filterLowerEnd;
         if (asFilter) {
-            filterLowerEnd = filterLower + new String(255);
+            filterLowerEnd = filterLower + new String(new byte[]{(byte) 255});
         } else {
             filterLowerEnd = filterLower;
         }

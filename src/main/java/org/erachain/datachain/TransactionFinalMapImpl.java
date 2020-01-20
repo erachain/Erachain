@@ -983,7 +983,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     public Transaction get(byte[] signature) {
-        return this.get(((DCSet)databaseSet).getTransactionFinalMapSigns().get(signature));
+        Long key = ((DCSet) databaseSet).getTransactionFinalMapSigns().get(signature);
+        if (key == null)
+            return null;
+
+        return this.get(key);
     }
 
     public Transaction get(Long key) {
