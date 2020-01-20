@@ -318,11 +318,11 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         if (descending) {
             return IteratorCloseableImpl.make(new IndexIterator(((NavigableSet) this.titleKey.subSet(
                     Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo),
-                    Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo))).descendingIterator()));
+                    Fun.t2(filterLowerEnd, Long.MAX_VALUE))).descendingIterator()));
         } else {
             return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
                     Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo),
-                    Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo)).iterator()));
+                    Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
         }
     }
 

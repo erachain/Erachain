@@ -583,7 +583,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                         break;
                 }
 
-                result.add(transaction);
+                if (descending) {
+                    result.add(transaction);
+                } else {
+                    result.add(0, transaction);
+                }
             }
         } catch (IOException e) {
         }

@@ -2583,7 +2583,7 @@ public class BlockExplorer {
                     // это значит нужно скакнуть в самый низ
                 }
 
-                transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
+                transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, fromID,
                         intOffest, pageSize, false);
 
                 if (transactions.isEmpty()) {
@@ -2616,6 +2616,10 @@ public class BlockExplorer {
 
                         transactions.add(transaction);
                         counter--;
+                    }
+
+                    if (!transactions.isEmpty()) {
+                        output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
                     }
                 } catch (IOException e) {
 
