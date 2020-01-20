@@ -271,7 +271,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
+    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, Long fromSeqNo, boolean descending) {
 
         String filterLower = filter.toLowerCase();
         //Iterable keys = Fun.filter(this.titleKey,
@@ -281,9 +281,9 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         //                filterLower + new String(new byte[]{(byte)255}) : filterLower,
         //                type==0?Integer.MAX_VALUE:type), true);
 
-        return map.getIndexIteratorFilter(titleTypeTxs.getColumnFamilyHandle(), type == 0 ? filterLower.getBytes()
-                        : Arrays.concatenate(filterLower.getBytes(), Ints.toByteArray(type)),
-                false, true);
+        return map.getIndexIteratorFilter(titleTypeTxs.getColumnFamilyHandle(), fromSeqNo == null || fromSeqNo == 0 ? filterLower.getBytes()
+                        : Arrays.concatenate(filterLower.getBytes(), Longs.toByteArray(fromSeqNo)),
+                descending, true);
 
     }
 

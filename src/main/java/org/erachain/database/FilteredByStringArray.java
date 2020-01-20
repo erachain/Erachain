@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface FilteredByStringArray<T> {
 
-    List<T> getKeysByFilterAsArray(String filter, int offset, int limit);
+    List<T> getKeysByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending);
 
 }

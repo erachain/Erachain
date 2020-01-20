@@ -367,7 +367,7 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
 
     // get list items in name substring str
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Long> getKeysByFilterAsArray(String filter, int offset, int limit) {
+    public List<Long> getKeysByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
 
         if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();

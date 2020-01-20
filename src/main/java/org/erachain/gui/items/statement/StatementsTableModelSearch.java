@@ -80,8 +80,8 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
 
         DCSet dcSet = DCSet.getInstance();
 
-        list = ((FilteredByStringArray)dcSet.getTransactionFinalMap())
-                .getKeysByFilterAsArray(filter, start, step);
+        list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
+                .getKeysByFilterAsArray(filter, , start, step, false, );
 
         fireTableDataChanged();
 

@@ -472,21 +472,23 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      * а не как фильтр. Иначе слово принимаем как фильтр на диаппазон
      * и его длинна должна быть не мнее 5-ти символов. Например:
      * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
-     * @param filter string of words
-     * @param type transaction Type = 0 for all
+     *
+     * @param filter     string of words
+     * @param fromSeqNo  transaction Type = 0 for all
      * @param offset
      * @param limit
+     * @param descending
      * @return
      */
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int offset, int limit) {
+    public List<Transaction> getTransactionsByTitle(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
 
-        if (filter == null || filter.isEmpty()){
+        if (filter == null || filter.isEmpty()) {
             return new ArrayList<>();
         }
 
@@ -502,8 +504,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         int tmpSize;
         int betterIndex = 0;
         for (int i = 0; i < words.length; i++) {
-            try (IteratorCloseable iterator = ((TransactionFinalSuit)map)
-                    .getIteratorByTitleAndType(words[i].getA(), words[i].getB(), type)) {
+            try (IteratorCloseable iterator = ((TransactionFinalSuit) map)
+                    .getIteratorByTitle(words[i].getA(), words[i].getB(), fromSeqNo, descending)) {
                 // ограничим максимальный перебор - иначе может затормозить
                 tmpSize = Iterators.size(Iterators.limit(iterator, LIMIT_FIND_TITLE));
                 if (tmpSize < betterSize) {
@@ -514,8 +516,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             }
         }
 
-        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit)map)
-                .getIteratorByTitleAndType(words[betterIndex].getA(), words[betterIndex].getB(), type)) {
+        try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map)
+                .getIteratorByTitle(words[betterIndex].getA(), words[betterIndex].getB(), fromSeqNo, descending)) {
 
             Long key;
             Transaction transaction;
@@ -577,7 +579,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getKeysByFilterAsArray(String filter, int offset, int limit) {
+    public List<Transaction> getKeysByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -587,7 +589,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             return new ArrayList<>();
         }
 
-        return getTransactionsByTitleAndType(filter, 0, offset, limit);
+        return getTransactionsByTitle(filter, fromSeqNo, offset, limit, descending);
     }
 
     @Override

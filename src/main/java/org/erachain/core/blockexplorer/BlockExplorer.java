@@ -224,7 +224,7 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                keys = ((FilteredByStringArray)map).getKeysByFilterAsArray(search, 0, 100);
+                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, , 0, 100, false, );
             }
         } catch (Exception e) {
             logger.error("Wrong search while process assets... ", e.getMessage());
@@ -2534,7 +2534,7 @@ public class BlockExplorer {
         int size = 200;
         List<Transaction> transactions;
         if (filterStr != null) {
-            transactions = ((FilteredByStringArray)map).getKeysByFilterAsArray(filterStr, 0, size);
+            transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, , 0, size, false, );
 
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
