@@ -120,6 +120,8 @@ public class Controller extends Observable {
 
     public static int HARD_WORK = 0;
     public boolean useGui = true;
+    public boolean useNet = true;
+
 
     private List<Thread> threads = new ArrayList<Thread>();
     public static long buildTimestamp;
@@ -309,10 +311,9 @@ public class Controller extends Observable {
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-            if (Settings.getInstance().isTestnet()) {
+            if (!BlockChain.DEVELOP_USE && Settings.getInstance().isTestnet()) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
-                this.messageMagic = Message.MAINNET_MAGIC;
             } else {
                 this.messageMagic = Message.MAINNET_MAGIC;
             }
@@ -900,7 +901,7 @@ public class Controller extends Observable {
             }
         });
 
-        if (Settings.getInstance().isTestnet())
+        if (!useNet)
             this.status = STATUS_OK;
 
         // start memory viewer
@@ -1528,7 +1529,7 @@ public class Controller extends Observable {
             }
 
             // UPDATE STATUS
-            if (isTestNet())
+            if (!useNet)
                 this.status = STATUS_OK;
             else
                 this.status = STATUS_NO_CONNECTIONS;
@@ -1749,7 +1750,7 @@ public class Controller extends Observable {
     }
 
     public boolean checkStatus(int shift) {
-        if (isTestNet()) {
+        if (!useNet) {
             this.status = STATUS_OK;
             return true;
         }
@@ -3696,6 +3697,7 @@ public class Controller extends Observable {
             }
             if (arg.equals("-testnet")) {
                 Settings.getInstance().setGenesisStamp(NTP.getTime());
+                useNet = false;
                 continue;
             }
             if (arg.startsWith("-testnet=") && arg.length() > 9) {
@@ -3710,6 +3712,10 @@ public class Controller extends Observable {
                 } catch (Exception e) {
                     Settings.getInstance().setGenesisStamp(Settings.DEFAULT_MAINNET_STAMP);
                 }
+            }
+            if (arg.equals("-notnet")) {
+                useNet = false;
+                continue;
             }
         }
 
