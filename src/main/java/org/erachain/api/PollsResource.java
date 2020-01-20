@@ -89,7 +89,7 @@ public class PollsResource {
                 throw ApiErrorFactory.getInstance().createError(Transaction.INVALID_ADDRESS);
             }
 
-            Controller controller = new Controller().getInstance();
+            Controller controller = Controller.getInstance();
             //CHECK IF WALLET EXISTS
             if (!controller.doesWalletExists()) {
                 throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_WALLET_NO_EXISTS);

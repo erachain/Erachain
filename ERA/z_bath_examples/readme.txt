@@ -5,6 +5,9 @@ Copy bath-file to root folder for use it.
 
 Start Commands
 
+-testnet[=genesis_timestamp]
+Start in TestNET mode and set Genesis Block Timestamp (in millis).
+
 -cli
 start as Command Line Interpretator.
 
@@ -38,6 +41,14 @@ Not store calculated transactions in DB. Make speed up
 
 -dbschain=rocksdb | mapdb | fast
 Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it si complex DB for fast speed (default)
+
+-testnet[=TIMESTAMP]
+-testnet - set genesis Timestamp = current Date and -nonet is ON and use 9045 port
+-testnet=1511164500000 - set genesis Timestamp = DEVELOP chain on 9066 port
+-testnet=... tesnet chain on port 9045
+
+-nonet
+No use Network
 
 example foe Windows:
 	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1

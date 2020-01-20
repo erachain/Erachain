@@ -8,6 +8,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
+import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -405,7 +406,7 @@ public class RSend extends TransactionAmount {
             if (Base58.isExtraSymbols(word)) {
                 // все слова сложим по длинне
                 length += word.length();
-                if (length > (BlockChain.DEVELOP_USE? 100 : 100))
+                if (length > (Settings.getInstance().isTestnet() ? 100 : 100))
                     return true;
             }
         }
@@ -496,7 +497,7 @@ public class RSend extends TransactionAmount {
     @Override
     public int isValid(int asDeal, long flags) {
 
-        if (head.getBytes(StandardCharsets.UTF_8).length > 256)
+        if (head.getBytes(StandardCharsets.UTF_8).length > 255)
             return INVALID_HEAD_LENGTH;
 
         if (this.data != null) {
@@ -525,6 +526,8 @@ public class RSend extends TransactionAmount {
                         return CREATOR_NOT_PERSONALIZED;
                     }
                 }
+            } else if (Settings.getInstance().isTestnet()) {
+                ;
             } else if (Base58.encode(this.getSignature()).equals( // TODO: remove on new CHAIN
                     "1ENwbUNQ7Ene43xWgN7BmNzuoNmFvBxBGjVot3nCRH4fiiL9FaJ6Fxqqt9E4zhDgJADTuqtgrSThp3pqWravkfg")) {
                 ;

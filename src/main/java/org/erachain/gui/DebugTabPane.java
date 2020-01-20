@@ -1,6 +1,5 @@
 package org.erachain.gui;
 
-import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.TransactionSuit;
@@ -90,7 +89,7 @@ public class DebugTabPane extends JTabbedPane {
         //ADD BLOCK TABLE
         this.addTab(Lang.getInstance().translate("Blocks"), new JScrollPane(blocksTable));
         //
-        if (BlockChain.DEVELOP_USE) {
+        if (Settings.getInstance().isTestnet()) {
             JPanel pppp = new JPanel();
             JButton bb = new JButton("OffRun");
             bb.addActionListener(new ActionListener() {

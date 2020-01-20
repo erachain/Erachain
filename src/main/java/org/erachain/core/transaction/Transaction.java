@@ -1299,11 +1299,12 @@ public abstract class Transaction implements ExplorerJsonLine {
             return NOT_ENOUGH_FEE;
         }
 
-        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
+        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0L
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
             if (BlockChain.DEVELOP_USE) {
+                // TODO убрать потом когда новую ДЕВ запустим
                 boolean good = false;
                 for (String admin : BlockChain.GENESIS_ADMINS) {
                     if (this.creator.equals(admin)) {
@@ -1313,6 +1314,8 @@ public abstract class Transaction implements ExplorerJsonLine {
                 }
                 if (!good)
                     return CREATOR_NOT_PERSONALIZED;
+            } else if (Settings.getInstance().isTestnet()) {
+                ;
             } else {
                 return CREATOR_NOT_PERSONALIZED;
             }

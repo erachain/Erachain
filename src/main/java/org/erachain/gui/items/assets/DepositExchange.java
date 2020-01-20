@@ -1,7 +1,6 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.library.MButton;
@@ -21,13 +20,17 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 //public class PersonConfirm extends JDialog { // InternalFrame  {
 public class DepositExchange extends JPanel {
@@ -128,7 +131,7 @@ public class DepositExchange extends JPanel {
         }
 
         if (jsonObject != null && jsonObject.containsKey("addr_in")) {
-            if (BlockChain.DEVELOP_USE) {
+            if (Settings.getInstance().isTestnet()) {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
@@ -575,7 +578,7 @@ public class DepositExchange extends JPanel {
 
         if (jsonObject != null) {
             if (jsonObject.containsKey("deal")) {
-                if (BlockChain.DEVELOP_USE) {
+                if (Settings.getInstance().isTestnet()) {
                     tip.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
                 }
 

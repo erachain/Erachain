@@ -779,6 +779,7 @@ public class Synchronizer extends Thread {
     public void checkBadBlock(Peer peer) throws Exception {
 
         if (BlockChain.DEVELOP_USE) {
+            // TODO тут только в Девелопе такой блок - если убьем то удалить эту проверку
             List<byte[]> headersCheck = this.getBlockSignatures(badCheck, peer);
             if (!headersCheck.isEmpty()) {
                 String mess = "Dishonest peer: my CHECKPOINT SIGNATURE -> BAD FORK";

@@ -40,10 +40,10 @@ public class MainFrame extends JFrame implements Observer {
     private MainFrame() {
 
         // CREATE FRAME
-        super(Controller.APP_NAME + " v." + Controller.getVersion());
+        super(Controller.getInstance().APP_NAME + " v." + Controller.getVersion());
         this.setVisible(false);
         if (Settings.getInstance().isTestnet()) {
-            setTitle(Controller.APP_NAME + " TestNet " + "v." + Controller.getVersion() + " TS:"
+            setTitle(Controller.getInstance().APP_NAME + " TestNet " + "v." + Controller.getVersion() + " TS:"
                     + Settings.getInstance().getGenesisStamp());
         }
 
