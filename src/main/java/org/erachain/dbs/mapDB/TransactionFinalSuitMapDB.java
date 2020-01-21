@@ -303,8 +303,32 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     }
 
     @Override
+    public IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending) {
+
+        if (descending) {
+            IteratorCloseable result =
+                    // делаем закрываемый Итератор
+                    IteratorCloseableImpl.make(
+                            // берем индекс с обратным отсчетом
+                            ((NavigableMap) this.map).descendingMap()
+                                    // задаем границы, так как он обратный границы меняем местами
+                                    .subMap(fromSeqNo == null || fromSeqNo.equals(0L) ? Long.MAX_VALUE : fromSeqNo, 0L).keySet().iterator());
+            return result;
+        }
+
+        IteratorCloseable result =
+                // делаем закрываемый Итератор
+                IteratorCloseableImpl.make(
+                        ((NavigableMap) this.map)
+                                // задаем границы, так как он обратный границы меняем местами
+                                .subMap(fromSeqNo == null || fromSeqNo.equals(0L) ? 0L : fromSeqNo,
+                                        Long.MAX_VALUE).keySet().iterator());
+
+        return result;
+    }
+
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, Long fromSeqNo, boolean descending) {
 
         String filterLower = filter.toLowerCase();
@@ -316,15 +340,14 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         if (descending) {
-            return IteratorCloseableImpl.make(new IndexIterator((this.titleKey.descendingSet().subSet(
-                    //Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),
-                    //Fun.t2(filterLower, Long.MIN_VALUE)
-                    Fun.t2(filterLowerEnd, Long.MAX_VALUE),
-                    Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo)
-            )).iterator()));
+            return IteratorCloseableImpl.make(new IndexIterator((((NavigableSet) this.titleKey).descendingSet()
+                    .subSet(
+                            Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),
+                            Fun.t2(filterLower, 0L)
+                    )).iterator()));
         } else {
             return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
-                    Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo),
+                    Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? 0L : fromSeqNo),
                     Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
         }
     }
@@ -375,31 +398,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             return new IteratorCloseableImpl(Lists.reverse(Lists.newArrayList(mergedIterator)).iterator());
 
         }
-    }
-
-    @Override
-    public IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending) {
-
-        if (descending) {
-            IteratorCloseable result =
-                    // делаем закрываемый Итератор
-                    IteratorCloseableImpl.make(
-                            // берем индекс с обратным отсчетом
-                            ((NavigableMap) this.map).descendingMap()
-                                    // задаем границы, так как он обратный границы меняем местами
-                                    .subMap(fromSeqNo == null || fromSeqNo.equals(0L) ? Long.MAX_VALUE : fromSeqNo, 0L).keySet().iterator());
-            return result;
-        }
-
-        IteratorCloseable result =
-                // делаем закрываемый Итератор
-                IteratorCloseableImpl.make(
-                        ((NavigableMap) this.map)
-                                // задаем границы, так как он обратный границы меняем местами
-                                .subMap(fromSeqNo == null || fromSeqNo.equals(0L) ? 0L : fromSeqNo,
-                                        Long.MAX_VALUE).keySet().iterator());
-
-        return result;
     }
 
     /**

@@ -639,18 +639,20 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
 
-            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offsetHere, limit, false);
+            List<Transaction> txsReverse = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offsetHere, limit, false);
             int count = txs.size();
+            for (Transaction transaction : txsReverse) {
+                txs.add(0, transaction);
+            }
 
             if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
                 // сюда пришло значит не полный список - дополним его
                 // и тут идем в обратку
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
-                        fromSeqNo, count > 0 ? 1 : 0, limit - count, true)) {
+                        fromSeqNo, 0, limit - count, false)) {
                     txs.add(transaction);
                 }
             }
-
 
         } else {
 
