@@ -526,7 +526,8 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, descending);
     }
 
-    public List<Transaction> getTransactionsByTitleFromBetter(Pair<String, Boolean>[] words, int betterIndex, Long fromSeqNo, int offset, int limit, boolean descending) {
+    public List<Transaction> getTransactionsByTitleFromBetter(Pair<String, Boolean>[] words, int betterIndex,
+                                                              Long fromSeqNo, int offset, int limit, boolean descending) {
 
         List<Transaction> result = new ArrayList<>();
 

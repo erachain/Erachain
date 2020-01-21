@@ -316,9 +316,12 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         }
 
         if (descending) {
-            return IteratorCloseableImpl.make(new IndexIterator(((NavigableSet) this.titleKey.subSet(
-                    Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo),
-                    Fun.t2(filterLowerEnd, Long.MAX_VALUE))).descendingIterator()));
+            return IteratorCloseableImpl.make(new IndexIterator((this.titleKey.descendingSet().subSet(
+                    //Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),
+                    //Fun.t2(filterLower, Long.MIN_VALUE)
+                    Fun.t2(filterLowerEnd, Long.MAX_VALUE),
+                    Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo)
+            )).iterator()));
         } else {
             return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
                     Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo),
@@ -381,24 +384,20 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             IteratorCloseable result =
                     // делаем закрываемый Итератор
                     IteratorCloseableImpl.make(
-                            // только ключи берем из Tuple2
-                            new IndexIterator<>(
-                                    // берем индекс с обратным отсчетом
-                                    ((NavigableMap) this.map).descendingMap()
-                                            // задаем границы, так как он обратный границы меняем местами
-                                            .subMap(fromSeqNo == null || fromSeqNo.equals(0L) ? Long.MAX_VALUE : fromSeqNo, 0L).keySet().iterator()));
+                            // берем индекс с обратным отсчетом
+                            ((NavigableMap) this.map).descendingMap()
+                                    // задаем границы, так как он обратный границы меняем местами
+                                    .subMap(fromSeqNo == null || fromSeqNo.equals(0L) ? Long.MAX_VALUE : fromSeqNo, 0L).keySet().iterator());
             return result;
         }
 
         IteratorCloseable result =
                 // делаем закрываемый Итератор
                 IteratorCloseableImpl.make(
-                        // только ключи берем из Tuple2
-                        new IndexIterator<>(
-                                ((NavigableMap) this.map)
-                                        // задаем границы, так как он обратный границы меняем местами
-                                        .subMap(fromSeqNo == null || fromSeqNo.equals(0L) ? 0L : fromSeqNo,
-                                                Long.MAX_VALUE).keySet().iterator()));
+                        ((NavigableMap) this.map)
+                                // задаем границы, так как он обратный границы меняем местами
+                                .subMap(fromSeqNo == null || fromSeqNo.equals(0L) ? 0L : fromSeqNo,
+                                        Long.MAX_VALUE).keySet().iterator());
 
         return result;
     }
