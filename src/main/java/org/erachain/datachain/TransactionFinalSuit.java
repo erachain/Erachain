@@ -24,6 +24,8 @@ public interface TransactionFinalSuit {
 
     IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort);
 
+    IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending);
+
     IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending);
 
     }

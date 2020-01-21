@@ -328,43 +328,57 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     }
 
     @Override
-    public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getBiDirectionIterator(Long fromSeqNo, boolean descending) {
         byte[] fromKey;
-        if (addressShort != null) {
-            if (fromSeqNo == null || fromSeqNo == 0) {
-                // ищем все с самого начала для данного адреса
-                fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-                System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-            } else {
-                // используем полный ключ для начального поиска
-                fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
-                System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
-                System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
-            }
 
-            byte[] toKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
-            System.arraycopy(addressShort, 0, toKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+        if (fromSeqNo == null || fromSeqNo == 0) {
+            fromKey = new byte[0];
+        } else {
+            // используем полный ключ для начального поиска
+            fromKey = Longs.toByteArray(fromSeqNo);
+        }
+        return map.getIndexIteratorFilter(fromKey, null, descending, false);
 
-            if (descending && fromSeqNo == null) {
-                // тут нужно взять кранее верхнее значени и найти нижнее первое
-                // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
-                int length = fromKey.length;
-                byte[] prevFilter = new byte[length + 1];
-                System.arraycopy(fromKey, 0, prevFilter, 0, length);
-                prevFilter[length] = (byte) 255;
+    }
 
-                //toKey =
-                return map.getIndexIteratorFilter(addressBiDirectionTxs.getColumnFamilyHandle(),
-                        prevFilter, toKey, descending, true);
+    @Override
+    public IteratorCloseable<Long> getBiDirectionAddressIterator(byte[] addressShort, Long fromSeqNo, boolean descending) {
 
-            } else {
-                return map.getIndexIteratorFilter(addressBiDirectionTxs.getColumnFamilyHandle(),
-                        fromKey, toKey, descending, true);
+        if (addressShort == null)
+            return getBiDirectionIterator(fromSeqNo, descending);
 
-            }
+        byte[] fromKey;
+
+        if (fromSeqNo == null || fromSeqNo == 0) {
+            // ищем все с самого начала для данного адреса
+            fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+            System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+        } else {
+            // используем полный ключ для начального поиска
+            fromKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN + Long.BYTES];
+            System.arraycopy(addressShort, 0, fromKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+            System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.ADDRESS_KEY_LEN, Long.BYTES);
+        }
+
+        byte[] toKey = new byte[TransactionFinalMap.ADDRESS_KEY_LEN];
+        System.arraycopy(addressShort, 0, toKey, 0, TransactionFinalMap.ADDRESS_KEY_LEN);
+
+        if (descending && fromSeqNo == null) {
+            // тут нужно взять кранее верхнее значени и найти нижнее первое
+            // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
+            int length = fromKey.length;
+            byte[] prevFilter = new byte[length + 1];
+            System.arraycopy(fromKey, 0, prevFilter, 0, length);
+            prevFilter[length] = (byte) 255;
+
+            //toKey =
+            return map.getIndexIteratorFilter(addressBiDirectionTxs.getColumnFamilyHandle(),
+                    prevFilter, toKey, descending, true);
 
         } else {
-            return map.getIndexIterator(addressBiDirectionTxs.getColumnFamilyHandle(), descending, true);
+            return map.getIndexIteratorFilter(addressBiDirectionTxs.getColumnFamilyHandle(),
+                    fromKey, toKey, descending, true);
+
         }
 
     }
