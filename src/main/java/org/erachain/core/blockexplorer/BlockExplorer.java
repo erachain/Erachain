@@ -2583,7 +2583,7 @@ public class BlockExplorer {
             }
 
             if (filterStr == null) {
-                transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, useForge, true);
+                transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, !useForge, true);
             } else {
                 transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, fromID,
                         intOffest, pageSize, false);

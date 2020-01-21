@@ -332,7 +332,8 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
         byte[] fromKey;
 
         if (fromSeqNo == null || fromSeqNo == 0) {
-            fromKey = new byte[0];
+            //fromKey = new byte[1]{descending ? Byte.MAX_VALUE : Byte.MIN_VALUE};
+            fromKey = null;
         } else {
             // используем полный ключ для начального поиска
             fromKey = Longs.toByteArray(fromSeqNo);

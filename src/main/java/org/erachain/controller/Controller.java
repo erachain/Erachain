@@ -871,7 +871,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
 
-            if (Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
+            if (!BlockChain.DEVELOP_USE && Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
                     && !this.wallet.getAccounts().isEmpty()) {
                 this.wallet.synchronize(true);
             }
