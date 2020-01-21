@@ -76,7 +76,7 @@ public class CoreResource {
     public String getVersion() {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("version", Controller.getInstance().getVersion());
+        jsonObject.put("version", Controller.getInstance().getVersion(true));
         jsonObject.put("buildDate", Controller.getInstance().getBuildDateString());
         jsonObject.put("buildTimeStamp", Controller.buildTimestamp);
 

@@ -647,7 +647,7 @@ public class Order implements Comparable<Order> {
         this.creator.changeBalance(this.dcSet, false,
                 this.haveAssetKey, this.getAmountHaveLeft(), false);
         transaction.addCalculated(block, this.creator, this.haveAssetKey, this.getAmountHaveLeft(),
-                "ended order @" + transaction.viewDBRef(this.id));
+                "Outprice close @" + transaction.viewDBRef(this.id));
 
     }
 

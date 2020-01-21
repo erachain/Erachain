@@ -67,8 +67,7 @@ public class SysTray implements Observer {
                 //String toolTipText = "Erachain.org "	+ Controller.getInstance().getVersion();
                 createPopupMenu = createPopupMenu();
                 TrayIcon icon = new TrayIcon(createImage(
-                        "images/icons/icon32.png", "tray icon"), "erachain.org"
-                        + Controller.getInstance().getVersion(),
+                        "images/icons/icon32.png", "tray icon"), Controller.getInstance().getApplicationName(false),
                         createPopupMenu);
 
                 icon.setImageAutoSize(true);
@@ -355,7 +354,7 @@ public class SysTray implements Observer {
 
                 String networkStatus = "";
                 String syncProcent = "";
-                String toolTipText = "erachain.org " + Controller.getInstance().getVersion() + "\n";
+                String toolTipText = Controller.getInstance().getApplicationName(false) + "\n";
 
                 if (Controller.getInstance().getStatus() == Controller.STATUS_NO_CONNECTIONS) {
                     networkStatus = Lang.getInstance().translate("No connections");
