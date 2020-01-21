@@ -578,16 +578,17 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     continue;
                 }
 
-                if (limit > 0) {
-                    if (--limit == 0)
-                        break;
-                }
-
                 if (descending) {
                     result.add(transaction);
                 } else {
                     result.add(0, transaction);
                 }
+
+                if (limit > 0) {
+                    if (--limit == 0)
+                        break;
+                }
+
             }
         } catch (IOException e) {
         }
@@ -637,13 +638,14 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
 
-            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, false);
+            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offsetHere, limit, false);
             int count = txs.size();
 
             if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
                 // сюда пришло значит не полный список - дополним его
+                // и тут идем в обратку
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
-                        fromSeqNo, 0, limit - count, false)) {
+                        fromSeqNo, count > 0 ? 1 : 0, limit - count, true)) {
                     txs.add(transaction);
                 }
             }

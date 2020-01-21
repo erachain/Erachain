@@ -272,13 +272,6 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         byte[] filterLower = filter.toLowerCase().getBytes(StandardCharsets.UTF_8);
         int filterLowerLength = filterLower.length;
-        byte[] filterLowerEnd;
-        if (asFilter) {
-            filterLowerEnd = new byte[filterLowerLength + 1];
-            filterLowerEnd[filterLowerLength] = (byte) 255;
-        } else {
-            filterLowerEnd = filterLower;
-        }
 
         byte[] fromKey;
         if (fromSeqNo == null || fromSeqNo == 0) {
@@ -294,12 +287,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         byte[] toKey;
         int toKeyLength = Math.min(filterLowerLength, TransactionFinalMap.CUT_NAME_INDEX);
-        if (asFilter ^ descending) {
-            toKey = new byte[toKeyLength + 1];
-            toKey[toKeyLength] = (byte) 255;
-        } else {
-            toKey = new byte[toKeyLength];
-        }
+        toKey = new byte[toKeyLength];
         System.arraycopy(filterLower, 0, toKey, 0, toKeyLength);
 
         if (descending && fromSeqNo == null) {
