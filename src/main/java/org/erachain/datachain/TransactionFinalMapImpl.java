@@ -788,7 +788,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     // сюда пришло значит не полный список - дополним его
                     for (Transaction transaction : getTransactionsFromID(fromSeqNo,
                             0, limit - count, noForge, false)) {
-                        txs.add(transaction);
+                        boolean exist = false;
+                        for (Transaction txHere : txs) {
+                            if (transaction.equals(txHere)) {
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            txs.add(transaction);
+                        }
                     }
                 }
 
@@ -831,7 +840,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     int limitLeft = limit - count;
                     for (Transaction transaction : getTransactionsFromID(fromSeqNo,
                             -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, noForge, false)) {
-                        txs.add(index++, transaction);
+                        boolean exist = false;
+                        for (Transaction txHere : txs) {
+                            if (transaction.equals(txHere)) {
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            txs.add(index++, transaction);
+                        }
                     }
                 }
 
@@ -1152,7 +1170,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     // сюда пришло значит не полный список - дополним его
                     for (Transaction transaction : getTransactionsByAddressFromID(addressShort,
                             fromSeqNo, 0, limit - count, noForge, false)) {
-                        txs.add(transaction);
+                        boolean exist = false;
+                        for (Transaction txHere : txs) {
+                            if (transaction.equals(txHere)) {
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            txs.add(transaction);
+                        }
                     }
                 }
 
@@ -1186,7 +1213,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
                     count++;
 
-                    txs.add(item);
+                    boolean exist = false;
+                    for (Transaction txHere : txs) {
+                        if (item.equals(txHere)) {
+                            exist = true;
+                            break;
+                        }
+                    }
+                    if (!exist) {
+                        txs.add(item);
+                    }
                 }
 
                 if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
@@ -1195,7 +1231,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     int limitLeft = limit - count;
                     for (Transaction transaction : getTransactionsByAddressFromID(addressShort,
                             fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, noForge, false)) {
-                        txs.add(index++, transaction);
+                        boolean exist = false;
+                        for (Transaction txHere : txs) {
+                            if (transaction.equals(txHere)) {
+                                exist = true;
+                                break;
+                            }
+                        }
+                        if (!exist) {
+                            txs.add(index++, transaction);
+                        }
                     }
                 }
 
