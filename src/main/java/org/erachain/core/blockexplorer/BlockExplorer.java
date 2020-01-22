@@ -2593,14 +2593,9 @@ public class BlockExplorer {
                 output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
             } else {
                 // включим ссылки на листание вверх
-                if (true || intOffest >= 0 || transactions.size() >= pageSize) {
-                    output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
-                }
-
-                if (true || !((fromID == null || fromID.equals(0L)) && intOffest < 0)) {
-                    // это не самый конец - включим листание вниз
-                    output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
-                }
+                output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                // это не самый конец - включим листание вниз
+                output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
             }
 
         }

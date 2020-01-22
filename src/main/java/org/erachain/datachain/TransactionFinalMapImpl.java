@@ -636,7 +636,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             int offsetHere = -(offset + limit);
 
             List<Transaction> txsReverse = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offsetHere, limit, false);
-            int count = txs.size();
+            int count = txsReverse.size();
             for (Transaction transaction : txsReverse) {
                 txs.add(0, transaction);
             }
@@ -645,7 +645,9 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 // сюда пришло значит не полный список - дополним его
                 // и тут идем в обратку
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
-                        fromSeqNo, 0, limit - count, false)) {
+                        fromSeqNo, 0, limit - count, false //true // здесь обратный список так как в обратну надо задать
+                )
+                ) {
                     txs.add(transaction);
                 }
             }
@@ -661,7 +663,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 int limitLeft = limit - count;
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
                         fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
-                    txs.add(index++, transaction);
+                    txs.add(0, transaction);
                 }
             }
 

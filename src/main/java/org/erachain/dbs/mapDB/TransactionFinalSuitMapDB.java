@@ -335,9 +335,15 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         String filterLowerEnd;
 
         if (descending) {
+            filterLowerEnd = filterLower;
+            if (true || fromSeqNo == null || fromSeqNo == 0) {
+                if (asFilter) {
+                    filterLowerEnd = filterLower + new String(new byte[]{(byte) 255});
+                }
+            }
             return IteratorCloseableImpl.make(new IndexIterator((((NavigableSet) this.titleKey).descendingSet()
                     .subSet(
-                            Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),// false,
+                            Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),// false,
                             Fun.t2(filterLower, 0L)//, true
                     )).iterator()));
         } else {
