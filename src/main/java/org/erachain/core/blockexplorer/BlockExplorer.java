@@ -2586,8 +2586,7 @@ public class BlockExplorer {
             if (filterStr == null) {
                 transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, !useForge, true);
             } else {
-                String fromWord = null; // TODO need set
-                transactions = map.getTransactionsByTitleFromID(filterStr, fromWord, fromID,
+                transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
                         intOffest, pageSize, true);
             }
 

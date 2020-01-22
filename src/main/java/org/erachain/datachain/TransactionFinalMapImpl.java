@@ -466,7 +466,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return result;
     }
 
-    public int getTransactionsByTitleBetterIndex(Pair<String, Boolean>[] words, String fromWord, Long fromSeqNo, boolean descending) {
+    public int getTransactionsByTitleBetterIndex(Pair<String, Boolean>[] words, boolean descending) {
 
         // сперва выберем самый короткий набор
         // TODO нужно еще отсортировать по длинне слов - самые длинные сперва проверять - они короче список дадут поидее
@@ -476,7 +476,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         int betterIndex = 0;
         for (int i = 0; i < words.length; i++) {
             try (IteratorCloseable iterator = ((TransactionFinalSuit) map)
-                    .getIteratorByTitle(words[i].getA(), words[i].getB(), fromWord, fromSeqNo, descending)) {
+                    .getIteratorByTitle(words[i].getA(), words[i].getB(), null, null, descending)) {
                 // ограничим максимальный перебор - иначе может затормозить
                 tmpSize = Iterators.size(Iterators.limit(iterator, LIMIT_FIND_TITLE));
                 if (tmpSize < betterSize) {
@@ -521,7 +521,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Pair<String, Boolean>[] words = stepFilter(filterArray);
 
         // сперва выберем самый короткий набор
-        int betterIndex = getTransactionsByTitleBetterIndex(words, fromWord, fromSeqNo, descending);
+        int betterIndex = getTransactionsByTitleBetterIndex(words, descending);
 
         return getTransactionsByTitleFromBetter(words, betterIndex, fromWord, fromSeqNo, offset, limit, descending);
     }
@@ -620,12 +620,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         //return getTransactionsByTitle(filter, fromSeqNo, offset, limit, descending);
-        return getTransactionsByTitleFromID(filter, fromWord, fromSeqNo, offset, limit, true);
+        return getTransactionsByTitleFromID(filter, fromSeqNo, offset, limit, true);
     }
 
     //@Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByTitleFromID(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean fillFullPage) {
+    public List<Transaction> getTransactionsByTitleFromID(String filter, Long fromSeqNo, int offset, int limit, boolean fillFullPage) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
@@ -639,7 +639,30 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Pair<String, Boolean>[] words = stepFilter(filterArray);
 
         // сперва выберем самый короткий набор
-        int betterIndex = getTransactionsByTitleBetterIndex(words, fromWord, fromSeqNo, false);
+        int betterIndex = getTransactionsByTitleBetterIndex(words, false);
+
+        String fromWord = null;
+
+        if (fromSeqNo != null) {
+            // теперь найдем текушее слово чтобы начать с него поиск
+            // это нужно только если задан номер начала поиска - тогда будет искать верно
+            Transaction txFrom = get(fromSeqNo);
+            if (txFrom != null) {
+                String fromTitle;
+                fromTitle = get(fromSeqNo).getTitle();
+                if (fromTitle != null) {
+                    // теперь проверим все слова в Заголовке
+                    String betterFilterWord = words[betterIndex].getA();
+                    String[] titleArray = fromTitle.toLowerCase().split(DCSet.SPLIT_CHARS);
+                    for (int i = 0; i < titleArray.length; i++) {
+                        if (titleArray[i].startsWith(betterFilterWord)) {
+                            fromWord = titleArray[i];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
         if (offset < 0 || limit < 0) {
             if (limit < 0)

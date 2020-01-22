@@ -270,7 +270,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending) {
 
-        byte[] filterLower = filter.toLowerCase().getBytes(StandardCharsets.UTF_8);
+        byte[] filterLower = fromWord == null ? filter.toLowerCase().getBytes(StandardCharsets.UTF_8) : fromWord.toLowerCase().getBytes(StandardCharsets.UTF_8);
         int filterLowerLength = filterLower.length;
 
         byte[] fromKey;
@@ -305,7 +305,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     prevFilter, toKey, descending, true);
 
         } else {
-            if (descending && asFilter) {
+            if (false && descending && asFilter) {
                 // диаппазон заданим если у нас фильтр - значение начальное увеличим в нути ключа
                 fromKey[filterLowerLength] = (byte) 255;
             }

@@ -52,6 +52,7 @@ import java.util.*;
 @Slf4j
 public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit {
 
+    private static boolean TITLE_AS_ONE_INDEX = true;
     public static final int BIDIRECTION_ADDRESS_INDEX = 1;
     public static final int BIDIRECTION_TITLE_INDEX = 2; // так как обратный отсчет идет не по Слову а по номеру транзакции
     private static int CUT_NAME_INDEX = 12;
@@ -171,7 +172,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     }
                 });
 
-        if (false) {
+        if (TITLE_AS_ONE_INDEX) {
             this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
             // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
@@ -372,7 +373,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         String filterLower = fromWord == null ? filter.toLowerCase() : fromWord.toLowerCase();
         String filterLowerEnd;
 
-        if (false) {
+        if (TITLE_AS_ONE_INDEX) {
 
             if (descending) {
                 filterLowerEnd = filterLower;
