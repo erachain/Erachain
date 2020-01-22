@@ -53,7 +53,6 @@ import java.util.*;
 public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit {
 
     public static final int BIDIRECTION_ADDRESS_INDEX = 1;
-    public static final int BIDIRECTION_TITLE_INDEX = 2; // так как обратный отсчет идет не по Слову а по номеру транзакции
     private static int CUT_NAME_INDEX = 12;
 
     @SuppressWarnings("rawtypes")
@@ -341,7 +340,6 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
             if (asFilter && fromWord == null) {
                 startFrom = filterLower + new String(new byte[]{(byte) 255});
             }
-            //filterLowerEnd = filterLower;
             return IteratorCloseableImpl.make(new IndexIterator((((NavigableSet) this.titleKey).descendingSet()
                     .subSet(
                             Fun.t2(startFrom, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),// false,

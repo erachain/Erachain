@@ -270,36 +270,32 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
     public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending) {
 
-        byte[] filterLower = fromWord == null ? filter.toLowerCase().getBytes(StandardCharsets.UTF_8) : fromWord.toLowerCase().getBytes(StandardCharsets.UTF_8);
-        int filterLowerLength = filterLower.length;
+        byte[] filterLower = filter.toLowerCase().getBytes(StandardCharsets.UTF_8);
+        byte[] startFrom = fromWord == null ? filterLower : fromWord.toLowerCase().getBytes(StandardCharsets.UTF_8);
+        int filterLowerLength =  Math.min(filterLower.length, TransactionFinalMap.CUT_NAME_INDEX);
 
         byte[] fromKey;
         if (fromSeqNo == null || fromSeqNo == 0) {
             // ищем все с самого начала для данного адреса
             fromKey = new byte[TransactionFinalMap.CUT_NAME_INDEX];
-            System.arraycopy(filterLower, 0, fromKey, 0, Math.min(filterLowerLength, TransactionFinalMap.CUT_NAME_INDEX));
+            System.arraycopy(filterLower, 0, fromKey, 0, filterLowerLength);
         } else {
             // используем полный ключ для начального поиска
+            // значит и стартовое слово надо использовать
             fromKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
-            System.arraycopy(filterLower, 0, fromKey, 0, Math.min(filterLowerLength, TransactionFinalMap.CUT_NAME_INDEX));
+            System.arraycopy(startFrom, 0, fromKey, 0, Math.min(startFrom.length, TransactionFinalMap.CUT_NAME_INDEX));
             System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
         }
 
-        byte[] toKey;
-        int toKeyLength = Math.min(filterLowerLength, TransactionFinalMap.CUT_NAME_INDEX);
-        toKey = new byte[toKeyLength + (asFilter ? 1 : 0)];
-        System.arraycopy(filterLower, 0, toKey, 0, toKeyLength);
-        if (asFilter) {
-            toKey[toKeyLength] = (byte) 255;
-        }
-
-        if (descending && fromSeqNo == null) {
+        if (descending) {
             // тут нужно взять кранее верхнее значени и найти нижнее первое
             // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
-            int length = fromKey.length;
-            byte[] prevFilter = new byte[length + 1];
-            System.arraycopy(fromKey, 0, prevFilter, 0, length);
-            prevFilter[length] = (byte) 255;
+            if (asFilter && fromWord == null) {
+                int length = fromKey.length;
+                byte[] prevFilter = new byte[filterLowerEnd + 1];
+                System.arraycopy(fromKey, 0, prevFilter, 0, length);
+                prevFilter[length] = (byte) 255;
+            }
 
             return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
                     prevFilter, toKey, descending, true);
