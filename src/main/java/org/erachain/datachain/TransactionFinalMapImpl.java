@@ -623,6 +623,31 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return getTransactionsByTitleFromID(filter, fromSeqNo, offset, limit, true);
     }
 
+    protected String findFromFilterWord(String betterFilterWord, Long fromSeqNo) {
+        if (fromSeqNo == null) {
+            return null;
+        }
+
+        // теперь найдем текушее слово чтобы начать с него поиск
+        // это нужно только если задан номер начала поиска - тогда будет искать верно
+        Transaction txFrom = get(fromSeqNo);
+        if (txFrom == null) {
+            return null;
+        }
+        String fromTitle;
+        fromTitle = get(fromSeqNo).getTitle();
+        if (fromTitle != null) {
+            // теперь проверим все слова в Заголовке
+            String[] titleArray = fromTitle.toLowerCase().split(DCSet.SPLIT_CHARS);
+            for (int i = 0; i < titleArray.length; i++) {
+                if (titleArray[i].startsWith(betterFilterWord)) {
+                    return titleArray[i];
+                }
+            }
+        }
+        return null;
+    }
+
     //@Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Transaction> getTransactionsByTitleFromID(String filter, Long fromSeqNo, int offset, int limit, boolean fillFullPage) {
@@ -641,27 +666,13 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         // сперва выберем самый короткий набор
         int betterIndex = getTransactionsByTitleBetterIndex(words, false);
 
-        String fromWord = null;
-
-        if (fromSeqNo != null) {
-            // теперь найдем текушее слово чтобы начать с него поиск
-            // это нужно только если задан номер начала поиска - тогда будет искать верно
-            Transaction txFrom = get(fromSeqNo);
-            if (txFrom != null) {
-                String fromTitle;
-                fromTitle = get(fromSeqNo).getTitle();
-                if (fromTitle != null) {
-                    // теперь проверим все слова в Заголовке
-                    String betterFilterWord = words[betterIndex].getA();
-                    String[] titleArray = fromTitle.toLowerCase().split(DCSet.SPLIT_CHARS);
-                    for (int i = 0; i < titleArray.length; i++) {
-                        if (titleArray[i].startsWith(betterFilterWord)) {
-                            fromWord = titleArray[i];
-                            break;
-                        }
-                    }
-                }
-            }
+        // если нужно с заданного номера найти то нужно слово полностью взять для фильта а не начало
+        String fromWord;
+        if (words[betterIndex].getB() && fromSeqNo != null) {
+            // поиск по фильтру и не с начала списка то
+            fromWord = findFromFilterWord(words[betterIndex].getA(), fromSeqNo);
+        } else {
+            fromWord = null;
         }
 
         if (offset < 0 || limit < 0) {
@@ -681,11 +692,21 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
                 // сюда пришло значит не полный список - дополним его
                 // и тут идем в обратку
+
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
                         fromWord, fromSeqNo, 0, limit - count, true // здесь обратный список так как в обратну надо задать
                 )
                 ) {
-                    txs.add(transaction);
+                    boolean exist = false;
+                    for (Transaction txHere : txs) {
+                        if (transaction.equals(txHere)) {
+                            exist = true;
+                            break;
+                        }
+                    }
+                    if (!exist) {
+                        txs.add(transaction);
+                    }
                 }
             }
 
@@ -700,7 +721,16 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 int limitLeft = limit - count;
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
                         fromWord, fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
-                    txs.add(0, transaction);
+                    boolean exist = false;
+                    for (Transaction txHere : txs) {
+                        if (transaction.equals(txHere)) {
+                            exist = true;
+                            break;
+                        }
+                    }
+                    if (!exist) {
+                        txs.add(0, transaction);
+                    }
                 }
             }
 

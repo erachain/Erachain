@@ -173,7 +173,7 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                 });
 
         if (TITLE_AS_ONE_INDEX) {
-            this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
+            this.titleKey = database.createTreeSet("title_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
             // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
             Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.titleKey,

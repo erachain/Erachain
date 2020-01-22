@@ -321,6 +321,7 @@ public class TransactionFinalMapImplTest {
                 assertEquals("1-2", find.get(0).viewHeightSeq());
 
                 /// MEDDLE
+                ////////////// работет именно тогда когда обновляем Начальный Поск Слово - fromWord (если не с начала ищем а с заданной позиции)
                 fromWord = ((RSend) map.get(fromSeqNo)).getTitle();
                 assertEquals("forgen", fromWord);
                 find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
