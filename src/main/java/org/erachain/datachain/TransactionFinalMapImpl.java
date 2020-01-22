@@ -645,7 +645,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 // сюда пришло значит не полный список - дополним его
                 // и тут идем в обратку
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
-                        fromSeqNo, 0, limit - count, false //true // здесь обратный список так как в обратну надо задать
+                        fromSeqNo, 0, limit - count, true // здесь обратный список так как в обратну надо задать
                 )
                 ) {
                     txs.add(transaction);
