@@ -287,8 +287,11 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         byte[] toKey;
         int toKeyLength = Math.min(filterLowerLength, TransactionFinalMap.CUT_NAME_INDEX);
-        toKey = new byte[toKeyLength];
+        toKey = new byte[toKeyLength + (asFilter ? 1 : 0)];
         System.arraycopy(filterLower, 0, toKey, 0, toKeyLength);
+        if (asFilter) {
+            toKey[toKeyLength] = (byte) 255;
+        }
 
         if (descending && fromSeqNo == null) {
             // тут нужно взять кранее верхнее значени и найти нижнее первое
@@ -302,8 +305,13 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                     prevFilter, toKey, descending, true);
 
         } else {
+            if (descending && asFilter) {
+                // диаппазон заданим если у нас фильтр - значение начальное увеличим в нути ключа
+                fromKey[filterLowerLength] = (byte) 255;
+            }
             return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
-                    fromKey, toKey, descending, true);
+                    fromKey, toKey,
+                    descending, true);
 
         }
 

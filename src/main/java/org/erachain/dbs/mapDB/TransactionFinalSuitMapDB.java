@@ -53,6 +53,7 @@ import java.util.*;
 public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> implements TransactionFinalSuit {
 
     public static final int BIDIRECTION_ADDRESS_INDEX = 1;
+    public static final int BIDIRECTION_TITLE_INDEX = 2; // так как обратный отсчет идет не по Слову а по номеру транзакции
     private static int CUT_NAME_INDEX = 12;
 
     @SuppressWarnings("rawtypes")
@@ -170,32 +171,69 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     }
                 });
 
-        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
+        if (false) {
+            this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
-        // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
-        Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.titleKey,
-                new Function2<String[], Long, Transaction>() {
-                    @Override
-                    public String[] run(Long key, Transaction transaction) {
-                        String title = transaction.getTitle();
-                        if (title == null || title.isEmpty() || title.equals("")) {
-                            // нужно возвращать не null что бы сработал Компаратор нормально
-                            return new String[0];
-                        }
-
-                        // see https://regexr.com/
-                        String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
-                        String[] keys = new String[tokens.length];
-                        for (int i = 0; i < tokens.length; ++i) {
-                            if (tokens[i].length() > CUT_NAME_INDEX) {
-                                tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
+            // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
+            Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.titleKey,
+                    new Function2<String[], Long, Transaction>() {
+                        @Override
+                        public String[] run(Long key, Transaction transaction) {
+                            String title = transaction.getTitle();
+                            if (title == null || title.isEmpty() || title.equals("")) {
+                                // нужно возвращать не null что бы сработал Компаратор нормально
+                                return new String[0];
                             }
-                            keys[i] = tokens[i];
-                        }
 
-                        return keys;
-                    }
-                });
+                            // see https://regexr.com/
+                            String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
+                            String[] keys = new String[tokens.length];
+                            for (int i = 0; i < tokens.length; ++i) {
+                                if (tokens[i].length() > CUT_NAME_INDEX) {
+                                    tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
+                                }
+                                keys[i] = tokens[i];
+                            }
+
+                            return keys;
+                        }
+                    });
+        } else {
+
+            // BI-DIrectional INDEX - for blockexplorer
+            NavigableSet<Integer> titleBiIndex = database.createTreeSet("title_txs")
+                    .comparator(Fun.COMPARATOR)
+                    .counterEnable()
+                    .makeOrGet();
+
+            NavigableSet<Integer> titleBiIndexDescending = database.createTreeSet("title_txs_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
+
+            createIndexes(BIDIRECTION_TITLE_INDEX, titleBiIndex, titleBiIndexDescending,
+                    new Function2<String[], Long, Transaction>() {
+                        @Override
+                        public String[] run(Long key, Transaction transaction) {
+                            String title = transaction.getTitle();
+                            if (title == null || title.isEmpty() || title.equals("")) {
+                                // нужно возвращать не null что бы сработал Компаратор нормально
+                                return new String[0];
+                            }
+
+                            // see https://regexr.com/
+                            String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
+                            String[] keys = new String[tokens.length];
+                            for (int i = 0; i < tokens.length; ++i) {
+                                if (tokens[i].length() > CUT_NAME_INDEX) {
+                                    tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
+                                }
+                                keys[i] = tokens[i];
+                            }
+
+                            return keys;
+                        }
+                    });
+        }
 
         // BI-DIrectional INDEX - for blockexplorer
         NavigableSet<Integer> addressBiIndex = database.createTreeSet("address_txs")
@@ -334,27 +372,62 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
         String filterLower = filter.toLowerCase();
         String filterLowerEnd;
 
-        if (descending) {
-            filterLowerEnd = filterLower;
-            if (true || fromSeqNo == null || fromSeqNo == 0) {
+        if (false) {
+
+            if (descending) {
+                filterLowerEnd = filterLower;
+                if (true || fromSeqNo == null || fromSeqNo == 0) {
+                    if (asFilter) {
+                        filterLowerEnd = filterLower + new String(new byte[]{(byte) 255});
+                    }
+                }
+                return IteratorCloseableImpl.make(new IndexIterator((((NavigableSet) this.titleKey).descendingSet()
+                        .subSet(
+                                Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),// false,
+                                Fun.t2(filterLower, 0L)//, true
+                        )).iterator()));
+            } else {
                 if (asFilter) {
                     filterLowerEnd = filterLower + new String(new byte[]{(byte) 255});
+                } else {
+                    filterLowerEnd = filterLower;
                 }
+                return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
+                        Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? 0L : fromSeqNo),
+                        Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
             }
-            return IteratorCloseableImpl.make(new IndexIterator((((NavigableSet) this.titleKey).descendingSet()
-                    .subSet(
-                            Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),// false,
-                            Fun.t2(filterLower, 0L)//, true
-                    )).iterator()));
+
         } else {
+
+            filterLowerEnd = filterLower;
             if (asFilter) {
                 filterLowerEnd = filterLower + new String(new byte[]{(byte) 255});
-            } else {
-                filterLowerEnd = filterLower;
             }
-            return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
-                    Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? 0L : fromSeqNo),
-                    Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
+            if (descending) {
+                IteratorCloseable result =
+                        // делаем закрываемый Итератор
+                        IteratorCloseableImpl.make(
+                                // только ключи берем из Tuple2
+                                new IndexIterator<>(
+                                        // берем индекс с обратным отсчетом
+                                        getIndex(BIDIRECTION_TITLE_INDEX, descending)
+                                                // задаем границы, так как он обратный границы меняем местами
+                                                .subSet(Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo.equals(0L) ? Long.MAX_VALUE : fromSeqNo),
+                                                        Fun.t2(filterLower, 0L)).iterator()));
+                return result;
+            }
+
+            IteratorCloseable result =
+                    // делаем закрываемый Итератор
+                    IteratorCloseableImpl.make(
+                            // только ключи берем из Tuple2
+                            new IndexIterator<>(
+                                    getIndex(BIDIRECTION_TITLE_INDEX, descending)
+                                            // задаем границы, так как он обратный границы меняем местами
+                                            .subSet(Fun.t2(filterLower, fromSeqNo == null ? 0L : fromSeqNo),
+                                                    Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
+
+            return result;
         }
     }
 
