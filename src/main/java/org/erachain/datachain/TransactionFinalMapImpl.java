@@ -579,11 +579,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                     continue;
                 }
 
-                if (descending) {
-                    result.add(transaction);
-                } else {
-                    result.add(0, transaction);
-                }
+                result.add(transaction);
 
                 if (limit > 0) {
                     if (--limit == 0)

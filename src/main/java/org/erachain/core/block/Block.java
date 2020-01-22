@@ -1685,6 +1685,11 @@ import java.util.*;
                                     + ":" + transaction.viewFullTypeName()
                                     + " signature  invalid!"
                                     + " " + Base58.encode(transaction.getSignature()));
+                            if (BlockChain.CHECK_BUGS > 1
+                                //&& transaction.viewHeightSeq().equals("869431-1")
+                            ) {
+                                boolean debug = transaction.isSignatureValid(dcSetPlace);
+                            }
                             return false;
                         }
                     }

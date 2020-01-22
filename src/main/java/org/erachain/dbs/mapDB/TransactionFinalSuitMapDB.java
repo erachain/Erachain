@@ -333,19 +333,19 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
         String filterLower = filter.toLowerCase();
         String filterLowerEnd;
-        if (asFilter) {
-            filterLowerEnd = filterLower + new String(new byte[]{(byte) 255});
-        } else {
-            filterLowerEnd = filterLower;
-        }
 
         if (descending) {
             return IteratorCloseableImpl.make(new IndexIterator((((NavigableSet) this.titleKey).descendingSet()
                     .subSet(
-                            Fun.t2(filterLowerEnd, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),
-                            Fun.t2(filterLower, 0L)
+                            Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MAX_VALUE : fromSeqNo),// false,
+                            Fun.t2(filterLower, 0L)//, true
                     )).iterator()));
         } else {
+            if (asFilter) {
+                filterLowerEnd = filterLower + new String(new byte[]{(byte) 255});
+            } else {
+                filterLowerEnd = filterLower;
+            }
             return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
                     Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? 0L : fromSeqNo),
                     Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
