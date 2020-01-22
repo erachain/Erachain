@@ -290,7 +290,10 @@ public class TransactionFinalMapImplTest {
                 Long fromSeqNo = Transaction.makeDBRef(1, 30);
                 // WORDS + asFilter
                 Pair<String, Boolean>[] wordsForging = new Pair[]{new Pair("forging", true)};
+                Pair<String, Boolean>[] wordsForgenFilter = new Pair[]{new Pair("forgen", true)};
+                Pair<String, Boolean>[] wordsForgen = new Pair[]{new Pair("forgen", false)};
                 Pair<String, Boolean>[] wordsFor = new Pair[]{new Pair("for", false)};
+                String fromWord;
 
                 List<Transaction> find;
                 //////////////////////// DIRECT FIND
@@ -298,34 +301,63 @@ public class TransactionFinalMapImplTest {
 
                 /// FIRST
                 find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
-                        wordsForging, 0, null, 0, 20, descending);
+                        wordsForging, 0, null, null, 0, 20, descending);
                 assertEquals(20, find.size());
                 assertEquals("1-1", find.get(0).viewHeightSeq());
 
                 find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
-                        wordsForging, 0, fromSeqNo, 0, 20, descending);
+                        wordsForgenFilter, 0, null, null, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-3", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForgen, 0, null, null, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-3", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsFor, 0, null, null, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-2", find.get(0).viewHeightSeq());
+
+                /// MEDDLE
+                fromWord = ((RSend) map.get(fromSeqNo)).getTitle();
+                assertEquals("forgen", fromWord);
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForging, 0, fromWord, fromSeqNo, 0, 20, descending);
                 assertEquals(20, find.size());
                 assertEquals("1-30", find.get(0).viewHeightSeq());
 
                 find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
-                        wordsFor, 0, fromSeqNo, 0, 5, descending);
-                assertEquals(5, find.size());
+                        wordsForgenFilter, 0, fromWord, fromSeqNo, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-30", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForgen, 0, fromWord, fromSeqNo, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-30", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsFor, 0, fromWord, fromSeqNo, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-32", find.get(0).viewHeightSeq());
 
                 /////////////// REVERSE FIND
                 descending = !descending;
 
                 /// LAST
                 find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
-                        wordsForging, 0, null, 0, 20, descending);
+                        wordsForging, 0, null, null, 0, 20, descending);
                 assertEquals(20, find.size());
                 assertEquals("1-133", find.get(0).viewHeightSeq());
 
                 find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
-                        wordsForging, 0, fromSeqNo, 0, 5, descending);
+                        wordsForging, 0, fromWord, fromSeqNo, 0, 5, descending);
                 assertEquals(5, find.size());
 
                 find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
-                        wordsFor, 0, fromSeqNo, 0, 5, descending);
+                        wordsFor, 0, fromWord, fromSeqNo, 0, 5, descending);
                 assertEquals(5, find.size());
 
 

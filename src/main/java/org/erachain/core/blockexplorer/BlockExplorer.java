@@ -225,7 +225,8 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
+                String fromWord = null; // TODO нужно задавать иначе не найдет
+                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, fromWord, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
                         start, pageSize, false);
             }
         } catch (Exception e) {
@@ -2585,7 +2586,8 @@ public class BlockExplorer {
             if (filterStr == null) {
                 transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, !useForge, true);
             } else {
-                transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
+                String fromWord = null; // TODO need set
+                transactions = map.getTransactionsByTitleFromID(filterStr, fromWord, fromID,
                         intOffest, pageSize, true);
             }
 

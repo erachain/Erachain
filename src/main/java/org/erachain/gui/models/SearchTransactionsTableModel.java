@@ -99,8 +99,9 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 // ИЩЕМ по Заголовку
                 DCSet dcSet = DCSet.getInstance();
 
+                String fromWord = null;
                 list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
-                        .getKeysByFilterAsArray(filter, fromID, start, step, false);
+                        .getKeysByFilterAsArray(filter, fromWord, fromID, start, step, false);
 
             }
         }

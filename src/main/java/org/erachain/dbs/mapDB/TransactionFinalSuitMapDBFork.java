@@ -100,7 +100,7 @@ public class TransactionFinalSuitMapDBFork extends DBMapSuitFork<Long, Transacti
     }
 
     @Override
-    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending) {
         return null;
     }
 

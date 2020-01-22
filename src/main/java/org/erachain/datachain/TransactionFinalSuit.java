@@ -20,7 +20,7 @@ public interface TransactionFinalSuit {
 
     IteratorCloseable<Long> getIteratorByAddressAndTypeFrom(byte[] addressShort, Integer type, Long fromID);
 
-    IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, Long fromSeqNo, boolean descending);
+    IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending);
 
     IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort);
 

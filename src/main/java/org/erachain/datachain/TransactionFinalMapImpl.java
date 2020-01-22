@@ -466,7 +466,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         return result;
     }
 
-    public int getTransactionsByTitleBetterIndex(Pair<String, Boolean>[] words, Long fromSeqNo, boolean descending) {
+    public int getTransactionsByTitleBetterIndex(Pair<String, Boolean>[] words, String fromWord, Long fromSeqNo, boolean descending) {
 
         // сперва выберем самый короткий набор
         // TODO нужно еще отсортировать по длинне слов - самые длинные сперва проверять - они короче список дадут поидее
@@ -476,7 +476,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         int betterIndex = 0;
         for (int i = 0; i < words.length; i++) {
             try (IteratorCloseable iterator = ((TransactionFinalSuit) map)
-                    .getIteratorByTitle(words[i].getA(), words[i].getB(), fromSeqNo, descending)) {
+                    .getIteratorByTitle(words[i].getA(), words[i].getB(), fromWord, fromSeqNo, descending)) {
                 // ограничим максимальный перебор - иначе может затормозить
                 tmpSize = Iterators.size(Iterators.limit(iterator, LIMIT_FIND_TITLE));
                 if (tmpSize < betterSize) {
@@ -497,15 +497,15 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
      * "Ермолаев Дмитр." - Найдет всех Ермолаев с Дмитр....
      *
      * @param filter     string of words
+     * @param fromWord
      * @param fromSeqNo  transaction Type = 0 for all
      * @param offset
      * @param limit
      * @param descending
      * @return
      */
-    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByTitle(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
+    public List<Transaction> getTransactionsByTitle(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -521,18 +521,32 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Pair<String, Boolean>[] words = stepFilter(filterArray);
 
         // сперва выберем самый короткий набор
-        int betterIndex = getTransactionsByTitleBetterIndex(words, fromSeqNo, descending);
+        int betterIndex = getTransactionsByTitleBetterIndex(words, fromWord, fromSeqNo, descending);
 
-        return getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, descending);
+        return getTransactionsByTitleFromBetter(words, betterIndex, fromWord, fromSeqNo, offset, limit, descending);
     }
 
+    /**
+     * Короче тут для корректного поиска по ключам с совпадением по началу слова ни с движением по номерам записям
+     * нужно обязательно передавать текущее слово в индексе на котром остановились и к нему прибавляем номер
+     * Иначе не будет искать корректно и всегда будет на начало прыгать
+     *
+     * @param words
+     * @param betterIndex
+     * @param fromWord
+     * @param fromSeqNo
+     * @param offset
+     * @param limit
+     * @param descending
+     * @return
+     */
     public List<Transaction> getTransactionsByTitleFromBetter(Pair<String, Boolean>[] words, int betterIndex,
-                                                              Long fromSeqNo, int offset, int limit, boolean descending) {
+                                                              String fromWord, Long fromSeqNo, int offset, int limit, boolean descending) {
 
         List<Transaction> result = new ArrayList<>();
 
         try (IteratorCloseable<Long> iterator = ((TransactionFinalSuit) map)
-                .getIteratorByTitle(words[betterIndex].getA(), words[betterIndex].getB(), fromSeqNo, descending)) {
+                .getIteratorByTitle(words[betterIndex].getA(), words[betterIndex].getB(), fromWord, fromSeqNo, descending)) {
 
             Long key;
             Transaction transaction;
@@ -595,7 +609,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getKeysByFilterAsArray(String filter, Long fromSeqNo, int offset, int limit, boolean descending) {
+    public List<Transaction> getKeysByFilterAsArray(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean descending) {
 
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
@@ -606,12 +620,12 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         }
 
         //return getTransactionsByTitle(filter, fromSeqNo, offset, limit, descending);
-        return getTransactionsByTitleFromID(filter, fromSeqNo, offset, limit, true);
+        return getTransactionsByTitleFromID(filter, fromWord, fromSeqNo, offset, limit, true);
     }
 
     //@Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public List<Transaction> getTransactionsByTitleFromID(String filter, Long fromSeqNo, int offset, int limit, boolean fillFullPage) {
+    public List<Transaction> getTransactionsByTitleFromID(String filter, String fromWord, Long fromSeqNo, int offset, int limit, boolean fillFullPage) {
         if (parent != null || Controller.getInstance().onlyProtocolIndexing) {
             return null;
         }
@@ -625,7 +639,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
         Pair<String, Boolean>[] words = stepFilter(filterArray);
 
         // сперва выберем самый короткий набор
-        int betterIndex = getTransactionsByTitleBetterIndex(words, fromSeqNo, false);
+        int betterIndex = getTransactionsByTitleBetterIndex(words, fromWord, fromSeqNo, false);
 
         if (offset < 0 || limit < 0) {
             if (limit < 0)
@@ -635,7 +649,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
             // и по пути сосздаем список обратный что нашли по обратнму итератору
             int offsetHere = -(offset + limit);
 
-            List<Transaction> txsReverse = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offsetHere, limit, false);
+            List<Transaction> txsReverse = getTransactionsByTitleFromBetter(words, betterIndex, fromWord, fromSeqNo, offsetHere, limit, false);
             int count = txsReverse.size();
             for (Transaction transaction : txsReverse) {
                 txs.add(0, transaction);
@@ -645,7 +659,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 // сюда пришло значит не полный список - дополним его
                 // и тут идем в обратку
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
-                        fromSeqNo, 0, limit - count, true // здесь обратный список так как в обратну надо задать
+                        fromWord, fromSeqNo, 0, limit - count, true // здесь обратный список так как в обратну надо задать
                 )
                 ) {
                     txs.add(transaction);
@@ -654,7 +668,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
 
         } else {
 
-            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromSeqNo, offset, limit, true);
+            txs = getTransactionsByTitleFromBetter(words, betterIndex, fromWord, fromSeqNo, offset, limit, true);
             int count = txs.size();
 
             if (fillFullPage && fromSeqNo != null && fromSeqNo != 0 && limit > 0 && count < limit) {
@@ -662,7 +676,7 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
                 int index = 0;
                 int limitLeft = limit - count;
                 for (Transaction transaction : getTransactionsByTitleFromBetter(words, betterIndex,
-                        fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
+                        fromWord, fromSeqNo, -(limitLeft + (count > 0 ? 1 : 0)), limitLeft, false)) {
                     txs.add(0, transaction);
                 }
             }

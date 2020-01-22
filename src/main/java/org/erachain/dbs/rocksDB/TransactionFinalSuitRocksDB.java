@@ -268,7 +268,7 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending) {
 
         byte[] filterLower = filter.toLowerCase().getBytes(StandardCharsets.UTF_8);
         int filterLowerLength = filterLower.length;

@@ -367,9 +367,9 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, Long fromSeqNo, boolean descending) {
+    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending) {
 
-        String filterLower = filter.toLowerCase();
+        String filterLower = fromWord == null ? filter.toLowerCase() : fromWord.toLowerCase();
         String filterLowerEnd;
 
         if (false) {
