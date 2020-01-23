@@ -439,7 +439,7 @@ public class RSend extends TransactionAmount {
 
             // ADD CREATOR/SERVICE/DATA
             if (this.isText() && !this.isEncrypted()) {
-                transaction.put("message", new String(this.data, Charset.forName("UTF-8")));
+                transaction.put("message", new String(this.data, StandardCharsets.UTF_8));
                 //transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
             } else {
                 transaction.put("message", Base58.encode(this.data));

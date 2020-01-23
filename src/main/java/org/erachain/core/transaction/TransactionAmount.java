@@ -369,9 +369,9 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             transaction.put("asset", this.getAbsKey());
             transaction.put("assetKey", this.getAbsKey());
             transaction.put("amount", this.amount.toPlainString());
-            transaction.put("action_key", this.getActionType());
+            ///transaction.put("action_key", this.getActionType());
             transaction.put("actionKey", this.getActionType());
-            transaction.put("action_name", this.viewActionType());
+            //transaction.put("action_name", this.viewActionType());
             transaction.put("actionName", this.viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
