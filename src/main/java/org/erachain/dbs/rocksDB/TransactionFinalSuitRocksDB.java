@@ -271,19 +271,20 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
     public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, String fromWord, Long fromSeqNo, boolean descending) {
 
         byte[] filterLower = filter.toLowerCase().getBytes(StandardCharsets.UTF_8);
+        int filterLowerLength = Math.min(filterLower.length, TransactionFinalMap.CUT_NAME_INDEX);
         byte[] startFrom = fromWord == null ? filterLower : fromWord.toLowerCase().getBytes(StandardCharsets.UTF_8);
-        int filterLowerLength =  Math.min(filterLower.length, TransactionFinalMap.CUT_NAME_INDEX);
+        int startFromLength = Math.min(startFrom.length, TransactionFinalMap.CUT_NAME_INDEX);
 
         byte[] fromKey;
         if (fromSeqNo == null || fromSeqNo == 0) {
             // ищем все с самого начала для данного адреса
             fromKey = new byte[TransactionFinalMap.CUT_NAME_INDEX];
-            System.arraycopy(filterLower, 0, fromKey, 0, filterLowerLength);
+            System.arraycopy(startFrom, 0, fromKey, 0, startFromLength);
         } else {
             // используем полный ключ для начального поиска
             // значит и стартовое слово надо использовать
             fromKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
-            System.arraycopy(startFrom, 0, fromKey, 0, Math.min(startFrom.length, TransactionFinalMap.CUT_NAME_INDEX));
+            System.arraycopy(startFrom, 0, fromKey, 0, startFromLength);
             System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
         }
 
@@ -292,17 +293,23 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
             // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
             if (asFilter && fromWord == null) {
                 int length = fromKey.length;
-                byte[] prevFilter = new byte[filterLowerEnd + 1];
-                System.arraycopy(fromKey, 0, prevFilter, 0, length);
+                byte[] prevFilter = new byte[length + 1];
+                System.arraycopy(startFrom, 0, prevFilter, 0, length);
                 prevFilter[length] = (byte) 255;
+
+                return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
+                        prevFilter, filterLower, descending, true);
             }
 
             return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
-                    prevFilter, toKey, descending, true);
+                    fromKey, filterLower, descending, true);
+
 
         } else {
-            if (false && descending && asFilter) {
+            byte[] toKey;
+            if (asFilter) {
                 // диаппазон заданим если у нас фильтр - значение начальное увеличим в нути ключа
+                toKey = new byte[filterLowerLength + 1];
                 fromKey[filterLowerLength] = (byte) 255;
             }
             return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
