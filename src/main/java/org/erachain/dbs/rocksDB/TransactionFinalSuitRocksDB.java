@@ -273,62 +273,77 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         byte[] filterLower = filter.toLowerCase().getBytes(StandardCharsets.UTF_8);
         int filterLowerLength = Math.min(filterLower.length, TransactionFinalMap.CUT_NAME_INDEX);
-        byte[] startFrom = fromWord == null ? filterLower : fromWord.toLowerCase().getBytes(StandardCharsets.UTF_8);
-        int startFromLength = Math.min(startFrom.length, TransactionFinalMap.CUT_NAME_INDEX);
 
         byte[] fromKey;
-        if (fromSeqNo == null || fromSeqNo == 0) {
+        byte[] toKey;
+
+        if (fromWord == null) {
             // ищем все с самого начала для данного адреса
-            fromKey = new byte[TransactionFinalMap.CUT_NAME_INDEX];
-            System.arraycopy(startFrom, 0, fromKey, 0, startFromLength);
+            //fromKey = new byte[filterLowerLength];
+            //System.arraycopy(filterLower, 0, fromKey, 0, filterLowerLength);
+
+            if (descending) {
+                // тут нужно взять кранее верхнее значени и найти нижнее первое
+                // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
+                byte[] prevFilter;
+                if (asFilter) {
+                    // тут берем вообще все варианты
+                    prevFilter = new byte[filterLowerLength + 1];
+                    System.arraycopy(filterLower, 0, prevFilter, 0, filterLowerLength);
+                    prevFilter[filterLowerLength] = (byte) 255;
+                } else {
+                    // тут берем только варианты обрезанные но со всеми номерами
+                    prevFilter = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
+                    System.arraycopy(filterLower, 0, prevFilter, 0, filterLowerLength);
+                    System.arraycopy(Longs.toByteArray(Long.MAX_VALUE), 0, prevFilter, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
+                    //prevFilter[filterLowerLength] = (byte) 255; // все что меньше не берем
+                }
+
+                return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
+                        prevFilter, filterLower, descending, true);
+
+            } else {
+
+                if (asFilter) {
+                    toKey = new byte[filterLowerLength + 1];
+                    System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
+                    toKey[filterLowerLength] = (byte) 255;
+                } else {
+                    // тут берем только варианты обрезанные но со всеми номерами
+                    toKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
+                    System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
+                    System.arraycopy(Longs.toByteArray(Long.MAX_VALUE), 0, toKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
+                }
+                return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
+                        filterLower, toKey, descending, true);
+
+            }
+
         } else {
+
+            byte[] startFrom = fromWord.toLowerCase().getBytes(StandardCharsets.UTF_8);
+            int startFromLength = Math.min(startFrom.length, TransactionFinalMap.CUT_NAME_INDEX);
             // используем полный ключ для начального поиска
             // значит и стартовое слово надо использовать
             fromKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
             System.arraycopy(startFrom, 0, fromKey, 0, startFromLength);
             System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
-        }
 
-        byte[] toKey = new byte[TransactionFinalMap.CUT_NAME_INDEX];
-        System.arraycopy(startFrom, 0, fromKey, 0, startFromLength);
-
-        if (descending && fromWord == null) {
-            // тут нужно взять кранее верхнее значени и найти нижнее первое
-            // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
-            byte[] prevFilter;
-            if (asFilter) {
-                // тут берем вообще все варианты
-                int length = fromKey.length;
-                prevFilter = new byte[length + 1];
-                System.arraycopy(startFrom, 0, prevFilter, 0, length);
-                prevFilter[length] = (byte) 255;
-            } else {
-                // тут берем только варианты обрезанные но со всеми номерами
-                prevFilter = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
-                System.arraycopy(startFrom, 0, prevFilter, 0, startFromLength);
-                System.arraycopy(Longs.toByteArray(Long.MAX_VALUE), 0, prevFilter, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
-            }
-
-            return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
-                    prevFilter, filterLower, descending, true);
-
-        } else {
             if (asFilter) {
                 // диаппазон заданим если у нас фильтр - значение начальное увеличим в нути ключа
                 toKey = new byte[filterLowerLength + 1];
+                System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
                 toKey[filterLowerLength] = (byte) 255;
             } else {
-                toKey = filterLower;
+                toKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
+                System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
+                System.arraycopy(Longs.toByteArray(Long.MAX_VALUE), 0, toKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
             }
             return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
-                    fromKey, toKey,
-                    descending, true);
-
+                    fromKey, toKey, descending, true);
         }
-
     }
 
-    // TODO сделать просто итератор складной - без создания списков и дубляжей в итераторе
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public IteratorCloseable<Long> getIteratorByAddress(byte[] addressShort) {
