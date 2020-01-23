@@ -321,26 +321,51 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
 
         } else {
 
+            // поиск ключа первого у всех одинаковый
             byte[] startFrom = fromWord.toLowerCase().getBytes(StandardCharsets.UTF_8);
             int startFromLength = Math.min(startFrom.length, TransactionFinalMap.CUT_NAME_INDEX);
             // используем полный ключ для начального поиска
             // значит и стартовое слово надо использовать
             fromKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
             System.arraycopy(startFrom, 0, fromKey, 0, startFromLength);
-            System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
 
-            if (asFilter) {
-                // диаппазон заданим если у нас фильтр - значение начальное увеличим в нути ключа
-                toKey = new byte[filterLowerLength + 1];
-                System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
-                toKey[filterLowerLength] = (byte) 255;
+            if (descending) {
+
+                // тут нужно взять кранее верхнее значени и найти нижнее первое
+                // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
+                /// учет на то что начальный ключ будет взят предыдущий от поиска + 1
+                System.arraycopy(Longs.toByteArray(fromSeqNo + 1L), 0, fromKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
+
+                if (asFilter) {
+                    // тут берем вообще все варианты
+                    toKey = filterLower;
+                } else {
+                    // тут берем только варианты обрезанные но со всеми номерами
+                    toKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
+                    System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
+                    System.arraycopy(Longs.toByteArray(0L), 0, toKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
+                    toKey[filterLowerLength] = (byte) 255; // все что меньше не берем
+                }
+
+                return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
+                        fromKey, toKey, descending, true);
             } else {
-                toKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
-                System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
-                System.arraycopy(Longs.toByteArray(Long.MAX_VALUE), 0, toKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
+
+                System.arraycopy(Longs.toByteArray(fromSeqNo), 0, fromKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
+
+                if (asFilter) {
+                    // диаппазон заданим если у нас фильтр - значение начальное увеличим в нути ключа
+                    toKey = new byte[filterLowerLength + 1];
+                    System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
+                    toKey[filterLowerLength] = (byte) 255;
+                } else {
+                    toKey = new byte[TransactionFinalMap.CUT_NAME_INDEX + Long.BYTES];
+                    System.arraycopy(filterLower, 0, toKey, 0, filterLowerLength);
+                    System.arraycopy(Longs.toByteArray(Long.MAX_VALUE), 0, toKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
+                }
+                return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
+                        fromKey, toKey, descending, true);
             }
-            return map.getIndexIteratorFilter(titleIndex.getColumnFamilyHandle(),
-                    fromKey, toKey, descending, true);
         }
     }
 
