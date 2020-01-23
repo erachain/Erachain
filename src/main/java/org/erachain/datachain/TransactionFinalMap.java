@@ -4,12 +4,20 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.FilteredByStringArray;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.utils.Pair;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredByStringArray {
+
+    /**
+     * Длинна слова до котрого слово рассматриваем как "ПОИСК ПОЛНОСТЬЮ"
+     */
+    int WHOLE_WORLD_LENGTH = 5;
+    /**
+     * ограничение поиска размера списка для слова
+     */
+    int LIMIT_FIND_TITLE = 200;
 
     int CUT_NAME_INDEX = 12;
     int ADDRESS_KEY_LEN = 10;
@@ -44,21 +52,7 @@ public interface TransactionFinalMap extends DBTab<Long, Transaction>, FilteredB
 
     List<Transaction> getTransactionsByAddressAndType(byte[] addressShort, Integer type, Long fromID, int limit, int offset, boolean onlyCreator);
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    List<Transaction> getTransactionsByTitleAndType(String filter, Integer type, int limit, boolean descending);
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    IteratorCloseable<Long> getKeysByTitleAndType(String filter, Integer type, int offset, int limit);
-
-    Pair<Integer, IteratorCloseable<Long>> getKeysByFilterAsArrayRecurse(int step, String[] filterArray);
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    Pair<String, IteratorCloseable<Long>> getKeysIteratorByFilterAsArray(String filter, int offset, int limit);
-
-    // get list items in name substring str
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    List<Transaction> getByFilterAsArray(String filter, int offset, int limit);
+    List<Transaction> getTransactionsByTitle(String filter, Long fromSeqNo, int offset, int limit, boolean descending);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK

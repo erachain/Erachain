@@ -2,13 +2,11 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCSet;
-import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.SearchTableModelCls;
-import org.erachain.utils.Pair;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class StatementsTableModelSearch extends SearchTableModelCls<Transaction> {
@@ -76,34 +74,14 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
         fireTableDataChanged();
     }
 
-    public void setFilterByName(String filter) {
+    public void setFilterByName(String filter, Long fromID) {
 
         clear();
 
         DCSet dcSet = DCSet.getInstance();
 
-        Pair<String, IteratorCloseable<Long>> result = dcSet.getTransactionFinalMap().getKeysIteratorByFilterAsArray(filter, start, step);
-
-        if (result.getA() != null) {
-            findMessage = result.getA();
-            return;
-        } else {
-            findMessage = "";
-        }
-
-        try (IteratorCloseable iterator = result.getB()) {
-
-            Transaction item;
-            Long key;
-
-            while (iterator.hasNext()) {
-                key = (Long) iterator.next();
-                item = (Transaction) map.get(key);
-                list.add(item);
-            }
-        } catch (IOException e) {
-        }
-
+        list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
+                .getKeysByFilterAsArray(filter, fromID, start, step, false);
 
         fireTableDataChanged();
 

@@ -14,10 +14,10 @@ import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
-import org.erachain.utils.URLViewer;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -67,7 +67,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 transactionsTableModel.clear();
-                transactionsTableModel.find(searchString.getText());
+                transactionsTableModel.find(searchString.getText(), null);
 
             }
 

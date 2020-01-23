@@ -149,7 +149,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 new Thread() {
                     @Override
                     public void run() {
-                        search_Table_Model.setFilterByName(search);
+                        search_Table_Model.setFilterByName(search, null);
                         if (search_Table_Model.getRowCount() < 1) {
                             Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Documents"));
                             jScrollPanelLeftPanel.setViewportView(search_Info_Panel);

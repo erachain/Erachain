@@ -670,7 +670,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String getTitle() {
-        return null;
+        return viewTypeName();
     }
 
     /*
@@ -1183,6 +1183,9 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     // PROCESS/ORPHAN
     public boolean isWiped() {
+        if (getType() == CALCULATED_TRANSACTION)
+            return false;
+
         return BlockChain.isWiped(this.signature);
     }
 

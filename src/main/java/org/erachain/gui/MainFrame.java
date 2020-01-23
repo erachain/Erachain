@@ -40,12 +40,8 @@ public class MainFrame extends JFrame implements Observer {
     private MainFrame() {
 
         // CREATE FRAME
-        super(Controller.getInstance().APP_NAME + " v." + Controller.getVersion());
+        super(Controller.getInstance().getApplicationName(true));
         this.setVisible(false);
-        if (Settings.getInstance().isTestnet()) {
-            setTitle(Controller.getInstance().APP_NAME + " TestNet " + "v." + Controller.getVersion() + " TS:"
-                    + Settings.getInstance().getGenesisStamp());
-        }
 
         //th = this;
         //    this.setModalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE);

@@ -432,7 +432,7 @@ public class RSend extends TransactionAmount {
 
         if (head.length() > 0) {
             transaction.put("title", this.head);
-            transaction.put("head", this.head);
+            //transaction.put("head", this.head);
         }
 
         if (data != null && data.length > 0) {
@@ -440,10 +440,10 @@ public class RSend extends TransactionAmount {
             // ADD CREATOR/SERVICE/DATA
             if (this.isText() && !this.isEncrypted()) {
                 transaction.put("message", new String(this.data, Charset.forName("UTF-8")));
-                transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
+                //transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
             } else {
                 transaction.put("message", Base58.encode(this.data));
-                transaction.put("data", Base58.encode(this.data));
+                // transaction.put("data", Base58.encode(this.data));
             }
             transaction.put("encrypted", this.isEncrypted());
             transaction.put("isText", this.isText());

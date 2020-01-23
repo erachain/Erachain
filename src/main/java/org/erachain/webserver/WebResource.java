@@ -1101,7 +1101,7 @@ public class WebResource {
                     Controller.getInstance().getForgingStatus().getName());
             pebbleHelper.getContextMap().put(
                     "version",
-                    "Erachain.org " + Controller.getInstance().getVersion());
+                    Controller.getInstance().getApplicationName(true));
 
             int status = Controller.getInstance().getStatus();
             String statustext = "";

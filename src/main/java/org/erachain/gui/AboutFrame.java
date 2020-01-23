@@ -10,13 +10,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.net.URL;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class AboutFrame extends JDialog implements Observer {
@@ -88,7 +85,7 @@ public class AboutFrame extends JDialog implements Observer {
         gbc_lblAuthorsLabel.gridy = 1;
         aboutPanel.add(lblAuthorsLabel, gbc_lblAuthorsLabel);
 
-        JLabel lblversionLabel = new JLabel(Lang.getInstance().translate("Version: ") + Controller.getVersion());
+        JLabel lblversionLabel = new JLabel(Lang.getInstance().translate("Version: ") + Controller.getVersion(true));
         lblversionLabel.setFont(new Font("Tahoma", Font.PLAIN, 17));
         lblversionLabel.setForeground(Color.RED);
         lblversionLabel.setHorizontalAlignment(SwingConstants.CENTER);

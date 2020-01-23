@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Base58;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -67,6 +66,11 @@ public class RCalculated extends TransactionAmount {
     @Override
     public boolean hasPublicText() {
         return false;
+    }
+
+    @Override
+    public String getTitle() {
+        return this.message;
     }
 
     public String getMessage() {

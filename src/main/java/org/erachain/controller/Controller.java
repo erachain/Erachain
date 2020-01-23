@@ -198,12 +198,18 @@ public class Controller extends Observable {
 
     }
 
-    public static String getVersion() {
+    public static String getVersion(boolean withTimestamp) {
+        if (withTimestamp)
+            return version + (BlockChain.DEVELOP_USE ? " DevelopNet"
+                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "");
+
         return version;
+
     }
 
-    public String getApplicationName() {
-        return APP_NAME + (Settings.getInstance().isTestnet() ? " TestNet " : " ") + "v." + version;
+    public String getApplicationName(boolean withVersion) {
+        return APP_NAME + " " + (withVersion ? getVersion(true) :
+                BlockChain.DEVELOP_USE ? "DevelopNet" : Settings.getInstance().isTestnet() ? "TestNet" : "");
     }
 
     public static String getBuildDateTimeString() {
@@ -1414,7 +1420,7 @@ public class Controller extends Observable {
 
         // SEND VERSION MESSAGE
         if (!peer.directSendMessage(
-                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(), buildTimestamp))) {
+                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(true), buildTimestamp))) {
             peer.ban(network.banForActivePeersCounter(), "connection - break on Version send");
             return;
         }
@@ -3763,7 +3769,7 @@ public class Controller extends Observable {
 
                 LOGGER.info(Lang.getInstance().translate("Starting %app%")
                         .replace("%app%", Lang.getInstance().translate(APP_NAME) + (Settings.getInstance().isTestnet() ? " TestNET " : "")));
-                LOGGER.info(getVersion() + Lang.getInstance().translate(" build ")
+                LOGGER.info(getVersion(true) + Lang.getInstance().translate(" build ")
                         + buildTime);
 
                 this.setChanged();

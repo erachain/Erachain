@@ -170,27 +170,27 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
                     }
                 });
 
-        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.TUPLE2_COMPARATOR).makeOrGet();
+        this.titleKey = database.createTreeSet("title_type_txs").comparator(Fun.COMPARATOR).makeOrGet();
 
         // в БИНЕ внутри уникальные ключи создаются добавлением основного ключа
         Bind.secondaryKeys((Bind.MapWithModificationListener) map, this.titleKey,
-                new Function2<Tuple2<String, Integer>[], Long, Transaction>() {
+                new Function2<String[], Long, Transaction>() {
                     @Override
-                    public Tuple2<String, Integer>[] run(Long key, Transaction transaction) {
+                    public String[] run(Long key, Transaction transaction) {
                         String title = transaction.getTitle();
                         if (title == null || title.isEmpty() || title.equals("")) {
                             // нужно возвращать не null что бы сработал Компаратор нормально
-                            return new Tuple2[0];
+                            return new String[0];
                         }
 
                         // see https://regexr.com/
                         String[] tokens = title.toLowerCase().split(DCSet.SPLIT_CHARS);
-                        Tuple2<String, Integer>[] keys = new Tuple2[tokens.length];
+                        String[] keys = new String[tokens.length];
                         for (int i = 0; i < tokens.length; ++i) {
                             if (tokens[i].length() > CUT_NAME_INDEX) {
                                 tokens[i] = tokens[i].substring(0, CUT_NAME_INDEX);
                             }
-                            keys[i] = new Tuple2<String, Integer>(tokens[i], transaction.getType());
+                            keys[i] = tokens[i];
                         }
 
                         return keys;
@@ -305,18 +305,25 @@ public class TransactionFinalSuitMapDB extends DBMapSuit<Long, Transaction> impl
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     // TODO ERROR - not use PARENT MAP and DELETED in FORK
-    public IteratorCloseable<Long> getIteratorByTitleAndType(String filter, boolean asFilter, Integer type) {
+    public IteratorCloseable<Long> getIteratorByTitle(String filter, boolean asFilter, Long fromSeqNo, boolean descending) {
 
         String filterLower = filter.toLowerCase();
-        Iterable keys = Fun.filter(this.titleKey,
-                new Tuple2<String, Integer>(filterLower,
-                        type==0?0:type), true,
-                new Tuple2<String, Integer>(asFilter?
-                        filterLower + new String(new byte[]{(byte)255}) : filterLower,
-                        type==0?Integer.MAX_VALUE:type), true);
+        String filterLowerEnd;
+        if (asFilter) {
+            filterLowerEnd = filterLower + new String(new byte[]{(byte) 255});
+        } else {
+            filterLowerEnd = filterLower;
+        }
 
-        Iterator iter = keys.iterator();
-        return new IteratorCloseableImpl(iter);
+        if (descending) {
+            return IteratorCloseableImpl.make(new IndexIterator(((NavigableSet) this.titleKey.subSet(
+                    Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo),
+                    Fun.t2(filterLowerEnd, Long.MAX_VALUE))).descendingIterator()));
+        } else {
+            return IteratorCloseableImpl.make(new IndexIterator(this.titleKey.subSet(
+                    Fun.t2(filterLower, fromSeqNo == null || fromSeqNo == 0 ? Long.MIN_VALUE : fromSeqNo),
+                    Fun.t2(filterLowerEnd, Long.MAX_VALUE)).iterator()));
+        }
     }
 
     @Override

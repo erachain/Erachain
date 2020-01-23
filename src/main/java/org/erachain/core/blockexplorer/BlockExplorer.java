@@ -198,7 +198,7 @@ public class BlockExplorer {
         return result;
     }
 
-    public Map jsonQuerySearchPages(Class type, String search, int start, int pageSize) throws WrongSearchException, Exception {
+    public Map jsonQuerySearchPages(UriInfo info, Class type, String search, int start, int pageSize) throws WrongSearchException, Exception {
         //Результирующий сортированный в порядке добавления словарь(map)
         Map result = new LinkedHashMap();
         List<Object> keys = new ArrayList();
@@ -225,7 +225,8 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                keys = ((FilteredByStringArray)map).getKeysByFilterAsArray(search, 0, 100);
+                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
+                        start, pageSize, false);
             }
         } catch (Exception e) {
             logger.error("Wrong search while process assets... ", e.getMessage());
@@ -313,27 +314,27 @@ public class BlockExplorer {
                         break;
                     case "persons":
                         //search persons
-                        output.putAll(jsonQuerySearchPages(PersonCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, PersonCls.class, search, (int) start, pageSize));
                         break;
                     case "assets":
                         //search assets
-                        output.putAll(jsonQuerySearchPages(AssetCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, AssetCls.class, search, (int) start, pageSize));
                         break;
                     case "statuses":
                         //search statuses
-                        output.putAll(jsonQuerySearchPages(StatusCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, StatusCls.class, search, (int) start, pageSize));
                         break;
                     case "templates":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(TemplateCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, TemplateCls.class, search, (int) start, pageSize));
                         break;
                     case "polls":
                         //search templates
-                        output.putAll(jsonQuerySearchPages(PollCls.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, PollCls.class, search, (int) start, pageSize));
                         break;
                     case "blocks":
                         //search block
-                        output.putAll(jsonQuerySearchPages(Block.class, search, (int) start, pageSize));
+                        output.putAll(jsonQuerySearchPages(info, Block.class, search, (int) start, pageSize));
                         break;
                     case "top":
                         output.putAll(jsonQueryTopRichest100(100, Long.valueOf(search)));
@@ -1045,6 +1046,7 @@ public class BlockExplorer {
 
         output.put("label_Fulfilled", Lang.getInstance().translateFromLangObj("Fulfilled", langObj));
         output.put("label_LeftHave", Lang.getInstance().translateFromLangObj("Left Have", langObj));
+        output.put("label_LeftPrice", Lang.getInstance().translateFromLangObj("Left Price", langObj));
         output.put("label_table_LastTrades", Lang.getInstance().translateFromLangObj("Last Trades", langObj));
         output.put("label_table_have", Lang.getInstance().translateFromLangObj("Base Asset", langObj));
         output.put("label_table_want", Lang.getInstance().translateFromLangObj("Price Asset", langObj));
@@ -2532,32 +2534,20 @@ public class BlockExplorer {
                 || forge.toString().toLowerCase().equals("1"));
 
         TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
-        int size = 200;
-        List<Transaction> transactions;
-        if (filterStr != null) {
-            //transactions = map.getTransactionsByTitleAndType(filterStr, null, size, true);
-            Pair<String, IteratorCloseable<Long>> pair = map.getKeysIteratorByFilterAsArray(filterStr, 0, size);
-            if (pair.getA() != null) {
-                output.put("error", pair.getA());
-                return;
-            }
+        boolean needFound = true;
 
-            transactions = new ArrayList<>();
-            try (IteratorCloseable iterator = pair.getB()) {
-                while (iterator.hasNext()) {
-                    transactions.add(map.get((Long) iterator.next()));
-                }
-            } catch (IOException e) {
-            }
+        List<Transaction> transactions = new ArrayList<>();
+        if (filterStr != null) {
 
             if (Base58.isExtraSymbols(filterStr)) {
                 try {
                     String[] strA = filterStr.split("\\-");
                     int height = Integer.parseInt(strA[0]);
                     int seq = Integer.parseInt(strA[1]);
-                    Transaction one = DCSet.getInstance().getTransactionFinalMap().get(height, seq);
+                    Transaction one = map.get(height, seq);
                     if (one != null) {
                         transactions.add(one);
+                        needFound = false;
                     }
                 } catch (Exception e1) {
                 }
@@ -2565,41 +2555,83 @@ public class BlockExplorer {
             } else {
                 try {
                     byte[] signature = Base58.decode(filterStr);
-                    Transaction one = DCSet.getInstance().getTransactionFinalMap().get(signature);
+                    Transaction one = map.get(signature);
                     if (one != null) {
                         transactions.add(one);
+                        needFound = false;
                     }
                 } catch (Exception e2) {
                 }
             }
 
-        } else {
-            // берем все с перебором с последней
-            transactions = new ArrayList<>();
-            try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
-                int counter = size;
-                //if (useForge) counter <<=1;
-                while (iterator.hasNext() && counter > 0) {
+        }
 
-                    Transaction transaction = map.get(iterator.next());
-                    if (transaction == null)
-                        continue;
+        if (needFound) {
+            if (filterStr != null) {
 
-                    if (!useForge && transaction.getType() == Transaction.CALCULATED_TRANSACTION
-                            && ((RCalculated) transaction).getMessage().equals("forging"))
-                        continue;
-
-                    transactions.add(transaction);
-                    counter--;
+                Long offset = checkAndGetLongParam(info, 0L, "offset");
+                int intOffest;
+                if (offset == null) {
+                    intOffest = 0;
+                } else {
+                    intOffest = (int) (long) offset;
                 }
-            } catch (IOException e) {
 
+                String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
+                Long fromID = Transaction.parseDBRef(fromSeqNoStr);
+                if (fromID != null && fromID.equals(0L) && intOffest < 0) {
+                    // это значит нужно скакнуть в самый низ
+                }
+
+                transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, fromID,
+                        intOffest, pageSize, false);
+
+                if (transactions.isEmpty()) {
+                    output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
+                } else {
+                    // включим ссылки на листание вверх
+                    if (true || intOffest >= 0 || transactions.size() >= pageSize) {
+                        output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                    }
+
+                    if (true || !((fromID == null || fromID.equals(0L)) && intOffest < 0)) {
+                        // это не самый конец - включим листание вниз
+                        output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+                    }
+                }
+
+            } else {
+                try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
+                    int counter = pageSize;
+                    //if (useForge) counter <<=1;
+                    while (iterator.hasNext() && counter > 0) {
+
+                        Transaction transaction = map.get(iterator.next());
+                        if (transaction == null)
+                            continue;
+
+                        if (!useForge && transaction.getType() == Transaction.CALCULATED_TRANSACTION
+                                && ((RCalculated) transaction).getMessage().equals("forging"))
+                            continue;
+
+                        transactions.add(transaction);
+                        counter--;
+                    }
+
+                    if (!transactions.isEmpty()) {
+                        output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                    }
+                } catch (IOException e) {
+
+                }
             }
         }
 
-        // Transactions view
-        transactionsJSON(output, null, transactions, start, pageSize,
-                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + size));
+        // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
+        transactionsJSON(output, null, transactions, 0, pageSize,
+                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", ""));
+
+        output.put("useoffset", true);
 
     }
 
@@ -2655,8 +2687,14 @@ public class BlockExplorer {
         LinkedHashMap output = new LinkedHashMap();
         output.put("address", address);
 
-        Account acc = new Account(address);
-        Tuple2<Integer, PersonCls> person = acc.getPerson();
+        Account account = new Account(address);
+        Tuple2<Integer, PersonCls> person = account.getPerson();
+
+        // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
+        transactionsJSON(output, account, transactions, 0, pageSize,
+                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", ""));
+
+        output.put("useoffset", true);
 
         if (person != null) {
             output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
@@ -2664,7 +2702,7 @@ public class BlockExplorer {
             output.put("person", person.b.getName());
             output.put("person_key", person.b.getKey());
 
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = acc.getBalance(AssetCls.LIA_KEY);
+            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = account.getBalance(AssetCls.LIA_KEY);
             output.put("registered", balabce_LIA.a.b.toPlainString());
             output.put("certified", balabce_LIA.b.b.toPlainString());
             output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
@@ -2675,12 +2713,6 @@ public class BlockExplorer {
 
         // balance assets from
         output.put("Balance", balanceJSON(new Account(address)));
-
-        // Transactions view - тут одна страница вся - и пересчет ее внутри делаем
-        transactionsJSON(output, acc, transactions, 0, pageSize,
-                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" ));
-
-        output.put("useoffset", true);
 
         return output;
     }
