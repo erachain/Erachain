@@ -247,12 +247,12 @@ public class BlockChain {
      * цена для остатка отклонится больше чем на эту величину то ему возвращаем остаток
      * see org.erachain.core.item.assets.OrderTestsMy#testOrderProcessingNonDivisible() - 0.0000432
      */
-    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.00001");
+    final public static BigDecimal INITIATOR_PRICE_DIFF_LIMIT = new BigDecimal("0.00005");
     /**
      * Если после исполнения торговой сделки оостатется статок у ордера-цели и
      * цена для остатка отклонится больше чем на эту величину то либо скидываем остаток в эту сделку либо ему возвращаем остаток
      */
-    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.00005");
+    final public static BigDecimal TARGET_PRICE_DIFF_LIMIT = new BigDecimal("0.0001");
     /**
      * Если сыграло INITIATOR_PRICE_DIFF_LIMIT и цена сделки после скидывания в нее остатка ордера-цели не выйдет за это ограничени то скидываем в сделку.
      * Инача отдаем обратно

@@ -225,7 +225,8 @@ public class BlockExplorer {
                 }
             } else {
                 //Поиск элементов по имени
-                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
+                String fromWord = null; // TODO нужно задавать иначе не найдет
+                keys = ((FilteredByStringArray) map).getKeysByFilterAsArray(search, fromWord, Transaction.parseDBRef(info.getQueryParameters().getFirst("fromID")),
                         start, pageSize, false);
             }
         } catch (Exception e) {
@@ -2567,64 +2568,37 @@ public class BlockExplorer {
         }
 
         if (needFound) {
-            if (filterStr != null) {
 
-                Long offset = checkAndGetLongParam(info, 0L, "offset");
-                int intOffest;
-                if (offset == null) {
-                    intOffest = 0;
-                } else {
-                    intOffest = (int) (long) offset;
-                }
-
-                String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
-                Long fromID = Transaction.parseDBRef(fromSeqNoStr);
-                if (fromID != null && fromID.equals(0L) && intOffest < 0) {
-                    // это значит нужно скакнуть в самый низ
-                }
-
-                transactions = ((FilteredByStringArray) map).getKeysByFilterAsArray(filterStr, fromID,
-                        intOffest, pageSize, false);
-
-                if (transactions.isEmpty()) {
-                    output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
-                } else {
-                    // включим ссылки на листание вверх
-                    if (true || intOffest >= 0 || transactions.size() >= pageSize) {
-                        output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
-                    }
-
-                    if (true || !((fromID == null || fromID.equals(0L)) && intOffest < 0)) {
-                        // это не самый конец - включим листание вниз
-                        output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
-                    }
-                }
-
+            Long offset = checkAndGetLongParam(info, 0L, "offset");
+            int intOffest;
+            if (offset == null) {
+                intOffest = 0;
             } else {
-                try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
-                    int counter = pageSize;
-                    //if (useForge) counter <<=1;
-                    while (iterator.hasNext() && counter > 0) {
-
-                        Transaction transaction = map.get(iterator.next());
-                        if (transaction == null)
-                            continue;
-
-                        if (!useForge && transaction.getType() == Transaction.CALCULATED_TRANSACTION
-                                && ((RCalculated) transaction).getMessage().equals("forging"))
-                            continue;
-
-                        transactions.add(transaction);
-                        counter--;
-                    }
-
-                    if (!transactions.isEmpty()) {
-                        output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
-                    }
-                } catch (IOException e) {
-
-                }
+                intOffest = (int) (long) offset;
             }
+
+            String fromSeqNoStr = info.getQueryParameters().getFirst("seqNo");
+            Long fromID = Transaction.parseDBRef(fromSeqNoStr);
+            if (fromID != null && fromID.equals(0L) && intOffest < 0) {
+                // это значит нужно скакнуть в самый низ
+            }
+
+            if (filterStr == null) {
+                transactions = map.getTransactionsFromID(fromID, intOffest, pageSize, !useForge, true);
+            } else {
+                transactions = map.getTransactionsByTitleFromID(filterStr, fromID,
+                        intOffest, pageSize, true);
+            }
+
+            if (transactions.isEmpty()) {
+                output.put("fromSeqNo", fromSeqNoStr); // возможно вниз вышли за границу
+            } else {
+                // включим ссылки на листание вверх
+                output.put("fromSeqNo", transactions.get(0).viewHeightSeq());
+                // это не самый конец - включим листание вниз
+                output.put("toSeqNo", transactions.get(transactions.size() - 1).viewHeightSeq());
+            }
+
         }
 
         // Transactions view - тут одна страница вся - и пересчет ее внутри делаем

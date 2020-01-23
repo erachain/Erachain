@@ -49,6 +49,18 @@ public class RCalculated extends TransactionAmount {
     // GETTERS/SETTERS
 
     @Override
+    public int hashCode() {
+        return Long.hashCode(dbRef);
+    }
+
+    @Override
+    public boolean equals(Object transaction) {
+        if (transaction instanceof RCalculated)
+            return dbRef == ((Transaction) transaction).getDBRef();
+        return false;
+    }
+
+    @Override
     public String viewTypeName() {
         return NAME_ID;
     }

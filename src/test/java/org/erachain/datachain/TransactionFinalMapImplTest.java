@@ -14,6 +14,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IDB;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
+import org.erachain.utils.Pair;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -31,9 +32,12 @@ import static org.junit.Assert.assertEquals;
 public class TransactionFinalMapImplTest {
 
     int[] TESTED_DBS = new int[]{
-            IDB.DBS_MAP_DB,
-            IDB.DBS_ROCK_DB
+            IDB.DBS_MAP_DB
+            //, IDB.DBS_ROCK_DB
     };
+
+    byte[] isText = new byte[]{1};
+    byte[] enCrypted = new byte[]{0};
 
     Random random = new Random();
     long flags = 0l;
@@ -244,4 +248,125 @@ public class TransactionFinalMapImplTest {
         }
 
     }
+
+    @Test
+    public void getTransactionsByTitleFromBetter() {
+
+        for (int dbs : TESTED_DBS) {
+
+            try {
+                init(dbs);
+
+                int seqNo = 1;
+
+                String address = "7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW";
+                Account recipientAcc = new Account(address);
+                BigDecimal amount_asset = new BigDecimal("1");
+                String title = "forging";
+                TransactionFinalMapImpl map = dcSet.getTransactionFinalMap();
+
+                RSend assetTransfer;
+                for (int i = 0; i < 100; i++) {
+                    assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1L, amount_asset, title + i,
+                            null, isText, enCrypted, timestamp++, 0L);
+                    assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
+                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                    map.put(assetTransfer);
+
+                    assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1L, amount_asset, "for",
+                            null, isText, enCrypted, timestamp++, 0L);
+                    assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
+                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                    map.put(assetTransfer);
+
+                    assetTransfer = new RSend(accountA, FEE_POWER, recipientAcc, 1L, amount_asset, "forgen",
+                            null, isText, enCrypted, timestamp++, 0L);
+                    assetTransfer.sign(accountA, Transaction.FOR_NETWORK);
+                    assetTransfer.setDC(dcSet, Transaction.FOR_NETWORK, 1, seqNo++);
+                    map.put(assetTransfer);
+
+                }
+
+                Long fromSeqNo = Transaction.makeDBRef(1, 30);
+                // WORDS + asFilter
+                Pair<String, Boolean>[] wordsForging = new Pair[]{new Pair("forging", true)};
+                Pair<String, Boolean>[] wordsForgenFilter = new Pair[]{new Pair("forgen", true)};
+                Pair<String, Boolean>[] wordsForgen = new Pair[]{new Pair("forgen", false)};
+                Pair<String, Boolean>[] wordsFor = new Pair[]{new Pair("for", false)};
+                String fromWord;
+
+                List<Transaction> find;
+                //////////////////////// DIRECT FIND
+                boolean descending = false;
+
+                /// FIRST
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForging, 0, null, null, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-1", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForgenFilter, 0, null, null, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-3", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForgen, 0, null, null, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-3", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsFor, 0, null, null, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-2", find.get(0).viewHeightSeq());
+
+                /// MEDDLE
+                ////////////// работет именно тогда когда обновляем Начальный Поск Слово - fromWord (если не с начала ищем а с заданной позиции)
+                fromWord = ((RSend) map.get(fromSeqNo)).getTitle();
+                assertEquals("forgen", fromWord);
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForging, 0, fromWord, fromSeqNo, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-30", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForgenFilter, 0, fromWord, fromSeqNo, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-30", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForgen, 0, fromWord, fromSeqNo, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-30", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsFor, 0, fromWord, fromSeqNo, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-32", find.get(0).viewHeightSeq());
+
+                /////////////// REVERSE FIND
+                descending = !descending;
+
+                /// LAST
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForging, 0, null, null, 0, 20, descending);
+                assertEquals(20, find.size());
+                assertEquals("1-133", find.get(0).viewHeightSeq());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsForging, 0, fromWord, fromSeqNo, 0, 5, descending);
+                assertEquals(5, find.size());
+
+                find = dcSet.getTransactionFinalMap().getTransactionsByTitleFromBetter(
+                        wordsFor, 0, fromWord, fromSeqNo, 0, 5, descending);
+                assertEquals(5, find.size());
+
+
+            } finally {
+                dcSet.close();
+            }
+        }
+
+    }
+
 }
