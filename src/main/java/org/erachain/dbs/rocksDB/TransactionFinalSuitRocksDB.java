@@ -334,7 +334,8 @@ public class TransactionFinalSuitRocksDB extends DBMapSuit<Long, Transaction> im
                 // тут нужно взять кранее верхнее значени и найти нижнее первое
                 // см. https://github.com/facebook/rocksdb/wiki/SeekForPrev
                 /// учет на то что начальный ключ будет взят предыдущий от поиска + 1
-                System.arraycopy(Longs.toByteArray(fromSeqNo + 1L), 0, fromKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
+                System.arraycopy(Longs.toByteArray(fromSeqNo // + 1L
+                ), 0, fromKey, TransactionFinalMap.CUT_NAME_INDEX, Long.BYTES);
 
                 if (asFilter) {
                     // тут берем вообще все варианты
