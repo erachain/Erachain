@@ -25,6 +25,7 @@ import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
@@ -33,10 +34,7 @@ import org.mapdb.Fun.Tuple5;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 //import org.erachain.core.crypto.Base64;
 
@@ -775,6 +773,22 @@ public class Account {
 
         // RETURN
         return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(own, rent, hold);
+    }
+
+    public static BigDecimal totalOwned(DCSet dcSet, TreeSet<String> addresses, Long assetKey) {
+
+        BigDecimal eraBalanceA = BigDecimal.ZERO;
+        for (String address : addresses) {
+
+            Account account = new Account(address);
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance
+                    = account.getBalance(dcSet, assetKey);
+
+            eraBalanceA = eraBalanceA.add(balance.a.b);
+        }
+
+        return eraBalanceA;
+
     }
 
     public long[] getLastTimestamp() {

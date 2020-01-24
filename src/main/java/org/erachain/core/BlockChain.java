@@ -683,12 +683,62 @@ public class BlockChain {
     }
 
     public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
-        int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
+        int height = timestamp < VERS_30SEC_TIME ? 1 : VERS_30SEC + 1;
         if (TEST_DB > 0) {
             return GENERATING_MIN_BLOCK_TIME_MS(height);
         } else {
             return Settings.getInstance().isTestnet() ? GENERATING_MIN_BLOCK_TIME_MS(height) << 4 : GENERATING_MIN_BLOCK_TIME_MS(height) << 3;
         }
+    }
+
+    public static boolean VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+
+        if (DEVELOP_USE) {
+            ;
+        } else if (Settings.getInstance().isTestnet()) {
+            ;
+        } else {
+            if (height < 700000) {
+                ;
+            }
+            if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
+                ;
+            } else {
+                if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+    public static boolean VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+
+        if (DEVELOP_USE) {
+            ;
+        } else if (Settings.getInstance().isTestnet()) {
+            ;
+        } else {
+            if (height < 700000) {
+                ;
+            }
+            if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
+                ;
+            } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+                if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                    return false;
+                }
+            } else {
+                if (totalERA.compareTo(new BigDecimal("100")) < 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
     }
 
     public static int BLOCKS_PER_DAY(int height) {

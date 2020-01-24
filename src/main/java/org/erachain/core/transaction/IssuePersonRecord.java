@@ -2,17 +2,21 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TreeSet;
 
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
@@ -216,7 +220,8 @@ public class IssuePersonRecord extends IssueItemRecord {
         }
 
         // TODO  удалить правки протокола для новой цепочки NEW CHAIN
-        if (person.isAlive(this.timestamp)) {
+        boolean isPersonAlive = person.isAlive(this.timestamp);
+        if (isPersonAlive) {
             // IF PERSON is LIVE
             if (person.getImage().length > person.getMAXimageLenght()) {
                 if (height > 157640) {
@@ -253,8 +258,9 @@ public class IssuePersonRecord extends IssueItemRecord {
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
+        boolean creatorIsPerson = creator.isPerson(dcSet, height);
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
-                && !creator.isPerson(dcSet, height)) {
+                && !creatorIsPerson) {
             long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
                 // FIRST Persons only by ME
@@ -268,6 +274,20 @@ public class IssuePersonRecord extends IssueItemRecord {
             }
             if (!creatorAdmin) {
                 return CREATOR_NOT_PERSONALIZED;
+            }
+        }
+
+        if (isPersonAlive && height > 9999999) {
+            Fun.Tuple4<Long, Integer, Integer, Integer> creatorPerson = creator.getPersonDuration(dcSet);
+            if (creatorPerson != null) {
+                TreeSet<String> thisPersonAddresses = dcSet.getPersonAddressMap().getItems(creatorPerson.a).keySet();
+
+                BigDecimal totalERAOwned = Account.totalOwned(dcSet, thisPersonAddresses, AssetCls.ERA_KEY);
+                BigDecimal totalLIAOwned = Account.totalOwned(dcSet, thisPersonAddresses, AssetCls.LIA_KEY);
+
+                if (!BlockChain.VALID_PERSON_REG_ERA(height, totalERAOwned, totalLIAOwned)) {
+                    return
+                }
             }
         }
         return res;
