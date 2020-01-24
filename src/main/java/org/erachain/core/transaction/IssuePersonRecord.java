@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
@@ -277,19 +277,20 @@ public class IssuePersonRecord extends IssueItemRecord {
             }
         }
 
-        if (isPersonAlive && height > 9999999) {
+        if (isPersonAlive && height > BlockChain.START_ISSUE_RIGHTS) {
             Fun.Tuple4<Long, Integer, Integer, Integer> creatorPerson = creator.getPersonDuration(dcSet);
             if (creatorPerson != null) {
-                TreeSet<String> thisPersonAddresses = dcSet.getPersonAddressMap().getItems(creatorPerson.a).keySet();
+                Set<String> thisPersonAddresses = dcSet.getPersonAddressMap().getItems(creatorPerson.a).keySet();
 
-                BigDecimal totalERAOwned = Account.totalOwned(dcSet, thisPersonAddresses, AssetCls.ERA_KEY);
-                BigDecimal totalLIAOwned = Account.totalOwned(dcSet, thisPersonAddresses, AssetCls.LIA_KEY);
+                BigDecimal totalERAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.ERA_KEY, TransactionAmount.ACTION_SEND);
+                BigDecimal totalLIAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.LIA_KEY, TransactionAmount.ACTION_SEND);
 
                 if (!BlockChain.VALID_PERSON_REG_ERA(height, totalERAOwned, totalLIAOwned)) {
-                    return
+                    return NOT_ENOUGH_ERA_BALANCE;
                 }
             }
         }
+
         return res;
     }
 

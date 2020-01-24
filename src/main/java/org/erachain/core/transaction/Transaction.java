@@ -119,6 +119,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_ECXHANGE_PAIR = 48;
 
     public static final int NO_INCLAIM_BALANCE = 49;
+    public static final int NOT_ENOUGH_ERA_BALANCE = 100;
 
     public static final int INVALID_BACKWARD_ACTION = 117;
     public static final int NOT_SELF_PERSONALIZY = 118;

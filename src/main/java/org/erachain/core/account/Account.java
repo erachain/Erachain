@@ -775,7 +775,7 @@ public class Account {
         return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(own, rent, hold);
     }
 
-    public static BigDecimal totalOwned(DCSet dcSet, TreeSet<String> addresses, Long assetKey) {
+    public static BigDecimal totalForAddresses(DCSet dcSet, Set<String> addresses, Long assetKey, int pos) {
 
         BigDecimal eraBalanceA = BigDecimal.ZERO;
         for (String address : addresses) {
@@ -784,7 +784,23 @@ public class Account {
             Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance
                     = account.getBalance(dcSet, assetKey);
 
-            eraBalanceA = eraBalanceA.add(balance.a.b);
+            switch (pos) {
+                case 1:
+                    eraBalanceA = eraBalanceA.add(balance.a.b);
+                    break;
+                case 2:
+                    eraBalanceA = eraBalanceA.add(balance.b.b);
+                    break;
+                case 3:
+                    eraBalanceA = eraBalanceA.add(balance.c.b);
+                    break;
+                case 4:
+                    eraBalanceA = eraBalanceA.add(balance.d.b);
+                    break;
+                case 5:
+                    eraBalanceA = eraBalanceA.add(balance.e.b);
+                    break;
+            }
         }
 
         return eraBalanceA;
