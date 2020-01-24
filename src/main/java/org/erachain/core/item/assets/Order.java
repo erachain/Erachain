@@ -168,13 +168,18 @@ public class Order implements Comparable<Order> {
 
         BigDecimal priceForLeft = calcPrice(willHave, willWant, wantAssetScale);
         BigDecimal diff = price.subtract(priceForLeft);
-        if (diff.signum() == 0)
+
+        int signum = diff.signum();
+        if (signum == 0) {
             return false;
+        }
 
         diff = diff.divide(price,
-                BlockChain.TARGET_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
+                BlockChain.INITIATOR_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
-        if (diff.compareTo(BlockChain.TARGET_PRICE_DIFF_LIMIT) > 0)
+        // если в худшую строну то быстрее отменим
+        if (signum < 0 && diff.compareTo(BlockChain.INITIATOR_PRICE_DIFF_LIMIT) > 0
+                || signum > 0 && diff.compareTo(BlockChain.INITIATOR_PRICE_DIFF_LIMIT_NEG) > 0)
             return true;
         return false;
     }
@@ -201,15 +206,19 @@ public class Order implements Comparable<Order> {
             return true;
 
         BigDecimal diff = priceForLeft.subtract(price);
-        if (diff.signum() == 0) {
+
+        int signum = diff.signum();
+        if (signum == 0) {
             return false;
         }
 
-        // тут МИНУС всегда случается и причем с маленьким отклонением
-        diff = diff.abs().divide(price,
-                BlockChain.INITIATOR_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN);
+        diff = diff.divide(price,
+                BlockChain.TARGET_PRICE_DIFF_LIMIT.scale() + 1, RoundingMode.HALF_DOWN).abs();
         // если разница цены выросла от начального сильно - то
-        if (diff.compareTo(BlockChain.INITIATOR_PRICE_DIFF_LIMIT) > 0)
+        // если в худшую строну то быстрее отменим
+        if (signum < 0 && diff.compareTo(BlockChain.TARGET_PRICE_DIFF_LIMIT) > 0
+                || signum > 0 && diff.compareTo(BlockChain.TARGET_PRICE_DIFF_LIMIT_NEG) > 0
+        )
             return true;
         return false;
     }
