@@ -32,9 +32,6 @@ import java.util.*;
 // typeBytes[2] - size of personalized accounts
 public class RSertifyPubKeys extends Transaction implements Itemable {
 
-    protected static final BigDecimal BONUS_FOR_PERSON_4_11 = BigDecimal.valueOf(1000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-
-    public static final int DEFAULT_DURATION = 365 * 3; // 3 years
     private static final byte TYPE_ID = (byte) Transaction.CERTIFY_PUB_KEYS_TRANSACTION;
     private static final String NAME_ID = "Certify Person";
     private static final int USER_ADDRESS_LENGTH = Transaction.CREATOR_LENGTH;
@@ -544,23 +541,6 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
         return Transaction.VALIDATE_OK;
     }
 
-    public BigDecimal getBonuses() {
-
-        // TODO: в кошельке сделать правильный пересчет
-        long personsTotal = this.dcSet.getItemPersonMap().getLastKey();
-        if (personsTotal < 3000)
-            return BlockChain.BONUS_FEE_LVL1;
-        else if (personsTotal < 10000)
-            return BlockChain.BONUS_FEE_LVL2;
-        else if (personsTotal < 100000)
-            return BlockChain.BONUS_FEE_LVL3;
-        else if (personsTotal < 1000000)
-            return BlockChain.BONUS_FEE_LVL4;
-        else
-            return BlockChain.BONUS_FEE_LVL5;
-
-    }
-
     //PROCESS/ORPHAN
 
     @Override
@@ -647,7 +627,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
         }
 
-        int add_day = this.add_day < 0? this.add_day : DEFAULT_DURATION;
+        int add_day = this.add_day < 0? this.add_day : BlockChain.DEFAULT_DURATION;
         // set to time stamp of record
         int end_day = (int) (this.timestamp / 86400000l) + add_day;
 
@@ -746,9 +726,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             // BONUSES
 
             // GIVE GIFT for this PUB_KEY - to PERSON
-            // GIVE GIFT for this PUB_KEY - to PERSON
-            BigDecimal personBonus = height < BlockChain.VERS_4_11 ? BONUS_FOR_PERSON_4_11.add(BONUS_FOR_PERSON_4_11)
-                    : BONUS_FOR_PERSON_4_11;
+            BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
             pkAccount.changeBalance(dcSet, true, FEE_KEY, personBonus, false);
             BigDecimal issued_FEE_BD_total = personBonus;
 
