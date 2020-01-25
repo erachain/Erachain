@@ -174,6 +174,8 @@ public class BlockChain {
 
     public static final int VERS_30SEC = TEST_DB > 0 ? 0 : DEVELOP_USE ? 471000 : Settings.getInstance().isTestnet() ? 0 : 280785; //	2019-09-17 12:01:13
 
+    public static final int BONUS_FOR_PERSON_4_21 = 670000;
+
     //public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC
     //        * (DEVELOP_USE ? 120L : Settings.getInstance().isTestnet()? 30L : 288L);
 
@@ -695,7 +697,7 @@ public class BlockChain {
         } else if (Settings.getInstance().isTestnet()) {
             ;
         } else {
-            if (height < 700000) {
+            if (height < BONUS_FOR_PERSON_4_21) {
                 ;
             }
             if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
@@ -718,7 +720,7 @@ public class BlockChain {
         } else if (Settings.getInstance().isTestnet()) {
             ;
         } else {
-            if (height < 700000) {
+            if (height < BONUS_FOR_PERSON_4_21) {
                 ;
             }
             if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
@@ -744,13 +746,11 @@ public class BlockChain {
 
     public static BigDecimal BONUS_FOR_PERSON(int height) {
 
-        if (height < BlockChain.VERS_4_11) {
+        if (Settings.getInstance().isTestnet() || height > BONUS_FOR_PERSON_4_21) {
+            return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+        } else {
             return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
-        } else if (false && height < (DEVELOP_USE? 700000
-                : Settings.getInstance().isTestnet()? 0 : 600000)) {
-            return BigDecimal.valueOf(1000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
         }
-        return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
     }
 
     public static int getCheckPoint(DCSet dcSet) {
