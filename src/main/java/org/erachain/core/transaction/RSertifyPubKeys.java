@@ -625,8 +625,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             }
 
             // GIVE GIFT for this PUB_KEY - to PERSON
-            BigDecimal personBonus = height < BlockChain.VERS_4_11 ? BONUS_FOR_PERSON_4_11.add(BONUS_FOR_PERSON_4_11)
-                    : BONUS_FOR_PERSON_4_11;
+            BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
             pkAccount.changeBalance(dcSet, false, FEE_KEY, personBonus, false);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,

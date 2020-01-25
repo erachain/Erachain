@@ -749,6 +749,17 @@ public class BlockChain {
         return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
     }
 
+    protected static BigDecimal BONUS_FOR_PERSON(int height) {
+
+        if (height < BlockChain.VERS_4_11) {
+            return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+        } else if (height < (DEVELOP_USE? 700000
+                : Settings.getInstance().isTestnet()? 0 : 600000)) {
+            return BigDecimal.valueOf(1000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+        }
+        return BigDecimal.valueOf(10000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+    }
+
     public static int getCheckPoint(DCSet dcSet) {
 
         Integer item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
