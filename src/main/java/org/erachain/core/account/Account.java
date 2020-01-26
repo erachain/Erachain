@@ -633,7 +633,7 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
-                                                                    BigDecimal amount_in, boolean notUpdateIncomed) {
+                                    BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
         int actionType = actionType(key, amount_in);
 
@@ -662,6 +662,20 @@ public class Account {
 
         boolean updateIncomed = !notUpdateIncomed;
 
+        Tuple2<BigDecimal, BigDecimal> spendBalance;
+        if (spendUpdate) {
+            // обновим Потрачено = Произведено одновременно
+            boolean amountNeg = amount_in.signum() < 0;
+            if (amountNeg) {
+                spendBalance = new Tuple2<BigDecimal, BigDecimal>(balance.d.a,  balance.d.b.add(amount));
+            } else {
+                // входит сумма плюс учет
+                spendBalance = new Tuple2<BigDecimal, BigDecimal>(balance.d.a.add(amount),  balance.d.b);
+            }
+        } else {
+            spendBalance = balance.d;
+        }
+
         if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -669,7 +683,7 @@ public class Account {
                             updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
                             balance.a.b.add(amount)),
-                    balance.b, balance.c, balance.d, balance.e);
+                    balance.b, balance.c, spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_DEBT) {
             // DEBT + CREDIT
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -678,7 +692,7 @@ public class Account {
                             updateIncomed ? balance.b.a.subtract(amount) : balance.b.a, balance.b.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
                             balance.b.b.add(amount)),
-                    balance.c, balance.d, balance.e);
+                    balance.c, spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -687,7 +701,7 @@ public class Account {
                             updateIncomed ? balance.c.a.subtract(amount) : balance.c.a, balance.c.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
                             balance.c.b.add(amount)),
-                    balance.d, balance.e);
+                    spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_SPEND) {
             // TODO - SPEND + PRODUCE
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
