@@ -1421,7 +1421,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                     BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
 
             if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
