@@ -48,7 +48,7 @@ public class Account {
     public static final int ADDRESS_SHORT_LENGTH = 20;
     public static final int ADDRESS_LENGTH = 25;
     // private static final long ERA_KEY = Transaction.RIGHTS_KEY;
-    private static final long FEE_KEY = Transaction.FEE_KEY;
+    ///private static final long FEE_KEY = Transaction.FEE_KEY;
     // public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
     // public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new
     // byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
@@ -665,8 +665,7 @@ public class Account {
         Tuple2<BigDecimal, BigDecimal> spendBalance;
         if (spendUpdate) {
             // обновим Потрачено = Произведено одновременно
-            boolean amountNeg = amount_in.signum() < 0;
-            if (amountNeg) {
+            if (substract) {
                 spendBalance = new Tuple2<BigDecimal, BigDecimal>(balance.d.a,  balance.d.b.add(amount));
             } else {
                 // входит сумма плюс учет
@@ -922,7 +921,7 @@ public class Account {
 
     public String viewFEEbalance() {
 
-        long result = this.getBalanceUSE(FEE_KEY).unscaledValue().longValue();
+        long result = this.getBalanceUSE(Transaction.FEE_KEY).unscaledValue().longValue();
         result /= BlockChain.FEE_PER_BYTE;
         result >>= 8;
 

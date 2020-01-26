@@ -1379,10 +1379,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         ) {
             // IT IS ME - all fee to INVITED
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, false);
-            // учтем как потрачено
-            invitedAccount.changeBalance(this.dcSet, asOrphan, -FEE_KEY,
-                    giftBG, false, false);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
@@ -1406,7 +1403,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
@@ -1422,11 +1419,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY,
-                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, false);
-
-            // учтем что получил награду
-            issuerAccount.changeBalance(this.dcSet, !asOrphan, -FEE_KEY,
-                    BigDecimal.valueOf(-fee_gift, BlockChain.FEE_SCALE), false, false);
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
@@ -1476,7 +1469,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true, false);
+                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true, true);
 
             }
 
@@ -1510,7 +1503,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true, false);
+                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true, true);
 
             }
 

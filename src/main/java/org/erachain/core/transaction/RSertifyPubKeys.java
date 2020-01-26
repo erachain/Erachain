@@ -606,7 +606,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
             // GIVE GIFT for this PUB_KEY - to PERSON
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
-            pkAccount.changeBalance(dcSet, false, FEE_KEY, personBonus, false, false);
+            pkAccount.changeBalance(dcSet, false, FEE_KEY, personBonus, false, true);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(pkAccount, FEE_KEY, personBonus,
                         "enter bonus", this.dbRef));
@@ -615,7 +615,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
-                    false, false);
+                    false, true);
             if (makeCalculates) {
                 block.txCalculated.add(new RCalculated(issuer, FEE_KEY, issued_FEE_BD, // BONUS_FOR_PERSON_REGISTRAR_4_11,
                         "register reward @P:" + this.key, this.dbRef));
@@ -727,12 +727,12 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
             // GIVE GIFT for this PUB_KEY - to PERSON
             BigDecimal personBonus = BlockChain.BONUS_FOR_PERSON(height);
-            pkAccount.changeBalance(dcSet, true, FEE_KEY, personBonus, false, false);
+            pkAccount.changeBalance(dcSet, true, FEE_KEY, personBonus, false, true);
             BigDecimal issued_FEE_BD_total = personBonus;
 
             BigDecimal issued_FEE_BD = transPersonIssue.getFee();
             issuer.changeBalance(dcSet, true, FEE_KEY, issued_FEE_BD, //BONUS_FOR_PERSON_REGISTRAR_4_11,
-                    false, false);
+                    false, true);
             issued_FEE_BD_total = issued_FEE_BD_total.add(issued_FEE_BD); //BONUS_FOR_PERSON_REGISTRAR_4_11);
 
             // ADD to EMISSION (with minus)
