@@ -67,15 +67,18 @@ public class WebTransactionsHTML {
         // она и так в заголовке будет
         //out += "<br><b>" + Lang.getInstance().translateFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Confirmations", langObj) + ": </b>" + tras_json.get("confirmations");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Size", langObj) + ": </b>" + tras_json.get("size");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
-        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
-        if (wiped) {
-            out += "<BR><b>" + Lang.getInstance().translateFromLangObj("WIPED", langObj) + ": </b>" + "true";
+
+        if (!(transaction instanceof RCalculated)) {
+            out += "<br><b>" + Lang.getInstance().translateFromLangObj("Size", langObj) + ": </b>" + tras_json.get("size");
+            out += "<br><b>" + Lang.getInstance().translateFromLangObj("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
+            out += "<br><b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
+            out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
+            if (wiped) {
+                out += "<BR><b>" + Lang.getInstance().translateFromLangObj("WIPED", langObj) + ": </b>" + "true";
+            }
+            out += "<br> ";
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
         }
-        out += "<br> ";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
 
         output.put("head", out);
         output.put("timestampLabel", Lang.getInstance().translateFromLangObj("Date", langObj));
@@ -86,10 +89,12 @@ public class WebTransactionsHTML {
 
         int type = transaction.getType();
         switch (type) {
+            case Transaction.CALCULATED_TRANSACTION:
+                output.put("body", r_Calculated_HTML(transaction, langObj));
+                break;
             case Transaction.SEND_ASSET_TRANSACTION:
                 output.put("body", r_Send_HTML(transaction, langObj));
                 output.put("message", ((RSend)transaction).viewData());
-
                 break;
             case Transaction.ISSUE_ASSET_TRANSACTION:
                 output.put("body", issue_Asset_HTML(transaction, langObj));
@@ -623,6 +628,29 @@ public class WebTransactionsHTML {
 
         if (!tr.getHead().equals(""))
             out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Title", langObj) + ":</b> " + tr.getHead();
+
+        return out;
+
+    }
+
+    private String r_Calculated_HTML(Transaction transaction, JSONObject langObj) {
+        // TODO Auto-generated method stub
+        RCalculated tr = (RCalculated) transaction;
+        String out = "";
+
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
+                + tr.getRecipient().getAddress() + get_Lang(langObj) + ">" + tr.getRecipient().getPersonAsString()
+                + "</a><br>";
+
+        if (!tr.getMessage().equals(""))
+            out += "<h4>"+ tr.getMessage() + "</h4>";
+
+        if (tr.getAmount() != null) {
+            out += "<br><b>" + Lang.getInstance().translateFromLangObj("Amount", langObj) + ":</b> "
+                    + tr.getAmount().toPlainString()
+                    + " <a href=?asset=" + tr.getAbsKey() + get_Lang(langObj) + ">"
+                    + Controller.getInstance().getAsset(tr.getAbsKey()).getName() + "</a>";
+        }
 
         return out;
 
