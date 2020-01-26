@@ -758,7 +758,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
-        if (BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
+        if (!BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
             // SWITCH OFF REFERRAL
             return 0l;
         }
@@ -1362,7 +1362,13 @@ public abstract class Transaction implements ExplorerJsonLine {
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
         Account issuerAccount = issueRecord.getCreator();
         Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
-        long issuerPersonKey = issuerPersonDuration.a;
+        long issuerPersonKey;
+        if (issuerPersonDuration == null && BlockChain.ANONIM_SERT_USE) {
+            // в тестовой сети возможно что каждый создает с неудостоверенного
+            issuerPersonKey = BlockChain.BONUS_STOP_PERSON_KEY;
+        } else {
+            issuerPersonKey = issuerPersonDuration.a;
+        }
 
         if (issuerPersonKey == invitedPersonKey) {
             // break loop
@@ -1398,7 +1404,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
             issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
             if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level));
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
@@ -1470,7 +1476,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (invitedFee > 0) {
                 process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                         block != null && block.txCalculated != null ?
-                                block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
+                                block.txCalculated : null, "Referal bonus " + "@" + this.viewHeightSeq());
             }
 
             // UPDATE REFERENCE OF SENDER

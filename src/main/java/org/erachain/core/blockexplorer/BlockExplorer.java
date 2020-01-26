@@ -3624,6 +3624,9 @@ public class BlockExplorer {
                         out.put("creator", txCalculated.getRecipient().getPersonAsString());
                         out.put("creator_addr", txCalculated.getRecipient().getAddress());
 
+                        out.put("amount", txCalculated.getAmount().toPlainString());
+                        out.put("asset", txCalculated.getAssetKey());
+
                         out.put("size", "--");
                         out.put("fee", "--");
 

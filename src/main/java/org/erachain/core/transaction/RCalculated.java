@@ -158,6 +158,9 @@ public class RCalculated extends TransactionAmount {
         // GET BASE
         JSONObject transaction = this.getJsonBase();
 
+        transaction.put("asset", this.getAbsKey());
+        transaction.put("amount", this.amount.toPlainString());
+
         if (message.length() > 0) {
             transaction.put("message", this.message);
         }
