@@ -107,7 +107,7 @@ public class Settings {
 
     List<Peer> cacheInternetPeers;
     long timeLoadInternetPeers;
-    private long genesisStamp;
+    public static long genesisStamp;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
     private String userPath = "";
@@ -126,8 +126,7 @@ public class Settings {
 
     private String telegramtPath;
 
-    private Settings(long networkTimestamp) {
-        this.genesisStamp = networkTimestamp;
+    private Settings() {
         this.localAddress = this.getCurrentIp();
         settingsJSON = read_setting_JSON();
 
@@ -161,13 +160,13 @@ public class Settings {
         }
     }
 
-    public static Settings getInstance(long networkTimestamp) {
+    public synchronized static Settings getInstance() {
         ReentrantLock lock = new ReentrantLock();
         lock.lock();
         try {
             if (instance == null) {
 
-                instance = new Settings(networkTimestamp);
+                instance = new Settings();
             }
         } finally {
             lock.unlock();
@@ -175,17 +174,8 @@ public class Settings {
         return instance;
     }
 
-    public static Settings getInstance() {
-        if (instance == null) {
-            return getInstance(DEFAULT_MAINNET_STAMP);
-        }
-        return instance;
-    }
-
-    public static void FreeInstance() {
-        if (instance != null) {
-            instance = null;
-        }
+    public synchronized static void freeInstance() {
+        instance = null;
     }
 
     public JSONObject Dump() {
@@ -1012,8 +1002,6 @@ public class Settings {
 
 
     }
-    
-   
 
     public String cutPath(String path) {
 

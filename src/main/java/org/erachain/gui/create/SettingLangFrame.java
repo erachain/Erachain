@@ -216,7 +216,7 @@ public class SettingLangFrame extends JDialog {
                 settingsLangJSON.put("font_size", size_Font.getSelectedItem().toString());
             }
             SaveStrToFile.saveJsonFine(Settings.getInstance().getSettingsPath(), settingsLangJSON);
-            Settings.FreeInstance();
+            Settings.freeInstance();
             Lang.getInstance().loadLang();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);

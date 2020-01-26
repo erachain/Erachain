@@ -50,7 +50,9 @@ public class Start {
             }
         }
 
-        Settings.getInstance(genesisStamp);
+        Settings.genesisStamp = genesisStamp;
+
+        Settings.getInstance();
 
         Controller.getInstance().startApplication(args);
 
