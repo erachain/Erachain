@@ -150,8 +150,6 @@ public class BlockChain {
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final long BONUS_STOP_PERSON_KEY = 13l;
-
     public static final int VERS_4_11 = TEST_DB > 0 ? 0 : DEVELOP_USE ? 230000 : Settings.getInstance().isTestnet() ? 0 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
@@ -306,11 +304,26 @@ public class BlockChain {
     public static final int FEE_FOR_ANONIMOUSE = 33;
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
-    public static final int FEE_INVITED_DEEP = 2;
 
-    // levels for deep
+
+    /**
+     * Multi-level Referal Sysytem. Levels for deep
+     */
+    public static final int FEE_INVITED_DEEP = 3;
+    /**
+     * Stop referals system on this person Number. Причем рефералка которая должна упать этим персонам
+     * (с номером ниже заданного) по сути просто сжигается - то есть идет дефляция.
+     */
+    public static final long BONUS_STOP_PERSON_KEY = 13L;
+
     public static final int FEE_INVITED_SHIFT = 1;
-    public static final int BONUS_REFERAL = 50 * FEE_PER_BYTE;
+    /**
+     * Постаянная награда за байт трнзакции
+     */
+    public static final int BONUS_REFERAL = 200 * FEE_PER_BYTE;
+    /**
+     * Какую долю отдавать на уровень ниже - как степерь двойки. 1 - половину, 2 - четверть, 3 - восьмую часть
+     */
     public static final int FEE_INVITED_SHIFT_IN_LEVEL = 1;
 
     // SERTIFY
@@ -751,6 +764,10 @@ public class BlockChain {
         } else {
             return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
         }
+    }
+
+    public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
+        return Settings.getInstance().isTestnet() || height > BONUS_FOR_PERSON_4_21;
     }
 
     public static int getCheckPoint(DCSet dcSet) {

@@ -758,9 +758,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
-        if (true)
+        if (BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
             // SWITCH OFF REFERRAL
             return 0l;
+        }
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
@@ -772,9 +773,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         long fee = this.fee.unscaledValue().longValue();
 
         // Если слишком большая комиссия, то и награду чуток увеличим
-        if (fee > BlockChain.BONUS_REFERAL << 3)
+        if (fee > BlockChain.BONUS_REFERAL << 4)
             return BlockChain.BONUS_REFERAL << 1;
+        else if (fee < BlockChain.BONUS_REFERAL << 2) {
+            // стандартно если обычная то половину отправим на подарки
+            return fee >> 1;
+        }
 
+        // если повышенная то не будем изменять
         return BlockChain.BONUS_REFERAL;
     }
 
@@ -1343,7 +1349,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                                    long invitedPersonKey, boolean asOrphan,
                                    List<RCalculated> txCalculated, String message) {
 
-        if (fee_gift <= 0l)
+        if (fee_gift <= 0L)
             return;
 
         String messageLevel;
@@ -1359,7 +1365,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         long issuerPersonKey = issuerPersonDuration.a;
 
         if (issuerPersonKey == invitedPersonKey) {
-            // loop ??
+            // break loop
             return;
         }
 
@@ -1405,7 +1411,8 @@ public abstract class Transaction implements ExplorerJsonLine {
             // this is END LEVEL
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY,
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
@@ -1460,12 +1467,11 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             // Multi Level Referal
             long invitedFee = getInvitedFee();
-            if (invitedFee > 0)
+            if (invitedFee > 0) {
                 process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                         block != null && block.txCalculated != null ?
                                 block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
-
-            String creatorAddress = this.creator.getAddress();
+            }
 
             // UPDATE REFERENCE OF SENDER
             this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);

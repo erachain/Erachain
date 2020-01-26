@@ -103,11 +103,11 @@ public class Settings {
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
 
-
     private static Settings instance;
+
     List<Peer> cacheInternetPeers;
     long timeLoadInternetPeers;
-    private long genesisStamp = -1;
+    private long genesisStamp;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
     private String userPath = "";
@@ -123,10 +123,11 @@ public class Settings {
     private String telegramDefaultReciever;
     private String telegramRatioReciever = null;
     private String getTelegramPath;
-    
+
     private String telegramtPath;
 
-    private Settings() {
+    private Settings(long networkTimestamp) {
+        this.genesisStamp = networkTimestamp;
         this.localAddress = this.getCurrentIp();
         settingsJSON = read_setting_JSON();
 
@@ -160,16 +161,23 @@ public class Settings {
         }
     }
 
-    public static Settings getInstance() {
+    public static Settings getInstance(long networkTimestamp) {
         ReentrantLock lock = new ReentrantLock();
         lock.lock();
         try {
             if (instance == null) {
 
-                instance = new Settings();
+                instance = new Settings(networkTimestamp);
             }
         } finally {
             lock.unlock();
+        }
+        return instance;
+    }
+
+    public static Settings getInstance() {
+        if (instance == null) {
+            return getInstance(DEFAULT_MAINNET_STAMP);
         }
         return instance;
     }
@@ -537,24 +545,7 @@ public class Settings {
     }
 
     public long getGenesisStamp() {
-        if (this.genesisStamp == -1) {
-            if (this.settingsJSON.containsKey("testnetstamp")) {
-                if (this.settingsJSON.get("testnetstamp").toString().equals("now") ||
-                        ((Long) this.settingsJSON.get("testnetstamp")).longValue() == 0) {
-                    this.genesisStamp = System.currentTimeMillis();
-                } else {
-                    this.genesisStamp = ((Long) this.settingsJSON.get("testnetstamp")).longValue();
-                }
-            } else {
-                this.genesisStamp = DEFAULT_MAINNET_STAMP;
-            }
-        }
-
         return this.genesisStamp;
-    }
-
-    public void setGenesisStamp(long testNetStamp) {
-        this.genesisStamp = testNetStamp;
     }
 
     public int getMaxConnections() {
