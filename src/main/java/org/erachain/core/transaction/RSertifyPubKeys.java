@@ -355,7 +355,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
 
     @Override
     public long getInvitedFee() {
-        return 0l;
+        return 0L;
     }
 
     //@Override

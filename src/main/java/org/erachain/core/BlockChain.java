@@ -314,7 +314,7 @@ public class BlockChain {
      * Stop referals system on this person Number. Причем рефералка которая должна упать этим персонам
      * (с номером ниже заданного) по сути просто сжигается - то есть идет дефляция.
      */
-    public static final long BONUS_STOP_PERSON_KEY = 13L;
+    public static final long BONUS_STOP_PERSON_KEY = Settings.getInstance().isTestnet()? 0 : 13L;
 
     public static final int FEE_INVITED_SHIFT = 1;
     /**
