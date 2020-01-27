@@ -184,7 +184,7 @@ public class BlockChain {
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : DEVELOP_USE ? 000000 : Settings.getInstance().isTestnet() ? 0 : 000000;
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : BONUS_FOR_PERSON_4_21;
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
