@@ -1363,21 +1363,18 @@ public abstract class Transaction implements ExplorerJsonLine {
         Account issuerAccount = issueRecord.getCreator();
         Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
         long issuerPersonKey;
-        if (issuerPersonDuration == null && BlockChain.ANONIM_SERT_USE) {
+        if (issuerPersonDuration == null) {
             // в тестовой сети возможно что каждый создает с неудостоверенного
-            issuerPersonKey = BlockChain.BONUS_STOP_PERSON_KEY;
+            issuerPersonKey = -1;
         } else {
             issuerPersonKey = issuerPersonDuration.a;
         }
 
-        if (issuerPersonKey == invitedPersonKey) {
-            // break loop
-            return;
-        }
-
-        if (issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
+        if (issuerPersonKey < 0 // это возможно только для певой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey == invitedPersonKey // это возможно только в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {
-            // IT IS ME - all fee to INVITED
+            // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
 
@@ -1477,6 +1474,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (BlockChain.FEE_INVITED_DEEP > 0) {
                 long invitedFee = getInvitedFee();
                 if (invitedFee > 0) {
+                    if (BlockChain.CHECK_BUGS > 3 && height == 3104) {
+                        boolean debug = true;
+                    }
                     process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
                             block != null && block.txCalculated != null ?
                                     block.txCalculated : null, "Referal bonus " + "@" + this.viewHeightSeq());
