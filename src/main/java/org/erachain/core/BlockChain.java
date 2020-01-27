@@ -172,7 +172,7 @@ public class BlockChain {
 
     public static final int VERS_30SEC = TEST_DB > 0 ? 0 : DEVELOP_USE ? 471000 : Settings.getInstance().isTestnet() ? 0 : 280785; //	2019-09-17 12:01:13
 
-    public static final int BONUS_FOR_PERSON_4_21 = 670000;
+    public static final int BONUS_FOR_PERSON_4_21 = 0000; // 670000
 
     //public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC
     //        * (DEVELOP_USE ? 120L : Settings.getInstance().isTestnet()? 30L : 288L);

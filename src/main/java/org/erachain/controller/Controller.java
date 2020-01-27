@@ -199,11 +199,30 @@ public class Controller extends Observable {
     }
 
     public static String getVersion(boolean withTimestamp) {
+
+        String dbs;
+        switch (getInstance().databaseSystem) {
+            case DCSet.DBS_ROCK_DB:
+                dbs = "RocksDB";
+                break;
+            case DCSet.DBS_MAP_DB:
+                dbs = "MapDB";
+                break;
+            case DCSet.DBS_FAST:
+                dbs = "fast";
+                break;
+            default:
+                dbs = "MapDB";
+
+        }
+
+
         if (withTimestamp)
             return version + (BlockChain.DEVELOP_USE ? " DevelopNet"
-                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "");
+                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "")
+                    + " (" + dbs + ")";
 
-        return version;
+        return version + " (" + dbs + ")";
 
     }
 
