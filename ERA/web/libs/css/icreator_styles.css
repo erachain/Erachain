@@ -9,6 +9,10 @@
     color: #13ad00;
 }
 
+tr>th {
+    padding: 3px 10px;
+}
+
 ul.sel_curr {
     margin-top: -5px;
 
