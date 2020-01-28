@@ -687,7 +687,7 @@ public class BlockChain {
         if (height <= VERS_30SEC) {
             return -GENERATING_MIN_BLOCK_TIME_MS(height);
         }
-        return DEVELOP_USE? 5000 : 5000;
+        return DEVELOP_USE ? 0 : 0;
     }
 
     public static int WIN_TIMEPOINT(int height) {
