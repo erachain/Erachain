@@ -12,6 +12,7 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -118,7 +119,6 @@ public class Network extends Observable {
 
     private void start() {
 
-
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
         creator.start();
@@ -137,9 +137,17 @@ public class Network extends Observable {
 
         messagesProcessor = new MessagesProcessor(this);
 
-        if (Settings.getInstance().isLocalPeersScannerEnabled()){
+        if (Settings.getInstance().isLocalPeersScannerEnabled()) {
             localPeerScanner = new LocalPeerScanner(this);
-            localPeerScanner.start();
+            if (true) {
+                try {
+                    localPeerScanner.scanLocalNetForPeers(Controller.getInstance().getNetworkPort());
+                } catch (IOException e) {
+                }
+            } else {
+                localPeerScanner = new LocalPeerScanner(this);
+                localPeerScanner.start();
+            }
         }
 
     }

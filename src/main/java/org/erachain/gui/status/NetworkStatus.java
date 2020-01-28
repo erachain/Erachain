@@ -2,7 +2,6 @@ package org.erachain.gui.status;
 // 30/03
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
@@ -37,7 +36,7 @@ public class NetworkStatus extends JLabel implements Observer {
            ToolTipManager.sharedInstance().setDismissDelay((int) TimeUnit.SECONDS.toMillis(5));
         this.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent mEvt) {
-                String mess = Lang.getInstance().translate("Network Port") + ": " + BlockChain.getNetworkPort()
+                String mess = Lang.getInstance().translate("Network Port") + ": " + Controller.getInstance().getNetworkPort()
                         + ", " + Lang.getInstance().translate("target")
                         + ": " + Controller.getInstance().getBlockChain().getTarget(DCSet.getInstance()) + ", ";
 
