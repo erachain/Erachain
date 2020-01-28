@@ -56,12 +56,10 @@ public class LocalPeerScanner extends Thread {
                         //network.startPeer(scanSocket);
                         scanSocket.close();
                         Peer peer = new Peer(host);
-                        //Peer peer = new Peer(network, scanSocket,"found new local Peer");
-                        //network.onConnect(peer);
-                        //network.addPeer(peer, 0);
-                        peer.connect(null, network, " connect to local Peer");
-                        result.add(host);
-                        counter++;
+                        if (peer.connect(null, network, " connect to local Peer")) {
+                            result.add(host);
+                            counter++;
+                        }
                     }
                     catch(SocketTimeoutException e){
 
@@ -86,6 +84,5 @@ public class LocalPeerScanner extends Thread {
                 logger.debug(e.getMessage());
             }
         }
-
     }
 }
