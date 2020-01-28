@@ -301,7 +301,7 @@ public class CancelOrderTransaction extends Transaction {
         BigDecimal left = order.getAmountHaveLeft();
         order.getCreator().changeBalance(dcSet, false, order.getHaveAssetKey(), left, false, false);
         this.addCalculated(block, this.creator, order.getHaveAssetKey(), left,
-                "cancel order @" + Transaction.viewDBRef(order.getId()));
+                "Cancel Order @" + Transaction.viewDBRef(order.getId()));
     }
 
     //@Override
