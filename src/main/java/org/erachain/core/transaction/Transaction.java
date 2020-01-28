@@ -1517,7 +1517,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             // UPDATE REFERENCE OF SENDER
             // set last transaction signature for this ACCOUNT
-            this.creator.removeLastTimestamp(this.dcSet);
+            this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         }
 
