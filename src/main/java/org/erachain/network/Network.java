@@ -12,7 +12,6 @@ import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -139,15 +138,7 @@ public class Network extends Observable {
 
         if (Settings.getInstance().isLocalPeersScannerEnabled()) {
             localPeerScanner = new LocalPeerScanner(this);
-            if (true) {
-                try {
-                    localPeerScanner.scanLocalNetForPeers(Controller.getInstance().getNetworkPort());
-                } catch (IOException e) {
-                }
-            } else {
-                localPeerScanner = new LocalPeerScanner(this);
-                localPeerScanner.start();
-            }
+            localPeerScanner.start();
         }
 
     }

@@ -27,6 +27,7 @@ public class LocalPeerScanner extends Thread {
     public void setNetwork(Network network) {
         this.network = network;
     }
+
     public List<InetAddress> scanLocalNetForPeers(int port) throws IOException {
 
         List<InetAddress> result = new ArrayList<>();
@@ -60,8 +61,7 @@ public class LocalPeerScanner extends Thread {
                             result.add(host);
                             counter++;
                         }
-                    }
-                    catch(SocketTimeoutException e){
+                    } catch (SocketTimeoutException e) {
 
                     }
                 }
@@ -72,17 +72,10 @@ public class LocalPeerScanner extends Thread {
 
     @Override
     public void run() {
-        while (!isInterrupted()){
-            try {
-                scanLocalNetForPeers(Controller.getInstance().getNetworkPort());
-                if (true)
-                    break;
-
-                sleep(60000);
-            }
-            catch (Exception e){
-                logger.debug(e.getMessage());
-            }
+        try {
+            scanLocalNetForPeers(Controller.getInstance().getNetworkPort());
+        } catch (Exception e) {
+            logger.debug(e.getMessage());
         }
     }
 }
