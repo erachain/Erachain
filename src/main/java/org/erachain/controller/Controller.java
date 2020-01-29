@@ -2067,6 +2067,12 @@ public class Controller extends Observable {
                             return null;
                         }
                     }
+
+                    // сохранимся - хотя может и заря - раньше то работало и так
+                    if (true) {
+                        dcSet.flush(0, true, false);
+                    }
+
                 }
 
                 blockchainSyncStatusUpdate(getMyHeight());
