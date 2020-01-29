@@ -318,10 +318,14 @@ public class OnDealClick {
                 mess = "Not enough rights";
                 break;
 
+            case Transaction.NOT_ENOUGH_ERA_BALANCE:
+                mess = "Not enough ERA balance";
+                break;
+
             case Transaction.INVALID_ITEM_KEY:
                 mess = "Invalid item key";
                 break;
-                
+
             case Transaction.INVALID_ITEM_VALUE:
                 mess = "Invalid item value";
                 break;

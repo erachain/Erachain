@@ -168,12 +168,13 @@ public class BlockChain {
      */
     public static final long LEFT_PRICE_HEIGHT_SEQ = TEST_DB > 0 ? 0 : Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
-
     public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : 44666;
 
     public static final int VERS_4_12 = TEST_DB > 0 ? 0 : DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
 
     public static final int VERS_30SEC = TEST_DB > 0 ? 0 : DEVELOP_USE ? 471000 : Settings.getInstance().isTestnet() ? 0 : 280785; //	2019-09-17 12:01:13
+
+    public static final int BONUS_FOR_PERSON_4_21 = 670000;
 
     //public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC
     //        * (DEVELOP_USE ? 120L : Settings.getInstance().isTestnet()? 30L : 288L);
@@ -181,6 +182,12 @@ public class BlockChain {
     // TODO поидее отрицательное тоже работать будет как надо
     public static final long VERS_30SEC_TIME = DEVELOP_USE ? (Settings.DEFAULT_DEV_NET_STAMP + (long) VERS_30SEC * 120L)
             : (Settings.getInstance().isTestnet() ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L);
+
+    /**
+     * Включает обработку заявок на бирже по цене рассчитанной по остаткам
+     */
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : DEVELOP_USE ? 000000 : Settings.getInstance().isTestnet() ? 0 : 000000;
+    public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
 
@@ -306,14 +313,6 @@ public class BlockChain {
     public static final int BONUS_REFERAL = 50 * FEE_PER_BYTE;
     public static final int FEE_INVITED_SHIFT_IN_LEVEL = 1;
 
-    // 0.0075 COMPU - is FEE for Issue Person - then >> 2 - всумме столько получают Форжер и кто привел
-    // Бонус получает Персона, Вносит, Удостоверяет - 3 человека = Эмиссия
-    // 0.0002 - цена за одну транзакцию
-    public static final BigDecimal BONUS_FEE_LVL1 = new BigDecimal("0.01"); // < 3 000
-    public static final BigDecimal BONUS_FEE_LVL2 = new BigDecimal("0.008"); // < 10 000
-    public static final BigDecimal BONUS_FEE_LVL3 = new BigDecimal("0.005"); // < 100 000
-    public static final BigDecimal BONUS_FEE_LVL4 = new BigDecimal("0.0025"); // < 1 000 000
-    public static final BigDecimal BONUS_FEE_LVL5 = new BigDecimal("0.0015"); // else
     // SERTIFY
     // need RIGHTS for non PERSON account
     public static final BigDecimal MAJOR_ERA_BALANCE_BD = BigDecimal.valueOf(MAJOR_ERA_BALANCE);
@@ -683,7 +682,7 @@ public class BlockChain {
     }
 
     public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
-        int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
+        int height = timestamp < VERS_30SEC_TIME ? 1 : VERS_30SEC + 1;
         if (TEST_DB > 0) {
             return GENERATING_MIN_BLOCK_TIME_MS(height);
         } else {
@@ -691,8 +690,67 @@ public class BlockChain {
         }
     }
 
+    public static boolean VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+
+        if (DEVELOP_USE) {
+            ;
+        } else if (Settings.getInstance().isTestnet()) {
+            ;
+        } else {
+            if (height < BONUS_FOR_PERSON_4_21) {
+                ;
+            }
+            if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
+                ;
+            } else {
+                if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+    public static boolean VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+
+        if (DEVELOP_USE) {
+            ;
+        } else if (Settings.getInstance().isTestnet()) {
+            ;
+        } else {
+            if (height < BONUS_FOR_PERSON_4_21) {
+                ;
+            }
+            if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
+                ;
+            } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+                if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                    return false;
+                }
+            } else {
+                if (totalERA.compareTo(new BigDecimal("100")) < 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
     public static int BLOCKS_PER_DAY(int height) {
         return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
+    }
+
+    public static BigDecimal BONUS_FOR_PERSON(int height) {
+
+        if (Settings.getInstance().isTestnet() || height > BONUS_FOR_PERSON_4_21) {
+            return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+        } else {
+            return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+        }
     }
 
     public static int getCheckPoint(DCSet dcSet) {
