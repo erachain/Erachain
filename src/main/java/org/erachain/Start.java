@@ -41,7 +41,7 @@ public class Start {
                     genesisStamp = Long.parseLong(arg.substring(9));
 
                     if (genesisStamp == 0) {
-                        genesisStamp = 1511164500000l; // DEVELOP default
+                        genesisStamp = Settings.DEFAULT_DEV_NET_STAMP; // DEVELOP default
                     }
 
                 } catch (Exception e) {
