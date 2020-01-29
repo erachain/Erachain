@@ -1,7 +1,6 @@
 package org.erachain;
 
 import org.erachain.controller.Controller;
-import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 
 import java.io.IOException;
@@ -33,20 +32,16 @@ public class Start {
         long genesisStamp = Settings.DEFAULT_MAINNET_STAMP;
         for (String arg : args) {
             if (arg.equals("-testnet")) {
-                genesisStamp = NTP.getTime();
-                continue;
-            }
-            if (arg.startsWith("-testnet=") && arg.length() > 9) {
+                genesisStamp = -1;
+                break;
+            } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
                 try {
                     genesisStamp = Long.parseLong(arg.substring(9));
-
-                    if (genesisStamp == 0) {
-                        genesisStamp = Settings.DEFAULT_DEV_NET_STAMP; // DEVELOP default
-                    }
 
                 } catch (Exception e) {
                     genesisStamp = Settings.DEFAULT_DEV_NET_STAMP;
                 }
+                break;
             }
         }
 

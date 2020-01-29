@@ -3717,13 +3717,16 @@ public class Controller extends Observable {
                 Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
                 continue;
             }
-            if (arg.equals("-testnet")) {
-                useNet = false;
-                continue;
-            }
             if (arg.equals("-nonet")) {
                 useNet = false;
                 continue;
+            }
+        }
+
+        if (Settings.genesisStamp <= 0) {
+            Settings.genesisStamp = NTP.getTime();
+            if (Settings.genesisStamp < 0) {
+                useNet = false;
             }
         }
 
