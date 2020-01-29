@@ -1388,7 +1388,7 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK IF SERTIFY PErSON
 			else if (transaction instanceof RSertifyPubKeys) {
-				this.processSertifyPerson((RSertifyPubKeys) transaction);
+				this.processSertifyPerson((RSertifyPubKeys) transaction, height);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1424,6 +1424,7 @@ public class Wallet extends Observable implements Observer {
 		if (block == null)
 			return;
 
+		int height = block.heightBlock;
 		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
         for (int i = block.blockHead.transactionsCount - 1; i >= 0; i--) {
@@ -1451,7 +1452,7 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK IF SERTIFY PErSON
 			else if (transaction instanceof RSertifyPubKeys) {
-				this.orphanSertifyPerson((RSertifyPubKeys) transaction);
+				this.orphanSertifyPerson((RSertifyPubKeys) transaction, height);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1545,7 +1546,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys) {
+	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1578,7 +1579,7 @@ public class Wallet extends Observable implements Observer {
 				///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 				// ISSUE NEW COMPU in chain
-				BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
+				BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
 
 				// GIFTs
 				if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
@@ -1611,7 +1612,7 @@ public class Wallet extends Observable implements Observer {
         }
     }
 
-    private void orphanSertifyPerson(RSertifyPubKeys sertifyPubKeys) {
+    private void orphanSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1644,7 +1645,7 @@ public class Wallet extends Observable implements Observer {
 			///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 			// ISSUE NEW COMPU in chain
-			BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
+			BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
 
 			// GIFTs
 			if (this.accountExists(transPersonIssue.getCreator().getAddress())) {

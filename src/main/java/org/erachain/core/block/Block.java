@@ -55,6 +55,7 @@ import java.util.*;
     public static final int TRANSACTION_SIZE_LENGTH = 4;
     public static final int HEIGHT_LENGTH = 4;
     public static final int WIN_VALUE_LENGTH = 8;
+    public static final int TOTAL_WIN_VALUE_LENGTH = 8;
     public static final int FEE_LENGTH = 8;
 
     public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
@@ -80,6 +81,7 @@ import java.util.*;
     protected long winValue;
     /// END of HEAD ///
     protected long target;
+    protected long totalWinValue;
     protected long totalFee;
     protected long emittedFee;
     public Block.BlockHead blockHead;
@@ -107,7 +109,7 @@ import java.util.*;
 
         public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
                 + TRANSACTIONS_COUNT_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH
-                + HEIGHT_LENGTH + GENERATING_BALANCE_LENGTH + WIN_VALUE_LENGTH + WIN_VALUE_LENGTH
+                + HEIGHT_LENGTH + GENERATING_BALANCE_LENGTH + WIN_VALUE_LENGTH + TOTAL_WIN_VALUE_LENGTH + WIN_VALUE_LENGTH
                 + FEE_LENGTH + FEE_LENGTH;
 
         public final int version;
@@ -122,13 +124,14 @@ import java.util.*;
         public final int forgingValue;
         public final long winValue;
         public final long target;
+        public final long totalWinValue;
         public final long totalFee;
         public final long emittedFee;
 
         public BlockHead(int version, byte[] reference, PublicKeyAccount creator, int transactionCount,
                          byte[] transactionsHash, byte[] signature,
                          int heightBlock, int forgingValue, long winValue, long target,
-                         long totalFee, long emittedFee) {
+                         long totalWinValue, long totalFee, long emittedFee) {
             this.version = version;
             this.creator = creator;
             this.signature = signature;
@@ -140,12 +143,13 @@ import java.util.*;
             this.forgingValue = forgingValue;
             this.winValue = winValue;
             this.target = target;
+            this.totalWinValue = totalWinValue;
             this.totalFee = totalFee;
             this.emittedFee = emittedFee;
         }
 
         public BlockHead(Block block, int heightBlock, int forgingValue, long winValue, long target,
-                         long totalFee, long emittedFee) {
+                         long totalFee, long emittedFee, long totalWinValue) {
             this.version = block.version;
             this.reference = block.reference;
             this.creator = block.creator;
@@ -157,6 +161,7 @@ import java.util.*;
             this.forgingValue = forgingValue;
             this.winValue = winValue;
             this.target = target;
+            this.totalWinValue = totalWinValue;
             this.totalFee = totalFee;
             this.emittedFee = emittedFee;
         }
@@ -173,6 +178,7 @@ import java.util.*;
             this.forgingValue = block.forgingValue;
             this.winValue = block.winValue;
             this.target = block.target;
+            this.totalWinValue = block.totalWinValue;
             this.totalFee = totalFee;
             this.emittedFee = emittedFee;
         }
@@ -189,6 +195,7 @@ import java.util.*;
             this.forgingValue = block.forgingValue;
             this.winValue = block.winValue;
             this.target = block.target;
+            this.totalWinValue = block.totalWinValue;
             this.totalFee = block.totalFee;
             this.emittedFee = block.emittedFee;
         }
@@ -260,6 +267,12 @@ import java.util.*;
             targetBytes = Bytes.ensureCapacity(targetBytes, WIN_VALUE_LENGTH, 0);
             System.arraycopy(targetBytes, 0, data, pos, WIN_VALUE_LENGTH);
             pos += WIN_VALUE_LENGTH;
+
+            //WRITE TOTAL WIN VALUE
+            byte[] totalWinValueBytes = Longs.toByteArray(this.totalWinValue);
+            totalWinValueBytes = Bytes.ensureCapacity(totalWinValueBytes, TOTAL_WIN_VALUE_LENGTH, 0);
+            System.arraycopy(totalWinValueBytes, 0, data, pos, TOTAL_WIN_VALUE_LENGTH);
+            pos += TOTAL_WIN_VALUE_LENGTH;
 
             //WRITE TOTAL FEE
             byte[] totalFeeBytes = Longs.toByteArray(this.totalFee);
@@ -336,6 +349,11 @@ import java.util.*;
             long target = Longs.fromByteArray(targetBytes);
             position += WIN_VALUE_LENGTH;
 
+            //READ TOTAL WIN VALUE
+            byte[] totalWinValueBytes = Arrays.copyOfRange(data, position, position + TOTAL_WIN_VALUE_LENGTH);
+            long tolalWinValue = Longs.fromByteArray(totalWinValueBytes);
+            position += TOTAL_WIN_VALUE_LENGTH;
+
             //READ TOTAL FEE
             byte[] totalFeeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             long totalFee = Longs.fromByteArray(totalFeeBytes);
@@ -347,7 +365,7 @@ import java.util.*;
             position += FEE_LENGTH;
 
             return new BlockHead(version, reference, creator, transactionCount, transactionsHash, signature,
-                    height, forgingValue, winValue, target, totalFee, emittedFee);
+                    height, forgingValue, winValue, target, tolalWinValue, totalFee, emittedFee);
 
         }
 
@@ -1504,6 +1522,9 @@ import java.util.*;
             return false;
         }
 
+        // вычислив всю силу цепочки
+        this.totalWinValue = this.parentBlockHead.totalWinValue + this.winValue;
+
         final long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
         if (targetedWinValue < 1) {
@@ -1970,7 +1991,7 @@ import java.util.*;
 
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
-                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
@@ -1983,7 +2004,7 @@ import java.util.*;
         if (this.blockHead.totalFee != 0) {
             BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
             this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
-                    totalFee, true);
+                    totalFee, true, false);
 
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && !Controller.getInstance().noCalculated) {
@@ -1998,7 +2019,7 @@ import java.util.*;
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
-                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, false);
         }
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #3");
@@ -2411,7 +2432,7 @@ import java.util.*;
                 transaction.orphan(this, Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
-                transaction.getCreator().removeLastTimestamp(dcSet);
+                transaction.getCreator().removeLastTimestamp(dcSet, transaction.getTimestamp());
             }
 
             if (notFork) {

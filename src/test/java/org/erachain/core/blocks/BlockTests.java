@@ -78,8 +78,8 @@ public class BlockTests {
         gbTransactions = gb.getTransactions();
 
         generator.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000), false);
-        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false); // need for payments
+        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
+        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false, false); // need for payments
     }
 
     private void initTrans(List<Transaction> transactions, long timestamp) {
@@ -95,7 +95,7 @@ public class BlockTests {
         //GENERATE NEW HEAD
         Block.BlockHead head = new Block.BlockHead(1, new byte[Block.REFERENCE_LENGTH], generator, 100,
                 new byte[Block.TRANSACTIONS_HASH_LENGTH], new byte[Block.SIGNATURE_LENGTH], 23, 10000,
-                45000, 33000, 3456,12);
+                45000, 33000, 567554563654L, 3456,12);
         byte[] raw = head.toBytes();
 
 
@@ -520,8 +520,8 @@ public class BlockTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000), false);
-        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false);
+        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
+        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false, false);
 
 
         //GENERATE NEXT BLOCK
@@ -618,8 +618,8 @@ public class BlockTests {
         //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
         //transaction.process(databaseSet, false);
         generator.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100000), false);
-        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false);
+        generator.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100000), false, false);
+        generator.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1000), false, false);
 
         //GENERATE NEXT BLOCK
         Block block = blockGenerator.generateNextBlock(generator, gb,

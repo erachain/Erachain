@@ -2,17 +2,21 @@ package org.erachain.core.transaction;
 
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonFactory;
 import org.erachain.core.item.persons.PersonHuman;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 //import java.util.Map;
 // import org.slf4j.LoggerFactory;
@@ -59,7 +63,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
     @Override
     public long getInvitedFee() {
-        return 0l;
+        return 0L;
     }
 
     // RETURN START KEY in tot GEMESIS
@@ -216,7 +220,8 @@ public class IssuePersonRecord extends IssueItemRecord {
         }
 
         // TODO  удалить правки протокола для новой цепочки NEW CHAIN
-        if (person.isAlive(this.timestamp)) {
+        boolean isPersonAlive = person.isAlive(this.timestamp);
+        if (isPersonAlive) {
             // IF PERSON is LIVE
             if (person.getImage().length > person.getMAXimageLenght()) {
                 if (height > 157640) {
@@ -253,8 +258,9 @@ public class IssuePersonRecord extends IssueItemRecord {
                 (checkFeeBalance ? 0L : NOT_VALIDATE_FLAG_FEE) | NOT_VALIDATE_FLAG_PUBLIC_TEXT);
         // FIRST PERSONS INSERT as ADMIN
         boolean creatorAdmin = false;
+        boolean creatorIsPerson = creator.isPerson(dcSet, height);
         if ((flags & NOT_VALIDATE_FLAG_PERSONAL) == 0l && !BlockChain.ANONIM_SERT_USE
-                && !creator.isPerson(dcSet, height)) {
+                && !creatorIsPerson) {
             long count = dcSet.getItemPersonMap().getLastKey();
             if (count < 20) {
                 // FIRST Persons only by ME
@@ -270,6 +276,21 @@ public class IssuePersonRecord extends IssueItemRecord {
                 return CREATOR_NOT_PERSONALIZED;
             }
         }
+
+        if (isPersonAlive && height > BlockChain.START_ISSUE_RIGHTS) {
+            Fun.Tuple4<Long, Integer, Integer, Integer> creatorPerson = creator.getPersonDuration(dcSet);
+            if (creatorPerson != null) {
+                Set<String> thisPersonAddresses = dcSet.getPersonAddressMap().getItems(creatorPerson.a).keySet();
+
+                BigDecimal totalERAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.ERA_KEY, TransactionAmount.ACTION_SEND);
+                BigDecimal totalLIAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.LIA_KEY, TransactionAmount.ACTION_SEND);
+
+                if (!BlockChain.VALID_PERSON_REG_ERA(height, totalERAOwned, totalLIAOwned)) {
+                    return NOT_ENOUGH_ERA_BALANCE;
+                }
+            }
+        }
+
         return res;
     }
 

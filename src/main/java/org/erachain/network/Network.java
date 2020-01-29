@@ -120,14 +120,17 @@ public class Network extends Observable {
 
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
-        creator.start();
+        if (controller.useNet)
+            creator.start();
 
         //START ConnectionAcceptor THREAD
         acceptor = new ConnectionAcceptor(this);
-        acceptor.start();
+        if (controller.useNet)
+            acceptor.start();
 
         peerManager = new PeerManager(this);
-        peerManager.start();
+        if (controller.useNet)
+            peerManager.start();
 
         telegramer = new TelegramManager(controller,
                 controller.getBlockChain(),
@@ -138,7 +141,8 @@ public class Network extends Observable {
 
         if (Settings.getInstance().isLocalPeersScannerEnabled()) {
             localPeerScanner = new LocalPeerScanner(this);
-            localPeerScanner.start();
+            if (controller.useNet)
+                localPeerScanner.start();
         }
 
     }

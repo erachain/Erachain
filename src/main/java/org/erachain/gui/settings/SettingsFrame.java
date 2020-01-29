@@ -1,10 +1,20 @@
 package org.erachain.gui.settings;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import org.apache.commons.io.FileUtils;
+import org.erachain.controller.Controller;
+import org.erachain.gui.MainFrame;
+import org.erachain.lang.Lang;
+import org.erachain.lang.LangFile;
+import org.erachain.network.Network;
+import org.erachain.settings.Settings;
+import org.erachain.utils.SaveStrToFile;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -13,25 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import org.apache.commons.io.FileUtils;
-import org.erachain.gui.MainFrame;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import org.erachain.controller.Controller;
-import org.erachain.lang.Lang;
-import org.erachain.lang.LangFile;
-import org.erachain.network.Network;
-import org.erachain.settings.Settings;
-import org.erachain.utils.SaveStrToFile;
 
 @SuppressWarnings("serial")
 public class SettingsFrame extends JDialog {
@@ -388,7 +379,7 @@ public class SettingsFrame extends JDialog {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        Settings.FreeInstance();
+        Settings.freeInstance();
 
         if (settingsTabPane.settingsAllowedPanel.rpcServiceRestart) {
             Controller.getInstance().rpcServiceRestart();

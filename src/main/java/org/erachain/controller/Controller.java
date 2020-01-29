@@ -199,11 +199,30 @@ public class Controller extends Observable {
     }
 
     public static String getVersion(boolean withTimestamp) {
+
+        String dbs;
+        switch (getInstance().databaseSystem) {
+            case DCSet.DBS_ROCK_DB:
+                dbs = "RocksDB";
+                break;
+            case DCSet.DBS_MAP_DB:
+                dbs = "MapDB";
+                break;
+            case DCSet.DBS_FAST:
+                dbs = "fast";
+                break;
+            default:
+                dbs = "MapDB";
+
+        }
+
+
         if (withTimestamp)
             return version + (BlockChain.DEVELOP_USE ? " DevelopNet"
-                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "");
+                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "")
+                    + " (" + dbs + ")";
 
-        return version;
+        return version + " (" + dbs + ")";
 
     }
 
@@ -1939,11 +1958,40 @@ public class Controller extends Observable {
 
     }
 
-    public void update(int shift) {
+    public Block checkNewPeerUpdates(Peer peer) {
+        if (this.blockChain.getWaitWinBuffer() == null) {
+            // если победный блок не подошел - значит он устарел и там скорее уже цепочка двинулась еще
+            byte[] lastSignature = getLastBlockSignature();
+            Message mess = MessageFactory.getInstance()
+                    .createGetHeadersMessage(lastSignature);
+            SignaturesMessage resp = (SignaturesMessage) peer.getResponse(mess, 3000); // AWAIT!
+            if (resp != null) {
+                List<byte[]> signatures = resp.getSignatures();
+                if (!signatures.isEmpty()) {
+                    // а теперь еще проверим - может там уже новый блок в цепочке последним добавлен?
+                    Message message = MessageFactory.getInstance().createGetBlockMessage(signatures.get((0)));
+                    //SEND MESSAGE TO PEER
+                    BlockMessage response = (BlockMessage) peer.getResponse(message, 10000);
+                    //CHECK IF WE GOT RESPONSE
+                    if (response != null) {
+                        Block block = response.getBlock();
+                        if (Arrays.equals(block.getReference(), lastSignature)) {
+                            LOGGER.debug("ADD update new block");
+                            this.blockChain.setWaitWinBuffer(this.dcSet, block, peer);
+                            return this.blockChain.popWaitWinBuffer();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public Peer update(int shift) {
         // UPDATE STATUS
 
         if (this.status == STATUS_NO_CONNECTIONS) {
-            return;
+            return null;
         }
 
         /// this.status = STATUS_SYNCHRONIZING;
@@ -2002,11 +2050,11 @@ public class Controller extends Observable {
                         if (!this.isOnStopping())
                             this.synchronizer.synchronize(dcSet, checkPointHeight, peer, peerHW.a);
                         if (this.isOnStopping())
-                            return;
+                            return null;
                     } catch (Exception e) {
                         if (this.isOnStopping()) {
                             // on closing this.blocchain.rollback(dcSet);
-                            return;
+                            return null;
                         } else if (peer.isBanned()) {
                             ;
                         } else if (blockGenerator.betterPeer != null) {
@@ -2016,9 +2064,15 @@ public class Controller extends Observable {
                         } else {
                             LOGGER.error(e.getMessage(), e);
                             peer.ban(e.getMessage());
-                            return;
+                            return null;
                         }
                     }
+
+                    // сохранимся - хотя может и заря - раньше то работало и так
+                    if (true) {
+                        dcSet.flush(0, true, false);
+                    }
+
                 }
 
                 blockchainSyncStatusUpdate(getMyHeight());
@@ -2039,20 +2093,21 @@ public class Controller extends Observable {
         } else {
             this.status = STATUS_OK;
             this.pingAllPeers(false);
-            if (this.isStopping) return;
+            if (this.isStopping) return null;
 
             // если в момент синхронизации прилетал победный блок
             // то его вынем и поновой вставим со всеми проверками
             Block winBlockUnchecked = this.blockChain.popWaitWinBuffer();
-            if (winBlockUnchecked != null)
-                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked, null);
+            if (winBlockUnchecked != null) {
+                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked, peer);
+            }
 
         }
 
         // send to ALL my HW
         //// broadcastHWeight(null);
         if (this.isStopping)
-            return;
+            return null;
 
         // NOTIFY
         this.setChanged();
@@ -2065,6 +2120,7 @@ public class Controller extends Observable {
         }
 
         this.statusInfo();
+        return peer;
 
     }
 
@@ -3587,9 +3643,6 @@ public class Controller extends Observable {
 
         String pass = null;
 
-        // init SETTINGS FIRST
-        Settings.getInstance();
-
         // init BlockChain then
         String log4JPropertyFile = "resources/log4j" + (Settings.getInstance().isTestnet() ? "-dev" : "") + ".properties";
         Properties p = new Properties();
@@ -3701,28 +3754,17 @@ public class Controller extends Observable {
                 Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
                 continue;
             }
-            if (arg.equals("-testnet")) {
-                Settings.getInstance().setGenesisStamp(NTP.getTime());
-                useNet = false;
-                continue;
-            }
-            if (arg.startsWith("-testnet=") && arg.length() > 9) {
-                try {
-                    long testnetstamp = Long.parseLong(arg.substring(9));
-
-                    if (testnetstamp == 0) {
-                        testnetstamp = 1511164500000l;
-                    }
-
-                    Settings.getInstance().setGenesisStamp(testnetstamp);
-                } catch (Exception e) {
-                    Settings.getInstance().setGenesisStamp(Settings.DEFAULT_MAINNET_STAMP);
-                }
-            }
             if (arg.equals("-nonet")) {
                 useNet = false;
                 continue;
             }
+        }
+
+        if (Settings.genesisStamp <= 0) {
+            if (Settings.genesisStamp < 0) {
+                useNet = false;
+            }
+            Settings.genesisStamp = NTP.getTime() - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(1) << 1);
         }
 
         // default DataBase System

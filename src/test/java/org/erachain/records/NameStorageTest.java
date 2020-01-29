@@ -61,14 +61,14 @@ public class NameStorageTest {
         //		.valueOf(1000), NTP.getTime());
         //transaction.process(databaseSet, false);
         //sender.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-        sender.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        sender.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
 
 
         // PROCESS GENESIS TRANSACTION TO MAKE SURE BUYER HAS FUNDS
         //transaction = new GenesisTransaction(buyer, BigDecimal.valueOf(1000)
         //		, NTP.getTime());
         //transaction.process(databaseSet, false);
-        buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
 
         // CREATE SIGNATURE
         long timestamp = NTP.getTime();

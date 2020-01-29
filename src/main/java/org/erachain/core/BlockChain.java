@@ -150,8 +150,6 @@ public class BlockChain {
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final long BONUS_STOP_PERSON_KEY = 13l;
-
     public static final int VERS_4_11 = TEST_DB > 0 ? 0 : DEVELOP_USE ? 230000 : Settings.getInstance().isTestnet() ? 0 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
@@ -168,7 +166,6 @@ public class BlockChain {
      */
     public static final long LEFT_PRICE_HEIGHT_SEQ = TEST_DB > 0 ? 0 : Transaction.makeDBRef(LEFT_PRICE_HEIGHT, 0);
 
-
     public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : 44666;
 
     public static final int VERS_4_12 = TEST_DB > 0 ? 0 : DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
@@ -181,6 +178,19 @@ public class BlockChain {
     // TODO поидее отрицательное тоже работать будет как надо
     public static final long VERS_30SEC_TIME = DEVELOP_USE ? (Settings.DEFAULT_DEV_NET_STAMP + (long) VERS_30SEC * 120L)
             : (Settings.getInstance().isTestnet() ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L);
+
+    public static final int VERS_4_21_02 = 670000;
+
+    /**
+     * Включает реферальную систему
+     */
+    public static final int REFERAL_BONUS_FOR_PERSON_4_21 = Settings.getInstance().isTestnet() ? 0 : Integer.MAX_VALUE;
+
+    /**
+     * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
+     */
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : VERS_4_21_02;
+    public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
 
@@ -299,21 +309,28 @@ public class BlockChain {
     public static final int FEE_FOR_ANONIMOUSE = 33;
     //
     public static final boolean VERS_4_11_USE_OLD_FEE = false;
-    public static final int FEE_INVITED_DEEP = 2;
 
-    // levels for deep
+
+    /**
+     * Multi-level Referal Sysytem. Levels for deep
+     */
+    public static final int FEE_INVITED_DEEP = TEST_DB > 0 ? 0 : 3;
+    /**
+     * Stop referals system on this person Number. Причем рефералка которая должна упать этим персонам
+     * (с номером ниже заданного) по сути просто сжигается - то есть идет дефляция.
+     */
+    public static final long BONUS_STOP_PERSON_KEY = Settings.getInstance().isTestnet()? 0 : 13L;
+
     public static final int FEE_INVITED_SHIFT = 1;
-    public static final int BONUS_REFERAL = 50 * FEE_PER_BYTE;
+    /**
+     * Постаянная награда за байт трнзакции
+     */
+    public static final int BONUS_REFERAL = 200 * FEE_PER_BYTE;
+    /**
+     * Какую долю отдавать на уровень ниже - как степерь двойки. 1 - половину, 2 - четверть, 3 - восьмую часть
+     */
     public static final int FEE_INVITED_SHIFT_IN_LEVEL = 1;
 
-    // 0.0075 COMPU - is FEE for Issue Person - then >> 2 - всумме столько получают Форжер и кто привел
-    // Бонус получает Персона, Вносит, Удостоверяет - 3 человека = Эмиссия
-    // 0.0002 - цена за одну транзакцию
-    public static final BigDecimal BONUS_FEE_LVL1 = new BigDecimal("0.01"); // < 3 000
-    public static final BigDecimal BONUS_FEE_LVL2 = new BigDecimal("0.008"); // < 10 000
-    public static final BigDecimal BONUS_FEE_LVL3 = new BigDecimal("0.005"); // < 100 000
-    public static final BigDecimal BONUS_FEE_LVL4 = new BigDecimal("0.0025"); // < 1 000 000
-    public static final BigDecimal BONUS_FEE_LVL5 = new BigDecimal("0.0015"); // else
     // SERTIFY
     // need RIGHTS for non PERSON account
     public static final BigDecimal MAJOR_ERA_BALANCE_BD = BigDecimal.valueOf(MAJOR_ERA_BALANCE);
@@ -675,7 +692,7 @@ public class BlockChain {
         if (height <= VERS_30SEC) {
             return -GENERATING_MIN_BLOCK_TIME_MS(height);
         }
-        return DEVELOP_USE? 5000 : 5000;
+        return DEVELOP_USE ? 0 : 0;
     }
 
     public static int WIN_TIMEPOINT(int height) {
@@ -683,7 +700,7 @@ public class BlockChain {
     }
 
     public static int UNCONFIRMED_DEADTIME_MS(long timestamp) {
-        int height = timestamp < VERS_30SEC_TIME? 1 : VERS_30SEC + 1;
+        int height = timestamp < VERS_30SEC_TIME ? 1 : VERS_30SEC + 1;
         if (TEST_DB > 0) {
             return GENERATING_MIN_BLOCK_TIME_MS(height);
         } else {
@@ -691,8 +708,60 @@ public class BlockChain {
         }
     }
 
+    public static boolean VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+
+        if (height < START_ISSUE_RIGHTS) {
+            ;
+        } else {
+            if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
+                ;
+            } else {
+                if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
+    }
+
+    public static boolean VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+
+        if (height < START_ISSUE_RIGHTS) {
+            ;
+        }
+        if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
+            ;
+        } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+            if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                return false;
+            }
+        } else {
+            if (totalERA.compareTo(new BigDecimal("100")) < 0) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
     public static int BLOCKS_PER_DAY(int height) {
         return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
+    }
+
+    public static BigDecimal BONUS_FOR_PERSON(int height) {
+
+        if (Settings.getInstance().isTestnet() || height > START_ISSUE_RIGHTS) {
+            return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+        } else {
+            return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
+        }
+    }
+
+    public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
+        return Settings.getInstance().isTestnet() || height > REFERAL_BONUS_FOR_PERSON_4_21;
     }
 
     public static int getCheckPoint(DCSet dcSet) {
@@ -980,7 +1049,7 @@ public class BlockChain {
             return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
         }
 
-        return this.genesisTimestamp
+        return this.genesisTimestamp + 46667L
                 + (long) VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
                 + (long) (height - VERS_30SEC) * GENERATING_MIN_BLOCK_TIME_MS(height);
 

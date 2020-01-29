@@ -2,6 +2,7 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
@@ -168,7 +169,7 @@ public class PersonConfirmDialog extends JDialog {
             return;
         }
 
-        Pair<Integer, Integer> toDateResult = ItemCls.resolveEndDayFromStr(toDateStr, RSertifyPubKeys.DEFAULT_DURATION);
+        Pair<Integer, Integer> toDateResult = ItemCls.resolveEndDayFromStr(toDateStr, BlockChain.DEFAULT_DURATION);
         if (toDateResult.getA() < 0) {
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Invalid to Date"),
                     Lang.getInstance().translate("Error"), JOptionPane.ERROR_MESSAGE);

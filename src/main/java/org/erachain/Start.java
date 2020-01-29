@@ -1,6 +1,7 @@
 package org.erachain;
 
 import org.erachain.controller.Controller;
+import org.erachain.settings.Settings;
 
 import java.io.IOException;
 
@@ -27,6 +28,26 @@ public class Start {
         //SpringApplicationBuilder builder = new SpringApplicationBuilder(Start.class);
 
         //builder.headless(false).run(args);
+
+        long genesisStamp = Settings.DEFAULT_MAINNET_STAMP;
+        for (String arg : args) {
+            if (arg.equals("-testnet")) {
+                genesisStamp = -1;
+                break;
+            } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
+                try {
+                    genesisStamp = Long.parseLong(arg.substring(9));
+
+                } catch (Exception e) {
+                    genesisStamp = Settings.DEFAULT_DEV_NET_STAMP;
+                }
+                break;
+            }
+        }
+
+        Settings.genesisStamp = genesisStamp;
+
+        Settings.getInstance();
 
         Controller.getInstance().startApplication(args);
 

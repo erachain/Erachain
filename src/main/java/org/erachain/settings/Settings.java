@@ -103,11 +103,11 @@ public class Settings {
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
 
-
     private static Settings instance;
+
     List<Peer> cacheInternetPeers;
     long timeLoadInternetPeers;
-    private long genesisStamp = -1;
+    public static long genesisStamp;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
     private String userPath = "";
@@ -123,7 +123,7 @@ public class Settings {
     private String telegramDefaultReciever;
     private String telegramRatioReciever = null;
     private String getTelegramPath;
-    
+
     private String telegramtPath;
 
     private Settings() {
@@ -160,7 +160,7 @@ public class Settings {
         }
     }
 
-    public static Settings getInstance() {
+    public synchronized static Settings getInstance() {
         ReentrantLock lock = new ReentrantLock();
         lock.lock();
         try {
@@ -174,10 +174,8 @@ public class Settings {
         return instance;
     }
 
-    public static void FreeInstance() {
-        if (instance != null) {
-            instance = null;
-        }
+    public synchronized static void freeInstance() {
+        instance = null;
     }
 
     public JSONObject Dump() {
@@ -537,24 +535,7 @@ public class Settings {
     }
 
     public long getGenesisStamp() {
-        if (this.genesisStamp == -1) {
-            if (this.settingsJSON.containsKey("testnetstamp")) {
-                if (this.settingsJSON.get("testnetstamp").toString().equals("now") ||
-                        ((Long) this.settingsJSON.get("testnetstamp")).longValue() == 0) {
-                    this.genesisStamp = System.currentTimeMillis();
-                } else {
-                    this.genesisStamp = ((Long) this.settingsJSON.get("testnetstamp")).longValue();
-                }
-            } else {
-                this.genesisStamp = DEFAULT_MAINNET_STAMP;
-            }
-        }
-
         return this.genesisStamp;
-    }
-
-    public void setGenesisStamp(long testNetStamp) {
-        this.genesisStamp = testNetStamp;
     }
 
     public int getMaxConnections() {
@@ -1021,8 +1002,6 @@ public class Settings {
 
 
     }
-    
-   
 
     public String cutPath(String path) {
 

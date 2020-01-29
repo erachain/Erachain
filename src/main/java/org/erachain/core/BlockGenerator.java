@@ -748,11 +748,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             for (int nonce = 0; nonce < BlockChain.TEST_DB_ACCOUNTS.length; nonce++) {
                 BlockChain.TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
                 // SET BALANCES
-                BlockChain.TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true);
+                BlockChain.TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true, false);
             }
         }
 
         try {
+            // если только что была синхронизация - возьмем новый блок
+            Peer afterUpdatePeer = null;
             while (!ctrl.isOnStopping()) {
 
                 int timeStartBroadcast = BlockChain.WIN_TIMEPOINT(height);
@@ -1201,6 +1203,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     if (this.orphanto > 0)
                         continue;
 
+                    if (waitWin == null && afterUpdatePeer != null) {
+                        waitWin = ctrl.checkNewPeerUpdates(afterUpdatePeer);
+                        afterUpdatePeer = null;
+                    }
+
                     if (waitWin == null) {
                         if (this.solvingReference != null) {
                             if (System.currentTimeMillis() - pointLogGoUpdate > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
@@ -1319,7 +1326,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.solvingReference = null;
                     bchain.clearWaitWinBuffer();
 
-                    ctrl.update(shift_height);
+                    afterUpdatePeer = ctrl.update(shift_height);
 
                     local_status = 0;
                     this.setMonitorStatus("local_status " + viewStatus());
