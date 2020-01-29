@@ -3754,14 +3754,17 @@ public class Controller extends Observable {
                 Settings.getInstance().setDefaultPeers(arg.substring(7).split(","));
                 continue;
             }
-            if (arg.equals("-testnet")) {
-                useNet = false;
-                continue;
-            }
             if (arg.equals("-nonet")) {
                 useNet = false;
                 continue;
             }
+        }
+
+        if (Settings.genesisStamp <= 0) {
+            if (Settings.genesisStamp < 0) {
+                useNet = false;
+            }
+            Settings.genesisStamp = NTP.getTime() - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(1) << 1);
         }
 
         // default DataBase System
