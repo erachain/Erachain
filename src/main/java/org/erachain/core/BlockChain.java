@@ -172,8 +172,6 @@ public class BlockChain {
 
     public static final int VERS_30SEC = TEST_DB > 0 ? 0 : DEVELOP_USE ? 471000 : Settings.getInstance().isTestnet() ? 0 : 280785; //	2019-09-17 12:01:13
 
-    public static final int BONUS_FOR_PERSON_4_21 = 670000;
-
     //public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC
     //        * (DEVELOP_USE ? 120L : Settings.getInstance().isTestnet()? 30L : 288L);
 
@@ -181,10 +179,17 @@ public class BlockChain {
     public static final long VERS_30SEC_TIME = DEVELOP_USE ? (Settings.DEFAULT_DEV_NET_STAMP + (long) VERS_30SEC * 120L)
             : (Settings.getInstance().isTestnet() ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L);
 
+    public static final int VERS_4_21_02 = 670000;
+
     /**
-     * Включает обработку заявок на бирже по цене рассчитанной по остаткам
+     * Включает реферальную систему
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : BONUS_FOR_PERSON_4_21;
+    public static final int REFERAL_BONUS_FOR_PERSON_4_21 = Settings.getInstance().isTestnet() ? 0 : Integer.MAX_VALUE;
+
+    /**
+     * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
+     */
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : VERS_4_21_02;
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
@@ -705,14 +710,9 @@ public class BlockChain {
 
     public static boolean VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
-        if (DEVELOP_USE) {
-            ;
-        } else if (Settings.getInstance().isTestnet()) {
+        if (height < START_ISSUE_RIGHTS) {
             ;
         } else {
-            if (height < BONUS_FOR_PERSON_4_21) {
-                ;
-            }
             if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
                 ;
             } else {
@@ -728,24 +728,18 @@ public class BlockChain {
 
     public static boolean VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
-        if (DEVELOP_USE) {
+        if (height < START_ISSUE_RIGHTS) {
             ;
-        } else if (Settings.getInstance().isTestnet()) {
+        }
+        if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
-        } else {
-            if (height < BONUS_FOR_PERSON_4_21) {
-                ;
+        } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
+            if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                return false;
             }
-            if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
-                ;
-            } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
-                if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                    return false;
-                }
-            } else {
-                if (totalERA.compareTo(new BigDecimal("100")) < 0) {
-                    return false;
-                }
+        } else {
+            if (totalERA.compareTo(new BigDecimal("100")) < 0) {
+                return false;
             }
         }
 
@@ -759,7 +753,7 @@ public class BlockChain {
 
     public static BigDecimal BONUS_FOR_PERSON(int height) {
 
-        if (Settings.getInstance().isTestnet() || height > BONUS_FOR_PERSON_4_21) {
+        if (Settings.getInstance().isTestnet() || height > START_ISSUE_RIGHTS) {
             return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
         } else {
             return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
@@ -767,7 +761,7 @@ public class BlockChain {
     }
 
     public static boolean REFERAL_BONUS_FOR_PERSON(int height) {
-        return Settings.getInstance().isTestnet() || height > BONUS_FOR_PERSON_4_21;
+        return Settings.getInstance().isTestnet() || height > REFERAL_BONUS_FOR_PERSON_4_21;
     }
 
     public static int getCheckPoint(DCSet dcSet) {
