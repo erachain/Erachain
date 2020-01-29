@@ -42,14 +42,14 @@ Not store calculated transactions in DB. Make speed up
 -dbschain=rocksdb | mapdb | fast
 Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it si complex DB for fast speed (default)
 
--testnet[=TIMESTAMP]
--testnet - set genesis Timestamp = current Date and -nonet is ON and use 9045 port
--testnet=dev - set genesis Timestamp = DEVELOP chain on 9066 port
--testnet=0 - set current NTP genesis Timestamp on port 9045
--testnet=[XXXX] - tesnet chain on port 9045 from genesis timestamp XXXX
-
 -nonet
 No use Network
+
+-testnet[=TIMESTAMP]
+-testnet - set genesis Timestamp = current Date and -nonet is ON and use 9065 port
+-testnet=dev - set genesis Timestamp = DEVELOP chain on 9066 port
+-testnet=0 - set current NTP genesis Timestamp on port 9065
+-testnet=[XXXX] - tesnet chain on port 9045 from genesis timestamp XXXX
 
 example foe Windows:
 	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1

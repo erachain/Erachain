@@ -3724,10 +3724,10 @@ public class Controller extends Observable {
         }
 
         if (Settings.genesisStamp <= 0) {
-            Settings.genesisStamp = NTP.getTime();
             if (Settings.genesisStamp < 0) {
                 useNet = false;
             }
+            Settings.genesisStamp = NTP.getTime() - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(1) << 1);
         }
 
         // default DataBase System

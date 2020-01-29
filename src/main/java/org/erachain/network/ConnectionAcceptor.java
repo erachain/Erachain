@@ -176,7 +176,8 @@ public class ConnectionAcceptor extends MonitoredThread {
 
         setMonitorStatusBefore("halt socket.close");
         try {
-            socket.close();
+            if (socket != null)
+                socket.close();
         } catch (IOException e) {
         }
         setMonitorStatusAfter();
