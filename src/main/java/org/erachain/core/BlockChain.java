@@ -778,14 +778,6 @@ public class BlockChain {
         return heightCheckPoint;
     }
 
-    public static int getNetworkPort() {
-        if (Settings.getInstance().isTestnet()) {
-            return BlockChain.TESTNET_PORT;
-        } else {
-            return BlockChain.MAINNET_PORT;
-        }
-    }
-
     public boolean isPeerTrusted(Peer peer) {
         return trustedPeers.contains(peer.getAddress().getHostAddress());
     }

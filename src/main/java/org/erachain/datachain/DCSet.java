@@ -1692,7 +1692,7 @@ public class DCSet extends DBASet {
                 this.uses = 0;
             }
 
-            logger.info("closed" + (parent == null ? " Main" : "fork " + this.toString()));
+            logger.info("closed " + (parent == null ? "Main" : "parent " + toString()));
         }
 
     }

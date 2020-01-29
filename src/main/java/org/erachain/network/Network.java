@@ -118,7 +118,6 @@ public class Network extends Observable {
 
     private void start() {
 
-
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
         if (controller.useNet)
