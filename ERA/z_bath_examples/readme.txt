@@ -44,8 +44,8 @@ Select DataBase for dataChain. rocksdb - RocksDB or mapdb - MapDB or fast - it s
 
 -testnet[=TIMESTAMP]
 -testnet - set genesis Timestamp = current Date and -nonet is ON and use 9045 port
--testnet=1511164500000 - set genesis Timestamp = DEVELOP chain on 9066 port
--testnet=... tesnet chain on port 9045
+-testnet=dev - set genesis Timestamp = DEVELOP chain on 9066 port
+-testnet=[XXXX] - tesnet chain on port 9045 from genesis timestamp XXXX
 
 -nonet
 No use Network

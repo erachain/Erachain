@@ -45,7 +45,7 @@ public class Start {
                     }
 
                 } catch (Exception e) {
-                    genesisStamp = Settings.DEFAULT_MAINNET_STAMP;
+                    genesisStamp = Settings.DEFAULT_DEV_NET_STAMP;
                 }
             }
         }
