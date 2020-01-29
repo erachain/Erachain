@@ -1169,7 +1169,8 @@ public class WebResource {
         File file = new File("web/favicon.ico");
 
         if (file.exists()) {
-            return Response.ok(file, "image/vnd.microsoft.icon").build();
+            return Response.ok(file, "image/png").build();
+            //return Response.ok(file, "image/vnd.microsoft.icon").build();
         } else {
             return error404(request, null);
         }
@@ -1181,7 +1182,8 @@ public class WebResource {
         File file = new File("web/favicon.ico");
 
         if (file.exists()) {
-            return Response.ok(file, "image/vnd.microsoft.icon").build();
+            return Response.ok(file, "image/png").build();
+            //return Response.ok(file, "image/vnd.microsoft.icon").build();
         } else {
             return error404(request, null);
         }

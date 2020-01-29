@@ -1970,7 +1970,7 @@ import java.util.*;
 
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
-                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
@@ -1983,7 +1983,7 @@ import java.util.*;
         if (this.blockHead.totalFee != 0) {
             BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
             this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
-                    totalFee, true);
+                    totalFee, true, false);
 
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && !Controller.getInstance().noCalculated) {
@@ -1998,7 +1998,7 @@ import java.util.*;
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
-                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, false);
         }
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #3");

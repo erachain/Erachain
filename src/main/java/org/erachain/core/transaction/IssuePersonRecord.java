@@ -63,7 +63,7 @@ public class IssuePersonRecord extends IssueItemRecord {
 
     @Override
     public long getInvitedFee() {
-        return 0l;
+        return 0L;
     }
 
     // RETURN START KEY in tot GEMESIS

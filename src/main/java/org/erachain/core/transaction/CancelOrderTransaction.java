@@ -274,7 +274,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //UPDATE BALANCE OF CREATOR
         //creator.setBalance(orderSignature.getHaveAssetKey(), creator.getBalance(db, orderSignature.getHaveAssetKey()).add(orderSignature.getAmountHaveLeft()), db);
-        order.getCreator().changeBalance(db, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
+        order.getCreator().changeBalance(db, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false, false);
 
     }
 
@@ -318,7 +318,7 @@ public class CancelOrderTransaction extends Transaction {
 
         //REMOVE BALANCE OF CREATOR
         //creator.setBalance(orderID.getHaveAssetKey(), creator.getBalance(db, orderID.getHaveAssetKey()).subtract(orderID.getAmountHaveLeft()), db);
-        order.getCreator().changeBalance(db, true, order.getHaveAssetKey(), order.getAmountHaveLeft(), false);
+        order.getCreator().changeBalance(db, true, order.getHaveAssetKey(), order.getAmountHaveLeft(), false, false);
 
     }
 
@@ -396,7 +396,6 @@ public class CancelOrderTransaction extends Transaction {
     //@Override
     public Map<String, Map<Long, BigDecimal>> getAssetAmount() {
         Map<String, Map<Long, BigDecimal>> assetAmount = new LinkedHashMap<>();
-
 
         assetAmount = subAssetAmount(assetAmount, this.creator.getAddress(), FEE_KEY, this.fee);
 

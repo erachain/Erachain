@@ -758,9 +758,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
-        if (true)
+        if (!BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
             // SWITCH OFF REFERRAL
             return 0l;
+        }
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
@@ -772,9 +773,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         long fee = this.fee.unscaledValue().longValue();
 
         // Если слишком большая комиссия, то и награду чуток увеличим
-        if (fee > BlockChain.BONUS_REFERAL << 3)
+        if (fee > BlockChain.BONUS_REFERAL << 4)
             return BlockChain.BONUS_REFERAL << 1;
+        else if (fee < BlockChain.BONUS_REFERAL << 2) {
+            // стандартно если обычная то половину отправим на подарки
+            return fee >> 1;
+        }
 
+        // если повышенная то не будем изменять
         return BlockChain.BONUS_REFERAL;
     }
 
@@ -1343,7 +1349,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                                    long invitedPersonKey, boolean asOrphan,
                                    List<RCalculated> txCalculated, String message) {
 
-        if (fee_gift <= 0l)
+        if (fee_gift <= 0L)
             return;
 
         String messageLevel;
@@ -1356,18 +1362,22 @@ public abstract class Transaction implements ExplorerJsonLine {
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
         Account issuerAccount = issueRecord.getCreator();
         Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
-        long issuerPersonKey = issuerPersonDuration.a;
-
-        if (issuerPersonKey == invitedPersonKey) {
-            // loop ??
-            return;
+        long issuerPersonKey;
+        if (issuerPersonDuration == null) {
+            // в тестовой сети возможно что каждый создает с неудостоверенного
+            issuerPersonKey = -1;
+        } else {
+            issuerPersonKey = issuerPersonDuration.a;
         }
 
-        if (issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
+        if (issuerPersonKey < 0 // это возможно только для певой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey == invitedPersonKey // это возможно только в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {
-            // IT IS ME - all fee to INVITED
+            // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
+
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
                 txCalculated.add(new RCalculated(invitedAccount, FEE_KEY, giftBG,
@@ -1390,9 +1400,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
             if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
@@ -1405,10 +1415,11 @@ public abstract class Transaction implements ExplorerJsonLine {
             // this is END LEVEL
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY,
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
 
             if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
@@ -1428,7 +1439,8 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
             GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, FEE_KEY,
-                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true);
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true, false);
+
             return;
         }
 
@@ -1454,18 +1466,22 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true);
+                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true, true);
 
             }
 
             // Multi Level Referal
-            long invitedFee = getInvitedFee();
-            if (invitedFee > 0)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
-                        block != null && block.txCalculated != null ?
-                                block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
-
-            String creatorAddress = this.creator.getAddress();
+            if (BlockChain.FEE_INVITED_DEEP > 0) {
+                long invitedFee = getInvitedFee();
+                if (invitedFee > 0) {
+                    if (BlockChain.CHECK_BUGS > 3 && height == 3104) {
+                        boolean debug = true;
+                    }
+                    process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
+                            block != null && block.txCalculated != null ?
+                                    block.txCalculated : null, "Referal bonus " + "@" + this.viewHeightSeq());
+                }
+            }
 
             // UPDATE REFERENCE OF SENDER
             this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
@@ -1487,15 +1503,17 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true);
+                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true, true);
 
             }
 
             // calc INVITED FEE
-            long invitedFee = getInvitedFee();
-            if (invitedFee > 0)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
-                        null, null);
+            if (BlockChain.FEE_INVITED_DEEP > 0) {
+                long invitedFee = getInvitedFee();
+                if (invitedFee > 0)
+                    process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
+                            null, null);
+            }
 
             // UPDATE REFERENCE OF SENDER
             // set last transaction signature for this ACCOUNT

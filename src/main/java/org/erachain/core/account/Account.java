@@ -48,7 +48,7 @@ public class Account {
     public static final int ADDRESS_SHORT_LENGTH = 20;
     public static final int ADDRESS_LENGTH = 25;
     // private static final long ERA_KEY = Transaction.RIGHTS_KEY;
-    private static final long FEE_KEY = Transaction.FEE_KEY;
+    ///private static final long FEE_KEY = Transaction.FEE_KEY;
     // public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
     // public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new
     // byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
@@ -633,7 +633,7 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
-                                                                    BigDecimal amount_in, boolean notUpdateIncomed) {
+                                    BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
         int actionType = actionType(key, amount_in);
 
@@ -662,6 +662,19 @@ public class Account {
 
         boolean updateIncomed = !notUpdateIncomed;
 
+        Tuple2<BigDecimal, BigDecimal> spendBalance;
+        if (spendUpdate) {
+            // обновим Потрачено = Произведено одновременно
+            if (substract) {
+                spendBalance = new Tuple2<BigDecimal, BigDecimal>(balance.d.a,  balance.d.b.add(amount));
+            } else {
+                // входит сумма плюс учет
+                spendBalance = new Tuple2<BigDecimal, BigDecimal>(balance.d.a.add(amount),  balance.d.b);
+            }
+        } else {
+            spendBalance = balance.d;
+        }
+
         if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -669,7 +682,7 @@ public class Account {
                             updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
                             balance.a.b.add(amount)),
-                    balance.b, balance.c, balance.d, balance.e);
+                    balance.b, balance.c, spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_DEBT) {
             // DEBT + CREDIT
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -678,7 +691,7 @@ public class Account {
                             updateIncomed ? balance.b.a.subtract(amount) : balance.b.a, balance.b.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
                             balance.b.b.add(amount)),
-                    balance.c, balance.d, balance.e);
+                    balance.c, spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -687,7 +700,7 @@ public class Account {
                             updateIncomed ? balance.c.a.subtract(amount) : balance.c.a, balance.c.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
                             balance.c.b.add(amount)),
-                    balance.d, balance.e);
+                    spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_SPEND) {
             // TODO - SPEND + PRODUCE
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -908,7 +921,7 @@ public class Account {
 
     public String viewFEEbalance() {
 
-        long result = this.getBalanceUSE(FEE_KEY).unscaledValue().longValue();
+        long result = this.getBalanceUSE(Transaction.FEE_KEY).unscaledValue().longValue();
         result /= BlockChain.FEE_PER_BYTE;
         result >>= 8;
 

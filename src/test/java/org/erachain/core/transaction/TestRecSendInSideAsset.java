@@ -81,10 +81,10 @@ public class TestRecSendInSideAsset {
 
         // FEE FUND
         creditor.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        creditor.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        creditor.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
 
         emitter.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
-        emitter.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        emitter.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
 
         asset = new AssetVenture(creditor, "aasdasd", icon, image, "asdasda", AssetCls.AS_INSIDE_ASSETS, 8, 50000l);
         // set SCALABLE assets ++

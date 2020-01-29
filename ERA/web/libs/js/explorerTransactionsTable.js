@@ -375,7 +375,7 @@ function transactions_Table(data) {
 
         if (item.title != null) {
             output += '<a href="?tx=' + item.signature + get_lang() + '">'
-                + escapeHtml(cutBlank(item.title, 30)) + '</a><td>';
+                + escapeHtml(cutBlank(item.title, 40)) + '</a><td>';
         } else {
             output += '<td>';
         }
@@ -390,7 +390,7 @@ function transactions_Table(data) {
 
             if (item.hasOwnProperty('itemName')) {
                 output += '<a href ="?' + item.itemType + '=' + item.itemKey + get_lang() + '">' +
-                    item.itemName + '</a>';
+                    cut(cutBlank(item.itemName, 40), 35) + '</a>';
             } else {
                 output += '[' + item.itemKey + ']';
             }
@@ -398,7 +398,7 @@ function transactions_Table(data) {
 
         output += '<td>' + convertTimestamp(item.timestamp, true);
         output += '<td><a href ="?address=' + item.creator_addr + get_lang() + '">' +
-            cut(cutBlank(item.creator, 30), 35) + '</a><td>';
+            cut(cutBlank(item.creator, 40), 35) + '</a><td>';
         output += item.size
             + '<td>'+ item.fee
             + '<td>' + item.confirmations + '</td>'

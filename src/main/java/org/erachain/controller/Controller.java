@@ -199,11 +199,30 @@ public class Controller extends Observable {
     }
 
     public static String getVersion(boolean withTimestamp) {
+
+        String dbs;
+        switch (getInstance().databaseSystem) {
+            case DCSet.DBS_ROCK_DB:
+                dbs = "RocksDB";
+                break;
+            case DCSet.DBS_MAP_DB:
+                dbs = "MapDB";
+                break;
+            case DCSet.DBS_FAST:
+                dbs = "fast";
+                break;
+            default:
+                dbs = "MapDB";
+
+        }
+
+
         if (withTimestamp)
             return version + (BlockChain.DEVELOP_USE ? " DevelopNet"
-                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "");
+                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "")
+                    + " (" + dbs + ")";
 
-        return version;
+        return version + " (" + dbs + ")";
 
     }
 
@@ -3587,9 +3606,6 @@ public class Controller extends Observable {
 
         String pass = null;
 
-        // init SETTINGS FIRST
-        Settings.getInstance();
-
         // init BlockChain then
         String log4JPropertyFile = "resources/log4j" + (Settings.getInstance().isTestnet() ? "-dev" : "") + ".properties";
         Properties p = new Properties();
@@ -3702,22 +3718,8 @@ public class Controller extends Observable {
                 continue;
             }
             if (arg.equals("-testnet")) {
-                Settings.getInstance().setGenesisStamp(NTP.getTime());
                 useNet = false;
                 continue;
-            }
-            if (arg.startsWith("-testnet=") && arg.length() > 9) {
-                try {
-                    long testnetstamp = Long.parseLong(arg.substring(9));
-
-                    if (testnetstamp == 0) {
-                        testnetstamp = 1511164500000l;
-                    }
-
-                    Settings.getInstance().setGenesisStamp(testnetstamp);
-                } catch (Exception e) {
-                    Settings.getInstance().setGenesisStamp(Settings.DEFAULT_MAINNET_STAMP);
-                }
             }
             if (arg.equals("-nonet")) {
                 useNet = false;
