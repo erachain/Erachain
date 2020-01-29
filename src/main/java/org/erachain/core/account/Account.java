@@ -900,6 +900,33 @@ public class Account {
         }
     }
 
+    public void removeLastTimestamp(DCSet dcSet, long timestamp) {
+
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+            return;
+        }
+
+        ReferenceMapImpl map = dcSet.getReferenceMap();
+
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            map.delete(shortBytes);
+            return;
+        }
+
+        // MAKE KEY for this TIMESTAMP
+        byte[] keyPrevPoint = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
+
+        // GET REFERENCE
+        // DELETE TIMESTAMP - REFERENCE
+        long[] reference = map.remove(keyPrevPoint);
+        if (reference == null) {
+            map.delete(shortBytes);
+        } else {
+            // PUT OLD REFERENCE
+            map.put(shortBytes, reference);
+        }
+    }
+
     // TOSTRING
     public String personChar(Tuple2<Integer, PersonCls> personRes) {
         if (personRes == null)

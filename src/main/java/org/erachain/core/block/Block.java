@@ -2411,7 +2411,7 @@ import java.util.*;
                 transaction.orphan(this, Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
-                transaction.getCreator().removeLastTimestamp(dcSet);
+                transaction.getCreator().removeLastTimestamp(dcSet, transaction.getTimestamp());
             }
 
             if (notFork) {

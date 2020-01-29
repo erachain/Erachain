@@ -685,7 +685,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             // при откате нужно след в истории удалить а сам публичный ключ отсавить на всякий случай?
             long[] lastPoint = publicAccount.getLastTimestamp(dcSet);
             if (lastPoint != null && lastPoint[0] == timestamp) {
-                publicAccount.removeLastTimestamp(dcSet);
+                publicAccount.removeLastTimestamp(dcSet, timestamp);
             }
 
         }

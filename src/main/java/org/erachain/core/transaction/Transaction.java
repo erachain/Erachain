@@ -1491,11 +1491,11 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public void orphan(Block block, int asDeal) {
 
-        if (BlockChain.CHECK_BUGS > 1
-                && viewHeightSeq().equals("628853-1")
-                //Base58.encode(this.signature)
-                //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
-                ) {
+        if (false && BlockChain.CHECK_BUGS > 1
+            ///&& viewHeightSeq().equals("628853-1") // is forging 628853-1
+            //Base58.encode(this.signature)
+            //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+        ) {
             int error = 0;
             error++;
         }
@@ -1517,7 +1517,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             // UPDATE REFERENCE OF SENDER
             // set last transaction signature for this ACCOUNT
-            this.creator.removeLastTimestamp(this.dcSet);
+            this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         }
 

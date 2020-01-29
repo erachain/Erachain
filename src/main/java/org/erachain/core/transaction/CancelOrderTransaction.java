@@ -264,20 +264,6 @@ public class CancelOrderTransaction extends Transaction {
 
     }
 
-    public static void process_it(DCSet db, Order order) {
-
-        //DELETE FROM DATABASE FIRST - иначе сработает проверка внутри
-        db.getOrderMap().delete(order.getId());
-
-        //SET ORPHAN DATA
-        db.getCompletedOrderMap().put(order.getId(), order);
-
-        //UPDATE BALANCE OF CREATOR
-        //creator.setBalance(orderSignature.getHaveAssetKey(), creator.getBalance(db, orderSignature.getHaveAssetKey()).add(orderSignature.getAmountHaveLeft()), db);
-        order.getCreator().changeBalance(db, false, order.getHaveAssetKey(), order.getAmountHaveLeft(), false, false);
-
-    }
-
     //@Override
     @Override
     public void process(Block block, int asDeal) {
@@ -305,21 +291,17 @@ public class CancelOrderTransaction extends Transaction {
             error++;
         }
 
-        process_it(this.dcSet, order);
-        this.addCalculated(block, this.creator, order.getHaveAssetKey(), order.getAmountHave(),
-                "cancel order @" + Transaction.viewDBRef(order.getId()));
-    }
+        //DELETE FROM DATABASE FIRST - иначе сработает проверка внутри
+        dcSet.getOrderMap().delete(order.getId());
 
-    public static void orphan_it(DCSet db, Order order) {
-        //DELETE ORPHAN DATA FIRST - иначе ошибка будет при добавлении в таблицу ордеров
-        db.getCompletedOrderMap().delete(order.getId());
+        //SET ORPHAN DATA
+        dcSet.getCompletedOrderMap().put(order.getId(), order);
 
-        db.getOrderMap().put(order.getId(), order);
-
-        //REMOVE BALANCE OF CREATOR
-        //creator.setBalance(orderID.getHaveAssetKey(), creator.getBalance(db, orderID.getHaveAssetKey()).subtract(orderID.getAmountHaveLeft()), db);
-        order.getCreator().changeBalance(db, true, order.getHaveAssetKey(), order.getAmountHaveLeft(), false, false);
-
+        //UPDATE BALANCE OF CREATOR
+        BigDecimal left = order.getAmountHaveLeft();
+        order.getCreator().changeBalance(dcSet, false, order.getHaveAssetKey(), left, false, false);
+        this.addCalculated(block, this.creator, order.getHaveAssetKey(), left,
+                "Cancel Order @" + Transaction.viewDBRef(order.getId()));
     }
 
     //@Override
@@ -352,7 +334,13 @@ public class CancelOrderTransaction extends Transaction {
             boolean debug = true;
         }
 
-        orphan_it(this.dcSet, order);
+        //DELETE ORPHAN DATA FIRST - иначе ошибка будет при добавлении в таблицу ордеров
+        dcSet.getCompletedOrderMap().delete(order.getId());
+
+        dcSet.getOrderMap().put(order.getId(), order);
+
+        //REMOVE BALANCE OF CREATOR
+        order.getCreator().changeBalance(dcSet, true, order.getHaveAssetKey(), order.getAmountHaveLeft(), false, false);
     }
 
     @Override
