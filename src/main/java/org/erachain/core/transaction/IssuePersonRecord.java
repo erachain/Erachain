@@ -285,8 +285,9 @@ public class IssuePersonRecord extends IssueItemRecord {
                 BigDecimal totalERAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.ERA_KEY, TransactionAmount.ACTION_SEND);
                 BigDecimal totalLIAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.LIA_KEY, TransactionAmount.ACTION_SEND);
 
-                if (!BlockChain.VALID_PERSON_REG_ERA(height, totalERAOwned, totalLIAOwned)) {
-                    return NOT_ENOUGH_ERA_BALANCE;
+                int resultERA = BlockChain.VALID_PERSON_REG_ERA(height, totalERAOwned, totalLIAOwned);
+                if (resultERA > 0) {
+                    return resultERA;
                 }
             }
         }
