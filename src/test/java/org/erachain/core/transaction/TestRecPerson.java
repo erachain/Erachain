@@ -761,7 +761,7 @@ public class TestRecPerson {
 
                 //CHECK BALANCE PERSON CREATOR
                 assertEquals(erm_amount_user, userAccount1.getBalanceUSE(ERM_KEY, dcSet));
-                assertEquals(oil_amount_user.add(RSertifyPubKeys.BONUS_FOR_PERSON_4_11), userAccount1.getBalanceUSE(FEE_KEY, dcSet));
+                assertEquals(oil_amount_user.add(BlockChain.BONUS_FOR_PERSON(1)), userAccount1.getBalanceUSE(FEE_KEY, dcSet));
 
                 assertEquals(userAccount2.addDEVAmount(ERM_KEY), userAccount2.getBalanceUSE(ERM_KEY, dcSet));
                 assertEquals(userAccount2.addDEVAmount(FEE_KEY), userAccount2.getBalanceUSE(FEE_KEY, dcSet));
@@ -779,7 +779,7 @@ public class TestRecPerson {
 
                 ////////// TO DATE ////////
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
-                int to_date = RSertifyPubKeys.DEFAULT_DURATION + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
+                int to_date = BlockChain.DEFAULT_DURATION + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
                 // PERSON STATUS ALIVE - beg_date = person birthDay
                 //assertEquals( (long)person.getBirthday(), (long)dbPS.getItem(personKey, ALIVE_KEY).a);
@@ -880,7 +880,7 @@ public class TestRecPerson {
                 r_SertifyPubKeys.process(gb, Transaction.FOR_NETWORK);
 
                 // у нас перезапись времени - по максимум сразу берем если не минус
-                end_date = RSertifyPubKeys.DEFAULT_DURATION;
+                end_date = BlockChain.DEFAULT_DURATION;
                 int abs_end_date = end_date + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
                 // PERSON STATUS ALIVE - date_begin
@@ -965,7 +965,7 @@ public class TestRecPerson {
                 if (false)
                     oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
                 else
-                    oil_amount_diff = RSertifyPubKeys.BONUS_FOR_PERSON_4_11.add(RSertifyPubKeys.BONUS_FOR_PERSON_4_11);
+                    oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1).add(BlockChain.BONUS_FOR_PERSON(1));
 
                 BigDecimal erm_amount = registrar.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount = registrar.getBalanceUSE(FEE_KEY, dcSet);
@@ -1036,7 +1036,7 @@ public class TestRecPerson {
 
                 ////////// TO DATE ////////
                 // .a - personKey, .b - end_date, .c - block height, .d - reference
-                int to_date = RSertifyPubKeys.DEFAULT_DURATION + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
+                int to_date = BlockChain.DEFAULT_DURATION + (int) (r_SertifyPubKeys.getTimestamp() / 86400000.0);
 
                 // PERSON STATUS ALIVE - beg_date = person birthDay
                 //assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
