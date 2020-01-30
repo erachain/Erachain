@@ -513,14 +513,6 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             return Transaction.ITEM_PERSON_NOT_EXIST;
         }
 
-        BigDecimal balERA = this.creator.getBalanceUSE(RIGHTS_KEY, dcSet);
-        if (balERA.compareTo(
-                //BlockChain.MINOR_ERA_BALANCE_BD
-                BlockChain.MIN_GENERATING_BALANCE_BD
-        ) < 0
-        )
-            return Transaction.NOT_ENOUGH_ERA_BALANCE;
-
         if (creatorPersonInfo != null && !creatorPersonInfo.b.isAlive(this.timestamp))
             return Transaction.ITEM_PERSON_IS_DEAD;
 
@@ -532,8 +524,9 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                 BigDecimal totalERAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.ERA_KEY, TransactionAmount.ACTION_SEND);
                 BigDecimal totalLIAOwned = Account.totalForAddresses(dcSet, thisPersonAddresses, AssetCls.LIA_KEY, TransactionAmount.ACTION_DEBT);
 
-                if (!BlockChain.VALID_PERSON_CERT_ERA(height, totalERAOwned, totalLIAOwned)) {
-                    return NOT_ENOUGH_ERA_BALANCE;
+                int resultERA = BlockChain.VALID_PERSON_CERT_ERA(height, totalERAOwned, totalLIAOwned);
+                if (resultERA > 0) {
+                    return resultERA;
                 }
             }
         }

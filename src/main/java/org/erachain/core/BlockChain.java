@@ -115,7 +115,9 @@ public class BlockChain {
     public static final int MAJOR_ERA_BALANCE = 33000;
     public static final int MINOR_ERA_BALANCE = 1000;
     public static final int MIN_GENERATING_BALANCE = 100;
+    public static final int MIN_REGISTRATING_BALANCE = 10;
     public static final BigDecimal MIN_GENERATING_BALANCE_BD = new BigDecimal(MIN_GENERATING_BALANCE);
+    public static final BigDecimal MIN_REGISTRATING_BALANCE_BD = new BigDecimal(MIN_REGISTRATING_BALANCE);
     //public static final int GENERATING_RETARGET = 10;
     //public static final int GENERATING_MIN_BLOCK_TIME = DEVELOP_USE ? 120 : 288; // 300 PER DAY
     //public static final int GENERATING_MIN_BLOCK_TIME_MS = GENERATING_MIN_BLOCK_TIME * 1000;
@@ -708,7 +710,7 @@ public class BlockChain {
         }
     }
 
-    public static boolean VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+    public static int VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
         if (height < START_ISSUE_RIGHTS) {
             ;
@@ -717,16 +719,16 @@ public class BlockChain {
                 ;
             } else {
                 if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                    return false;
+                    return Transaction.NOT_ENOUGH_ERA_OWN_10;
                 }
             }
         }
 
-        return true;
+        return 0;
 
     }
 
-    public static boolean VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
+    public static int VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
         if (height < START_ISSUE_RIGHTS) {
             ;
@@ -735,15 +737,15 @@ public class BlockChain {
             ;
         } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
             if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                return false;
+                return Transaction.NOT_ENOUGH_ERA_OWN_10;
             }
         } else {
             if (totalERA.compareTo(new BigDecimal("100")) < 0) {
-                return false;
+                return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
         }
 
-        return true;
+        return 0;
 
     }
 

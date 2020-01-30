@@ -318,8 +318,18 @@ public class OnDealClick {
                 mess = "Not enough rights";
                 break;
 
-            case Transaction.NOT_ENOUGH_ERA_BALANCE:
-                mess = "Not enough ERA balance";
+            case Transaction.NOT_ENOUGH_ERA_OWN_10:
+                mess = "Need 10 ERA in OWN or more";
+                break;
+            case Transaction.NOT_ENOUGH_ERA_USE_10:
+                mess = "Need 10 ERA in USE or more";
+                break;
+
+            case Transaction.NOT_ENOUGH_ERA_OWN_100:
+                mess = "Need 100 ERA in OWN or more";
+                break;
+            case Transaction.NOT_ENOUGH_ERA_USE_100:
+                mess = "Need 1000 ERA in USE or more";
                 break;
 
             case Transaction.INVALID_ITEM_KEY:

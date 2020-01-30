@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.transaction.OnDealClick;
@@ -84,7 +85,8 @@ public class CancelOrderFrame extends JDialog {
         //TXT TIMESTAMP
         txtGBC.gridy = 1;
 
-        JTextField txtTimestamp = new JTextField(DateTimeFormat.timestamptoString(order.getId()));
+        Transaction transaction = DCSet.getInstance().getTransactionFinalMap().get(order.getId());
+        JTextField txtTimestamp = new JTextField(DateTimeFormat.timestamptoString(transaction.getTimestamp()));
         txtTimestamp.setEditable(false);
         this.add(txtTimestamp, txtGBC);
 
