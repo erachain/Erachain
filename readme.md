@@ -13,4 +13,10 @@ https://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#j
 
 Для тестирования так же использовать  
 
+Для сборки JAR файла без прогона тестов используем ключи:  
+-x test
+
+Описание кдючей запуска приложения в файле:  
+ERA\z_bath_examples\readme.txt
+
 
