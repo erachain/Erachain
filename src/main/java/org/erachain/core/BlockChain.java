@@ -719,7 +719,7 @@ public class BlockChain {
                 ;
             } else {
                 if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                    return Transaction.NOT_ENOUGH_ERA_BALANCE_10;
+                    return Transaction.NOT_ENOUGH_ERA_OWN_10;
                 }
             }
         }
@@ -737,11 +737,11 @@ public class BlockChain {
             ;
         } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
             if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                return Transaction.NOT_ENOUGH_ERA_BALANCE_10;
+                return Transaction.NOT_ENOUGH_ERA_OWN_10;
             }
         } else {
             if (totalERA.compareTo(new BigDecimal("100")) < 0) {
-                return Transaction.NOT_ENOUGH_ERA_BALANCE_100;
+                return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
         }
 
