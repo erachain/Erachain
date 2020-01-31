@@ -756,11 +756,11 @@ public class RSendResource {
         // преобразуем в seqNo
         Long fromSeqNo = null;
         if (activeAfter != null && activeAfter > 0) {
-            fromSeqNo = Transaction.makeDBRef(chain.getBlockOnTimestamp(activeAfter), 0);
+            fromSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeAfter), 0);
         }
         Long toSeqNo = null;
         if (activeBefore != null && activeBefore > 0) {
-            toSeqNo = Transaction.makeDBRef(chain.getBlockOnTimestamp(activeBefore), 0);
+            toSeqNo = Transaction.makeDBRef(chain.getHeightOnTimestamp(activeBefore), 0);
         }
 
         if (!test) {
