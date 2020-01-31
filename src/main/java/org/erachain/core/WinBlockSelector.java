@@ -80,7 +80,9 @@ public class WinBlockSelector extends MonitoredThread {
         }
 
         // тут внутри проверка полной валидности
-        if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
+        if (blockChain.setWaitWinBuffer(dcSet, newBlock,
+                message.getSender() // тут забаним пир если не сошелся так ка заголовок то верный был
+        )) {
             // IF IT WIN
             // BROADCAST
             //List<Peer> excludes = new ArrayList<Peer>();
