@@ -1282,7 +1282,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 long[] reference = this.creator.getLastTimestamp(dcSet);
                 if (reference != null && reference[0] >= this.timestamp
                         && height > BlockChain.VERS_4_11
-                        && (!BlockChain.DEVELOP_USE || height > 776575 // issues/1149
+                        && !(BlockChain.DEVELOP_USE && height < 897144)
                 )) {
                     if (BlockChain.TEST_DB == 0) {
                         if (BlockChain.CHECK_BUGS > 1)
