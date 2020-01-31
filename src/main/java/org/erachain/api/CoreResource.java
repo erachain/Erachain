@@ -4,6 +4,7 @@ import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
 import org.erachain.datachain.BlocksHeadsMap;
+import org.erachain.datachain.BlocksMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
@@ -142,11 +143,13 @@ public class CoreResource {
     @Path("/cwv")
     public String checkWinVal() {
         DCSet dcSet = DCSet.getInstance();
-        BlocksHeadsMap map = dcSet.getBlocksHeadsMap();
+        BlocksHeadsMap mapHeads = dcSet.getBlocksHeadsMap();
+        BlocksMapImpl mapBlock = dcSet.getBlockMap();
         int height = 1;
         long totalWV = 0;
+        String out = "";
         do {
-            Block.BlockHead head = map.get(++height);
+            Block.BlockHead head = mapHeads.get(++height);
             if (head == null)
                 break;
 
@@ -158,12 +161,15 @@ public class CoreResource {
             Fun.Tuple2<Integer, Integer> forgingData = head.creator.getForgingData(dcSet, height);
             long winValue = BlockChain.calcWinValue(dcSet, head.creator, height, forgingData.b, forgingData);
             if (winValue != head.winValue) {
-                return "ERROR on Height: " + height + ", WinValue diff: " + (winValue - head.winValue);
+                out += "\nERROR on Height: " + height + ", WinValue diff: " + (winValue - head.winValue);
             }
 
         } while (true);
 
-        return "height: " + (height - 1) + ", totalWV: " + totalWV;
+        if (out.isEmpty())
+            return "height: " + (height - 1) + ", totalWV: " + totalWV;
+
+        return out;
     }
 
 }

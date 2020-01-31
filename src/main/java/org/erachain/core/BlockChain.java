@@ -864,10 +864,18 @@ public class BlockChain {
                                     Tuple2<Integer, Integer> previousForgingPoint_in) {
 
         if (forgingBalance < MIN_GENERATING_BALANCE && height > ALL_BALANCES_OK_TO) {
-            return 0l;
+            return 0L;
         }
 
-        Tuple2<Integer, Integer> previousForgingPoint = previousForgingPoint_in == null ? creator.getLastForgingData(dcSet) : previousForgingPoint_in;
+        Tuple2<Integer, Integer> previousForgingPoint;
+        if (previousForgingPoint_in == null) {
+            previousForgingPoint = creator.getForgingData(dcSet, height);
+            if (previousForgingPoint == null) {
+                previousForgingPoint = creator.getLastForgingData(dcSet);
+            }
+        } else {
+            previousForgingPoint = previousForgingPoint_in;
+        }
 
         if (ERA_COMPU_ALL_UP) {
             if (previousForgingPoint == null) {

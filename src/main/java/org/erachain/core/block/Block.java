@@ -1401,12 +1401,10 @@ import java.util.*;
 
         if (this.version == 0 || this.creator == null) {
             // GENESIS
-            this.winValue = BlockChain.GENESIS_WIN_VALUE;
-            return this.winValue;
+            return this.winValue = BlockChain.GENESIS_WIN_VALUE;
         }
 
-        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
-        return this.winValue;
+        return this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
     }
 
     public int calcWinValueTargeted() {
@@ -1421,7 +1419,7 @@ import java.util.*;
 
     public boolean isValidHead(DCSet dcSet) {
 
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
         if (BlockChain.BLOCK_COUNT > 0 && this.heightBlock > BlockChain.BLOCK_COUNT) {
             LOGGER.debug("*** Block[" + this.heightBlock + "] - Max count reached");
