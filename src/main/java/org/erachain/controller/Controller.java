@@ -1977,7 +1977,9 @@ public class Controller extends Observable {
                         Block block = response.getBlock();
                         if (Arrays.equals(block.getReference(), lastSignature)) {
                             LOGGER.debug("ADD update new block");
-                            this.blockChain.setWaitWinBuffer(this.dcSet, block, peer);
+                            this.blockChain.setWaitWinBuffer(this.dcSet, block,
+                                    peer // тут ПИР забаним если не прошел так как заголовок то сошелся
+                            );
                             return this.blockChain.popWaitWinBuffer();
                         }
                     }
@@ -2099,7 +2101,9 @@ public class Controller extends Observable {
             // то его вынем и поновой вставим со всеми проверками
             Block winBlockUnchecked = this.blockChain.popWaitWinBuffer();
             if (winBlockUnchecked != null) {
-                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked, peer);
+                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked,
+                        null // если блок не верный - не баним ПИР может просто он отстал
+                );
             }
 
         }

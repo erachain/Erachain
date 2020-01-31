@@ -1111,7 +1111,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         //PASS BLOCK TO CONTROLLER
                                         try {
                                             LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock,
+                                                    null // не надо банить тут - может цепочка ушла ужеи это мой блок же
+                                            )) {
 
                                                 // need to BROADCAST
                                                 local_status = 8;
