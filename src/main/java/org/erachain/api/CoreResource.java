@@ -1,6 +1,9 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.block.Block;
+import org.erachain.datachain.BlocksHeadsMap;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
@@ -131,6 +134,27 @@ public class CoreResource {
     @Path("/info/speed")
     public String getSpeedInfo() {
         return Controller.getInstance().getBenchmarks().toJSONString();
+    }
+
+    @GET
+    @Path("/cwv")
+    public String checkWinVal() {
+        BlocksHeadsMap map = DCSet.getInstance().getBlocksHeadsMap();
+        int height = 1;
+        long totalWV = 0;
+        do {
+            Block.BlockHead head = map.get(++height);
+            if (head == null)
+                break;
+
+            totalWV += head.winValue;
+            if (totalWV != head.totalWinValue) {
+                return "height: " + height + ", total WinValue diff: " + (totalWV - head.totalWinValue);
+            }
+
+        } while (true);
+
+        return "height: " + (height - 1) + ", totalWV: " + totalWV;
     }
 
 }
