@@ -978,7 +978,7 @@ public class API {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity("" + BlockChain.calcWinValue(DCSet.getInstance(),
                         account, Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()),
-                        account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue()))
+                        account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue(), null))
                 .build();
     }
 

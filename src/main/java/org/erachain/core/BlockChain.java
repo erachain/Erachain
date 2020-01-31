@@ -852,19 +852,22 @@ public class BlockChain {
 
     /**
      * calc WIN_VALUE for ACCOUNT in HEIGHT
+     *
      * @param dcSet
-     * @param creator account of block creator
-     * @param height current blockchain height
-     * @param forgingBalance current forging Balance on account
+     * @param creator                 account of block creator
+     * @param height                  current blockchain height
+     * @param forgingBalance          current forging Balance on account
+     * @param previousForgingPoint_in
      * @return (long) Win Value
      */
-    public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
+    public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance,
+                                    Tuple2<Integer, Integer> previousForgingPoint_in) {
 
         if (forgingBalance < MIN_GENERATING_BALANCE && height > ALL_BALANCES_OK_TO) {
             return 0l;
         }
 
-        Tuple2<Integer, Integer> previousForgingPoint = creator.getLastForgingData(dcSet);
+        Tuple2<Integer, Integer> previousForgingPoint = previousForgingPoint_in == null ? creator.getLastForgingData(dcSet) : previousForgingPoint_in;
 
         if (ERA_COMPU_ALL_UP) {
             if (previousForgingPoint == null) {
