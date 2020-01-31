@@ -1597,11 +1597,10 @@ public class Controller extends Observable {
                 // TEST TIMESTAMP of PEER
                 Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
                 // TODO
-                if (this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(hW.a)
-                        > NTP.getTime()) {
+                String errorMess = this.getBlockChain().blockFromFuture(hW.a - 2);
+                if (errorMess != null) {
                     // IT PEER from FUTURE
-                    long ii = this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(hW.a) - NTP.getTime();
-                    this.banPeerOnError(hWeightMessage.getSender(), "peer from FUTURE");
+                    this.banPeerOnError(hWeightMessage.getSender(), errorMess);
                     return;
                 }
 
@@ -2157,6 +2156,8 @@ public class Controller extends Observable {
         long weight = myHWeight.b;
         Peer maxPeer = null;
 
+        long maxHeight = blockChain.getHeightOnTimestamp(NTP.getTime());
+
         try {
             for (Peer peer : this.peerHWeight.keySet()) {
                 if (peer.getPing() < 0) {
@@ -2166,6 +2167,13 @@ public class Controller extends Observable {
                     continue;
                 }
                 Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
+                // TODO потом убрать +1 когда перейдем на новый +30 сдвиг - а нет цепочка наша встанет и будет ждать!
+                if (maxHeight < whPeer.a) {
+                    // Этот пир дает цепочку из будущего - не берем его
+                    this.peerHWeight.remove(peer);
+                    continue;
+                }
+
                 if (height < whPeer.a
                         || useWeight && weight < whPeer.b) {
                     height = whPeer.a;

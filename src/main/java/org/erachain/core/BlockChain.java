@@ -13,6 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.Peer;
+import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -1062,7 +1063,7 @@ public class BlockChain {
         return getTimestamp(height);
     }
 
-    public int getBlockOnTimestamp(long timestamp) {
+    public int getHeightOnTimestamp(long timestamp) {
         long diff = timestamp - genesisTimestamp;
         int height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(1));
         if (height <= VERS_30SEC)
@@ -1391,5 +1392,15 @@ public class BlockChain {
 
         dcSet.getTransactionTab().clearByDeadTimeAndLimit(this.getTimestamp(dcSet), cutDeadTime);
 
+    }
+
+    public String blockFromFuture(int height) {
+        long blockTimestamp = getTimestamp(height);
+        if (blockTimestamp + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
+            return "invalid Timestamp from FUTURE: "
+                    + (blockTimestamp + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) - NTP.getTime());
+        }
+
+        return null;
     }
 }

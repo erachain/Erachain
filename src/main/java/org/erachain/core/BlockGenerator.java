@@ -130,6 +130,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         while (counter++ < 30) {
 
             Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
+
             peer = maxPeer.c;
 
             if (peer == null) {

@@ -233,8 +233,8 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         // тут индекс не по времени а по номерам блоков как лонг
         //int heightStart = Controller.getInstance().getMyHeight();
         //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getBlockOnTimestamp(startTimestamp);
-        int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getBlockOnTimestamp(stopTimestamp);
+        int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestamp(startTimestamp);
+        int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestamp(stopTimestamp);
 
         //RETURN
         return getTradesByHeight(fromBlock, toBlock, limit);
@@ -258,8 +258,8 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
         // тут индекс не по времени а по номерам блоков как лонг
         //int heightStart = Controller.getInstance().getMyHeight();
         //int heightEnd = heightStart - Controller.getInstance().getBlockChain().getBlockOnTimestamp(timestamp);
-        int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getBlockOnTimestamp(startTimestamp);
-        int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getBlockOnTimestamp(stopTimestamp);
+        int fromBlock = startTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestamp(startTimestamp);
+        int toBlock = stopTimestamp == 0 ? 0 : Controller.getInstance().getBlockChain().getHeightOnTimestamp(stopTimestamp);
 
         //RETURN
         return getTradesByHeight(have, want, fromBlock, toBlock, limit);
