@@ -165,10 +165,7 @@ public class CoreResource {
 
             // берем текущую - там есть предыдущая
             Fun.Tuple3<Integer, Integer, Integer> forgingData = head.creator.getForgingData(dcSet, height);
-            int prevForgedBlock = forgingData.a;
-            int currentForgingValue = forgingData.b;
-            Fun.Tuple3<Integer, Integer, Integer> previousPoint = head.creator.getForgingData(dcSet, forgingData.a);
-            long winValue = BlockChain.calcWinValue(dcSet, head.creator, height, currentForgingValue, previousPoint);
+            long winValue = BlockChain.calcWinValue(dcSet, head.creator, height, forgingData.c, null);
             if (winValue != head.winValue) {
                 return "ERROR on Height: " + height + ", WinValue diff: " + (winValue - head.winValue);
             }

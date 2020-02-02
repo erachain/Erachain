@@ -54,7 +54,9 @@ public class AddressForgingTest {
 
         Tuple2<String, Integer> key2 = new Tuple2<>(address, height);
         point = forgingMap.get(key2);
-        assertEquals(point, lastPoint);
+        assertEquals(point.a, lastPoint.a);
+        assertEquals(point.b, lastPoint.b);
+        assertEquals((int) point.c, (int) (point.b - 1000));
 
         // SET SAME height
         weight += 333;
@@ -64,7 +66,9 @@ public class AddressForgingTest {
         assertEquals(lastPoint3, new Tuple3<>(height, weight, 0));
 
         point = forgingMap.get(key2);
-        assertEquals(point, lastPoint);
+        assertEquals(point.a, lastPoint.a);
+        assertEquals(point.b, lastPoint.b);
+        assertEquals((int) point.c, (int) (point.b - 1000));
 
     }
 
@@ -127,7 +131,9 @@ public class AddressForgingTest {
 
         Tuple2<String, Integer> key2 = new Tuple2<>(address, height);
         point = forgingMap.get(key2);
-        assertEquals(point, lastPoint);
+        assertEquals(point.a, lastPoint.a);
+        assertEquals(point.b, lastPoint.b);
+        assertEquals((int) point.b, (int) (point.c - 1000));
 
         // SET SAME height
         weight += 5000;
@@ -137,7 +143,9 @@ public class AddressForgingTest {
         assertEquals(lastPoint3, new Tuple3<>(height, weight, 0));
 
         point = forgingMap.get(key2);
-        assertEquals(point, lastPoint);
+        assertEquals(point.a, lastPoint.a);
+        assertEquals(point.b, lastPoint.b);
+        assertEquals((int) point.b, (int) (point.c - 1000));
 
         // TRY DELETE
         Tuple2<String, Integer> key3 = new Tuple2<>(address, lastPoint3.a);
@@ -146,7 +154,9 @@ public class AddressForgingTest {
         Tuple3<Integer, Integer, Integer> lastPoint4 = forgingMap.getLast(address);
         Tuple3<Integer, Integer, Integer> prevPoint4 = forgingMap.get(address, lastPoint4.b);
 
-        assertEquals(lastPoint4, lastPoint);
+        assertEquals(lastPoint4.a, lastPoint.a);
+        assertEquals(lastPoint4.b, lastPoint.b);
+        assertEquals((int) lastPoint4.b, (int) (point.c - 1000));
         assertEquals(prevPoint4, null);
 
         // TRY DELETE TWICE
@@ -156,7 +166,9 @@ public class AddressForgingTest {
         Tuple3<Integer, Integer, Integer> lastPoint5 = forgingMap.getLast(address);
         Tuple3<Integer, Integer, Integer> prevPoint5 = forgingMap.get(address, lastPoint5.b);
 
-        assertEquals(lastPoint5, lastPoint);
+        assertEquals(lastPoint5.a, lastPoint.a);
+        assertEquals(lastPoint5.b, lastPoint.b);
+        assertEquals((int) lastPoint5.b, (int) (point.c - 1000));
         assertEquals(prevPoint5, null);
 
         // TRY DELETE FIRST

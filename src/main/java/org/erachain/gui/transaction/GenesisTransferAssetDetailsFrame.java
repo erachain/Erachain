@@ -13,7 +13,7 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
         super(assetTransfer);
 
         boolean isCredit = false;
-        if (assetTransfer.getOwner() != null) {
+        if (assetTransfer.getCreator() != null) {
             isCredit = true;
             //LABEL OWNER
             ++labelGBC.gridy;
@@ -22,12 +22,12 @@ public class GenesisTransferAssetDetailsFrame extends RecGenesis_DetailsFrame {
 
             //RECIPIENT
             ++detailGBC.gridy;
-            JTextField ownerFld = new JTextField(assetTransfer.getOwner().getAddress());
+            JTextField ownerFld = new JTextField(assetTransfer.getCreator().getAddress());
             ownerFld.setEditable(false);
             MenuPopupUtil.installContextMenu(ownerFld);
             this.add(ownerFld, detailGBC);
 
-            String personOwnerStr = assetTransfer.getOwner().viewPerson();
+            String personOwnerStr = assetTransfer.getCreator().viewPerson();
             if (personOwnerStr.length() > 0) {
                 ++labelGBC.gridy;
                 ++detailGBC.gridy;

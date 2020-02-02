@@ -180,14 +180,14 @@ public class WebTransactionsHTML {
         String out = "";
         GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction) transaction;
         boolean isCredit = false;
-        if (assetTransfer.getOwner() != null) {
-            if (assetTransfer.getOwner().getPerson() != null) {
+        if (assetTransfer.getCreator() != null) {
+            if (assetTransfer.getCreator().getPerson() != null) {
                 out += "<b>" + Lang.getInstance().translateFromLangObj("Creditor", langObj) + ":</b> <a href=?person="
-                        + assetTransfer.getOwner().getPerson().b.getKey() + get_Lang(langObj) + ">"
-                        + assetTransfer.getOwner().viewPerson() + "</a><br>";
+                        + assetTransfer.getCreator().getPerson().b.getKey() + get_Lang(langObj) + ">"
+                        + assetTransfer.getCreator().viewPerson() + "</a><br>";
             } else {
                 out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
-                        + assetTransfer.getOwner().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getOwner().getAddress()
+                        + assetTransfer.getCreator().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getCreator().getAddress()
                         + "</a><br>";
             }
         }

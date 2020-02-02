@@ -208,7 +208,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             if (gen_send.getCreator() != null) cr = gen_send.getCreator().getAddress();
             // if is owner
             String own = "";
-            if (gen_send.getOwner() != null) own = gen_send.getOwner().getAddress();
+            if (gen_send.getCreator() != null) own = gen_send.getCreator().getAddress();
 
             trr.key = gen_send.getKey();
             trr.transaction = gen_send;
@@ -221,7 +221,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             // if is creator
             if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
             // if is owner
-            if (gen_send.getOwner() != null) trr.owner = gen_send.getOwner();
+            if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
             trr.recipient = gen_send.viewRecipient();
 
         } else if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {

@@ -37,7 +37,7 @@ public class BlockChain {
     /**
      * Задает потолок цепочки
      */
-    public static final int BLOCK_COUNT = 5;
+    public static final int BLOCK_COUNT = 0;
     /**
      * DATABASE benchmark test. use start options:<br>
      * erachain.jar -pass=1 -seed=5:new:1 -nogui -opi -nodatawallet -nocalculated -hardwork=[0..10] -dbschain=[rocksdb|mapdb] <br>
