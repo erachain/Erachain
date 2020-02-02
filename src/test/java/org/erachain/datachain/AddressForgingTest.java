@@ -2,6 +2,7 @@ package org.erachain.datachain;
 
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,8 +12,8 @@ public class AddressForgingTest {
     String address = "7CzxxwH7u9aQtx5iNHskLQjyJvybyKg8rF";
     AddressForging forgingMap;
     Tuple2<String, Integer> key;
-    Tuple2<Integer, Integer> lastPoint;
-    Tuple2<Integer, Integer> currentPoint;
+    Tuple3<Integer, Integer, Integer> lastPoint;
+    Tuple3<Integer, Integer, Integer> currentPoint;
 
     private void init() {
 
@@ -34,21 +35,21 @@ public class AddressForgingTest {
         int weight = 34789;
 
         forgingMap.putAndProcess(address, height, weight);
-        currentPoint = new Tuple2<>(height, weight);
+        currentPoint = new Tuple3<>(height, weight, 0);
         lastPoint = forgingMap.getLast(address);
 
         Tuple2<String, Integer> key = new Tuple2<>(address, height);
-        Tuple2<Integer, Integer> point = forgingMap.get(key);
+        Tuple3<Integer, Integer, Integer> point = forgingMap.get(key);
 
         assertEquals(point, null);
         assertEquals(currentPoint, lastPoint);
 
         height += 100;
         weight -= 1000;
-        Tuple2<Integer, Integer> currentPoint2 = new Tuple2<>(height, weight);
+        Tuple3<Integer, Integer, Integer> currentPoint2 = new Tuple3<>(height, weight, 0);
         forgingMap.putAndProcess(address, height, weight);
 
-        Tuple2<Integer, Integer> lastPoint2 = forgingMap.getLast(address);
+        Tuple3<Integer, Integer, Integer> lastPoint2 = forgingMap.getLast(address);
         assertEquals(currentPoint2, lastPoint2);
 
         Tuple2<String, Integer> key2 = new Tuple2<>(address, height);
@@ -59,8 +60,8 @@ public class AddressForgingTest {
         weight += 333;
         forgingMap.putAndProcess(address, height, weight);
 
-        Tuple2<Integer, Integer> lastPoint3 = forgingMap.getLast(address);
-        assertEquals(lastPoint3, new Tuple2<>(height, weight));
+        Tuple3<Integer, Integer, Integer> lastPoint3 = forgingMap.getLast(address);
+        assertEquals(lastPoint3, new Tuple3<>(height, weight, 0));
 
         point = forgingMap.get(key2);
         assertEquals(point, lastPoint);
@@ -76,11 +77,11 @@ public class AddressForgingTest {
         int weight = 34789;
 
         forgingMap.putAndProcess(address, height, weight);
-        currentPoint = new Tuple2<>(height, weight);
+        currentPoint = new Tuple3<>(height, weight, 0);
         lastPoint = forgingMap.getLast(address);
 
         Tuple2<String, Integer> key = new Tuple2<>(address, height);
-        Tuple2<Integer, Integer> point = forgingMap.get(key);
+        Tuple3<Integer, Integer, Integer> point = forgingMap.get(key);
 
         assertEquals(point, null);
         assertEquals(currentPoint, lastPoint);
@@ -88,7 +89,7 @@ public class AddressForgingTest {
         // WRONG
         height -= 100;
         weight -= 1000;
-        Tuple2<Integer, Integer> currentPoint2 = new Tuple2<>(height, weight);
+        Tuple3<Integer, Integer, Integer> currentPoint2 = new Tuple3<>(height, weight, 0);
         try {
             forgingMap.putAndProcess(address, height, weight);
             assert(false);
@@ -107,21 +108,21 @@ public class AddressForgingTest {
         int weight = 34789;
 
         forgingMap.putAndProcess(address, height, weight);
-        currentPoint = new Tuple2<>(height, weight);
+        currentPoint = new Tuple3<>(height, weight, 0);
         lastPoint = forgingMap.getLast(address);
 
         Tuple2<String, Integer> key = new Tuple2<>(address, height);
-        Tuple2<Integer, Integer> point = forgingMap.get(key);
+        Tuple3<Integer, Integer, Integer> point = forgingMap.get(key);
 
         assertEquals(point, null);
         assertEquals(currentPoint, lastPoint);
 
         height += 100;
         weight += 1000;
-        Tuple2<Integer, Integer> currentPoint2 = new Tuple2<>(height, weight);
+        Tuple3<Integer, Integer, Integer> currentPoint2 = new Tuple3<>(height, weight, 0);
         forgingMap.putAndProcess(address, height, weight);
 
-        Tuple2<Integer, Integer> lastPoint2 = forgingMap.getLast(address);
+        Tuple3<Integer, Integer, Integer> lastPoint2 = forgingMap.getLast(address);
         assertEquals(currentPoint2, lastPoint2);
 
         Tuple2<String, Integer> key2 = new Tuple2<>(address, height);
@@ -132,8 +133,8 @@ public class AddressForgingTest {
         weight += 5000;
         forgingMap.putAndProcess(address, height, weight);
 
-        Tuple2<Integer, Integer> lastPoint3 = forgingMap.getLast(address);
-        assertEquals(lastPoint3, new Tuple2<>(height, weight));
+        Tuple3<Integer, Integer, Integer> lastPoint3 = forgingMap.getLast(address);
+        assertEquals(lastPoint3, new Tuple3<>(height, weight, 0));
 
         point = forgingMap.get(key2);
         assertEquals(point, lastPoint);
@@ -142,8 +143,8 @@ public class AddressForgingTest {
         Tuple2<String, Integer> key3 = new Tuple2<>(address, lastPoint3.a);
         point = forgingMap.removeAndProcess(key3);
 
-        Tuple2<Integer, Integer> lastPoint4 = forgingMap.getLast(address);
-        Tuple2<Integer, Integer> prevPoint4 = forgingMap.get(address, lastPoint4.b);
+        Tuple3<Integer, Integer, Integer> lastPoint4 = forgingMap.getLast(address);
+        Tuple3<Integer, Integer, Integer> prevPoint4 = forgingMap.get(address, lastPoint4.b);
 
         assertEquals(lastPoint4, lastPoint);
         assertEquals(prevPoint4, null);
@@ -152,8 +153,8 @@ public class AddressForgingTest {
         Tuple2<String, Integer> key4 = new Tuple2<>(address, lastPoint3.a);
         point = forgingMap.removeAndProcess(key4);
 
-        Tuple2<Integer, Integer> lastPoint5 = forgingMap.getLast(address);
-        Tuple2<Integer, Integer> prevPoint5 = forgingMap.get(address, lastPoint5.b);
+        Tuple3<Integer, Integer, Integer> lastPoint5 = forgingMap.getLast(address);
+        Tuple3<Integer, Integer, Integer> prevPoint5 = forgingMap.get(address, lastPoint5.b);
 
         assertEquals(lastPoint5, lastPoint);
         assertEquals(prevPoint5, null);
@@ -163,7 +164,7 @@ public class AddressForgingTest {
         point = forgingMap.removeAndProcess(key5);
         assertEquals(point, null);
 
-        Tuple2<Integer, Integer> lastPoint6 = forgingMap.getLast(address);
+        Tuple3<Integer, Integer, Integer> lastPoint6 = forgingMap.getLast(address);
         assertEquals(lastPoint6, null);
 
     }
@@ -177,21 +178,21 @@ public class AddressForgingTest {
         int weight = 34789;
 
         forgingMap.putAndProcess(address, height, weight);
-        currentPoint = new Tuple2<>(height, weight);
+        currentPoint = new Tuple3<>(height, weight, 0);
         lastPoint = forgingMap.getLast(address);
 
         Tuple2<String, Integer> key = new Tuple2<>(address, height);
-        Tuple2<Integer, Integer> point = forgingMap.get(key);
+        Tuple3<Integer, Integer, Integer> point = forgingMap.get(key);
 
         assertEquals(point, null);
         assertEquals(currentPoint, lastPoint);
 
         height += 100;
         weight -= 1000;
-        Tuple2<Integer, Integer> currentPoint2 = new Tuple2<>(height, weight);
+        Tuple3<Integer, Integer, Integer> currentPoint2 = new Tuple3<>(height, weight, 0);
         forgingMap.putAndProcess(address, height, weight);
 
-        Tuple2<Integer, Integer> lastPoint2 = forgingMap.getLast(address);
+        Tuple3<Integer, Integer, Integer> lastPoint2 = forgingMap.getLast(address);
         assertEquals(currentPoint2, lastPoint2);
 
         //Tuple2<String, Integer> key2 = new Tuple2<>(address, height);

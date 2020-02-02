@@ -6,6 +6,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,7 +161,7 @@ public class OtherSeasrchBlocksTableModel extends AbstractTableModel {
                     }
 
                     int height = block.getHeight();
-                    Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, height);
+                    Tuple3<Integer, Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, height);
 
                     return forgingPoint.b + " "
                             + (height - forgingPoint.a) + " "

@@ -153,15 +153,24 @@ public class CoreResource {
             if (head == null)
                 break;
 
+            Block block = mapBlock.get(height);
+            if (!block.getCreator().equals(head.creator)) {
+                return "ERROR on Height: " + height + ", tCREATOR diff: " + block.getCreator() + " - " + head.creator;
+            }
+
             totalWV += head.winValue;
             if (totalWV != head.totalWinValue) {
                 return "ERROR on Height: " + height + ", total WinValue diff: " + (totalWV - head.totalWinValue);
             }
 
-            Fun.Tuple2<Integer, Integer> forgingData = head.creator.getForgingData(dcSet, height);
-            long winValue = BlockChain.calcWinValue(dcSet, head.creator, height, forgingData.b, forgingData);
+            // берем текущую - там есть предыдущая
+            Fun.Tuple3<Integer, Integer, Integer> forgingData = head.creator.getForgingData(dcSet, height);
+            int prevForgedBlock = forgingData.a;
+            int currentForgingValue = forgingData.b;
+            Fun.Tuple3<Integer, Integer, Integer> previousPoint = head.creator.getForgingData(dcSet, forgingData.a);
+            long winValue = BlockChain.calcWinValue(dcSet, head.creator, height, currentForgingValue, previousPoint);
             if (winValue != head.winValue) {
-                out += "\nERROR on Height: " + height + ", WinValue diff: " + (winValue - head.winValue);
+                return "ERROR on Height: " + height + ", WinValue diff: " + (winValue - head.winValue);
             }
 
         } while (true);

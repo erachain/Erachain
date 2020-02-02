@@ -20,6 +20,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -280,7 +281,7 @@ public class BlockTests {
         assertEquals(0, recipient2.getBalanceUSE(FEE_KEY, db).compareTo(BigDecimal.valueOf(0.0)));
 
         int height = genesisBlock.getHeight() + 1;
-        Tuple2<Integer, Integer> forgingData = recipient1.getForgingData(db, height);
+        Tuple3<Integer, Integer, Integer> forgingData = recipient1.getForgingData(db, height);
         assertEquals(-1, (int) forgingData.a);
 
         forgingData = recipient2.getForgingData(db, height);

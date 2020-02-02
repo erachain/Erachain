@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -98,8 +99,8 @@ public class TestChain {
         Block block = blockChain.getLastBlock(dcSet);
         int height = block.getHeight();
         Account creator = block.getCreator();
-        Tuple2<Integer, Integer> forging = creator.getForgingData(dcSet, height);
-        Tuple2<Integer, Integer> lastForging = creator.getLastForgingData(dcSet);
+        Tuple3<Integer, Integer, Integer> forging = creator.getForgingData(dcSet, height);
+        Tuple3<Integer, Integer, Integer> lastForging = creator.getLastForgingData(dcSet);
 
         DCSet fork = dcSet.fork();
 
@@ -110,8 +111,8 @@ public class TestChain {
             e.printStackTrace();
         }
 
-        Tuple2<Integer, Integer> forging_o = creator.getForgingData(dcSet, height);
-        Tuple2<Integer, Integer> lastForging_o = creator.getLastForgingData(dcSet);
+        Tuple3<Integer, Integer, Integer> forging_o = creator.getForgingData(dcSet, height);
+        Tuple3<Integer, Integer, Integer> lastForging_o = creator.getLastForgingData(dcSet);
         int height_0 = block.getHeight();
 
         assertEquals(1, forging);

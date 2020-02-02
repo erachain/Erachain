@@ -19,6 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -779,7 +780,7 @@ public class GeneratorTests {
 
         height = newBlock.getHeight();
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
-        Tuple2<Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
+        Tuple3<Integer, Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
         assertEquals((int) forgingData.a, 2);
 
         forgingData = recipient.getForgingData(dcSet, height);

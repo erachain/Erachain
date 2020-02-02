@@ -37,7 +37,7 @@ public class BlockChain {
     /**
      * Задает потолок цепочки
      */
-    public static final int BLOCK_COUNT = 0;
+    public static final int BLOCK_COUNT = 5;
     /**
      * DATABASE benchmark test. use start options:<br>
      * erachain.jar -pass=1 -seed=5:new:1 -nogui -opi -nodatawallet -nocalculated -hardwork=[0..10] -dbschain=[rocksdb|mapdb] <br>
@@ -861,13 +861,13 @@ public class BlockChain {
      * @return (long) Win Value
      */
     public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance,
-                                    Tuple2<Integer, Integer> previousForgingPoint_in) {
+                                    Tuple3<Integer, Integer, Integer> previousForgingPoint_in) {
 
         if (forgingBalance < MIN_GENERATING_BALANCE && height > ALL_BALANCES_OK_TO) {
             return 0L;
         }
 
-        Tuple2<Integer, Integer> previousForgingPoint;
+        Tuple3<Integer, Integer, Integer> previousForgingPoint;
         if (previousForgingPoint_in == null) {
             previousForgingPoint = creator.getForgingData(dcSet, height);
             if (previousForgingPoint == null) {
@@ -880,7 +880,7 @@ public class BlockChain {
         if (ERA_COMPU_ALL_UP) {
             if (previousForgingPoint == null) {
                 // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
-                previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
+                previousForgingPoint = new Tuple3<Integer, Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance, 0);
             }
         } else {
             if (previousForgingPoint == null)
