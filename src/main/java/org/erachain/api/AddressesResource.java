@@ -357,7 +357,7 @@ public class AddressesResource {
         Account account = new Account(address);
         return "" + BlockChain.calcWinValue(DCSet.getInstance(),
                 account, Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()),
-                account.getBalanceUSE(Transaction.RIGHTS_KEY, DCSet.getInstance()).intValue());
+                account.getBalanceUSE(Transaction.RIGHTS_KEY, DCSet.getInstance()).intValue(), null);
     }
 
     public JSONArray tuple5_toJson(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance) {

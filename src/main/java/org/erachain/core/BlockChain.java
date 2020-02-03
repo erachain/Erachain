@@ -852,24 +852,35 @@ public class BlockChain {
 
     /**
      * calc WIN_VALUE for ACCOUNT in HEIGHT
+     *
      * @param dcSet
-     * @param creator account of block creator
-     * @param height current blockchain height
-     * @param forgingBalance current forging Balance on account
+     * @param creator                 account of block creator
+     * @param height                  current blockchain height
+     * @param forgingBalance          current forging Balance on account
+     * @param previousForgingPoint_in
      * @return (long) Win Value
      */
-    public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
+    public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance,
+                                    Tuple3<Integer, Integer, Integer> previousForgingPoint_in) {
 
         if (forgingBalance < MIN_GENERATING_BALANCE && height > ALL_BALANCES_OK_TO) {
-            return 0l;
+            return 0L;
         }
 
-        Tuple2<Integer, Integer> previousForgingPoint = creator.getLastForgingData(dcSet);
+        Tuple3<Integer, Integer, Integer> previousForgingPoint;
+        if (previousForgingPoint_in == null) {
+            previousForgingPoint = creator.getForgingData(dcSet, height);
+            if (previousForgingPoint == null) {
+                previousForgingPoint = creator.getLastForgingData(dcSet);
+            }
+        } else {
+            previousForgingPoint = previousForgingPoint_in;
+        }
 
         if (ERA_COMPU_ALL_UP) {
             if (previousForgingPoint == null) {
                 // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
-                previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
+                previousForgingPoint = new Tuple3<Integer, Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance, 0);
             }
         } else {
             if (previousForgingPoint == null)

@@ -1,7 +1,18 @@
 package org.erachain.gui.status;
 // 16/03
 
-import java.awt.Color;
+import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
+import org.erachain.core.BlockGenerator;
+import org.erachain.core.account.Account;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
+import org.erachain.lang.Lang;
+import org.erachain.utils.GUIUtils;
+import org.erachain.utils.ObserverMessage;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
@@ -9,19 +20,7 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.ToolTipManager;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
-import org.erachain.core.BlockGenerator;;
-import org.erachain.core.account.Account;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.datachain.DCSet;
-import org.erachain.lang.Lang;
-import org.erachain.utils.GUIUtils;
-import org.erachain.utils.ObserverMessage;
+;
 
 @SuppressWarnings("serial")
 public class ForgingStatus extends JLabel implements Observer {
@@ -58,7 +57,7 @@ public class ForgingStatus extends JLabel implements Observer {
 
                 DCSet dcSet = DCSet.getInstance();
                 for (Account account : Controller.getInstance().getAccounts()) {
-                    long win_value = BlockChain.calcWinValue(dcSet, account, newHeight, account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue());
+                    long win_value = BlockChain.calcWinValue(dcSet, account, newHeight, account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue(), null);
                     if (Math.abs(win_value) > winBalance) {
                         winBalance = Math.abs(win_value);
                         winAccount = account;

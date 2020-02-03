@@ -190,7 +190,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
 
         if (BlockChain.CHECK_BUGS > 5) {
             Block.BlockHead head = block.blockHead;
-            Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
+            Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(block.getCreator().getAddress());
             if (lastPoint.a > head.heightBlock) {
                 LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + head.heightBlock);
                 Long i = null;
@@ -222,7 +222,7 @@ public class BlocksMapImpl extends DBTabImpl<Integer, Block> implements BlockMap
         creator.delForgingData(dcSet, height);
 
         if (BlockChain.CHECK_BUGS > 5) {
-            Fun.Tuple2<Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
+            Fun.Tuple3<Integer, Integer, Integer> lastPoint = dcSet.getAddressForging().getLast(creator.getAddress());
             if (lastPoint.a > height) {
                 LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + height);
                 Long i = null;

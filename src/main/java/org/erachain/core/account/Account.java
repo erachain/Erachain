@@ -1194,7 +1194,7 @@ public class Account {
     }
 
     // previous forging block or changed ERA volume
-    public Tuple2<Integer, Integer> getForgingData(DCSet db, int height) {
+    public Tuple3<Integer, Integer, Integer> getForgingData(DCSet db, int height) {
         return db.getAddressForging().get(getAddress(), height);
     }
     /*
@@ -1211,7 +1211,7 @@ public class Account {
         db.getAddressForging().deleteAndProcess(getAddress(), height);
     }
 
-    public Tuple2<Integer, Integer> getLastForgingData(DCSet db) {
+    public Tuple3<Integer, Integer, Integer> getLastForgingData(DCSet db) {
         return db.getAddressForging().getLast(getAddress());
     }
 

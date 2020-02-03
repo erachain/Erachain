@@ -8,6 +8,7 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,7 @@ public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
                     if (block.heightBlock == 1) {
                         return "GENESIS";
                     }
-                    Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+                    Tuple3<Integer, Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
                     if (forgingPoint == null)
                         return "--";
                     return forgingPoint.b + " ";

@@ -946,7 +946,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 for (PrivateKeyAccount account : knownAccounts) {
 
                                     forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue);
+                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
                                     if (winValue < 1)
                                         continue;
 
