@@ -182,7 +182,7 @@ public class BlockChain {
     public static final long VERS_30SEC_TIME = DEVELOP_USE ? (Settings.DEFAULT_DEV_NET_STAMP + (long) VERS_30SEC * 120L)
             : (Settings.getInstance().isTestnet() ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L);
 
-    public static final int VERS_4_21_02 = 670000;
+    public static final int VERS_4_21_02 = 681283;
 
     /**
      * Включает реферальную систему
@@ -192,7 +192,7 @@ public class BlockChain {
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : VERS_4_21_02;
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : Integer.MAX_VALUE; ///VERS_4_21_02;
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
@@ -713,7 +713,7 @@ public class BlockChain {
 
     public static int VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
-        if (height < START_ISSUE_RIGHTS) {
+        if (START_ISSUE_RIGHTS == 0 || height < START_ISSUE_RIGHTS) {
             ;
         } else {
             if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
@@ -731,9 +731,13 @@ public class BlockChain {
 
     public static int VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
-        if (height < START_ISSUE_RIGHTS) {
-            ;
+        if (START_ISSUE_RIGHTS == 0 || height < START_ISSUE_RIGHTS) {
+            if (totalERA.compareTo(new BigDecimal("100")) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_OWN_100;
+            }
+            return 0;
         }
+
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
         } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
@@ -936,7 +940,7 @@ public class BlockChain {
                     } else if (height < 120000) {
                         if (repeatsMin > 40)
                             repeatsMin = 40;
-                    } else if (height < VERS_4_11) {
+                    } else if (height < VERS_4_21_02) {
                         if (repeatsMin > 200)
                             repeatsMin = 200;
                     } else if (repeatsMin < 10) {
@@ -1059,7 +1063,7 @@ public class BlockChain {
 	 */
 
     public long getTimestamp(int height) {
-        if (height <= VERS_30SEC) {
+        if (VERS_30SEC == 0 || height <= VERS_30SEC) {
             return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
         }
 
