@@ -698,6 +698,10 @@ public class BlockChain {
         return DEVELOP_USE ? 0 : 0;
     }
 
+    public static int BLOCKS_PER_DAY(int height) {
+        return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
+    }
+
     public static int WIN_TIMEPOINT(int height) {
         return GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
     }
@@ -713,15 +717,15 @@ public class BlockChain {
 
     public static int VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
-        if (START_ISSUE_RIGHTS == 0 || height < START_ISSUE_RIGHTS) {
+        if (START_ISSUE_RIGHTS > 0 && height < START_ISSUE_RIGHTS) {
+            return 0;
+        }
+
+        if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
         } else {
-            if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
-                ;
-            } else {
-                if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                    return Transaction.NOT_ENOUGH_ERA_OWN_10;
-                }
+            if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_OWN_10;
             }
         }
 
@@ -731,7 +735,7 @@ public class BlockChain {
 
     public static int VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
-        if (START_ISSUE_RIGHTS == 0 || height < START_ISSUE_RIGHTS) {
+        if (START_ISSUE_RIGHTS > 0 && height < START_ISSUE_RIGHTS) {
             if (totalERA.compareTo(new BigDecimal("100")) < 0) {
                 return Transaction.NOT_ENOUGH_ERA_OWN_100;
             }
@@ -754,13 +758,9 @@ public class BlockChain {
 
     }
 
-    public static int BLOCKS_PER_DAY(int height) {
-        return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
-    }
-
     public static BigDecimal BONUS_FOR_PERSON(int height) {
 
-        if (Settings.getInstance().isTestnet() || height > START_ISSUE_RIGHTS) {
+        if (START_ISSUE_RIGHTS == 0 || height > START_ISSUE_RIGHTS || Settings.getInstance().isTestnet()) {
             return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
         } else {
             return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
