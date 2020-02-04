@@ -115,19 +115,18 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         //logger.debug("try check better WEIGHT peers");
 
-        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-
         betterPeer = null;
 
         Peer peer;
         this.setMonitorStatus("checkWeightPeers");
 
-        //byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
-        byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
-
         int counter = 0;
         // на всякий случай поставим ораничение
         while (counter++ < 30) {
+
+            Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+            byte[] lastSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 2).signature;
+            //byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
 
             Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
 
@@ -160,45 +159,32 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             List<byte[]> headers = response.getSignatures();
+            if (headers.isEmpty()) {
+                // общего блока не найдено - значит цепочка уже разошлась - делаем откат своего блока???
+                // Или ждем когда сами встанем
+                LOGGER.debug("I to orphan - Peer has DEEP different CHAIN " + maxPeer);
+                betterPeer = peer;
+                return true;
+            }
 
-            do {
+            // Удалим то что унас тоже есть
+            while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0))) {
                 headers.remove(0);
-            } while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0)));
+            }
 
             int headersSize = headers.size();
             ///LOGGER.debug("FOUND head SIZE: " + headersSize);
 
             if (headersSize > 0) {
-                boolean isSame = false;
-                for (byte[] signature : headers) {
-                    if (Arrays.equals(signature, lastSignature)) {
-                        isSame = true;
-                        break;
-                    }
-                }
-
-                if (isSame) {
-                    // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                    ///LOGGER.debug("peer has same Weight " + maxPeer);
-                    ctrl.resetWeightOfPeer(peer);
-                    // продолжим поиск дальше
-                    continue;
-                } else {
-                    LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
-                    betterPeer = peer;
-                    return true;
-                }
+                LOGGER.debug("I to orphan - Peer has different CHAIN " + maxPeer);
+                betterPeer = peer;
+                return true;
             } else {
-                /// наоборот значит тут точно та же цепочка
-                if (false) {
-                    // more then 2 - need to UPDATE
-                    LOGGER.debug("to update - peers " + maxPeer
-                            + " headers: " + headersSize);
-                    betterPeer = peer;
-                    return true;
-                } else {
-                    ctrl.resetWeightOfPeer(peer);
-                }
+                // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
+                ///LOGGER.debug("peer has same Weight " + maxPeer);
+                ctrl.resetWeightOfPeer(peer);
+                // продолжим поиск дальше
+                continue;
             }
 
         }
