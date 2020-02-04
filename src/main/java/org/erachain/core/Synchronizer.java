@@ -1214,12 +1214,12 @@ public class Synchronizer extends Thread {
         long timePoint = 0;
         BlockGenerator blockGenerator;
 
-        long shiftPoint = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1)
-                + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> 1) - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> 2);
+        int blockTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1);
+        long shiftPoint = blockTime + (blockTime >> 1) - (blockTime >> 2);
         // INIT wait START
         do {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 return;
             }
