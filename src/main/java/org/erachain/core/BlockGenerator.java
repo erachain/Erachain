@@ -159,6 +159,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             List<byte[]> headers = response.getSignatures();
+
+            do {
+                headers.remove(0);
+            } while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0)));
+
             int headersSize = headers.size();
             ///LOGGER.debug("FOUND head SIZE: " + headersSize);
 
@@ -179,15 +184,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     continue;
                 } else {
                     LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
-                    try {
-                        // да - там другой блок - откатим тогда свой
-                        //// ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        betterPeer = peer;
-                        return true;
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.resetWeightOfPeer(peer);
-                    }
+                    betterPeer = peer;
+                    return true;
                 }
             } else {
                 /// наоборот значит тут точно та же цепочка
