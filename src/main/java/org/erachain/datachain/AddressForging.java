@@ -100,6 +100,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
         Tuple3<Integer, Integer, Integer> lastPoint = this.getLast(key.a);
         if (lastPoint == null) {
             // это последние значения. Причем в позиции Текущий - 0 - дальше то пока не известно
+            // тут же и поиск по этой высоте должен дать Пусто
             this.setLast(key.a, new Tuple3(key.b, forgingValue, 0));
             /// там же пусто - поэтому ничего не делаем - super.set(key, previousPoint);
         } else {
