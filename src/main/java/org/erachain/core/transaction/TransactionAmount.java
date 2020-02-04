@@ -494,7 +494,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         // при откатах для нового счета который первый раз сделал транзакцию
                         // из нулевого баланса - Референс будеть ошибочный
                         // поэтому отключим эту проверку тут
-                        && !BlockChain.ERA_COMPU_ALL_UP
+                        && !(BlockChain.DEVELOP_USE && height < 897144)
                 ) {
 
                     if (height > 0 || BlockChain.CHECK_BUGS > 7

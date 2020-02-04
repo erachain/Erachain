@@ -130,6 +130,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         while (counter++ < 30) {
 
             Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
+
             peer = maxPeer.c;
 
             if (peer == null) {
@@ -943,7 +944,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 for (PrivateKeyAccount account : knownAccounts) {
 
                                     forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue);
+                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
                                     if (winValue < 1)
                                         continue;
 
@@ -1109,7 +1110,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         //PASS BLOCK TO CONTROLLER
                                         try {
                                             LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock,
+                                                    null // не надо банить тут - может цепочка ушла ужеи это мой блок же
+                                            )) {
 
                                                 // need to BROADCAST
                                                 local_status = 8;

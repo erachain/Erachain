@@ -41,7 +41,7 @@ public class AccountTest {
 
         // MAKE COPY hoe hasCode() check
         Account newAccount = new Account(account.getAddress());
-        Fun.Tuple2<Integer, Integer> point = newAccount.getLastForgingData(db);
+        Fun.Tuple3<Integer, Integer, Integer> point = newAccount.getLastForgingData(db);
         assertEquals(point != null, true);
         long[] reference = newAccount.getLastTimestamp(db);
         assertEquals(reference != null, true);

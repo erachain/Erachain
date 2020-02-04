@@ -31,7 +31,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
     private static final int BASE_LENGTH = GenesisRecord.BASE_LENGTH + RECIPIENT_LENGTH + KEY_LENGTH + AMOUNT_LENGTH;
 
-    private Account owner;
+    private Account creator;
     private Account recipient;
     private BigDecimal amount;
     private long key;
@@ -50,9 +50,9 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     }
 
     // RENT
-    public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount, Account owner) {
+    public GenesisTransferAssetTransaction(Account recipient, long key, BigDecimal amount, Account creator) {
         this(recipient, key, amount);
-        this.owner = owner;
+        this.creator = creator;
         this.generateSignature();
     }
 
@@ -95,10 +95,6 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
             return new GenesisTransferAssetTransaction(recipient, key, amount);
         }
 
-    }
-
-    public Account getOwner() {
-        return this.owner;
     }
 
     public Account getRecipient() {
@@ -184,8 +180,8 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         JSONObject transaction = super.toJson();
 
         //ADD CREATOR/RECIPIENT/AMOUNT/ASSET
-        if (this.owner != null)
-            transaction.put("owner", this.owner.getAddress());
+        if (this.creator != null)
+            transaction.put("creator", this.creator.getAddress());
 
         transaction.put("recipient", this.recipient.getAddress());
         transaction.put("asset", this.key);
@@ -217,7 +213,7 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
         if (key < 0) {
             //WRITE OWNER
-            data = Bytes.concat(data, Base58.decode(this.owner.getAddress()));
+            data = Bytes.concat(data, Base58.decode(this.creator.getAddress()));
         }
 
         return data;
@@ -284,10 +280,10 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
         if (key < 0) {
             // THIS is CREDIT
             //this.owner.setBalance(key, this.owner.getBalance(db, key).subtract(this.amount), db);
-            this.owner.changeBalance(this.dcSet, true, key, this.amount, false, false);
+            this.creator.changeBalance(this.dcSet, true, key, this.amount, false, false);
             this.dcSet.getCredit_AddressesMap().add(
                     new Tuple3<String, Long, String>(
-                            this.owner.getAddress(), -key,
+                            this.creator.getAddress(), -key,
                             this.recipient.getAddress()),
                     //new Tuple3<String, Long, String>(this.owner.getAddress(), -key, this.recipient.getAddress()),
                     this.amount);
@@ -336,6 +332,15 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
 
     //REST
 
+    @Override
+    public HashSet<Account> getInvolvedAccounts() {
+        HashSet<Account> accounts = new HashSet<Account>(3, 1);
+        if (this.creator != null)
+            accounts.add(this.creator);
+
+        accounts.addAll(this.getRecipientAccounts());
+        return accounts;
+    }
 
     @Override
     public HashSet<Account> getRecipientAccounts() {
@@ -348,8 +353,8 @@ public class GenesisTransferAssetTransaction extends GenesisRecord {
     public boolean isInvolved(Account account) {
         String address = account.getAddress();
 
-        if (address.equals(recipient.getAddress())
-                || owner != null && address.equals(owner.getAddress())) {
+        if (this.creator != null && address.equals(creator.getAddress())
+                || address.equals(recipient.getAddress())) {
             return true;
         }
 

@@ -26,6 +26,7 @@ import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -406,7 +407,7 @@ import java.util.*;
 
             ///loadHeadMind(DCSet.getInstance());
             blockJSON.put("totalFee", viewFeeAsBigDecimal());
-            Tuple2<Integer, Integer> forgingPoint = creator.getForgingData(DCSet.getInstance(), heightBlock);
+            Tuple3<Integer, Integer, Integer> forgingPoint = creator.getForgingData(DCSet.getInstance(), heightBlock);
             if (forgingPoint != null) {
                 blockJSON.put("deltaHeight", heightBlock - forgingPoint.a);
             }
@@ -434,7 +435,7 @@ import java.util.*;
 
         ///loadHeadMind(DCSet.getInstance());
         blockJSON.put("totalFee", viewFeeAsBigDecimal());
-        Tuple2<Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
+        Tuple3<Integer, Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
         if (forgingPoint != null) {
             blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
         }
@@ -842,7 +843,7 @@ import java.util.*;
     public void makeHeadMind(DCSet dcSet) {
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
-        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
 
         if (this.parentBlockHead == null) {
             this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
@@ -1401,12 +1402,10 @@ import java.util.*;
 
         if (this.version == 0 || this.creator == null) {
             // GENESIS
-            this.winValue = BlockChain.GENESIS_WIN_VALUE;
-            return this.winValue;
+            return this.winValue = BlockChain.GENESIS_WIN_VALUE;
         }
 
-        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
-        return this.winValue;
+        return this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
     }
 
     public int calcWinValueTargeted() {
@@ -1421,7 +1420,7 @@ import java.util.*;
 
     public boolean isValidHead(DCSet dcSet) {
 
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
         if (BlockChain.BLOCK_COUNT > 0 && this.heightBlock > BlockChain.BLOCK_COUNT) {
             LOGGER.debug("*** Block[" + this.heightBlock + "] - Max count reached");
@@ -1502,12 +1501,12 @@ import java.util.*;
 
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
-        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
         if (this.winValue < 1) {
             this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-            this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+            this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
 
-            Tuple2<Integer, Integer> forgingPoint = creator.getLastForgingData(dcSet);
+            Tuple3<Integer, Integer, Integer> forgingPoint = creator.getLastForgingData(dcSet);
             LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue
                 + " Creator: " + this.creator.getAddress());
             LOGGER.debug("*** forging Value: " + this.forgingValue
@@ -2104,7 +2103,7 @@ import java.util.*;
 
             for (Account account : this.forgingInfoUpdate) {
 
-                Tuple2<Integer, Integer> privousForgingPoint = account.getLastForgingData(dcSet);
+                Tuple3<Integer, Integer, Integer> privousForgingPoint = account.getLastForgingData(dcSet);
                 int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
                 if (privousForgingPoint == null) {
                     if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
@@ -2358,7 +2357,7 @@ import java.util.*;
             for (Account account : this.forgingInfoUpdate) {
                 if (!this.getCreator().equals(account)) {
                     // если этот блок не собирался этим человеком
-                    Tuple2<Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
+                    Tuple3<Integer, Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
                     if (true // теперь можно удалять полностью - внутри идет проверка
                             || lastForgingPoint != null && lastForgingPoint.a == heightBlock
                             && !this.getCreator().equals(account)) {

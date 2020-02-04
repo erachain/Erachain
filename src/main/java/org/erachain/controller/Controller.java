@@ -95,8 +95,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.21.02 beta dev";
-    public static String buildTime = "2020-01-09 13:33:33 UTC";
+    public static String version = "4.21.02 beta";
+    public static String buildTime = "2020-01-30 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -1619,11 +1619,10 @@ public class Controller extends Observable {
                 // TEST TIMESTAMP of PEER
                 Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
                 // TODO
-                if (this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(hW.a)
-                        > NTP.getTime()) {
+                String errorMess = this.getBlockChain().blockFromFuture(hW.a - 2);
+                if (errorMess != null) {
                     // IT PEER from FUTURE
-                    long ii = this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(hW.a) - NTP.getTime();
-                    this.banPeerOnError(hWeightMessage.getSender(), "peer from FUTURE");
+                    this.banPeerOnError(hWeightMessage.getSender(), errorMess);
                     return;
                 }
 
@@ -1999,7 +1998,9 @@ public class Controller extends Observable {
                         Block block = response.getBlock();
                         if (Arrays.equals(block.getReference(), lastSignature)) {
                             LOGGER.debug("ADD update new block");
-                            this.blockChain.setWaitWinBuffer(this.dcSet, block, peer);
+                            this.blockChain.setWaitWinBuffer(this.dcSet, block,
+                                    peer // тут ПИР забаним если не прошел так как заголовок то сошелся
+                            );
                             return this.blockChain.popWaitWinBuffer();
                         }
                     }
@@ -2121,7 +2122,9 @@ public class Controller extends Observable {
             // то его вынем и поновой вставим со всеми проверками
             Block winBlockUnchecked = this.blockChain.popWaitWinBuffer();
             if (winBlockUnchecked != null) {
-                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked, peer);
+                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked,
+                        null // если блок не верный - не баним ПИР может просто он отстал
+                );
             }
 
         }
@@ -2175,6 +2178,8 @@ public class Controller extends Observable {
         long weight = myHWeight.b;
         Peer maxPeer = null;
 
+        long maxHeight = blockChain.getHeightOnTimestamp(NTP.getTime());
+
         try {
             for (Peer peer : this.peerHWeight.keySet()) {
                 Integer muteCount = peerHWeightMute.get(peer);
@@ -2186,6 +2191,13 @@ public class Controller extends Observable {
                     continue;
                 }
                 Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
+                // TODO потом убрать +1 когда перейдем на новый +30 сдвиг - а нет цепочка наша встанет и будет ждать!
+                if (maxHeight < whPeer.a) {
+                    // Этот пир дает цепочку из будущего - не берем его
+                    this.peerHWeight.remove(peer);
+                    continue;
+                }
+
                 if (height < whPeer.a
                         || useWeight && weight < whPeer.b) {
                     height = whPeer.a;

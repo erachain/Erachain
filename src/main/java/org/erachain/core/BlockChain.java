@@ -13,6 +13,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.Peer;
+import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 import org.mapdb.DB;
@@ -181,7 +182,7 @@ public class BlockChain {
     public static final long VERS_30SEC_TIME = DEVELOP_USE ? (Settings.DEFAULT_DEV_NET_STAMP + (long) VERS_30SEC * 120L)
             : (Settings.getInstance().isTestnet() ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L);
 
-    public static final int VERS_4_21_02 = 670000;
+    public static final int VERS_4_21_02 = 681283;
 
     /**
      * Включает реферальную систему
@@ -191,7 +192,7 @@ public class BlockChain {
     /**
      * Включает новые права на выпуск персон и на удостоверение публичных ключей и увеличение Бонуса персоне
      */
-    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : VERS_4_21_02;
+    public static final int START_ISSUE_RIGHTS = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : Integer.MAX_VALUE; ///VERS_4_21_02;
     public static final int DEFAULT_DURATION = 365 * 5; // 5 years
 
     public static final int DEVELOP_FORGING_START = 100;
@@ -697,6 +698,10 @@ public class BlockChain {
         return DEVELOP_USE ? 0 : 0;
     }
 
+    public static int BLOCKS_PER_DAY(int height) {
+        return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
+    }
+
     public static int WIN_TIMEPOINT(int height) {
         return GENERATING_MIN_BLOCK_TIME_MS(height) >> 2;
     }
@@ -712,15 +717,15 @@ public class BlockChain {
 
     public static int VALID_PERSON_REG_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
-        if (height < START_ISSUE_RIGHTS) {
+        if (START_ISSUE_RIGHTS > 0 && height < START_ISSUE_RIGHTS) {
+            return 0;
+        }
+
+        if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
         } else {
-            if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
-                ;
-            } else {
-                if (totalERA.compareTo(BigDecimal.TEN) < 0) {
-                    return Transaction.NOT_ENOUGH_ERA_OWN_10;
-                }
+            if (totalERA.compareTo(BigDecimal.TEN) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_OWN_10;
             }
         }
 
@@ -730,9 +735,13 @@ public class BlockChain {
 
     public static int VALID_PERSON_CERT_ERA(int height, BigDecimal totalERA, BigDecimal totalLIA) {
 
-        if (height < START_ISSUE_RIGHTS) {
-            ;
+        if (START_ISSUE_RIGHTS > 0 && height < START_ISSUE_RIGHTS) {
+            if (totalERA.compareTo(new BigDecimal("100")) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_OWN_100;
+            }
+            return 0;
         }
+
         if (totalLIA.compareTo(BigDecimal.TEN) < 0) {
             ;
         } else if (totalERA.compareTo(new BigDecimal("20")) < 0) {
@@ -749,13 +758,9 @@ public class BlockChain {
 
     }
 
-    public static int BLOCKS_PER_DAY(int height) {
-        return 24 * 60 * 60 / GENERATING_MIN_BLOCK_TIME(height); // 300 PER DAY
-    }
-
     public static BigDecimal BONUS_FOR_PERSON(int height) {
 
-        if (Settings.getInstance().isTestnet() || height > START_ISSUE_RIGHTS) {
+        if (START_ISSUE_RIGHTS == 0 || height > START_ISSUE_RIGHTS || Settings.getInstance().isTestnet()) {
             return BigDecimal.valueOf(5000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
         } else {
             return BigDecimal.valueOf(2000 * BlockChain.FEE_PER_BYTE, BlockChain.FEE_SCALE);
@@ -851,24 +856,35 @@ public class BlockChain {
 
     /**
      * calc WIN_VALUE for ACCOUNT in HEIGHT
+     *
      * @param dcSet
-     * @param creator account of block creator
-     * @param height current blockchain height
-     * @param forgingBalance current forging Balance on account
+     * @param creator                 account of block creator
+     * @param height                  current blockchain height
+     * @param forgingBalance          current forging Balance on account
+     * @param previousForgingPoint_in
      * @return (long) Win Value
      */
-    public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance) {
+    public static long calcWinValue(DCSet dcSet, Account creator, int height, int forgingBalance,
+                                    Tuple3<Integer, Integer, Integer> previousForgingPoint_in) {
 
         if (forgingBalance < MIN_GENERATING_BALANCE && height > ALL_BALANCES_OK_TO) {
-            return 0l;
+            return 0L;
         }
 
-        Tuple2<Integer, Integer> previousForgingPoint = creator.getLastForgingData(dcSet);
+        Tuple3<Integer, Integer, Integer> previousForgingPoint;
+        if (previousForgingPoint_in == null) {
+            previousForgingPoint = creator.getForgingData(dcSet, height);
+            if (previousForgingPoint == null) {
+                previousForgingPoint = creator.getLastForgingData(dcSet);
+            }
+        } else {
+            previousForgingPoint = previousForgingPoint_in;
+        }
 
         if (ERA_COMPU_ALL_UP) {
             if (previousForgingPoint == null) {
                 // так как неизвестно когда блок первый со счета соберется - задаем постоянный отступ у ДЕВЕЛОП
-                previousForgingPoint = new Tuple2<Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance);
+                previousForgingPoint = new Tuple3<Integer, Integer, Integer>(height - DEVELOP_FORGING_START, forgingBalance, 0);
             }
         } else {
             if (previousForgingPoint == null)
@@ -924,7 +940,7 @@ public class BlockChain {
                     } else if (height < 120000) {
                         if (repeatsMin > 40)
                             repeatsMin = 40;
-                    } else if (height < VERS_4_11) {
+                    } else if (height < VERS_4_21_02) {
                         if (repeatsMin > 200)
                             repeatsMin = 200;
                     } else if (repeatsMin < 10) {
@@ -1047,11 +1063,11 @@ public class BlockChain {
 	 */
 
     public long getTimestamp(int height) {
-        if (height <= VERS_30SEC) {
+        if (VERS_30SEC == 0 || height <= VERS_30SEC) {
             return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
         }
 
-        return this.genesisTimestamp + 46667L
+        return this.genesisTimestamp + (DEVELOP_USE ? 0L : 16667L)
                 + (long) VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
                 + (long) (height - VERS_30SEC) * GENERATING_MIN_BLOCK_TIME_MS(height);
 
@@ -1062,7 +1078,7 @@ public class BlockChain {
         return getTimestamp(height);
     }
 
-    public int getBlockOnTimestamp(long timestamp) {
+    public int getHeightOnTimestamp(long timestamp) {
         long diff = timestamp - genesisTimestamp;
         int height = (int) (diff / GENERATING_MIN_BLOCK_TIME_MS(1));
         if (height <= VERS_30SEC)
@@ -1391,5 +1407,15 @@ public class BlockChain {
 
         dcSet.getTransactionTab().clearByDeadTimeAndLimit(this.getTimestamp(dcSet), cutDeadTime);
 
+    }
+
+    public String blockFromFuture(int height) {
+        long blockTimestamp = getTimestamp(height);
+        if (blockTimestamp + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
+            return "invalid Timestamp from FUTURE: "
+                    + (blockTimestamp + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) - NTP.getTime());
+        }
+
+        return null;
     }
 }

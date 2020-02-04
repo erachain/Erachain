@@ -364,7 +364,7 @@ public abstract class CalculatedAmount extends Calculated {
             // balance
             // get height by LAST block in CHAIN + 2 - skip incoming BLOCK
             
-            Tuple2<Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(dcSet);
+            Tuple3<Integer, Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(dcSet);
             int currentForgingBalance = recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             if (privousForgingPoint == null || privousForgingPoint.a == this.blockNo) {
                 if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
@@ -479,7 +479,7 @@ public abstract class CalculatedAmount extends Calculated {
         }
         
         if (absKey == Transaction.RIGHTS_KEY) {
-            Tuple2<Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(dcSet);
+            Tuple3<Integer, Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(dcSet);
             if (lastForgingPoint != null && lastForgingPoint.a == this.blockNo) {
                 this.recipient.delForgingData(dcSet, this.blockNo);
             }

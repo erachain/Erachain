@@ -19,6 +19,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -779,7 +780,7 @@ public class GeneratorTests {
 
         height = newBlock.getHeight();
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
-        Tuple2<Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
+        Tuple3<Integer, Integer, Integer> forgingData = userAccount1.getForgingData(dcSet, height);
         assertEquals((int) forgingData.a, 2);
 
         forgingData = recipient.getForgingData(dcSet, height);
@@ -806,7 +807,7 @@ public class GeneratorTests {
                 previousForgingHeight = BlockChain.REPEAT_WIN + (BlockChain.BASE_TARGET >> 1) + (height >> 2);
 
             previousForgingHeight = height;
-            winned_value = BlockChain.calcWinValue(dcSet, generator1, height, generator1.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue());
+            winned_value = BlockChain.calcWinValue(dcSet, generator1, height, generator1.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue(), null);
             base = BlockChain.getTargetedMin(height);
             targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winned_value, target);
 
