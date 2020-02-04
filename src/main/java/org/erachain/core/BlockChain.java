@@ -182,7 +182,7 @@ public class BlockChain {
     public static final long VERS_30SEC_TIME = DEVELOP_USE ? (Settings.DEFAULT_DEV_NET_STAMP + (long) VERS_30SEC * 120L)
             : (Settings.getInstance().isTestnet() ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L);
 
-    public static final int VERS_4_21_02 = 681283;
+    public static final int VERS_4_21_02 = 684000;
 
     /**
      * Включает реферальную систему
