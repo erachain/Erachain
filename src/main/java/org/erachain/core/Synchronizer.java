@@ -1262,6 +1262,9 @@ public class Synchronizer extends Thread {
                     }
                 }
 
+                // снизим ожижание блокировки с "сильных но таких же как мы" узлов
+                cnt.updateWeightOfPeerMutes(1);
+
                 if (needCheck) {
                     LOGGER.debug("try CHECK BETTER CHAIN PEER");
                     needCheck = false;

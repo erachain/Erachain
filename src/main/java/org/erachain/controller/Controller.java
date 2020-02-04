@@ -108,6 +108,8 @@ public class Controller extends Observable {
 
     public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 1 << 23;
+
+    public final Integer MUTE_PEER_COUNT = 100;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
@@ -150,6 +152,7 @@ public class Controller extends Observable {
     private long toOfflineTime;
     private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>(20, 1);
     private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>(20, 1);
+    private ConcurrentHashMap<Peer, Integer> peerHWeightMute = new ConcurrentHashMap<Peer, Integer>(20, 1);
 
     public DLSet dlSet; // = DLSet.getInstance();
     private DCSet dcSet; // = DLSet.getInstance();
@@ -500,18 +503,37 @@ public class Controller extends Observable {
     public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
         if (hWeight != null) {
             peerHWeight.put(peer, hWeight);
+            Integer countMute = peerHWeightMute.get(peer);
+            if (countMute != null && countMute > 0) {
+                peerHWeightMute.put(peer, peerHWeightMute.get(peer) - 1);
+            } else {
+                peerHWeightMute.remove(peer);
+            }
         } else {
             peerHWeight.remove(peer);
+            peerHWeightMute.remove(peer);
         }
     }
 
     /**
      * set my getHWeightFull to PEER
+     *
      * @param peer
      */
     public void resetWeightOfPeer(Peer peer) {
         peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
+        peerHWeightMute.put(peer, MUTE_PEER_COUNT);
+
     }
+
+    public void updateWeightOfPeerMutes(int add) {
+        for (Peer peer : peerHWeightMute.keySet()) {
+            peerHWeightMute.put(peer, peerHWeightMute.get(peer) - add);
+        }
+
+    }
+
+
     /*
      * public static Controller getInstance(boolean withObserver, boolean
      * dynamicGUI) { if (instance == null) { instance = new Controller();
@@ -2160,10 +2182,12 @@ public class Controller extends Observable {
 
         try {
             for (Peer peer : this.peerHWeight.keySet()) {
-                if (peer.getPing() < 0) {
+                Integer muteCount = peerHWeightMute.get(peer);
+                if (peer.getPing() < 0 || muteCount != null && muteCount > 0) {
                     // не использовать пиры которые не в быстром коннекте
                     // - так как иначе они заморозят синхронизацию совсем
                     // да и не понятно как с них данные получать
+                    ///// и не использовать те кому мы заткнули - они данные по Силе блока завышенные дают
                     continue;
                 }
                 Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
