@@ -19,12 +19,12 @@ import java.util.Map;
  * Хранит сделки на бирже
  * Ключ: ссылка на иницатора + ссылка на цель
  * Значение - Сделка
-Initiator DBRef (Long) + Target DBRef (Long) -> Trade
+ * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> implements TradeSuit {
+public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
-    public TradeMapSuitMapDBFork(TradeMap parent, DBASet databaseSet) {
+    public TradeSuitMapDBFork(TradeMap parent, DBASet databaseSet) {
         super(parent, databaseSet, logger);
     }
 
