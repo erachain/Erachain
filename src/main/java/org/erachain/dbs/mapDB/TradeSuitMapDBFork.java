@@ -13,8 +13,6 @@ import org.mapdb.BTreeMap;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import java.util.Map;
-
 /**
  * Хранит сделки на бирже
  * Ключ: ссылка на иницатора + ссылка на цель
@@ -47,19 +45,17 @@ public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade>
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
         //FILTER ALL KEYS
-        Map uncastedMap = map;
-        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
                 Fun.t2(order.getId(), null),
-                Fun.t2(order.getId(), Fun.HI())).keySet().iterator());
+                Fun.t2(order.getId(), Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
         //FILTER ALL KEYS
-        Map uncastedMap = map;
-        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
                 Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).keySet().iterator());
+                Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override
