@@ -109,7 +109,7 @@ public class Controller extends Observable {
     public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 1 << 23;
 
-    public final Integer MUTE_PEER_COUNT = 100;
+    public final Integer MUTE_PEER_COUNT = 32;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
