@@ -168,23 +168,20 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             }
 
             // Удалим то что унас тоже есть
-            while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0))) {
+            do {
                 headers.remove(0);
-            }
+            } while (!headers.isEmpty() && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
-            int headersSize = headers.size();
-            ///LOGGER.debug("FOUND head SIZE: " + headersSize);
-
-            if (headersSize > 0) {
-                LOGGER.debug("I to orphan - Peer has different CHAIN " + maxPeer);
-                betterPeer = peer;
-                return true;
-            } else {
+            if (headers.isEmpty()) {
                 // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
                 ///LOGGER.debug("peer has same Weight " + maxPeer);
                 ctrl.resetWeightOfPeer(peer);
                 // продолжим поиск дальше
                 continue;
+            } else {
+                LOGGER.debug("I to orphan - Peer has different CHAIN " + maxPeer);
+                betterPeer = peer;
+                return true;
             }
 
         }
