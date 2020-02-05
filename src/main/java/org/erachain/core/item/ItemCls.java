@@ -640,17 +640,14 @@ public abstract class ItemCls implements ExplorerJsonLine {
             }
 
         } else {
-            if (BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
+            if (false && BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
                 thisKey = this.getKey(db);
             }
             map.delete(thisKey);
         }
 
         //DELETE ORPHAN DATA
-        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 2");
         this.getDBIssueMap(db).delete(this.reference);
-
-        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 3");
 
         return thisKey;
 
