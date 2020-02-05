@@ -107,7 +107,7 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         //FILTER ALL KEYS
         Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
                 Fun.t3(pollKey, null, null),
-                Fun.t3(pollKey, Fun.HI(), Fun.HI())).firstKey();
+                Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI())).firstKey();
 
         //RETURN
         return key != null;
@@ -117,9 +117,9 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        return  ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+        return ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
                 Fun.t3(pollKey, null, null),
-                Fun.t3(pollKey, Fun.HI(), Fun.HI())).size();
+                Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI())).size();
 
     }
 

@@ -10,8 +10,8 @@ import org.erachain.core.item.assets.Trade;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DBTabImpl;
 import org.erachain.dbs.IteratorCloseable;
-import org.erachain.dbs.mapDB.TradeMapSuitMapDBFork;
 import org.erachain.dbs.mapDB.TradeSuitMapDB;
+import org.erachain.dbs.mapDB.TradeSuitMapDBFork;
 import org.erachain.dbs.rocksDB.TradeSuitRocksDB;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
@@ -65,7 +65,7 @@ public class TradeMapImpl extends DBTabImpl<Tuple2<Long, Long>, Trade> implement
                     //map = new NativeMapTreeMapFork(parent, databaseSet, Fun.TUPLE2_COMPARATOR, this);
                     //break;
                 default:
-                    map = new TradeMapSuitMapDBFork((TradeMap)parent, databaseSet);
+                    map = new TradeSuitMapDBFork((TradeMap) parent, databaseSet);
             }
         }
     }

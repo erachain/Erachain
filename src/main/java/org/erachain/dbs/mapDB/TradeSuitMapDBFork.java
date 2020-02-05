@@ -13,18 +13,16 @@ import org.mapdb.BTreeMap;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
-import java.util.Map;
-
 /**
  * Хранит сделки на бирже
  * Ключ: ссылка на иницатора + ссылка на цель
  * Значение - Сделка
-Initiator DBRef (Long) + Target DBRef (Long) -> Trade
+ * Initiator DBRef (Long) + Target DBRef (Long) -> Trade
  */
 @Slf4j
-public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> implements TradeSuit {
+public class TradeSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Trade> implements TradeSuit {
 
-    public TradeMapSuitMapDBFork(TradeMap parent, DBASet databaseSet) {
+    public TradeSuitMapDBFork(TradeMap parent, DBASet databaseSet) {
         super(parent, databaseSet, logger);
     }
 
@@ -47,19 +45,17 @@ public class TradeMapSuitMapDBFork extends DBMapSuitFork<Tuple2<Long, Long>, Tra
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
         //FILTER ALL KEYS
-        Map uncastedMap = map;
-        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
                 Fun.t2(order.getId(), null),
-                Fun.t2(order.getId(), Fun.HI())).keySet().iterator());
+                Fun.t2(order.getId(), Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override
     public IteratorCloseable<Tuple2<Long, Long>> getIteratorByKeys(Long orderID) {
         //FILTER ALL KEYS
-        Map uncastedMap = map;
-        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Order>) uncastedMap).subMap(
+        return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
                 Fun.t2(orderID, null),
-                Fun.t2(orderID, Fun.HI())).keySet().iterator());
+                Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override
