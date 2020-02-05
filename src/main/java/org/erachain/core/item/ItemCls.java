@@ -596,6 +596,12 @@ public abstract class ItemCls implements ExplorerJsonLine {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
 
+        if (BlockChain.DEVELOP_USE && this.getDBIssueMap(db).contains(this.reference)) {
+            // были двойные добавления из-за ошибок в проверках протокола и теперь тут две одинаковых записи
+            // поэтому игнорируем - иначе при откате будет поломана цепочка
+            return -1L;
+        }
+
         long newKey;
         long novaKey = this.isNovaAsset(this.owner, db);
         if (novaKey > 0) {
