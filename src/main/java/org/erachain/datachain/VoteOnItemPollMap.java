@@ -88,11 +88,11 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public NavigableSet<Tuple3<Long, Integer, BigInteger>> getVotes(Long pollKey, Integer option) {
+    public NavigableSet<Tuple3> getVotes(Long pollKey, Integer option) {
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        NavigableSet<Tuple3<Long, Integer, BigInteger>> keys = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+        NavigableSet<Tuple3> keys = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
                 Fun.t3(pollKey, option, null),
                 Fun.t3(pollKey, option, Fun.HI())).keySet();
 
@@ -105,7 +105,7 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, Object>, Tuple2>) map).subMap(
+        Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
                 Fun.t3(pollKey, null, null),
                 Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI())).firstKey();
 
@@ -117,7 +117,7 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        return ((BTreeMap<Tuple3<Long, Integer, Object>, Tuple2>) map).subMap(
+        return ((BTreeMap<Tuple3, Tuple2>) map).subMap(
                 Fun.t3(pollKey, null, null),
                 Fun.t3(pollKey, Integer.MAX_VALUE, Fun.HI())).size();
 
@@ -128,7 +128,7 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         BTreeMap map = (BTreeMap) this.map;
 
         //FILTER ALL KEYS
-        Tuple3<Long, Integer, BigInteger> key = ((BTreeMap<Tuple3<Long, Integer, BigInteger>, Tuple2>) map).subMap(
+        Tuple3 key = ((BTreeMap<Tuple3, Tuple2>) map).subMap(
                 Fun.t3(pollKey, option, null),
                 Fun.t3(pollKey, option, Fun.HI())).firstKey();
 
