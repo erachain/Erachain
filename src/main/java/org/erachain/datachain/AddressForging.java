@@ -69,7 +69,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
     @SuppressWarnings({"rawtypes", "unchecked"})
     public Collection<Tuple3<Integer, Integer, Integer>> getGeneratorBlocks(String address) {
         Collection<Tuple3<Integer, Integer, Integer>> headers = ((BTreeMap) (this.map))
-                .subMap(Fun.t2(address, null), Fun.t2(address, Fun.HI())).values();
+                .subMap(Fun.t2(address, null), Fun.t2(address, Integer.MAX_VALUE)).values();
 
         return headers;
     }

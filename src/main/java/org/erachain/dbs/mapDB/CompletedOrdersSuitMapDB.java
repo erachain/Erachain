@@ -66,7 +66,7 @@ public class CompletedOrdersSuitMapDB extends DBMapSuit<Long, Order> implements 
 
         return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple2, Long>) this.addressKeyMap).subMap(
                 Fun.t2(address, fromOrder),
-                Fun.t2(address, Fun.HI())).values().iterator());
+                Fun.t2(address, Long.MAX_VALUE)).values().iterator());
     }
 
 }

@@ -160,7 +160,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         BTreeMap map = (BTreeMap) this.map;
         // GET ALL CalculatedS THAT BELONG TO THAT ADDRESS
         Collection<Tuple3> keys = ((BTreeMap<Tuple3, Calculated>) map)
-                .subMap(Fun.t3(height, null, null), Fun.t3(height, Fun.HI(), Fun.HI())).keySet();
+                .subMap(Fun.t3(height, null, null), Fun.t3(height, Integer.MAX_VALUE, Long.MAX_VALUE)).keySet();
 
         // DELETE CalculatedS
         for (Tuple3<Integer, Integer, Long> key : keys) {
@@ -201,7 +201,7 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         //BTreeMap map = (BTreeMap) this.map;
         // GET ALL TRANSACTIONS THAT BELONG TO THAT ADDRESS
         Collection<Calculated> keys1 = ((BTreeMap) map)
-                .subMap(Fun.t2(block, null), Fun.t2(block, Fun.HI())).values();
+                .subMap(Fun.t2(block, null), Fun.t2(block, Integer.MAX_VALUE)).values();
 
 
         List<Calculated> txs = new ArrayList<>();
