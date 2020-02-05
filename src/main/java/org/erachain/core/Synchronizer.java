@@ -1027,6 +1027,8 @@ public class Synchronizer extends Thread {
                         return;
                     }
 
+                    cnt.stopAll(22);
+
                     throw error;
 
                 } else if (thrown != null) {
