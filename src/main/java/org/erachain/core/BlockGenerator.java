@@ -802,18 +802,22 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // не было остаков в пакетах RocksDB и трынзакциях MapDB
                     dcSet.flush(0, true, true);
 
-                    try {
-                        while (bchain.getHeight(dcSet) >= this.orphanto
-                            //    && bchain.getHeight(dcSet) > 157044
-                        ) {
-                            //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
-                            //    long iii = 11;
-                            //}
-                            //Block block = bchain.getLastBlock(dcSet);
+                    while (bchain.getHeight(dcSet) >= this.orphanto
+                        //    && bchain.getHeight(dcSet) > 157044
+                    ) {
+                        //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
+                        //    long iii = 11;
+                        //}
+                        //Block block = bchain.getLastBlock(dcSet);
+                        try {
                             ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                        } catch (Exception e) {
+                            // если ошибка то выход делаем чтобы зарегистрировать ошибку
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(1004);
+                            return;
+
                         }
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
                     }
 
                     if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
