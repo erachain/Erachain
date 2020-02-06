@@ -109,7 +109,7 @@ public class Controller extends Observable {
     public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 1 << 23;
 
-    public final Integer MUTE_PEER_COUNT = 8;
+    public static final Integer MUTE_PEER_COUNT = 8;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
@@ -519,10 +519,12 @@ public class Controller extends Observable {
      * set my getHWeightFull to PEER
      *
      * @param peer
+     * @param setMute
      */
-    public void resetWeightOfPeer(Peer peer) {
+    public void resetWeightOfPeer(Peer peer, Integer setMute) {
         peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
-        peerHWeightMute.put(peer, MUTE_PEER_COUNT);
+        if (setMute != null)
+            peerHWeightMute.put(peer, setMute);
 
     }
 
@@ -2200,7 +2202,7 @@ public class Controller extends Observable {
                 // TODO потом убрать +1 когда перейдем на новый +30 сдвиг - а нет цепочка наша встанет и будет ждать!
                 if (maxHeight < whPeer.a) {
                     // Этот пир дает цепочку из будущего - не берем его
-                    this.resetWeightOfPeer(peer);
+                    this.resetWeightOfPeer(peer, 4);
                     continue;
                 }
 

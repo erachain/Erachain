@@ -809,8 +809,8 @@ public class Synchronizer extends Thread {
                 headers.remove(0);
             } while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
-            if (headers.size() == 0) {
-                cnt.resetWeightOfPeer(peer);
+            if (headers.isEmpty()) {
+                cnt.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
                 String mess = "Peer is SAME as me";
                 //peer.ban(0, mess);
                 throw new Exception(mess);
