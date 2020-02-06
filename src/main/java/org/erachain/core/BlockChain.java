@@ -766,11 +766,15 @@ public class BlockChain {
 
     public static int getCheckPoint(DCSet dcSet) {
 
-        Integer item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
-        if (item == null || item < 1)
-            return 1;
+        int heightCheckPoint = 1;
+        if (CHECKPOINT.a > 1) {
+            Integer item = dcSet.getBlockSignsMap().get(CHECKPOINT.b);
+            if (item == null || item < 1)
+                return 1;
 
-        int heightCheckPoint = item;
+            heightCheckPoint = item;
+        }
+
         int dynamicCheckPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
 
         if (dynamicCheckPoint > heightCheckPoint)
