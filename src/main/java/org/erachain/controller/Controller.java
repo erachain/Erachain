@@ -187,8 +187,8 @@ public class Controller extends Observable {
         instance.LICENSE_LANG_REFS = Settings.getInstance().isTestnet() ?
                 new HashMap<String, Long>(3, 1) {
                     {
-                        put("en", Transaction.makeDBRef(148450, 1));
-                        put("ru", Transaction.makeDBRef(191502, 1));
+                        put("en", Transaction.makeDBRef(0, 1));
+                        put("ru", Transaction.makeDBRef(0, 1));
                     }
                 } :
                 new HashMap<String, Long>(3, 1) {
@@ -3854,7 +3854,7 @@ public class Controller extends Observable {
                 }
 
                 LOGGER.info(Lang.getInstance().translate("Starting %app%")
-                        .replace("%app%", Lang.getInstance().translate(APP_NAME) + (Settings.getInstance().isTestnet() ? " TestNET " : "")));
+                        .replace("%app%", getApplicationName(false)));
                 LOGGER.info(getVersion(true) + Lang.getInstance().translate(" build ")
                         + buildTime);
 
