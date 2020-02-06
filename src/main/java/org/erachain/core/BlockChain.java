@@ -1064,7 +1064,7 @@ public class BlockChain {
             return this.genesisTimestamp + (long) height * GENERATING_MIN_BLOCK_TIME_MS(height);
         }
 
-        return this.genesisTimestamp + 16667L
+        return this.genesisTimestamp + (Settings.getInstance().isTestnet() ? 0L : 16667L)
                 + (long) VERS_30SEC * GENERATING_MIN_BLOCK_TIME_MS(VERS_30SEC)
                 + (long) (height - VERS_30SEC) * GENERATING_MIN_BLOCK_TIME_MS(height);
 

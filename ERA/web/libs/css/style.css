@@ -3,25 +3,19 @@ table.tiny td {
     flex-wrap: nowrap !important;
     white-space: nowrap !important;
 }
-table.markdown th, td {
+table.markdown th, table.markdown td {
   border: 1px solid #ddd;
   padding: 3px 8px;
-  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
 }
-
-tr:nth-child(even){background-color: #f2f2f2;}
-
-tr:hover {background-color: #ddd;}
-
-th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: #4CAF50;
+table.markdown th {
+  border: 2px solid #fff;
+  padding: 5px 12px;
+  background-color: #3a9e3e;
   color: white;
 }
+
+table.markdown tr:nth-child(even){background-color: #f2f2f2;}
+
 
 a {
     color: #6467FF;
