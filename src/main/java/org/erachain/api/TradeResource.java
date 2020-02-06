@@ -711,7 +711,7 @@ public class TradeResource {
         if (!Settings.getInstance().isTestnet()
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET trade/test1\n ", request, true);
 

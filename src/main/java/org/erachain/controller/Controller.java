@@ -221,7 +221,7 @@ public class Controller extends Observable {
 
 
         if (withTimestamp)
-            return version + (BlockChain.DEVELOP_USE ? " DevelopNet"
+            return version + (BlockChain.DEVELOP_USE ? " DEMONet"
                     : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "")
                     + " (" + dbs + ")";
 
@@ -231,7 +231,7 @@ public class Controller extends Observable {
 
     public String getApplicationName(boolean withVersion) {
         return APP_NAME + " " + (withVersion ? getVersion(true) :
-                BlockChain.DEVELOP_USE ? "DevelopNet" : Settings.getInstance().isTestnet() ? "TestNet" : "");
+                BlockChain.DEVELOP_USE ? "DEMONet" : Settings.getInstance().isTestnet() ? "TestNet" : "");
     }
 
     public static String getBuildDateTimeString() {
@@ -3688,7 +3688,7 @@ public class Controller extends Observable {
         String pass = null;
 
         // init BlockChain then
-        String log4JPropertyFile = "resources/log4j" + (Settings.getInstance().isTestnet() ? "-dev" : "") + ".properties";
+        String log4JPropertyFile = "resources/log4j" + (Settings.getInstance().isTestnet() ? "-test" : "") + ".properties";
         Properties p = new Properties();
 
         try {

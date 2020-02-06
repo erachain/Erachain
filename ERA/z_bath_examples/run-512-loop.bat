@@ -1,5 +1,5 @@
 @ECHO OFF
-set app=erachain-dev
+set app=erachain
 set xms=512
 
 :start

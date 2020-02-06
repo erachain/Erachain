@@ -267,7 +267,7 @@ public class PeersResource {
     public String testHW(@PathParam("address") String address) {
 
         if (!Settings.getInstance().isTestnet())
-            return "not develop";
+            return "not testnet";
 
         List<Peer> activePeers = Controller.getInstance().getActivePeers();
 

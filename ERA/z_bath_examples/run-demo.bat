@@ -6,8 +6,6 @@ set mms=256
 set jpars=
 // USE DEVELOP chain
 set pars=-testnet=demo
-rem set jpars=-Dlog4j.configuration=file:log4j-dev.properties
-
 
 IF EXIST java (
 	start "%app%" java -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m -XX:MaxMetaspaceSize=%mms%m %jpars% -jar %app%.jar %pars%

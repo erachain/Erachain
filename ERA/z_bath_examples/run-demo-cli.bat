@@ -6,7 +6,6 @@ set mms=256
 set jpars=
 // USE DEVELOP chain
 set pars=-testnet=demo -cli
-rem set jpars=-Dlog4j.configuration=file:log4j-dev.properties
 
 
 IF EXIST java (

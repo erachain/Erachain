@@ -1,9 +1,9 @@
 @ECHO OFF
-set app=erachain-dev
+set app=erachain
 set xms=700
 set xmx=1500
 set pars=-pass=1 -seed=5:new:1 -opi --nodatawallet
-set jpars=-Dlog4j.configuration=file:log4j-dev.properties
+set jpars=-Dlog4j.configuration=file:log4j-test.properties
 
 IF EXIST java (
 	set run=java

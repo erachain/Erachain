@@ -330,7 +330,7 @@ public class RSendResource {
         if (!Settings.getInstance().isTestnet()
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
 
@@ -513,7 +513,7 @@ public class RSendResource {
         if (!Settings.getInstance().isTestnet()
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET test2\n ", request, true);
 
@@ -721,7 +721,7 @@ public class RSendResource {
         if (!test && !Settings.getInstance().isTestnet()
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         Long activeAfter;

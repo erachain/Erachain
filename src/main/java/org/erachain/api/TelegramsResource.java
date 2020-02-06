@@ -662,7 +662,7 @@ public class TelegramsResource {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
                 && !Settings.getInstance().isTestnet())
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET telegrams/test1\n ", request, true);
 
