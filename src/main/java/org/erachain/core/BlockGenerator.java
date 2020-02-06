@@ -128,7 +128,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             byte[] lastSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 2).signature;
             //byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
 
-            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
+            // не тестируем те узлы которые мы заткунули по Силе - они выдаются Силу выше хотя цепочка та же
+            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true, true);
 
             peer = maxPeer.c;
 
@@ -147,14 +148,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             } catch (Exception e) {
                 ///LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
                 // remove HW from peers
-                ctrl.resetWeightOfPeer(peer);
+                ctrl.resetWeightOfPeer(peer, 0);
                 continue;
             }
 
             if (response == null) {
                 ///LOGGER.debug("peer RESPONSE is null " + peer);
                 // remove HW from peers
-                ctrl.resetWeightOfPeer(peer);
+                ctrl.resetWeightOfPeer(peer, 0);
                 continue;
             }
 
@@ -175,7 +176,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             if (headers.isEmpty()) {
                 // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
                 ///LOGGER.debug("peer has same Weight " + maxPeer);
-                ctrl.resetWeightOfPeer(peer);
+                ctrl.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
                 // продолжим поиск дальше
                 continue;
             } else {
