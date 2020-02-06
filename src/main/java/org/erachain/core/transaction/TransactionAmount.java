@@ -494,7 +494,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                         // при откатах для нового счета который первый раз сделал транзакцию
                         // из нулевого баланса - Референс будеть ошибочный
                         // поэтому отключим эту проверку тут
-                        && !(BlockChain.DEVELOP_USE && height < 897144)
+                    /////   && !(BlockChain.DEVELOP_USE && height < 897144)
                 ) {
 
                     if (height > 0 || BlockChain.CHECK_BUGS > 7
@@ -534,7 +534,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 }
 
                 // самому себе нельзя пересылать
-                if (height > (BlockChain.DEVELOP_USE ? 259300 : BlockChain.VERS_4_11) && creator.equals(recipient)) {
+                if (height > BlockChain.VERS_4_11 && creator.equals(recipient)) {
                     return Transaction.INVALID_ADDRESS;
                 }
 
@@ -729,9 +729,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                                             && this.creator.getBalanceUSE(absKey, this.dcSet)
                                             .compareTo(this.amount) < 0) {
 
-                                        if ((!BlockChain.DEVELOP_USE && height > 120000) // в боевой
-                                                || BlockChain.DEVELOP_USE && height > 239800 // в девелопе
-                                                || Settings.getInstance().isTestnet() && height > 0 // в тестовой
+                                        if (height > BlockChain.ALL_BALANCES_OK_TO // в боевой
                                         )
                                             return NO_BALANCE;
                                     }

@@ -230,11 +230,9 @@ public class IssuePersonRecord extends IssueItemRecord {
                 }
             } else if (person.getImage().length < person.getMINimageLenght()) {
                 // 2998-1 - трнзакция забаненая
-                // TODO удалить это в новой цепочке
-                if (!(BlockChain.DEVELOP_USE && height < 300000)
-                        && !(!BlockChain.DEVELOP_USE && height == 2998)) {
+                //if (!(!Settings.getInstance().isTestnet() && height == 2998)) {
                     return Transaction.INVALID_IMAGE_LENGTH_MIN;
-                }
+                //}
             }
         } else {
             // person is DIE - any PHOTO

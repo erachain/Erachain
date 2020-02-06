@@ -15,6 +15,7 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemMap;
+import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
@@ -277,9 +278,10 @@ public abstract class ItemCls implements ExplorerJsonLine {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
             } else if (BlockChain.CHECK_BUGS > 0
-                    && !(BlockChain.DEVELOP_USE
-                        && (Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
-                            || Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW"))) // see issue/1149
+                    && !Settings.getInstance().isTestnet()
+                    && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
+                ///|| Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW")) // see issue/1149
+
             ) {
                 // zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH
                 LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
@@ -595,12 +597,6 @@ public abstract class ItemCls implements ExplorerJsonLine {
     public Long insertToMap(DCSet db, long startKey) {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
-
-        if (BlockChain.DEVELOP_USE && this.getDBIssueMap(db).contains(this.reference)) {
-            // были двойные добавления из-за ошибок в проверках протокола и теперь тут две одинаковых записи
-            // поэтому игнорируем - иначе при откате будет поломана цепочка
-            return -1L;
-        }
 
         long newKey;
         long novaKey = this.isNovaAsset(this.owner, db);

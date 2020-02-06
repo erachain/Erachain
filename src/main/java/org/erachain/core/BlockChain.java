@@ -153,12 +153,12 @@ public class BlockChain {
     public static final String[] GENESIS_ADMINS = new String[]{"78JFPWVVAVP3WW7S8HPgSkt24QF2vsGiS5",
             "7B3gTXXKB226bxTxEHi8cJNfnjSbuuDoMC"};
 
-    public static final int VERS_4_11 = TEST_DB > 0 ? 0 : DEVELOP_USE ? 230000 : Settings.getInstance().isTestnet() ? 0 : 194400;
+    public static final int VERS_4_11 = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : 194400;
 
     //public static final int ORDER_FEE_DOWN = VERS_4_11;
     public static final int HOLD_VALID_START = TESTS_VERS > 0? 0 : VERS_4_11;
 
-    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : DEVELOP_USE ? 800000 : Settings.getInstance().isTestnet() ? 0 : 623904;
+    public static final int ALL_BALANCES_OK_TO = TESTS_VERS > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : 623904;
     public static final int CANCEL_ORDERS_ALL_VALID = TEST_DB > 0 ? 0 : ALL_BALANCES_OK_TO; //260120;
     /**
      * Включает обработку заявок на бирже по цене рассчитанной по остаткам
@@ -171,16 +171,16 @@ public class BlockChain {
 
     public static final int SKIP_VALID_SIGN_BEFORE = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : 44666;
 
-    public static final int VERS_4_12 = TEST_DB > 0 ? 0 : DEVELOP_USE ? VERS_4_11 + 20000 : VERS_4_11;
+    public static final int VERS_4_12 = TEST_DB > 0 ? 0 : VERS_4_11;
 
-    public static final int VERS_30SEC = TEST_DB > 0 ? 0 : DEVELOP_USE ? 471000 : Settings.getInstance().isTestnet() ? 0 : 280785; //	2019-09-17 12:01:13
+    public static final int VERS_30SEC = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : 280785; //	2019-09-17 12:01:13
 
     //public static final long VERS_30SEC_TIME = Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC
     //        * (DEVELOP_USE ? 120L : Settings.getInstance().isTestnet()? 30L : 288L);
 
     // TODO поидее отрицательное тоже работать будет как надо
-    public static final long VERS_30SEC_TIME = DEVELOP_USE ? (Settings.DEFAULT_DEV_NET_STAMP + (long) VERS_30SEC * 120L)
-            : (Settings.getInstance().isTestnet() ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L);
+    public static final long VERS_30SEC_TIME =
+            Settings.getInstance().isTestnet() ? 0 : Settings.DEFAULT_MAINNET_STAMP + (long) VERS_30SEC * 288L;
 
     public static final int VERS_4_21_02 = 684000;
 
@@ -279,11 +279,11 @@ public class BlockChain {
     final public static BigDecimal TRADE_PRICE_DIFF_LIMIT = new BigDecimal("0.001");
 
 
-    public static final int ITEM_POLL_FROM = TEST_DB > 0? 0 : DEVELOP_USE ? 77000 : VERS_4_11;
+    public static final int ITEM_POLL_FROM = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : VERS_4_11;
 
-    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 ? 0 : DEVELOP_USE ? 1034 : Settings.getInstance().isTestnet() ? 0 : 1033;
+    public static final int AMOUNT_SCALE_FROM = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : 1033;
     public static final int AMOUNT_DEDAULT_SCALE = 8;
-    public static final int FREEZE_FROM = TEST_DB > 0 ? 0 : DEVELOP_USE ? 12980 : Settings.getInstance().isTestnet() ? 0 : 249222;
+    public static final int FREEZE_FROM = TEST_DB > 0 ? 0 : Settings.getInstance().isTestnet() ? 0 : 249222;
     // только на них можно замороженные средства вернуть из списка FOUNDATION_ADDRESSES (там же и замароженные из-за утраты)
     public static final String[] TRUE_ADDRESSES = TEST_DB > 0 ? new String[]{} : new String[]{
             "7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ"
@@ -352,11 +352,10 @@ public class BlockChain {
     public static final BigDecimal GIFTED_COMPU_AMOUNT_FOR_PERSON_BD = BigDecimal.valueOf(GIFTED_COMPU_AMOUNT_FOR_PERSON, FEE_SCALE);
 
     public static final Tuple2<Integer, byte[]> CHECKPOINT = new Tuple2<Integer, byte[]>(
-            DEVELOP_USE ? 289561 : Settings.getInstance().isTestnet() ? 0 : 235267,
-            Base58.decode(DEVELOP_USE ?
-                    "4MhxLvzH3svg5MoVi4sX8LZYVQosamoBubsEbeTo2fqu6Fcv14zJSVPtZDuu93Tc7RuS2nPJDYycWjpvdSYdmm1W"
-                    : Settings.getInstance().isTestnet() ? ""
-                    : "2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"));
+            Settings.getInstance().isTestnet() ? 0 : 235267,
+            Base58.decode(
+                    Settings.getInstance().isTestnet() ? ""
+                            : "2VTp79BBpK5E4aZYV5Tk3dYRS887W1devsrnyJeN6WTBQYQzoe2cTg819DdRs5o9Wh6tsGLsetYTbDu9okgriJce"));
 
     // issue PERSON
     //public static final BigDecimal PERSON_MIN_ERA_BALANCE = BigDecimal.valueOf(10000000);
@@ -405,12 +404,6 @@ public class BlockChain {
         if (TEST_DB > 0 || Settings.getInstance().isTestnet() && !DEVELOP_USE) {
             ;
         } else if (DEVELOP_USE) {
-
-            /////// WIPED
-            // ORDER on ERG
-            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("4ycpev6jq5dagkCz49LHoMmo6MM7cQEyC36A7tHKLz6ex25NjjKMkd7hdfPnd8yEmuy3biYVSezQXUuEH8f3HZFv")));
-            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("3JR3Wivtjm1uTmrnzkTHtXRdUvMdxrApcmu2Q5uha82HMucWqFWLgN82SwKqYB7EXQ7ThVtJD5s7iJqR8BwqGxF9")));
-            WIPED_RECORDS.add(Longs.fromByteArray(Base58.decode("5rh9StwPMPsxu7dRvsT5N3KmYkKwUTnRdfQ4Crhqmzbey6uDMh1i6SudphFSUZkexmDAJYJzrarUGsbdEycYytu4")));
 
             // GENERAL TRUST
             TRUSTED_ANONYMOUS.add("7BAXHMTuk1vh6AiZU65oc7kFVJGqNxLEpt");
@@ -667,8 +660,8 @@ public class BlockChain {
 
     public static int GENERATING_MIN_BLOCK_TIME(int height) {
 
-        if (height <= VERS_30SEC) {
-            return DEVELOP_USE? 120 : 288;
+        if (VERS_30SEC > 0 || height <= VERS_30SEC) {
+            return 288; // old MainNet
         }
 
         return 30;
@@ -692,10 +685,10 @@ public class BlockChain {
     }
 
     public static int UNCONFIRMED_SORT_WAIT_MS(int height) {
-        if (height <= VERS_30SEC) {
+        if (VERS_30SEC > 0 && height <= VERS_30SEC) {
             return -GENERATING_MIN_BLOCK_TIME_MS(height);
         }
-        return DEVELOP_USE ? 0 : 0;
+        return 0;
     }
 
     public static int BLOCKS_PER_DAY(int height) {

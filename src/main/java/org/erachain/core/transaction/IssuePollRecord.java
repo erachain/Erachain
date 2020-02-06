@@ -14,7 +14,7 @@ public class IssuePollRecord extends IssueItemRecord {
     private static final String NAME_ID = "Issue Poll";
 
     // TODO: в старой версии с 1 - 2 первый номер будет - надо скинуть в  0 или 1000000L
-    public static final long START_KEY = BlockChain.DEVELOP_USE ? 1L : 1000L;
+    public static final long START_KEY = 1000L;
 
     public IssuePollRecord(byte[] typeBytes, PublicKeyAccount creator, PollCls poll, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, poll, feePow, timestamp, reference);

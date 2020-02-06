@@ -405,9 +405,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (this.haveAsset == null || this.wantAsset == null)
             return ITEM_ASSET_NOT_EXIST;
 
-        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()
-                // TODO походу тут уже есть кривые записи и эту проверку надо убрать при новом Деве
-                && !BlockChain.DEVELOP_USE) {
+        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()) {
 
             return INVALID_ACCOUNTING_PAIR;
         }
