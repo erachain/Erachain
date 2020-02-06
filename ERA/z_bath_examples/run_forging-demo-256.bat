@@ -6,7 +6,7 @@ set mms=256
 set jpars=
 
 // USE DEVELOP chain
-set pars=-testnet=dev -pass=1
+set pars=-testnet=demo -pass=1
 
 
 IF EXIST java (

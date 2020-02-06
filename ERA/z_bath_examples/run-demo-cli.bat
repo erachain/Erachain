@@ -5,7 +5,7 @@ set xmx=1024
 set mms=256
 set jpars=
 // USE DEVELOP chain
-set pars=-testnet=dev
+set pars=-testnet=demo -cli
 rem set jpars=-Dlog4j.configuration=file:log4j-dev.properties
 
 
@@ -36,7 +36,7 @@ IF EXIST "%JAVAHOME%\bin\java.exe" (
 
 REG QUERY "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome" >nul 2>nul || ( GOTO NOTFOUND3 )
 	for /f "tokens=1,2,*" %%a in ('reg query "HKLM\SOFTWARE\JavaSoft\Java Runtime Environment\1.8" /v "JavaHome"') do if "%%a"=="JavaHome" set JAVAHOME=%%c
-	
+
 IF EXIST "%JAVAHOME%\bin\java.exe" (
 	start "%app%" "%JAVAHOME%\bin\java.exe" -Xms%xms%m -Xmx%xmx%m -XX:MaxMetaspaceSize=%mms%m %jpars% -jar %app%.jar %pars%
 	EXIT /b

@@ -28,9 +28,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
-    public static final long DEFAULT_DEV_NET_STAMP = 1581001700000L; // default for developers test net
+    public static final long DEFAULT_DEMO_NET_STAMP = 1581001700000L; // default for developers test net
 
     //private static final String[] DEFAULT_PEERS = { };
+    public static final String DEFAULT_THEME = "System";
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
@@ -192,7 +193,7 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (isTestnet() ? "peers-dev.json" : "peers.json");
+        return this.userPath + (isTestnet() ? "peers-demo.json" : "peers.json");
     }
 
     public String getWalletDir() {
@@ -525,8 +526,8 @@ public class Settings {
         return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
     }
 
-    public boolean isDevnet() {
-        return this.getGenesisStamp() == DEFAULT_DEV_NET_STAMP;
+    public boolean isDemonet() {
+        return this.getGenesisStamp() == DEFAULT_DEMO_NET_STAMP;
     }
 
     public long getGenesisStamp() {
