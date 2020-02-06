@@ -3,6 +3,9 @@ table.tiny td {
     flex-wrap: nowrap !important;
     white-space: nowrap !important;
 }
+table.markdown th, td {
+    padding: 1px 5px !important;
+}
 
 a {
     color: #6467FF;
