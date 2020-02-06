@@ -109,7 +109,7 @@ public class Controller extends Observable {
     public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 1 << 23;
 
-    public final Integer MUTE_PEER_COUNT = 32;
+    public final Integer MUTE_PEER_COUNT = 8;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
@@ -528,7 +528,7 @@ public class Controller extends Observable {
 
     public void updateWeightOfPeerMutes(int add) {
         for (Peer peer : peerHWeightMute.keySet()) {
-            peerHWeightMute.put(peer, peerHWeightMute.get(peer) - add);
+            peerHWeightMute.put(peer, peerHWeightMute.get(peer) + add);
         }
 
     }
@@ -1567,6 +1567,7 @@ public class Controller extends Observable {
 
         this.peerHWeight.remove(peer);
         this.peersVersions.remove(peer);
+        this.peerHWeightMute.remove(peer);
 
         if (this.peerHWeight.isEmpty()) {
 
@@ -1816,7 +1817,7 @@ public class Controller extends Observable {
         }
 
         // withWinBuffer
-        Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift, false);
+        Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift, false, false);
         if (maxHW.c == null) {
             this.status = STATUS_OK;
             return true;
@@ -1960,7 +1961,7 @@ public class Controller extends Observable {
 
         // нам не важно отличие в последнем блоке тут - главное чтобы цепочка была длиньше?
         //blockGenerator.checkWeightPeers();
-        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false);
+        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false, false);
         if (betterPeerHW != null) {
             Tuple2<Integer, Long> currentHW = getHWeightOfPeer(currentBetterPeer);
             if (currentHW != null && (currentHW.a >= betterPeerHW.a
@@ -2044,7 +2045,7 @@ public class Controller extends Observable {
             Tuple3<Integer, Long, Peer> peerHW;
             Tuple2<Integer, Long> peerHWdata = null;
             if (blockGenerator.betterPeer == null) {
-                peerHW = this.getMaxPeerHWeight(shift, false);
+                peerHW = this.getMaxPeerHWeight(shift, false, false);
             } else {
                 // берем пир который нашли в генераторе при осмотре более сильных цепочек
                 // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
@@ -2052,7 +2053,7 @@ public class Controller extends Observable {
                 peerHWdata = this.getHWeightOfPeer(blockGenerator.betterPeer);
                 if (peerHWdata == null) {
                     // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
-                    peerHW = this.getMaxPeerHWeight(shift, false);
+                    peerHW = this.getMaxPeerHWeight(shift, false, false);
                 } else {
                     peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
                 }
@@ -2168,7 +2169,7 @@ public class Controller extends Observable {
      * return highestPeer; }
      */
 
-    public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift, boolean useWeight) {
+    public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift, boolean useWeight, boolean excludeMute) {
 
         if (this.isStopping || this.dcSet.isStoped())
             return null;
@@ -2182,19 +2183,24 @@ public class Controller extends Observable {
 
         try {
             for (Peer peer : this.peerHWeight.keySet()) {
-                Integer muteCount = peerHWeightMute.get(peer);
-                if (peer.getPing() < 0 || muteCount != null && muteCount > 0) {
+                if (peer.getPing() < 0) {
                     // не использовать пиры которые не в быстром коннекте
                     // - так как иначе они заморозят синхронизацию совсем
                     // да и не понятно как с них данные получать
-                    ///// и не использовать те кому мы заткнули - они данные по Силе блока завышенные дают
                     continue;
+                }
+                if (excludeMute) {
+                    Integer muteCount = peerHWeightMute.get(peer);
+                    if (muteCount != null && muteCount > 0) {
+                        ///// и не использовать те кому мы заткнули - они данные по Силе блока завышенные дают
+                        continue;
+                    }
                 }
                 Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
                 // TODO потом убрать +1 когда перейдем на новый +30 сдвиг - а нет цепочка наша встанет и будет ждать!
                 if (maxHeight < whPeer.a) {
                     // Этот пир дает цепочку из будущего - не берем его
-                    this.peerHWeight.remove(peer);
+                    this.resetWeightOfPeer(peer);
                     continue;
                 }
 

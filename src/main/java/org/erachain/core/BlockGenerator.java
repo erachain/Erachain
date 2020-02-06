@@ -128,7 +128,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             byte[] lastSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 2).signature;
             //byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
 
-            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
+            // не тестируем те узлы которые мы заткунули по Силе - они выдаются Силу выше хотя цепочка та же
+            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true, true);
 
             peer = maxPeer.c;
 

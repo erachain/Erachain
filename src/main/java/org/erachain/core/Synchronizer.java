@@ -1243,10 +1243,16 @@ public class Synchronizer extends Thread {
 
                 timeTmp = bchain.getTimestamp(dcSet) + shiftPoint;
 
-                if (timePoint == timeTmp || timeTmp > NTP.getTime() || !cnt.isStatusOK())
+                if (timePoint == timeTmp || timeTmp > NTP.getTime())
                     continue;
 
                 timePoint = timeTmp;
+
+                // снизим ожижание блокировки с "сильных но таких же как мы" узлов
+                cnt.updateWeightOfPeerMutes(-1);
+
+                if (!cnt.isStatusOK())
+                    continue;
 
                 // иначе просиходит сброс и синхронизация новая
                 if (blockGenerator.getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT)
@@ -1263,9 +1269,6 @@ public class Synchronizer extends Thread {
                         needCheck = true;
                     }
                 }
-
-                // снизим ожижание блокировки с "сильных но таких же как мы" узлов
-                cnt.updateWeightOfPeerMutes(1);
 
                 if (needCheck) {
                     LOGGER.debug("try CHECK BETTER CHAIN PEER");
