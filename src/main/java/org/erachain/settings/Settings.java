@@ -1,6 +1,4 @@
 package org.erachain.settings;
-// 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
-// 30/03 ++
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -26,9 +24,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-
-//import java.util.Arrays;
-// import org.slf4j.LoggerFactory;
 
 public class Settings {
 
