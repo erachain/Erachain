@@ -596,6 +596,12 @@ public abstract class ItemCls implements ExplorerJsonLine {
         //INSERT INTO DATABASE
         ItemMap dbMap = this.getDBMap(db);
 
+        if (BlockChain.DEVELOP_USE && this.getDBIssueMap(db).contains(this.reference)) {
+            // были двойные добавления из-за ошибок в проверках протокола и теперь тут две одинаковых записи
+            // поэтому игнорируем - иначе при откате будет поломана цепочка
+            return -1L;
+        }
+
         long newKey;
         long novaKey = this.isNovaAsset(this.owner, db);
         if (novaKey > 0) {
@@ -628,20 +634,26 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         long thisKey = this.getKey(db);
 
+        ItemMap map = this.getDBMap(db);
         if (thisKey > startKey) {
-            this.getDBMap(db).decrementDelete(thisKey);
+            map.decrementDelete(thisKey);
+
+            if (BlockChain.CHECK_BUGS > 1
+                    && map.getLastKey() != thisKey - 1) {
+                LOGGER.error("After delete KEY: " + key + " != map.value.key - 1: " + map.getLastKey());
+                Long error = null;
+                error++;
+            }
+
         } else {
-            if (BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
+            if (false && BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
                 thisKey = this.getKey(db);
             }
-            this.getDBMap(db).delete(thisKey);
+            map.delete(thisKey);
         }
 
         //DELETE ORPHAN DATA
-        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 2");
         this.getDBIssueMap(db).delete(this.reference);
-
-        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 3");
 
         return thisKey;
 

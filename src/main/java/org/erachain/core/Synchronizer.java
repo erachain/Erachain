@@ -1027,6 +1027,8 @@ public class Synchronizer extends Thread {
                         return;
                     }
 
+                    cnt.stopAll(22);
+
                     throw error;
 
                 } else if (thrown != null) {
@@ -1198,7 +1200,7 @@ public class Synchronizer extends Thread {
             if (processTiming < 999999999999l) {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
-                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.blockHead.transactionsCount);
+                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
             }
         }
 
