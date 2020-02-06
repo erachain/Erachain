@@ -316,6 +316,10 @@ button.white-bgc[disabled]:focus,
                             var type = data.type;
                             document.getElementById('Langs').innerHTML = langs(data);
 
+                            if (data.hasOwnProperty('network')) {
+                                document.getElementById('network').innerHTML = data.network;
+                            }
+
                             // select searchID in need
                             if (data.hasOwnProperty('search')) {
                                 $('#selectID').val(data.search);
@@ -2279,6 +2283,7 @@ button.white-bgc[disabled]:focus,
                     <a href="http://erachain.org" class="navbar-brand"><img src="img/logo_header.png"
                                                                             style="height:50px" alt=""
                                                                             class="logo-header"></a>
+                    <b><span id="network" style="color:red;"></span></b>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <!--    <ul class="nav navbar-nav navbar-right">

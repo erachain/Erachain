@@ -32,7 +32,6 @@ public class Settings {
 
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
-    public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
     public static final String DEFAULT_DATA_DIR = "datachain";

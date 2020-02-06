@@ -259,7 +259,7 @@ public class BlockExplorer {
             langFile = info.getQueryParameters().getFirst("lang") + ".json";
         }
 
-        logger.info("try lang file: " + langFile);
+        ///logger.info("try lang file: " + langFile);
 
         langObj = Lang.openLangFile(langFile);
 
@@ -432,8 +432,7 @@ public class BlockExplorer {
                     logger.error(e.getMessage(), e);
                     return output;
                 }
-            } else
-            if (info.getQueryParameters().get("asset").size() == 2) {
+            } else if (info.getQueryParameters().get("asset").size() == 2) {
                 long have = Integer.valueOf(info.getQueryParameters().get("asset").get(0));
                 long want = Integer.valueOf(info.getQueryParameters().get("asset").get(1));
 
@@ -448,23 +447,22 @@ public class BlockExplorer {
 
         // Exchange
         else if (info.getQueryParameters().containsKey("exchange")) {
-            jsonQueryExchange(null, (int)start);
+            jsonQueryExchange(null, (int) start);
         }
 
         ///////////////////////////// ADDRESSES //////////////////////
         // address
         else if (info.getQueryParameters().containsKey("address")) {
             output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int) start, info));
-        }
-        else if (info.getQueryParameters().containsKey("addresses")) {
+        } else if (info.getQueryParameters().containsKey("addresses")) {
             jsonQueryAddresses();
 
-        ///////// BLOCKS /////////////
+            ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("type", "blocks");
-            output.putAll(jsonQueryPages(Block.BlockHead.class, (int)start, pageSize));
+            output.putAll(jsonQueryPages(Block.BlockHead.class, (int) start, pageSize));
         } else if (info.getQueryParameters().containsKey("block")) {
-            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int)start));
+            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int) start));
         }
 
         ///////////////////////////// TRANSACTIONS ///////////////
@@ -529,6 +527,9 @@ public class BlockExplorer {
 
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
+        if (Settings.getInstance().isTestnet()) {
+            output.put("network", BlockChain.DEVELOP_USE ? "DEMO Net" : "TEST Net");
+        }
         return output;
     }
 
