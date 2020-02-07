@@ -109,7 +109,7 @@ public class BlockChain {
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
     public static final int BASE_TARGET = 100000;///1 << 15;
-    public static final int REPEAT_WIN = DEMO_MODE ? 4 : TEST_MODE ? 1 : ERA_COMPU_ALL_UP ? 15 : 40; // GENESIS START TOP ACCOUNTS
+    public static final int REPEAT_WIN = DEMO_MODE ? 10 : TEST_MODE ? 5 : ERA_COMPU_ALL_UP ? 15 : 40; // GENESIS START TOP ACCOUNTS
 
     // RIGHTs
     public static final int GENESIS_ERA_TOTAL = 10000000;
@@ -904,54 +904,49 @@ public class BlockChain {
 
         int difference = height - previousForgingHeight;
 
-        if (Controller.getInstance().isTestNet()) {
-            if (difference < 10) {
-                difference = 10;
-            }
-        } else if (ERA_COMPU_ALL_UP) {
-            if (height < 5650 && difference < REPEAT_WIN) {
-                difference = REPEAT_WIN;
-            } else if (difference < REPEAT_WIN) {
-                return difference - REPEAT_WIN;
-            }
+        if (CHECK_BUGS > 1 && difference < REPEAT_WIN) {
+            boolean debug = true;
+        }
+
+        int repeatsMin;
+
+        if (height < BlockChain.REPEAT_WIN) {
+            repeatsMin = height - 2;
         } else {
+            repeatsMin = BlockChain.GENESIS_ERA_TOTAL / forgingBalance;
+            repeatsMin = (repeatsMin >> 2);
 
-            int repeatsMin;
-
-            if (height < BlockChain.REPEAT_WIN) {
-                repeatsMin = height - 2;
+            if (ERA_COMPU_ALL_UP) {
+                if (DEMO_MODE && height < 2100) {
+                    repeatsMin = 1;
+                } else {
+                    repeatsMin = REPEAT_WIN;
+                }
             } else {
-                repeatsMin = BlockChain.GENESIS_ERA_TOTAL / forgingBalance;
-                repeatsMin = (repeatsMin >> 2);
-
-                if (!TEST_MODE) {
-                    if (height < 40000) {
-                        if (repeatsMin > 4)
-                            repeatsMin = 4;
-                    } else if (height < 100000) {
-                        if (repeatsMin > 6)
-                            repeatsMin = 6;
-                    } else if (height < 110000) {
-                        if (repeatsMin > 10) {
-                            repeatsMin = 10;
-                        }
-                    } else if (height < 120000) {
-                        if (repeatsMin > 40)
-                            repeatsMin = 40;
-                    } else if (height < VERS_4_21_02) {
-                        if (repeatsMin > 200)
-                            repeatsMin = 200;
-                    } else if (repeatsMin < 10) {
+                if (height < 40000) {
+                    if (repeatsMin > 4)
+                        repeatsMin = 4;
+                } else if (height < 100000) {
+                    if (repeatsMin > 6)
+                        repeatsMin = 6;
+                } else if (height < 110000) {
+                    if (repeatsMin > 10) {
                         repeatsMin = 10;
                     }
-                } else if (repeatsMin > DEVELOP_FORGING_START) {
-                    repeatsMin = DEVELOP_FORGING_START;
+                } else if (height < 120000) {
+                    if (repeatsMin > 40)
+                        repeatsMin = 40;
+                } else if (height < VERS_4_21_02) {
+                    if (repeatsMin > 200)
+                        repeatsMin = 200;
+                } else if (repeatsMin < 10) {
+                    repeatsMin = 10;
                 }
             }
+        }
 
-            if (difference < repeatsMin) {
-                return difference - repeatsMin;
-            }
+        if (difference < repeatsMin) {
+            return difference - repeatsMin;
         }
 
         long win_value;
@@ -961,7 +956,7 @@ public class BlockChain {
         else
             win_value = forgingBalance;
 
-        if (ERA_COMPU_ALL_UP || Controller.getInstance().isTestNet())
+        if (ERA_COMPU_ALL_UP || BlockChain.TEST_MODE)
             return win_value;
 
         if (false) {
@@ -1008,7 +1003,7 @@ public class BlockChain {
 
         int base = BlockChain.getTargetedMin(height);
         int targetedWinValue = calcWinValueTargeted(win_value, target);
-        if (!ERA_COMPU_ALL_UP && !Controller.getInstance().isTestNet()
+        if (!ERA_COMPU_ALL_UP && !BlockChain.TEST_MODE
                 && height > VERS_4_11
                 && base > targetedWinValue) {
             return -targetedWinValue;

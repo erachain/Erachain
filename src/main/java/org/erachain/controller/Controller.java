@@ -332,10 +332,6 @@ public class Controller extends Observable {
         }
     }
 
-    public boolean isTestNet() {
-        return BlockChain.TEST_MODE;
-    }
-
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
