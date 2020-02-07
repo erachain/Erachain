@@ -1,6 +1,7 @@
 package org.erachain.api;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
@@ -15,7 +16,6 @@ import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
 import org.erachain.network.message.TelegramMessage;
 import org.erachain.ntp.NTP;
-import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Converter;
 import org.json.simple.JSONArray;
@@ -661,7 +661,7 @@ public class TelegramsResource {
     public String test1(@PathParam("delay") long delay, @QueryParam("password") String password) {
 
         if (ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
-                && !Settings.getInstance().isTestnet())
+                && !BlockChain.TEST_MODE)
             return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET telegrams/test1\n ", request, true);

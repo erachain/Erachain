@@ -8,7 +8,6 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
-import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -406,7 +405,7 @@ public class RSend extends TransactionAmount {
             if (Base58.isExtraSymbols(word)) {
                 // все слова сложим по длинне
                 length += word.length();
-                if (length > (Settings.getInstance().isTestnet() ? 100 : 100))
+                if (length > (BlockChain.TEST_MODE ? 100 : 100))
                     return true;
             }
         }

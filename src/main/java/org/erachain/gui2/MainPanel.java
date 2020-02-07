@@ -1,5 +1,6 @@
 package org.erachain.gui2;
 
+import org.erachain.core.BlockChain;
 import org.erachain.gui.Wallets.WalletsManagerSplitPanel;
 import org.erachain.gui.bank.IssueSendPaymentOrder;
 import org.erachain.gui.bank.MyOrderPaimentsSplitPanel;
@@ -46,7 +47,6 @@ import org.erachain.gui.library.MSplitPane;
 import org.erachain.gui.telegrams.ALLTelegramPanel;
 import org.erachain.gui.telegrams.TelegramSplitPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -448,7 +448,7 @@ public class MainPanel extends javax.swing.JPanel {
                 insertTab(Lang.getInstance().translate("Search Statuses"), new SearchStatusesSplitPanel());
                 return;
             }
-            if (Settings.getInstance().isTestnet()) {
+            if (BlockChain.TEST_MODE) {
                 if (str.equals(Lang.getInstance().translate("My Unions")) || str.equals("MyUnionsTab")) {
                     insertTab(Lang.getInstance().translate("My Unions"), new MyUnionsTab());
                     return;
@@ -555,7 +555,7 @@ public class MainPanel extends javax.swing.JPanel {
                 return;
             }
 
-            if (Settings.getInstance().isTestnet()) {
+            if (BlockChain.TEST_MODE) {
                 if (str.equals(Lang.getInstance().translate("Wallets Manager"))
                         || str.equals("WalletsManagerSplitPanel")) {
                     insertTab(Lang.getInstance().translate("Wallets Manager"), new WalletsManagerSplitPanel());

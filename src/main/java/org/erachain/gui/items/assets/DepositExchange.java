@@ -1,6 +1,7 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.gui.library.MButton;
@@ -131,7 +132,7 @@ public class DepositExchange extends JPanel {
         }
 
         if (jsonObject != null && jsonObject.containsKey("addr_in")) {
-            if (Settings.getInstance().isTestnet()) {
+            if (BlockChain.TEST_MODE) {
                 jLabel_Adress_Check.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
             }
 
@@ -578,7 +579,7 @@ public class DepositExchange extends JPanel {
 
         if (jsonObject != null) {
             if (jsonObject.containsKey("deal")) {
-                if (Settings.getInstance().isTestnet()) {
+                if (BlockChain.TEST_MODE) {
                     tip.setText("<html>" + StrJSonFine.convert(jsonObject) + "</html>");
                 }
 

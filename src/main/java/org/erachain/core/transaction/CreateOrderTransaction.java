@@ -10,7 +10,6 @@ import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.datachain.DCSet;
-import org.erachain.settings.Settings;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
 
@@ -435,7 +434,7 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
             return HAVE_EQUALS_WANT;
         }
 
-        if (haveKey == RIGHTS_KEY && !Settings.getInstance().isTestnet()
+        if (haveKey == RIGHTS_KEY && !BlockChain.TEST_MODE
                 && height > BlockChain.FREEZE_FROM
                 && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
             // LOCK ERA sell

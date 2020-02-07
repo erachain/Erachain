@@ -26,7 +26,6 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -527,8 +526,8 @@ public class BlockExplorer {
 
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
-        if (Settings.getInstance().isTestnet()) {
-            output.put("network", BlockChain.DEVELOP_USE ? "DEMO Net" : "TEST Net");
+        if (BlockChain.TEST_MODE) {
+            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net" : "TEST Net");
         }
         return output;
     }
@@ -2427,7 +2426,7 @@ public class BlockExplorer {
         List<Pair<Long, Long>> list = new ArrayList<>();
         HashSet<Pair<Long, Long>> pairsSet = new HashSet<>();
 
-        if (Settings.getInstance().isTestnet()) {
+        if (BlockChain.TEST_MODE) {
             list.add(new Pair<Long, Long>(1L, 2L));
         } else {
             list.add(new Pair<Long, Long>(12L, 92L));

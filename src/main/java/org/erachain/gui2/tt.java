@@ -1,7 +1,7 @@
 package org.erachain.gui2;
 
+import org.erachain.core.BlockChain;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 import javax.swing.event.AncestorEvent;
@@ -46,7 +46,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         DefaultMutableTreeNode telegrams_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams"));
 
 
-        if (Settings.getInstance().isTestnet())
+        if (BlockChain.TEST_MODE)
             root.add(bank_Tree);
 
         root.add(account_Node);
@@ -57,16 +57,16 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(templates_Node);
         root.add(statuses_Node);
 
-        if (Settings.getInstance().isTestnet())
+        if (BlockChain.TEST_MODE)
             root.add(unions_Node);
 
         root.add(polls_Node);
 
-        if (Settings.getInstance().isTestnet())
+        if (BlockChain.TEST_MODE)
             root.add(hashes_Node);
-        if (Settings.getInstance().isTestnet())
+        if (BlockChain.TEST_MODE)
             root.add(linked_hashes_Node);
-        if (Settings.getInstance().isTestnet())
+        if (BlockChain.TEST_MODE)
             root.add(telegrams_Tree);
         
         root.add(records_Node);
@@ -130,7 +130,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Unconfirmed Records")));
 
         other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
-        if (Settings.getInstance().isTestnet())
+        if (BlockChain.TEST_MODE)
             other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
         
         other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Console")));

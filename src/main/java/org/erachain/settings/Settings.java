@@ -192,7 +192,7 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (isTestnet() ? "peers-demo.json" : "peers.json");
+        return this.userPath + (isTestNet() ? "peers-demo.json" : "peers.json");
     }
 
     public String getWalletDir() {
@@ -353,7 +353,7 @@ public class Settings {
         try {
 
             File file = new File(this.userPath
-                    + (Settings.getInstance().isTestnet() ? "peers-trusted-test.json" : "peers-trusted.json"));
+                    + (BlockChain.TEST_MODE ? "peers-trusted-test.json" : "peers-trusted.json"));
 
             //CREATE FILE IF IT DOESNT EXIST
             if (file.exists()) {
@@ -386,7 +386,7 @@ public class Settings {
             List<Peer> knownPeers = new ArrayList<>();
             JSONArray peersArray = new JSONArray();
 
-            if (!Settings.getInstance().isTestnet()) {
+            if (!BlockChain.TEST_MODE) {
                 try {
                     JSONArray peersArraySettings = (JSONArray) this.settingsJSON.get("knownpeers");
 
@@ -423,7 +423,7 @@ public class Settings {
 
             knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 
-            if (!Settings.getInstance().isTestnet() && (knownPeers.isEmpty() || loadPeersFromInternet)) {
+            if (!BlockChain.TEST_MODE && (knownPeers.isEmpty() || loadPeersFromInternet)) {
                 knownPeers.addAll(getKnownPeersFromInternet());
             }
 
@@ -521,11 +521,11 @@ public class Settings {
         }
     }
 
-    public boolean isTestnet() {
+    public boolean isTestNet() {
         return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
     }
 
-    public boolean isDemonet() {
+    public boolean isDemoNet() {
         return this.getGenesisStamp() == DEFAULT_DEMO_NET_STAMP;
     }
 
@@ -721,7 +721,7 @@ public class Settings {
             }
 
             //RETURN
-            return (Settings.getInstance().isTestnet() ? ";" : DEFAULT_WEB_ALLOWED).split(";");
+            return (BlockChain.TEST_MODE ? ";" : DEFAULT_WEB_ALLOWED).split(";");
 
         } catch (Exception e) {
             //RETURN EMPTY LIST

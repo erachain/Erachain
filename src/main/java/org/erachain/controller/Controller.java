@@ -184,7 +184,7 @@ public class Controller extends Observable {
     public int databaseSystem = -1;
 
     Controller() {
-        instance.LICENSE_LANG_REFS = Settings.getInstance().isTestnet() ?
+        instance.LICENSE_LANG_REFS = BlockChain.TEST_MODE ?
                 new HashMap<String, Long>(3, 1) {
                     {
                         put("en", Transaction.makeDBRef(0, 1));
@@ -221,8 +221,8 @@ public class Controller extends Observable {
 
 
         if (withTimestamp)
-            return version + (BlockChain.DEVELOP_USE ? " DEMONet"
-                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "")
+            return version + (BlockChain.DEMO_MODE ? " DEMO Net"
+                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp() : "")
                     + " (" + dbs + ")";
 
         return version + " (" + dbs + ")";
@@ -231,7 +231,7 @@ public class Controller extends Observable {
 
     public String getApplicationName(boolean withVersion) {
         return APP_NAME + " " + (withVersion ? getVersion(true) :
-                BlockChain.DEVELOP_USE ? "DEMONet" : Settings.getInstance().isTestnet() ? "TestNet" : "");
+                BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net" : "");
     }
 
     public static String getBuildDateTimeString() {
@@ -325,7 +325,7 @@ public class Controller extends Observable {
     }
 
     public int getNetworkPort() {
-        if (Settings.getInstance().isTestnet()) {
+        if (BlockChain.TEST_MODE) {
             return BlockChain.TESTNET_PORT;
         } else {
             return BlockChain.MAINNET_PORT;
@@ -333,13 +333,13 @@ public class Controller extends Observable {
     }
 
     public boolean isTestNet() {
-        return Settings.getInstance().isTestnet();
+        return BlockChain.TEST_MODE;
     }
 
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-            if (!BlockChain.DEVELOP_USE && Settings.getInstance().isTestnet()) {
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
             } else {
@@ -914,7 +914,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
 
-            if (!BlockChain.DEVELOP_USE && Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE && this.wallet.isWalletDatabaseExisting()
                     && !this.wallet.getAccounts().isEmpty()) {
                 this.wallet.synchronize(true);
             }
@@ -1487,7 +1487,7 @@ public class Controller extends Observable {
             }
         }
 
-        if (false && Settings.getInstance().isTestnet()) {
+        if (false && BlockChain.TEST_MODE) {
             try {
                 synchronizer.checkBadBlock(peer);
             } catch (Exception e) {
@@ -3688,7 +3688,7 @@ public class Controller extends Observable {
         String pass = null;
 
         // init BlockChain then
-        String log4JPropertyFile = "resources/log4j" + (Settings.getInstance().isTestnet() ? "-test" : "") + ".properties";
+        String log4JPropertyFile = "resources/log4j" + (BlockChain.TEST_MODE ? "-test" : "") + ".properties";
         Properties p = new Properties();
 
         try {

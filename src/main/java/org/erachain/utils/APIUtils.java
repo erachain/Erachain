@@ -126,7 +126,7 @@ public class APIUtils {
                 min_length = 8;
             }
 
-            if (Settings.getInstance().isTestnet())
+            if (BlockChain.TEST_MODE)
                 min_length = 0;
 
             if (password != null) {
