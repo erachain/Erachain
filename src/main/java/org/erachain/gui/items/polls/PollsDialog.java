@@ -287,6 +287,11 @@ public class PollsDialog extends JDialog {
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
+        dd.dispose();
+
+        // ENABLE
+        this.voteButton.setEnabled(true);
+
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
@@ -302,6 +307,9 @@ public class PollsDialog extends JDialog {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate("Your vote has been sent") + "!",
                         Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+                this.dispose();
+
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(result)),
@@ -309,9 +317,5 @@ public class PollsDialog extends JDialog {
             }
         }
 
-        dd.dispose();
-
-        // ENABLE
-        this.voteButton.setEnabled(true);
     }
 }
