@@ -2,6 +2,7 @@ package org.erachain.utils;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.wallet.TransactionMap;
@@ -41,7 +42,7 @@ public class SysTray implements Observer {
     private TrayIcon icon = null;
     private PopupMenu createPopupMenu;
 
-    public boolean stopMessages = Settings.getInstance().isTestnet();
+    public boolean stopMessages = BlockChain.TEST_MODE;
 
     private long timePoint;
 
@@ -319,7 +320,7 @@ public class SysTray implements Observer {
             String syncProcent = 100 * currentHeight / Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "%";
 
             String toolTipText = networkStatus + " " + syncProcent;
-            toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false).a;
+            toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance()).a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false).a;
             setToolTipText(toolTipText);
 
         } else if (message.getType() == ObserverMessage.BLOCKCHAIN_SYNC_STATUS) {
@@ -333,11 +334,11 @@ public class SysTray implements Observer {
 
             String syncProcent = "";
             if (Controller.getInstance().getStatus() == Controller.STATUS_SYNCHRONIZING) {
-                syncProcent = 100 * currentHeight / Controller.getInstance().getMaxPeerHWeight(0, false).a + "%";
+                syncProcent = 100 * currentHeight / Controller.getInstance().getMaxPeerHWeight(0, false, false).a + "%";
             }
 
             String toolTipText = syncProcent;
-            toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0, false);
+            toolTipText += "\n" + Lang.getInstance().translate("Height") + ": " + currentHeight + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false);
             setToolTipText(toolTipText);
 
         } else if (message.getType() == ObserverMessage.CHAIN_ADD_BLOCK_TYPE || message.getType() == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE

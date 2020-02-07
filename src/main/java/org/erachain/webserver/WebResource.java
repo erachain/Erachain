@@ -1111,7 +1111,7 @@ public class WebResource {
             if (Controller.getInstance().getWalletSyncHeight() > 0) {
                 statustext = "<span class=\"translate\">Wallet Synchronizing</span> ";
                 statustext += 100 * Controller.getInstance().getWalletSyncHeight() / HWeight.a + "%<br>";
-                statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getWalletSyncHeight() + "/" + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false).a;
+                statustext += "<span class=\"translate\">Height</span>: " + Controller.getInstance().getWalletSyncHeight() + "/" + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false).a;
             } else if (status == Controller.STATUS_OK) {
                 statustext = "OK<br>";
                 statustext += "<span class=\"translate\">Height</span>: " + HWeight.a;
@@ -1122,8 +1122,8 @@ public class WebResource {
                 statustext += " <span class=\"translate\">Weight</span>: " + HWeight.b;
             } else if (status == Controller.STATUS_SYNCHRONIZING) {
                 statustext = "<span class=\"translate\">Synchronizing</span> ";
-                statustext += 100 * HWeight.a / Controller.getInstance().getMaxPeerHWeight(0, false).a + "%<br>";
-                statustext += "<span class=\"translate\">Height</span>: " + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false).a;
+                statustext += 100 * HWeight.a / Controller.getInstance().getMaxPeerHWeight(0, false, false).a + "%<br>";
+                statustext += "<span class=\"translate\">Height</span>: " + HWeight.a + "/" + Controller.getInstance().getMaxPeerHWeight(0, false, false).a;
             }
 
             pebbleHelper.getContextMap().put(

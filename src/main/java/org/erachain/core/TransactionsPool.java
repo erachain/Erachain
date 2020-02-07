@@ -5,7 +5,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMapImpl;
 import org.erachain.network.message.TransactionMessage;
-import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,7 @@ import java.util.concurrent.BlockingQueue;
 public class TransactionsPool extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE ? false : Settings.getInstance().isTestnet() ? true : false;
+    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE ? true : false;
     private boolean runned;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionsPool.class.getSimpleName());

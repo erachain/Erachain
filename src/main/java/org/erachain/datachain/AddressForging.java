@@ -5,17 +5,10 @@ import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 
 import java.util.Collection;
 import java.util.HashMap;
-
-//import java.util.List;
-//import java.util.TreeMap;
-//import java.util.TreeSet;
-//import org.mapdb.Fun.Tuple3;
-
-/*
- */
 
 //
 // last forged block for ADDRESS -> by height = 0
@@ -24,17 +17,19 @@ import java.util.HashMap;
  * если номер блока не задан - то это последнее значение.
  * При этом если номер блока не задана то хранится поледнее значение
  *  account.address + current block.Height ->
- *     previous making blockHeight + this ForgingH balance
+ *     previous making blockHeight + previous ForgingH balance + this ForgingH balance
 <hr>
  - not SAME with BLOCK HEADS - use point for not only forged blocks - with incoming ERA Volumes
  <br>
- Так же тут можно искать блоки собранны с данного счета - а вторичный индекс у блоков не нужен
+ Так же тут можно искать блоки собранны с данного счета - а вторичный индекс у блоков не нужен.
+ <br>
+ Если точка первая то предыдущее в ней значение Высоты = 0, то есть указывает что ниже нету но текущй баланс уже есть для Форжинга
 
  * @return
  */
 
 // TODO укротить до 20 байт адрес
-public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>> {
+public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integer, Integer, Integer>> {
 
 
     public AddressForging(DCSet databaseSet, DB database) {
@@ -58,7 +53,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
 
     @Override
     protected void getMemoryMap() {
-        map = new HashMap<Tuple2<String, Integer>, Tuple2<Integer, Integer>>();
+        map = new HashMap<Tuple2<String, Integer>, Tuple3<Integer, Integer, Integer>>();
     }
 
     /**
@@ -67,14 +62,14 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * @param height
      * @return
      */
-    public Tuple2<Integer, Integer> get(String address, int height) {
+    public Tuple3<Integer, Integer, Integer> get(String address, int height) {
         return this.get(new Tuple2<String, Integer>(address, height));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public Collection<Tuple2<Integer, Integer>> getGeneratorBlocks(String address) {
-        Collection<Tuple2<Integer, Integer>> headers = ((BTreeMap) (this.map))
-                .subMap(Fun.t2(address, null), Fun.t2(address, Fun.HI())).values();
+    public Collection<Tuple3<Integer, Integer, Integer>> getGeneratorBlocks(String address) {
+        Collection<Tuple3<Integer, Integer, Integer>> headers = ((BTreeMap) (this.map))
+                .subMap(Fun.t2(address, null), Fun.t2(address, Integer.MAX_VALUE)).values();
 
         return headers;
     }
@@ -83,61 +78,65 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * заносит новую точку и обновляет Последнюю точку (height & ForgingValue)/
      * При этом если последняя точка уже с той же высотой - то обновляем только ForgingValue/
      * Внимание! нельзя в этот set() заносить при writeToParent иначе будет двойная обработка
-     * @param key
-     * @param currentForgingValue
+     * @param key Addres + height
+     * @param forgingPoint a: previous Height, b: previous GenBalance, c: current GenBalance
      * @return
      */
     // TODO надо перенести логику эту наверх в BlockChain поидее
     // иначе если бы set и put тут будут то они делают зацикливание
-    public boolean setAndProcess(Tuple2<String, Integer> key, Tuple2<Integer, Integer> currentForgingValue) {
+    public boolean setAndProcess(Tuple2<String, Integer> key, int forgingValue) {
 
         if (key.b == 0) {
             // это сохранение из writeToParent - там все значения сливаются из Форкнутой базы включая setLast с 0-м значением
-            return super.set(key, currentForgingValue);
-        } else if (!key.b.equals(currentForgingValue.a)) {
-            LOGGER.error("NOT VALID forging info " + key + " != " + currentForgingValue);
+            ///return super.set(key, forgingPoint);
+        ///} else if (key.b.equals(forgingPoint.a)) {
+            if (BlockChain.CHECK_BUGS > 0) {
+                LOGGER.error("NOT VALID forging info " + key + " == " + key);
+            }
             Long i = null;
             i++;
         }
 
-        Tuple2<Integer, Integer> lastPoint = this.getLast(key.a);
+        Tuple3<Integer, Integer, Integer> lastPoint = this.getLast(key.a);
         if (lastPoint == null) {
-            this.setLast(key.a, currentForgingValue);
+            // это последние значения. Причем в позиции Текущий - 0 - дальше то пока не известно
+            // тут же и поиск по этой высоте должен дать Пусто
+            this.setLast(key.a, new Tuple3(key.b, forgingValue, 0));
             /// там же пусто - поэтому ничего не делаем - super.set(key, previousPoint);
         } else {
-            if (currentForgingValue.a > lastPoint.a) {
+            if (key.b > lastPoint.a) {
                 // ONLY if not SAME HEIGHT !!! потому что в одном блоке может идти несколько
                 // транзакций на один счет инициализирующих - нужно результат в конце поймать
                 // и если одниковый блок и форжинговое значение - то обновлять только Последнее,
                 // то есть сюда приходит только если НАОБОРОТ - это не Первое значение и Не с темже блоком в Последнее.
-                super.put(key, lastPoint);
-                this.setLast(key.a, currentForgingValue);
-            } else if (currentForgingValue.a < lastPoint.a) {
+                super.put(key, new Tuple3(lastPoint.a, lastPoint.b, forgingValue));
+            } else if (key.b < lastPoint.a) {
                 // тут ошибка
                 if (BlockChain.ERA_COMPU_ALL_UP) {
                     // так как непонятно когда генерация начнется в этом случае - игнорируем такую ситуацию
                     super.delete(new Tuple2(key.a, lastPoint.a));
-                    this.setLast(key.a, currentForgingValue);
                 } else {
-                    LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + key + " " + currentForgingValue);
+                    LOGGER.error("NOT VALID forging POINTS:" + lastPoint + " > " + key);
                     Long i = null;
                     i++;
-                    //assert(currentForgingValue.a >= lastPoint.a);
+                    //assert(forgingPoint.a >= lastPoint.a);
                 }
             } else {
                 // тут все нормально - такое бывает когда несколько раз в блоке пришли ERA
                 // просто нужно обновить новое значение кующей величины
-                this.setLast(key.a, currentForgingValue);
+                ;
             }
+            this.setLast(key.a, new Tuple3(key.b, forgingValue, 0));
         }
 
         return true;
 
     }
 
-    public void putAndProcess(String address, Integer currentHeight, Integer currentForgingVolume) {
+    public void putAndProcess(String address, Integer currentHeight,
+                              Integer currentForgingVolume) {
         this.setAndProcess(new Tuple2<String, Integer>(address, currentHeight),
-                new Tuple2<Integer, Integer>(currentHeight, currentForgingVolume));
+                currentForgingVolume);
     }
 
     /**
@@ -148,21 +147,21 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
      * @param key
      * @return
      */
-    public Tuple2<Integer, Integer> removeAndProcess(Tuple2<String, Integer> key) {
+    public Tuple3<Integer, Integer, Integer> removeAndProcess(Tuple2<String, Integer> key) {
 
-        if (key.b < 3) {
+        if (key.b < 1) {
             // not delete GENESIS forging data for all accounts
             return null;
         }
 
         boolean debug;
-        if (BlockChain.CHECK_BUGS > 1 && key.a.equals("785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E")) {
+        if (BlockChain.CHECK_BUGS > 4 && key.a.equals("785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E")) {
             debug = true; // *** Block[322065] WIN_VALUE not in BASE RULES 0 Creator: 785kSn6mehhtaqgc2yqvBxp84WMZnP4j3E
         }
 
         // удалять можно только если последняя точка совпадает с удаляемой
         // иначе нельзя - так как может быть несколько удалений в один блок
-        Tuple2<Integer, Integer> lastPoint = getLast(key.a);
+        Tuple3<Integer, Integer, Integer> lastPoint = getLast(key.a);
         if (lastPoint == null) {
             // обычно такого не должно случаться!!!
             if (BlockChain.CHECK_BUGS > 5)
@@ -171,7 +170,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         } else {
             //LOGGER.debug("last POINT: " + lastPoint);
             if (lastPoint.a.equals(key.b)) {
-                Tuple2<Integer, Integer> previous = super.remove(key);
+                Tuple3<Integer, Integer, Integer> previous = super.remove(key);
                 this.setLast(key.a, previous);
                 //LOGGER.debug("delete and set prev POINT as last: " + (previous == null? "null" : previous) + " for " + key);
                 return previous;
@@ -184,7 +183,7 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
                     // тут ошибка
                     if (BlockChain.CHECK_BUGS > 3)
                         LOGGER.error("WRONG deleted and LAST forging POINTS:" + lastPoint + " > " + key);
-                    //Tuple2<Integer, Integer> previous = super.remove(key);
+                    //Tuple3<Integer, Integer, Integer> previous = super.remove(key);
                     //this.setLast(key.a, previous);
                     assert (lastPoint.a <= key.b);
                     Long iii = null;
@@ -200,11 +199,6 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
         return null;
     }
 
-    public void deleteAndProcess(Tuple2<String, Integer> key) {
-        // Код почти не изменится если там (void)DELETE вставить так как при удалении всегда предыдущее значение выбирается
-        this.removeAndProcess(key);
-    }
-
     public void deleteAndProcess(String address, int height) {
         // Код почти не изменится если там (void)DELETE вставить так как при удалении всегда предыдущее значение выбирается
         this.removeAndProcess(new Tuple2<String, Integer>(address, height));
@@ -213,13 +207,13 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple2<Integ
     /**
      *
      * @param address
-     * @return последний блок собранный и его кующее значение
+     * @return последний блок собранный и его кующее значение - a: current Height, b: current Forgingalue, c: None
      */
-    public Tuple2<Integer, Integer> getLast(String address) {
+    public Tuple3<Integer, Integer, Integer> getLast(String address) {
         return this.get(new Tuple2<String, Integer>(address, 0));
     }
 
-    private void setLast(String address, Tuple2<Integer, Integer> point) {
+    private void setLast(String address, Tuple3<Integer, Integer, Integer> point) {
         if (point == null) {
             // вызываем супер-класс
             super.delete(new Tuple2<String, Integer>(address, 0));

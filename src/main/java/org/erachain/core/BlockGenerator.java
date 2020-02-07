@@ -115,21 +115,22 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         //logger.debug("try check better WEIGHT peers");
 
-        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-
         betterPeer = null;
 
         Peer peer;
         this.setMonitorStatus("checkWeightPeers");
 
-        //byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
-        byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
-
         int counter = 0;
         // на всякий случай поставим ораничение
         while (counter++ < 30) {
 
-            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true);
+            Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+            byte[] lastSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 2).signature;
+            //byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
+
+            // не тестируем те узлы которые мы заткунули по Силе - они выдаются Силу выше хотя цепочка та же
+            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true, true);
+
             peer = maxPeer.c;
 
             if (peer == null) {
@@ -147,59 +148,41 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             } catch (Exception e) {
                 ///LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
                 // remove HW from peers
-                ctrl.resetWeightOfPeer(peer);
+                ctrl.resetWeightOfPeer(peer, 0);
                 continue;
             }
 
             if (response == null) {
                 ///LOGGER.debug("peer RESPONSE is null " + peer);
                 // remove HW from peers
-                ctrl.resetWeightOfPeer(peer);
+                ctrl.resetWeightOfPeer(peer, 0);
                 continue;
             }
 
             List<byte[]> headers = response.getSignatures();
-            int headersSize = headers.size();
-            ///LOGGER.debug("FOUND head SIZE: " + headersSize);
+            if (headers.isEmpty()) {
+                // общего блока не найдено - значит цепочка уже разошлась - делаем откат своего блока???
+                // Или ждем когда сами встанем
+                LOGGER.debug("I to orphan - Peer has DEEP different CHAIN " + maxPeer);
+                betterPeer = peer;
+                return true;
+            }
 
-            if (headersSize > 0) {
-                boolean isSame = false;
-                for (byte[] signature : headers) {
-                    if (Arrays.equals(signature, lastSignature)) {
-                        isSame = true;
-                        break;
-                    }
-                }
+            // Удалим то что унас тоже есть
+            do {
+                headers.remove(0);
+            } while (!headers.isEmpty() && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
-                if (isSame) {
-                    // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                    ///LOGGER.debug("peer has same Weight " + maxPeer);
-                    ctrl.resetWeightOfPeer(peer);
-                    // продолжим поиск дальше
-                    continue;
-                } else {
-                    LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
-                    try {
-                        // да - там другой блок - откатим тогда свой
-                        //// ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        betterPeer = peer;
-                        return true;
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.resetWeightOfPeer(peer);
-                    }
-                }
+            if (headers.isEmpty()) {
+                // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
+                ///LOGGER.debug("peer has same Weight " + maxPeer);
+                ctrl.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
+                // продолжим поиск дальше
+                continue;
             } else {
-                /// наоборот значит тут точно та же цепочка
-                if (false) {
-                    // more then 2 - need to UPDATE
-                    LOGGER.debug("to update - peers " + maxPeer
-                            + " headers: " + headersSize);
-                    betterPeer = peer;
-                    return true;
-                } else {
-                    ctrl.resetWeightOfPeer(peer);
-                }
+                LOGGER.debug("I to orphan - Peer has different CHAIN " + maxPeer);
+                betterPeer = peer;
+                return true;
             }
 
         }
@@ -803,18 +786,22 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // не было остаков в пакетах RocksDB и трынзакциях MapDB
                     dcSet.flush(0, true, true);
 
-                    try {
-                        while (bchain.getHeight(dcSet) >= this.orphanto
-                            //    && bchain.getHeight(dcSet) > 157044
-                        ) {
-                            //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
-                            //    long iii = 11;
-                            //}
-                            //Block block = bchain.getLastBlock(dcSet);
+                    while (bchain.getHeight(dcSet) >= this.orphanto
+                        //    && bchain.getHeight(dcSet) > 157044
+                    ) {
+                        //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
+                        //    long iii = 11;
+                        //}
+                        //Block block = bchain.getLastBlock(dcSet);
+                        try {
                             ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                        } catch (Exception e) {
+                            // если ошибка то выход делаем чтобы зарегистрировать ошибку
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(1004);
+                            return;
+
                         }
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
                     }
 
                     if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
@@ -945,7 +932,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                 for (PrivateKeyAccount account : knownAccounts) {
 
                                     forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue);
+                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
                                     if (winValue < 1)
                                         continue;
 
@@ -1111,7 +1098,9 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         //PASS BLOCK TO CONTROLLER
                                         try {
                                             LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock,
+                                                    null // не надо банить тут - может цепочка ушла ужеи это мой блок же
+                                            )) {
 
                                                 // need to BROADCAST
                                                 local_status = 8;

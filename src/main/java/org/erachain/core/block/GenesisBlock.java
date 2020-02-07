@@ -513,7 +513,7 @@ public class GenesisBlock extends Block {
         switch (key) {
             case (int) TemplateCls.LICENSE_KEY:
                 String license = "";
-                if (!(BlockChain.TESTS_VERS != 0 && BlockChain.DEVELOP_USE)) {
+                if (!(BlockChain.TESTS_VERS != 0 && BlockChain.TEST_MODE)) {
                     try {
                         //File file = new File("License Erachain.txt");
                         File file = new File("Erachain Licence Agreement (genesis).txt");

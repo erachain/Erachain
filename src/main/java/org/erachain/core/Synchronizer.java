@@ -622,9 +622,8 @@ public class Synchronizer extends Thread {
                         }
                         LOGGER.debug("BLOCK Signature is Valid");
 
-                        if (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > NTP.getTime()) {
-                            errorMess = "invalid Timestamp from FUTURE: "
-                                    + (blockFromPeer.getTimestamp() + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) - NTP.getTime());
+                        errorMess = bchain.blockFromFuture(blockFromPeer.heightBlock);
+                        if (errorMess != null) {
                             break;
                         }
 
@@ -778,7 +777,7 @@ public class Synchronizer extends Thread {
     static byte[] badCheck = Base58.decode("5SxUGJcgS29XA5rGGhTu9RnjSdoK4qtA8AgHEtANdLei11f386P6Net8MPPBVNKKJqkGKeHoAWg6N116fhCRrh2f");
     public void checkBadBlock(Peer peer) throws Exception {
 
-        if (BlockChain.DEVELOP_USE) {
+        if (false && BlockChain.DEMO_MODE) {
             // TODO тут только в Девелопе такой блок - если убьем то удалить эту проверку
             List<byte[]> headersCheck = this.getBlockSignatures(badCheck, peer);
             if (!headersCheck.isEmpty()) {
@@ -810,8 +809,8 @@ public class Synchronizer extends Thread {
                 headers.remove(0);
             } while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
-            if (headers.size() == 0) {
-                cnt.resetWeightOfPeer(peer);
+            if (headers.isEmpty()) {
+                cnt.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
                 String mess = "Peer is SAME as me";
                 //peer.ban(0, mess);
                 throw new Exception(mess);
@@ -1028,6 +1027,8 @@ public class Synchronizer extends Thread {
                         return;
                     }
 
+                    cnt.stopAll(22);
+
                     throw error;
 
                 } else if (thrown != null) {
@@ -1199,7 +1200,7 @@ public class Synchronizer extends Thread {
             if (processTiming < 999999999999l) {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
-                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.blockHead.transactionsCount);
+                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
             }
         }
 
@@ -1215,12 +1216,12 @@ public class Synchronizer extends Thread {
         long timePoint = 0;
         BlockGenerator blockGenerator;
 
-        long shiftPoint = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1)
-                + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> 1) - (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1) >> 2);
+        int blockTime = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(BlockChain.VERS_30SEC + 1);
+        long shiftPoint = blockTime + (blockTime >> 1) - (blockTime >> 2);
         // INIT wait START
         do {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 return;
             }
@@ -1242,10 +1243,16 @@ public class Synchronizer extends Thread {
 
                 timeTmp = bchain.getTimestamp(dcSet) + shiftPoint;
 
-                if (timePoint == timeTmp || timeTmp > NTP.getTime() || !cnt.isStatusOK())
+                if (timePoint == timeTmp || timeTmp > NTP.getTime())
                     continue;
 
                 timePoint = timeTmp;
+
+                // снизим ожижание блокировки с "сильных но таких же как мы" узлов
+                cnt.updateWeightOfPeerMutes(-1);
+
+                if (!cnt.isStatusOK())
+                    continue;
 
                 // иначе просиходит сброс и синхронизация новая
                 if (blockGenerator.getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT)

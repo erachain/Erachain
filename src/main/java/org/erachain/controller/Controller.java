@@ -95,8 +95,8 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.21.02 beta dev";
-    public static String buildTime = "2020-01-09 13:33:33 UTC";
+    public static String version = "4.21.02 beta";
+    public static String buildTime = "2020-01-30 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
     public static final char GROUPING_SEPARATOR = '`';
@@ -108,6 +108,8 @@ public class Controller extends Observable {
 
     public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 1 << 23;
+
+    public static final Integer MUTE_PEER_COUNT = 8;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
@@ -150,6 +152,7 @@ public class Controller extends Observable {
     private long toOfflineTime;
     private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>(20, 1);
     private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>(20, 1);
+    private ConcurrentHashMap<Peer, Integer> peerHWeightMute = new ConcurrentHashMap<Peer, Integer>(20, 1);
 
     public DLSet dlSet; // = DLSet.getInstance();
     private DCSet dcSet; // = DLSet.getInstance();
@@ -181,11 +184,11 @@ public class Controller extends Observable {
     public int databaseSystem = -1;
 
     Controller() {
-        instance.LICENSE_LANG_REFS = Settings.getInstance().isTestnet() ?
+        instance.LICENSE_LANG_REFS = BlockChain.TEST_MODE ?
                 new HashMap<String, Long>(3, 1) {
                     {
-                        put("en", Transaction.makeDBRef(148450, 1));
-                        put("ru", Transaction.makeDBRef(191502, 1));
+                        put("en", Transaction.makeDBRef(0, 1));
+                        put("ru", Transaction.makeDBRef(0, 1));
                     }
                 } :
                 new HashMap<String, Long>(3, 1) {
@@ -218,8 +221,8 @@ public class Controller extends Observable {
 
 
         if (withTimestamp)
-            return version + (BlockChain.DEVELOP_USE ? " DevelopNet"
-                    : Settings.getInstance().isTestnet() ? " TestNet:" + Settings.getInstance().getGenesisStamp() : "")
+            return version + (BlockChain.DEMO_MODE ? " DEMO Net"
+                    : BlockChain.TEST_MODE ? " Test Net:" + Settings.getInstance().getGenesisStamp() : "")
                     + " (" + dbs + ")";
 
         return version + " (" + dbs + ")";
@@ -228,7 +231,7 @@ public class Controller extends Observable {
 
     public String getApplicationName(boolean withVersion) {
         return APP_NAME + " " + (withVersion ? getVersion(true) :
-                BlockChain.DEVELOP_USE ? "DevelopNet" : Settings.getInstance().isTestnet() ? "TestNet" : "");
+                BlockChain.DEMO_MODE ? "DEMO Net" : BlockChain.TEST_MODE ? "Test Net" : "");
     }
 
     public static String getBuildDateTimeString() {
@@ -322,21 +325,17 @@ public class Controller extends Observable {
     }
 
     public int getNetworkPort() {
-        if (Settings.getInstance().isTestnet()) {
+        if (BlockChain.TEST_MODE) {
             return BlockChain.TESTNET_PORT;
         } else {
             return BlockChain.MAINNET_PORT;
         }
     }
 
-    public boolean isTestNet() {
-        return Settings.getInstance().isTestnet();
-    }
-
     public byte[] getMessageMagic() {
         if (this.messageMagic == null) {
             long longTestNetStamp = Settings.getInstance().getGenesisStamp();
-            if (!BlockChain.DEVELOP_USE && Settings.getInstance().isTestnet()) {
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE) {
                 byte[] seedTestNetStamp = Crypto.getInstance().digest(Longs.toByteArray(longTestNetStamp));
                 this.messageMagic = Arrays.copyOfRange(seedTestNetStamp, 0, Message.MAGIC_LENGTH);
             } else {
@@ -500,18 +499,39 @@ public class Controller extends Observable {
     public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
         if (hWeight != null) {
             peerHWeight.put(peer, hWeight);
+            Integer countMute = peerHWeightMute.get(peer);
+            if (countMute != null && countMute > 0) {
+                peerHWeightMute.put(peer, peerHWeightMute.get(peer) - 1);
+            } else {
+                peerHWeightMute.remove(peer);
+            }
         } else {
             peerHWeight.remove(peer);
+            peerHWeightMute.remove(peer);
         }
     }
 
     /**
      * set my getHWeightFull to PEER
+     *
      * @param peer
+     * @param setMute
      */
-    public void resetWeightOfPeer(Peer peer) {
+    public void resetWeightOfPeer(Peer peer, Integer setMute) {
         peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
+        if (setMute != null)
+            peerHWeightMute.put(peer, setMute);
+
     }
+
+    public void updateWeightOfPeerMutes(int add) {
+        for (Peer peer : peerHWeightMute.keySet()) {
+            peerHWeightMute.put(peer, peerHWeightMute.get(peer) + add);
+        }
+
+    }
+
+
     /*
      * public static Controller getInstance(boolean withObserver, boolean
      * dynamicGUI) { if (instance == null) { instance = new Controller();
@@ -890,7 +910,7 @@ public class Controller extends Observable {
             this.setChanged();
             this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate("Wallet OK")));
 
-            if (!BlockChain.DEVELOP_USE && Settings.getInstance().isTestnet() && this.wallet.isWalletDatabaseExisting()
+            if (!BlockChain.DEMO_MODE && BlockChain.TEST_MODE && this.wallet.isWalletDatabaseExisting()
                     && !this.wallet.getAccounts().isEmpty()) {
                 this.wallet.synchronize(true);
             }
@@ -1463,7 +1483,7 @@ public class Controller extends Observable {
             }
         }
 
-        if (false && Settings.getInstance().isTestnet()) {
+        if (false && BlockChain.TEST_MODE) {
             try {
                 synchronizer.checkBadBlock(peer);
             } catch (Exception e) {
@@ -1545,6 +1565,7 @@ public class Controller extends Observable {
 
         this.peerHWeight.remove(peer);
         this.peersVersions.remove(peer);
+        this.peerHWeightMute.remove(peer);
 
         if (this.peerHWeight.isEmpty()) {
 
@@ -1597,11 +1618,10 @@ public class Controller extends Observable {
                 // TEST TIMESTAMP of PEER
                 Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
                 // TODO
-                if (this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(hW.a)
-                        > NTP.getTime()) {
+                String errorMess = this.getBlockChain().blockFromFuture(hW.a - 2);
+                if (errorMess != null) {
                     // IT PEER from FUTURE
-                    long ii = this.getBlockChain().getTimestamp(hW.a) - 2 * BlockChain.GENERATING_MIN_BLOCK_TIME_MS(hW.a) - NTP.getTime();
-                    this.banPeerOnError(hWeightMessage.getSender(), "peer from FUTURE");
+                    this.banPeerOnError(hWeightMessage.getSender(), errorMess);
                     return;
                 }
 
@@ -1795,7 +1815,7 @@ public class Controller extends Observable {
         }
 
         // withWinBuffer
-        Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift, false);
+        Tuple3<Integer, Long, Peer> maxHW = this.getMaxPeerHWeight(shift, false, false);
         if (maxHW.c == null) {
             this.status = STATUS_OK;
             return true;
@@ -1939,7 +1959,7 @@ public class Controller extends Observable {
 
         // нам не важно отличие в последнем блоке тут - главное чтобы цепочка была длиньше?
         //blockGenerator.checkWeightPeers();
-        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false);
+        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false, false);
         if (betterPeerHW != null) {
             Tuple2<Integer, Long> currentHW = getHWeightOfPeer(currentBetterPeer);
             if (currentHW != null && (currentHW.a >= betterPeerHW.a
@@ -1977,7 +1997,9 @@ public class Controller extends Observable {
                         Block block = response.getBlock();
                         if (Arrays.equals(block.getReference(), lastSignature)) {
                             LOGGER.debug("ADD update new block");
-                            this.blockChain.setWaitWinBuffer(this.dcSet, block, peer);
+                            this.blockChain.setWaitWinBuffer(this.dcSet, block,
+                                    peer // тут ПИР забаним если не прошел так как заголовок то сошелся
+                            );
                             return this.blockChain.popWaitWinBuffer();
                         }
                     }
@@ -2021,7 +2043,7 @@ public class Controller extends Observable {
             Tuple3<Integer, Long, Peer> peerHW;
             Tuple2<Integer, Long> peerHWdata = null;
             if (blockGenerator.betterPeer == null) {
-                peerHW = this.getMaxPeerHWeight(shift, false);
+                peerHW = this.getMaxPeerHWeight(shift, false, false);
             } else {
                 // берем пир который нашли в генераторе при осмотре более сильных цепочек
                 // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
@@ -2029,7 +2051,7 @@ public class Controller extends Observable {
                 peerHWdata = this.getHWeightOfPeer(blockGenerator.betterPeer);
                 if (peerHWdata == null) {
                     // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
-                    peerHW = this.getMaxPeerHWeight(shift, false);
+                    peerHW = this.getMaxPeerHWeight(shift, false, false);
                 } else {
                     peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
                 }
@@ -2099,7 +2121,9 @@ public class Controller extends Observable {
             // то его вынем и поновой вставим со всеми проверками
             Block winBlockUnchecked = this.blockChain.popWaitWinBuffer();
             if (winBlockUnchecked != null) {
-                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked, peer);
+                this.blockChain.setWaitWinBuffer(this.dcSet, winBlockUnchecked,
+                        null // если блок не верный - не баним ПИР может просто он отстал
+                );
             }
 
         }
@@ -2143,7 +2167,7 @@ public class Controller extends Observable {
      * return highestPeer; }
      */
 
-    public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift, boolean useWeight) {
+    public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift, boolean useWeight, boolean excludeMute) {
 
         if (this.isStopping || this.dcSet.isStoped())
             return null;
@@ -2153,6 +2177,8 @@ public class Controller extends Observable {
         long weight = myHWeight.b;
         Peer maxPeer = null;
 
+        long maxHeight = blockChain.getHeightOnTimestamp(NTP.getTime());
+
         try {
             for (Peer peer : this.peerHWeight.keySet()) {
                 if (peer.getPing() < 0) {
@@ -2161,7 +2187,21 @@ public class Controller extends Observable {
                     // да и не понятно как с них данные получать
                     continue;
                 }
+                if (excludeMute) {
+                    Integer muteCount = peerHWeightMute.get(peer);
+                    if (muteCount != null && muteCount > 0) {
+                        ///// и не использовать те кому мы заткнули - они данные по Силе блока завышенные дают
+                        continue;
+                    }
+                }
                 Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
+                // TODO потом убрать +1 когда перейдем на новый +30 сдвиг - а нет цепочка наша встанет и будет ждать!
+                if (maxHeight < whPeer.a) {
+                    // Этот пир дает цепочку из будущего - не берем его
+                    this.resetWeightOfPeer(peer, 4);
+                    continue;
+                }
+
                 if (height < whPeer.a
                         || useWeight && weight < whPeer.b) {
                     height = whPeer.a;
@@ -3644,7 +3684,7 @@ public class Controller extends Observable {
         String pass = null;
 
         // init BlockChain then
-        String log4JPropertyFile = "resources/log4j" + (Settings.getInstance().isTestnet() ? "-dev" : "") + ".properties";
+        String log4JPropertyFile = "resources/log4j" + (BlockChain.TEST_MODE ? "-test" : "") + ".properties";
         Properties p = new Properties();
 
         try {
@@ -3810,7 +3850,7 @@ public class Controller extends Observable {
                 }
 
                 LOGGER.info(Lang.getInstance().translate("Starting %app%")
-                        .replace("%app%", Lang.getInstance().translate(APP_NAME) + (Settings.getInstance().isTestnet() ? " TestNET " : "")));
+                        .replace("%app%", getApplicationName(false)));
                 LOGGER.info(getVersion(true) + Lang.getInstance().translate(" build ")
                         + buildTime);
 

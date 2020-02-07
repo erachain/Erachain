@@ -14,7 +14,7 @@ public class Chain {
             return 0;
         }
 
-        Tuple3<Integer, Long, Peer> maxPeerWeight = cnt.getMaxPeerHWeight(0, false);
+        Tuple3<Integer, Long, Peer> maxPeerWeight = cnt.getMaxPeerHWeight(0, false, false);
         return 1;
     }
 

@@ -469,7 +469,7 @@ public class TestRecGenesisAsset {
 
             //CHECK A
             GenesisTransferAssetTransaction aaa = (GenesisTransferAssetTransaction) assetTransfer;
-            assertEquals(true, aaa.getOwner().equals(parsedAssetTransfer.getOwner()));
+            assertEquals(true, aaa.getCreator().equals(parsedAssetTransfer.getCreator()));
 
         } catch (Exception e) {
             fail("Exception while parsing transaction. " + e);

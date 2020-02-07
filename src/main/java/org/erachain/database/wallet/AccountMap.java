@@ -248,7 +248,7 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
         Map<Tuple2<String, Long>, Tuple3<BigDecimal, BigDecimal, BigDecimal>> keys = ((BTreeMap) this.assetsBalanceMap).subMap(
                 //BTreeMap keys = ((BTreeMap) this.assetsBalanceMap).subMap(
                 Fun.t2(accountPublicKey.getAddress(), null),
-                Fun.t2(accountPublicKey.getAddress(), Fun.HI()));
+                Fun.t2(accountPublicKey.getAddress(), Long.MAX_VALUE));
 
         /*
 		if(this.publickKeys == null)

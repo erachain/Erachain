@@ -1282,13 +1282,12 @@ public abstract class Transaction implements ExplorerJsonLine {
                 long[] reference = this.creator.getLastTimestamp(dcSet);
                 if (reference != null && reference[0] >= this.timestamp
                         && height > BlockChain.VERS_4_11
-                        && (!BlockChain.DEVELOP_USE || height > 776575 // issues/1149
-                )) {
+                ) {
                     if (BlockChain.TEST_DB == 0) {
                         if (BlockChain.CHECK_BUGS > 1)
                             LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
-                                + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
-                                + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                                    + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                    + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
                     }
 
                     return INVALID_TIMESTAMP;
@@ -1317,22 +1316,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
-            if (BlockChain.DEVELOP_USE) {
-                // TODO убрать потом когда новую ДЕВ запустим
-                boolean good = false;
-                for (String admin : BlockChain.GENESIS_ADMINS) {
-                    if (this.creator.equals(admin)) {
-                        good = true;
-                        break;
-                    }
-                }
-                if (!good)
-                    return CREATOR_NOT_PERSONALIZED;
-            } else if (Settings.getInstance().isTestnet()) {
-                ;
-            } else {
-                return CREATOR_NOT_PERSONALIZED;
-            }
+            return CREATOR_NOT_PERSONALIZED;
         }
 
         if (false &&  // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN

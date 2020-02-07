@@ -9,11 +9,10 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.VoteOnItemPollTransaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.library.IssueConfirmDialog;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.OptionsComboBoxModel;
@@ -288,6 +287,11 @@ public class PollsDialog extends JDialog {
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
+        dd.dispose();
+
+        // ENABLE
+        this.voteButton.setEnabled(true);
+
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
@@ -301,8 +305,11 @@ public class PollsDialog extends JDialog {
 
                 // TODO "A" ??
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Message and/or payment has been sent!"),
+                        Lang.getInstance().translate("Your vote has been sent") + "!",
                         Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+                this.dispose();
+
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(result)),
@@ -310,7 +317,5 @@ public class PollsDialog extends JDialog {
             }
         }
 
-        // ENABLE
-        this.voteButton.setEnabled(true);
     }
 }

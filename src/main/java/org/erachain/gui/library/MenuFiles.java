@@ -1,6 +1,7 @@
 package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.*;
@@ -248,7 +249,7 @@ public class MenuFiles extends JMenu {
 
             }
         });
-        if (Settings.getInstance().isTestnet()) add(writeTransItem);
+        if (BlockChain.TEST_MODE) add(writeTransItem);
 
         //WEB SERVER
         webServerItem = new JMenuItem(Lang.getInstance().translate("Decentralized Web server"));

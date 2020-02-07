@@ -1,12 +1,12 @@
 package org.erachain.gui.status;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionMap;
 import org.erachain.gui.items.records.UnconfirmedTransactionsPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +137,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             mess = "| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0";
         }
 
-        if (Settings.getInstance().isTestnet()) {
+        if (BlockChain.TEST_MODE) {
             // MISSED TELEGRAMS
             long missedMessagesTmp = Controller.getInstance().network.missedTelegrams.get();
             if (missedMessagesTmp > 0)

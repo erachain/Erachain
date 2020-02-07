@@ -277,9 +277,10 @@ public abstract class ItemCls implements ExplorerJsonLine {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
             } else if (BlockChain.CHECK_BUGS > 0
-                    && !(BlockChain.DEVELOP_USE
-                        && (Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
-                            || Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW"))) // see issue/1149
+                    && !BlockChain.TEST_MODE
+                    && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
+                ///|| Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW")) // see issue/1149
+
             ) {
                 // zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH
                 LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
@@ -628,20 +629,26 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         long thisKey = this.getKey(db);
 
+        ItemMap map = this.getDBMap(db);
         if (thisKey > startKey) {
-            this.getDBMap(db).decrementDelete(thisKey);
+            map.decrementDelete(thisKey);
+
+            if (BlockChain.CHECK_BUGS > 1
+                    && map.getLastKey() != thisKey - 1) {
+                LOGGER.error("After delete KEY: " + key + " != map.value.key - 1: " + map.getLastKey());
+                Long error = null;
+                error++;
+            }
+
         } else {
-            if (BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
+            if (false && BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
                 thisKey = this.getKey(db);
             }
-            this.getDBMap(db).delete(thisKey);
+            map.delete(thisKey);
         }
 
         //DELETE ORPHAN DATA
-        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 2");
         this.getDBIssueMap(db).delete(this.reference);
-
-        //logger.debug("<<<<< core.item.ItemCls.deleteFromMap 3");
 
         return thisKey;
 
