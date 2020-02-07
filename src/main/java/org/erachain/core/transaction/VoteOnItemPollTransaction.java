@@ -94,6 +94,10 @@ public class VoteOnItemPollTransaction extends Transaction implements Itemable {
         return this.option;
     }
 
+    public String getTitle() {
+        return "Vote #" + option + " @V" + key;
+    }
+
     @Override
     public boolean hasPublicText() {
         return false;
