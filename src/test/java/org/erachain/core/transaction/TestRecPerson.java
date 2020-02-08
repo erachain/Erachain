@@ -51,7 +51,7 @@ public class TestRecPerson {
     //long ALIVE_KEY = StatusCls.ALIVE_KEY;
     byte FEE_POWER = (byte) 1;
     byte[] personReference = new byte[64];
-    long timestamp = NTP.getTime();
+    long timestamp;
 
     long flags = 0l;
     Long last_ref;
@@ -103,6 +103,10 @@ public class TestRecPerson {
 
     // INIT PERSONS
     private void init(int dbs) {
+
+        Settings.getInstance();
+        timestamp = NTP.getTime();
+
         LOGGER.info(" ********** open DBS: " + dbs);
 
         File tempDir = new File(Settings.getInstance().getDataTempDir());

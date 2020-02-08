@@ -35,6 +35,9 @@ public class Settings {
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
     public static final long DEFAULT_DEV_NET_STAMP = 1511164500000L; // default for developers test net
 
+    // FOR TEST by default
+    public static long genesisStamp = DEFAULT_MAINNET_STAMP;
+
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
@@ -107,7 +110,6 @@ public class Settings {
 
     List<Peer> cacheInternetPeers;
     long timeLoadInternetPeers;
-    public static long genesisStamp;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
     private String userPath = "";

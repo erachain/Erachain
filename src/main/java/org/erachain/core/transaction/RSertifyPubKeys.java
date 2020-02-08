@@ -529,6 +529,10 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
                     return resultERA;
                 }
             }
+        } else {
+            if (creator.getBalanceUSE(RIGHTS_KEY, dcSet).compareTo(BlockChain.MIN_GENERATING_BALANCE_BD) < 0) {
+                return Transaction.NOT_ENOUGH_ERA_USE_100;
+            }
         }
 
         return Transaction.VALIDATE_OK;
