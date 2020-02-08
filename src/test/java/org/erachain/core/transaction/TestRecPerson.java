@@ -506,7 +506,7 @@ public class TestRecPerson {
                 assertEquals(Transaction.VALIDATE_OK, r_SertifyPubKeys.isValid(Transaction.FOR_NETWORK, flags));
 
                 certifier.changeBalance(this.dcSet, true, AssetCls.ERA_KEY, new BigDecimal("1000"), false, false);
-                assertEquals(Transaction.NOT_ENOUGH_RIGHTS, r_SertifyPubKeys.isValid(Transaction.FOR_NETWORK, flags | Transaction.NOT_VALIDATE_FLAG_PERSONAL));
+                assertEquals(Transaction.NOT_ENOUGH_ERA_USE_100, r_SertifyPubKeys.isValid(Transaction.FOR_NETWORK, flags | Transaction.NOT_VALIDATE_FLAG_PERSONAL));
 
                 //r_SertifyPerson.sign(maker, false);
                 //r_SertifyPerson.process(dcSet, false);
@@ -969,7 +969,7 @@ public class TestRecPerson {
                 if (false)
                     oil_amount_diff = BigDecimal.valueOf(BlockChain.GIFTED_COMPU_AMOUNT, BlockChain.FEE_SCALE);
                 else
-                    oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1).add(BlockChain.BONUS_FOR_PERSON(1));
+                    oil_amount_diff = BlockChain.BONUS_FOR_PERSON(1);
 
                 BigDecimal erm_amount = registrar.getBalanceUSE(ERM_KEY, dcSet);
                 BigDecimal oil_amount = registrar.getBalanceUSE(FEE_KEY, dcSet);
