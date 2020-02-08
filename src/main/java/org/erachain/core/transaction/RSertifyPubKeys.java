@@ -651,11 +651,11 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             dcSet.getPersonAddressMap().addItem(this.key, address, itemP);
 
 
-            if (!dcSet.getReferenceMap().contains(publicAccount.getShortAddressBytes())) {
+            // TODO удалить это если публичный ключ будет созраняться в таблице Счетов
+            if (publicAccount.getLastTimestamp(dcSet) == null) {
                 // for quick search public keys by address - use PUB_KEY from Person DATA owner
                 // used in - controller.Controller.getPublicKeyByAddress
-                dcSet.getReferenceMap().put(
-                        publicAccount.getShortAddressBytes(), new long[]{timestamp, dbRef});
+                publicAccount.setLastTimestamp(new long[]{timestamp, dbRef}, dcSet);
             }
 
         }
@@ -675,6 +675,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             dcSet.getAddressPersonMap().removeItem(publicAccount.getShortAddressBytes());
             dcSet.getPersonAddressMap().removeItem(this.key, address);
 
+            // TODO удалить это если публичный ключ будет созраняться в таблице Счетов
             // при откате нужно след в истории удалить а сам публичный ключ отсавить на всякий случай?
             long[] lastPoint = publicAccount.getLastTimestamp(dcSet);
             if (lastPoint != null && lastPoint[0] == timestamp) {
@@ -732,6 +733,7 @@ public class RSertifyPubKeys extends Transaction implements Itemable {
             GenesisBlock.CREATOR.changeBalance(dcSet, false, FEE_KEY, issued_FEE_BD_total, true, false);
 
         }
+
     }
 
     @Override
