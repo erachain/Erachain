@@ -8,12 +8,23 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.item.persons.PersonHuman;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.database.IDB;
+import org.erachain.datachain.AddressPersonMap;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.ItemAssetMap;
+import org.erachain.datachain.KKPersonStatusMap;
+import org.erachain.datachain.PersonAddressMap;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
+import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
 import org.junit.Test;
+import org.mapdb.Fun;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,74 +32,228 @@ import static org.junit.Assert.assertEquals;
 
 public class RSertifyPubKeysTest {
 
-    int[] TESTED_DBS = new int[]{IDB.DBS_MAP_DB, IDB.DBS_ROCK_DB};
-    DCSet dcSet;
+    static Logger LOGGER = LoggerFactory.getLogger(RSertifyPubKeysTest.class.getName());
 
-    Controller cntrl;
+    int[] TESTED_DBS = new int[]{
+            IDB.DBS_MAP_DB
+            , IDB.DBS_ROCK_DB
+    };
 
+    BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
+    long ERM_KEY = Transaction.RIGHTS_KEY;
+    long FEE_KEY = Transaction.FEE_KEY;
+    //long ALIVE_KEY = StatusCls.ALIVE_KEY;
+    byte FEE_POWER = (byte) 1;
+    byte[] personReference = new byte[64];
+    long timestamp = NTP.getTime();
+
+    long flags = 0l;
+    Long last_ref;
     //CREATE KNOWN ACCOUNT
-    byte[] seed = Crypto.getInstance().digest("tes213sdffsdft".getBytes());
+    byte[] seed = Crypto.getInstance().digest("test".getBytes());
     byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-    PrivateKeyAccount creator = new PrivateKeyAccount(privateKey);
-    byte[] seed_1 = Crypto.getInstance().digest("tes213sdffsdft_1".getBytes());
-    byte[] privateKey_1 = Crypto.getInstance().createKeyPair(seed_1).getA();
-    PrivateKeyAccount creator_2 = new PrivateKeyAccount(privateKey_1);
-    long key = 0;
-    byte[] ownerSignature = new byte[64];
-    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<>();
-    byte feePow = (byte) 0;
-    byte gender = (byte) 0;
-    long timestamp;
+    PrivateKeyAccount registrar = new PrivateKeyAccount(privateKey);
+
+    //GENERATE ACCOUNT SEED
+    int nonce = 1;
+
+    byte[] certifierSeed = Wallet.generateAccountSeed(seed, nonce++);
+    PrivateKeyAccount certifier = new PrivateKeyAccount(certifierSeed);
+
+    //byte[] accountSeed;
+    //core.wallet.Wallet.generateAccountSeed(byte[], int)
+    byte[] accountSeed1 = Wallet.generateAccountSeed(seed, nonce++);
+    PrivateKeyAccount userAccount1 = new PrivateKeyAccount(accountSeed1);
+    String userAddress1 = userAccount1.getAddress();
+    byte[] accountSeed2 = Wallet.generateAccountSeed(seed, nonce++);
+    PrivateKeyAccount userAccount2 = new PrivateKeyAccount(accountSeed2);
+    String userAddress2 = userAccount2.getAddress();
+    byte[] accountSeed3 = Wallet.generateAccountSeed(seed, nonce++);
+    PrivateKeyAccount userAccount3 = new PrivateKeyAccount(accountSeed3);
+    String userAddress3 = userAccount3.getAddress();
+    List<PrivateKeyAccount> sertifiedPrivateKeys = new ArrayList<PrivateKeyAccount>();
+    List<PublicKeyAccount> sertifiedPublicKeys = new ArrayList<PublicKeyAccount>();
+    PersonCls personGeneral;
     PersonCls person;
-    ItemAssetMap assetMap;
+    long genesisPersonKey = -1;
+    long personKey = -1;
+    IssuePersonRecord issuePersonTransaction;
+    RSertifyPubKeys r_SertifyPubKeys;
+    KKPersonStatusMap dbPS;
+    PersonAddressMap dbPA;
+    AddressPersonMap dbAP;
+    //int version = 0; // without signs of person
+    int version = 1; // with signs of person
     private byte[] icon = new byte[]{1, 3, 4, 5, 6, 9}; // default value
-    private byte[] image = new byte[]{4, 11, 32, 23, 45, 122, 11, -45}; // default value
-    private GenesisBlock gb;
+    int seqNo = 1;
+    private byte[] image = new byte[18000]; // default value
+    private byte[] ownerSignature = new byte[Crypto.SIGNATURE_LENGTH];
+    //CREATE EMPTY MEMORY DATABASE
+    private DCSet dcSet;
     private BlockChain bchain;
+    private Controller cntrl;
+    private GenesisBlock gb;
 
-    // INIT ASSETS
+    // INIT PERSONS
     private void init(int dbs) {
+        LOGGER.info(" ********** open DBS: " + dbs);
 
-        dcSet = DCSet.createEmptyHardDatabaseSet(dbs);
+        File tempDir = new File(Settings.getInstance().getDataTempDir());
+        try {
+            Files.walkFileTree(tempDir.toPath(), new SimpleFileVisitorForRecursiveFolderDeletion());
+        } catch (Throwable e) {
+            LOGGER.info(" ********** " + e.getMessage());
+        }
+
+        dcSet = DCSet.createEmptyHardDatabaseSetWithFlush(null, dbs);
+
         cntrl = Controller.getInstance();
         cntrl.initBlockChain(dcSet);
         bchain = cntrl.getBlockChain();
         gb = bchain.getGenesisBlock();
 
-        assetMap = dcSet.getItemAssetMap();
+        dbPA = dcSet.getPersonAddressMap();
+        dbAP = dcSet.getAddressPersonMap();
+        dbPS = dcSet.getPersonStatusMap();
 
-        sertifiedPublicKeys.add(creator_2);
+        try {
+            gb.process(dcSet);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-        timestamp = NTP.getTime();
+        last_ref = gb.getTimestamp();
 
-        person = new PersonHuman(creator, "START PERSON",
-                timestamp, timestamp, gender, "String race", 0f, 0f,
-                "String skinColor", "String eyeColor", "String hairСolor", 170,
-                icon, image, ".", ownerSignature);
-        person.setReference(new byte[64]);
+        registrar.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
+        registrar.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        registrar.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
-        person.insertToMap(dcSet, BlockChain.AMOUNT_SCALE_FROM + 1);
+        certifier.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
+        certifier.changeBalance(dcSet, false, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        certifier.changeBalance(dcSet, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
+        byte gender = 0;
+        long birthDay = timestamp - 12345678;
+
+        ownerSignature = new byte[64];
+        ownerSignature[1] = (byte) 1;
+        person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as registrar", birthDay, birthDay - 1,
+                gender, "Slav", (float) 28.12345, (float) 133.7777,
+                "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
+        person.setReference(ownerSignature);
+        dcSet.getItemPersonMap().incrementPut(person);
+        long keyRegistrar = person.getKey(dcSet);
+
+        ownerSignature = new byte[64];
+        ownerSignature[1] = (byte) 2;
+        person = new PersonHuman(certifier, "Ermolaev Dmitrii Sergeevich as certifier", birthDay, birthDay - 1,
+                gender, "Slav", (float) 28.12345, (float) 133.7777,
+                "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
+        person.setReference(ownerSignature);
+        dcSet.getItemPersonMap().incrementPut(person);
+        long keyCertifier = person.getKey(dcSet);
+
+        // внесем его как удостовренную персону
+        Fun.Tuple3<Integer, Integer, Integer> itemPRegistrar = new Fun.Tuple3<Integer, Integer, Integer>(999999, 2, 2);
+        Fun.Tuple4<Long, Integer, Integer, Integer> itemARegistrar = new Fun.Tuple4<Long, Integer, Integer, Integer>(keyRegistrar, 999999, 2, 3);
+
+        dcSet.getAddressPersonMap().addItem(registrar.getShortAddressBytes(), itemARegistrar);
+        dcSet.getPersonAddressMap().addItem(33L, registrar.getAddress(), itemPRegistrar);
+
+        // внесем его как удостовренную персону
+        Fun.Tuple3<Integer, Integer, Integer> itemPCertifier = new Fun.Tuple3<Integer, Integer, Integer>(999999, 2, 2);
+        Fun.Tuple4<Long, Integer, Integer, Integer> itemACertifier = new Fun.Tuple4<Long, Integer, Integer, Integer>(keyCertifier, 999999, 2, 3);
+
+        dcSet.getAddressPersonMap().addItem(certifier.getShortAddressBytes(), itemACertifier);
+        dcSet.getPersonAddressMap().addItem(33L, certifier.getAddress(), itemPCertifier);
+
+        ownerSignature = new byte[64];
+        ownerSignature[1] = (byte) -1;
+
+        // GET RIGHTS TO CERTIFIER
+        personGeneral = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich as sertifier", birthDay, birthDay - 1,
+                gender, "Slav", (float) 28.12345, (float) 133.7777,
+                "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
+        //personGeneral.setKey(genesisPersonKey);
+
+        GenesisIssuePersonRecord genesis_issue_person = new GenesisIssuePersonRecord(personGeneral);
+        genesis_issue_person.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        genesis_issue_person.process(gb, Transaction.FOR_NETWORK);
+        //genesisPersonKey = dcSet.getIssuePersonMap().size();
+        genesisPersonKey = genesis_issue_person.getAssetKey(dcSet);
+
+        GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(registrar, genesisPersonKey);
+        genesis_certify.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        genesis_certify.process(gb, Transaction.FOR_NETWORK);
+
+        person = new PersonHuman(registrar, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
+                gender, "Slav", (float) 28.12345, (float) 133.7777,
+                "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
+
+        //person.setKey(genesisPersonKey + 1);
+        //CREATE ISSUE PERSON TRANSACTION
+        issuePersonTransaction = new IssuePersonRecord(registrar, person, FEE_POWER, timestamp, registrar.getLastTimestamp(dcSet)[0]);
+
+        if (sertifiedPrivateKeys.isEmpty()) {
+            sertifiedPrivateKeys.add(userAccount1);
+            sertifiedPrivateKeys.add(userAccount2);
+            sertifiedPrivateKeys.add(userAccount3);
+        }
+
+        if (sertifiedPublicKeys.isEmpty()) {
+            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount1.getPublicKey()));
+            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount2.getPublicKey()));
+            sertifiedPublicKeys.add(new PublicKeyAccount(userAccount3.getPublicKey()));
+        }
+
+    }
+
+    public void initPersonalize() {
+
+        issuePersonTransaction.setDC(dcSet, Transaction.FOR_NETWORK, 3, seqNo++);
+        assertEquals(Transaction.VALIDATE_OK, issuePersonTransaction.isValid(Transaction.FOR_NETWORK, flags));
+
+        issuePersonTransaction.sign(registrar, Transaction.FOR_NETWORK);
+
+        issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
+
+        // нужно занести ее в базу чтобы считать по этой записи персону создавшую эту запись
+        dcSet.getTransactionFinalMap().put(issuePersonTransaction);
+        dcSet.getTransactionFinalMapSigns().put(issuePersonTransaction.signature, issuePersonTransaction.dbRef);
+
+        personKey = person.getKey(dcSet);
+
+        // issue 1 genesis person in init() here
+        //assertEquals( genesisPersonKey + 1, personKey);
+        //assertEquals( null, dbPS.getItem(personKey, ALIVE_KEY));
+
+        //CREATE PERSONALIZE REcORD
+        timestamp += 100;
+        r_SertifyPubKeys = new RSertifyPubKeys(version, certifier, FEE_POWER, personKey,
+                sertifiedPublicKeys,
+                timestamp, registrar.getLastTimestamp(dcSet)[0]);
 
     }
 
     @Test
     public void test1() {
 
+        // see org.erachain.core.transaction.TestRecPerson.init
         for (int dbs : TESTED_DBS) {
 
             init(dbs);
 
-            assertEquals(creator.getLastTimestamp(dcSet), null);
+            assertEquals(registrar.getLastTimestamp(dcSet), null);
 
-            RSertifyPubKeys certPubKey = new RSertifyPubKeys(0, creator, feePow,
+            RSertifyPubKeys certPubKey = new RSertifyPubKeys(0, registrar, FEE_POWER,
                     person.getKey(dcSet), sertifiedPublicKeys, timestamp, 0L);
             certPubKey.setDC(dcSet, Transaction.FOR_NETWORK, 3, 5);
             certPubKey.process(null, Transaction.FOR_NETWORK);
 
-            creator.getLastTimestamp(dcSet);
+            registrar.getLastTimestamp(dcSet);
 
-            assertEquals(new long[]{123L, 345L}, creator.getLastTimestamp(dcSet));
+            assertEquals(new long[]{123L, 345L}, registrar.getLastTimestamp(dcSet));
 
         }
 

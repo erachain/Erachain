@@ -41,8 +41,8 @@ public class TestRecPerson {
     static Logger LOGGER = LoggerFactory.getLogger(TestRecPerson.class.getName());
 
     int[] TESTED_DBS = new int[]{
-            IDB.DBS_MAP_DB,
-            IDB.DBS_ROCK_DB
+            IDB.DBS_MAP_DB
+            , IDB.DBS_ROCK_DB
     };
 
     BigDecimal BG_ZERO = BigDecimal.ZERO.setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
