@@ -50,8 +50,10 @@ public class ReferenceSuitMapDBForkTest {
         assertEquals(point2, account.getLastTimestamp(dcSet));
 
         DCSet forkDCSet = dcSet.fork();
-        account.removeLastTimestamp(forkDCSet);
-        assertEquals(pointStart, account.getLastTimestamp(forkDCSet));
+        account.removeLastTimestamp(forkDCSet, point2[0]);
+        long[] pointStartCopy = new long[]{2345L, 123L};
+        assertEquals(2345L, account.getLastTimestamp(forkDCSet)[0]);
+        assertEquals(123L, account.getLastTimestamp(forkDCSet)[1]);
 
         account.removeLastTimestamp(forkDCSet);
         assertEquals(null, account.getLastTimestamp(forkDCSet));
