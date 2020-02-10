@@ -1373,17 +1373,17 @@ public class TestRecPerson {
                 //assertEquals( (long)person.getBirthday(), (long)dbPS_fork.getItem(personKey, ALIVE_KEY).a);
 
                 // ADDRESSES
-                assertEquals(null, dbAP_dcSet.getItem(userAddress1));
+                assertEquals(null, fork.getAddressPersonMap().getItem(userAddress1));
                 // PERSON -> ADDRESS
-                assertEquals(null, dbPA_dcSet.getItem(personKey, userAddress1));
+                assertEquals(null, fork.getPersonAddressMap().getItem(personKey, userAddress1));
 
-                assertEquals(null, dbAP_dcSet.getItem(userAddress2));
+                assertEquals(null, fork.getAddressPersonMap().getItem(userAddress2));
                 // PERSON -> ADDRESS
-                assertEquals(null, dbPA_dcSet.getItem(personKey, userAddress2));
+                assertEquals(null, fork.getPersonAddressMap().getItem(personKey, userAddress2));
 
-                assertEquals(null, dbAP_dcSet.getItem(userAddress3));
+                assertEquals(null, fork.getAddressPersonMap().getItem(userAddress3));
                 // PERSON -> ADDRESS
-                assertEquals(null, dbPA_dcSet.getItem(personKey, userAddress3));
+                assertEquals(null, fork.getPersonAddressMap().getItem(personKey, userAddress3));
 
                 assertEquals(false, userAccount1.isPerson(fork, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
                 assertEquals(false, userAccount2.isPerson(fork, dcSet.getBlockSignsMap().get(dcSet.getBlockMap().getLastBlockSignature())));
