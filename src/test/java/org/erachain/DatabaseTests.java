@@ -49,7 +49,6 @@ public class DatabaseTests {
     PersonCls person;
     long personKey = -1;
     IssuePersonRecord issuePersonTransaction;
-    RSertifyPubKeys r_SertifyPubKeys;
     //int version = 0; // without signs of person
     int version = 1; // with signs of person
     private byte[] icon = new byte[0]; // default value

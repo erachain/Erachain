@@ -32,7 +32,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     protected Comparator COMPARATOR;
 
     //ConcurrentHashMap deleted;
-    HashMap deleted;
+    Map<T, Boolean> deleted;
     Boolean EXIST = true;
     int shiftSize;
 
@@ -54,7 +54,13 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         }
 
         this.parent = parent;
+
         COMPARATOR = comparator;
+        if (COMPARATOR == null) {
+            this.deleted = new HashMap(1024, 0.75f);
+        } else {
+            this.deleted = new TreeMap<T, Boolean>(COMPARATOR);
+        }
 
         this.openMap();
 
@@ -195,10 +201,6 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         value = this.map.remove(key);
 
         // это форкнутая таблица
-
-        if (this.deleted == null) {
-            this.deleted = new HashMap(1024 , 0.75f);
-        }
 
         // добавляем в любом случае, так как
         // Если это был ордер или еще что, что подлежит обновлению в форкнутой базе

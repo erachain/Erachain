@@ -29,10 +29,11 @@ public class Start {
 
         //builder.headless(false).run(args);
 
-        long genesisStamp = Settings.DEFAULT_MAINNET_STAMP;
+        long genesisStamp;
         for (String arg : args) {
             if (arg.equals("-testnet")) {
                 genesisStamp = -1;
+                Settings.genesisStamp = genesisStamp;
                 break;
             } else if (arg.startsWith("-testnet=") && arg.length() > 9) {
                 try {
@@ -41,11 +42,10 @@ public class Start {
                 } catch (Exception e) {
                     genesisStamp = Settings.DEFAULT_DEMO_NET_STAMP;
                 }
+                Settings.genesisStamp = genesisStamp;
                 break;
             }
         }
-
-        Settings.genesisStamp = genesisStamp;
 
         Settings.getInstance();
 

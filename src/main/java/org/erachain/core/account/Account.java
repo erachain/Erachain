@@ -838,6 +838,10 @@ public class Account {
         return dcSet.getReferenceMap().get(shortBytes);
     }
 
+    /**
+     * @param currentPoint [timestamp, dbRef]
+     * @param dcSet        DCSet
+     */
     public void setLastTimestamp(long[] currentPoint, DCSet dcSet) {
 
         if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
