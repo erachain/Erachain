@@ -1715,13 +1715,7 @@ import java.util.*;
                     }
 
                     //CHECK TIMESTAMP AND DEADLINE
-                    if (BlockChain.DEVELOP_USE && heightBlock > 494000
-                            && transaction.getTimestamp() > timestampEnd
-                            || !BlockChain.DEVELOP_USE
-                            && (heightBlock > BlockChain.VERS_30SEC && transaction.getTimestamp() > timestampEnd)
-                            || heightBlock > 278989
-                            && transaction.getTimestamp()
-                            > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
+                    if (transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                     ) {
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()
@@ -2234,8 +2228,6 @@ import java.util.*;
 
                 //PROCESS
                 if (transaction.isWiped()
-                        || BlockChain.DEVELOP_USE && heightBlock > 473600 && heightBlock < 493700
-                        && transaction.getType() == Transaction.CERTIFY_PUB_KEYS_TRANSACTION
                 ) {
                     //UPDATE REFERENCE OF SENDER
                     transaction.getCreator().setLastTimestamp(

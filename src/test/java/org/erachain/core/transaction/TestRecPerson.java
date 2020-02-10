@@ -516,7 +516,7 @@ public class TestRecPerson {
                         sertifiedPublicKeys,
                         356, timestamp);
                 personalizeRecord_0.setDC(dcSet, Transaction.FOR_NETWORK, BlockChain.VERS_4_12 + 1, 4);
-                if (!Settings.getInstance().isTestnet()) {
+                if (!Settings.getInstance().isTestNet()) {
                     assertEquals(Transaction.CREATOR_NOT_PERSONALIZED, personalizeRecord_0.isValid(Transaction.FOR_NETWORK, flags));
                 }
 

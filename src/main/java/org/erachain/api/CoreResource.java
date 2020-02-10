@@ -29,7 +29,7 @@ public class CoreResource {
     @Path("/stop")
     public String stop() {
 
-        if (!Settings.getInstance().isTestnet())
+        if (!BlockChain.TEST_MODE)
             APIUtils.askAPICallAllowed(null, "GET core/stop", request, true);
 
         //STOP

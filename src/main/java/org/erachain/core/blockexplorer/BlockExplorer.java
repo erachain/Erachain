@@ -26,7 +26,6 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.models.PeersTableModel;
 import org.erachain.lang.Lang;
-import org.erachain.settings.Settings;
 import org.erachain.utils.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -259,7 +258,7 @@ public class BlockExplorer {
             langFile = info.getQueryParameters().getFirst("lang") + ".json";
         }
 
-        logger.info("try lang file: " + langFile);
+        ///logger.info("try lang file: " + langFile);
 
         langObj = Lang.openLangFile(langFile);
 
@@ -432,8 +431,7 @@ public class BlockExplorer {
                     logger.error(e.getMessage(), e);
                     return output;
                 }
-            } else
-            if (info.getQueryParameters().get("asset").size() == 2) {
+            } else if (info.getQueryParameters().get("asset").size() == 2) {
                 long have = Integer.valueOf(info.getQueryParameters().get("asset").get(0));
                 long want = Integer.valueOf(info.getQueryParameters().get("asset").get(1));
 
@@ -448,23 +446,22 @@ public class BlockExplorer {
 
         // Exchange
         else if (info.getQueryParameters().containsKey("exchange")) {
-            jsonQueryExchange(null, (int)start);
+            jsonQueryExchange(null, (int) start);
         }
 
         ///////////////////////////// ADDRESSES //////////////////////
         // address
         else if (info.getQueryParameters().containsKey("address")) {
             output.putAll(jsonQueryAddress(info.getQueryParameters().getFirst("address"), (int) start, info));
-        }
-        else if (info.getQueryParameters().containsKey("addresses")) {
+        } else if (info.getQueryParameters().containsKey("addresses")) {
             jsonQueryAddresses();
 
-        ///////// BLOCKS /////////////
+            ///////// BLOCKS /////////////
         } else if (info.getQueryParameters().containsKey("blocks")) {
             output.put("type", "blocks");
-            output.putAll(jsonQueryPages(Block.BlockHead.class, (int)start, pageSize));
+            output.putAll(jsonQueryPages(Block.BlockHead.class, (int) start, pageSize));
         } else if (info.getQueryParameters().containsKey("block")) {
-            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int)start));
+            output.putAll(jsonQueryBlock(info.getQueryParameters().getFirst("block"), (int) start));
         }
 
         ///////////////////////////// TRANSACTIONS ///////////////
@@ -529,6 +526,9 @@ public class BlockExplorer {
 
         // time guery
         output.put("queryTimeMs", stopwatchAll.elapsedTime());
+        if (BlockChain.TEST_MODE) {
+            output.put("network", BlockChain.DEMO_MODE ? "DEMO Net" : "TEST Net");
+        }
         return output;
     }
 
@@ -2426,7 +2426,7 @@ public class BlockExplorer {
         List<Pair<Long, Long>> list = new ArrayList<>();
         HashSet<Pair<Long, Long>> pairsSet = new HashSet<>();
 
-        if (Settings.getInstance().isTestnet()) {
+        if (BlockChain.TEST_MODE) {
             list.add(new Pair<Long, Long>(1L, 2L));
         } else {
             list.add(new Pair<Long, Long>(12L, 92L));

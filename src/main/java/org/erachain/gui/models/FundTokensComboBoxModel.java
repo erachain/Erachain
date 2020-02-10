@@ -1,8 +1,8 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.settings.Settings;
 
 import javax.swing.*;
 
@@ -12,7 +12,7 @@ public class FundTokensComboBoxModel extends DefaultComboBoxModel<AssetCls> {
     public FundTokensComboBoxModel(boolean deposit) {
 
         AssetCls asset;
-        if (Settings.getInstance().isTestnet()) {
+        if (BlockChain.TEST_MODE) {
             //this.addElement(Controller.getInstance().getAsset(1031));
 
 

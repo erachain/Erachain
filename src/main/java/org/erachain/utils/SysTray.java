@@ -2,6 +2,7 @@ package org.erachain.utils;
 // 30/03
 
 import org.erachain.controller.Controller;
+import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.wallet.TransactionMap;
@@ -41,7 +42,7 @@ public class SysTray implements Observer {
     private TrayIcon icon = null;
     private PopupMenu createPopupMenu;
 
-    public boolean stopMessages = Settings.getInstance().isTestnet();
+    public boolean stopMessages = BlockChain.TEST_MODE;
 
     private long timePoint;
 

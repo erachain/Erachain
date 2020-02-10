@@ -15,7 +15,6 @@ import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.ntp.NTP;
-import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.erachain.utils.StrJSonFine;
@@ -327,10 +326,10 @@ public class RSendResource {
     @Path("test1/{probability}/{delay}")
     public String test1(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (!Settings.getInstance().isTestnet()
+        if (!BlockChain.TEST_MODE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET test1\n ", request, true);
 
@@ -510,10 +509,10 @@ public class RSendResource {
     @Path("test2/{probability}/{delay}")
     public String test2(@PathParam("probability") float probability, @PathParam("delay") long delay, @QueryParam("password") String password) {
 
-        if (!Settings.getInstance().isTestnet()
+        if (!BlockChain.TEST_MODE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         APIUtils.askAPICallAllowed(password, "GET test2\n ", request, true);
 
@@ -718,10 +717,10 @@ public class RSendResource {
                             @DefaultValue("false") @QueryParam("onlyperson") Boolean onlyPerson,
                             @QueryParam("password") String password) {
 
-        if (!test && !Settings.getInstance().isTestnet()
+        if (!test && !BlockChain.TEST_MODE
                 && ServletUtils.isRemoteRequest(request, ServletUtils.getRemoteAddress(request))
         )
-            return "not LOCAL && not DEVELOP";
+            return "not LOCAL && not testnet";
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         Long activeAfter;

@@ -1,6 +1,4 @@
 package org.erachain.settings;
-// 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
-// 30/03 ++
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -27,13 +25,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-//import java.util.Arrays;
-// import org.slf4j.LoggerFactory;
-
 public class Settings {
 
     public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
-    public static final long DEFAULT_DEV_NET_STAMP = 1511164500000L; // default for developers test net
+    public static final long DEFAULT_DEMO_NET_STAMP = 1581001700000L; // default for developers test net
 
     // FOR TEST by default
     public static long genesisStamp = DEFAULT_MAINNET_STAMP;
@@ -199,7 +194,7 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (isTestnet() ? "peers-dev.json" : "peers.json");
+        return this.userPath + (isTestNet() ? "peers-demo.json" : "peers.json");
     }
 
     public String getWalletDir() {
@@ -360,7 +355,7 @@ public class Settings {
         try {
 
             File file = new File(this.userPath
-                    + (Settings.getInstance().isTestnet() ? "peers-trusted-test.json" : "peers-trusted.json"));
+                    + (BlockChain.TEST_MODE ? "peers-trusted-test.json" : "peers-trusted.json"));
 
             //CREATE FILE IF IT DOESNT EXIST
             if (file.exists()) {
@@ -393,7 +388,7 @@ public class Settings {
             List<Peer> knownPeers = new ArrayList<>();
             JSONArray peersArray = new JSONArray();
 
-            if (!Settings.getInstance().isTestnet()) {
+            if (!BlockChain.TEST_MODE) {
                 try {
                     JSONArray peersArraySettings = (JSONArray) this.settingsJSON.get("knownpeers");
 
@@ -430,7 +425,7 @@ public class Settings {
 
             knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 
-            if (!Settings.getInstance().isTestnet() && (knownPeers.isEmpty() || loadPeersFromInternet)) {
+            if (!BlockChain.TEST_MODE && (knownPeers.isEmpty() || loadPeersFromInternet)) {
                 knownPeers.addAll(getKnownPeersFromInternet());
             }
 
@@ -528,12 +523,12 @@ public class Settings {
         }
     }
 
-    public boolean isTestnet() {
+    public boolean isTestNet() {
         return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
     }
 
-    public boolean isDevnet() {
-        return this.getGenesisStamp() == DEFAULT_DEV_NET_STAMP;
+    public boolean isDemoNet() {
+        return this.getGenesisStamp() == DEFAULT_DEMO_NET_STAMP;
     }
 
     public long getGenesisStamp() {
@@ -728,7 +723,7 @@ public class Settings {
             }
 
             //RETURN
-            return (Settings.getInstance().isTestnet() ? ";" : DEFAULT_WEB_ALLOWED).split(";");
+            return (BlockChain.TEST_MODE ? ";" : DEFAULT_WEB_ALLOWED).split(";");
 
         } catch (Exception e) {
             //RETURN EMPTY LIST

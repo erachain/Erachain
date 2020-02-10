@@ -3,13 +3,13 @@
 LOG=`basename $0`.log
 DTFMT='+ %d-%m-%Y %T'
 
-app=erachain-dev
+app=erachain
 xms=512
 xmx=1024
 mms=256
 
 jpars"-Xms512m -Xms1024m"
-pars="-nogui -pass=123456789 -seed=2:ABRjfyP7zVdtuuhEaTogtcJNUdU1hcop4zG4z2JiVjhR:123456789"
+pars="-nogui -pass=123456789 -seed=2:ABRjfyP7zVdtuuhEaTogtcJNUdU1hcop4zG4z2JiVjhR:123456789 -testnet=demo"
 
 #java -Xms${xms}m -Xms${xmx}m -XX:MaxMetaspaceSize=${mms}m -jar $app.jar $pars
 

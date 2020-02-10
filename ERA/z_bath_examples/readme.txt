@@ -47,9 +47,10 @@ No use Network
 
 -testnet[=TIMESTAMP]
 -testnet - set genesis Timestamp = current Date and -nonet is ON and use 9065 port
--testnet=dev - set genesis Timestamp = DEVELOP chain on 9066 port
+-testnet=demo - set genesis Timestamp = DEMO chain on 9066 port
 -testnet=0 - set current NTP genesis Timestamp on port 9065
 -testnet=[XXXX] - tesnet chain on port 9045 from genesis timestamp XXXX
+For start generation of blocks need more than 5 accounts on all nodes or in Your wallet is used '-testnet'.
 
 example foe Windows:
 	start "erachain" java -jar erachain.jar -pass=1 -seed=3:AXRJwqktmgNYVnpR5uYwBh5v6K6kFb2XH1KYjwDroKcy:1

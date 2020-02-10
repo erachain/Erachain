@@ -3,9 +3,19 @@ table.tiny td {
     flex-wrap: nowrap !important;
     white-space: nowrap !important;
 }
-table.markdown th, td {
-    padding: 1px 5px !important;
+table.markdown th, table.markdown td {
+  border: 1px solid #ddd;
+  padding: 3px 8px;
 }
+table.markdown th {
+  border: 2px solid #fff;
+  padding: 5px 12px;
+  background-color: #3a9e3e;
+  color: white;
+}
+
+table.markdown tr:nth-child(even){background-color: #f2f2f2;}
+
 
 a {
     color: #6467FF;

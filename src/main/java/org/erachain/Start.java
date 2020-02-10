@@ -40,7 +40,7 @@ public class Start {
                     genesisStamp = Long.parseLong(arg.substring(9));
 
                 } catch (Exception e) {
-                    genesisStamp = Settings.DEFAULT_DEV_NET_STAMP;
+                    genesisStamp = Settings.DEFAULT_DEMO_NET_STAMP;
                 }
                 Settings.genesisStamp = genesisStamp;
                 break;

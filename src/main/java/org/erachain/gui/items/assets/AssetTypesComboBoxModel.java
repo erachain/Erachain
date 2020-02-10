@@ -1,8 +1,8 @@
 package org.erachain.gui.items.assets;
 
+import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetType;
-import org.erachain.settings.Settings;
 import org.erachain.utils.AssetTypeComparator;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
 
         ArrayList<AssetType> list = new ArrayList<AssetType>();
 
-        if (Settings.getInstance().isTestnet()) {
+        if (BlockChain.TEST_MODE) {
             list.add(new AssetType(AssetCls.AS_OUTSIDE_GOODS));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_IMMOVABLE));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_CURRENCY));
