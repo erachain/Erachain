@@ -2,6 +2,7 @@ package org.erachain.dbs.rocksDB;
 
 import com.google.common.primitives.Longs;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.util.Arrays;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.item.assets.Order;
@@ -20,6 +21,7 @@ import org.mapdb.Fun;
 import org.rocksdb.ReadOptions;
 import org.rocksdb.WriteOptions;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,6 +126,24 @@ public class OrdersSuitRocksDB extends DBMapSuit<Long, Order> implements OrderSu
 
         indexes.add(addressHaveWantKeyIndex);
         indexes.add(wantHaveKeyIndex);
+    }
+
+    // TODO тут можно заменить на быстрый поиск по org.rocksdb.RocksDB.get(org.rocksdb.ReadOptions, byte[], int, int, byte[], int, int)
+    @Override
+    public Order getHaveWanFirst(long have, long want) {
+
+        try (IteratorCloseable<Long> iter = map.getIndexIteratorFilter(haveWantKeyIndex.getColumnFamilyHandle(), Arrays.concatenate(
+                Longs.toByteArray(have),
+                Longs.toByteArray(want)), false, true)) {
+            if (iter.hasNext()) {
+                return get(iter.next());
+            }
+
+        } catch (IOException e) {
+        }
+
+        return null;
+
     }
 
     @Override

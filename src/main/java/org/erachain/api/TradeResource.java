@@ -324,8 +324,8 @@ public class TradeResource {
         for (Order order : wantOrders) {
             JSONObject json = order.toJson();
             // get REVERSE price and AMOUNT
-            json.put("pairAmount", order.getAmountWantLeft().setScale(wantAsset.getScale()).toPlainString());
-            json.put("pairTotal", order.getAmountHaveLeft().setScale(haveAsset.getScale()).toPlainString());
+            json.put("pairAmount", order.getAmountWantLeft().setScale(haveAsset.getScale()).toPlainString());
+            json.put("pairTotal", order.getAmountHaveLeft().setScale(wantAsset.getScale()).toPlainString());
             json.put("pairPrice", order.calcLeftPriceReverse().toPlainString());
             arrayWant.add(json);
         }

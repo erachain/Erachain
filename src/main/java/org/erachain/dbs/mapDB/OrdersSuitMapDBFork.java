@@ -114,6 +114,11 @@ public class OrdersSuitMapDBFork extends DBMapSuitFork<Long, Order> implements O
     }
 
     @Override
+    public Order getHaveWanFirst(long have, long want) {
+        return null;
+    }
+
+    @Override
     public IteratorCloseable<Long> getHaveWantIterator(long have, long want) {
         return null;
     }

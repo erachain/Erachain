@@ -221,6 +221,12 @@ public class OrderMapImpl extends DBTabImpl<Long, Order> implements OrderMap {
     }
 
     @Override
+    public Order getHaveWanFirst(long have, long want) {
+        return ((OrderSuit) map).getHaveWanFirst(have, want);
+    }
+
+
+    @Override
     public List<Order> getOrdersForAddress(
             String address, Long have, Long want, int limit) {
 
