@@ -1781,11 +1781,13 @@ import java.util.*;
                                 unconfirmedMap.delete(transactionSignature);
                             } else {
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
+                                unconfirmedMap.delete(transactionSignature);
                             }
                         } catch (java.lang.Throwable e) {
                             if (e instanceof java.lang.IllegalAccessError) {
                                 // налетели на закрытую таблицу
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
+                                unconfirmedMap.delete(transactionSignature);
                             } else {
                                 LOGGER.error(e.getMessage(), e);
                             }
