@@ -288,9 +288,11 @@ public class APIExchange {
         } else {
             if (trade.getHaveKey().equals(want)) {
                 out.put("lastPrice", trade.calcPrice().toPlainString());
+                out.put("lastAmount", trade.getAmountHave().toPlainString());
                 out.put("lastDir", "buy");
             } else {
                 out.put("lastPrice", trade.calcPriceRevers().toPlainString());
+                out.put("lastAmount", trade.getAmountWant().toPlainString());
                 out.put("lastDir", "sell");
             }
         }
