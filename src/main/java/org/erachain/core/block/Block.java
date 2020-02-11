@@ -1715,7 +1715,8 @@ import java.util.*;
                     }
 
                     //CHECK TIMESTAMP AND DEADLINE
-                    if (transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
+                    if ((BlockChain.TEST_MODE || heightBlock > 278989) &&
+                            transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                     ) {
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()

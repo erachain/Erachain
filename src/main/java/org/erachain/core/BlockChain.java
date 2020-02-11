@@ -661,7 +661,7 @@ public class BlockChain {
 
     public static int GENERATING_MIN_BLOCK_TIME(int height) {
 
-        if (VERS_30SEC > 0 || height <= VERS_30SEC) {
+        if (VERS_30SEC > 0 && height <= VERS_30SEC) {
             return 288; // old MainNet
         }
 
