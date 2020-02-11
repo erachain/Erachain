@@ -9,6 +9,8 @@ import java.util.Map;
 
 public interface OrderSuit {
 
+    Order getHaveWanFirst(long have, long want);
+
     IteratorCloseable<Long> getHaveWantIterator(long have, long want);
 
     IteratorCloseable<Long> getHaveWantIterator(long have);

@@ -302,6 +302,9 @@ public class TradeResource {
 
         int limitInt = limit.intValue();
 
+        AssetCls haveAsset = map.get(have);
+        AssetCls wantAsset = map.get(want);
+
         List<Order> haveOrders = DCSet.getInstance().getOrderMap().getOrders(have, want, limitInt);
         List<Order> wantOrders = DCSet.getInstance().getOrderMap().getOrders(want, have, limitInt);
 
@@ -310,8 +313,8 @@ public class TradeResource {
         JSONArray arrayHave = new JSONArray();
         for (Order order : haveOrders) {
             JSONObject json = order.toJson();
-            json.put("pairAmount", order.getAmountHaveLeft().toPlainString());
-            json.put("pairTotal", order.getAmountWantLeft().toPlainString());
+            json.put("pairAmount", order.getAmountHaveLeft().setScale(haveAsset.getScale()).toPlainString());
+            json.put("pairTotal", order.getAmountWantLeft().setScale(wantAsset.getScale()).toPlainString());
             json.put("pairPrice", order.calcLeftPrice().toPlainString());
             arrayHave.add(json);
         }
@@ -321,8 +324,8 @@ public class TradeResource {
         for (Order order : wantOrders) {
             JSONObject json = order.toJson();
             // get REVERSE price and AMOUNT
-            json.put("pairAmount", order.getAmountWantLeft().toPlainString());
-            json.put("pairTotal", order.getAmountHaveLeft().toPlainString());
+            json.put("pairAmount", order.getAmountWantLeft().setScale(haveAsset.getScale()).toPlainString());
+            json.put("pairTotal", order.getAmountHaveLeft().setScale(wantAsset.getScale()).toPlainString());
             json.put("pairPrice", order.calcLeftPriceReverse().toPlainString());
             arrayWant.add(json);
         }
@@ -533,9 +536,13 @@ public class TradeResource {
             listResult = Controller.getInstance().getOrdersByTimestamp(have, want, fromTimestamp * 1000, limit);
         }
 
+        //AssetCls haveAsset = map.get(have);
+        //AssetCls wantAsset = map.get(want);
+
         JSONArray arrayJSON = new JSONArray();
         for (Order order : listResult) {
             arrayJSON.add(order.toJson());
+
         }
 
         return arrayJSON.toJSONString();

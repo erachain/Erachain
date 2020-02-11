@@ -8,11 +8,14 @@ package org.erachain.webserver;
 import org.erachain.api.ApiErrorFactory;
 import org.erachain.api.TradeResource;
 import org.erachain.controller.Controller;
+import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetMap;
 import org.erachain.utils.StrJSonFine;
+import org.json.simple.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -41,6 +44,8 @@ public class APIExchange {
 
         help.put("GET apiexchange/order/[seqNo|signature]",
                 "Get Order by seqNo or Signature. For example: 4321-2");
+        help.put("GET apiexchange/pair/{have}/{want}",
+                "Get Pair info fot Have / Want");
         help.put("GET apiexchange/ordersbook/[have]/[want]?limit=[limit]",
                 "Get active orders in orderbook for amountAssetKey & priceAssetKey, "
                         + "limit is count record. The number of orders is limited by input param, default 20.");
@@ -246,6 +251,55 @@ public class APIExchange {
         return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
                 .entity(TradeResource.getOrder(seqNo))
+                .build();
+    }
+
+    @GET
+    @Path("pair/{have}/{want}")
+    // apiexchange/pair?have=1&want=2
+    public Response getPair(@PathParam("have") Long have, @PathParam("want") Long want) {
+
+        ItemAssetMap map = this.dcSet.getItemAssetMap();
+        // DOES ASSETID EXIST
+        if (have == null || !map.contains(have)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+        if (want == null || !map.contains(want)) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
+
+        JSONObject out = new JSONObject();
+        out.put("vol24", dcSet.getTradeMap().getVolume24(have, want).toPlainString());
+
+        Order haveOrder = DCSet.getInstance().getOrderMap().getHaveWanFirst(have, want);
+        if (haveOrder != null) {
+            out.put("havePrice", haveOrder.calcLeftPrice().toPlainString());
+        }
+        Order wantOrder = DCSet.getInstance().getOrderMap().getHaveWanFirst(want, have);
+        if (wantOrder != null) {
+            out.put("wantPrice", wantOrder.calcLeftPriceReverse().toPlainString());
+        }
+
+        Trade trade = dcSet.getTradeMap().getLastTrade(have, want);
+        if (trade == null) {
+            out.put("last", "--");
+        } else {
+            if (trade.getHaveKey().equals(want)) {
+                out.put("lastPrice", trade.calcPrice().toPlainString());
+                out.put("lastAmount", trade.getAmountHave().toPlainString());
+                out.put("lastDir", "buy");
+            } else {
+                out.put("lastPrice", trade.calcPriceRevers().toPlainString());
+                out.put("lastAmount", trade.getAmountWant().toPlainString());
+                out.put("lastDir", "sell");
+            }
+        }
+
+        return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(out.toJSONString())
                 .build();
     }
 
