@@ -27,7 +27,7 @@ public class TelegramsTableModel extends DefaultTableModel implements Observer {
     public static final int COLUMN_MESSAGE = 3;
     public static final int COLUMN_SIGNATURE = 4;
   //  public static final int COLUMN_DATE = 0;
-    static Logger LOGGER = LoggerFactory.getLogger(TelegramsTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(TelegramsTableModel.class);
     // ItemAssetMap dbItemAssetMap;
     private SortableList<String, Transaction> transactions;
     private String[] columnNames = Lang.getInstance().translate(new String[] {"Date", "Sender", "Recipient", "Message", "Signature" });

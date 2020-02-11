@@ -2,7 +2,8 @@ package org.erachain.database.wallet;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.naming.NameSale;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
@@ -18,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.Map.Entry;
 
-public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
+public class NameSaleMap extends DCUMapImpl<Tuple2<String, String>, BigDecimal> {
     public static final int NAME_INDEX = 1;
     public static final int SELLER_INDEX = 2;
     public static final int AMOUNT_INDEX = 3;
@@ -28,16 +29,15 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
         super(dWSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.WALLET_RESET_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.WALLET_LIST_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_NAME_SALE_TYPE);
         }
     }
 
-    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
         //NAME INDEX
         NavigableSet<Tuple2<String, Tuple2<String, String>>> nameIndex = database.createTreeSet("namesales_index_name")
                 .comparator(Fun.COMPARATOR)
@@ -88,21 +88,21 @@ public class NameSaleMap extends DBMap<Tuple2<String, String>, BigDecimal> {
     }
 
     @Override
-    protected Map<Tuple2<String, String>, BigDecimal> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("namesales")
+        map = database.createTreeMap("namesales")
                 .keySerializer(BTreeKeySerializer.TUPLE2)
                 .counterEnable()
                 .makeOrGet();
     }
 
     @Override
-    protected Map<Tuple2<String, String>, BigDecimal> getMemoryMap() {
-        return new TreeMap<Tuple2<String, String>, BigDecimal>(Fun.TUPLE2_COMPARATOR);
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple2<String, String>, BigDecimal>(Fun.TUPLE2_COMPARATOR);
     }
 
     @Override
-    protected BigDecimal getDefaultValue() {
+    public BigDecimal getDefaultValue() {
         return BigDecimal.ZERO;
     }
 

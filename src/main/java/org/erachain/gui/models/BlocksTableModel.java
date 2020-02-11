@@ -8,6 +8,7 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class BlocksTableModel extends AbstractTableModel implements Observer {
+public class BlocksTableModel extends TimerTableModelCls<Block.BlockHead> {
 
     private static final int maxSize = 100;
 
@@ -34,49 +35,26 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
     public static final int COLUMN_dtWV = 7;
     public static final int COLUMN_TRANSACTIONS = 8;
     public static final int COLUMN_FEE = 9;
-    static Logger logger = LoggerFactory.getLogger(BlocksTableModel.class.getName());
-    private List<Block.BlockHead> blocks;
-    private String[] columnNames = Lang.getInstance().translate(
-            new String[]{"Height", "Target", "Timestamp creation block", "Creator account", "Gen.Balance", "Delta Height", "WV", "dtWV", "Transactions", "Fee"});
 
     public BlocksTableModel() {
-        DCSet.getInstance().getBlockMap().addObserver(this);
+        super(new String[]{"Height", "Target", "Timestamp creation block", "Creator account", "Gen.Balance", "Delta Height", "WV", "dtWV", "Transactions", "Fee"}, false);
+
+        addObservers();
         resetRows();
-    }
 
-    // set column type
-    @Override
-    public Class<?> getColumnClass(int c) {
-        Object o = getValueAt(0, c);
-        return o == null ? Null.class : o.getClass();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return columnNames.length;
-    }
-
-    @Override
-    public String getColumnName(int index) {
-        return columnNames[index];
-    }
-
-    @Override
-    public int getRowCount() {
-        if (blocks == null) {
-            return 0;
-        }
-        return blocks.size();
     }
 
     @Override
     public Object getValueAt(int row, int column) {
         try {
-            if (blocks == null || blocks.size() - 1 < row) {
+            if (list == null || list.size() - 1 < row) {
                 return null;
             }
-            Block.BlockHead block = blocks.get(row);
-            Tuple2<Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+            Block.BlockHead block = list.get(row);
+            if (block == null) {
+                return "--";
+            }
+
             switch (column) {
                 case COLUMN_HEIGHT:
                     return block.heightBlock + "";
@@ -87,15 +65,30 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
                 case COLUMN_GENERATOR:
                     return block.creator.getPersonAsString();
                 case COLUMN_GB:
-                    if (block.target == 0) {
+                    if (block.heightBlock == 1) {
                         return "GENESIS";
                     }
+                    Tuple3<Integer, Integer, Integer> forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+                    if (forgingPoint == null)
+                        return "--";
                     return forgingPoint.b + " ";
                 case COLUMN_DH:
+                    if (block.heightBlock == 1) {
+                        return "GENESIS";
+                    }
+                    forgingPoint = block.creator.getForgingData(DCSet.getInstance(), block.heightBlock);
+                    if (forgingPoint == null)
+                        return "--";
                     return (block.heightBlock - forgingPoint.a) + "";
                 case COLUMN_WV:
                     return block.winValue + "";
                 case COLUMN_dtWV:
+                    if (block.heightBlock == 1) {
+                        return "GENESIS";
+                    }
+                    if (block.target == 0) {
+                        return "--";
+                    }
                     return String.format("%10.3f%%", (100f * (block.winValue - block.target) / block.target));
                 case COLUMN_TRANSACTIONS:
                     return block.transactionsCount;
@@ -112,43 +105,35 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
     }
 
     @Override
-    public void update(Observable o, Object arg) {
-        try {
-            syncUpdate(arg);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
-    private synchronized void syncUpdate(Object arg) {
+    public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
         int type = message.getType();
         if (type == ObserverMessage.CHAIN_LIST_BLOCK_TYPE) {
             //CHECK IF NEW LIST
             logger.error("gui.models.BlocksTableModel.syncUpdate- CHAIN_LIST_BLOCK_TYPE");
-            if (blocks == null) {
+            if (list == null) {
                 resetRows();
                 fireTableDataChanged();
             }
         } else if (type == ObserverMessage.CHAIN_ADD_BLOCK_TYPE) {
             //CHECK IF LIST UPDATED
             Block block = (Block) message.getValue();
-            blocks.add(0, block.blockHead);
+            list.add(0, block.blockHead);
             fireTableRowsInserted(0, 0);
-            while (blocks.size() > maxSize) {
-                blocks.remove(maxSize);
+            while (list.size() > maxSize) {
+                list.remove(maxSize);
                 fireTableRowsDeleted(maxSize, maxSize);
             }
         } else if (type == ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE) {
             //CHECK IF LIST UPDATED
             try {
-                blocks.remove(0);
+                list.remove(0);
             } catch (Exception e) {
                 resetRows();
                 fireTableDataChanged();
                 return;
             }
-            if (blocks.size() > 10) {
+            if (list.size() > 10) {
                 fireTableRowsDeleted(0, 0);
             } else {
                 resetRows();
@@ -163,7 +148,7 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
     }
 
     private void resetRows() {
-        blocks = new ArrayList<>();
+        list = new ArrayList<>();
         Controller controller = Controller.getInstance();
 //        DCSet dcSet = DCSet.getInstance();
         Block.BlockHead head = controller.getLastBlock().blockHead;
@@ -172,12 +157,19 @@ public class BlocksTableModel extends AbstractTableModel implements Observer {
             if (head == null) {
                 return;
             }
-            blocks.add(head);
+            list.add(head);
             head = controller.getBlockHead(head.heightBlock - 1);
         }
     }
 
-    public void removeObservers() {
+    @Override
+    public void addObservers() {
+        DCSet.getInstance().getBlockMap().addObserver(this);
+    }
+
+    @Override
+    public void deleteObservers() {
         DCSet.getInstance().getBlockMap().deleteObserver(this);
     }
+
 }

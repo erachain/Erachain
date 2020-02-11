@@ -205,7 +205,7 @@ public class OnDealClick {
                 mess = "Invalid duplicte option";
                 break;
             case Transaction.POLL_ALREADY_CREATED:
-                mess = "Pool already created";
+                mess = "Poll already created";
                 break;
             case Transaction.POLL_ALREADY_HAS_VOTES:
                 mess = "Poll already has votes";
@@ -318,10 +318,24 @@ public class OnDealClick {
                 mess = "Not enough rights";
                 break;
 
+            case Transaction.NOT_ENOUGH_ERA_OWN_10:
+                mess = "Need 10 ERA in OWN or more";
+                break;
+            case Transaction.NOT_ENOUGH_ERA_USE_10:
+                mess = "Need 10 ERA in USE or more";
+                break;
+
+            case Transaction.NOT_ENOUGH_ERA_OWN_100:
+                mess = "Need 100 ERA in OWN or more";
+                break;
+            case Transaction.NOT_ENOUGH_ERA_USE_100:
+                mess = "Need 1000 ERA in USE or more";
+                break;
+
             case Transaction.INVALID_ITEM_KEY:
                 mess = "Invalid item key";
                 break;
-                
+
             case Transaction.INVALID_ITEM_VALUE:
                 mess = "Invalid item value";
                 break;

@@ -8,17 +8,17 @@ import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
-import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MDecimalFormatedTextField;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.transaction.CreateOrderDetailsFrame;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,7 +32,7 @@ import java.math.RoundingMode;
 
 @SuppressWarnings("serial")
 public class CreateOrderPanel extends JPanel {
-    static Logger LOGGER = LoggerFactory.getLogger(CreateOrderPanel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(CreateOrderPanel.class);
     public JComboBox<Account> cbxAccount;
     public MDecimalFormatedTextField txtAmountHave;
     public MDecimalFormatedTextField txtPrice;
@@ -212,21 +212,21 @@ public class CreateOrderPanel extends JPanel {
             public void changedUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtPrice, buying);
+                calculateAmounts(txtPrice, buying, true);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtPrice, buying);
+                calculateAmounts(txtPrice, buying, true);
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtPrice, buying);
+                calculateAmounts(txtPrice, buying, true);
             }
         });
 
@@ -254,21 +254,21 @@ public class CreateOrderPanel extends JPanel {
             public void changedUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountWant, buying);
+                calculateAmounts(txtAmountWant, buying, true);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountWant, buying);
+                calculateAmounts(txtAmountWant, buying, true);
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountWant, buying);
+                calculateAmounts(txtAmountWant, buying, true);
             }
         });
 
@@ -286,21 +286,21 @@ public class CreateOrderPanel extends JPanel {
             public void changedUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountHave, buying);
+                calculateAmounts(txtAmountHave, buying, true);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountHave, buying);
+                calculateAmounts(txtAmountHave, buying, true);
             }
 
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (noUpdateFields) return;
 
-                calculateAmounts(txtAmountHave, buying);
+                calculateAmounts(txtAmountHave, buying, true);
             }
         });
 
@@ -399,11 +399,13 @@ public class CreateOrderPanel extends JPanel {
      */
 
     //нужно отдельно цену считаь для подстановок извне
-    public synchronized void calculateAmounts(MDecimalFormatedTextField editedField, boolean buying) {
+    public synchronized void calculateAmounts(MDecimalFormatedTextField editedField, boolean buying, boolean recurse) {
 
-        noUpdateFields = true;
+        if (recurse) {
+            noUpdateFields = true;
 
-        addQueve(editedField);
+            addQueve(editedField);
+        }
 
         try {
 
@@ -411,7 +413,8 @@ public class CreateOrderPanel extends JPanel {
             BigDecimal price;
             BigDecimal total;
 
-            if (notQueved(txtAmountWant)) {
+            if (recurse && notQueved(txtAmountWant)
+                    || !recurse && queve[1].equals(txtAmountWant)) {
                 amount = new BigDecimal(txtAmountHave.getText());
                 price = new BigDecimal(txtPrice.getText());
                 if (buying) {
@@ -421,7 +424,8 @@ public class CreateOrderPanel extends JPanel {
                 }
                 txtAmountWant.setText(total.toPlainString());
 
-            } else if (notQueved(txtPrice)) {
+            } else if (recurse && notQueved(txtPrice)
+                    || !recurse && queve[1].equals(txtPrice)) {
                 amount = new BigDecimal(txtAmountHave.getText());
                 total = new BigDecimal(txtAmountWant.getText());
                 if (buying) {
@@ -431,7 +435,8 @@ public class CreateOrderPanel extends JPanel {
                 }
                 txtPrice.setText(price.toPlainString());
 
-            } else if (notQueved(txtAmountHave)) {
+            } else if (recurse && notQueved(txtAmountHave)
+                    || !recurse && queve[1].equals(txtAmountHave)) {
                 total = new BigDecimal(txtAmountWant.getText());
                 price = new BigDecimal(txtPrice.getText());
                 if (buying) {
@@ -442,23 +447,30 @@ public class CreateOrderPanel extends JPanel {
                 txtAmountHave.setText(amount.toPlainString());
             }
 
-
         } catch (Exception e) {
             sellButton.setEnabled(false);
         }
 
-        try {
-            BigDecimal value = new BigDecimal(editedField.getText());
-            if (value.signum() <= 0) {
-                sellButton.setEnabled(false);
-            } else {
-                sellButton.setEnabled(true);
+        if (recurse) {
+
+            if (queve[1] != null) {
+                // так же пересчитать еще и поле второе для точности
+                calculateAmounts(queve[1], buying, false);
             }
-        } catch (Exception e) {
-            sellButton.setEnabled(false);
-        }
 
-        noUpdateFields = false;
+            try {
+                BigDecimal value = new BigDecimal(editedField.getText());
+                if (value.signum() <= 0) {
+                    sellButton.setEnabled(false);
+                } else {
+                    sellButton.setEnabled(true);
+                }
+            } catch (Exception e) {
+                sellButton.setEnabled(false);
+            }
+
+            noUpdateFields = false;
+        }
 
     }
 
@@ -472,19 +484,48 @@ public class CreateOrderPanel extends JPanel {
 
             if (buying) {
                 txtAmountHave.setText(amount.toPlainString());
-                addQueve(txtAmountHave);
+                addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
                 txtPrice.setText(price.toPlainString());
                 addQueve(txtPrice);
-                total = price.multiply(amount).setScale(have.getScale(), RoundingMode.HALF_DOWN);
+                /////////// Тут мы покупаем - значит втречно рынку нужно меньшую цену дать
+                total = price.multiply(amount)
+                        // точность от HAVE
+                        .setScale(have.getScale(), RoundingMode.HALF_DOWN);
                 txtAmountWant.setText(total.toPlainString());
+
             } else {
                 txtAmountHave.setText(amount.toPlainString());
                 addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
                 txtPrice.setText(price.toPlainString());
                 addQueve(txtPrice);
-                total = price.multiply(amount).setScale(want.getScale(), RoundingMode.HALF_DOWN);
+                /////////// Тут мы продаем - значит втречно рынку нужно большую цену дать
+                total = price.multiply(amount)
+                        // точность от WANT
+                        .setScale(want.getScale(), RoundingMode.HALF_UP);
                 txtAmountWant.setText(total.toPlainString());
             }
+
+            sellButton.setEnabled(true);
+
+        } catch (Exception e) {
+            sellButton.setEnabled(false);
+        }
+
+        noUpdateFields = false;
+
+    }
+
+    public synchronized void setFields(BigDecimal amountHave, BigDecimal price, BigDecimal amountWant) {
+
+        noUpdateFields = true;
+
+        try {
+
+            txtAmountHave.setText(amountHave.toPlainString());
+            addQueve(txtAmountHave); // очередность запомним иначе при первом двойном клике потом цену не пересчитывает
+            txtPrice.setText(price.toPlainString());
+            addQueve(txtPrice);
+            txtAmountWant.setText(amountWant.toPlainString());
 
             sellButton.setEnabled(true);
 
@@ -603,7 +644,7 @@ public class CreateOrderPanel extends JPanel {
         }
 
         Transaction transaction = Controller.getInstance().createOrder(creator, this.have, this.want,
-                amountHave.setScale(this.have.getScale(), RoundingMode.HALF_DOWN),
+                amountHave.setScale(this.have.getScale(), RoundingMode.HALF_UP),
                 amountWant.setScale(this.want.getScale(), RoundingMode.HALF_DOWN), feePow);
 
         String Status_text = "";

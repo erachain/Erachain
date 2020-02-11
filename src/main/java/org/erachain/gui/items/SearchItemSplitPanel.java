@@ -1,5 +1,8 @@
 package org.erachain.gui.items;
 
+import org.erachain.core.item.ItemCls;
+import org.erachain.core.item.persons.PersonCls;
+import org.erachain.gui.items.persons.PersonInfo002;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -8,18 +11,15 @@ import javax.swing.table.TableColumn;
 
 import org.erachain.gui.library.MDecimalFormatedTextField;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class SearchItemSplitPanel extends ItemSplitPanel {
+public abstract class SearchItemSplitPanel extends ItemSplitPanel {
 
     private static final long serialVersionUID = 2717571093561259483L;
     protected SearchItemsTableModel search_Table_Model;
     private MDecimalFormatedTextField key_Item;
-//	protected JMenuItem favoriteMenuItems;
-//	protected JPopupMenu menuTable;
-//	protected ItemCls itemMenu;
-//	protected ItemCls itemTableSelected = null;
 
     @SuppressWarnings("rawtypes")
     public SearchItemSplitPanel(SearchItemsTableModel search_Table_Model1, String gui_Name, String search_Label_Text) {
@@ -27,12 +27,12 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
         super(search_Table_Model1, gui_Name);
         this.search_Table_Model = search_Table_Model1;
         setName(Lang.getInstance().translate(search_Label_Text));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
 
         // CHECKBOX FOR FAVORITE
         TableColumn favorite_Column = jTableJScrollPanelLeftPanel.getColumnModel()
                 .getColumn(search_Table_Model.COLUMN_FAVORITE);
-        favorite_Column.setMaxWidth(1000);
+        favorite_Column.setMaxWidth(100);
         favorite_Column.setPreferredWidth(50);
         // search Panel
         this.searchToolBar_LeftPanel.setVisible(true);
@@ -54,7 +54,7 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                searchTextField_SearchToolBar_LeftPanel.setText("");
+                searchTextFieldSearchToolBarLeftPanelDocument.setText("");
                 Label_search_Info_Panel.setText(Lang.getInstance().translate("Waiting..."));
                 jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
                 new Thread() {
@@ -77,13 +77,13 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
 
         // UPDATE FILTER ON TEXT CHANGE
 
-        searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
                 if (search.equals("")) {
                     jScrollPaneJPanelRightPanel.setViewportView(null);
                     search_Table_Model.clear();
@@ -119,4 +119,5 @@ public class SearchItemSplitPanel extends ItemSplitPanel {
         });
 
     }
+
 }

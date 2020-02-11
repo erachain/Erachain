@@ -1,22 +1,28 @@
 package org.erachain.database;
 // 30/03 ++
 
-import javafx.beans.Observable;
-import org.erachain.settings.Settings;
+import lombok.extern.slf4j.Slf4j;
+import org.erachain.controller.Controller;
+import org.erachain.dbs.DBTab;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 
 import java.io.File;
-import java.util.Observer;
+import java.util.ArrayList;
+import java.util.List;
 
 //import org.mapdb.Serializer;
 
+@Slf4j
 abstract public class DBASet implements IDB {
 
     private static final String VERSION = "version";
 
+    int DBS_USED;
+
     protected File DATA_FILE;
-    protected DB database;
+    public DB database;
+    protected List<DBTab> tables = new ArrayList<>();
+
     protected int uses;
 
     private boolean withObserver;// observe
@@ -25,15 +31,25 @@ abstract public class DBASet implements IDB {
     public DBASet() {
     }
 
-    public DBASet(File DATA_FILE, boolean withObserver, boolean dynamicGUI) {
+    /**
+     *
+     * @param DATA_FILE
+     * @param database общая база данных для данного набора - вообще надо ее в набор свтавить и все.
+     *               У каждой таблицы внутри может своя база данных открытьваться.
+     *               А команды базы данных типа close commit должны из таблицы передаваться в свою.
+     *               Если в общей базе таблица, то не нужно обработка так как она делается в наборе наверху
+     * @param withObserver
+     * @param dynamicGUI
+     */
+    public DBASet(File DATA_FILE, DB database, boolean withObserver, boolean dynamicGUI) {
         this.DATA_FILE = DATA_FILE;
         this.withObserver = withObserver;
         this.dynamicGUI = dynamicGUI;
+        this.database = database;
     }
 
-    public DBASet(File DATA_FILE, DB database, boolean withObserver, boolean dynamicGUI) {
-        this(DATA_FILE, withObserver, dynamicGUI);
-        this.database = database;
+    public DB getDatabase() {
+        return this.database;
     }
 
     public int getVersion() {
@@ -43,10 +59,18 @@ abstract public class DBASet implements IDB {
         return u;
     }
 
+    public File getFile() {
+        return DATA_FILE;
+    }
+
     public void setVersion(int version) {
         this.uses++;
         this.database.getAtomicInteger(VERSION).set(version);
         this.uses--;
+    }
+
+    public void addTable(DBTab table) {
+        tables.add(table);
     }
 
     public boolean isWithObserver() {
@@ -79,6 +103,21 @@ abstract public class DBASet implements IDB {
 
     public void clearCache() {
         this.database.getEngine().clearCache();
+    }
+
+    public void writeToParent() {
+        this.addUses();
+
+        try {
+
+        } catch (java.lang.OutOfMemoryError e) {
+            logger.error(e.getMessage(), e);
+            this.outUses();
+            Controller.getInstance().stopAll(13);
+        } finally {
+            this.outUses();
+        }
+
     }
 
     public void commit() {

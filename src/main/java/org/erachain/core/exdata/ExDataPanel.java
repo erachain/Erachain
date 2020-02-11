@@ -83,7 +83,7 @@ public class ExDataPanel extends javax.swing.JPanel {
             @Override
             public void hyperlinkUpdate(HyperlinkEvent arg0) {
                 // TODO Auto-generated method stub
-                EventType i = arg0.getEventType();
+                //EventType i = arg0.getEventType();
                 if (arg0.getEventType() != HyperlinkEvent.EventType.ACTIVATED)
                     return;
                 String str = JOptionPane.showInputDialog(jTextPane_Message_Public.th,

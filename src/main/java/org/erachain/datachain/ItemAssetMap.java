@@ -5,11 +5,8 @@ import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.AssetVenture;
-import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-
-import java.util.Map;
 
 //import database.serializer.AssetSerializer;
 
@@ -20,34 +17,18 @@ import java.util.Map;
  */
 public class ItemAssetMap extends ItemMap {
 
-    // private Atomic.Long atomicKey;
-    // private long key;
-    static final String NAME = "item_assets";
-    static final int TYPE = ItemCls.ASSET_TYPE;
-
     public ItemAssetMap(DCSet databaseSet, DB database) {
         super(databaseSet, database,
-                // TYPE,
-                NAME, ObserverMessage.RESET_ASSET_TYPE, ObserverMessage.ADD_ASSET_TYPE,
+                ItemCls.ASSET_TYPE, ObserverMessage.RESET_ASSET_TYPE, ObserverMessage.ADD_ASSET_TYPE,
                 ObserverMessage.REMOVE_ASSET_TYPE, ObserverMessage.LIST_ASSET_TYPE);
     }
 
-    public ItemAssetMap(ItemAssetMap parent) {
-        super(parent);
-    }
-
-    // type+name not initialized yet! - it call as Super in New
-    protected Map<Long, ItemCls> getMap(DB database) {
-
-        // OPEN MAP
-        return database.createTreeMap(NAME).valueSerializer(new ItemSerializer(TYPE))
-                // .valueSerializer(new AssetSerializer())
-                // key instead size - .counterEnable()
-                .makeOrGet();
+    public ItemAssetMap(ItemAssetMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
     public boolean contains(Long key) {
-        if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
+        if (BlockChain.TEST_MODE && key > 100 && key < 1000) {
             return true;
         } else {
             return super.contains(key);
@@ -58,10 +39,10 @@ public class ItemAssetMap extends ItemMap {
     public AssetCls get(Long key) {
 
         AssetCls item;
-        if (BlockChain.DEVELOP_USE && key > 100 && key < 1000) {
+        if (BlockChain.TEST_MODE && key > 100 && key < 1000) {
             switch (key.intValue()) {
 
-                case (int)AssetCls.LIA_KEY:
+                case (int) AssetCls.LIA_KEY:
                     item = new AssetVenture((byte) 0, GenesisBlock.CREATOR, AssetCls.LIA_NAME, null, null,
                             AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
                     item = null;

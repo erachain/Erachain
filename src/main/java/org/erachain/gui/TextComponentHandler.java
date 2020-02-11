@@ -1,14 +1,17 @@
 package org.erachain.gui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 class TextComponentHandler extends Handler {
-    private static final Logger LOGGER = Logger.getLogger(LoggerTextArea.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoggerTextArea.class);
+
     private final JTextArea text;
 
     TextComponentHandler(JTextArea text) {

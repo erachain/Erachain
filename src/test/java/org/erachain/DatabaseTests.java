@@ -49,7 +49,6 @@ public class DatabaseTests {
     PersonCls person;
     long personKey = -1;
     IssuePersonRecord issuePersonTransaction;
-    RSertifyPubKeys r_SertifyPubKeys;
     //int version = 0; // without signs of person
     int version = 1; // with signs of person
     private byte[] icon = new byte[0]; // default value
@@ -62,7 +61,7 @@ public class DatabaseTests {
     // INIT PERSONS
     private void init() {
 
-        dcSet = DCSet.createEmptyDatabaseSet();
+        dcSet = DCSet.createEmptyDatabaseSet(0);
 
         gb = new GenesisBlock();
         try {
@@ -86,16 +85,16 @@ public class DatabaseTests {
         GenesisCertifyPersonRecord genesis_certify = new GenesisCertifyPersonRecord(maker, 0L);
         genesis_certify.process(gb, Transaction.FOR_NETWORK);
 
-        maker.setLastTimestamp(last_ref, dcSet);
-        maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.setLastTimestamp(new long[]{last_ref, 0}, dcSet);
+        maker.changeBalance(dcSet, true, ERM_KEY, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(dcSet, true, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         person = new PersonHuman(maker, "Ermolaev Dmitrii Sergeevich", birthDay, birthDay - 2,
                 gender, "Slav", (float) 28.12345, (float) 133.7777,
                 "white", "green", "шанет", 188, icon, image, "изобретатель, мыслитель, создатель идей", ownerSignature);
 
         //CREATE ISSUE PERSON TRANSACTION
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
 
     }
 
@@ -107,32 +106,32 @@ public class DatabaseTests {
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(dcSet)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
 
-        //assertEquals(dcSet.getItemPersonMap().getKeys().toString(), "");
+        //assertEquals(dcSet.getItemPersonMap().keySet().toString(), "");
         //assertEquals(dcSet.getItemPersonMap().getValuesAll().toString(), "");
         //CREATE FORK
         DCSet fork = dcSet.fork();
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork));
+        issuePersonTransaction = new IssuePersonRecord(maker, person, FEE_POWER, timestamp++, maker.getLastTimestamp(fork)[0]);
         issuePersonTransaction.sign(maker, Transaction.FOR_NETWORK);
         issuePersonTransaction.process(gb, Transaction.FOR_NETWORK);
 
-        //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).getKeys().toString(), "");
+        //assertEquals(PersonCls.getItem(fork, ItemCls.PERSON_TYPE, 1).getDBMap(fork).keySet().toString(), "");
 
         //SET BALANCE
-        dcSet.getAssetBalanceMap().set("test", 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        dcSet.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ONE, BigDecimal.ONE),
@@ -141,13 +140,13 @@ public class DatabaseTests {
                 ));
 
         //CHECK VALUE IN DB
-        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get(seed, 1L));
 
         //CHECK VALUE IN FORK
-        assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ONE, fork.getAssetBalanceMap().get(seed, 1L));
 
         //SET BALANCE IN FORK
-        fork.getAssetBalanceMap().set("test", 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        fork.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.TEN, BigDecimal.TEN),
@@ -157,16 +156,16 @@ public class DatabaseTests {
                 ));
 
         //CHECK VALUE IN DB
-        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get(seed, 1L));
 
         //CHECK VALUE IN FORK
-        assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get(seed, 1L));
 
         //CREATE SECOND FORK
         DCSet fork2 = fork.fork();
 
         //SET BALANCE IN FORK2
-        fork2.getAssetBalanceMap().set("test", 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        fork2.getAssetBalanceMap().put(seed, 1L, new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
                 (
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
                         new Tuple2<BigDecimal, BigDecimal>(BigDecimal.ZERO, BigDecimal.ZERO),
@@ -176,13 +175,13 @@ public class DatabaseTests {
                 ));
 
         //CHECK VALUE IN DB
-        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ONE, dcSet.getAssetBalanceMap().get(seed, 1L));
 
         //CHECK VALUE IN FORK
-        assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.TEN, fork.getAssetBalanceMap().get(seed, 1L));
 
         //CHECK VALUE IN FORK
-        assertEquals(BigDecimal.ZERO, fork2.getAssetBalanceMap().get("test", 1L));
+        assertEquals(BigDecimal.ZERO, fork2.getAssetBalanceMap().get(seed, 1L));
     }
 
     @Test
@@ -204,7 +203,7 @@ public class DatabaseTests {
         }
 
         ItemAssetMap dbMap = dcSet.getItemAssetMap();
-        Collection<ItemCls> assets = dbMap.getValues();
+        Collection<ItemCls> assets = dbMap.values();
         for (ItemCls asset : assets) {
             //Asset asset = DLSet.getInstance().getAssetMap().get(key);
             AssetCls aa = (AssetCls) asset;
@@ -215,8 +214,8 @@ public class DatabaseTests {
             //db.add(asset);
         }
 
-        dbMap.add(dbMap.get(1l));
-        LOGGER.info("keys " + dbMap.getKeys());
+        dbMap.incrementPut(dbMap.get(1l));
+        LOGGER.info("keys " + dbMap.keySet());
 
         //Collection<Asset> issues = DLSet.getInstance().getIssueAssetMap.getValuesAll();
 
@@ -230,7 +229,7 @@ public class DatabaseTests {
         init();
 
         AssetCls asset = new AssetVenture(maker, "test", icon, image, "strontje", 0, 8, 50000l);
-        Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet));
+        Transaction issueAssetTransaction = new IssueAssetTransaction(maker, asset, FEE_POWER, timestamp, maker.getLastTimestamp(dcSet)[0]);
         issueAssetTransaction.sign(maker, Transaction.FOR_NETWORK);
         issueAssetTransaction.process(gb, Transaction.FOR_NETWORK);
         //logger.info(asset.toString() + " getQuantity " + asset.getQuantity());
@@ -238,7 +237,7 @@ public class DatabaseTests {
         long key = asset.getKey(dcSet);
 
         ItemAssetMap assetDB = dcSet.getItemAssetMap();
-        Collection<ItemCls> assets = assetDB.getValues();
+        Collection<ItemCls> assets = assetDB.values();
         for (ItemCls asset_2 : assets) {
             AssetCls aa = (AssetCls) asset_2;
             LOGGER.info(aa.toString() + " getQuantity " + aa.getQuantity());

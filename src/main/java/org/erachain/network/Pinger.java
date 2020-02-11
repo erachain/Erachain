@@ -16,9 +16,9 @@ import java.util.concurrent.TimeUnit;
 
 public class Pinger extends Thread {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class);
-    private static final int DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 4;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class.getSimpleName());
+    private int DEFAULT_PING_TIMEOUT;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 4;
 
     private Peer peer;
     //private boolean needPing = false;
@@ -30,6 +30,8 @@ public class Pinger extends Thread {
         this.peer = peer;
         this.ping = Integer.MAX_VALUE;
         this.setName("Pinger-" + this.getId() + " for: " + peer.getName());
+
+        DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight());
 
         this.start();
     }
@@ -95,7 +97,7 @@ public class Pinger extends Thread {
         }
 
         //logger.info("PING " + this.peer);
-        Controller.getInstance().getDBSet().getPeerMap().addPeer(peer, 0);
+        Controller.getInstance().getDLSet().getPeerMap().addPeer(peer, 0);
 
         if (response.getType() == Message.HWEIGHT_TYPE) {
             HWeightMessage hWeightMessage = (HWeightMessage) response;

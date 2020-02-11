@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class ConnectionAcceptor extends MonitoredThread {
 
-    static Logger LOGGER = LoggerFactory.getLogger(ConnectionAcceptor.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(ConnectionAcceptor.class.getSimpleName());
     private Network network;
     private ServerSocket socket;
     private boolean isRun;
@@ -34,7 +34,8 @@ public class ConnectionAcceptor extends MonitoredThread {
 
         Random random = new Random();
 
-        PeerMap map = Controller.getInstance().getDBSet().getPeerMap();
+        PeerMap map = Controller.getInstance().getDLSet().getPeerMap();
+
         this.initMonitor();
         while (this.isRun && !this.isInterrupted()) {
             this.setMonitorPoint();
@@ -175,7 +176,8 @@ public class ConnectionAcceptor extends MonitoredThread {
 
         setMonitorStatusBefore("halt socket.close");
         try {
-            socket.close();
+            if (socket != null)
+                socket.close();
         } catch (IOException e) {
         }
         setMonitorStatusAfter();

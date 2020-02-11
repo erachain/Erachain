@@ -1,7 +1,7 @@
 package org.erachain.gui.models;
 
-import org.erachain.database.DBMap;
 import org.erachain.database.SortableList;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.utils.Pair;
 
 @SuppressWarnings("serial")
@@ -13,7 +13,7 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
         super(columnNames, descending);
     }
 
-    public SortedListTableModelCls(DBMap map, String[] columnNames, boolean descending) {
+    public SortedListTableModelCls(DBTabImpl map, String[] columnNames, boolean descending) {
         super(map, columnNames, descending);
     }
 
@@ -21,18 +21,14 @@ public abstract class SortedListTableModelCls<T, U> extends TimerTableModelCls<U
         super(columnNames, column_AutoHeight, descending);
     }
 
-    public SortedListTableModelCls(DBMap map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
+    public SortedListTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
         super(map, columnNames, column_AutoHeight, descending);
     }
 
-    public SortedListTableModelCls(DBMap map, String[] columnNames, Boolean[] column_AutoHeight, int favoriteColumn, boolean descending) {
+    public SortedListTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] column_AutoHeight, int favoriteColumn, boolean descending) {
         super(map, columnNames, column_AutoHeight, favoriteColumn, descending);
     }
-
-    public SortedListTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] column_AutoHeight, boolean descending) {
-        super(map, name, timeout, columnNames, column_AutoHeight, descending);
-    }
-
+    
     @Override
     public U getItem(int k) {
         return this.listSorted.get(k).getB();

@@ -61,7 +61,7 @@ public class MyLoansSplitPanel extends SplitPanel {
 //			my_Accounts_SplitPanel.rightPanel.jTable1.revalidate();
             // PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
             //my_Person_SplitPanel.jSplitPanel.setDividerLocation(my_Person_SplitPanel.jSplitPanel.getDividerLocation());
-            ////my_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+            ////my_Person_SplitPanel.searchTextFieldSearchToolBarLeftPanelDocument.setEnabled(true);
 
 
         }

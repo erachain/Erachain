@@ -1,21 +1,17 @@
 package org.erachain.gui.items;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.FavoriteItemMap;
-import org.erachain.datachain.DCMap;
-import org.erachain.datachain.ItemMap;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.gui.models.SortedListTableModelCls;
-import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Long, Object> implements Observer, ObserverWaiter {
@@ -27,7 +23,7 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
 
     protected FavoriteItemMap favoriteMap;
 
-    public FavoriteItemModelTable(DCMap map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
+    public FavoriteItemModelTable(DBTabImpl map, FavoriteItemMap favoriteMap, String[] columnNames, Boolean[] columnAutoHeight,
                                   int resetObserver, int addObserver, int deleteObserver, int listObserver, int favorite) {
         super(columnNames, columnAutoHeight, false);
 
@@ -103,12 +99,12 @@ public abstract class FavoriteItemModelTable extends SortedListTableModelCls<Lon
     @Override
     public void getInterval() {
 
-        getIntervalThis( start, step);
+        getIntervalThis(start, step);
 
     }
 
     @Override
-    public void getIntervalThis(long startBack, long endBack) {
+    public void getIntervalThis(long startBack, int limit) {
         listSorted = new SortableList<Long, Object>(map, favoriteMap.getFromToKeys(0, Long.MAX_VALUE));
         listSorted.sort();
 

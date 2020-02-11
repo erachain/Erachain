@@ -230,22 +230,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
                 reference, signatureBytes, feeLong);
     }
 
-    /*
-    public void setDC(DCSet dcSet, int asDeal) {
+    public void setDC(DCSet dcSet) {
 
-        super.setDC(dcSet, asDeal);
+        super.setDC(dcSet);
 
-        this.haveAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.haveKey);
-        this.wantAsset = (AssetCls) this.dcSet.getItemAssetMap().get(this.wantKey);
+        if (dcSet != null && dcSet.getItemAssetMap() != null) {
+            this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
+            this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
+        }
 
-    }
-    */
-
-    public void setDC(DCSet dcSet, int asDeal, int blockHeight, int seqNo) {
-        super.setDC(dcSet, asDeal, blockHeight, seqNo);
-
-        this.haveAsset = this.dcSet.getItemAssetMap().get(this.haveKey);
-        this.wantAsset = this.dcSet.getItemAssetMap().get(this.wantKey);
     }
 
     public Long getOrderId() {
@@ -411,14 +404,14 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         if (this.haveAsset == null || this.wantAsset == null)
             return ITEM_ASSET_NOT_EXIST;
 
-        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting() && !BlockChain.DEVELOP_USE) {
+        if (this.wantAsset.isAccounting() ^ this.haveAsset.isAccounting()) {
 
             return INVALID_ACCOUNTING_PAIR;
         }
-        
+
         if (this.wantAsset.isInsideBonus() ^ this.haveAsset.isInsideBonus()) {
             if (this.height < BlockChain.VERS_4_12 || this.haveKey != AssetCls.FEE_KEY && this.wantKey != AssetCls.FEE_KEY)
-            return INVALID_ECXHANGE_PAIR;
+                return INVALID_ECXHANGE_PAIR;
         }
 
         long haveKey = this.haveKey;
@@ -437,19 +430,15 @@ public class CreateOrderTransaction extends Transaction implements Itemable {
         int height = this.getBlockHeightByParentOrLast(this.dcSet);
 
         // CHECK IF ASSETS NOT THE SAME
-        if (haveKey == RIGHTS_KEY && !BlockChain.DEVELOP_USE
-            // && wantKey != FEE_KEY
-                ) {
-            // haveKey ERA
-            if (height > BlockChain.FREEZE_FROM
-                    && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
-                // LOCK ERA sell
-                return INVALID_CREATOR;
-            }
-        }
-
         if (haveKey == wantKey) {
             return HAVE_EQUALS_WANT;
+        }
+
+        if (haveKey == RIGHTS_KEY && !BlockChain.TEST_MODE
+                && height > BlockChain.FREEZE_FROM
+                && BlockChain.FOUNDATION_ADDRESSES.contains(this.creator.getAddress())) {
+            // LOCK ERA sell
+            return INVALID_CREATOR;
         }
 
         // CHECK IF AMOUNT POSITIVE

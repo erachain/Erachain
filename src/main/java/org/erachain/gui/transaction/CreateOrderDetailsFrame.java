@@ -1,6 +1,8 @@
 package org.erachain.gui.transaction;
 
 import org.erachain.core.transaction.CreateOrderTransaction;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
@@ -11,7 +13,7 @@ public class CreateOrderDetailsFrame extends RecDetailsFrame {
     public CreateOrderDetailsFrame(CreateOrderTransaction orderCreation) {
         super(orderCreation);
 
-        //orderCreation.setDC(DCSet.getInstance(), Transaction.FOR_NETWORK);
+        orderCreation.setDC(DCSet.getInstance());
 
         //LABEL HAVE
         ++labelGBC.gridy;

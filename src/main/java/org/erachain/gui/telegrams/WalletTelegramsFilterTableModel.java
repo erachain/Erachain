@@ -32,7 +32,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
 
     public static final int COLUMN_MESSAGE = 0;
   //  public static final int COLUMN_DATE = 0;
-    static Logger LOGGER = LoggerFactory.getLogger(WalletTelegramsFilterTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(WalletTelegramsFilterTableModel.class);
     // ItemAssetMap dbItemAssetMap;
     private SortableList<String, Transaction> transactions;
     private String[] columnNames = Lang.getInstance().translate(new String[] { "Message" });
@@ -235,7 +235,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
         // REGISTER ON WALLET TRANSACTIONS
         Controller.getInstance().getWallet().database.getTelegramsMap().addObserver(this);
         // for UNCONFIRMEDs
-        DCSet.getInstance().getTransactionMap().addObserver(this);
+        DCSet.getInstance().getTransactionTab().addObserver(this);
         // for ??
         /// Controller.getInstance().wallet.database.getPersonMap().addObserver(transactions);
 
@@ -244,7 +244,7 @@ public class WalletTelegramsFilterTableModel extends DefaultTableModel implement
     public void removeObservers() {
 
         Controller.getInstance().getWallet().database.getTelegramsMap().deleteObserver(this);
-        DCSet.getInstance().getTransactionMap().addObserver(this);
+        DCSet.getInstance().getTransactionTab().addObserver(this);
         /// ???
         /// Controller.getInstance().wallet.database.getPersonMap().deleteObserver(transactions);
     }

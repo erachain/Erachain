@@ -20,8 +20,8 @@ public class KKAssetStatusMap extends KKMap {
         );
     }
 
-    public KKAssetStatusMap(KKAssetStatusMap parent) {
-        super(parent);
+    public KKAssetStatusMap(KKAssetStatusMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 

@@ -22,7 +22,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
                 new Boolean[]{false, true, true, false, false, false, false, false},
                 COLUMN_FAVORITE);
 
-        logger = LoggerFactory.getLogger(ItemAssetsTableModel.class.getName());
+        logger = LoggerFactory.getLogger(ItemAssetsTableModel.class);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class ItemAssetsTableModel extends SearchItemsTableModel {
 
             case COLUMN_AMOUNT:
 
-                return asset.getTotalQuantity(DCSet.getInstance());
+                return asset.getQuantity();
 
             case COLUMN_FAVORITE:
 

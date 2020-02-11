@@ -402,8 +402,7 @@ public class TelegramSplitPanel extends SplitPanel {
                 Pair<String, Tuple2<String, String>> ac = accountModel.getPairItem(row);
                 Controller.getInstance().wallet.database.getAccountsPropertisMap().delete(ac.getA());
             } catch (Exception e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+                logger.error(e1.getMessage(), e1);
             }
 
         }
@@ -570,7 +569,7 @@ public void onSendClick() {
    // CREATE TX MESSAGE
     Transaction transaction = Controller.getInstance().r_Send(
             Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, key,
-            amount, head, messageBytes, isTextByte, encrypted);
+            amount, head, messageBytes, isTextByte, encrypted, 0);
     
     Controller.getInstance().broadcastTelegram(transaction, true);
        

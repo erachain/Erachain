@@ -18,10 +18,7 @@ import org.erachain.lang.Lang;
 public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Lend", assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
-
-        this.jLabel_Title.setText(Lang.getInstance().translate("If You want to give a loan asset %asset%, fill in this form")
-                .replace("%asset%", asset.viewName()));
+        super("Lend", assetIn, "If You want to give a loan asset %asset%, fill in this form", TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         //	icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Lend"));
@@ -39,7 +36,7 @@ public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
         Transaction transaction = Controller.getInstance()
                 .r_Send(Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient,
                         -key, amount,
-                        head, messageBytes, isTextByte, encrypted);
+                        head, messageBytes, isTextByte, encrypted, 0);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,

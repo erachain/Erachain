@@ -36,6 +36,8 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.ZipBytes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -48,6 +50,8 @@ import org.erachain.utils.ZipBytes;
  * @author Саша
  */
 public class MPDFView extends javax.swing.JPanel {
+
+    protected Logger logger;
 
     private PDFFile pdffile;
     /**
@@ -64,78 +68,82 @@ public class MPDFView extends javax.swing.JPanel {
     protected double zoomIndex;
     private int width1;
     private int height1;
-    int pageNum =0;
+    int pageNum = 0;
+
     public MPDFView() {
         super();
-      //  new PDFViewer(true);
+
+        logger = LoggerFactory.getLogger(getClass());
+
+        //  new PDFViewer(true);
         th = this;
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screens = kit.getScreenSize();
-        
-        width1 = width = (int) (screens.width/1.4);
+
+        width1 = width = (int) (screens.width / 1.4);
         height1 = height = (int) (width * 1.4);
-        zoomIndex =1.0;
+        zoomIndex = 1.0;
         initComponents();
-        
+
         try {
             pdffile = new PDFFile(readPDFFile());
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-       pages =  pdffile.getNumPages();
-         
-       // view smal pages
-        for(int i = 1; i<=pages;i++){
-            jPanel1.add(new PDFPageViewSmall( pdffile.getPage(i,true), i));
+        pages = pdffile.getNumPages();
+
+        // view smal pages
+        for (int i = 1; i <= pages; i++) {
+            jPanel1.add(new PDFPageViewSmall(pdffile.getPage(i, true), i));
         }
         // button Zoom +
-        jButtonZoomAdd.addActionListener(new ActionListener(){
+        jButtonZoomAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 zoomIndex = zoomIndex + 0.1;
-                height1 = (int)(height * zoomIndex);
+                height1 = (int) (height * zoomIndex);
                 width1 = (int) (width * zoomIndex);
                 setImage(pageNum);
-            
-                }
-            
+
+            }
+
         });
         // button zoom -
-        jButtonZoomDec.addActionListener(new ActionListener(){
+        jButtonZoomDec.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 zoomIndex = zoomIndex - 0.1;
-                height1 = (int)(height * zoomIndex);
+                height1 = (int) (height * zoomIndex);
                 width1 = (int) (width * zoomIndex);
                 setImage(pageNum);
-           
-                }   
-            
+
+            }
+
         });
-        
-       // show page
+
+        // show page
         setImage(pageNum);
         jSplitPane_Main.setDividerLocation(200);
         jScrollPane1.setViewportView(image);
     }
-    
-    private void  setImage(int pageNum){
-        
-        PDFPage pp = pdffile.getPage(pageNum,true);
+
+    private void setImage(int pageNum) {
+
+        PDFPage pp = pdffile.getPage(pageNum, true);
         Rectangle2D r2d = pp.getBBox();
-        Image pp1 = pp .getImage(
+        Image pp1 = pp.getImage(
                 width1, height1,
                 r2d, // clip rect
                 null, // null for the ImageObserver
                 true, // fill background with white
                 true // block until drawing is done
-                );
-       
-        image.setPreferredSize(new Dimension (width1, height1));
-        image.setIcon(new ImageIcon(pp1));  
+        );
+
+        image.setPreferredSize(new Dimension(width1, height1));
+        image.setIcon(new ImageIcon(pp1));
     }
 
     private void initComponents() {
@@ -215,25 +223,25 @@ public class MPDFView extends javax.swing.JPanel {
     }
 
     private ByteBuffer readPDFFile() {
-      
+
         Long langRef = Controller.LICENSE_LANG_REFS.get(Settings.getInstance().getLang());
         if (langRef == null)
             langRef = Controller.LICENSE_LANG_REFS.get("en");
         Transaction record = DCSet.getInstance().getTransactionFinalMap().get(langRef);
         if (record != null) {
             if (record.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
-                
+
                 RSignNote note = (RSignNote) record;
                 if (record.getVersion() == 2) {
                     byte[] data = note.getData();
-                    
+
                     Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
                     try {
                         map = ExData.parse_Data_V2(data);
                     } catch (Exception e) {
                         map = null;
                     }
-                    
+
                     if (map != null) {
                         HashMap<String, Tuple2<Boolean, byte[]>> files = map.d;
                         if (files != null) {
@@ -241,8 +249,8 @@ public class MPDFView extends javax.swing.JPanel {
                             while (it_Files.hasNext()) {
                                 Entry<String, Tuple2<Boolean, byte[]>> fileData = it_Files.next();
                                 boolean zip = new Boolean(fileData.getValue().a);
-                               // String name_File = (String) fileData.getKey();
-                               // setTitle(getTitle() + " - " + name_File);
+                                // String name_File = (String) fileData.getKey();
+                                // setTitle(getTitle() + " - " + name_File);
 
                                 byte[] file_byte = (byte[]) fileData.getValue().b;
                                 if (zip) {
@@ -250,12 +258,10 @@ public class MPDFView extends javax.swing.JPanel {
                                         try {
                                             file_byte = ZipBytes.decompress(file_byte);
                                         } catch (IOException e) {
-                                            // TODO Auto-generated catch block
-                                            e.printStackTrace();
+                                            logger.error(e.getMessage(), e);
                                         }
                                     } catch (DataFormatException e1) {
-                                        // TODO Auto-generated catch block
-                                        e1.printStackTrace();
+                                        logger.error(e1.getMessage(), e1);
                                     }
                                 }
 
@@ -266,12 +272,12 @@ public class MPDFView extends javax.swing.JPanel {
                 }
             }
         }
-        
+
         if (buf == null) {
             // load a pdf from a byte buffer
 
             File file;
-            if (Settings.getInstance().getLang().equals("ru") )
+            if (Settings.getInstance().getLang().equals("ru"))
                 file = new File("Erachain Licence Agreement (ru).pdf");
             else
                 file = new File("Erachain Licence Agreement.pdf");
@@ -284,7 +290,7 @@ public class MPDFView extends javax.swing.JPanel {
                 try {
                     raf = new RandomAccessFile(file, "r");
                 } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                     return null;
                 }
             }
@@ -295,54 +301,54 @@ public class MPDFView extends javax.swing.JPanel {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-       
+
         }
         return buf;
     }
-    
-    class PDFPageViewSmall extends JButton{
+
+    class PDFPageViewSmall extends JButton {
         PDFPage page1;
         private int pp3;
 
-        PDFPageViewSmall(PDFPage pdfPage, int i){
-           super();
-           pp3 = i;
-           page1 = pdfPage;
-           Rectangle2D r2d = pdfPage.getBBox();
-         //  Image pp2 = pdfPage.getImage(120, 200, r2d, null);
-           Image pp2 = pdfPage.getImage(
-                   120, 180, //width & height
-                   r2d, // clip rect
-                   null, // null for the ImageObserver
-                   true, // fill background with white
-                   true // block until drawing is done
-                   );
-          
-           this.setIcon(new ImageIcon(pp2));
-         
-              
-           this.addActionListener(new ActionListener(){
+        PDFPageViewSmall(PDFPage pdfPage, int i) {
+            super();
+            pp3 = i;
+            page1 = pdfPage;
+            Rectangle2D r2d = pdfPage.getBBox();
+            //  Image pp2 = pdfPage.getImage(120, 200, r2d, null);
+            Image pp2 = pdfPage.getImage(
+                    120, 180, //width & height
+                    r2d, // clip rect
+                    null, // null for the ImageObserver
+                    true, // fill background with white
+                    true // block until drawing is done
+            );
 
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                // TODO Auto-generated method stub
-                pageNum = pp3;
-                Image pp1 = pdfPage.getImage(
-                        width1, height1,
-                        r2d, // clip rect
-                        null, // null for the ImageObserver
-                        true, // fill background with white
-                        true // block until drawing is done
-                        );
-               
-                image.setPreferredSize(new Dimension (width1, height1));
-                image.setIcon(new ImageIcon(pp1));  
+            this.setIcon(new ImageIcon(pp2));
+
+
+            this.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    // TODO Auto-generated method stub
+                    pageNum = pp3;
+                    Image pp1 = pdfPage.getImage(
+                            width1, height1,
+                            r2d, // clip rect
+                            null, // null for the ImageObserver
+                            true, // fill background with white
+                            true // block until drawing is done
+                    );
+
+                    image.setPreferredSize(new Dimension(width1, height1));
+                    image.setIcon(new ImageIcon(pp1));
                 }
-           });
-           
+            });
+
         }
     }
-    
+
     // Variables declaration - do not modify                     
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel_Bottom;

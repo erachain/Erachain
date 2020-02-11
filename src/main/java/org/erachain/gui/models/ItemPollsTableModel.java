@@ -14,20 +14,22 @@ import java.util.Observer;
 
 @SuppressWarnings("serial")
 public class ItemPollsTableModel extends SortedListTableModelCls<Long, ItemCls> implements Observer {
-    public static final int COLUMN_NAME = 0;
-    public static final int COLUMN_VOTES = 2;
-    private static final int COLUMN_CREATOR = 1;
+    public static final int COLUMN_KEY = 0;
+    public static final int COLUMN_NAME = 1;
+    private static final int COLUMN_CREATOR = 2;
+    public static final int COLUMN_VOTES = 3;
     private AssetCls asset;
 
     private SortableList<Long, ItemCls> polls;
 
     public ItemPollsTableModel() {
         super(DCSet.getInstance().getItemPollMap(),
-                new String[]{"Name", "Creator", "Total Votes"}, true);
+                new String[]{"Key", "Name", "Creator", "Total Votes"}, true);
     }
 
     public void setAsset(AssetCls asset) {
         this.asset = asset;
+
         this.fireTableDataChanged();
     }
 
@@ -50,17 +52,13 @@ public class ItemPollsTableModel extends SortedListTableModelCls<Long, ItemCls> 
         PollCls poll = (PollCls) this.polls.get(row).getB();
 
         switch (column) {
+            case COLUMN_KEY:
+
+                return poll.getKey();
+
             case COLUMN_NAME:
 
-                String key = poll.getName();
-
-                //CHECK IF ENDING ON A SPACE
-                if (key.endsWith(" ")) {
-                    key = key.substring(0, key.length() - 1);
-                    key += ".";
-                }
-
-                return key;
+                return poll;
 
             case COLUMN_CREATOR:
 

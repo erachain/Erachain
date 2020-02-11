@@ -5,9 +5,12 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NumberAsString;
+import org.mapdb.Fun;
 
 import javax.swing.table.AbstractTableModel;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
 
 @SuppressWarnings("serial")
 public class ItemPollOptionsTableModel extends AbstractTableModel {
@@ -18,13 +21,15 @@ public class ItemPollOptionsTableModel extends AbstractTableModel {
     public static final int COLUMN_VOTES = 4;
     public static final int COLUMN_PERCENTAGE = 5;
     private String[] columnNames = Lang.getInstance().translate(
-            new String[]{"Number", "Name", "Persons", "% of Total", "Votes", "% of Total"});
+            new String[]{"Number", "Name", "Vote #P", "Vote % #P", "Share #Vote", "Share % #Vote"});
     private PollCls poll;
     private AssetCls asset;
+    private Fun.Tuple4<Integer, long[], BigDecimal, BigDecimal[]> votesWithPersons;
 
     public ItemPollOptionsTableModel(PollCls poll, AssetCls asset) {
         this.poll = poll;
         this.asset = asset;
+        votesWithPersons = poll.votesWithPersons(DCSet.getInstance(), asset.getKey(), 0);
     }
 
     @Override
@@ -59,35 +64,44 @@ public class ItemPollOptionsTableModel extends AbstractTableModel {
 
             case COLUMN_PERSONAL_VOTES:
 
-                //return NumberAsString.formatAsString(poll.getVotes(this.asset.getKey(DCSet.getInstance())));
-                return NumberAsString.formatAsString(poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance())));
+                //List<Long> personsVotes = this.poll.getPersonCountVotes(DCSet.getInstance());
+                //return personsVotes.get(row);
+
+                return votesWithPersons.b[row];
 
             case COLUMN_PERSONAL_PERCENTAGE:
 
-                BigDecimal total = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()));
-                BigDecimal votes = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()), row);
+                Long personVotes = votesWithPersons.b[row];
+                long totalPerson = votesWithPersons.a;
 
-                if (votes.compareTo(BigDecimal.ZERO) == 0) {
+                //long totalPerson = this.poll.getPersonCountTotalVotes(DCSet.getInstance());
+                //Long personVotes = this.poll.getPersonCountVotes(DCSet.getInstance()).get(row);
+
+                if (personVotes == 0 || totalPerson == 0) {
                     return "0 %";
                 }
 
-                return votes.divide(total, BigDecimal.ROUND_UP).multiply(BigDecimal.valueOf(100)).toPlainString() + " %";
+                return new BigDecimal(100000 * personVotes / totalPerson).movePointLeft(3).toPlainString() + " %";
 
             case COLUMN_VOTES:
 
-                //return NumberAsString.formatAsString(poll.getVotes(this.asset.getKey(DCSet.getInstance())));
-                return NumberAsString.formatAsString(poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance())));
+                //return NumberAsString.formatAsString(poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance())));
+                return votesWithPersons.d[row].setScale(asset.getScale()).toPlainString();
 
             case COLUMN_PERCENTAGE:
 
-                total = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()));
-                votes = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()), row);
+                //BigDecimal total = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()));
+                //BigDecimal votes = this.poll.getTotalVotes(DCSet.getInstance(), this.asset.getKey(DCSet.getInstance()), row);
 
-                if (votes.compareTo(BigDecimal.ZERO) == 0) {
+                BigDecimal votes = votesWithPersons.d[row];
+                BigDecimal total = votesWithPersons.c;
+
+                if (votes.compareTo(BigDecimal.ZERO) == 0
+                        || total.compareTo(BigDecimal.ZERO) == 0) {
                     return "0 %";
                 }
 
-                return votes.divide(total, BigDecimal.ROUND_UP).multiply(BigDecimal.valueOf(100)).toPlainString() + " %";
+                return BigDecimal.valueOf(100).multiply(votes).divide(total, 3, BigDecimal.ROUND_UP).toPlainString() + " %";
 
         }
 
@@ -96,6 +110,7 @@ public class ItemPollOptionsTableModel extends AbstractTableModel {
 
     public void setAsset(AssetCls asset) {
         this.asset = asset;
+        votesWithPersons = poll.votesWithPersons(DCSet.getInstance(), asset.getKey(), 0);
         this.fireTableDataChanged();
     }
 }

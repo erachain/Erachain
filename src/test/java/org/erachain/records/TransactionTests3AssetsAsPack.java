@@ -46,7 +46,7 @@ public class TransactionTests3AssetsAsPack {
     // INIT ASSETS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
             gb.process(db);
@@ -56,8 +56,8 @@ public class TransactionTests3AssetsAsPack {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
-        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
+        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         asset = new AssetVenture(maker, "a", icon, image, "a", 0, 8, 50000l);
         //key = asset.getKey();
@@ -212,7 +212,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(true, Arrays.equals(db.getItemAssetMap().get(key).toBytes(true, false), asset.toBytes(true, false)));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(true, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);
+        assertEquals(true, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.compareTo(new BigDecimal(asset.getQuantity())) == 0);
 
         //CHECK REFERENCE SENDER
         assertEquals(issueAssetTransaction.getSignature(), Transaction.FOR_NETWORK);
@@ -245,7 +245,7 @@ public class TransactionTests3AssetsAsPack {
         assertEquals(false, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.longValue());
+        assertEquals(0, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.longValue());
 
         //CHECK REFERENCE SENDER
         //assertEquals(issueAssetTransaction.getReference(), Transaction.FOR_NETWORK);
@@ -419,11 +419,11 @@ public class TransactionTests3AssetsAsPack {
         //CREATE SIGNATURE
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
         //Long maker_LastReference = Transaction.FOR_NETWORK;
-        Long recipient_LastReference = recipient.getLastTimestamp(db);
+        Long recipient_LastReference = recipient.getLastTimestamp(db)[0];
 
         //CREATE ASSET TRANSFER
         long key = 221;
-        maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, key, BigDecimal.valueOf(200).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         Transaction assetTransfer = new RSend(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), 0l);
         assetTransfer.sign(maker, asPack);
         assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
@@ -451,11 +451,11 @@ public class TransactionTests3AssetsAsPack {
         //CREATE SIGNATURE
         Account recipient = new Account("7MFPdpbaxKtLMWq7qvXU6vqTWbjJYmxsLW");
         //Long maker_LastReference = Transaction.FOR_NETWORK;
-        Long recipient_LastReference = recipient.getLastTimestamp(db);
+        Long recipient_LastReference = recipient.getLastTimestamp(db)[0];
 
         //CREATE ASSET TRANSFER
         long key = 1l;
-        maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         Transaction assetTransfer = new RSend(maker, recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), 0l);
         assetTransfer.sign(maker, asPack);
         assetTransfer.setDC(db, Transaction.FOR_NETWORK, 1, 1);
@@ -546,7 +546,7 @@ public class TransactionTests3AssetsAsPack {
         //CREATE INVALID CANCEL ORDER NO BALANCE
         DCSet fork = db.fork();
         cancelOrderTransaction = new CancelOrderTransaction(maker, new byte[]{5, 6}, FEE_POWER, System.currentTimeMillis(), 0l, new byte[]{1, 2});
-        maker.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO, false);
+        maker.changeBalance(fork, false, FEE_KEY, BigDecimal.ZERO, false, false);
 
         //CHECK IF CANCEL ORDER IS INVALID
         assertEquals(Transaction.NOT_ENOUGH_FEE, cancelOrderTransaction.isValid(Transaction.FOR_NETWORK, flags));
@@ -721,7 +721,7 @@ public class TransactionTests3AssetsAsPack {
 
         long key = 2l;
 
-        creator.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        creator.changeBalance(db, false, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         RSend r_Send = new RSend(
                 creator,
@@ -731,7 +731,7 @@ public class TransactionTests3AssetsAsPack {
                 "headdd", data,
                 new byte[]{1},
                 new byte[]{0},
-                maker.getLastTimestamp()
+                maker.getLastTimestamp()[0]
         );
         r_Send.setDC(db, Transaction.FOR_NETWORK, 1, 1);
         r_Send.sign(creator, asPack);

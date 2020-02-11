@@ -44,7 +44,7 @@ public class NameStorageTest {
     public void setup() {
         //Ed25519.load();
 
-        databaseSet = DCSet.createEmptyDatabaseSet();
+        databaseSet = DCSet.createEmptyDatabaseSet(0);
 
         // CREATE KNOWN ACCOUNT
         byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -61,14 +61,14 @@ public class NameStorageTest {
         //		.valueOf(1000), NTP.getTime());
         //transaction.process(databaseSet, false);
         //sender.setLastReference(genesisBlock.getGeneratorSignature(), databaseSet);
-        sender.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        sender.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
 
 
         // PROCESS GENESIS TRANSACTION TO MAKE SURE BUYER HAS FUNDS
         //transaction = new GenesisTransaction(buyer, BigDecimal.valueOf(1000)
         //		, NTP.getTime());
         //transaction.process(databaseSet, false);
-        buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        buyer.changeBalance(databaseSet, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
 
         // CREATE SIGNATURE
         long timestamp = NTP.getTime();
@@ -77,7 +77,7 @@ public class NameStorageTest {
         // CREATE NAME REGISTRATION
         Transaction nameRegistration = new RegisterNameTransaction(null,
                 sender, name, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         //nameRegistration.sign(sender);
 
 
@@ -106,7 +106,7 @@ public class NameStorageTest {
         // ADDING KEY COMPLETE WITH YES
         ArbitraryTransactionV3 arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -133,7 +133,7 @@ public class NameStorageTest {
         // ADDING KEY COMPLETE WITH YES
         arbitraryTransaction = new ArbitraryTransactionV3(
                 null, badSender, null, 10, data, (byte) 0,
-                timestamp, badSender.getLastTimestamp(databaseSet));
+                timestamp, badSender.getLastTimestamp(databaseSet)[0]);
 
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -167,7 +167,7 @@ public class NameStorageTest {
         // ADDING KEY COMPLETE WITH YES
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -187,7 +187,7 @@ public class NameStorageTest {
 
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -207,7 +207,7 @@ public class NameStorageTest {
 
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
@@ -237,7 +237,7 @@ public class NameStorageTest {
         // ADDING Skerberus as List key
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -256,7 +256,7 @@ public class NameStorageTest {
         // ADDING vrontis as List key
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -277,7 +277,7 @@ public class NameStorageTest {
         // removing skerberus as List key
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -303,7 +303,7 @@ public class NameStorageTest {
         // removing skerberus as List key
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -329,7 +329,7 @@ public class NameStorageTest {
         // removing skerberus as List key
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
@@ -348,7 +348,7 @@ public class NameStorageTest {
 
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -369,7 +369,7 @@ public class NameStorageTest {
 
         arbitraryTransaction = new ArbitraryTransactionV3(null, sender, null, 10,
                 data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
@@ -396,12 +396,12 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction);
 
         assertEquals(
                 "first",
@@ -416,12 +416,12 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
 
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction2);
 
         assertEquals(
                 "first second",
@@ -460,11 +460,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction);
 
         // After first tx
         // Profenable:yes
@@ -481,11 +481,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction2);
 
         // After second tx
         // Profenable:yes
@@ -502,11 +502,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction3);
 
         // After second tx
         // Profenable:yes
@@ -566,11 +566,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction);
 
         // After first tx
         // Profenable:yes
@@ -587,11 +587,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction2);
 
         // After second tx
         // Profenable:yes
@@ -608,11 +608,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction3);
 
         // After third tx
         // Profenable:yes
@@ -689,11 +689,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction);
 
         // After first tx
         // Profenable:yes
@@ -710,11 +710,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction2 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction2.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction2.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction2);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction2);
 
         // After second tx
         // Profenable:yes
@@ -731,11 +731,11 @@ public class NameStorageTest {
 
         ArbitraryTransaction arbitraryTransaction3 = new ArbitraryTransactionV3(
                 null, sender, null, 10, data, (byte) 0,
-                timestamp, sender.getLastTimestamp(databaseSet));
+                timestamp, sender.getLastTimestamp(databaseSet)[0]);
         arbitraryTransaction3.sign(sender, Transaction.FOR_NETWORK);
         arbitraryTransaction3.process(null, Transaction.FOR_NETWORK);
 
-        DCSet.getInstance().getTransactionMap().add(arbitraryTransaction3);
+        DCSet.getInstance().getTransactionTab().put(arbitraryTransaction3);
 
         // After third tx
         // Profenable:yes

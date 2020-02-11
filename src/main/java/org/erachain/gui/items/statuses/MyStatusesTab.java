@@ -34,7 +34,7 @@ public class MyStatusesTab extends SplitPanel {
         super("MyStatusesTab");
         tSP = this;
         setName(Lang.getInstance().translate("My Statuses"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -135,7 +135,7 @@ public class MyStatusesTab extends SplitPanel {
 
                 //	PersJSpline.setDividerLocation(PersJSpline.getDividerLocation());
                 tSP.jSplitPanel.setDividerLocation(tSP.jSplitPanel.getDividerLocation());
-                tSP.searchTextField_SearchToolBar_LeftPanel.setEnabled(true);
+                tSP.searchTextFieldSearchToolBarLeftPanelDocument.setEnabled(true);
             }
         });
         tSP.jScrollPaneJPanelRightPanel.setViewportView(info1);
@@ -224,7 +224,7 @@ public class MyStatusesTab extends SplitPanel {
     public void onChange(SplitPanel search_Status_SplitPanel, RowSorter sorter) {
         // filter
         // GET VALUE
-        String search = search_Status_SplitPanel.searchTextField_SearchToolBar_LeftPanel.getText();
+        String search = search_Status_SplitPanel.searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
         RowFilter<Object, Object> fooBarFilter;
         statusesModel.fireTableDataChanged();

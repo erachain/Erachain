@@ -9,8 +9,10 @@ import org.erachain.gui.library.MTable;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -20,6 +22,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class SearchStatementsSplitPanel extends SplitPanel {
@@ -37,7 +41,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
     public SearchStatementsSplitPanel() {
         super("SearchStatementsSplitPanel");
         setName(Lang.getInstance().translate("Search Statements"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         this.searchToolBar_LeftPanel.setVisible(true);
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
 
@@ -63,7 +67,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
-                searchTextField_SearchToolBar_LeftPanel.setText("");
+                searchTextFieldSearchToolBarLeftPanelDocument.setText("");
                 search_Table_Model.findByKey(key_Item.getText());
                 if (search_Table_Model.getRowCount() < 1)
                     return;
@@ -117,14 +121,14 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         // search_Table.setRowSorter(searchSorter);
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 // TODO Auto-generated method stub
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
                 jScrollPanelLeftPanel.setViewportView(null);
                 jScrollPaneJPanelRightPanel.setViewportView(null);
 
@@ -145,7 +149,7 @@ public class SearchStatementsSplitPanel extends SplitPanel {
                 new Thread() {
                     @Override
                     public void run() {
-                        search_Table_Model.setFilterByName(search);
+                        search_Table_Model.setFilterByName(search, null);
                         if (search_Table_Model.getRowCount() < 1) {
                             Label_search_Info_Panel.setText(Lang.getInstance().translate("Not Found Documents"));
                             jScrollPanelLeftPanel.setViewportView(search_Info_Panel);
@@ -176,20 +180,6 @@ public class SearchStatementsSplitPanel extends SplitPanel {
 
         JPopupMenu menu = new JPopupMenu();
 
-        JMenuItem set_Status_Item = new JMenuItem(Lang.getInstance().translate("Set status"));
-
-        set_Status_Item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // @SuppressWarnings("unused")
-                // PersonSetStatusDialog fm = new PersonSetStatusDialog(
-                // search_Table_Model.get_Statement(search_Table.convertRowIndexToModel(search_Table.getSelectedRow())));
-
-            }
-        });
-
-        // menu.add(set_Status_Item);
-
         JMenuItem vouch_Item = new JMenuItem(Lang.getInstance().translate("Vouch"));
 
         vouch_Item.addActionListener(new ActionListener() {
@@ -211,6 +201,35 @@ public class SearchStatementsSplitPanel extends SplitPanel {
         });
 
         menu.add(vouch_Item);
+
+        menu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTableJScrollPanelLeftPanel.getSelectedRow() < 0) {
+                    return;
+                }
+
+                Transaction transaction = search_Table_Model.getItem(jTableJScrollPanelLeftPanel
+                        .convertRowIndexToModel(jTableJScrollPanelLeftPanel.getSelectedRow()));
+                if (transaction == null) {
+                    return;
+                }
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?tx=" + transaction.viewHeightSeq()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        menu.add(setSeeInBlockexplorer);
 
         TableMenuPopupUtil.installContextMenu(jTableJScrollPanelLeftPanel, menu);
 

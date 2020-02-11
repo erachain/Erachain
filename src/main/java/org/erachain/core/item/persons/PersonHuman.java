@@ -13,8 +13,8 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.json.simple.JSONObject;
 import org.erachain.utils.ByteArrayUtils;
+import org.json.simple.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -49,7 +49,8 @@ public class PersonHuman extends PersonCls {
 
     public PersonHuman(byte[] typeBytes, PublicKeyAccount owner, String fullName, long birthday, long deathday,
                        byte gender, String race, float birthLatitude, float birthLongitude,
-                       String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image, String description, byte[] ownerSignature) {
+                       String skinColor, String eyeColor, String hairСolor, int height, byte[] icon, byte[] image,
+                       String description, byte[] ownerSignature) {
         super(typeBytes, owner, fullName, birthday, deathday,
                 gender, race, birthLatitude, birthLongitude,
                 skinColor, eyeColor, hairСolor, (byte) height, icon, image, description);
@@ -294,9 +295,9 @@ public class PersonHuman extends PersonCls {
                 || Arrays.equals(this.ownerSignature, new byte[Crypto.SIGNATURE_LENGTH]))
             return false;
 
-        if (dcSet.getBlocksHeadsMap().size() < 100000) {
+        if (dcSet.getBlocksHeadsMap().size() < BlockChain.SKIP_VALID_SIGN_BEFORE) {
             // for skip NOT VALID SIGNs
-            for (byte[] valid_item : Transaction.VALID_SIGN) {
+            for (byte[] valid_item : BlockChain.VALID_SIGN) {
                 if (Arrays.equals(this.reference, valid_item)) {
                     if (dcSet.getTransactionFinalMapSigns().contains(this.reference))
                         return false;

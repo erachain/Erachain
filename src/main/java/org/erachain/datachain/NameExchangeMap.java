@@ -2,7 +2,7 @@ package org.erachain.datachain;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.naming.NameSale;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.ReverseComparator;
 import org.mapdb.DB;
@@ -10,23 +10,26 @@ import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.NavigableSet;
 
 /**
  * для Имен - не используется в трнзакциях сейчас
  */
-public class NameExchangeMap extends DCMap<String, BigDecimal> {
+public class NameExchangeMap extends DCUMap<String, BigDecimal> {
     public static final int AMOUNT_INDEX = 1;
 
     public NameExchangeMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_NAME_SALE_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_NAME_SALE_TYPE);
         }
     }
 
@@ -36,7 +39,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
 
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
 
         if (Controller.getInstance().onlyProtocolIndexing)
             // NOT USE SECONDARY INDEXES
@@ -60,20 +63,19 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
     }
 
     @Override
-    protected Map<String, BigDecimal> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("namesales")
-                .counterEnable()
+        map = database.createTreeMap("namesales")
                 .makeOrGet();
     }
 
     @Override
-    protected Map<String, BigDecimal> getMemoryMap() {
-        return new HashMap<String, BigDecimal>();
+    protected void getMemoryMap() {
+        map = new HashMap<String, BigDecimal>();
     }
 
     @Override
-    protected BigDecimal getDefaultValue() {
+    public BigDecimal getDefaultValue() {
         return BigDecimal.ZERO;
     }
 
@@ -93,10 +95,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
 
             if (this.deleted != null) {
                 //DELETE DELETED
-                for (String deleted : this.deleted) {
-                    nameSales.remove(deleted);
-                }
-
+                nameSales.removeAll(deleted.keySet());
             }
         }
 
@@ -108,7 +107,7 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
     }
 
     public void add(NameSale nameSale) {
-        this.set(nameSale.getKey(), nameSale.getAmount());
+        this.put(nameSale.getKey(), nameSale.getAmount());
     }
 
     public boolean contains(NameSale nameSale) {
@@ -116,6 +115,6 @@ public class NameExchangeMap extends DCMap<String, BigDecimal> {
     }
 
     public void delete(NameSale nameSale) {
-        this.delete(nameSale.getKey());
+        this.remove(nameSale.getKey());
     }
 }

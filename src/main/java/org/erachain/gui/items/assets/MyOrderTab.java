@@ -1,12 +1,10 @@
 package org.erachain.gui.items.assets;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
@@ -42,7 +40,7 @@ public class MyOrderTab extends SplitPanel {
     public MyOrderTab() {
         super("MyOrderTab");
         this.setName(Lang.getInstance().translate("My Orders"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -100,7 +98,7 @@ public class MyOrderTab extends SplitPanel {
         jScrollPanelLeftPanel.setViewportView(jTableJScrollPanelLeftPanel);
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
                 onChange();
@@ -242,7 +240,7 @@ public class MyOrderTab extends SplitPanel {
                 jTableJScrollPanelLeftPanel.setRowSelectionInterval(row, row);
 
                 Order order = ordersModel.getItem(row).b;
-                if (order.state() == "Active")
+                if (order.isActive(DCSet.getInstance()))
                     orderMenu.getComponent(2).setEnabled(true);
                 else
                     orderMenu.getComponent(2).setEnabled(false);

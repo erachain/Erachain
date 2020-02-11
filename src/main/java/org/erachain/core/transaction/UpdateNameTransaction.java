@@ -178,7 +178,7 @@ public class UpdateNameTransaction extends Transaction {
         }
 
         //CHECK CREATOR
-        if (!Crypto.getInstance().isValidAddress(this.name.getOwner().getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.name.getOwner().getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 
@@ -210,7 +210,7 @@ public class UpdateNameTransaction extends Transaction {
 
         //SET ORPHAN DATA
         Name oldName = this.dcSet.getNameMap().get(this.name.getName());
-        this.dcSet.getUpdateNameMap().set(this, oldName);
+        this.dcSet.getUpdateNameMap().put(this, oldName);
 
         //INSERT INTO DATABASE
         this.dcSet.getNameMap().add(this.name);

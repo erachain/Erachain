@@ -19,6 +19,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.nio.charset.StandardCharsets;
 
+import static org.erachain.core.BlockChain.MAX_REC_DATA_BYTES;
+
 @Path("rec_statement")
 @Produces(MediaType.APPLICATION_JSON)
 public class RecStatementResource {
@@ -81,7 +83,7 @@ public class RecStatementResource {
                     }
                 }
 
-                if (messageBytes.length > 4000) {
+                if (messageBytes.length > MAX_REC_DATA_BYTES) {
                     throw ApiErrorFactory.getInstance().createError(
                             Transaction.INVALID_DATA_LENGTH);
                 }

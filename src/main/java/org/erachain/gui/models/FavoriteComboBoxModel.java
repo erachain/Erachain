@@ -2,20 +2,14 @@ package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
-import org.erachain.core.item.assets.AssetCls;
-import org.erachain.database.DBMap;
 import org.erachain.database.wallet.FavoriteItemMap;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.items.TypeOfImage;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -39,7 +33,7 @@ public abstract class FavoriteComboBoxModel extends DefaultComboBoxModel<ItemCls
     public FavoriteComboBoxModel(int item_type) {
         this.item_type = item_type;
 
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         addObservers();
     }
 

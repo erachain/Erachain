@@ -466,14 +466,14 @@ public abstract class ATController {
                 if (tx.getRecipientId() != null && !Arrays.equals(tx.getRecipientId(), new byte[ATConstants.AT_ID_SIZE])) {
                     Account recipient = new Account(Base58.encode(tx.getRecipientId()));
                     if (false && recipient.getLastTimestamp(dcSet) == null) {
-                        recipient.setLastTimestamp(-1L, dcSet);
+                        recipient.setLastTimestamp(new long[]{0L, 0L}, dcSet);
                     }
                     //recipient.setBalance( Transaction.FEE_KEY, recipient.getBalance( dcSet, Transaction.FEE_KEY ).add( BigDecimal.valueOf( tx.getAmount()) ) , dcSet );
                 } else {
                     totalFees += tx.getAmount();
                 }
                 //sender.setBalance( Transaction.FEE_KEY, sender.getBalance( dcSet, Transaction.FEE_KEY ).subtract( BigDecimal.valueOf( tx.getAmount() ) ) , dcSet );
-                sender.changeBalance(dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf(tx.getAmount()), false);
+                sender.changeBalance(dcSet, true, Transaction.FEE_KEY, BigDecimal.valueOf(tx.getAmount()), false, false);
                 LOGGER.trace("Sender:" + sender.getAddress() + " total balance:" + sender.getBalance(dcSet, Transaction.FEE_KEY));
             }
 

@@ -49,7 +49,7 @@ public class TestRecHash {
     // INIT
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
 
         gb = new GenesisBlock();
         try {
@@ -60,8 +60,8 @@ public class TestRecHash {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
-        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
+        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
     }
 
@@ -72,14 +72,14 @@ public class TestRecHash {
 
         init();
 
-        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
+        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
         hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CHECK IF ISSUE PLATE TRANSACTION IS VALID
         assertEquals(true, hashesRecord.isSignatureValid(db));
 
         //INVALID SIGNATURE
-        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db), new byte[64]);
+        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0], new byte[64]);
 
         //CHECK IF ISSUE PLATE IS INVALID
         assertEquals(false, hashesRecord.isSignatureValid(db));
@@ -92,7 +92,7 @@ public class TestRecHash {
         init();
 
 
-        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
+        hashesRecord = new RHashes(maker, FEE_POWER, url, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
         hashesRecord.sign(maker, Transaction.FOR_NETWORK);
 
         //CONVERT TO BYTES
@@ -149,7 +149,7 @@ public class TestRecHash {
         byte[] hash0 = maker.getPublicKey();
         hashes[0] = hash0;
 
-        hashesRecord = new RHashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db));
+        hashesRecord = new RHashes(maker, FEE_POWER, null, data, hashes, timestamp + 10, maker.getLastTimestamp(db)[0]);
         hashesRecord.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(Transaction.VALIDATE_OK, hashesRecord.isValid(Transaction.FOR_NETWORK, flags));

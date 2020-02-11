@@ -67,12 +67,17 @@ public class API {
 
         Map help = new LinkedHashMap();
 
+        help.put("see /apiasset", "Help for assets API");
         help.put("see /apidocuments", "Help for documents API");
         help.put("see /apiperson", "Help for person API");
         help.put("see /apipoll", "Help for polls API");
         help.put("see /apitelegrams", "Help for telegrams API");
         help.put("see /apiexchange", "Help for exchange API");
         help.put("see /apirecords", "Help for transactions API");
+
+        help.put("*** BALANCE SYSTEM ***", "");
+        help.put("bal 1", "Balance Components - {Total_Income, Remaining_Balance]");
+        help.put("bal 2", "Balances Array - [Balance in Own, Balance in Debt, Balance on Hold, Balance of Consumer]");
 
         help.put("*** CHAIN ***", "");
         help.put("GET Height", "height");
@@ -124,6 +129,7 @@ public class API {
 
         help.put("*** PERSON ***", "");
         help.put("GET Person Height", "personheight");
+        help.put("GET Person Key by PubKey of Owner", "personkeybyownerpublickey/{publickey}");
         help.put("GET Person", "person/{key}");
         help.put("GET Person Data", "persondata/{key}");
         help.put("GET Person Key by Address", "personkeybyaddress/{address}");
@@ -140,6 +146,7 @@ public class API {
         help.put("*** TOOLS ***", "");
         help.put("POST Verify Signature for JSON {'message': ..., 'signature': Base58, 'publickey': Base58)", "verifysignature");
         help.put("GET info by node", " GET api/info");
+        help.put("GET benchmark info by node", " GET api/bench");
 
         help.put("POST Broadcast", "/broadcast JSON {raw=raw(BASE58)}");
         help.put("GET Broadcast", "/broadcast/{raw(BASE58)}");
@@ -164,9 +171,11 @@ public class API {
     @GET
     @Path("firstblock")
     public Response getFirstBlock() {
-        Map out = new LinkedHashMap();
+        //Map out = new LinkedHashMap();
 
-        out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+        //JSONObject out = Controller.getInstance().getBlockChain().getGenesisBlock().toJson();
+
+        JSONObject out = dcSet.getBlockMap().get(1).toJson();
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -241,7 +250,7 @@ public class API {
             ++step;
             Integer heightWT = dcSet.getBlockSignsMap().get(signatureBytes);
             if (heightWT != null && heightWT > 0) {
-                out = dcSet.getBlockMap().get(heightWT + 1).toJson();
+                out = dcSet.getBlockMap().getAndProcess(heightWT + 1).toJson();
             } else {
                 out.put("message", "signature not found");
             }
@@ -339,7 +348,6 @@ public class API {
     }
 
     @GET
-    // 		this.getIterator(23, true)
     @Path("blockbyheight2/{height}")
     public Response blockByHeight2(@PathParam("height") String heightStr) {
 
@@ -394,7 +402,8 @@ public class API {
         if (limit > 30)
             limit = 30;
 
-        Map out = new LinkedHashMap();
+        //Map out = new LinkedHashMap();
+        JSONObject out = new JSONObject();
         int step = 1;
 
         try {
@@ -402,12 +411,12 @@ public class API {
             JSONArray array = new JSONArray();
             BlockMap blockMap = dcSet.getBlockMap();
             int max = blockMap.size();
-            for (int i = height; i < height + limit + 1; ++i) {
-                if (height >= max) {
+            for (int i = height; i < height + limit; i++) {
+                if (i > max) {
                     out.put("end", 1);
                     break;
                 }
-                array.add(blockMap.get(i));
+                array.add(blockMap.getAndProcess(i));
             }
             out.put("blocks", array);
 
@@ -425,7 +434,7 @@ public class API {
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(StrJSonFine.convert(out))
+                .entity(out.toString())
                 .build();
     }
 
@@ -445,8 +454,8 @@ public class API {
             JSONArray array = new JSONArray();
             BlocksHeadsMap blocksHeadsMap = dcSet.getBlocksHeadsMap();
             int max = dcSet.getBlockMap().size();
-            for (int i = height; i < height + limit + 1; ++i) {
-                if (height >= max) {
+            for (int i = height; i < height + limit; i++) {
+                if (i > max) {
                     out.put("end", 1);
                     break;
                 }
@@ -479,7 +488,7 @@ public class API {
 
     @POST
     @Path("recordparse")
-    public Response recordParse(@QueryParam("raw") String raw) // throws JSONException
+    public Response recordParse(String raw) // throws JSONException
     {
 
         JSONObject out = new JSONObject();
@@ -696,11 +705,24 @@ public class API {
     }
 
     @POST
-    @Path("broadcast")
+    @Path("broadcastjson")
     public Response broadcastFromRawPost(@Context HttpServletRequest request,
                                          MultivaluedMap<String, String> form) {
 
         String raw = form.getFirst("raw");
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(broadcastFromRaw_1(raw)))
+                .build();
+
+    }
+
+    @POST
+    @Path("broadcast")
+    public Response broadcastFromRawPost(@Context HttpServletRequest request,
+                                         String raw) {
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -738,7 +760,6 @@ public class API {
         }
     }
 
-    // http://127.0.0.1:9047/api/broadcastTelegram1?data=DPDnFCNvPk4m8GMi2ZprirSgQDwxuQw4sWoJA3fmkKDrYwddTPtt1ucFV4i45BHhNEn1W1pxy3zhRfpxKy6fDb5vmvQwwJ3M3E12jyWLBJtHRYPLnRJnK7M2x5MnPbvnePGX1ahqt7PpFwwGiivP1t272YZ9VKWWNUB3Jg6zyt51fCuyDCinLx4awQPQJNHViux9xoGS2c3ph32oi56PKpiyM
     public JSONObject broadcastTelegram_1(String rawDataBase58) {
         JSONObject out = new JSONObject();
         byte[] transactionBytes;
@@ -765,10 +786,12 @@ public class API {
             return out;
         }
 
-        if (Controller.getInstance().broadcastTelegram(transaction, true)) {
+        int status = Controller.getInstance().broadcastTelegram(transaction, true);
+        if (status == 0) {
             out.put("status", "ok");
         } else {
-            out.put("status", "exist");
+            out.put("status", "error");
+            out.put("error", OnDealClick.resultMess(status));
         }
         out.put("signature", Base58.encode(transaction.getSignature()));
         return out;
@@ -789,7 +812,7 @@ public class API {
     }
 
     @POST
-    @Path("broadcasttelegram")
+    @Path("broadcasttelegramjson")
     public Response broadcastTelegramPost(@Context HttpServletRequest request,
                                           MultivaluedMap<String, String> form) {
 
@@ -803,9 +826,23 @@ public class API {
 
     }
 
+    @POST
+    @Path("broadcasttelegram")
+    public Response broadcastTelegramPost(@Context HttpServletRequest request,
+                                          String raw) {
+
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(StrJSonFine.convert(broadcastTelegram_1(raw)))
+                .build();
+
+    }
+
     /*
      * ********** ADDRESS **********
      */
+    // TODO перименовать бы LastTimestamp - так более понятно
     @GET
     @Path("addresslastreference/{address}")
     public Response getAddressLastReference(@PathParam("address") String address) {
@@ -820,13 +857,13 @@ public class API {
         // GET ACCOUNT
         Account account = new Account(address);
 
-        Long lastTimestamp = account.getLastTimestamp();
+        long[] lastTimestamp = account.getLastTimestamp();
 
         String out;
         if (lastTimestamp == null) {
             out = "-";
         } else {
-            out = "" + lastTimestamp;
+            out = "" + lastTimestamp[0];
         }
 
         return Response.status(200)
@@ -941,7 +978,7 @@ public class API {
                 .header("Access-Control-Allow-Origin", "*")
                 .entity("" + BlockChain.calcWinValue(DCSet.getInstance(),
                         account, Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()),
-                        account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue()))
+                        account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue(), null))
                 .build();
     }
 
@@ -977,7 +1014,8 @@ public class API {
 
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = dcSet.getAssetBalanceMap().get(address, assetAsLong);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = dcSet.getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
         JSONArray array = new JSONArray();
 
         array.add(setJSONArray(balance.a));
@@ -1004,20 +1042,28 @@ public class API {
 
         }
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        Account account = new Account(address);
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(account);
 
         JSONObject out = new JSONObject();
 
-        for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>>
+                assetsBalance : assetsBalances) {
             JSONArray array = new JSONArray();
-            JSONObject a = new JSONObject();
-            array.add(setJSONArray(assetsBalance.getB().a));
+            long assetKey = ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.getA());
+
+            if (BlockChain.ERA_COMPU_ALL_UP) {
+                array.add(setJSONArray(account.balAaddDEVAmount(assetKey, assetsBalance.getB().a)));
+            } else {
+                array.add(setJSONArray(assetsBalance.getB().a));
+            }
             array.add(setJSONArray(assetsBalance.getB().b));
             array.add(setJSONArray(assetsBalance.getB().c));
             array.add(setJSONArray(assetsBalance.getB().d));
             array.add(setJSONArray(assetsBalance.getB().e));
-            out.put(assetsBalance.getA().b, array);
+            out.put(assetKey, array);
         }
 
         return Response.status(200)
@@ -1136,17 +1182,11 @@ public class API {
     public Response asset(@PathParam("key") long key) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        // DOES ASSETID EXIST
-        if (!map.contains(key)) {
-            throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_ASSET_NOT_EXIST);
-        }
 
         AssetCls asset = (AssetCls) map.get(key);
         if (asset == null) {
-
-
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
         }
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -1161,14 +1201,12 @@ public class API {
     public Response assetData(@PathParam("key") long key) {
 
         ItemAssetMap map = DCSet.getInstance().getItemAssetMap();
-        // DOES ASSETID EXIST
-        if (!map.contains(key)) {
-            throw ApiErrorFactory.getInstance().createError(
-                    //ApiErrorFactory.ERROR_INVALID_ASSET_ID);
-                    Transaction.ITEM_ASSET_NOT_EXIST);
-        }
 
         AssetCls asset = (AssetCls) map.get(key);
+        if (asset == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    Transaction.ITEM_ASSET_NOT_EXIST);
+        }
 
         return Response.status(200)
                 .header("Content-Type", "application/json; charset=utf-8")
@@ -1296,22 +1334,24 @@ public class API {
         */
 
         JSONArray arraySell = new JSONArray();
-        List<Order> orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(have, want, false);
+        List<Order> orders = this.dcSet.getOrderMap().getOrdersForTrade(have, want, false);
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
-            itemJson.add(order.getPrice());
+            itemJson.add(order.calcLeftPrice());
+            itemJson.add(order.getAmountWantLeft());
 
             arraySell.add(itemJson);
 
         }
 
         JSONArray arrayBuy = new JSONArray();
-        orders = this.dcSet.getOrderMap().getOrdersForTradeWithFork(want, have, false);
+        orders = this.dcSet.getOrderMap().getOrdersForTrade(want, have, false);
         for (Order order : orders) {
             JSONArray itemJson = new JSONArray();
             itemJson.add(order.getAmountHaveLeft());
-            itemJson.add(order.calcPriceReverse()); // REVERSE
+            itemJson.add(order.calcLeftPriceReverse()); // REVERSE
+            itemJson.add(order.getAmountWantLeft());
 
             arrayBuy.add(itemJson);
 
@@ -1518,7 +1558,7 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
 
         if (personItem == null) {
             throw ApiErrorFactory.getInstance().createError(
@@ -1637,7 +1677,7 @@ public class API {
 
         PublicKeyAccount publicKeyAccount = new PublicKeyAccount(publicKey);
 
-        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
+        Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getShortAddressBytes());
         //Tuple4<Long, Integer, Integer, Integer> personItem = DCSet.getInstance().getAddressPersonMap().getItem(publicKeyAccount.getAddress());
 
         if (personItem == null) {
@@ -1770,6 +1810,12 @@ public class API {
      * ************* TOOLS **************
      */
 
+    /**
+     * wiury2876rw7yer8923y63riyrf9287y6r87wyr9737yriwuyr3yr978ry48732y3rsiouyvbkshefiuweyriuwer
+     * {"trtr": 293847}
+     * @param x
+     * @return
+     */
     @POST
     @Path("verifysignature")
     public Response verifysignature(String x) {
@@ -1850,4 +1896,15 @@ public class API {
                 .entity(jsonObject.toJSONString())
                 .build();
     }
+
+    @GET
+    @Path("bench")
+    public Response getSpeedInfo() {
+        return Response.status(200)
+                .header("Content-Type", "application/json; charset=utf-8")
+                .header("Access-Control-Allow-Origin", "*")
+                .entity(Controller.getInstance().getBenchmarks().toJSONString())
+                .build();
+    }
+
 }

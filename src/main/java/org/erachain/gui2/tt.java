@@ -1,22 +1,15 @@
 package org.erachain.gui2;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.erachain.core.BlockChain;
+import org.erachain.lang.Lang;
 
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-
-import org.erachain.core.BlockChain;
-import org.erachain.lang.Lang;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * @author DarkRaha
@@ -51,9 +44,9 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         DefaultMutableTreeNode other_Node = new DefaultMutableTreeNode(Lang.getInstance().translate("Network DashBoard"));
         DefaultMutableTreeNode bank_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Bank"));
         DefaultMutableTreeNode telegrams_Tree = new DefaultMutableTreeNode(Lang.getInstance().translate("Telegrams"));
-        
 
-        if (BlockChain.DEVELOP_USE)
+
+        if (BlockChain.TEST_MODE)
             root.add(bank_Tree);
 
         root.add(account_Node);
@@ -64,16 +57,16 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         root.add(templates_Node);
         root.add(statuses_Node);
 
-        if (BlockChain.DEVELOP_USE)
+        if (BlockChain.TEST_MODE)
             root.add(unions_Node);
 
         root.add(polls_Node);
 
-        if (BlockChain.DEVELOP_USE)
+        if (BlockChain.TEST_MODE)
             root.add(hashes_Node);
-        if (BlockChain.DEVELOP_USE)
+        if (BlockChain.TEST_MODE)
             root.add(linked_hashes_Node);
-        if (BlockChain.DEVELOP_USE)
+        if (BlockChain.TEST_MODE)
             root.add(telegrams_Tree);
         
         root.add(records_Node);
@@ -137,7 +130,7 @@ public class tt extends JPanel { // implements TreeSelectionListener {
         records_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Unconfirmed Records")));
 
         other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Other")));
-        if (BlockChain.DEVELOP_USE)
+        if (BlockChain.TEST_MODE)
             other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Wallets Manager")));
         
         other_Node.add(new DefaultMutableTreeNode(Lang.getInstance().translate("Console")));

@@ -1,25 +1,21 @@
 package org.erachain.gui.items.accounts;
 
-import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
-import org.erachain.core.account.PrivateKeyAccount;
-import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.*;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.TransactionMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.ObserverWaiter;
-import org.erachain.gui.models.SortedListTableModelCls;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.lang.Lang;
-import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 ////////
 
@@ -133,17 +129,18 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
 
         if (this.sender == null || this.asset == null)
             return;
 
+        /// WALLET addesses
         Iterator<Tuple2<Long, Long>> keysIterator = ((TransactionMap) map).getAddressDescendingIterator(this.sender);
 
         list = new ArrayList<>();
 
         int counter = 0;
-        while (keysIterator.hasNext() && counter < 333) {
+        while (keysIterator.hasNext() && counter < 999) {
             Tuple2<Long, Long> key = keysIterator.next();
             Transaction transaction = ((Tuple2<Long, Transaction>) map.get(key)).b;
             if (trans_Parse(transaction)) {
@@ -165,6 +162,14 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
                 // все для Компушек
                 && this.asset.getKey() != Transaction.FEE_KEY)
             return false;
+
+        if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+            RCalculated tx = (RCalculated) transaction;
+            String mess = tx.getMessage();
+            if (mess != null && mess.equals("forging")) {
+                return false;
+            }
+        }
 
         Trans trr = new Trans();
         if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
@@ -203,7 +208,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             if (gen_send.getCreator() != null) cr = gen_send.getCreator().getAddress();
             // if is owner
             String own = "";
-            if (gen_send.getOwner() != null) own = gen_send.getOwner().getAddress();
+            if (gen_send.getCreator() != null) own = gen_send.getCreator().getAddress();
 
             trr.key = gen_send.getKey();
             trr.transaction = gen_send;
@@ -216,7 +221,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             // if is creator
             if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
             // if is owner
-            if (gen_send.getOwner() != null) trr.owner = gen_send.getOwner();
+            if (gen_send.getCreator() != null) trr.owner = gen_send.getCreator();
             trr.recipient = gen_send.viewRecipient();
 
         } else if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
@@ -234,7 +239,7 @@ public class AccountsTransactionsTableModel extends TimerTableModelCls<AccountsT
             trr.key = createOrder.getKey();
             trr.owner = createOrder.getCreator();
             trr.transaction = createOrder;
-            trr.amount = createOrder.getAmount();
+            trr.amount = createOrder.getAmount().negate();
             trr.recipient = "" + createOrder.getWantKey();
             trr.title = ""+ createOrder.getAmountWant().toPlainString();
 

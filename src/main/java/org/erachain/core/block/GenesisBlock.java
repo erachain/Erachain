@@ -1,19 +1,10 @@
 package org.erachain.core.block;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.mapdb.Fun.Tuple2;
-
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
@@ -26,18 +17,20 @@ import org.erachain.core.item.statuses.Status;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.item.templates.Template;
 import org.erachain.core.item.templates.TemplateCls;
-import org.erachain.core.transaction.GenesisCertifyPersonRecord;
-import org.erachain.core.transaction.GenesisIssueAssetTransaction;
-import org.erachain.core.transaction.GenesisIssueStatusRecord;
-import org.erachain.core.transaction.GenesisIssueTemplateRecord;
-import org.erachain.core.transaction.GenesisTransferAssetTransaction;
-import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun.Tuple2;
+
+import java.io.File;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 // import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+
 //import org.erachain.core.item.assets.AssetCls;
 
 public class GenesisBlock extends Block {
@@ -68,7 +61,7 @@ public class GenesisBlock extends Block {
         // ISSUE ITEMS
         this.initItems();
 
-        if (genesisTimestamp != BlockChain.DEFAULT_MAINNET_STAMP) {
+        if (false && genesisTimestamp != Settings.DEFAULT_MAINNET_STAMP) {
             this.testnetInfo = "";
 
             //ADD TESTNET GENESIS TRANSACTIONS
@@ -96,13 +89,17 @@ public class GenesisBlock extends Block {
 				 */
 
 
-                //CREATE ISSUE PERSON TRANSACTION
-                //this.addTransaction(new GenesisIssuePersonRecord(user));
+                if (false) {
+                    //CREATE ISSUE PERSON TRANSACTION
+                    ////this.addTransaction(new GenesisIssuePersonRecord(user));
 
-                // CERTIFY PERSON
-                transactions.add(new GenesisCertifyPersonRecord(recipient, nonce++));
+                    // CERTIFY PERSON
+                    // TODO: тут ошибка сериализации транзакции - поидее нужно проверить и чтобы она работала
+                    // а лучше разрешить создание персон и так
+                    transactions.add(new GenesisCertifyPersonRecord(recipient, nonce++));
 
-                this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address + " / POST addresses " + Base58.encode(accountSeed);
+                    this.testnetInfo += "\ngenesisAccount(" + String.valueOf(nonce) + "): " + address + " / POST addresses " + Base58.encode(accountSeed);
+                }
 
                 // SEND GENESIS ASSETS
                 transactions.add(new GenesisTransferAssetTransaction(recipient, AssetCls.ERA_KEY, bdAmount0));
@@ -169,7 +166,7 @@ public class GenesisBlock extends Block {
                     ////
                     Arrays.asList("7Mr6qTY2vN1int3Byo6NmZQDRmH7zuLEZ7", "1800"),
                     Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
-                    Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"),
+                    Arrays.asList("7J1S62H1YrVhPcLibcUtA2vFACMtiLakMA", "1289.69596627"), // двойная запись она по сингнатуре не ищется - 1-43 - 1-44
                     Arrays.asList("73igNXcJbLZxoM989B2yj4214oztMHoLGc", "43.84966285"),
                     Arrays.asList("7A9FFw3mQfDrP9y8WCifrZ3pvsKwerkMLr", "1289.69596627"),
                     Arrays.asList("7QqeSR442vstwcf5Hzm3t2pWgqupQNxRTv", "257.93919325"),
@@ -464,7 +461,8 @@ public class GenesisBlock extends Block {
 
         //GENERATE AND VALIDATE TRANSACTIONS
         this.transactionCount = transactions.size();
-        this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
+
+        makeTransactionsRAWandHASH();
 
         // SIGN simple as HASH
         this.signature = generateHeadHash();
@@ -515,7 +513,7 @@ public class GenesisBlock extends Block {
         switch (key) {
             case (int) TemplateCls.LICENSE_KEY:
                 String license = "";
-                if(!(BlockChain.TESTS_VERS!=0 && BlockChain.DEVELOP_USE==true)) {
+                if (!(BlockChain.TESTS_VERS != 0 && BlockChain.TEST_MODE)) {
                     try {
                         //File file = new File("License Erachain.txt");
                         File file = new File("Erachain Licence Agreement (genesis).txt");
@@ -749,7 +747,7 @@ public class GenesisBlock extends Block {
         if (false) {
             AssetVenture item = new AssetVenture(CREATOR, AssetCls.LIA_NAME, null, null, AssetCls.LIA_DESCR, AssetCls.AS_ACCOUNTING, 0, 0l);
             item.setReference(this.signature);
-            dcSet.getItemAssetMap().set(AssetCls.LIA_KEY, item);
+            dcSet.getItemAssetMap().put(AssetCls.LIA_KEY, item);
         }
 
     }
@@ -757,7 +755,7 @@ public class GenesisBlock extends Block {
     public void orphan(DCSet dcSet) throws Exception {
 
         if (false)
-            dcSet.getItemAssetMap().delete(AssetCls.LIA_KEY);
+            dcSet.getItemAssetMap().remove(AssetCls.LIA_KEY);
 
         super.orphan(dcSet);
 

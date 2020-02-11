@@ -1,6 +1,4 @@
 package org.erachain.settings;
-// 17/03 Qj1vEeuz7iJADzV2qrxguSFGzamZiYZVUP
-// 30/03 ++
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -27,38 +25,43 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-//import java.util.Arrays;
-// import org.slf4j.LoggerFactory;
-
 public class Settings {
+
+    public static final long DEFAULT_MAINNET_STAMP = 1487844793333L;
+    public static final long DEFAULT_DEMO_NET_STAMP = 1581001700000L; // default for developers test net
+
+    // FOR TEST by default
+    public static long genesisStamp = DEFAULT_MAINNET_STAMP;
+
     //private static final String[] DEFAULT_PEERS = { };
     public static final String DEFAULT_THEME = "System";
     public static final int DEFAULT_ACCOUNTS = 1;
     //DATA
     public static final String DEFAULT_DATA_DIR = "datachain";
     public static final String DEFAULT_LOCAL_DIR = "datalocal";
+    public static final String DEFAULT_DATATEMP_DIR = "datatemp";
     public static final String DEFAULT_WALLET_DIR = "walletKeys";
     private static final String DEFAULT_DATAWALET_DIR = "dataWallet";
     public static final String DEFAULT_BACKUP_DIR = "backup";
     public static final String DEFAULT_TEMP_DIR = "temp";
-    public static final String DEFAULT_TELEGRAM_DIR = "telegram";
+    public static final String DEFAULT_TELEGRAM_DIR = "datatele";
     private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
     //NETWORK
-    private static final int DEFAULT_MIN_CONNECTIONS = 10; // for OWN maked connections
+    private static final int DEFAULT_MIN_CONNECTIONS = 10; // for OWN connections
     private static final int DEFAULT_MAX_CONNECTIONS = 100;
+    private static final boolean DEFAULT_LOCAL_PEER_SCANNER = false;
     // EACH known PEER may send that whit peers to me - not white peer may be white peer for me
     private static final int DEFAULT_MAX_RECEIVE_PEERS = 100;
     private static final int DEFAULT_MAX_SENT_PEERS = DEFAULT_MAX_RECEIVE_PEERS;
     // BLOCK
     //public static final int BLOCK_MAX_SIGNATURES = 100; // blocks load onetime
     private static final int DEFAULT_CONNECTION_TIMEOUT = 20000;
-    private static final int DEFAULT_PING_INTERVAL = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
     private static final boolean DEFAULT_TRYING_CONNECT_TO_BAD_PEERS = true;
     private static final Integer DEFAULT_FONT_SIZE = 11;
     private static final String DEFAULT_FONT_NAME = "Arial";
     //RPC
     private static final String DEFAULT_RPC_ALLOWED = "127.0.0.1"; // localhost = error in accessHandler.setWhite(Settings.getInstance().getRpcAllowed());
-    private static final boolean DEFAULT_RPC_ENABLED = false;
+    private static final boolean DEFAULT_RPC_ENABLED = false; //
     private static final boolean DEFAULT_BACUP_ENABLED = false;
     private static final boolean DEFAULT_BACKUP_ASK_ENABLED = false;
     //GUI CONSOLE
@@ -98,11 +101,10 @@ public class Settings {
     public static final int TELEGRAM_STORE_PERIOD = 5; // in days
 
 
-
     private static Settings instance;
+
     List<Peer> cacheInternetPeers;
     long timeLoadInternetPeers;
-    private long genesisStamp = -1;
     private JSONObject settingsJSON;
     private JSONObject peersJSON;
     private String userPath = "";
@@ -118,7 +120,7 @@ public class Settings {
     private String telegramDefaultReciever;
     private String telegramRatioReciever = null;
     private String getTelegramPath;
-    
+
     private String telegramtPath;
 
     private Settings() {
@@ -155,7 +157,7 @@ public class Settings {
         }
     }
 
-    public static Settings getInstance() {
+    public synchronized static Settings getInstance() {
         ReentrantLock lock = new ReentrantLock();
         lock.lock();
         try {
@@ -169,10 +171,8 @@ public class Settings {
         return instance;
     }
 
-    public static void FreeInstance() {
-        if (instance != null) {
-            instance = null;
-        }
+    public synchronized static void freeInstance() {
+        instance = null;
     }
 
     public JSONObject Dump() {
@@ -194,7 +194,7 @@ public class Settings {
     }
 
     public String getPeersPath() {
-        return this.userPath + (BlockChain.DEVELOP_USE ? "peers-dev.json" : "peers.json");
+        return this.userPath + (isTestNet() ? "peers-demo.json" : "peers.json");
     }
 
     public String getWalletDir() {
@@ -309,6 +309,10 @@ public class Settings {
         return this.getUserPath() + DEFAULT_LOCAL_DIR;
     }
 
+    public String getDataTempDir() {
+        return this.getUserPath() + DEFAULT_DATATEMP_DIR;
+    }
+
     public String getLangDir() {
         return this.getUserPath() + "languages";
     }
@@ -343,6 +347,36 @@ public class Settings {
     }
 
     @SuppressWarnings("unchecked")
+    /**
+     * полностью доверныые пиры от которых данные не проверяются - ни блоки ни транзакции
+     */
+    public List<String> getTrustedPeers() {
+
+        try {
+
+            File file = new File(this.userPath
+                    + (BlockChain.TEST_MODE ? "peers-trusted-test.json" : "peers-trusted.json"));
+
+            //CREATE FILE IF IT DOESNT EXIST
+            if (file.exists()) {
+                //READ PEERS FILE
+                List<String> lines = Files.readLines(file, Charsets.UTF_8);
+
+                String jsonString = "";
+                for (String line : lines) {
+                    jsonString += line;
+                }
+
+                //CREATE JSON OBJECT
+                return new ArrayList<String>((JSONArray) JSONValue.parse(jsonString));
+            }
+        } catch (Exception e) {
+            LOGGER.debug(e.getMessage(), e);
+        }
+
+        return new ArrayList<>();
+    }
+
     public List<Peer> getKnownPeers() {
         try {
             boolean loadPeersFromInternet = (
@@ -354,7 +388,7 @@ public class Settings {
             List<Peer> knownPeers = new ArrayList<>();
             JSONArray peersArray = new JSONArray();
 
-            if (!BlockChain.DEVELOP_USE) {
+            if (!BlockChain.TEST_MODE) {
                 try {
                     JSONArray peersArraySettings = (JSONArray) this.settingsJSON.get("knownpeers");
 
@@ -391,7 +425,7 @@ public class Settings {
 
             knownPeers.addAll(getKnownPeersFromJSONArray(peersArray));
 
-            if (!BlockChain.DEVELOP_USE && (knownPeers.isEmpty() || loadPeersFromInternet)) {
+            if (!BlockChain.TEST_MODE && (knownPeers.isEmpty() || loadPeersFromInternet)) {
                 knownPeers.addAll(getKnownPeersFromInternet());
             }
 
@@ -414,7 +448,7 @@ public class Settings {
 
             if (this.cacheInternetPeers.isEmpty() || NTP.getTime() - this.timeLoadInternetPeers > 24 * 60 * 60 * 1000) {
                 this.timeLoadInternetPeers = NTP.getTime();
-                URL u = new URL("https://raw.githubusercontent.com/icreator/ERMbase_public/master/peers.json");
+                URL u = new URL("https://raw.githubusercontent.com/erachain/erachain-public/master/peers.json");
                 InputStream in = u.openStream();
                 String stringInternetSettings = IOUtils.toString(in);
                 JSONObject internetSettingsJSON = (JSONObject) JSONValue.parse(stringInternetSettings);
@@ -489,29 +523,16 @@ public class Settings {
         }
     }
 
-    public boolean isTestnet() {
-        return this.getGenesisStamp() != BlockChain.DEFAULT_MAINNET_STAMP;
+    public boolean isTestNet() {
+        return this.getGenesisStamp() != DEFAULT_MAINNET_STAMP;
+    }
+
+    public boolean isDemoNet() {
+        return this.getGenesisStamp() == DEFAULT_DEMO_NET_STAMP;
     }
 
     public long getGenesisStamp() {
-        if (this.genesisStamp == -1) {
-            if (this.settingsJSON.containsKey("testnetstamp")) {
-                if (this.settingsJSON.get("testnetstamp").toString().equals("now") ||
-                        ((Long) this.settingsJSON.get("testnetstamp")).longValue() == 0) {
-                    this.genesisStamp = System.currentTimeMillis();
-                } else {
-                    this.genesisStamp = ((Long) this.settingsJSON.get("testnetstamp")).longValue();
-                }
-            } else {
-                this.genesisStamp = BlockChain.DEFAULT_MAINNET_STAMP;
-            }
-        }
-
         return this.genesisStamp;
-    }
-
-    public void setGenesisStamp(long testNetStamp) {
-        this.genesisStamp = testNetStamp;
     }
 
     public int getMaxConnections() {
@@ -552,6 +573,14 @@ public class Settings {
         }
 
         return DEFAULT_CONNECTION_TIMEOUT;
+    }
+
+    public boolean isLocalPeersScannerEnabled() {
+        if (this.settingsJSON.containsKey("localpeerscanner")) {
+            return ((Boolean) this.settingsJSON.get("localpeerscanner")).booleanValue();
+        }
+
+        return DEFAULT_LOCAL_PEER_SCANNER;
     }
 
     public boolean isTryingConnectToBadPeers() {
@@ -661,6 +690,14 @@ public class Settings {
         return BlockChain.DEFAULT_WEB_PORT;
     }
 
+    public String getBlockexplorerURL() {
+        if (this.settingsJSON.containsKey("explorerURL")) {
+            return this.settingsJSON.get("explorerURL").toString();
+        }
+
+        return BlockChain.DEFAULT_EXPLORER;
+    }
+
     public boolean isGuiConsoleEnabled() {
         if (this.settingsJSON.containsKey("guiconsoleenabled")) {
             return ((Boolean) this.settingsJSON.get("guiconsoleenabled")).booleanValue();
@@ -686,7 +723,8 @@ public class Settings {
             }
 
             //RETURN
-            return DEFAULT_WEB_ALLOWED.split(";");
+            return (BlockChain.TEST_MODE ? ";" : DEFAULT_WEB_ALLOWED).split(";");
+
         } catch (Exception e) {
             //RETURN EMPTY LIST
             return new String[0];
@@ -719,14 +757,6 @@ public class Settings {
         }
 
         return DEFAULT_FORGING_ENABLED;
-    }
-
-    public int getPingInterval() {
-        if (this.settingsJSON.containsKey("pinginterval")) {
-            return ((Long) this.settingsJSON.get("pinginterval")).intValue();
-        }
-
-        return DEFAULT_PING_INTERVAL;
     }
 
     public boolean isGeneratorKeyCachingEnabled() {
@@ -969,8 +999,6 @@ public class Settings {
 
 
     }
-    
-   
 
     public String cutPath(String path) {
 

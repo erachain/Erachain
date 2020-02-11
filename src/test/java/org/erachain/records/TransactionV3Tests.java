@@ -57,7 +57,7 @@ public class TransactionV3Tests {
     // INIT ASSETS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         gb = new GenesisBlock();
         try {
             gb.process(db);
@@ -68,9 +68,9 @@ public class TransactionV3Tests {
 
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
-        maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
+        maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
     }
 
@@ -88,7 +88,7 @@ public class TransactionV3Tests {
                 "headdd", data,
                 isText,
                 encrypted,
-                timestamp, maker.getLastTimestamp(db)
+                timestamp, maker.getLastTimestamp(db)[0]
         );
         messageTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
@@ -155,7 +155,7 @@ public class TransactionV3Tests {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
         payments.add(new Payment(recipient1, 61l, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
@@ -166,7 +166,7 @@ public class TransactionV3Tests {
                 maker, payments, 111,
                 data,
                 FEE_POWER,
-                timestamp + 100, maker.getLastTimestamp(db)
+                timestamp + 100, maker.getLastTimestamp(db)[0]
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 
@@ -229,7 +229,7 @@ public class TransactionV3Tests {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, 61l, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
 
@@ -237,7 +237,7 @@ public class TransactionV3Tests {
                 maker, payments, 111,
                 data,
                 FEE_POWER,
-                timestamp, maker.getLastTimestamp(db)
+                timestamp, maker.getLastTimestamp(db)[0]
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
 

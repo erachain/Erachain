@@ -10,6 +10,10 @@ import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.models.AccountsTableModel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
+import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
@@ -19,9 +23,13 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class DealsPopupMenu extends JPopupMenu {
-    
+
+    protected Logger logger;
+
     public AccountsTableModel tableModel;
     protected JComboBox<ItemCls> assetSelector;
     protected AssetCls asset;
@@ -36,6 +44,9 @@ public class DealsPopupMenu extends JPopupMenu {
     private JMenuItem holdAsset;
         
     public DealsPopupMenu(AccountsTableModel tableModel, MTable table, JComboBox<ItemCls> assetSelector) {
+
+        logger = LoggerFactory.getLogger(getClass());
+
         this.tableModel = tableModel;
         this.table = table;
         this.assetSelector = assetSelector;
@@ -167,7 +178,27 @@ public class DealsPopupMenu extends JPopupMenu {
             }
         });
         this.add(set_name);
-        
+
+        this.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?address=" + pubKey.getAddress()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        add(setSeeInBlockexplorer);
+
         this.addPopupMenuListener(new PopupMenuListener() {
 
             @Override

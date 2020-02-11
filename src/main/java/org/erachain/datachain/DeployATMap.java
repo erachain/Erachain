@@ -5,11 +5,9 @@ import org.erachain.core.transaction.Transaction;
 import org.mapdb.BTreeKeySerializer;
 import org.mapdb.DB;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.TreeMap;
 
-public class DeployATMap extends DCMap<byte[], Long> {
+public class DeployATMap extends DCUMap<byte[], Long> {
 
     public DeployATMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
@@ -19,34 +17,34 @@ public class DeployATMap extends DCMap<byte[], Long> {
         super(parent, null);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<byte[], Long> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("DeployATOrphanData")
+        map = database.createTreeMap("DeployATOrphanData")
                 .keySerializer(BTreeKeySerializer.BASIC)
                 .comparator(UnsignedBytes.lexicographicalComparator())
                 .makeOrGet();
     }
 
     @Override
-    protected Map<byte[], Long> getMemoryMap() {
-        return new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
+    protected void getMemoryMap() {
+        map = new TreeMap<byte[], Long>(UnsignedBytes.lexicographicalComparator());
     }
 
     @Override
-    protected Long getDefaultValue() {
-        return -1l;
+    public Long getDefaultValue() {
+        return -1L;
     }
 
     public Long get(Transaction transaction) {
         return this.get(transaction.getSignature());
     }
 
-    public void set(Transaction transaction, Long key) {
-        this.set(transaction.getSignature(), key);
+    public void put(Transaction transaction, Long key) {
+        this.put(transaction.getSignature(), key);
     }
 
     public void delete(Transaction transaction) {

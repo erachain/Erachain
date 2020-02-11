@@ -52,7 +52,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
      *
      */
     private static final long serialVersionUID = 1L;
-    static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(AccountsNameSearchSplitPanel.class);
     protected FileChooser chooser;
     protected int row;
     private AccountsNameTableModel tableModelImprints;
@@ -69,9 +69,9 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
             db = Controller.getInstance().wallet.database.getAccountsPropertisMap();
 
         setName(Lang.getInstance().translate("Favorite Accounts"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
-        searthLabel_SearchToolBar_LeftPanel.setVisible(true);
-        // this.searchTextField_SearchToolBar_LeftPanel.setVisible(true);
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setVisible(true);
+        // this.searchTextFieldSearchToolBarLeftPanelDocument.setVisible(true);
         // this.searchToolBar_LeftPanel.setVisible(true);
         // not show buttons
         // button1ToolBarLeftPanel.setVisible(false);
@@ -142,7 +142,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
                  *
                  * // search_Person_SplitPanel.jSplitPanel.setDividerLocation(
                  * search_Person_SplitPanel.jSplitPanel.getDividerLocation()); //
-                 * search_Person_SplitPanel.searchTextField_SearchToolBar_LeftPanel.setEnabled(
+                 * search_Person_SplitPanel.searchTextFieldSearchToolBarLeftPanelDocument.setEnabled(
                  * true); ImprintsInfoPanel info_panel = new ImprintsInfoPanel(imprint);
                  * info_panel.setPreferredSize(new
                  * Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,
@@ -287,8 +287,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
                     Pair<String, Tuple2<String, String>> ac = tableModelImprints.getPairItem(row);
                     db.delete(ac.getA());
                 } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
 
             }
@@ -430,7 +429,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
                             JSONObject ss = (JSONObject) inJSON.get(a);
                             Object a1 = ss.get("name");
                             Object a2 = ss.get("json");
-                            db.set(a, new Tuple2(ss.get("name"), ss.get("json")));
+                            db.put(a, new Tuple2(ss.get("name"), ss.get("json")));
                         }
 
                         // while (it.hasNext()){

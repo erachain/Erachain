@@ -277,14 +277,14 @@ public abstract class CalculatedAmount extends Calculated {
         if (this.asset.isOutsideType()) {
             if (actionType == TransactionAmount.ACTION_SEND && backward) {
                 // UPDATE SENDER
-                this.sender.changeBalance(dcSet, true, this.assetKey, this.amount, true);
+                this.sender.changeBalance(dcSet, true, this.assetKey, this.amount, true, false);
                 
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(dcSet, false, this.assetKey, this.amount, true);
+                this.recipient.changeBalance(dcSet, false, this.assetKey, this.amount, true, false);
                 
                 // CLOSE IN CLAIN - back amount to claim ISSUER
-                this.sender.changeBalance(dcSet, false, -absKey, this.amount, true);
-                this.recipient.changeBalance(dcSet, true, -absKey, this.amount, true);
+                this.sender.changeBalance(dcSet, false, -absKey, this.amount, true, false);
+                this.recipient.changeBalance(dcSet, true, -absKey, this.amount, true, false);
                 
                 // CLOSE IN CLAIM table balance
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.sender.getAddress(),
@@ -292,10 +292,10 @@ public abstract class CalculatedAmount extends Calculated {
                 dcSet.getCredit_AddressesMap().sub(creditKey, this.amount);
             } else {
                 // UPDATE SENDER
-                this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, false);
+                this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, false, false);
                 
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(dcSet, backward, this.assetKey, this.amount, false);
+                this.recipient.changeBalance(dcSet, backward, this.assetKey, this.amount, false, false);
                 
             }
             
@@ -304,25 +304,25 @@ public abstract class CalculatedAmount extends Calculated {
             if (false && actionType == TransactionAmount.ACTION_DEBT) {
                 if (backward) {
                     // UPDATE CREDITOR
-                    this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, true);
+                    this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, true, false);
                     // UPDATE DEBTOR
-                    this.recipient.changeBalance(dcSet, backward, this.assetKey, this.amount, false);
+                    this.recipient.changeBalance(dcSet, backward, this.assetKey, this.amount, false, false);
                 } else {
                     // UPDATE CREDITOR
-                    this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, true);
+                    this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, true, false);
                     // UPDATE DEBTOR
-                    this.recipient.changeBalance(dcSet, backward, this.assetKey, this.amount, false);
+                    this.recipient.changeBalance(dcSet, backward, this.assetKey, this.amount, false, false);
                 }
                 
             } else {
                 // UPDATE SENDER
                 if (absKey == 666l) {
-                    this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, !incomeReverse);
+                    this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, !incomeReverse, false);
                 } else {
-                    this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, !incomeReverse);
+                    this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, !incomeReverse, false);
                 }
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(dcSet, backward, this.assetKey, this.amount, incomeReverse);
+                this.recipient.changeBalance(dcSet, backward, this.assetKey, this.amount, incomeReverse, false);
             }
         }
         
@@ -364,7 +364,7 @@ public abstract class CalculatedAmount extends Calculated {
             // balance
             // get height by LAST block in CHAIN + 2 - skip incoming BLOCK
             
-            Tuple2<Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(dcSet);
+            Tuple3<Integer, Integer, Integer> privousForgingPoint = this.recipient.getLastForgingData(dcSet);
             int currentForgingBalance = recipient.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
             if (privousForgingPoint == null || privousForgingPoint.a == this.blockNo) {
                 if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
@@ -402,23 +402,23 @@ public abstract class CalculatedAmount extends Calculated {
         if (this.asset.isOutsideType()) {
             if (actionType == TransactionAmount.ACTION_SEND && backward) {
                 // UPDATE SENDER
-                this.sender.changeBalance(dcSet, false, this.assetKey, this.amount, true);
+                this.sender.changeBalance(dcSet, false, this.assetKey, this.amount, true, false);
                 
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(dcSet, true, this.assetKey, this.amount, true);
+                this.recipient.changeBalance(dcSet, true, this.assetKey, this.amount, true, false);
                 
-                this.sender.changeBalance(dcSet, true, -absKey, this.amount, true);
-                this.recipient.changeBalance(dcSet, false, -absKey, this.amount, true);
+                this.sender.changeBalance(dcSet, true, -absKey, this.amount, true, false);
+                this.recipient.changeBalance(dcSet, false, -absKey, this.amount, true, false);
                 
                 Tuple3<String, Long, String> creditKey = new Tuple3<String, Long, String>(this.sender.getAddress(),
                         absKey, this.recipient.getAddress());
                 dcSet.getCredit_AddressesMap().add(creditKey, this.amount);
             } else {
                 // UPDATE SENDER
-                this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, false);
+                this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, false, false);
                 
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(dcSet, !backward, this.assetKey, this.amount, false);
+                this.recipient.changeBalance(dcSet, !backward, this.assetKey, this.amount, false, false);
                 
             }
             
@@ -428,26 +428,26 @@ public abstract class CalculatedAmount extends Calculated {
             if (false && actionType == TransactionAmount.ACTION_DEBT) {
                 if (backward) {
                     // UPDATE CREDITOR
-                    this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, true);
+                    this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, true, false);
                     // UPDATE DEBTOR
-                    this.recipient.changeBalance(dcSet, !backward, this.assetKey, this.amount, false);
+                    this.recipient.changeBalance(dcSet, !backward, this.assetKey, this.amount, false, false);
                 } else {
                     // UPDATE CREDITOR
-                    this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, true);
+                    this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, true, false);
                     // UPDATE DEBTOR
-                    this.recipient.changeBalance(dcSet, !backward, this.assetKey, this.amount, false);
+                    this.recipient.changeBalance(dcSet, !backward, this.assetKey, this.amount, false, false);
                 }
                 
             } else {
                 
                 // UPDATE SENDER
                 if (absKey == 666l) {
-                    this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, !incomeReverse);
+                    this.sender.changeBalance(dcSet, !backward, this.assetKey, this.amount, !incomeReverse, false);
                 } else {
-                    this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, !incomeReverse);
+                    this.sender.changeBalance(dcSet, backward, this.assetKey, this.amount, !incomeReverse, false);
                 }
                 // UPDATE RECIPIENT
-                this.recipient.changeBalance(dcSet, !backward, this.assetKey, this.amount, incomeReverse);
+                this.recipient.changeBalance(dcSet, !backward, this.assetKey, this.amount, incomeReverse, false);
                 
             }
         }
@@ -479,7 +479,7 @@ public abstract class CalculatedAmount extends Calculated {
         }
         
         if (absKey == Transaction.RIGHTS_KEY) {
-            Tuple2<Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(dcSet);
+            Tuple3<Integer, Integer, Integer> lastForgingPoint = this.recipient.getLastForgingData(dcSet);
             if (lastForgingPoint != null && lastForgingPoint.a == this.blockNo) {
                 this.recipient.delForgingData(dcSet, this.blockNo);
             }

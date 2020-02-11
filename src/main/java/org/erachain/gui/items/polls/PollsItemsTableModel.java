@@ -9,10 +9,11 @@ public class PollsItemsTableModel extends SearchItemsTableModel {
     public static final int COLUMN_KEY = 0;
     public static final int COLUMN_NAME = 1;
     public static final int COLUMN_ADDRESS = 2;
-    public static final int COLUMN_FAVORITE = 3;
+    public static final int COLUMN_TOTAL_VOTES = 3;
+    public static final int COLUMN_FAVORITE = 4;
 
     public PollsItemsTableModel() {
-        super(DCSet.getInstance().getItemPollMap(), new String[]{"Key", "Name", "Creator", "Favorite"},
+        super(DCSet.getInstance().getItemPollMap(), new String[]{"Key", "Name", "Creator", "Votes", "Favorite"},
             null, COLUMN_FAVORITE);
     }
 
@@ -36,6 +37,10 @@ public class PollsItemsTableModel extends SearchItemsTableModel {
             case COLUMN_ADDRESS:
 
                 return poll.getOwner().getPersonAsString();
+
+            case COLUMN_TOTAL_VOTES:
+
+                return DCSet.getInstance().getVoteOnItemPollMap().countVotes(poll.getKey());
 
             case COLUMN_FAVORITE:
 

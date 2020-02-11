@@ -1,29 +1,20 @@
 package org.erachain.gui.items.assets;
 
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.accounts.AccountAssetRepayDebtPanel;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.utils.NumberAsString;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class AssetDetailsPanel extends JPanel {
 
@@ -103,7 +94,12 @@ public class AssetDetailsPanel extends JPanel {
 
         //DESCRIPTION
         detailGBC.gridy = gridy;
-        JTextArea txtAreaDescription = new JTextArea(Lang.getInstance().translate(asset.viewDescription()));
+        JTextArea txtAreaDescription;
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            txtAreaDescription = new JTextArea(Lang.getInstance().translate(asset.viewDescription()));
+        } else {
+            txtAreaDescription = new JTextArea(asset.viewDescription());
+        }
         txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(txtName.getBorder());
         txtAreaDescription.setEditable(false);
@@ -150,9 +146,18 @@ public class AssetDetailsPanel extends JPanel {
 
         //QUANTITY
         detailGBC.gridy = gridy;
-        JTextField txtQuantity = new JTextField(asset.getQuantity().toString());
+        JTextField txtQuantity = new JTextField(NumberAsString.formatAsString(asset.getQuantity()));
         txtQuantity.setEditable(false);
         this.add(txtQuantity, detailGBC);
+
+        //LABEL RELEASED
+        labelGBC.gridy = ++gridy;
+        this.add(new JLabel(Lang.getInstance().translate("Released") + ":"), labelGBC);
+        //RELEASED
+        detailGBC.gridy = gridy;
+        JTextField txtReleased = new JTextField(NumberAsString.formatAsString(asset.getReleased()));
+        txtReleased.setEditable(false);
+        this.add(txtReleased, detailGBC);
 
         //LABEL TYPE
         labelGBC.gridy = ++gridy;
@@ -161,7 +166,7 @@ public class AssetDetailsPanel extends JPanel {
 
         //TYPE
         detailGBC.gridy = gridy;
-        JTextField textType = new JTextField(Lang.getInstance().translate(asset.viewAssetType()));
+        JTextField textType = new JTextField(Lang.getInstance().translate(asset.viewAssetTypeFull()));
 
         //	textType.setSelected(asset.isDivisible()); // SELECT - OPION = asset.getAssetType();
         //	asset.viewAssetType()

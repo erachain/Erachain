@@ -3,9 +3,7 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
-import org.erachain.datachain.DCSet;
 import org.erachain.gui.SplitPanel;
-import org.erachain.gui.items.ItemSplitPanel;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.models.RendererIcon;
 import org.erachain.gui.models.WalletItemAssetsTableModel;
@@ -13,6 +11,7 @@ import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.TableMenuPopupUtil;
+import org.erachain.utils.URLViewer;
 import org.mapdb.Fun;
 
 import javax.swing.*;
@@ -21,6 +20,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MyAssetsTab extends SplitPanel {
 
@@ -32,13 +33,13 @@ public class MyAssetsTab extends SplitPanel {
      */
     WalletItemAssetsTableModel assetsModel;
     RowSorter<WalletItemAssetsTableModel> sorter;
-    private MyAssetsTab th;
+    //private MyAssetsTab th;
 
     public MyAssetsTab() {
         super("MyAssetsTab");
-        th = this;
+        //th = this;
         this.setName(Lang.getInstance().translate("My Assets"));
-        searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
+        searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Search") + ":  ");
         // not show buttons
         button1ToolBarLeftPanel.setVisible(false);
         button2ToolBarLeftPanel.setVisible(false);
@@ -122,7 +123,7 @@ public class MyAssetsTab extends SplitPanel {
         jTableJScrollPanelLeftPanel.getSelectionModel().addListSelectionListener(new search_listener());
 
         // UPDATE FILTER ON TEXT CHANGE
-        searchTextField_SearchToolBar_LeftPanel.getDocument().addDocumentListener(new DocumentListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void changedUpdate(DocumentEvent e) {
@@ -142,7 +143,7 @@ public class MyAssetsTab extends SplitPanel {
             public void onChange() {
 
                 // GET VALUE
-                String search = searchTextField_SearchToolBar_LeftPanel.getText();
+                String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
                 // SET FILTER
                 assetsModel.fireTableDataChanged();
@@ -221,7 +222,6 @@ public class MyAssetsTab extends SplitPanel {
 
         });
 
-
         JMenuItem favorite = new JMenuItem(Lang.getInstance().translate("Exchange"));
         favorite.addActionListener(new ActionListener() {
             @Override
@@ -244,7 +244,6 @@ public class MyAssetsTab extends SplitPanel {
 
         });
 
-
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             @Override
@@ -254,7 +253,6 @@ public class MyAssetsTab extends SplitPanel {
             }
         });
         assetsMenu.add(excahge);
-
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
@@ -345,7 +343,29 @@ public class MyAssetsTab extends SplitPanel {
             }
         });
         assetsMenu.add(dividend);
-   //     table.setComponentPopupMenu(assetsMenu);
+
+        assetsMenu.addSeparator();
+
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                AssetCls asset = assetsModel.getItem(row).b;
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?asset=" + asset.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
+
+        assetsMenu.add(setSeeInBlockexplorer);
+
+        //     table.setComponentPopupMenu(assetsMenu);
         TableMenuPopupUtil.installContextMenu(table, assetsMenu);  // SELECT ROW ON WHICH CLICKED RIGHT BUTTON
 
 
@@ -446,8 +466,8 @@ public class MyAssetsTab extends SplitPanel {
             if (asset == null) return;
             //AssetDetailsPanel001 info_panel = new AssetDetailsPanel001(asset);
             //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
-            int div = th.jSplitPanel.getDividerLocation();
-            int or = th.jSplitPanel.getOrientation();
+            int div = jSplitPanel.getDividerLocation();
+            int or = jSplitPanel.getOrientation();
             AssetInfo info_panel = new AssetInfo(asset, false);
             //info_panel.setPreferredSize(new Dimension(jScrollPaneJPanelRightPanel.getSize().width-50,jScrollPaneJPanelRightPanel.getSize().height-50));
             jScrollPaneJPanelRightPanel.setViewportView(info_panel);

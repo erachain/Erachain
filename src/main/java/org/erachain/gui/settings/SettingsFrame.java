@@ -1,10 +1,20 @@
 package org.erachain.gui.settings;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Toolkit;
+import org.apache.commons.io.FileUtils;
+import org.erachain.controller.Controller;
+import org.erachain.gui.MainFrame;
+import org.erachain.lang.Lang;
+import org.erachain.lang.LangFile;
+import org.erachain.network.Network;
+import org.erachain.settings.Settings;
+import org.erachain.utils.SaveStrToFile;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -14,28 +24,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
-import org.apache.commons.io.FileUtils;
-import org.erachain.gui.MainFrame;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import org.erachain.controller.Controller;
-import org.erachain.lang.Lang;
-import org.erachain.lang.LangFile;
-import org.erachain.network.Network;
-import org.erachain.settings.Settings;
-import org.erachain.utils.SaveStrToFile;
-
 @SuppressWarnings("serial")
 public class SettingsFrame extends JDialog {
-    static Logger LOGGER = LoggerFactory.getLogger(SettingsFrame.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(SettingsFrame.class);
 
     public JSONObject settingsJSONbuf;
     private SettingsTabPane settingsTabPane;
@@ -153,6 +144,7 @@ public class SettingsFrame extends JDialog {
         boolean changeWallet = false;
         boolean changeDataDir = false;
         boolean limitConnections = false;
+        boolean localPeerScanner = false;
         boolean changeLang = false;
 
         // save Rate
@@ -301,6 +293,12 @@ public class SettingsFrame extends JDialog {
             limitConnections = true;
         }
 
+        if (Settings.getInstance().isLocalPeersScannerEnabled() != settingsTabPane.settingsBasicPanel.chckbxLocalPeersScannerEnabled.isSelected()) {
+            settingsJSONbuf.put("localpeerscanner", settingsTabPane.settingsBasicPanel.chckbxLocalPeersScannerEnabled.isSelected());
+            localPeerScanner = true;
+        }
+
+
         if (!Settings.getInstance().getWalletDir().equals(settingsTabPane.settingsBasicPanel.textWallet.getText())) {
             settingsJSONbuf.put("walletdir", settingsTabPane.settingsBasicPanel.textWallet.getText());
             changeWallet = true;
@@ -381,7 +379,7 @@ public class SettingsFrame extends JDialog {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        Settings.FreeInstance();
+        Settings.freeInstance();
 
         if (settingsTabPane.settingsAllowedPanel.rpcServiceRestart) {
             Controller.getInstance().rpcServiceRestart();
@@ -411,6 +409,12 @@ public class SettingsFrame extends JDialog {
         if (limitConnections) {
             JOptionPane.showMessageDialog(
                     new JFrame(), Lang.getInstance().translate("You changed max connections or min connections. You need to restart the wallet for the changes to take effect."),
+                    Lang.getInstance().translate("Attention!"),
+                    JOptionPane.WARNING_MESSAGE);
+        }
+        if (localPeerScanner) {
+            JOptionPane.showMessageDialog(
+                    new JFrame(), Lang.getInstance().translate("You changed local peer discovery. You need to restart the wallet for the changes to take effect."),
                     Lang.getInstance().translate("Attention!"),
                     JOptionPane.WARNING_MESSAGE);
         }

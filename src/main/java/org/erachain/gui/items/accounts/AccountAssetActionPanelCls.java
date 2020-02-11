@@ -11,7 +11,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
-//import org.erachain.gui.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.assets.AssetInfo;
 import org.erachain.gui.items.assets.ComboBoxAssetsModel;
@@ -28,13 +27,13 @@ import org.erachain.utils.Pair;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
+//import org.erachain.gui.AccountRenderer;
 
 public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
@@ -56,6 +55,8 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     public AssetCls asset;
 
+    public String title;
+
     public long key;
 
     public String head;
@@ -74,7 +75,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(String panelName, AssetCls assetIn, int balancePosition,
+    public AccountAssetActionPanelCls(String panelName, AssetCls assetIn, String title, int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
         setName(Lang.getInstance().translate(panelName));
@@ -83,11 +84,20 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         else
             this.asset = assetIn;
 
+        this.title = title;
+
         this.account = accountFrom;
         recipient = accountTo;
         this.balancePosition = balancePosition;
 
         initComponents(message);
+
+        if (title != null) {
+            if (asset == null)
+                this.jLabel_Title.setText(Lang.getInstance().translate(title));
+            else
+                this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+        }
 
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
@@ -108,7 +118,11 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
 
-        this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
+        } else {
+            this.jTextArea_Account_Description.setText(asset.viewDescription());
+        }
 
         for (int i = 0; i < jComboBox_Asset.getItemCount(); i++) {
             ItemCls item = jComboBox_Asset.getItemAt(i);
@@ -131,9 +145,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
             public void actionPerformed(ActionEvent e) {
 
                 account = ((Account) jComboBox_Account.getSelectedItem());
-                if (asset != null)
+                if (asset != null) {
                     jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
                             + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+                }
 
             }
         });
@@ -156,6 +171,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                         jComboBox_Account.repaint();
                     }
 
+                    if (title != null) {
+                        jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+                    }
+
                     // set scale
                     int scale = 8;
                     if (asset != null) scale = asset.getScale();
@@ -163,8 +182,9 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                     // jTextArea_Account_Description.setText(asset.getDescription());
                     jScrollPane2.setViewportView(new AssetInfo(asset, false));
 
-                    jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
-                            + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
+                    if (account != null)
+                        jLabel_AmountHave.setText(Lang.getInstance().translate("Balance") + ": "
+                                + account.getBalanceInPosition(asset.getKey(), balancePosition).b.toPlainString());
 
                 }
 
@@ -206,7 +226,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         }
 
-        this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
+        ///this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
         this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
         this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
@@ -423,13 +443,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         //CHECK VALIDATE MESSAGE
         if (result == Transaction.VALIDATE_OK) {
             //RESET FIELDS
-
-            if (amount != null && amount.compareTo(BigDecimal.ZERO) != 0) //IF MORE THAN ZERO
-            {
-                this.jTextField_Amount.setText("0");
-            }
-
-            this.jTextArea_Description.setText("");
 
             JOptionPane.showMessageDialog(new JFrame(), Lang.getInstance().translate("Message and/or payment has been sent!"),
                     Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);

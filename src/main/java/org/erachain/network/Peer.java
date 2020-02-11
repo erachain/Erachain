@@ -1,7 +1,7 @@
 package org.erachain.network;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
+import org.erachain.core.BlockBuffer;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -32,14 +32,15 @@ public class Peer extends MonitoredThread {
     private final static boolean USE_MONITOR = false;
     private final static boolean logPings = false;
 
-    static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getSimpleName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
     // поэтому нужно ожидание дольще делать
-    private static int SOCKET_BUFFER_SIZE = BlockChain.HARD_WORK ? 1024 << 11 : 1024 << 9;
+    private static int SOCKET_BUFFER_SIZE = 1024 << (10 + Controller.HARD_WORK);
     private static int MAX_BEFORE_PING = SOCKET_BUFFER_SIZE >> 2;
     public Network network;
     private InetAddress address;
     public Socket socket;
+    public BlockBuffer blockBuffer;
 
     BlockingQueue<Object> startReading = new ArrayBlockingQueue<Object>(1);
 
@@ -337,6 +338,10 @@ public class Peer extends MonitoredThread {
         return this.socket != null && this.socket.isConnected() && this.runed;
     }
 
+    /**
+     * for all peers ONE
+     */
+    private static long countAlarmMess = 0;
     public void run() {
         byte[] messageMagic = null;
 
@@ -361,6 +366,8 @@ public class Peer extends MonitoredThread {
                 break;
             }
 
+            MessageFactory messageFactory = MessageFactory.getInstance();
+            byte[] messageMagicChain = Controller.getInstance().getMessageMagic();
             while (this.runed && this.network.run) {
 
                 //READ FIRST 4 BYTES
@@ -399,9 +406,9 @@ public class Peer extends MonitoredThread {
                     break;
                 }
 
-                if (!Arrays.equals(messageMagic, Controller.getInstance().getMessageMagic())) {
+                if (!Arrays.equals(messageMagic, messageMagicChain)) {
                     //ERROR and BAN
-                    ban(3600, "parse - received message with wrong magic");
+                    ban(30, "parse - received message with wrong magic");
                     break;
                 }
 
@@ -409,7 +416,7 @@ public class Peer extends MonitoredThread {
                 //PROCESS NEW MESSAGE
                 Message message;
                 try {
-                    message = MessageFactory.getInstance().parse(this, in);
+                    message = messageFactory.parse(this, in);
                 } catch (java.net.SocketTimeoutException timeOut) {
                     ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
                     break;
@@ -440,13 +447,14 @@ public class Peer extends MonitoredThread {
                 }
 
                 parsePoint = (System.nanoTime() - parsePoint) / 1000;
-                if (parsePoint < 999999999l) {
-                    if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 10000
-                            || parsePoint > 1000000
+                if (System.currentTimeMillis() - countAlarmMess > 1000 && parsePoint < 999999999l) {
+                    if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 1000
+                            || parsePoint > 1009000
                     ) {
                             LOGGER.debug(this + message.viewPref(false) + message
                                 + " PARSE: " + parsePoint + "[us]");
                     }
+                    countAlarmMess = System.currentTimeMillis();
                 }
 
                 if (USE_MONITOR) this.setMonitorStatus("in.message process");
@@ -508,8 +516,10 @@ public class Peer extends MonitoredThread {
                     }
 
                     timeStart = System.currentTimeMillis() - timeStart;
-                    if (timeStart > 100
-                            || message.getType() == Message.WIN_BLOCK_TYPE) {
+                    if (System.currentTimeMillis() - countAlarmMess > 1000
+                            && (timeStart > 1
+                                || message.getType() == Message.WIN_BLOCK_TYPE && timeStart > 100)) {
+                        countAlarmMess = System.currentTimeMillis();
                         LOGGER.debug(this + message.viewPref(false) + message + " solved by period: " + timeStart);
                     }
                 }
@@ -636,14 +646,14 @@ public class Peer extends MonitoredThread {
     }
 
     public boolean isBad() {
-        return Controller.getInstance().getDBSet().getPeerMap().isBad(this.getAddress());
+        return Controller.getInstance().getDLSet().getPeerMap().isBad(this.getAddress());
     }
 
     public boolean isBanned() {
-        return Controller.getInstance().getDBSet().getPeerMap().isBanned(address.getAddress());
+        return Controller.getInstance().getDLSet().getPeerMap().isBanned(address.getAddress());
     }
     public int getBanMinutes() {
-        return Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(this);
+        return Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(this);
     }
 
     /**
@@ -653,6 +663,11 @@ public class Peer extends MonitoredThread {
      * @param message
      */
     public /* synchronized */ void ban(int banForMinutes, String message) {
+
+        if (blockBuffer != null) {
+            blockBuffer.stopThread();
+            blockBuffer = null;
+        }
 
         if (!runed) {
             if (banForMinutes > this.getBanMinutes())

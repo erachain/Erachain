@@ -382,7 +382,7 @@ public class DeployATTransaction extends Transaction {
         //UPDATE ISSUER
         super.process(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
-        this.creator.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, false);
+        this.creator.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, false, false);
 
         //CREATE AT ID = ADDRESS
         String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
@@ -390,11 +390,11 @@ public class DeployATTransaction extends Transaction {
         Account atAccount = new Account(atId);
 
         //atAccount.setBalance(Transaction.FEE_KEY, this.amount , db );
-        atAccount.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, false);
+        atAccount.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, false, false);
 
         //UPDATE REFERENCE OF RECIPIENT
         if (true || atAccount.getLastTimestamp(this.dcSet) == null) {
-            atAccount.setLastTimestamp(this.timestamp, this.dcSet);
+            atAccount.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
         }
 
         //CREATE AT - public key or address? Is that the correct height?
@@ -445,7 +445,7 @@ public class DeployATTransaction extends Transaction {
         //UPDATE ISSUER
         super.orphan(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.amount), db);
-        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, false);
+        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.amount, false, false);
 
         String atId = Crypto.getInstance().getATAddress(getBytesForAddress(this.dcSet));
 
@@ -453,10 +453,10 @@ public class DeployATTransaction extends Transaction {
 
         //UPDATE RECIPIENT
         //atAccount.setBalance(Transaction.FEE_KEY, atAccount.getBalance(db, Transaction.FEE_KEY).subtract(this.amount), db);
-        atAccount.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, false);
+        atAccount.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.amount, false, false);
 
         //UPDATE REFERENCE OF SENDER
-        this.creator.setLastTimestamp(this.reference, this.dcSet);
+        this.creator.setLastTimestamp(new long[]{this.reference, dbRef}, this.dcSet);
 
     }
 

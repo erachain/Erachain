@@ -2,19 +2,15 @@ package org.erachain.gui.models;
 
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
-import org.erachain.core.item.assets.AssetCls;
+import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("serial")
@@ -29,9 +25,10 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
     public static final int COLUMN_TYPE = 3;
     public static final int COLUMN_TITLE = 4;
     public static final int COLUMN_KEY = 5;
-    public static final int COLUMN_FAVORITE = 6;
-    public static final int COLUMN_AMOUNT = 7;
+    public static final int COLUMN_AMOUNT = 6;
+    public static final int COLUMN_FAVORITE = 7;
 
+    DCSet dcSet = DCSet.getInstance();
     Integer blockNo;
 
     public SearchTransactionsTableModel() {
@@ -59,11 +56,20 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
         }
 
         list = (List<Transaction>) ((TransactionFinalMap)map).getTransactionsByBlock(blockNo);
+
+        for (Transaction item : list) {
+            if (item instanceof RCalculated) {
+                list.remove(item);
+                continue;
+            }
+            item.setDC_HeightSeq(dcSet);
+        }
+
         this.fireTableDataChanged();
 
     }
 
-    public void find(String filter) {
+    public void find(String filter, Long fromID) {
 
         clear();
 
@@ -74,7 +80,8 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
 
         if (account != null) {
             // ИЩЕМ по СЧЕТУ
-            list = ((TransactionFinalMap)map).getTransactionsByAddressLimit(account.getAddress(), 1000);
+            list = ((TransactionFinalMap)map).getTransactionsByAddressLimit(account.getShortAddressBytes(), 1000, true);
+
         } else {
 
             try {
@@ -92,28 +99,19 @@ public class SearchTransactionsTableModel extends SearchTableModelCls<Transactio
                 // ИЩЕМ по Заголовку
                 DCSet dcSet = DCSet.getInstance();
 
-                Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysIteratorByFilterAsArray(filter, start, step);
+                String fromWord = null;
+                list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
+                        .getKeysByFilterAsArray(filter, fromWord, fromID, start, step, false);
 
-                if (result.getA() != null) {
-                    findMessage = result.getA();
-                    return;
-                } else {
-                    findMessage = "";
-                }
-
-                Iterator iterator = result.getB().iterator();
-
-                Transaction item;
-                Long key;
-
-                list = new ArrayList<>();
-
-                while (iterator.hasNext()) {
-                    key = (Long) iterator.next();
-                    item = (Transaction) map.get(key);
-                    list.add(item);
-                }
             }
+        }
+
+        for (Transaction item : list) {
+            if (item instanceof RCalculated) {
+                list.remove(item);
+                continue;
+            }
+            item.setDC_HeightSeq(dcSet);
         }
 
         this.fireTableDataChanged();

@@ -1,12 +1,19 @@
 package org.erachain.core;
 
 
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.PrivateKeyAccount;
+import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
+import org.erachain.core.crypto.Crypto;
+import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ReferenceMapImpl;
 import org.erachain.datachain.TransactionMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.network.message.MessageFactory;
@@ -15,11 +22,14 @@ import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -29,9 +39,7 @@ import java.util.*;
  */
 public class BlockGenerator extends MonitoredThread implements Observer {
 
-    public static final boolean TEST_001 = false;
-
-    static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getName());
+    private static Logger LOGGER = LoggerFactory.getLogger(BlockGenerator.class.getSimpleName());
 
     private static int WAIT_STEP_MS = 100;
 
@@ -96,6 +104,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
     }
 
+    public Peer betterPeer;
     /**
      * если цепочка встала из-за патовой ситуации то попробовать ее решить
      ^ путем выбора люолее сильной а не длинной
@@ -104,118 +113,86 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public boolean checkWeightPeers() {
         // MAY BE PAT SITUATION
 
-        if (ctrl.getActivePeersCounter() < (BlockChain.DEVELOP_USE? 2 : 4))
-            return false;
-
         //logger.debug("try check better WEIGHT peers");
 
-        Peer peer = null;
-        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-        Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, false);
-        if (maxPeer.c != null) {
-            // если мы не в синхроне то выход
-            LOGGER.debug("need UPDATE from " + maxPeer );
-            return false;
-        }
+        betterPeer = null;
 
+        Peer peer;
         this.setMonitorStatus("checkWeightPeers");
 
-        int counter = ctrl.getActivePeersCounter();
-        do {
+        int counter = 0;
+        // на всякий случай поставим ораничение
+        while (counter++ < 30) {
 
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-            }
+            Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+            byte[] lastSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 2).signature;
+            //byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
 
-            if (ctrl.isOnStopping()) {
-                return true;
-            }
-
-
-            maxPeer = ctrl.getMaxPeerHWeight(0, true);
-            if (maxPeer.c == null)
-                return false;
+            // не тестируем те узлы которые мы заткунули по Силе - они выдаются Силу выше хотя цепочка та же
+            Tuple3<Integer, Long, Peer> maxPeer = ctrl.getMaxPeerHWeight(0, true, true);
 
             peer = maxPeer.c;
 
-            if (myHW.a >= maxPeer.a && myHW.b >= maxPeer.b)
+            if (peer == null) {
                 return false;
+            }
 
-            if (myHW.a < 2)
-                return false;
-
-            LOGGER.debug("better WEIGHT peers found: "
-                    //+ peer
-                    //+ " - HW: " + maxPeer.a + ":" + maxPeer.b);
-                    + peer);
+            ///LOGGER.debug("better WEIGHT peers found: " + maxPeer);
 
             SignaturesMessage response = null;
             try {
 
-                byte[] prevSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 1).reference;
                 response = (SignaturesMessage) peer.getResponse(
-                        MessageFactory.getInstance().createGetHeadersMessage(prevSignature),
+                        MessageFactory.getInstance().createGetHeadersMessage(lastSignature),
                         Synchronizer.GET_BLOCK_TIMEOUT >> 2);
             } catch (Exception e) {
-                ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                LOGGER.debug("peers response error " + peer);
+                ///LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
                 // remove HW from peers
-                ctrl.setWeightOfPeer(peer, null);
+                ctrl.resetWeightOfPeer(peer, 0);
                 continue;
             }
 
             if (response == null) {
-                ////peer.ban(1, "Cannot retrieve headers - from UPDATE");
-                LOGGER.debug("peers is null " + peer);
+                ///LOGGER.debug("peer RESPONSE is null " + peer);
                 // remove HW from peers
-                ctrl.setWeightOfPeer(peer, null);
+                ctrl.resetWeightOfPeer(peer, 0);
                 continue;
             }
 
             List<byte[]> headers = response.getSignatures();
-            byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
-            int headersSize = headers.size();
-            if (headersSize == 3 || headersSize == 2) {
-                if (Arrays.equals(headers.get(headersSize - 1), lastSignature)) {
-                    // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                    LOGGER.debug("peer has same Weight " + maxPeer);
-                    ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
-                    // продолжим поиск дальше
-                    continue;
-                } else {
-                    LOGGER.debug("I to orphan x2 - peer has better Weight " + maxPeer);
-                    try {
-                        ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        //ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        return true;
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
-                        ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
-                    }
-                }
-            } else if (headersSize < 2) {
-                LOGGER.debug("I to orphan - peer has better Weight " + maxPeer);
-                try {
-                    ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                } catch (Exception e) {
-                    LOGGER.error(e.getMessage(), e);
-                    ctrl.setWeightOfPeer(peer, ctrl.getBlockChain().getHWeightFull(dcSet));
-                }
-            } else {
-                // more then 2 - need to UPDATE
-                LOGGER.debug("to update - peers " + maxPeer
-                        + " headers: " + headersSize);
+            if (headers.isEmpty()) {
+                // общего блока не найдено - значит цепочка уже разошлась - делаем откат своего блока???
+                // Или ждем когда сами встанем
+                LOGGER.debug("I to orphan - Peer has DEEP different CHAIN " + maxPeer);
+                betterPeer = peer;
+                return true;
             }
-            return true;
-        } while (--counter > 0);
+
+            // Удалим то что унас тоже есть
+            do {
+                headers.remove(0);
+            } while (!headers.isEmpty() && dcSet.getBlockSignsMap().contains(headers.get(0)));
+
+            if (headers.isEmpty()) {
+                // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
+                ///LOGGER.debug("peer has same Weight " + maxPeer);
+                ctrl.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
+                // продолжим поиск дальше
+                continue;
+            } else {
+                LOGGER.debug("I to orphan - Peer has different CHAIN " + maxPeer);
+                betterPeer = peer;
+                return true;
+            }
+
+        }
 
         return false;
 
     }
 
     public Block generateNextBlock(PrivateKeyAccount account,
-                  Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
+                                   Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
 
         if (transactionsItem == null) {
             return null;
@@ -226,7 +203,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         atBytes = new byte[0];
 
         //CREATE NEW BLOCK
-        Block newBlock = new Block(version, parentBlock.getSignature(), account, height,
+        Block newBlock = new Block(version, parentBlock, account, height,
                 transactionsItem, atBytes,
                 forgingValue, winValue, previousTarget);
         newBlock.sign(account);
@@ -234,9 +211,112 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
     }
 
+    private void testTransactions(int blockHeight, long timePointForValidTX) {
+
+        SecureRandom randomSecure = new SecureRandom();
+        // сдвиг назад организуем
+
+        long blockTimestampBeg = bchain.getTimestamp(blockHeight - 1) + 10;
+        long blockTimestampEnd = timePointForValidTX;
+
+
+        LOGGER.info("generate TEST txs: " + BlockChain.TEST_DB
+                + " period: " + new Timestamp(blockTimestampBeg) + " >>> " + new Timestamp(blockTimestampEnd));
+
+        boolean generateNewAccount = false;
+
+        long assetKey = 2L;
+        BigDecimal amount = new BigDecimal("0.00000001");
+        RSend messageTx;
+        byte[] isText = new byte[]{1};
+        byte[] encryptMessage = new byte[]{0};
+
+        Random random = new Random();
+
+        long timestamp;
+        PublicKeyAccount recipient;
+        HashMap<PrivateKeyAccount, Long> creatorsReference = new HashMap<>();
+        for (int index = 0; index < BlockChain.TEST_DB; index++) {
+
+            if (generateNewAccount) {
+                byte[] seedRecipient = new byte[32];
+                randomSecure.nextBytes(seedRecipient);
+                recipient = new PublicKeyAccount(seedRecipient);
+            } else {
+                recipient = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+            }
+
+            PrivateKeyAccount creator;
+            // ограничим выборку счетов как сверху так и снизу
+            int countSeek = 3 + (BlockChain.TEST_DB_ACCOUNTS.length >> 5);
+            do {
+                timestamp = 0;
+                creator = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+                if (creatorsReference.containsKey(creator)) {
+                    timestamp = creatorsReference.get(creator);
+                    timestamp++;
+                } else {
+                    // определим время создания для каждого счета
+                    timestamp = blockTimestampBeg;
+                }
+            } while (timestamp > blockTimestampEnd && countSeek-- > 0);
+
+            creatorsReference.put(creator, timestamp);
+
+            if (BlockChain.NOT_CHECK_SIGNS) {
+                byte[] sign = new byte[64];
+                // первые 8 байт нужно уникальные
+                System.arraycopy(Longs.toByteArray(random.nextLong()), 0, sign, 0, 8);
+                System.arraycopy(creator.getPublicKey(), 0, sign, 8, 32);
+                System.arraycopy(recipient.getPublicKey(), 0, sign, 32, 32);
+
+                messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                        amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l, sign);
+            } else {
+                messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                        amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage, timestamp, 0l);
+                messageTx.sign(creator, Transaction.FOR_NETWORK);
+            }
+
+            // может переполниться очередь на добавление транзакций - подождем
+            while (!ctrl.transactionsPool.offerMessage(messageTx)) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+
+        }
+
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
+            //// только если включена проверка повторов - запускаем эту проверку на невалидные транзакции
+
+            // добавить невалидных транзакций немного - по времени создания
+            timestamp = blockTimestampBeg - 10000000L * 1L;
+            PrivateKeyAccount[] creators = creatorsReference.keySet().toArray(new PrivateKeyAccount[0]);
+            for (int index = 0; index < (BlockChain.TEST_DB >> 3); index++) {
+
+                recipient = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+
+                PrivateKeyAccount creator = creators[random.nextInt(creators.length)];
+
+                messageTx = new RSend(creator, (byte) 0, recipient, assetKey,
+                        amount, "TEST" + blockHeight + "-" + index, null, isText, encryptMessage,
+                        timestamp, 0l);
+                messageTx.sign(creator, Transaction.FOR_NETWORK);
+
+                ctrl.transactionsPool.offerMessage(messageTx);
+
+            }
+        }
+
+    }
 
     public Tuple2<List<Transaction>, Integer> getUnconfirmedTransactions(int blockHeight, long timestamp, BlockChain bchain,
                                                                          long max_winned_value) {
+
+        LOGGER.debug("* * * * * COLLECT TRANSACTIONS to time: " + new Timestamp(timestamp));
 
         long start = System.currentTimeMillis();
 
@@ -245,101 +325,155 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
         Block waitWin;
 
-        start = System.currentTimeMillis();
-
         List<Transaction> transactionsList = new ArrayList<Transaction>();
 
         //	boolean transactionProcessed;
         long totalBytes = 0;
         int counter = 0;
+        int check_time = 0;
+        int max_time_gen = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(blockHeight) >> 2;
 
-        TransactionMap map = dcSet.getTransactionMap();
-        Iterator<Long> iterator = map.getTimestampIterator();
+        try {
+            TransactionMap map = dcSet.getTransactionTab();
+            needRemoveInvalids = new ArrayList<byte[]>();
 
-        needRemoveInvalids = new ArrayList<byte[]>();
+            this.setMonitorStatusBefore("getUnconfirmedTransactions");
 
-        this.setMonitorStatusBefore("getUnconfirmedTransactions");
+            try (IteratorCloseable<Long> iterator = map.getTimestampIterator(false)) {
 
-        while (iterator.hasNext()) {
+                long testTime = 0;
+                while (iterator.hasNext()) {
 
-            if (ctrl.isOnStopping()) {
-                return null;
+                    // проверим иногда - вдруг уже слишком долго собираем - останов сборки транзакций
+                    // так как иначе такой блок и сеткой остальной не успеет обработаться
+                    if (BlockChain.TEST_DB == 0 && check_time++ > 300) {
+                        if (System.currentTimeMillis() - start > max_time_gen) {
+                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by SPEND TIME[ms]: " + (System.currentTimeMillis() - start));
+                            break;
+                        }
+                        check_time = 0;
+                    }
+                    if (ctrl.isOnStopping()) {
+                        break;
+                    }
+
+                    if (bchain != null) {
+                        waitWin = bchain.getWaitWinBuffer();
+                        if (betterPeer != null || waitWin != null && waitWin.getWinValue() > max_winned_value) {
+                            break;
+                        }
+                    }
+
+                    Transaction transaction = map.get(iterator.next());
+                    if (transaction == null) {
+                        LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by NULL NEXT");
+                        break;
+                    }
+
+                    if (BlockChain.CHECK_BUGS > 7) {
+                        LOGGER.debug(" found TRANSACTION on " + new Timestamp(transaction.getTimestamp()));
+                        if (testTime > transaction.getTimestamp()) {
+                            LOGGER.error(" ERROR testTIME " + new Timestamp(testTime));
+                            testTime = transaction.getTimestamp();
+                        }
+                    }
+
+                    if (transaction.getTimestamp() > timestamp) {
+                        LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by UTX TIMESTAMP: " + new Timestamp(transaction.getTimestamp()));
+                        break;
+                    }
+
+                    // делать форк только если есть трнзакции - так как это сильно кушает память
+                    if (newBlockDC == null) {
+                        //CREATE FORK OF GIVEN DATABASE
+                        // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
+                        DB database = DCSet.makeDBinMemory();
+                        newBlockDC = dcSet.fork(database);
+                    }
+
+                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+
+                    if (false // вообще-то все внутренние транзакции уже провверены на подпись!
+                            && !transaction.isSignatureValid(newBlockDC)) {
+                        needRemoveInvalids.add(transaction.getSignature());
+                        continue;
+                    }
+
+                    if (false && // тут нельзя пока удалять - может она будет включена
+                            // и пусть удаляется только если невалидная будет
+                            timestamp > transaction.getDeadline()) {
+                        needRemoveInvalids.add(transaction.getSignature());
+                        continue;
+                    }
+
+                    try {
+
+                        if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                            needRemoveInvalids.add(transaction.getSignature());
+                            if (BlockChain.CHECK_BUGS > 1) {
+                                LOGGER.error(" Transaction invalid: " + transaction.isValid(Transaction.FOR_NETWORK, 0l));
+                            }
+                            continue;
+                        }
+
+                        //CHECK IF ENOUGH ROOM
+                        if (++counter > BlockChain.MAX_BLOCK_SIZE_GEN) {
+                            counter--;
+                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by MAX COUNT: " + counter);
+                            break;
+                        }
+
+                        totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                        if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTES_GEN) {
+                            counter--;
+                            LOGGER.debug("* * * * * COLLECT TRANSACTIONS BREAK by MAX BYTES: " + totalBytes);
+                            break;
+                        }
+
+                        ////ADD INTO LIST
+                        transactionsList.add(transaction);
+
+                        //PROCESS IN NEWBLOCKDB
+                        transaction.process(null, Transaction.FOR_NETWORK);
+
+                    } catch (Exception e) {
+
+                        if (ctrl.isOnStopping()) {
+                            break;
+                        }
+
+                        //     transactionProcessed = true;
+
+                        LOGGER.error(e.getMessage(), e);
+                        //REMOVE FROM LIST
+                        needRemoveInvalids.add(transaction.getSignature());
+
+                    }
+
+                }
+
+            } finally {
+                if (newBlockDC != null)
+                    newBlockDC.close();
             }
 
-            if (bchain != null) {
-                waitWin = bchain.getWaitWinBuffer();
-                if (waitWin != null && waitWin.getWinValue() > max_winned_value) {
-                    break;
-                }
-            }
+            LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
+                    + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size()
+                    + " from Poll: " + map.size());
 
-            Transaction transaction = map.get(iterator.next());
+            this.setMonitorStatusAfter();
 
-            if (transaction.getTimestamp() > timestamp)
-                break;
-
-            // делать форк только если есть трнзакции - так как это сильно кушает память
-            if (newBlockDC == null) {
-                //CREATE FORK OF GIVEN DATABASE
-                newBlockDC = dcSet.fork();
-            }
-
-            if (!transaction.isSignatureValid(newBlockDC)) {
-                needRemoveInvalids.add(transaction.getSignature());
-                continue;
-            }
-
-            try {
-
-                transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
-
-                if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                    needRemoveInvalids.add(transaction.getSignature());
-                    continue;
-                }
-
-                //CHECK IF ENOUGH ROOM
-                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-
-                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTE
-                        || ++counter > BlockChain.MAX_BLOCK_SIZE) {
-                    counter--;
-                    break;
-                }
-
-                ////ADD INTO LIST
-                transactionsList.add(transaction);
-
-                //PROCESS IN NEWBLOCKDB
-                transaction.process(null, Transaction.FOR_NETWORK);
-
-                // GO TO NEXT TRANSACTION
-                continue;
-
-            } catch (Exception e) {
-
-                if (ctrl.isOnStopping()) {
-                    return null;
-                }
-
-                //     transactionProcessed = true;
-
+        } catch (java.lang.Throwable e) {
+            if (e instanceof java.lang.IllegalAccessError) {
+                // налетели на закрытую таблицу
+            } else {
                 LOGGER.error(e.getMessage(), e);
-                //REMOVE FROM LIST
-                needRemoveInvalids.add(transaction.getSignature());
-
-                continue;
-
             }
+            LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start)
+                    + "ms for trans: " + counter + " and DELETE: " + needRemoveInvalids.size()
+                    + " before CLEARED event!");
 
         }
-
-        if (newBlockDC != null )
-            newBlockDC.close();
-
-        LOGGER.debug("get Unconfirmed Transactions = " + (System.currentTimeMillis() - start) + "ms for trans: " + counter);
-
-        this.setMonitorStatusAfter();
 
         return new Tuple2<List<Transaction>, Integer>(transactionsList, counter);
     }
@@ -347,13 +481,22 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private void clearInvalids() {
         if (needRemoveInvalids != null && !needRemoveInvalids.isEmpty()) {
             long start = System.currentTimeMillis();
-            TransactionMap transactionsMap = dcSet.getTransactionMap();
+            TransactionMap transactionsMap = dcSet.getTransactionTab();
+
             for (byte[] signature : needRemoveInvalids) {
                 if (ctrl.isOnStopping()) {
                     return;
                 }
-                if (transactionsMap.contains(signature))
-                    transactionsMap.delete(signature);
+                try {
+                    if (!transactionsMap.isClosed() && transactionsMap.contains(signature))
+                        transactionsMap.delete(signature);
+                } catch (java.lang.Throwable e) {
+                    if (e instanceof java.lang.IllegalAccessError) {
+                        // налетели на закрытую таблицу
+                    } else {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+                }
             }
             LOGGER.debug("clear INVALID Transactions = " + (System.currentTimeMillis() - start) + "ms for removed: " + needRemoveInvalids.size()
                     + " LEFT: " + transactionsMap.size());
@@ -366,85 +509,101 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     public void checkForRemove(long timestamp) {
 
         //CREATE FORK OF GIVEN DATABASE
-        DCSet newBlockDC = dcSet.fork();
-        int blockHeight =  newBlockDC.getBlockMap().size() + 1;
+        DB database = DCSet.makeDBinMemory();
+        try {
+            DCSet newBlockDC = dcSet.fork(database);
+            int blockHeight = newBlockDC.getBlockSignsMap().size() + 1;
 
-        //Block waitWin;
-        int counter = 0;
-        int totalBytes = 0;
+            //Block waitWin;
+            int counter = 0;
+            int totalBytes = 0;
 
-        long start = System.currentTimeMillis();
+            long start = System.currentTimeMillis();
 
-        TransactionMap map = dcSet.getTransactionMap();
-        Iterator<Long> iterator = map.getTimestampIterator();
+            TransactionMap map = dcSet.getTransactionTab();
+            LOGGER.debug("get ITERATOR for Remove = " + (System.currentTimeMillis() - start) + " ms");
 
-        needRemoveInvalids = new ArrayList<byte[]>();
+            needRemoveInvalids = new ArrayList<byte[]>();
 
-        this.setMonitorStatusBefore("checkForRemove");
+            this.setMonitorStatusBefore("checkForRemove");
 
-        while (iterator.hasNext()) {
+            try (IteratorCloseable<Long> iterator = map.getTimestampIterator(false)) {
 
-            if (ctrl.isOnStopping()) {
-                return;
-            }
+                while (iterator.hasNext()) {
 
-            Transaction transaction = map.get(iterator.next());
+                    if (ctrl.isOnStopping()) {
+                        return;
+                    }
 
-            if (transaction.getTimestamp() > timestamp)
-                break;
-            if (!transaction.isSignatureValid(newBlockDC)) {
-                needRemoveInvalids.add(transaction.getSignature());
-                continue;
-            }
+                    Transaction transaction = map.get(iterator.next());
 
-            try {
+                    if (transaction.getTimestamp() > timestamp)
+                        break;
 
-                transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
+                    transaction.setDC(newBlockDC, Transaction.FOR_NETWORK, blockHeight, counter + 1);
 
-                if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
-                    needRemoveInvalids.add(transaction.getSignature());
-                    continue;
+                    if (false // тут уже все проверено внутри нашей базы
+                            && !transaction.isSignatureValid(newBlockDC)) {
+                        needRemoveInvalids.add(transaction.getSignature());
+                        continue;
+                    }
+
+                    try {
+
+                        if (transaction.isValid(Transaction.FOR_NETWORK, 0l) != Transaction.VALIDATE_OK) {
+                            needRemoveInvalids.add(transaction.getSignature());
+                            continue;
+                        }
+
+                        //CHECK IF ENOUGH ROOM
+                        if (++counter > (BlockChain.MAX_BLOCK_SIZE << 2)) {
+                            break;
+                        }
+
+                        totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                        if (totalBytes > (BlockChain.MAX_BLOCK_SIZE_BYTES_GEN << 2)) {
+                            break;
+                        }
+
+                        //PROCESS IN NEWBLOCKDB
+                        transaction.process(null, Transaction.FOR_NETWORK);
+
+                        // GO TO NEXT TRANSACTION
+                        continue;
+
+                    } catch (Exception e) {
+
+                        if (ctrl.isOnStopping()) {
+                            return;
+                        }
+
+                        //     transactionProcessed = true;
+
+                        LOGGER.error(e.getMessage(), e);
+                        //REMOVE FROM LIST
+                        needRemoveInvalids.add(transaction.getSignature());
+
+                        continue;
+
+                    }
+
                 }
 
-                //CHECK IF ENOUGH ROOM
-                totalBytes += transaction.getDataLength(Transaction.FOR_NETWORK, true);
-
-                if (totalBytes > BlockChain.MAX_BLOCK_SIZE_BYTE
-                        || ++counter > BlockChain.MAX_BLOCK_SIZE) {
-                    counter--;
-                    break;
+            } catch (java.lang.Throwable e) {
+                if (e instanceof java.lang.IllegalAccessError) {
+                    // налетели на закрытую таблицу
+                } else {
+                    LOGGER.error(e.getMessage(), e);
                 }
-
-                //PROCESS IN NEWBLOCKDB
-                transaction.process(null, Transaction.FOR_NETWORK);
-
-                // GO TO NEXT TRANSACTION
-                continue;
-
-            } catch (Exception e) {
-
-                if (ctrl.isOnStopping()) {
-                    return;
-                }
-
-                //     transactionProcessed = true;
-
-                LOGGER.error(e.getMessage(), e);
-                //REMOVE FROM LIST
-                needRemoveInvalids.add(transaction.getSignature());
-
-                continue;
-
             }
+            this.setMonitorStatusAfter();
 
+            LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + map.size()
+                    + " needRemoveInvalids:" + needRemoveInvalids.size());
+
+        } finally {
+            database.close();
         }
-
-        newBlockDC.close();
-
-        this.setMonitorStatusAfter();
-
-        LOGGER.debug("get check for Remove = " + (System.currentTimeMillis() - start) + "ms for trans: " + map.size()
-                + " needRemoveInvalids:" + needRemoveInvalids.size());
 
     }
 
@@ -522,7 +681,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     @Override
     public void run() {
 
-        TransactionMap transactionsMap = dcSet.getTransactionMap();
+        //TransactionMap transactionsMap = dcSet.getTransactionMap();
 
         int heapOverflowCount = 0;
 
@@ -530,10 +689,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         long transactionMakeTimingCounter = 0;
         long transactionMakeTimingAverage = 0;
 
-        long timeToPing = 0;
+        /**
+         * время пинга если идет синхронизация например
+         */
+        long pointPing = 0;
         long timeTmp;
         long timePoint = 0;
-        long timePointForGenerate = 0;
+        long timePointForValidTX = 0;
         long flushPoint = 0;
         long timeUpdate = 0;
         int shift_height = 0;
@@ -551,38 +713,62 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         int wait_new_block_broadcast;
         long wait_step;
         boolean newWinner;
+        long pointLogGoUpdate = 0;
+        long pointLogWaitFlush = 0;
 
         this.initMonitor();
 
-        while (!ctrl.isOnStopping()) {
+        Random random = new Random();
+        if (BlockChain.TEST_DB > 0) {
 
-            Block waitWin = null;
-            Block generatedBlock;
-            Block solvingBlock;
-            Peer peer = null;
-            Tuple3<Integer, Long, Peer> maxPeer;
-            SignaturesMessage response;
+            // REST balances! иначе там копится размер таблицы
+            //dcSet.getAssetBalanceMap().clear();
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                break;
+            byte[] seed = Crypto.getInstance().digest("test24243k2l3j42kl43j".getBytes());
+            byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
+            BigDecimal balance = new BigDecimal("10000");
+
+            for (int nonce = 0; nonce < BlockChain.TEST_DB_ACCOUNTS.length; nonce++) {
+                BlockChain.TEST_DB_ACCOUNTS[nonce] = new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce));
+                // SET BALANCES
+                BlockChain.TEST_DB_ACCOUNTS[nonce].changeBalance(dcSet, false, 2, balance, true, false);
             }
+        }
 
-            try {
+        try {
+            // если только что была синхронизация - возьмем новый блок
+            Peer afterUpdatePeer = null;
+            while (!ctrl.isOnStopping()) {
+
+                int timeStartBroadcast = BlockChain.WIN_TIMEPOINT(height);
+
+                Block waitWin = null;
+                Block generatedBlock;
+                Block solvingBlock;
+                Peer peer = null;
+                Tuple3<Integer, Long, Peer> maxPeer;
+                SignaturesMessage response;
+
+                try {
+                    Thread.sleep(WAIT_STEP_MS);
+                } catch (InterruptedException e) {
+                    break;
+                }
 
                 this.setMonitorPoint();
 
                 if (ctrl.isOnStopping()) {
-                    local_status = -1;
                     return;
                 }
 
                 // GET real HWeight
                 // пингуем всех тут чтобы знать кому слать свои транакции
-                if (System.currentTimeMillis() - timeToPing > (BlockChain.DEVELOP_USE ? 60000 : 120000)) {
+                // на самом деле они сами присылают свое состояние после апдейта
+                if (BlockChain.TEST_DB > 0) {
+                    pointPing = 0;
+                } else if (NTP.getTime() - pointPing > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 1) {
                     // нужно просмотривать пиги для синхронизации так же - если там -ХХ то не будет синхронизации
-                    timeToPing = System.currentTimeMillis();
+                    pointPing = NTP.getTime();
                     ctrl.pingAllPeers(false);
                 }
 
@@ -596,19 +782,36 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
                     dcSet.clearCache();
 
-                    try {
-                        while (bchain.getHeight(dcSet) >= this.orphanto
-                            //    && bchain.getHeight(dcSet) > 157044
-                            ) {
-                            //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
-                            //    long iii = 11;
-                            //}
-                            //Block block = bchain.getLastBlock(dcSet);
+                    // и перед всем этим необходимо слить все изменения на диск чтобы потом когда откат закончился
+                    // не было остаков в пакетах RocksDB и трынзакциях MapDB
+                    dcSet.flush(0, true, true);
+
+                    while (bchain.getHeight(dcSet) >= this.orphanto
+                        //    && bchain.getHeight(dcSet) > 157044
+                    ) {
+                        //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
+                        //    long iii = 11;
+                        //}
+                        //Block block = bchain.getLastBlock(dcSet);
+                        try {
                             ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                        } catch (Exception e) {
+                            // если ошибка то выход делаем чтобы зарегистрировать ошибку
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(1004);
+                            return;
+
                         }
-                    } catch (Exception e) {
-                        LOGGER.error(e.getMessage(), e);
                     }
+
+                    if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
+                        // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
+                        ReferenceMapImpl map = dcSet.getReferenceMap();
+
+                        return;
+                    }
+
+
                     this.orphanto = 0;
                     ctrl.checkStatusAndObserve(0);
 
@@ -616,47 +819,34 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 }
 
-                timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
+                timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height);
                 if (timeTmp > NTP.getTime())
                     continue;
 
                 if (timePoint != timeTmp) {
                     timePoint = timeTmp;
-                    timePointForGenerate = timePoint
-                            + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS
-                            : BlockChain.FLUSH_TIMEPOINT)
-                            - BlockChain.UNCONFIRMED_SORT_WAIT_MS
-                        ;
+                    timePointForValidTX = timePoint - BlockChain.UNCONFIRMED_SORT_WAIT_MS(height);
+                    betterPeer = null;
 
                     Timestamp timestampPoit = new Timestamp(timePoint);
-                    LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit);
+                    LOGGER.info("+ + + + + START GENERATE POINT on " + timestampPoit + " for UTX time: " + new Timestamp(timePointForValidTX));
                     this.setMonitorStatus("+ + + + + START GENERATE POINT on " + timestampPoit);
 
-                    flushPoint = BlockChain.FLUSH_TIMEPOINT + timePoint;
+                    flushPoint = timePoint + BlockChain.FLUSH_TIMEPOINT(height);
                     this.solvingReference = null;
                     local_status = 0;
 
                     // пинганем тут все чтобы знать кому слать вобедный блок
-                    timeToPing = System.currentTimeMillis();
+                    // а так же чтобы знать с кем мы в синхре или кто лучше нас в checkWeightPeers
+                    pointPing = NTP.getTime();
                     ctrl.pingAllPeers(true);
-
-                    // осмотр сети по СИЛЕ
-                    // уже все узлы свою силу передали при Controller.flushNewBlockGenerated
-
-                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-                    if (BlockChain.DEVELOP_USE ||
-                            myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
-                        // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
-                        checkWeightPeers();
-                    }
 
                 }
 
                 // is WALLET
-                if (ctrl.doesWalletExists()) {
+                if (BlockChain.TEST_DB > 0 || ctrl.doesWalletExists()) {
 
-
-                    if (timePoint + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS > NTP.getTime()) {
+                    if (timePoint > NTP.getTime()) {
                         continue;
                     }
 
@@ -664,31 +854,29 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.setMonitorStatus("local_status " + viewStatus());
 
                     //CHECK IF WE HAVE CONNECTIONS and READY to GENERATE
-                    ////syncForgingStatus();
+                    // если на 1 высота выше хотябы то переходим на синхронизацию
+                    // поэтому сдвиг = 0
+                    ctrl.checkStatusAndObserve(0);
 
-                    //Timestamp timestamp = new Timestamp(NTP.getTime());
-                    //logger.info("NTP.getTime() " + timestamp);
+                    if (BlockChain.TEST_DB == 0 && forgingStatus == ForgingStatus.FORGING_WAIT
+                            && (timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) << 1) < NTP.getTime()
+                            || BlockChain.ERA_COMPU_ALL_UP && height < 100
+                            || height < 10)) {
 
-                    //waitWin = bchain.getWaitWinBuffer();
-
-                    ctrl.checkStatusAndObserve(1);
-
-                    if (forgingStatus == ForgingStatus.FORGING_WAIT
-                            && timePoint + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS << 2) < NTP.getTime())
                         setForgingStatus(ForgingStatus.FORGING);
+                    }
 
-                    if (//true ||
+                    if (BlockChain.TEST_DB > 0 ||
                             (forgingStatus == ForgingStatus.FORGING // FORGING enabled
-                                    && !ctrl.needUpToDate()
+                                    && betterPeer == null && !ctrl.needUpToDate()
                                     && (this.solvingReference == null // AND GENERATING NOT MAKED
                                     || !Arrays.equals(this.solvingReference, dcSet.getBlockMap().getLastBlockSignature())
                             ))
-                            ) {
+                    ) {
 
                         /////////////////////////////// TRY FORGING ////////////////////////
 
                         if (ctrl.isOnStopping()) {
-                            local_status = -1;
                             return;
                         }
 
@@ -697,7 +885,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         solvingBlock = dcSet.getBlockMap().last();
 
                         if (ctrl.isOnStopping()) {
-                            local_status = -1;
                             return;
                         }
 
@@ -724,7 +911,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         //this.lastBlocksForTarget = bchain.getLastBlocksForTarget(dcSet);
                         this.acc_winner = null;
 
-
                         //unconfirmedTransactionsHash = null;
                         winned_winValue = 0;
                         winned_forgingValue = 0;
@@ -732,176 +918,207 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         height = bchain.getHeight(dcSet) + 1;
                         previousTarget = bchain.getTarget(dcSet);
 
-                        ///if (height > BlockChain.BLOCK_COUNT) return;
+                        if (BlockChain.TEST_DB == 0) {
 
-                        //PREVENT CONCURRENT MODIFY EXCEPTION
-                        List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
-                        synchronized (knownAccounts) {
+                            ///if (height > BlockChain.BLOCK_COUNT) return;
 
-                            local_status = 5;
-                            this.setMonitorStatus("local_status " + viewStatus());
+                            //PREVENT CONCURRENT MODIFY EXCEPTION
+                            List<PrivateKeyAccount> knownAccounts = this.getKnownAccounts();
+                            synchronized (knownAccounts) {
 
-                            for (PrivateKeyAccount account : knownAccounts) {
+                                local_status = 5;
+                                this.setMonitorStatus("local_status " + viewStatus());
 
-                                forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-                                winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue);
-                                if (winValue < 1)
-                                    continue;
+                                for (PrivateKeyAccount account : knownAccounts) {
 
-                                targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
-                                if (targetedWinValue < 1)
-                                    continue;
+                                    forgingValue = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+                                    winValue = BlockChain.calcWinValue(dcSet, account, height, forgingValue, null);
+                                    if (winValue < 1)
+                                        continue;
 
-                                if (winValue > winned_winValue) {
-                                    //this.winners.put(account, winned_value);
-                                    acc_winner = account;
-                                    winned_winValue = winValue;
-                                    winned_forgingValue = forgingValue;
-                                    //max_winned_value_account = winned_value_account;
+                                    targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, height, winValue, previousTarget);
+                                    if (targetedWinValue < 1)
+                                        continue;
 
+                                    if (winValue > winned_winValue) {
+                                        //this.winners.put(account, winned_value);
+                                        acc_winner = account;
+                                        winned_winValue = winValue;
+                                        winned_forgingValue = forgingValue;
+                                        //max_winned_value_account = winned_value_account;
+
+                                    }
                                 }
                             }
+
+                            if (BlockChain.CHECK_BUGS > 7) {
+                                Tuple2<List<Transaction>, Integer> unconfirmedTransactions
+                                        = getUnconfirmedTransactions(height, timePointForValidTX,
+                                        bchain, winned_winValue);
+                            }
+                        } else if (!BlockChain.STOP_GENERATE_BLOCKS) {
+                            /// тестовый аккаунт
+                            acc_winner = BlockChain.TEST_DB_ACCOUNTS[random.nextInt(BlockChain.TEST_DB_ACCOUNTS.length)];
+                            /// закатем в очередь транзакции
+                            testTransactions(height, timePointForValidTX);
                         }
 
-                        if (acc_winner != null) {
+                        if (!BlockChain.STOP_GENERATE_BLOCKS && acc_winner != null) {
 
                             if (ctrl.isOnStopping()) {
-                                local_status = -1;
                                 return;
                             }
 
-                            wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1;
-                            int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
-                            wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
-
-                            // сдвиг на заранее - только на 1/4 максимум
-                            if (wait_new_block_broadcast < BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2) {
-                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 2;
-                            } else if (wait_new_block_broadcast > BlockChain.GENERATING_MIN_BLOCK_TIME_MS) {
-                                wait_new_block_broadcast = BlockChain.GENERATING_MIN_BLOCK_TIME_MS;
-                            }
-
                             newWinner = false;
-                            if (wait_new_block_broadcast > 0) {
+                            // Соберем тут транзакции сразу же чтобы потом не тратить время
+                            Tuple2<List<Transaction>, Integer> unconfirmedTransactions
+                                    = getUnconfirmedTransactions(height, timePointForValidTX,
+                                    bchain, winned_winValue);
 
-                                local_status = 6;
-                                this.setMonitorStatus("local_status " + viewStatus());
+                            if (BlockChain.TEST_DB == 0) {
 
-                                LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
-                                // SLEEP and WATCH break
-                                wait_step = wait_new_block_broadcast / WAIT_STEP_MS;
+                                wait_new_block_broadcast = (timeStartBroadcast + BlockChain.FLUSH_TIMEPOINT(height)) >> 1;
+                                int shiftTime = (int) (((wait_new_block_broadcast * (previousTarget - winned_winValue) * 10) / previousTarget));
+                                wait_new_block_broadcast = wait_new_block_broadcast + shiftTime;
 
-                                this.setMonitorStatus("wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
-
-                                do {
-                                    try {
-                                        Thread.sleep(WAIT_STEP_MS);
-                                    } catch (InterruptedException e) {
-                                    }
-
-                                    if (ctrl.isOnStopping()) {
-                                        local_status = -1;
-                                        return;
-                                    }
-
-                                    waitWin = bchain.getWaitWinBuffer();
-                                    if (waitWin != null && waitWin.calcWinValue(dcSet) > winned_winValue) {
-                                        // NEW WINNER received
-                                        newWinner = true;
-                                        break;
-                                    }
-
+                                // сдвиг на заранее - только на 1/4 максимум
+                                if (wait_new_block_broadcast < timeStartBroadcast) {
+                                    wait_new_block_broadcast = timeStartBroadcast;
+                                } else if (wait_new_block_broadcast > BlockChain.FLUSH_TIMEPOINT(height)) {
+                                    wait_new_block_broadcast = BlockChain.FLUSH_TIMEPOINT(height);
                                 }
-                                while (this.orphanto <= 0 && wait_step-- > 0 && NTP.getTime() < timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS);
+
+                                if (wait_new_block_broadcast > 0
+                                        // и мы не отстаем
+                                        && NTP.getTime() < timePoint + wait_new_block_broadcast) {
+
+                                    local_status = 6;
+                                    this.setMonitorStatus("local_status " + viewStatus());
+
+                                    LOGGER.info("@@@@@@@@ wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
+                                    // SLEEP and WATCH break
+                                    wait_step = wait_new_block_broadcast / WAIT_STEP_MS;
+
+                                    this.setMonitorStatus("wait for new winner and BROADCAST: " + wait_new_block_broadcast / 1000);
+
+                                    do {
+                                        try {
+                                            Thread.sleep(WAIT_STEP_MS);
+                                        } catch (InterruptedException e) {
+                                            return;
+                                        }
+
+                                        if (ctrl.isOnStopping()) {
+                                            return;
+                                        }
+
+                                        waitWin = bchain.getWaitWinBuffer();
+                                        if (waitWin != null && waitWin.calcWinValue(dcSet) > winned_winValue) {
+                                            // NEW WINNER received
+                                            newWinner = true;
+                                            break;
+                                        }
+
+                                    }
+                                    while (this.orphanto <= 0 && wait_step-- > 0
+                                            && NTP.getTime() < timePoint + wait_new_block_broadcast
+                                            && betterPeer == null && !ctrl.needUpToDate());
+                                }
+
                             }
 
-                            if (this.orphanto > 0)
+                            if (this.orphanto > 0) {
                                 continue;
-
-                            if (newWinner) {
-                                LOGGER.info("NEW WINER RECEIVED - drop my block");
+                            } else if (ctrl.needUpToDate()) {
+                                LOGGER.info("skip GENERATING block - need UPDATE");
+                            } else if (betterPeer != null) {
+                                LOGGER.info("skip GENERATING block - better PERR founf: " + betterPeer);
                             } else {
-                                /////////////////////    MAKING NEW BLOCK  //////////////////////
-                                local_status = 7;
-                                this.setMonitorStatus("local_status " + viewStatus());
 
-                                // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
-                                LOGGER.info("GENERATE my BLOCK");
-
-                                generatedBlock = null;
-                                try {
-                                    processTiming = System.nanoTime();
-                                    generatedBlock = generateNextBlock(acc_winner, solvingBlock,
-                                            getUnconfirmedTransactions(height, timePointForGenerate,
-                                                    bchain, winned_winValue),
-                                            height, winned_forgingValue, winned_winValue, previousTarget);
-
-                                    processTiming = System.nanoTime() - processTiming;
-
-                                    // только если вблоке есть стрнзакции то вычислим
-                                    if (generatedBlock.getTransactionCount() > 0
-                                            && processTiming < 999999999999l) {
-                                        // при переполнении может быть минус
-                                        // в миеросекундах подсчет делаем
-                                        // ++ 10 потому что там ФОРК базы делаем - он очень медленный
-                                        processTiming = processTiming / 1000 /
-                                                (Controller.BLOCK_AS_TX_COUNT + generatedBlock.getTransactionCount());
-                                        if (transactionMakeTimingCounter < 1 << 3) {
-                                            transactionMakeTimingCounter++;
-                                            transactionMakeTimingAverage = ((transactionMakeTimingAverage * transactionMakeTimingCounter)
-                                                    + processTiming - transactionMakeTimingAverage) / transactionMakeTimingCounter;
-                                        } else
-                                            transactionMakeTimingAverage = ((transactionMakeTimingAverage << 3)
-                                                    + processTiming - transactionMakeTimingAverage) >> 3;
-
-                                        ctrl.setTransactionMakeTimingAverage(transactionMakeTimingAverage);
-                                    }
-
-                                } catch (java.lang.OutOfMemoryError e) {
-                                    local_status = -1;
-                                    LOGGER.error(e.getMessage(), e);
-                                    ctrl.stopAll(94);
-                                    return;
-                                }
-
-                                solvingBlock = null;
-
-                                if (generatedBlock == null) {
-                                    if (ctrl.isOnStopping()) {
-                                        this.local_status = -1;
-                                        return;
-                                    }
-
-                                    LOGGER.info("generateNextBlock is NULL... try wait");
-                                    try {
-                                        Thread.sleep(10000);
-                                    } catch (InterruptedException e) {
-                                    }
-
-                                    continue;
+                                if (newWinner) {
+                                    LOGGER.info("NEW WINER RECEIVED - drop my block");
                                 } else {
-                                    //PASS BLOCK TO CONTROLLER
+                                    /////////////////////    MAKING NEW BLOCK  //////////////////////
+                                    local_status = 7;
+                                    this.setMonitorStatus("local_status " + viewStatus());
+
+                                    // GET VALID UNCONFIRMED RECORDS for current TIMESTAMP
+                                    LOGGER.info("GENERATE my BLOCK for TXs: " + unconfirmedTransactions.b);
+
+                                    generatedBlock = null;
                                     try {
-                                        LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
-                                        if (bchain.setWaitWinBuffer(dcSet, generatedBlock, peer)) {
+                                        processTiming = System.nanoTime();
+                                        generatedBlock = generateNextBlock(acc_winner, solvingBlock,
+                                                unconfirmedTransactions,
+                                                height, winned_forgingValue, winned_winValue, previousTarget);
 
-                                            // need to BROADCAST
-                                            local_status = 8;
-                                            this.setMonitorStatus("local_status " + viewStatus());
+                                        processTiming = System.nanoTime() - processTiming;
 
-                                            ctrl.broadcastWinBlock(generatedBlock);
-                                            local_status = 0;
-                                            this.setMonitorStatus("local_status " + viewStatus());
+                                        // только если вблоке есть стрнзакции то вычислим
+                                        if (generatedBlock.getTransactionCount() > 0
+                                                && processTiming < 999999999999l) {
+                                            // при переполнении может быть минус
+                                            // в миеросекундах подсчет делаем
+                                            // ++ 10 потому что там ФОРК базы делаем - он очень медленный
+                                            processTiming = processTiming / 1000 /
+                                                    (Controller.BLOCK_AS_TX_COUNT + generatedBlock.getTransactionCount());
+                                            if (transactionMakeTimingCounter < 1 << 3) {
+                                                transactionMakeTimingCounter++;
+                                                transactionMakeTimingAverage = ((transactionMakeTimingAverage * transactionMakeTimingCounter)
+                                                        + processTiming - transactionMakeTimingAverage) / transactionMakeTimingCounter;
+                                            } else
+                                                transactionMakeTimingAverage = ((transactionMakeTimingAverage << 3)
+                                                        + processTiming - transactionMakeTimingAverage) >> 3;
 
-                                        } else {
-                                            LOGGER.info("my BLOCK is weak ((...");
+                                            ctrl.setTransactionMakeTimingAverage(transactionMakeTimingAverage);
                                         }
-                                        generatedBlock = null;
+
                                     } catch (java.lang.OutOfMemoryError e) {
-                                        local_status = -1;
                                         LOGGER.error(e.getMessage(), e);
-                                        ctrl.stopAll(94);
+                                        ctrl.stopAll(234);
                                         return;
+                                    }
+                                    LOGGER.info("GENERATE done");
+
+                                    solvingBlock = null;
+
+                                    if (generatedBlock == null) {
+                                        if (ctrl.isOnStopping()) {
+                                            return;
+                                        }
+
+                                        LOGGER.info("generateNextBlock is NULL... try wait");
+                                        try {
+                                            Thread.sleep(1000);
+                                        } catch (InterruptedException e) {
+                                        }
+
+                                        continue;
+                                    } else {
+                                        //PASS BLOCK TO CONTROLLER
+                                        try {
+                                            LOGGER.info("bchain.setWaitWinBuffer, size: " + generatedBlock.getTransactionCount());
+                                            if (bchain.setWaitWinBuffer(dcSet, generatedBlock,
+                                                    null // не надо банить тут - может цепочка ушла ужеи это мой блок же
+                                            )) {
+
+                                                // need to BROADCAST
+                                                local_status = 8;
+                                                this.setMonitorStatus("local_status " + viewStatus());
+
+                                                ctrl.broadcastWinBlock(generatedBlock);
+                                                local_status = 0;
+                                                this.setMonitorStatus("local_status " + viewStatus());
+
+                                            } else {
+                                                LOGGER.info("my BLOCK is weak ((...");
+                                            }
+                                            generatedBlock = null;
+                                        } catch (java.lang.OutOfMemoryError e) {
+                                            LOGGER.error(e.getMessage(), e);
+                                            ctrl.stopAll(235);
+                                            return;
+                                        }
                                     }
                                 }
                             }
@@ -909,47 +1126,122 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     }
                 }
 
+                height = bchain.getHeight(dcSet);
+
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
-                ctrl.checkStatusAndObserve(1);
-                if (!ctrl.needUpToDate()) {
+                // сдвиг 0 делаем
+                ctrl.checkStatusAndObserve(0);
+                if (betterPeer != null || orphanto > 0
+                        || timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()
+                        && ctrl.needUpToDate()) {
+
+                    if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
+                        pointLogWaitFlush = System.currentTimeMillis();
+                        LOGGER.info("To late for FLUSH - need UPDATE !");
+                    }
+                } else {
 
                     // try solve and flush new block from Win Buffer
-                    waitWin = bchain.getWaitWinBuffer();
-                    if (waitWin != null) {
 
-                        this.solvingReference = null;
+                    // FLUSH WINER to DB MAP
+                    if (this.solvingReference != null)
+                        if (System.currentTimeMillis() - pointLogWaitFlush > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
+                            pointLogWaitFlush = System.currentTimeMillis();
+                            LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
+                        }
 
-                        // FLUSH WINER to DB MAP
-                        LOGGER.info("wait to FLUSH WINER to DB MAP " + (flushPoint - NTP.getTime()) / 1000);
+                    // ждем основное время просто
+                    while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
+                        try {
+                            Thread.sleep(WAIT_STEP_MS);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
 
-                        local_status = 1;
-                        this.setMonitorStatus("local_status " + viewStatus());
+                        if (ctrl.isOnStopping()) {
+                            return;
+                        }
+                    }
 
-                        while (this.orphanto <= 0 && flushPoint > NTP.getTime()) {
-                            try {
-                                Thread.sleep(WAIT_STEP_MS);
-                            } catch (InterruptedException e) {
-                            }
+                    if (this.orphanto > 0)
+                        continue;
 
-                            if (ctrl.isOnStopping()) {
-                                local_status = -1;
-                                return;
+                    // если нет ничего в буфере то еще несного подождем
+                    do {
+
+                        waitWin = bchain.getWaitWinBuffer();
+                        if (waitWin != null) {
+                            break;
+                        }
+
+                        try {
+                            Thread.sleep(WAIT_STEP_MS);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+
+                        if (ctrl.isOnStopping()) {
+                            return;
+                        }
+                    } while (this.orphanto <= 0
+                            && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime()
+                            // возможно уже надо обновиться - мы отстали
+                            && betterPeer == null
+                            && !ctrl.needUpToDate());
+
+                    if (this.orphanto > 0)
+                        continue;
+
+                    if (waitWin == null && afterUpdatePeer != null) {
+                        waitWin = ctrl.checkNewPeerUpdates(afterUpdatePeer);
+                        afterUpdatePeer = null;
+                    }
+
+                    if (waitWin == null) {
+                        if (this.solvingReference != null) {
+                            if (System.currentTimeMillis() - pointLogGoUpdate > BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 2) {
+                                pointLogGoUpdate = System.currentTimeMillis();
+                                // сбросим и ссылку для генератора
+                                this.solvingReference = null;
+                                LOGGER.debug("WIN BUFFER is EMPTY - go to UPDATE");
+                                // обнулим - чтобы потом сработало новое создание
+                                this.solvingReference = null;
                             }
                         }
 
-                        if (this.orphanto > 0)
-                            continue;
+                    } else if (ctrl.needUpToDate()) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+                        LOGGER.debug("need UPDATE! skip FLUSH BLOCK");
+                    } else if (betterPeer != null) {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+                        LOGGER.debug("found better PEER! skip FLUSH BLOCK " + betterPeer);
+                    } else {
+                        // только если мы не отстали
+
+                        this.solvingReference = null;
+
+                        local_status = 1;
+                        this.setMonitorStatus("local_status " + viewStatus());
 
                         // FLUSH WINER to DB MAP
                         LOGGER.info("TRY to FLUSH WINER to DB MAP");
 
                         try {
-                            if (timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS < NTP.getTime()) {
+                            if (BlockChain.TEST_DB == 0 && flushPoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()) {
                                 try {
                                     // если вдруг цепочка встала,, то догоняем не очень быстро чтобы принимать все
                                     // победные блоки не спеша
-                                    Thread.sleep(BlockChain.DEVELOP_USE ? 500 : 5000);
+                                    Thread.sleep(1000);
                                 } catch (InterruptedException e) {
+                                    return;
                                 }
                             }
 
@@ -967,21 +1259,18 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         setForgingStatus(ForgingStatus.FORGING);
                                 }
                             } catch (java.lang.OutOfMemoryError e) {
-                                local_status = -1;
                                 LOGGER.error(e.getMessage(), e);
-                                ctrl.stopAll(94);
+                                ctrl.stopAll(235);
                                 return;
                             }
 
                             if (ctrl.isOnStopping()) {
-                                local_status = -1;
                                 return;
                             }
 
                         } catch (Exception e) {
                             // TODO Auto-generated catch block
                             if (ctrl.isOnStopping()) {
-                                local_status = -1;
                                 return;
                             }
                             LOGGER.error(e.getMessage(), e);
@@ -992,45 +1281,31 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         if (needRemoveInvalids != null) {
                             clearInvalids();
                         } else {
-                            checkForRemove(timePointForGenerate);
+                            checkForRemove(timePointForValidTX);
                             clearInvalids();
                         }
+
+                        // была обработка буфера, тогда на точку начала вернемся
+                        continue;
                     }
 
-                    continue;
                 }
 
                 ////////////////////////// UPDATE ////////////////////
 
-                timeUpdate = timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS - NTP.getTime();
-                if (timeUpdate > 0)
+                if (orphanto > 0 || betterPeer == null &&
+                        timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime())
                     continue;
-
-                if (timeUpdate + BlockChain.GENERATING_MIN_BLOCK_TIME_MS + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS >> 1) < 0
-                        && ctrl.getActivePeersCounter() > (BlockChain.DEVELOP_USE? 1 : 3)) {
-                    // если случилась патовая ситуация то найдем более сильную цепочку (не по высоте)
-                    // если есть сильнее то сделаем откат у себя
-                    //logger.debug("try resolve PAT situation");
-                    try {
-                        Thread.sleep(10000);
-                    } catch (InterruptedException e) {
-                    }
-
-                    if (ctrl.isOnStopping()) {
-                        local_status = -1;
-                        return;
-                    }
-                    checkWeightPeers();
-                }
 
                 /// CHECK PEERS HIGHER
                 // так как в девелопе все гоняют свои цепочки то посмотреть самыю жирную а не длинную
                 ctrl.checkStatusAndObserve(shift_height);
                 //CHECK IF WE ARE NOT UP TO DATE
-                if (ctrl.needUpToDate()) {
+                if (betterPeer != null || ctrl.needUpToDate()) {
+
+                    LOGGER.info("update by " + (betterPeer != null ? "better PEER: " + betterPeer : "controller status"));
 
                     if (ctrl.isOnStopping()) {
-                        local_status = -1;
                         return;
                     }
 
@@ -1040,13 +1315,12 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.solvingReference = null;
                     bchain.clearWaitWinBuffer();
 
-                    ctrl.update(shift_height);
+                    afterUpdatePeer = ctrl.update(shift_height);
 
                     local_status = 0;
                     this.setMonitorStatus("local_status " + viewStatus());
 
                     if (ctrl.isOnStopping()) {
-                        local_status = -1;
                         return;
                     }
 
@@ -1055,29 +1329,32 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                     setForgingStatus(ForgingStatus.FORGING_WAIT);
 
-                } else {
-
                 }
-
-            } catch (java.lang.OutOfMemoryError e) {
-                this.local_status = -1;
-                LOGGER.error(e.getMessage(), e);
-                ctrl.stopAll(96);
-                return;
-            } catch (Throwable e) {
-                if (ctrl.isOnStopping()) {
-                    this.local_status = -1;
-                    return;
-                }
-
-                LOGGER.error(e.getMessage(), e);
-
             }
-        }
 
-        // EXITED
-        this.local_status = -1;
-        this.setMonitorStatus("local_status " + viewStatus());
+        } catch (java.lang.OutOfMemoryError e) {
+            LOGGER.error(e.getMessage(), e);
+            ctrl.stopAll(96);
+            return;
+        } catch (Exception e) {
+            if (ctrl.isOnStopping()) {
+                return;
+            }
+
+            LOGGER.error(e.getMessage(), e);
+
+        } catch (Throwable e) {
+            if (ctrl.isOnStopping()) {
+                return;
+            }
+
+            LOGGER.error(e.getMessage(), e);
+
+        } finally {
+            // EXITED
+            this.local_status = -1;
+            this.setMonitorStatus("local_status " + viewStatus());
+        }
 
     }
 
@@ -1112,7 +1389,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         // TARGET_WIN will be small
         if (status != Controller.STATUS_OK
             ///|| ctrl.isProcessingWalletSynchronize()
-                ) {
+        ) {
             setForgingStatus(ForgingStatus.FORGING_ENABLED);
             return;
         }

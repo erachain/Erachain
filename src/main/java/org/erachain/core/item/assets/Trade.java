@@ -1,20 +1,19 @@
 package org.erachain.core.item.assets;
 // 16/03
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.datachain.DCSet;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 
-import org.erachain.datachain.DCSet;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
 
 public class Trade {
 
@@ -104,15 +103,36 @@ public class Trade {
         return timestamp; // + this.sequence;
     }
 
+    public static long[] parseID(String ordersID) {
+        try {
+            String[] strA = ordersID.split("/");
+            long orderIDinitiator = Transaction.parseDBRef(strA[0]);
+            long orderIDtarget = Transaction.parseDBRef(strA[1]);
+            return new long[]{orderIDinitiator, orderIDtarget};
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    public JSONObject toJson(long keyForBuySell) {
+    public JSONObject toJson(long keyForBuySell, boolean withCreators) {
 
         JSONObject trade = new JSONObject();
         trade.put("initiator", Transaction.viewDBRef(initiator));
         trade.put("target", Transaction.viewDBRef(target));
+
+        int height = Transaction.parseDBRefHeight(initiator);
+        trade.put("height", height);
+        trade.put("timestamp", Controller.getInstance().blockChain.getTimestamp(height));
+
         trade.put("sequence", sequence);
-        if (keyForBuySell == haveKey) {
-            trade.put("type", "sell");
+
+        if (keyForBuySell == 0 || keyForBuySell == haveKey) {
+
+            if (keyForBuySell != 0) {
+                // задана пара и направление можно давать
+                trade.put("type", "sell");
+            }
 
             trade.put("haveKey", haveKey);
             trade.put("wantKey", wantKey);
@@ -133,6 +153,15 @@ public class Trade {
 
             trade.put("price", calcPrice());
             trade.put("reversePrice", calcPriceRevers());
+
+        }
+
+        if (withCreators) {
+            Order order = getInitiatorOrder(DCSet.getInstance());
+            trade.put("initiatorCreator", order.getCreator().getAddress());
+
+            order = getTargetOrder(DCSet.getInstance());
+            trade.put("targetCreator", order.getCreator().getAddress());
 
         }
 
@@ -265,7 +294,7 @@ public class Trade {
         Order target = this.getTargetOrder(db);
 
         //ADD TRADE TO DATABASE
-        db.getTradeMap().add(this);
+        db.getTradeMap().put(this);
         if (!db.getTradeMap().contains(new Tuple2<Long, Long>(this.initiator, this.target))) {
             int error = 0;
         }
@@ -281,10 +310,10 @@ public class Trade {
 
             //ADD TO COMPLETED ORDERS
             //initiator.setFulfilledWant(initiator.getAmountWant());
-            db.getCompletedOrderMap().add(initiator);
+            db.getCompletedOrderMap().put(initiator);
         } else {
             //UPDATE ORDER
-            db.getOrderMap().add(initiator);
+            db.getOrderMap().put(initiator);
         }
 
         if (target.isFulfilled()) {
@@ -293,18 +322,18 @@ public class Trade {
 
             //ADD TO COMPLETED ORDERS
             //target.setFulfilledWant(target.getAmountWant());
-            db.getCompletedOrderMap().add(target);
+            db.getCompletedOrderMap().put(target);
         } else {
             //UPDATE ORDER
             //target.setFulfilledWant(target.getFulfilledWant().add(amountWant));
-            db.getOrderMap().add(target);
+            db.getOrderMap().put(target);
         }
 
         //TRANSFER FUNDS
         //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).add(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, false, initiator.getWantAssetKey(), this.amountHave, false);
+        initiator.getCreator().changeBalance(db, false, initiator.getWantAssetKey(), this.amountHave, false, false);
         //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).add(this.amountWant), db);
-        target.getCreator().changeBalance(db, false, target.getWantAssetKey(), this.amountWant, false);
+        target.getCreator().changeBalance(db, false, target.getWantAssetKey(), this.amountWant, false, false);
     }
 
     public void orphan_old(DCSet db) {
@@ -313,9 +342,9 @@ public class Trade {
 
         //REVERSE FUNDS
         //initiator.getCreator().setBalance(initiator.getWantAssetKey(), initiator.getCreator().getBalance(db, initiator.getWantAssetKey()).subtract(this.amountHave), db);
-        initiator.getCreator().changeBalance(db, true, initiator.getWantAssetKey(), this.amountHave, false);
+        initiator.getCreator().changeBalance(db, true, initiator.getWantAssetKey(), this.amountHave, false, false);
         //target.getCreator().setBalance(target.getWantAssetKey(), target.getCreator().getBalance(db, target.getWantAssetKey()).subtract(this.amountWant), db);
-        target.getCreator().changeBalance(db, true, target.getWantAssetKey(), this.amountWant, false);
+        target.getCreator().changeBalance(db, true, target.getWantAssetKey(), this.amountWant, false, false);
 
         //CHECK IF ORDER IS FULFILLED
         if (initiator.isFulfilled()) {
@@ -332,8 +361,8 @@ public class Trade {
         target.setFulfilledHave(target.getFulfilledHave().subtract(this.amountHave));
 
         //UPDATE ORDERS
-        db.getOrderMap().add(initiator);
-        db.getOrderMap().add(target);
+        db.getOrderMap().put(initiator);
+        db.getOrderMap().put(target);
 
         //REMOVE FROM DATABASE
         db.getTradeMap().delete(this);
@@ -349,4 +378,10 @@ public class Trade {
 
         return false;
     }
+
+    @Override
+    public String toString() {
+        return Transaction.viewDBRef(this.initiator) + ">" + Transaction.viewDBRef(this.target) + "=" + this.haveKey + "/" + this.wantKey;
+    }
+
 }

@@ -4,17 +4,15 @@ import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.models.SortedListTableModelCls;
-import org.erachain.lang.Lang;
+import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.NumberAsString;
-import org.mapdb.Fun.Tuple2;
 
 import java.util.Observable;
 import java.util.Observer;
 
 @SuppressWarnings("serial")
-public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, Long>, Trade> implements Observer {
+public class OrderTradesTableModel extends TimerTableModelCls<Trade> implements Observer {
     public static final int COLUMN_TIMESTAMP = 0;
     public static final int COLUMN_AMOUNT_WHO = 1;
     public static final int COLUMN_PRICE = 2;
@@ -33,17 +31,17 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
         this.order = order;
         this.isSell = isSell;
-        this.listSorted = DCSet.getInstance().getTradeMap().getTrades(order.getId());
+        this.list = DCSet.getInstance().getTradeMap().getTradesByOrderID(order.getId());
 
     }
 
     @Override
     public Object getValueAt(int row, int column) {
-        if (this.listSorted == null || row > this.listSorted.size() - 1) {
+        if (this.list == null || row > this.list.size() - 1) {
             return null;
         }
 
-        Trade trade = this.listSorted.get(row).getB();
+        Trade trade = this.list.get(row);
         if (trade == null) {
             return null;
         }
@@ -54,6 +52,9 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
         Order initiatorOrder = Order.getOrder(db, trade.getInitiator());
         Order targetOrder = Order.getOrder(db, trade.getTarget());
+
+        boolean isMine = Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())
+                || Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress());
 
         switch (column) {
             case COLUMN_TIMESTAMP:
@@ -69,7 +70,7 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
                 else
                     result = initiatorOrder.getCreator().getPersonAsString();
 
-                if (Controller.getInstance().isAddressIsMine(initiatorOrder.getCreator().getAddress())) {
+                if (isMine) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 
@@ -79,22 +80,23 @@ public class OrderTradesTableModel extends SortedListTableModelCls<Tuple2<Long, 
 
                 if (isSell)
                     return "<html><span style='color:green'>▲</span>"
-                            + NumberAsString.formatAsString(trade.calcPrice())
+                            + (isMine? "<b>" + NumberAsString.formatAsString(trade.calcPrice()) + "</b>"
+                                : NumberAsString.formatAsString(trade.calcPrice()))
                             + "</html>";
                 else
                     return "<html><span style='color:red'>▼</span>"
-                            + NumberAsString.formatAsString(trade.calcPriceRevers())
+                            + (isMine? "<b>" + NumberAsString.formatAsString(trade.calcPriceRevers()) + "</b>"
+                                : NumberAsString.formatAsString(trade.calcPriceRevers()))
                             + "</html>";
 
             case COLUMN_WHO_AMOUNT:
 
                 if (isSell)
                     result = initiatorOrder.getCreator().getPersonAsString();
-                    //result = NumberAsString.formatAsString(trade.getAmountWant());
                 else
                     result = NumberAsString.formatAsString(trade.getAmountHave());
 
-                if (Controller.getInstance().isAddressIsMine(targetOrder.getCreator().getAddress())) {
+                if (isMine) {
                     result = "<html><b>" + result + "</b></html>";
                 }
 

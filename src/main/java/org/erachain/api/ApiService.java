@@ -1,19 +1,18 @@
 package org.erachain.api;
 
-import java.util.HashSet;
-import java.util.Observable;
-import java.util.Observer;
-import java.util.Set;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.IPAccessHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.erachain.settings.Settings;
 import org.erachain.utils.ObserverMessage;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import org.erachain.settings.Settings;
+import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.Set;
 
 public class ApiService extends Observable {
 
@@ -49,6 +48,7 @@ public class ApiService extends Observable {
         s.add(RecStatementResource.class);
         s.add(MultiPaymentResource.class);
         s.add(TradeResource.class);
+        s.add(UtilResource.class);
 
         ResourceConfig config = new ResourceConfig(s);
 

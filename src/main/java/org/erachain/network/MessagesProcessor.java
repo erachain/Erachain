@@ -18,13 +18,13 @@ import java.util.concurrent.BlockingQueue;
 public class MessagesProcessor extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
-    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.DEVELOP_USE? false : false;
+    private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE ? true : false;
     private boolean runned;
 
     private Network network;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessagesProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessagesProcessor.class.getSimpleName());
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE ? 100 : 100;
+    private static final int QUEUE_LENGTH = 128 << (Controller.HARD_WORK >> 1);
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private long unconfigmedMessageTimingAverage;

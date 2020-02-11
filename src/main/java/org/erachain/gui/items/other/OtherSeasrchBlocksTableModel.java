@@ -6,6 +6,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,7 @@ public class OtherSeasrchBlocksTableModel extends AbstractTableModel {
     public static final int COLUMN_BASETARGET = 3;
     public static final int COLUMN_TRANSACTIONS = 4;
     public static final int COLUMN_FEE = 5;
-    static Logger LOGGER = LoggerFactory.getLogger(OtherSeasrchBlocksTableModel.class.getName());
+    static Logger LOGGER = LoggerFactory.getLogger(OtherSeasrchBlocksTableModel.class);
     private List<Block> blocks;
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"Height", "Timestamp", "Generator", "GB pH WV dtWV", // "Generating
@@ -160,7 +161,7 @@ public class OtherSeasrchBlocksTableModel extends AbstractTableModel {
                     }
 
                     int height = block.getHeight();
-                    Tuple2<Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, height);
+                    Tuple3<Integer, Integer, Integer> forgingPoint = block.getCreator().getForgingData(dcSet, height);
 
                     return forgingPoint.b + " "
                             + (height - forgingPoint.a) + " "
@@ -201,7 +202,7 @@ public class OtherSeasrchBlocksTableModel extends AbstractTableModel {
         if (start <= end) {
             DCSet dcSet = DCSet.getInstance();
             for (Integer i = start; i <= end; i++) {
-                Block block = DCSet.getInstance().getBlockMap().get(i);
+                Block block = DCSet.getInstance().getBlockMap().getAndProcess(i);
                 if (block != null) {
                     blocks.add(block);
                 }

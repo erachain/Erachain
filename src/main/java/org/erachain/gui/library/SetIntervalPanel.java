@@ -1,8 +1,8 @@
 package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.gui.ObserverWaiter;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
@@ -23,7 +23,7 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
     Logger LOGGER;
 
     private static final long serialVersionUID = 1L;
-    DBMap map;
+    DBTabImpl map;
     private long size;
     private boolean needUpdate;
 
@@ -32,17 +32,17 @@ public class SetIntervalPanel extends JPanel implements Observer, ObserverWaiter
      * Без динамического режима перерисовывается по внешнему таймеру из
      * gui.GuiTimer - только если было обновление
      */
-    public SetIntervalPanel(DBMap map) {
+    public SetIntervalPanel(DBTabImpl map) {
         jLabelTotal = new JLabel();
         this.map = map;
         this.size = this.map.size();
 
-        RESET_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_RESET);
-        LIST_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_LIST);
-        ADD_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_ADD);
-        REMOVE_EVENT = (Integer) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+        RESET_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_RESET);
+        LIST_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_LIST);
+        ADD_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_ADD);
+        REMOVE_EVENT = (Integer) map.getObservableData().get(DBTab.NOTIFY_REMOVE);
 
-        LOGGER = LoggerFactory.getLogger(getClass().getName());
+        LOGGER = LoggerFactory.getLogger(getClass());
 
         initComponents();
 

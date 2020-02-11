@@ -84,23 +84,7 @@ public class WalletOrdersTableModel extends WalletAutoKeyTableModel<Tuple2<Strin
 
             case COLUMN_STATUS:
 
-                if (order.getAmountHave().compareTo(order.getFulfilledHave()) == 0) {
-                    return Lang.getInstance().translate("Done");
-                } else {
-
-                    if (DCSet.getInstance().getCompletedOrderMap().contains(order.getId()))
-                        return Lang.getInstance().translate("Canceled");
-
-                    if (DCSet.getInstance().getOrderMap().contains(order.getId())) {
-                        if (order.getFulfilledHave().signum() == 0)
-                            return Lang.getInstance().translate("Active");
-                        else
-                            return Lang.getInstance().translate("Fulfilled");
-                    }
-
-                    return "orphaned"; //"unconfirmed";
-                }
-                // TODO: return "orphaned !";
+                Lang.getInstance().translate(order.state());
 
             case COLUMN_BLOCK:
 

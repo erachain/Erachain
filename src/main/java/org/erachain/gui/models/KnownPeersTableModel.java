@@ -28,7 +28,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
     private static final int COLUMN_FINDING_AGO = 5;
     private static final int COLUMN_ONLINE_TIME = 6;
     private static final int COLUMN_VERSION = 7;
-    static Logger logger = LoggerFactory.getLogger(KnownPeersTableModel.class.getName());
+    static Logger logger = LoggerFactory.getLogger(KnownPeersTableModel.class);
     String[] columnNames = Lang.getInstance().translate(new String[]{"IP", "Height",
             "Ping mc", "Reliable", "Initiator", "Finding ago", "Online Time", "Version"});
     private List<Peer> peers;
@@ -104,7 +104,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
             return null;
         }
 
-        PeerInfo peerInfo = Controller.getInstance().getDBSet().getPeerMap().getInfo(peer.getAddress());
+        PeerInfo peerInfo = Controller.getInstance().getDLSet().getPeerMap().getInfo(peer.getAddress());
         if (peerInfo == null){
             return null;
         }
@@ -115,7 +115,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
 
             case COLUMN_HEIGHT:
                 if (!peer.isUsed()) {
-                    int banMinutes = Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(peer);
+                    int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
                     if (banMinutes > 0) {
                         return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
                     } else {

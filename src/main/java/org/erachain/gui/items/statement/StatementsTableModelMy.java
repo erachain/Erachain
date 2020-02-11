@@ -221,14 +221,14 @@ public class StatementsTableModelMy extends AbstractTableModel implements Observ
         tran = new ArrayList<Transaction>();
         transactions.clear();
         // база данных
-        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(0, 1000, true)) {
+        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(1000, true)) {
             if (transaction.getType() == Transaction.SIGN_NOTE_TRANSACTION) {
                 transactions.add(transaction);
             }
         }
 
         for (Account account : Controller.getInstance().getAccounts()) {
-            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByTypeAndAddress(account.getAddress(), Transaction.SIGN_NOTE_TRANSACTION, 0));//.SEND_ASSET_TRANSACTION, 0));
+            transactions.addAll(DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SIGN_NOTE_TRANSACTION, 0, 0));//.SEND_ASSET_TRANSACTION, 0));
         }
 
         HashSet<Transaction> col = new HashSet<Transaction>(transactions);

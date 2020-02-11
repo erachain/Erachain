@@ -21,16 +21,12 @@ public class PublicKeyAccount extends Account {
     protected byte[] publicKey;
 
     public PublicKeyAccount(byte[] publicKey) {
-        super(Crypto.getInstance().getAddress(publicKey));
+        super(Crypto.getInstance().getAddressBytes(publicKey));
         this.publicKey = publicKey;
     }
 
     public PublicKeyAccount(String publicKey) {
         this(Base58.decode(publicKey));
-    }
-
-    protected PublicKeyAccount() {
-
     }
 
     //CHECK IF IS VALID PUBLIC KEY and MAKE NEW

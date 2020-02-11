@@ -3,11 +3,13 @@ package org.erachain.gui.items.assets;
 import org.erachain.controller.Controller;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.assets.Order;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.gui.models.TimerTableModelCls;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun;
 
 import java.math.BigDecimal;
 import java.util.Observable;
@@ -53,8 +55,6 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
             order = this.list.get(row);
 
             if (order == null) {
-                //totalCalc();
-                //this.fireTableRowsDeleted(row, row);
                 return null;
             }
 
@@ -83,7 +83,7 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
 
             case COLUMN_PRICE:
 
-                BigDecimal price = order.calcPrice();
+                BigDecimal price = order.calcLeftPrice();
                 amountStr = NumberAsString.formatAsString(price.stripTrailingZeros());
 
                 if (isMine)
@@ -93,12 +93,20 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
 
             case COLUMN_AMOUNT_WANT:
 
-                amountStr = order.getCreator().getPersonAsString();
+                String personStr;
+                Fun.Tuple2<Integer, PersonCls> person = order.getCreator().getPerson();
+                if (person == null || person.b == null) {
+                    personStr = order.getCreator().getAddress();
+                    if (isMine)
+                        personStr = "<html><b>" + personStr + "</b></html>";
+                } else {
+                    personStr = "<b>[" + person.b.getKey() + "]</b> "
+                            + (isMine? "<b>" + person.b.getName() + "</b>" : person.b.getName());
 
-                if (isMine)
-                    amountStr = "<html><b>" + amountStr + "</b></html>";
+                    personStr = "<html>" + personStr + "</html>";
+                }
 
-                return amountStr;
+                return personStr;
 
         }
 
@@ -123,16 +131,42 @@ public class SellOrdersTableModel extends TimerTableModelCls<Order> implements O
         // CHECK IF LIST UPDATED
         if (type == ObserverMessage.ADD_ORDER_TYPE
                 || type == ObserverMessage.REMOVE_ORDER_TYPE
-                ) {
+        ) {
 
-            Order order = (Order) message.getValue();
-            long haveKey = order.getHaveAssetKey();
-            long wantKey = order.getWantAssetKey();
+
+            long haveKey;
+            long wantKey;
+
+            Order order;
+            Object object = message.getValue();
+            if (object instanceof Order) {
+                order = (Order) object;
+                haveKey = order.getHaveAssetKey();
+                wantKey = order.getWantAssetKey();
+            } else if (object instanceof Long) {
+                // Сработал ордер или отменили значит он удалился но еще не добавлся в Исполненые
+                // Поэтому просто ищем тутт по ID
+                for (Order item : list) {
+                    if (item.getId().equals(object)) {
+                        this.needUpdate = true;
+                        return;
+                    }
+                }
+                // not found
+                return;
+            } else {
+                return;
+            }
+
             if (!(haveKey == this.haveKey && wantKey == this.wantKey)
                     && !(haveKey == this.wantKey && wantKey == this.haveKey)) {
                 return;
             }
 
+            this.needUpdate = true;
+            return;
+
+        } else if (type == ObserverMessage.LIST_ORDER_TYPE) {
             this.needUpdate = true;
             return;
 

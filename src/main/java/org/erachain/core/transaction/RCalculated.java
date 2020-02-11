@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
-import org.erachain.core.crypto.Base58;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -50,6 +49,18 @@ public class RCalculated extends TransactionAmount {
     // GETTERS/SETTERS
 
     @Override
+    public int hashCode() {
+        return Long.hashCode(dbRef);
+    }
+
+    @Override
+    public boolean equals(Object transaction) {
+        if (transaction instanceof RCalculated)
+            return dbRef == ((Transaction) transaction).getDBRef();
+        return false;
+    }
+
+    @Override
     public String viewTypeName() {
         return NAME_ID;
     }
@@ -67,6 +78,11 @@ public class RCalculated extends TransactionAmount {
     @Override
     public boolean hasPublicText() {
         return false;
+    }
+
+    @Override
+    public String getTitle() {
+        return this.message;
     }
 
     public String getMessage() {
@@ -90,7 +106,7 @@ public class RCalculated extends TransactionAmount {
 
         // READ RECIPIENT
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-        Account recipient = new Account(Base58.encode(recipientBytes));
+        Account recipient = new Account(recipientBytes);
         position += RECIPIENT_LENGTH;
 
         long key = 0;
@@ -142,6 +158,9 @@ public class RCalculated extends TransactionAmount {
         // GET BASE
         JSONObject transaction = this.getJsonBase();
 
+        transaction.put("asset", this.getAbsKey());
+        transaction.put("amount", this.amount.toPlainString());
+
         if (message.length() > 0) {
             transaction.put("message", this.message);
         }
@@ -163,7 +182,7 @@ public class RCalculated extends TransactionAmount {
         data = Bytes.concat(data, referenceBytes);
 
         // WRITE RECIPIENT
-        data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+        data = Bytes.concat(data, this.recipient.getAddressBytes());
 
         if (this.amount != null) {
 

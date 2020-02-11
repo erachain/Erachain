@@ -44,7 +44,7 @@ public class TestRecGenesisAsset {
     private void initIssue(boolean toProcess) {
 
         //CREATE EMPTY MEMORY DATABASE
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
 
         //CREATE ASSET
         asset = GenesisBlock.makeAsset(0);
@@ -227,7 +227,7 @@ public class TestRecGenesisAsset {
         assertEquals(false, db.getItemAssetMap().contains(key));
 
         //CHECK ASSET BALANCE SENDER
-        assertEquals(0, db.getAssetBalanceMap().get(maker.getAddress(), key).a.b.longValue());
+        assertEquals(0, db.getAssetBalanceMap().get(maker.getShortAddressBytes(), key).a.b.longValue());
 
         //CHECK REFERENCE SENDER
         // it for not genesis - assertEquals(true, Arrays.equals(genesisIssueAssetTransaction.getReference(), maker.getLastReference(db)));
@@ -271,7 +271,7 @@ public class TestRecGenesisAsset {
         assetTransfer.process(gb, Transaction.FOR_NETWORK);
 
         //CREATE VALID ASSET TRANSFER
-        maker.changeBalance(db, false, 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, 1, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
         assetTransfer = new GenesisTransferAssetTransaction(recipient, key, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE));
 
         //CHECK IF ASSET TRANSFER IS VALID
@@ -469,7 +469,7 @@ public class TestRecGenesisAsset {
 
             //CHECK A
             GenesisTransferAssetTransaction aaa = (GenesisTransferAssetTransaction) assetTransfer;
-            assertEquals(true, aaa.getOwner().equals(parsedAssetTransfer.getOwner()));
+            assertEquals(true, aaa.getCreator().equals(parsedAssetTransfer.getCreator()));
 
         } catch (Exception e) {
             fail("Exception while parsing transaction. " + e);

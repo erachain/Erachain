@@ -11,18 +11,13 @@ import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
 import org.erachain.lang.Lang;
 
-//import org.erachain.settings.Settings;
-
 @SuppressWarnings("serial")
 
 public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
     // private final MessagesTableModel messagesTableModel;
 
     public AccountAssetRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Repay Debt", assetIn, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
-
-        this.jLabel_Title.setText(Lang.getInstance()
-                .translate("If You want to give the borrowed asset %asset%, fill in this form").replace("%asset%", asset.viewName()));
+        super("Repay Debt", assetIn, "If You want to give the borrowed asset %asset%, fill in this form", TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Repay Debt"));
@@ -39,7 +34,7 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(
                 Controller.getInstance().getPrivateKeyAccountByAddress(sender.getAddress()), feePow, recipient, -key,
-                amount, head, messageBytes, isTextByte, encrypted);
+                amount, head, messageBytes, isTextByte, encrypted, 0);
 
         String Status_text = "";
         IssueConfirmDialog dd = new IssueConfirmDialog(null, true, transaction,

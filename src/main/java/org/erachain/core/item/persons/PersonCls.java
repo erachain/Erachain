@@ -2,7 +2,7 @@ package org.erachain.core.item.persons;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-import org.erachain.core.BlockChain;
+import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
 import org.erachain.datachain.DCSet;
@@ -27,7 +27,7 @@ import java.util.Set;
 //birthLatitude -90..90; birthLongitude -180..180
 public abstract class PersonCls extends ItemCls {
 
-    public static int MAX_IMAGE_LENGTH = BlockChain.DEVELOP_USE? 20480 : 28000;
+    public static int MAX_IMAGE_LENGTH = 28000;
     public static int MIN_IMAGE_LENGTH = 10240;
 
     public static final int HUMAN = 1;
@@ -189,6 +189,10 @@ public abstract class PersonCls extends ItemCls {
 
     }
 
+    public Set<String> getPubKeys(DCSet dcSet) {
+        return dcSet.getPersonAddressMap().getItems(this.getKey(dcSet)).keySet();
+    }
+
     public static BigDecimal getBalance(long personKey, long assetKey, int pos) {
 
         Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();
@@ -197,7 +201,8 @@ public abstract class PersonCls extends ItemCls {
 
         // тут переключение внутри цикла идет - так же слишком ресурсно
         BigDecimal sum = addresses.stream()
-                .map((address) -> map.get(address, assetKey))
+                .map((adr) -> Account.makeShortBytes(adr))
+                .map((key) -> map.get(key, assetKey))
                 .map((balances) -> {
                     switch (pos) {
                         case 1:
@@ -308,16 +313,18 @@ public abstract class PersonCls extends ItemCls {
     public String toString(DCSet db) {
         long key = this.getKey(db);
         return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
-                + this.name + "♥"
-                + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC");
+                + this.name // + "♥"
+                ///+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
+                ;
     }
 
     @Override
     public String getShort(DCSet db) {
         long key = this.getKey(db);
         return "[" + (key < 1 ? "?" : key) + (this.typeBytes[0] == HUMAN ? "" : ("." + this.typeBytes[0])) + "]"
-                + this.name.substring(0, Math.min(this.name.length(), 20)) + "♥"
-                + DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC");
+                + this.name.substring(0, Math.min(this.name.length(), 20)) //"♥"
+                //+ DateTimeFormat.timestamptoString(birthday, "dd-MM-YY", "UTC")
+                ;
     }
 
     @SuppressWarnings("unchecked")

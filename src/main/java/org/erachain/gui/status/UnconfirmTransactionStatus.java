@@ -30,7 +30,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
     public UnconfirmTransactionStatus() {
         super("| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0 0/usec");
 
-        map = DCSet.getInstance().getTransactionMap();
+        map = DCSet.getInstance().getTransactionTab();
         counter = map.size();
 
         map.addObserver(this);
@@ -98,17 +98,17 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
                 needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_ADD_BLOCK_TYPE:
-                needUpdate = true;
-                return;
             case ObserverMessage.CHAIN_REMOVE_BLOCK_TYPE:
                 needUpdate = true;
                 return;
             case ObserverMessage.CHAIN_RESET_BLOCK_TYPE:
+            case ObserverMessage.LIST_UNC_TRANSACTION_TYPE:
+            case ObserverMessage.RESET_UNC_TRANSACTION_TYPE:
                 counter = 0;
-                needUpdate = false;
-                refresh();
+                needUpdate = true;
                 return;
             case ObserverMessage.GUI_REPAINT:
+                // только тут запускаем пеперисовку - чтобы она основные процессы не тормозила
                 if (needUpdate) {
                     needUpdate = false;
                     refresh();
@@ -117,9 +117,16 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
         }
     }
 
+    long resetPoint = 0;
     private void refresh() {
 
         String mess;
+
+        if (counter < 0 || System.currentTimeMillis() - resetPoint > 300000) {
+            counter = map.size();
+            resetPoint = System.currentTimeMillis();
+        }
+
         if (counter > 0) {
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
             mess = "<HTML>| <A href = ' '>" + Lang.getInstance().translate("Unconfirmed Records") + ": " + counter
@@ -130,14 +137,14 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             mess = "| " + Lang.getInstance().translate("Unconfirmed Records") + ": 0";
         }
 
-        if (BlockChain.DEVELOP_USE) {
+        if (BlockChain.TEST_MODE) {
             // MISSED TELEGRAMS
             long missedMessagesTmp = Controller.getInstance().network.missedTelegrams.get();
             if (missedMessagesTmp > 0)
                 mess += " " + missedMessagesTmp + "-tg";
 
             // MISSED TRANSACTIONS
-            missedMessagesTmp = Controller.getInstance().network.missedTransactions.get();
+            missedMessagesTmp = Controller.getInstance().transactionsPool.missedTransactions;
             if (missedMessagesTmp > 0)
                 mess += " " + missedMessagesTmp + "-tx";
 
@@ -149,7 +156,7 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
             // MISSED MESSAGES
             missedMessagesTmp = Controller.getInstance().network.missedMessages.get();
             if (missedMessagesTmp > 0)
-                mess += " " + missedMessagesTmp + "-me";
+                mess += " " + missedMessagesTmp + "-ms";
 
             // MISSED SENDS
             missedMessagesTmp = Controller.getInstance().network.missedSendes.get();
@@ -159,31 +166,31 @@ public class UnconfirmTransactionStatus extends JLabel implements Observer {
 
         long timing = Controller.getInstance().network.telegramer.messageTimingAverage;
         if (timing > 0) {
-            mess += " " + 1000000000l / timing + "tlg/s";
+            mess += " " + 1000000000L / timing + "tlg/s";
         }
 
         timing = Controller.getInstance().getUnconfigmedMessageTimingAverage();
         if (timing > 0) {
-            mess += " " + 1000000l / timing + "utx/s";
+            mess += " " + 1000000L / timing + "utx/s";
         }
 
         timing = Controller.getInstance().getBlockChain().transactionWinnedTimingAverage;
         if (timing > 0) {
-            mess += " " + 1000000l / timing + "wtx/s";
+            mess += " " + 1000000L / timing + "wtx/s";
         }
 
         timing = Controller.getInstance().getTransactionMakeTimingAverage();
         if (timing > 0) {
-            mess += " " + 1000000l / timing + "mtx/s";
+            mess += " " + 1000000L / timing + "mtx/s";
         }
         timing = Controller.getInstance().getBlockChain().transactionValidateTimingAverage;
         if (timing > 0) {
-            mess += " " + 1000000l / timing + "vtx/s";
+            mess += " " + 1000000L / timing + "vtx/s";
         }
 
         timing = Controller.getInstance().getBlockChain().transactionProcessTimingAverage;
         if (timing > 0) {
-            mess += " " + 1000000l / timing + "ctx/s";
+            mess += " " + 1000000L / timing + "ctx/s";
         }
 
         setText(mess + " |");

@@ -9,10 +9,11 @@ import org.erachain.core.item.polls.PollCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.VoteOnItemPollTransaction;
 import org.erachain.datachain.DCSet;
-import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.items.ComboBoxModelItemsAll;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.library.IssueConfirmDialog;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.models.AccountsComboBoxModel;
 import org.erachain.gui.models.OptionsComboBoxModel;
 import org.erachain.gui.transaction.OnDealClick;
@@ -103,10 +104,10 @@ public class PollsDialog extends JDialog {
         descrGBC.gridwidth = 2;
         descrGBC.insets = new Insets(0, 5, 5, 0);
         descrGBC.fill = GridBagConstraints.BOTH;
-        JTextArea txtAreaDescription = new JTextArea(poll.getDescription());
-        txtAreaDescription.setRows(4);
+        MTextPane txtAreaDescription = new MTextPane(poll.getDescription());
+        //txtAreaDescription.setRows(4);
         txtAreaDescription.setBorder(name.getBorder());
-        txtAreaDescription.setEditable(false);
+        //txtAreaDescription.setEditable(false);
         JScrollPane ss = new JScrollPane();
         ss.setViewportView(txtAreaDescription);
 
@@ -171,7 +172,7 @@ public class PollsDialog extends JDialog {
 
         // CBX ACCOUNT
         detailGBC.gridy = 5;
-        this.cbxOptions = new JComboBox<String>(new OptionsComboBoxModel(poll.getOptions()));
+        this.cbxOptions = new JComboBox<String>(new OptionsComboBoxModel(poll.viewOptions()));
         if (this.cbxOptions.getItemCount() > option)
             this.cbxOptions.setSelectedIndex(option);
 		/*		
@@ -286,6 +287,11 @@ public class PollsDialog extends JDialog {
         dd.setLocationRelativeTo(this);
         dd.setVisible(true);
 
+        dd.dispose();
+
+        // ENABLE
+        this.voteButton.setEnabled(true);
+
         // JOptionPane.OK_OPTION
         if (dd.isConfirm) {
 
@@ -299,8 +305,11 @@ public class PollsDialog extends JDialog {
 
                 // TODO "A" ??
                 JOptionPane.showMessageDialog(new JFrame(),
-                        Lang.getInstance().translate("Message and/or payment has been sent!"),
+                        Lang.getInstance().translate("Your vote has been sent") + "!",
                         Lang.getInstance().translate("Success"), JOptionPane.INFORMATION_MESSAGE);
+
+                this.dispose();
+
             } else {
                 JOptionPane.showMessageDialog(new JFrame(),
                         Lang.getInstance().translate(OnDealClick.resultMess(result)),
@@ -308,7 +317,5 @@ public class PollsDialog extends JDialog {
             }
         }
 
-        // ENABLE
-        this.voteButton.setEnabled(true);
     }
 }

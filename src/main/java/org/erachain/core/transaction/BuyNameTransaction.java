@@ -5,7 +5,6 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.json.simple.JSONObject;
@@ -94,7 +93,7 @@ public class BuyNameTransaction extends Transaction {
 
         //READ SELLER
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + SELLER_LENGTH);
-        Account seller = new Account(Base58.encode(recipientBytes));
+        Account seller = new Account(recipientBytes);
         position += SELLER_LENGTH;
 
         //READ FEE POWER
@@ -164,7 +163,7 @@ public class BuyNameTransaction extends Transaction {
         data = Bytes.concat(data, this.nameSale.toBytes());
 
         //WRITE SELLER
-        data = Bytes.concat(data, Base58.decode(this.seller.getAddress()));
+        data = Bytes.concat(data, this.seller.getAddressBytes());
 
         //WRITE FEE POWER
         byte[] feePowBytes = new byte[1];
@@ -248,12 +247,12 @@ public class BuyNameTransaction extends Transaction {
         //UPDATE CREATOR
         super.process(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).subtract(this.nameSale.getAmount()), db);
-        this.creator.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
+        this.creator.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), false, false);
 
         //UPDATE SELLER
         Name name = this.nameSale.getName(this.dcSet);
         //this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
-        this.seller.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
+        this.seller.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false, false);
 
         //UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
         name = new Name(this.creator, name.getName(), name.getValue());
@@ -270,11 +269,11 @@ public class BuyNameTransaction extends Transaction {
         //UPDATE CREATOR
         super.orphan(block, asDeal);
         //this.creator.setBalance(Transaction.FEE_KEY, this.creator.getBalance(db, Transaction.FEE_KEY).add(this.nameSale.getAmount()), db);
-        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
+        this.creator.changeBalance(this.dcSet, false, Transaction.FEE_KEY, this.nameSale.getAmount(), false, false);
 
         //UPDATE SELLER
         //this.seller.setBalance(Transaction.FEE_KEY, this.seller.getBalance(db, Transaction.FEE_KEY).subtract(this.nameSale.getAmount()), db);
-        this.seller.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), false);
+        this.seller.changeBalance(this.dcSet, true, Transaction.FEE_KEY, this.nameSale.getAmount(), false, false);
 
         //UPDATE NAME OWNER (NEW OBJECT FOR PREVENTING CACHE ERRORS)
         Name name = this.nameSale.getName(this.dcSet);

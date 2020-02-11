@@ -59,6 +59,11 @@ public class CreatePollTransaction extends Transaction {
     //GETTERS/SETTERS
     //public static String getName() { return "Create Poll"; }
 
+    @Override
+    public boolean isWiped() {
+        return true;
+    }
+
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
 
         int test_len;
@@ -266,7 +271,7 @@ public class CreatePollTransaction extends Transaction {
         }
 
         //CHECK POLL CREATOR VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(this.poll.getCreator().getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.poll.getCreator().getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 
@@ -301,6 +306,7 @@ public class CreatePollTransaction extends Transaction {
     //@Override
     @Override
     public void process(Block block, int asDeal) {
+
         //UPDATE CREATOR
         super.process(block, asDeal);
 
@@ -312,6 +318,7 @@ public class CreatePollTransaction extends Transaction {
     //@Override
     @Override
     public void orphan(Block block, int asDeal) {
+
         //UPDATE CREATOR
         super.orphan(block, asDeal);
 

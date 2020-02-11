@@ -4,8 +4,6 @@ import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
 import org.erachain.datachain.DCSet;
-import org.erachain.network.Peer;
-import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.GetBlockMessage;
 import org.erachain.network.message.Message;
 import org.erachain.network.message.MessageFactory;
@@ -13,8 +11,6 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -24,9 +20,18 @@ public class BlocksRequest extends MonitoredThread {
     //private final static boolean logPings = true;
     private boolean runned;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BlocksRequest.class.getSimpleName());
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 50 : 50;
+    /**
+     * запросов может быть много - они очередь не сильно нагружают - так чтобы разрывов часто не было
+     * иначе buffer-3 = null ошибка на той стороне вылетает
+     */
+    private static final int QUEUE_LENGTH = 300 + (256 >> (Controller.HARD_WORK >> 1));
+    /**
+     * число выданных транзакций
+     */
+    private static final int TX_COUNTER_WAIT = 1000 << Controller.HARD_WORK;
+
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -131,14 +136,21 @@ public class BlocksRequest extends MonitoredThread {
             }
 
             // FREEZE sometimes
-            if (counter > 333) {
+            if (counter > TX_COUNTER_WAIT) {
                 counter = 0;
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     break;
                 }
+            } else {
+                try {
+                    Thread.sleep(2);
+                } catch (InterruptedException e) {
+                    break;
+                }
             }
+
         }
 
         LOGGER.info("Block Request halted");

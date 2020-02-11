@@ -231,6 +231,30 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public static String getItemTypeName(int itemType) {
+        switch (itemType) {
+            case ItemCls.ASSET_TYPE:
+                return "ASSET";
+            case ItemCls.IMPRINT_TYPE:
+                return "IMPRINT";
+            case ItemCls.PERSON_TYPE:
+                return "PERSON";
+            case ItemCls.POLL_TYPE:
+                return "POLL"; // Opinion
+            case ItemCls.UNION_TYPE:
+                return "UNION";
+            case ItemCls.STATEMENT_TYPE:
+                return "STATEMENT"; // TeXT
+            case ItemCls.STATUS_TYPE:
+                return "STATUS";
+            case ItemCls.TEMPLATE_TYPE:
+                return "TEMPLATE"; // TeMPLATE
+            default:
+                return null;
+
+        }
+    }
+
+    public static String getItemTypeChar2(int itemType) {
         return "@" + getItemTypeChar(itemType);
     }
 
@@ -244,12 +268,29 @@ public abstract class ItemCls implements ExplorerJsonLine {
     }
 
     public long resolveKey(DCSet db) {
+
+        if (this.reference == null || BlockChain.isWiped(this.reference))
+            return 0L;
+
         if (this.key == 0 // & this.reference != null
                 ) {
             if (this.getDBIssueMap(db).contains(this.reference)) {
                 this.key = this.getDBIssueMap(db).get(this.reference);
+            } else if (BlockChain.CHECK_BUGS > 0
+                    && !BlockChain.TEST_MODE
+                    && Base58.encode(this.reference).equals("2Mm3MY2F19CgqebkpZycyT68WtovJbgBb9p5SJDhPDGFpLQq5QjAXsbUZcRFDpr8D4KT65qMV7qpYg4GStmRp4za")
+                ///|| Base58.encode(this.reference).equals("4VLYXuFEx9hYVwg82921Nh1N1y2ozCyxpvoTs2kXnQk89HLGshF15FJossTBU6dZhXRDAXKUwysvLUD4TFNJfXhW")) // see issue/1149
+
+            ) {
+                // zDLLXWRmL8qhrU9DaxTTG4xrLHgb7xLx5fVrC2NXjRaw2vhzB1PArtgqNe2kxp655saohUcWcsSZ8Bo218ByUzH
+                LOGGER.error("Item [" + this.name + "] not found for REFERENCE: " + Base58.encode(this.reference));
+                if (BlockChain.CHECK_BUGS > 3) {
+                    Long error = null;
+                    error++;
+                }
             }
         }
+
         return this.key;
     }
 
@@ -277,6 +318,11 @@ public abstract class ItemCls implements ExplorerJsonLine {
     public void setReference(byte[] reference) {
         // TODO - if few itens issued in one recor - need reference to include nonce here
         this.reference = reference;
+
+    }
+
+    public Transaction getIssueTransaction(DCSet dcSet) {
+        return dcSet.getTransactionFinalMap().get(this.reference);
 
     }
 
@@ -557,7 +603,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
             // INSERT WITH NOVA KEY
             newKey = novaKey;
-            dbMap.set(newKey, this);
+            dbMap.put(newKey, this);
 
         } else {
 
@@ -567,33 +613,42 @@ public abstract class ItemCls implements ExplorerJsonLine {
                 // IF this not GENESIS issue - start from startKey
                 dbMap.setLastKey(startKey);
             }
-            newKey = dbMap.add(this);
+            newKey = dbMap.incrementPut(this);
 
         }
 
         this.key = newKey;
         //SET ORPHAN DATA
-        this.getDBIssueMap(db).set(this.reference, newKey);
+        this.getDBIssueMap(db).put(this.reference, newKey);
 
         return key;
     }
 
-    public long removeFromMap(DCSet db, long startKey) {
+    public long deleteFromMap(DCSet db, long startKey) {
         //DELETE FROM DATABASE
 
         long thisKey = this.getKey(db);
 
+        ItemMap map = this.getDBMap(db);
         if (thisKey > startKey) {
-            this.getDBMap(db).remove(thisKey);
+            map.decrementDelete(thisKey);
+
+            if (BlockChain.CHECK_BUGS > 1
+                    && map.getLastKey() != thisKey - 1) {
+                LOGGER.error("After delete KEY: " + key + " != map.value.key - 1: " + map.getLastKey());
+                Long error = null;
+                error++;
+            }
+
         } else {
-            this.getDBMap(db).delete(thisKey);
+            if (false && BlockChain.CHECK_BUGS > 3 && thisKey == 0) {
+                thisKey = this.getKey(db);
+            }
+            map.delete(thisKey);
         }
 
         //DELETE ORPHAN DATA
-        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 2");
         this.getDBIssueMap(db).delete(this.reference);
-
-        //logger.debug("<<<<< core.item.ItemCls.removeFromMap 3");
 
         return thisKey;
 

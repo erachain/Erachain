@@ -2,15 +2,12 @@ package org.erachain.gui.items.statement;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.database.FilteredByStringArray;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.models.SearchTableModelCls;
-import org.erachain.utils.Pair;
-import org.mapdb.Fun;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class StatementsTableModelSearch extends SearchTableModelCls<Transaction> {
 
@@ -77,32 +74,14 @@ public class StatementsTableModelSearch extends SearchTableModelCls<Transaction>
         fireTableDataChanged();
     }
 
-    public void setFilterByName(String filter) {
+    public void setFilterByName(String filter, Long fromID) {
 
         clear();
 
         DCSet dcSet = DCSet.getInstance();
 
-        Pair<String, Iterable> result = dcSet.getTransactionFinalMap().getKeysIteratorByFilterAsArray(filter, start, step);
-
-        if (result.getA() != null) {
-            findMessage = result.getA();
-            return;
-        } else {
-            findMessage = "";
-        }
-
-        Iterator iterator = result.getB().iterator();
-
-        Transaction item;
-        Long key;
-
-        while (iterator.hasNext()) {
-            key = (Long) iterator.next();
-            item = (Transaction) map.get(key);
-            list.add(item);
-        }
-
+        list = ((FilteredByStringArray) dcSet.getTransactionFinalMap())
+                .getKeysByFilterAsArray(filter, null, fromID, start, step, false);
 
         fireTableDataChanged();
 

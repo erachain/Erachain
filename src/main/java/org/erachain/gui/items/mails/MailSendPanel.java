@@ -11,18 +11,18 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
+import org.erachain.gui.items.accounts.AccountRenderer;
 import org.erachain.gui.items.accounts.AccountsComboBoxModel;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.MButton;
 import org.erachain.gui.models.SendTableModel;
 import org.erachain.gui.transaction.OnDealClick;
 import org.erachain.lang.Lang;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.utils.Converter;
 import org.erachain.utils.MenuPopupUtil;
+import org.mapdb.Fun.Tuple2;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -699,7 +699,7 @@ public class MailSendPanel extends JPanel {
                 if (recipient instanceof PublicKeyAccount) {
                     publicKey = ((PublicKeyAccount) recipient).getPublicKey();
                 } else {
-                    publicKey = Controller.getInstance().getPublicKeyByAddress(recipient.getAddress());
+                    publicKey = Controller.getInstance().getPublicKey(recipient);
                 }
                 if (publicKey == null) {
                     JOptionPane.showMessageDialog(new JFrame(),
@@ -739,7 +739,7 @@ public class MailSendPanel extends JPanel {
 
         // CREATE TX MESSAGE
         Transaction transaction = Controller.getInstance().r_Send(creator, feePow, recipient, key,
-                amount, head, messageBytes, isTextByte, encrypted);
+                amount, head, messageBytes, isTextByte, encrypted, 0);
         // test result = new Pair<Transaction, Integer>(null,
         // Transaction.VALIDATE_OK);
 

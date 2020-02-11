@@ -12,6 +12,7 @@ import org.erachain.utils.MonitoredThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.util.List;
 
 //
@@ -23,7 +24,7 @@ public class ConnectionCreator extends MonitoredThread {
 
     // как часто запрашивать все пиры у других пиров
     private static long GET_PEERS_PERIOD = 60 * 10 * 1000;
-    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCreator.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConnectionCreator.class.getSimpleName());
     private Network network;
     private static long getPeersTimestamp;
 
@@ -87,10 +88,14 @@ public class ConnectionCreator extends MonitoredThread {
                 continue;
 
             //CHECK IF SOCKET IS NOT LOCALHOST
-            if (newPeer.getAddress().isSiteLocalAddress()
-                    || newPeer.getAddress().isLoopbackAddress()
-                    || newPeer.getAddress().isAnyLocalAddress())
+            if (newPeer.getAddress().isAnyLocalAddress()
+                    || newPeer.getAddress().isLoopbackAddress()) {
                 continue;
+            }
+            if (newPeer.getAddress().isSiteLocalAddress()) {
+                LOGGER.debug("Local peer: {}",newPeer.getAddress());
+                //continue;
+            }
 
             if (!Settings.getInstance().isTryingConnectToBadPeers() && newPeer.isBad())
                 continue;
@@ -99,7 +104,7 @@ public class ConnectionCreator extends MonitoredThread {
                 Thread.sleep(100);
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(94);
+                Controller.getInstance().stopAll(194);
                 break;
             } catch (InterruptedException e) {
                 break;
@@ -153,7 +158,7 @@ public class ConnectionCreator extends MonitoredThread {
                 Thread.sleep(100);
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(96);
+                Controller.getInstance().stopAll(156);
                 break;
             } catch (InterruptedException e) {
                 break;
@@ -165,6 +170,16 @@ public class ConnectionCreator extends MonitoredThread {
             this.setName("ConnectionCreator - " + this.getId()
                     + " white:" + network.getActivePeersCounter(true)
                     + " total:" + network.getActivePeersCounter(false));
+
+            if (BlockChain.START_PEER != null) {
+                // TRY CONNECT to WHITE peers of this PEER
+                try {
+                    Peer startPeer = new Peer(InetAddress.getByAddress(BlockChain.START_PEER));
+                    connectToPeersOfThisPeer(startPeer, 1, true);
+                } catch (Exception e) {
+
+                }
+            }
 
             //CHECK IF WE NEED NEW CONNECTIONS
             if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
@@ -196,10 +211,13 @@ public class ConnectionCreator extends MonitoredThread {
 
                     //CHECK IF SOCKET IS NOT LOCALHOST
                     //if(true)
-                    if (peer.getAddress().isSiteLocalAddress()
-                            || peer.getAddress().isLoopbackAddress()
-                            || peer.getAddress().isAnyLocalAddress()) {
+                    if (peer.getAddress().isAnyLocalAddress()
+                            || peer.getAddress().isLoopbackAddress()) {
                         continue;
+                    }
+                    if (peer.getAddress().isSiteLocalAddress()) {
+                        //continue;
+                        LOGGER.debug("Local peer: {}",peer.getAddress());
                     }
 
                     //CHECK IF PEER ALREADY used
@@ -262,7 +280,7 @@ public class ConnectionCreator extends MonitoredThread {
             //SLEEP
             int counter = network.getActivePeersCounter(true);
             if (counter == 0
-                    || counter < 6 && !BlockChain.DEVELOP_USE)
+                    || counter < 6 && !BlockChain.TEST_MODE)
                 continue;
 
             int needMinConnections = Settings.getInstance().getMinConnections();
@@ -277,7 +295,7 @@ public class ConnectionCreator extends MonitoredThread {
 
             try {
                 if (counter < needMinConnections)
-                    Thread.sleep(BlockChain.DEVELOP_USE ? 5000 : 5000);
+                    Thread.sleep(BlockChain.TEST_MODE ? 5000 : 5000);
                 else
                     Thread.sleep(10000);
             } catch (java.lang.OutOfMemoryError e) {

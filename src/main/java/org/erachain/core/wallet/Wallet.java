@@ -18,6 +18,7 @@ import org.erachain.core.naming.Name;
 import org.erachain.core.naming.NameSale;
 import org.erachain.core.transaction.*;
 import org.erachain.core.voting.Poll;
+import org.erachain.database.wallet.AccountMap;
 import org.erachain.database.wallet.DWSet;
 import org.erachain.database.wallet.SecureWalletDatabase;
 import org.erachain.datachain.BlockMap;
@@ -40,8 +41,8 @@ import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
 import java.util.Timer;
+import java.util.*;
 
 /**
  * обработка секртеных ключей и моих записей, которые относятся к набору моих счетов
@@ -55,7 +56,7 @@ public class Wallet extends Observable implements Observer {
 
 	private static final long RIGHTS_KEY = Transaction.RIGHTS_KEY;
 	private static final long FEE_KEY = Transaction.FEE_KEY;
-	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getName());
+	static Logger LOGGER = LoggerFactory.getLogger(Wallet.class.getSimpleName());
 	public DWSet database;
 	AssetsFavorites assetsFavorites;
 	TemplatesFavorites templatesFavorites;
@@ -64,6 +65,7 @@ public class Wallet extends Observable implements Observer {
 	private int secondsToUnlock = 100;
 	private Timer lockTimer; // = new Timer();
 	private int syncHeight;
+	private WalletUpdater walletUpdater;
 
 	private List<ObserverWaiter> waitingObservers = new ArrayList<>();
 	// CONSTRUCTORS
@@ -82,10 +84,13 @@ public class Wallet extends Observable implements Observer {
 			if (withObserver) {
 				// ADD OBSERVER
 				// Controller.getInstance().addObserver(this);
-				DCSet.getInstance().getTransactionMap().addObserver(this);
+				DCSet.getInstance().getTransactionTab().addObserver(this);
 				DCSet.getInstance().getBlockMap().addObserver(this);
 				// DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 			}
+
+			walletUpdater = new WalletUpdater(Controller.getInstance(),
+					Controller.getInstance().getBlockChain(), DCSet.getInstance(), this);
 
         }
 
@@ -162,7 +167,11 @@ public class Wallet extends Observable implements Observer {
 		if (this.database == null)
 			return new ArrayList<>();
 
-		return this.database.getAccountMap().getPublicKeyAccounts();
+
+        AccountMap mapAccs = this.database.getAccountMap();
+        synchronized (mapAccs) { // else deadlock in org.erachain.database.wallet.AccountMap.add
+            return mapAccs.getPublicKeyAccounts();
+        }
 	}
 
 	public List<Tuple2<Account, Long>> getAccountsAssets() {
@@ -470,7 +479,7 @@ public class Wallet extends Observable implements Observer {
 
 		// ADD OBSERVER
 		Controller.getInstance().addObserver(this);
-		DCSet.getInstance().getCompletedOrderMap().addObserver(this);
+		////DCSet.getInstance().getCompletedOrderMap().addObserver(this);
 
 		// SOME
 		// Account initAccount = this.getAccounts().get(0);
@@ -535,7 +544,7 @@ public class Wallet extends Observable implements Observer {
 			this.database.getAccountMap().add(account, -1);
 			// set name
 			ob.put("description", Lang.getInstance().translate("Created by default Account") + " " + (nonce + 1));
-			this.database.getAccountsPropertisMap().set(account.getAddress(), new Tuple2<String, String>(
+			this.database.getAccountsPropertisMap().put(account.getAddress(), new Tuple2<String, String>(
 					Lang.getInstance().translate("My Account") + " " + (nonce + 1), StrJSonFine.convert(ob)));
 			LOGGER.info("Added account #" + nonce);
 
@@ -619,18 +628,18 @@ public class Wallet extends Observable implements Observer {
             this.database.hardFlush();
 
             // RESET MAPS
-			this.database.getTransactionMap().reset();
-			this.database.getBlocksHeadMap().reset();
-			this.database.getNameMap().reset();
-			this.database.getNameSaleMap().reset();
-            this.database.getPollMap_old().reset();
-			this.database.getAssetMap().reset();
-			this.database.getImprintMap().reset();
-			this.database.getTemplateMap().reset();
-			this.database.getPersonMap().reset();
-			this.database.getStatusMap().reset();
-			this.database.getUnionMap().reset();
-			this.database.getOrderMap().reset();
+			this.database.getTransactionMap().clear();
+			this.database.getBlocksHeadMap().clear();
+			this.database.getNameMap().clear();
+			this.database.getNameSaleMap().clear();
+            this.database.getPollMap_old().clear();
+			this.database.getAssetMap().clear();
+			this.database.getImprintMap().clear();
+			this.database.getTemplateMap().clear();
+			this.database.getPersonMap().clear();
+			this.database.getStatusMap().clear();
+			this.database.getUnionMap().clear();
+			this.database.getOrderMap().clear();
 
             LOGGER.info("   >>>>  Maps was Resetted");
 
@@ -670,7 +679,7 @@ public class Wallet extends Observable implements Observer {
         	if (getAccounts() != null && !getAccounts().isEmpty()) {
 				do {
 
-					Block block = blockMap.get(height);
+					Block block = blockMap.getAndProcess(height);
 
 					if (block == null) {
 						break;
@@ -773,7 +782,8 @@ public class Wallet extends Observable implements Observer {
     // asynchronous RUN from BlockGenerator
     public void synchronize(boolean reset) {
         if (!reset && Controller.getInstance().isProcessingWalletSynchronize()
-                || Controller.getInstance().isOnStopping()) {
+                || Controller.getInstance().isOnStopping()
+			|| Controller.getInstance().noDataWallet || Controller.getInstance().noUseWallet) {
             return;
         }
 
@@ -791,7 +801,7 @@ public class Wallet extends Observable implements Observer {
         if (CHECK_CHAIN_BROKENS_ON_SYNC_WALLET) {
             LOGGER.info("TEST CHAIN .... ");
             for (int i = 1; i <= dcSet.getBlockMap().size(); i++) {
-                Block block = dcSet.getBlockMap().get(i);
+                Block block = dcSet.getBlockMap().getAndProcess(i);
                 if (block.getHeight() != i) {
                     Long error = null;
                     ++error;
@@ -816,7 +826,7 @@ public class Wallet extends Observable implements Observer {
                         Long error = null;
                         ++error;
                     }
-                    parent = dcSet.getBlockMap().get(i - 1);
+                    parent = dcSet.getBlockMap().getAndProcess(i - 1);
                     if (!Arrays.equals(parent.getSignature(), reference)) {
                         Long error = null;
                         ++error;
@@ -964,20 +974,56 @@ public class Wallet extends Observable implements Observer {
 	}
 
 	// IMPORT/EXPORT
-
 	public String importAccountSeed(byte[] accountSeed) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.isUnlocked()) {
-			return "";
+			return "Wallet is locked";
 		}
 
 		// CHECK LENGTH
 		if (accountSeed.length != Crypto.HASH_LENGTH) {
-			return "";
+			return "Wrong length != 32";
 		}
 
 		// CREATE ACCOUNT
 		PrivateKeyAccount account = new PrivateKeyAccount(accountSeed);
+
+		// CHECK IF ACCOUNT ALREADY EXISTS
+		if (!this.accountExists(account.getAddress())) {
+			// ADD TO DATABASE
+			this.secureDatabase.getAccountSeedMap().add(account);
+			this.database.getAccountMap().add(account, -1);
+
+			// SAVE TO DISK
+			this.database.hardFlush();
+
+			// SYNCHRONIZE
+			this.synchronize(true);
+
+			// NOTIFY
+			this.setChanged();
+			this.notifyObservers(new ObserverMessage(ObserverMessage.ADD_ACCOUNT_TYPE, account));
+
+			// RETURN
+			return account.getAddress();
+		}
+
+		return "";
+	}
+
+	public String importPrivateKey(byte[] privateKey64) {
+		// CHECK IF WALLET IS OPEN
+		if (!this.isUnlocked()) {
+			return "Wallet is locked";
+		}
+
+		// CHECK LENGTH
+		if (privateKey64.length != Crypto.SIGNATURE_LENGTH) {
+			return "Wrong length != 64";
+		}
+
+		// CREATE ACCOUNT
+		PrivateKeyAccount account = new PrivateKeyAccount(privateKey64);
 
 		// CHECK IF ACCOUNT ALREADY EXISTS
 		if (!this.accountExists(account.getAddress())) {
@@ -1287,7 +1333,7 @@ public class Wallet extends Observable implements Observer {
 
 	private long processBlockLogged = 0;
 
-    private void processBlock(DCSet dcSet, Block block) {
+	void processBlock(DCSet dcSet, Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1342,7 +1388,7 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK IF SERTIFY PErSON
 			else if (transaction instanceof RSertifyPubKeys) {
-				this.processSertifyPerson((RSertifyPubKeys) transaction);
+				this.processSertifyPerson((RSertifyPubKeys) transaction, height);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1358,32 +1404,27 @@ public class Wallet extends Observable implements Observer {
 		}
 
         if (block.blockHead.transactionsCount > 0
-				&& start - processBlockLogged > (BlockChain.DEVELOP_USE ? 30000 : 30000)) {
+				&& start - processBlockLogged > 30000) {
 			long tickets = System.currentTimeMillis() - start;
 			processBlockLogged = start;
-            LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets * 0.001
-                    + " TXs = " + block.blockHead.transactionsCount + " millsec/record:"
-                    + tickets / (block.blockHead.transactionsCount + 1));
+			LOGGER.debug("WALLET [" + block.blockHead.heightBlock + "] processing time: " + tickets * 0.001
+					+ " TXs = " + block.blockHead.transactionsCount + " millsec/record:"
+					+ tickets / (block.blockHead.transactionsCount + 1));
 		}
 
     }
 
-    private void orphanBlock(Block block) {
+	void orphanBlock(DCSet dcSet, Block block) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
 		}
 
-		// long start = System.currentTimeMillis();
-
-		//List<Transaction> transactions = block.a.a;
-
-		DCSet dcSet = DCSet.getInstance();
-
 		// ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
 		if (block == null)
 			return;
 
+		int height = block.heightBlock;
 		List<Transaction> transactions = block.getTransactions();
 		int seqNo;
         for (int i = block.blockHead.transactionsCount - 1; i >= 0; i--) {
@@ -1411,7 +1452,7 @@ public class Wallet extends Observable implements Observer {
 
 			// CHECK IF SERTIFY PErSON
 			else if (transaction instanceof RSertifyPubKeys) {
-				this.orphanSertifyPerson((RSertifyPubKeys) transaction);
+				this.orphanSertifyPerson((RSertifyPubKeys) transaction, height);
 			}
 
 			// CHECK IF ORDER CREATION
@@ -1505,7 +1546,7 @@ public class Wallet extends Observable implements Observer {
 		}
 	}
 
-	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys) {
+	private void processSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1538,7 +1579,7 @@ public class Wallet extends Observable implements Observer {
 				///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 				// ISSUE NEW COMPU in chain
-				BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
+				BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
 
 				// GIFTs
 				if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
@@ -1571,7 +1612,7 @@ public class Wallet extends Observable implements Observer {
         }
     }
 
-    private void orphanSertifyPerson(RSertifyPubKeys sertifyPubKeys) {
+    private void orphanSertifyPerson(RSertifyPubKeys sertifyPubKeys, int height) {
 		// CHECK IF WALLET IS OPEN
 		if (!this.exists()) {
 			return;
@@ -1604,7 +1645,7 @@ public class Wallet extends Observable implements Observer {
 			///transPersonIssue.setDC(db, Transaction.FOR_NETWORK); // RECALC FEE if from DB
 
 			// ISSUE NEW COMPU in chain
-			BigDecimal issued_FEE_BD = sertifyPubKeys.getBonuses();
+			BigDecimal issued_FEE_BD = BlockChain.BONUS_FOR_PERSON(height);
 
 			// GIFTs
 			if (this.accountExists(transPersonIssue.getCreator().getAddress())) {
@@ -1711,6 +1752,9 @@ public class Wallet extends Observable implements Observer {
 	@SuppressWarnings("unchecked")
     @Override
     public void update(Observable o, Object arg) {
+    	if (Controller.getInstance().noUseWallet || Controller.getInstance().noDataWallet)
+    		return;
+
         try {
             this.syncUpdate(o, arg);
         } catch (Exception e) {
@@ -1780,6 +1824,7 @@ public class Wallet extends Observable implements Observer {
         }
 
         //////////// PROCESS BLOCKS ////////////
+		DCSet dcSet = DCSet.getInstance();
 
         if (this.synchronizeStatus) {
             // идет синхронизация кошелька уже - не обрабатываем блоки тут
@@ -1799,7 +1844,7 @@ public class Wallet extends Observable implements Observer {
             }
 
             // CHECK BLOCK
-            this.orphanBlock(block);
+			this.orphanBlock(dcSet, block);
 
             //this.database.clearCache();
             //this.database.commit();

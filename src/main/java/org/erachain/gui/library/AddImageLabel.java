@@ -18,26 +18,35 @@ import java.io.File;
 import java.io.IOException;
 
 
-public class AddImageLabel extends JLabel {
+public class AddImageLabel extends JPanel {
 
     private static final long serialVersionUID = 1L;
+    private final int initialWidth;
+    private final int initialHeight;
+    private final String text;
     private byte[] imgBytes;
     private int bezelWidth;
     private int bezelHeight;
-    private Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private JLabel label = new JLabel();
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    private JLabel label;
+    private JLabel mainLabel = new JLabel();
 
-    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize,int initialWidth,int initialHeight) {
+    public AddImageLabel(String text, int bezelWidth, int bezelHeight, TypeOfImage typeOfImage, int minSize, int maxSize, int initialWidth, int initialHeight) {
         setLayout(new BorderLayout());
-        label.setText(text);
+        this.text = text;
+        label = new JLabel("The Label", SwingConstants.CENTER);
+        label.setText(this.text);
         add(label, BorderLayout.NORTH);
+        add(mainLabel, BorderLayout.CENTER);
         this.bezelWidth = bezelWidth;
         this.bezelHeight = bezelHeight;
-        setIcon(createImageIcon(Color.WHITE, initialWidth, initialHeight));
+        this.initialWidth = initialWidth;
+        this.initialHeight = initialHeight;
+        mainLabel.setIcon(createImageIcon(Color.WHITE, this.initialWidth, this.initialHeight));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         setBorder(BorderFactory.createEtchedBorder());
-        setVerticalAlignment(SwingConstants.TOP);
-        setHorizontalAlignment(SwingConstants.CENTER);
+        mainLabel.setVerticalAlignment(SwingConstants.TOP);
+        mainLabel.setHorizontalAlignment(SwingConstants.CENTER);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -81,7 +90,7 @@ public class AddImageLabel extends JLabel {
                         return;
                     }
                     ImageIcon imageIcon = new ImageIcon(image);
-                    setIcon(imageIcon);
+                    mainLabel.setIcon(imageIcon);
                     ByteArrayOutputStream imageStream = new ByteArrayOutputStream();
                     try {
                         if (typeOfImage == TypeOfImage.GIF) {
@@ -92,10 +101,10 @@ public class AddImageLabel extends JLabel {
 
                         imgBytes = imageStream.toByteArray();
                         if (minSize > 0) {
-                            int templWidth = bezelWidth;
-                            int templHeight = bezelHeight;
+                            int templWidth = image.getWidth();
+                            int templHeight = image.getHeight();
                             int counter = 0;
-                            while (imgBytes.length < minSize && counter++ < 5) {
+                            while (imgBytes.length < minSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth *= 1.2;
                                 templHeight *= 1.2;
@@ -104,10 +113,10 @@ public class AddImageLabel extends JLabel {
                             }
                         }
                         if (maxSize > 0) {
-                            int templWidth = bezelWidth;
-                            int templHeight = bezelHeight;
+                            int templWidth = image.getWidth();
+                            int templHeight = image.getHeight();
                             int counter = 0;
-                            while (imgBytes.length > maxSize && counter++ < 10) {
+                            while (imgBytes.length > maxSize && counter++ < 100) {
                                 imageStream.reset();
                                 templWidth /= 1.2;
                                 templHeight /= 1.2;
@@ -139,7 +148,9 @@ public class AddImageLabel extends JLabel {
 
     public void reset() {
         imgBytes = null;
-        setIcon(null);
+//        label.setText(text);
+//        add(label, BorderLayout.NORTH);
+        mainLabel.setIcon(createImageIcon(Color.WHITE, initialWidth, initialHeight));
     }
 
     public byte[] getImgBytes() {

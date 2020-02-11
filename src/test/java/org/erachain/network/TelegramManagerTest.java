@@ -66,7 +66,7 @@ public class TelegramManagerTest {
     // INIT ASSETS
     private void init() {
 
-        dcSet = DCSet.createEmptyDatabaseSet();
+        dcSet = DCSet.createEmptyDatabaseSet(0);
         telegramer = new TelegramManager(null, null, null, null);
         telegramer.start();
     }
@@ -80,6 +80,7 @@ public class TelegramManagerTest {
 
         init();
 
+        boolean outcomes = false;
         Transaction transaction;
 
         Controller cntr = Controller.getInstance();
@@ -100,7 +101,7 @@ public class TelegramManagerTest {
 
         }
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null, outcomes);
         assertEquals(telegrams.size(), 100);
 
         transaction = telegrams.get(10).getTransaction();
@@ -111,7 +112,7 @@ public class TelegramManagerTest {
 
         assertEquals((int)telegramer.telegramCount(), 100 - 1);
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null, outcomes);
         assertEquals(telegrams.size(), 100 - 1);
 
         telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);
@@ -130,7 +131,7 @@ public class TelegramManagerTest {
 
         assertEquals((int)telegramer.telegramCount(), 100 - 1 - signsList.size());
 
-        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null);
+        telegrams = telegramer.getTelegramsFromTimestamp(0l, null, null, outcomes);
         assertEquals(telegrams.size(), 100 - 1 - signsList.size());
 
         telegrams = telegramer.getTelegramsForAddress(recipient1.getAddress(), 0, null);

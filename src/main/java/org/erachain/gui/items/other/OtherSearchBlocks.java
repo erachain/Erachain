@@ -35,14 +35,14 @@ public class OtherSearchBlocks extends SplitPanel {
         this.searchFavoriteJCheckBoxLeftPanel.setVisible(false);
         this.searchMyJCheckBoxLeftPanel.setVisible(false);
         this.searchToolBar_LeftPanel.setVisible(true);
-        this.searthLabel_SearchToolBar_LeftPanel.setText(Lang.getInstance().translate("Block") + " (1-20)");
-        this.searchTextField_SearchToolBar_LeftPanel.setMinimumSize(new Dimension(500, 20));
+        this.searthLabelSearchToolBarLeftPanel.setText(Lang.getInstance().translate("Block") + " (1-20)");
+        this.searchTextFieldSearchToolBarLeftPanelDocument.setMinimumSize(new Dimension(500, 20));
         this.button2ToolBarLeftPanel.setVisible(false);
         this.button1ToolBarLeftPanel.setVisible(false);
         tamleModel = new OtherSeasrchBlocksTableModel();
         Table_Hash = new JTable(tamleModel);
 
-        searchTextField_SearchToolBar_LeftPanel.addActionListener(new ActionListener() {
+        searchTextFieldSearchToolBarLeftPanelDocument.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
@@ -73,7 +73,7 @@ public class OtherSearchBlocks extends SplitPanel {
 
                 rp.searchToolBar_LeftPanel.setVisible(false);
                 rp.toolBarLeftPanel.setVisible(false);
-                rp.searchTextField_SearchToolBar_LeftPanel.setText(item_Table_Selected.getHeight() + "");
+                rp.searchTextFieldSearchToolBarLeftPanelDocument.setText(item_Table_Selected.getHeight() + "");
                 rp.listener();
                 jScrollPaneJPanelRightPanel.setViewportView(rp);
                 //			itemTableSelected = null;
@@ -87,7 +87,7 @@ public class OtherSearchBlocks extends SplitPanel {
     }
 
     private void find() {
-        String search = searchTextField_SearchToolBar_LeftPanel.getText();
+        String search = searchTextFieldSearchToolBarLeftPanelDocument.getText();
 
 
         try {
@@ -191,7 +191,7 @@ public class OtherSearchBlocks extends SplitPanel {
             String hashe = Base58.encode(Crypto.getInstance().digest(fileInArray));
             // tableModel.addRow(new Object[] { hashes,
             // Lang.getInstance().translate("from file ") + file_name });
-            this.searchTextField_SearchToolBar_LeftPanel.setText(hashe);
+            this.searchTextFieldSearchToolBarLeftPanelDocument.setText(hashe);
             find();
 
         }

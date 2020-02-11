@@ -2,12 +2,17 @@ package org.erachain.api;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.block.Block;
+import org.erachain.datachain.BlocksHeadsMap;
+import org.erachain.datachain.BlocksMapImpl;
+import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.mapdb.Fun;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -24,7 +29,7 @@ public class CoreResource {
     @Path("/stop")
     public String stop() {
 
-        if (!BlockChain.DEVELOP_USE)
+        if (!BlockChain.TEST_MODE)
             APIUtils.askAPICallAllowed(null, "GET core/stop", request, true);
 
         //STOP
@@ -77,7 +82,7 @@ public class CoreResource {
     public String getVersion() {
         JSONObject jsonObject = new JSONObject();
 
-        jsonObject.put("version", Controller.getInstance().getVersion());
+        jsonObject.put("version", Controller.getInstance().getVersion(true));
         jsonObject.put("buildDate", Controller.getInstance().getBuildDateString());
         jsonObject.put("buildTimeStamp", Controller.buildTimestamp);
 
@@ -131,27 +136,46 @@ public class CoreResource {
     @GET
     @Path("/info/speed")
     public String getSpeedInfo() {
-        JSONObject jsonObj = new JSONObject();
-        Controller cnt = Controller.getInstance();
+        return Controller.getInstance().getBenchmarks().toJSONString();
+    }
 
-        if (BlockChain.DEVELOP_USE) {
-            jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
-            jsonObj.put("missedTransactions", cnt.getInstance().network.missedTransactions.get());
-            jsonObj.put("activePeersCounter", cnt.getInstance().network.getKnownPeers());
-            jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
-            jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
-            jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
-            jsonObj.put("msgTimingAvrg", cnt.getInstance().network.telegramer.messageTimingAverage);
-            jsonObj.put("unconfMsgTimingAvrg", cnt.getInstance().getUnconfigmedMessageTimingAverage());
-            jsonObj.put("transactionWinnedTimingAvrg", cnt.getInstance().getBlockChain().transactionWinnedTimingAverage);
-            jsonObj.put("transactionMakeTimingAvrg", cnt.getInstance().getTransactionMakeTimingAverage());
-            jsonObj.put("transactionValidateTimingAvrg", cnt.getInstance().getBlockChain().transactionValidateTimingAverage);
-            jsonObj.put("transactionProcessTimingAvrg", cnt.getInstance().getBlockChain().transactionProcessTimingAverage);
-        }
-        else {
-            jsonObj.put("null", "null");
-        }
-        return jsonObj.toJSONString();
+    @GET
+    @Path("/cwv")
+    public String checkWinVal() {
+        DCSet dcSet = DCSet.getInstance();
+        BlocksHeadsMap mapHeads = dcSet.getBlocksHeadsMap();
+        BlocksMapImpl mapBlock = dcSet.getBlockMap();
+        int height = 1;
+        long totalWV = 0;
+        String out = "";
+        do {
+            Block.BlockHead head = mapHeads.get(++height);
+            if (head == null)
+                break;
+
+            Block block = mapBlock.get(height);
+            if (!block.getCreator().equals(head.creator)) {
+                return "ERROR on Height: " + height + ", tCREATOR diff: " + block.getCreator() + " - " + head.creator;
+            }
+
+            totalWV += head.winValue;
+            if (totalWV != head.totalWinValue) {
+                return "ERROR on Height: " + height + ", total WinValue diff: " + (totalWV - head.totalWinValue);
+            }
+
+            // берем текущую - там есть предыдущая
+            Fun.Tuple3<Integer, Integer, Integer> forgingData = head.creator.getForgingData(dcSet, height);
+            long winValue = BlockChain.calcWinValue(dcSet, head.creator, height, forgingData.c, null);
+            if (winValue != head.winValue) {
+                return "ERROR on Height: " + height + ", WinValue diff: " + (winValue - head.winValue);
+            }
+
+        } while (true);
+
+        if (out.isEmpty())
+            return "height: " + (height - 1) + ", totalWV: " + totalWV;
+
+        return out;
     }
 
 }

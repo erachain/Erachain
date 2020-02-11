@@ -29,7 +29,7 @@ import java.util.TimeZone;
 import static org.erachain.gui.items.utils.GUIUtils.checkWalletUnlock;
 
 public class InsertPersonPanel extends IssuePersonPanel {
-    private static final Logger logger = LoggerFactory.getLogger(InsertPersonPanel.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(InsertPersonPanel.class);
     private static final long serialVersionUID = 1L;
 
     private JTextField txtSign = new JTextField();
@@ -71,7 +71,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
     private void init() {
         titleJLabel.setText(Lang.getInstance().translate("Enter Person"));
-        textPersonNumber.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
         txtHeight.setText("");
@@ -87,7 +86,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
         addImageLabel.setVisible(false);
         comboBoxGender.setVisible(false);
         txtGenderTxt.setEditable(false);
-        textPersonNumber.setEditable(false);
         txtBirthLatitude.setEditable(false);
         txtBirthLongitudeLatitude.setEditable(false);
         txtSkinColor.setEditable(false);
@@ -210,9 +208,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
             comboBoxGender.setSelectedIndex(person.getGender());
             txtGenderTxt.setText(comboBoxGender.getSelectedItem().toString());
 
-            if (person.getRace() != null) {
-                textPersonNumber.setText(person.getRace());
-            }
             txtBirthLatitude.setText("" + person.getBirthLatitude() + ", " + person.getBirthLongitude());
             if (person.getSkinColor() != null) {
                 txtSkinColor.setText(person.getSkinColor());
@@ -227,7 +222,7 @@ public class InsertPersonPanel extends IssuePersonPanel {
 
             txtSign.setText(
                     person.isSignatureValid(DCSet.getInstance()) ? Base58.encode(person.getOwnerSignature())
-                            : Lang.getInstance().translate("Wrong signaryte for data owner"));
+                            : Lang.getInstance().translate("Wrong signature for data owner"));
             txtPublicKey.setText(Base58.encode(person.getOwner().getPublicKey()));
 
         });
@@ -327,7 +322,6 @@ public class InsertPersonPanel extends IssuePersonPanel {
         txtName.setText("");
         txtareaDescription.setText("");
         txtGenderTxt.setText("");
-        textPersonNumber.setText("");
         txtBirthLatitude.setText("");
         txtBirthLongitudeLatitude.setText("");
         txtSkinColor.setText("");

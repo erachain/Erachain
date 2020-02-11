@@ -48,7 +48,7 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
     public ModelAccountTransactions() {
         super(new String[]{"Account", "Amount", "Type"}, true);
 
-        logger = LoggerFactory.getLogger(ModelAccountTransactions.class.getName());
+        logger = LoggerFactory.getLogger(ModelAccountTransactions.class);
 
         this.transactions_Asset = new ArrayList<Transaction>();
         this.publicKeyAccounts = Controller.getInstance().getPublicKeyAccounts();
@@ -95,7 +95,7 @@ public class ModelAccountTransactions extends SortedListTableModelCls<Tuple2<Lon
             asset_Key = asset.getKey();
         }
 
-        List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(this.account.getAddress(), 1000);
+        List<Transaction> transactions = DCSet.getInstance().getTransactionFinalMap().getTransactionsByAddressLimit(this.account.getShortAddressBytes(), 1000, true);
 
 
         this.transactions_Asset.clear();

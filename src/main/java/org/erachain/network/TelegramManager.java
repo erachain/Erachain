@@ -27,13 +27,13 @@ public class TelegramManager extends Thread {
     /**
      * count telegrams
      */
-    private static final int MAX_HANDLED_TELEGRAMS_SIZE = BlockChain.HARD_WORK ? 1 << 20 : 8000;
+    private static final int MAX_HANDLED_TELEGRAMS_SIZE = 1024 << (4 + Controller.HARD_WORK);
 
     /**
      * time to live telegram
      */
-    private static final int KEEP_TIME = 60000 * 60 * (BlockChain.HARD_WORK ? 2 : 24);
-    static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getName());
+    private static final int KEEP_TIME = 60000 * 60 * (25 - 3 * Controller.HARD_WORK);
+    static Logger LOGGER = LoggerFactory.getLogger(TelegramManager.class.getSimpleName());
     private Network network;
     private boolean run;
     // pool of messages
@@ -45,7 +45,7 @@ public class TelegramManager extends Thread {
     // counts for CREATORs COUNT
     private ConcurrentHashMap<String, Integer> telegramsCounts;
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE ? 3000 : 3000;
+    private static final int QUEUE_LENGTH = 512 << (Controller.HARD_WORK >> 1);
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -91,7 +91,7 @@ public class TelegramManager extends Thread {
 
         onMessageProcessTiming = System.nanoTime();
 
-        if (add((TelegramMessage) message))
+        if (add((TelegramMessage) message) != 0)
             return;
 
         onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
@@ -123,10 +123,11 @@ public class TelegramManager extends Thread {
 
 
     // GET telegrams for RECIPIENT from TIME
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter) {
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
         List<TelegramMessage> telegrams = new ArrayList<TelegramMessage>();
         if (!Controller.getInstance().isOnStopping()) {
 
+            boolean skip = false;
             SortedMap<Long, List<TelegramMessage>> subMap = telegramsForTime.tailMap(timestamp);
             for (Entry<Long, List<TelegramMessage>> item : subMap.entrySet()) {
                 List<TelegramMessage> telegramsTimestamp = item.getValue();
@@ -142,10 +143,16 @@ public class TelegramManager extends Thread {
                                 continue;
                         }
 
-                        if (recipient != null && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                            Account account = ((RSend) transaction).getRecipient();
-                            if (!account.equals(recipient))
+                        if (recipient != null) {
+                            if (
+                                // только входящие
+                                    transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
+                                            && !((RSend) transaction).getRecipient().equals(recipient)
+                                            // можно и исходящие
+                                            && outcomes && !transaction.getCreator().equals(recipient)
+                            ) {
                                 continue;
+                            }
                         }
 
                         telegrams.add(telegram);
@@ -525,7 +532,7 @@ public class TelegramManager extends Thread {
      * @param telegram  телеграмма котрую надо добавить
      * @return TRUE if not added
      */
-    public boolean add(TelegramMessage telegram) {
+    public int add(TelegramMessage telegram) {
 
         Transaction transaction;
 
@@ -533,30 +540,25 @@ public class TelegramManager extends Thread {
 
         // CHECK IF SIGNATURE IS VALID OR GENESIS TRANSACTION
         Account creator = transaction.getCreator();
-        if (creator == null || !transaction.isSignatureValid(DCSet.getInstance())) {
-            // DISHONEST PEER
-            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-            ///		"ban PeerOnError - invalid telegram signature");
-            return true;
+        if (creator == null) {
+            return Transaction.INVALID_CREATOR;
+        }
+
+        if(!transaction.isSignatureValid(DCSet.getInstance())) {
+            return Transaction.INVALID_SIGNATURE;
         }
 
         long timestamp = transaction.getTimestamp();
-        if (timestamp > NTP.getTime() + 10000) {
-            // DISHONEST PEER
-            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-            ///		"ban PeerOnError - invalid telegram timestamp >>");
-            return true;
-        } else if (30000 + timestamp < NTP.getTime()) {
-            // DISHONEST PEER
-            ///this.tryDisconnect(telegram.getSender(), Synchronizer.BAN_BLOCK_TIMES,
-            ///		"ban PeerOnError - invalid telegram timestamp <<");
-            return true;
+        if (timestamp > NTP.getTime() + 120000) {
+            return Transaction.INVALID_TIMESTAMP;
+        } else if (200000 + timestamp < NTP.getTime()) {
+            return Transaction.INVALID_TIMESTAMP;
         }
 
         // TRY DO COMMANDS
         if (!try_command(transaction)) {
             // go broadcast
-            return false;
+            return 0;
         }
 
         String signatureKey;
@@ -566,7 +568,7 @@ public class TelegramManager extends Thread {
         signatureKey = Base58.encode(transaction.getSignature());
 
         if (this.handledTelegrams.containsKey(signatureKey))
-            return true;
+            return Transaction.ITEM_DUPLICATE;
 
         // CHECK IF LIST IS FULL
         if (this.handledTelegrams.size() > MAX_HANDLED_TELEGRAMS_SIZE) {
@@ -631,7 +633,7 @@ public class TelegramManager extends Thread {
         }
 
 
-        return false;
+        return 0;
 
     }
 

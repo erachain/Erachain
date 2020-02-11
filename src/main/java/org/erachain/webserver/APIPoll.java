@@ -79,6 +79,6 @@ public class APIPoll {
 
         return Response.status(200).header("Content-Type", "application/json; charset=utf-8")
                 .header("Access-Control-Allow-Origin", "*")
-                .entity(listPolls.get(0).toJson()).build();
+                .entity(listPolls.get(0).toJson().toJSONString()).build();
     }
 }

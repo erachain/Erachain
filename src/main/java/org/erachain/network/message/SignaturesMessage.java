@@ -2,7 +2,10 @@ package org.erachain.network.message;
 
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
+import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +15,9 @@ public class SignaturesMessage extends Message {
 
     private static final int SIGNATURE_LENGTH = Block.SIGNATURE_LENGTH;
     private static final int DATA_LENGTH = 4;
+
+    static Logger LOGGER = LoggerFactory.getLogger(SignaturesMessage.class.getName());
+    private static boolean loggerOn = BlockChain.CHECK_BUGS > 5 && false;
 
     private List<byte[]> signatures;
 
@@ -23,6 +29,11 @@ public class SignaturesMessage extends Message {
 
     public static SignaturesMessage parse(byte[] data) throws Exception {
         //READ LENGTH
+
+        if (loggerOn) {
+            LOGGER.debug("try parse LEN: " + data.length);
+        }
+
         byte[] lengthBytes = Arrays.copyOfRange(data, 0, DATA_LENGTH);
         int length = Ints.fromByteArray(lengthBytes);
 
@@ -58,18 +69,25 @@ public class SignaturesMessage extends Message {
 
     @Override
     public byte[] toBytes() {
-        byte[] data = new byte[0];
+
+        int listSize = this.signatures.size();
+        if (loggerOn) {
+            LOGGER.debug("try toBytes items: " + listSize);
+        }
+        byte[] data = new byte[DATA_LENGTH + SIGNATURE_LENGTH * listSize];
 
         //WRITE LENGTH
-        int listSize = this.signatures.size();
         byte[] lengthBytes = Ints.toByteArray(listSize);
         lengthBytes = Bytes.ensureCapacity(lengthBytes, DATA_LENGTH, 0);
-        data = Bytes.concat(data, lengthBytes);
+        System.arraycopy(lengthBytes, 0, data, 0, DATA_LENGTH);
 
+        int pos = DATA_LENGTH;
         //WRITE SIGNATURES
         for (byte[] header : this.signatures) {
             //WRITE SIGNATURE
-            data = Bytes.concat(data, header);
+            //data = Bytes.concat(data, header);
+            System.arraycopy(header, 0, data, pos, SIGNATURE_LENGTH);
+            pos += SIGNATURE_LENGTH;
         }
 
         //ADD CHECKSUM

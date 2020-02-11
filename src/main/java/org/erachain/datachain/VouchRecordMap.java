@@ -3,16 +3,13 @@ package org.erachain.datachain;
 
 //import java.lang.reflect.Array;
 
-import org.erachain.database.DBMap;
-import org.mapdb.BTreeKeySerializer;
+import org.erachain.dbs.DBTab;
+import org.erachain.utils.ObserverMessage;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
-import org.mapdb.DBMaker;
 import org.mapdb.Fun.Tuple2;
-import org.erachain.utils.ObserverMessage;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,24 +24,24 @@ import java.util.Map;
  * @return dcMap
  */
 
-public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> {
+public class VouchRecordMap extends DCUMap<Long, Tuple2<BigDecimal, List<Long>>> {
 
     public VouchRecordMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
 
         if (databaseSet.isWithObserver()) {
-            this.observableData.put(DBMap.NOTIFY_RESET, ObserverMessage.RESET_VOUCH_TYPE);
-            this.observableData.put(DBMap.NOTIFY_LIST, ObserverMessage.LIST_VOUCH_TYPE);
-            this.observableData.put(DBMap.NOTIFY_ADD, ObserverMessage.ADD_VOUCH_TYPE);
-            this.observableData.put(DBMap.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOUCH_TYPE);
+            this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.RESET_VOUCH_TYPE);
+            this.observableData.put(DBTab.NOTIFY_LIST, ObserverMessage.LIST_VOUCH_TYPE);
+            this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.ADD_VOUCH_TYPE);
+            this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.REMOVE_VOUCH_TYPE);
         }
     }
 
-    public VouchRecordMap(VouchRecordMap parent) {
-        super(parent, null);
+    public VouchRecordMap(VouchRecordMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     //@SuppressWarnings("unchecked")
@@ -61,22 +58,14 @@ public class VouchRecordMap extends DCMap<Long, Tuple2<BigDecimal, List<Long>>> 
 
 
     @Override
-    protected Map<Long, Tuple2<BigDecimal, List<Long>>> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return openMap(database);
+        map = openMap(database);
     }
 
     @Override
-    protected Map<Long, Tuple2<BigDecimal, List<Long>>> getMemoryMap() {
-        DB database = DBMaker.newMemoryDB().make();
-
-        //OPEN MAP
-        return this.getMap(database);
-    }
-
-    @Override
-    protected Tuple2<BigDecimal, List<Long>> getDefaultValue() {
-        return null;
+    protected void getMemoryMap() {
+        openMap();
     }
 
 }

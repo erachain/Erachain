@@ -9,11 +9,14 @@ import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.erachain.utils.URLViewer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
     /**
@@ -21,59 +24,67 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
      */
     private static final long serialVersionUID = 1L;
     //private static ItemAssetsTableModel tableModelItemAssets = ;
-    private SearchAssetsSplitPanel th;
+    ///private SearchAssetsSplitPanel th;
 
 
     public SearchAssetsSplitPanel(boolean search_and_exchange) {
         super(new ItemAssetsTableModel(), "SearchAssetsSplitPanel", "SearchAssetsSplitPanel");
-        th = this;
         setName(Lang.getInstance().translate("Search Assets"));
-
 
         // MENU
 
+        JMenuItem setSeeInBlockexplorer = new JMenuItem(Lang.getInstance().translate("Check in Blockexplorer"));
+
+        setSeeInBlockexplorer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                try {
+                    URLViewer.openWebpage(new URL("http://" + Settings.getInstance().getBlockexplorerURL()
+                            + ":" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"
+                            + "?asset=" + itemTableSelected.getKey()));
+                } catch (MalformedURLException e1) {
+                    logger.error(e1.getMessage(), e1);
+                }
+            }
+        });
 
         JMenuItem sell = new JMenuItem(Lang.getInstance().translate("To sell"));
         sell.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //new ExchangeFrame((AssetCls) th.itemMenu, null, "To sell", "");
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemMenu, null, "To sell", ""));
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "To sell", ""));
 
             }
         });
-
 
         JMenuItem excahge = new JMenuItem(Lang.getInstance().translate("Exchange"));
         excahge.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls)th.itemMenu, null, "", ""));
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "", ""));
 
             }
         });
-
 
         JMenuItem buy = new JMenuItem(Lang.getInstance().translate("Buy"));
         buy.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) th.itemMenu, null, "Buy", ""));
+                MainPanel.getInstance().insertTab(new ExchangePanel((AssetCls) itemTableSelected, null, "Buy", ""));
 
             }
         });
-
 
         JMenuItem vouch_menu = new JMenuItem(Lang.getInstance().translate("Vouch"));
         vouch_menu.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 DCSet db = DCSet.getInstance();
-                Transaction trans = db.getTransactionFinalMap().get(th.itemMenu.getReference());
+                Transaction trans = db.getTransactionFinalMap().get(itemTableSelected.getReference());
 
                 new VouchRecordDialog(trans.getBlockHeight(), trans.getSeqNo());
 
             }
         });
 
-
-//	nameSalesMenu.add(favorite);
         if (search_and_exchange) {
             this.menuTable.add(excahge);
             this.menuTable.addSeparator();
@@ -85,10 +96,15 @@ public class SearchAssetsSplitPanel extends SearchItemSplitPanel {
             this.menuTable.addSeparator();
 
             this.menuTable.add(vouch_menu);
+
+            menuTable.addSeparator();
+            menuTable.add(setSeeInBlockexplorer);
         } else {
             this.menuTable.remove(this.favoriteMenuItems);
-        }
 
+            menuTable.addSeparator();
+            menuTable.add(setSeeInBlockexplorer);
+        }
 
     }
 

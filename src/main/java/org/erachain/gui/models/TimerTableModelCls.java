@@ -1,7 +1,8 @@
 package org.erachain.gui.models;
 
 import org.erachain.controller.Controller;
-import org.erachain.database.DBMap;
+import org.erachain.dbs.DBTab;
+import org.erachain.dbs.DBTabImpl;
 import org.erachain.lang.Lang;
 import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
@@ -9,15 +10,16 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-import java.util.*;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 @SuppressWarnings("serial")
 public abstract class TimerTableModelCls<U> extends AbstractTableModel implements Observer {
 
     private String name;
-    private long timeout;
     protected String[] columnNames;
-    private Timer timer;
+    //private Timer timer;
     protected boolean needUpdate;
     protected boolean descending;
 
@@ -38,78 +40,44 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     protected int step = 50;
     protected long size = 0;
 
-    protected DBMap map;
+    protected DBTabImpl map;
     protected Logger logger;
 
     public TimerTableModelCls(String[] columnNames, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.columnNames = columnNames;
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+    public TimerTableModelCls(DBTabImpl map, String[] columnNames, boolean descending) {
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.descending = descending;
     }
 
     public TimerTableModelCls(String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+        logger = LoggerFactory.getLogger(this.getClass());
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+    public TimerTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
     }
 
-    public TimerTableModelCls(DBMap map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
+    public TimerTableModelCls(DBTabImpl map, String[] columnNames, Boolean[] columnAutoHeight, int favoriteColumn, boolean descending) {
+        logger = LoggerFactory.getLogger(this.getClass());
         this.map = map;
         this.columnNames = columnNames;
         this.columnAutoHeight = columnAutoHeight;
         this.descending = descending;
         this.COLUMN_FAVORITE = favoriteColumn;
-    }
-
-    public TimerTableModelCls(DBMap map, String name, long timeout, String[] columnNames, Boolean[] columnAutoHeight, boolean descending) {
-        logger = LoggerFactory.getLogger(this.getClass().getName());
-        this.map = map;
-        this.columnNames = columnNames;
-        this.name = name;
-        this.timeout = timeout;
-        this.columnAutoHeight = columnAutoHeight;
-        this.descending = descending;
-    }
-
-    public void initTimer() {
-        if (this.timer == null && name != null) {
-            this.timer = new Timer(name);
-
-            TimerTask action = new TimerTask() {
-                public void run() {
-                    try {
-                        if (needUpdate) {
-                            getInterval();
-                            fireTableDataChanged();
-                            needUpdate = false;
-                        }
-                    } catch (Exception e) {
-                        //logger.error(e.getMessage(),e);
-                        String err = e.getMessage();
-                    }
-                }
-            };
-
-            this.timer.schedule(action, 100, timeout);
-        }
-
     }
 
     public Boolean[] getColumnAutoHeight() {
@@ -172,11 +140,12 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
         ObserverMessage message = (ObserverMessage) arg;
 
         if (message.getType() == ADD_EVENT
-                        || message.getType() == DELETE_EVENT) {
+                || message.getType() == DELETE_EVENT) {
             needUpdate = true;
         } else if (message.getType() == LIST_EVENT
-                    || message.getType() == RESET_EVENT
-                    || message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
+                || message.getType() == RESET_EVENT) {
+            needUpdate = true;
+        } else if (message.getType() == ObserverMessage.GUI_REPAINT && needUpdate) {
             needUpdate = false;
             getInterval();
             this.fireTableDataChanged();
@@ -184,14 +153,14 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     //public abstract void getIntervalThis(int startBack, int endBack);
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
     }
 
     public int getMapDefaultIndex() {
         if (map == null)
             return 0;
 
-        return map.DEFAULT_INDEX;
+        return map.getDefaultIndex();
     }
 
     public long getMapSize() {
@@ -210,9 +179,9 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
 
         if (descending) {
             long startBack = -getMapSize() + start;
-            getIntervalThis(startBack, startBack + step);
+            getIntervalThis(startBack, step);
         } else {
-            getIntervalThis(start, start + step);
+             getIntervalThis(start, step);
         }
 
     }
@@ -225,40 +194,23 @@ public abstract class TimerTableModelCls<U> extends AbstractTableModel implement
     }
 
     public void addObservers() {
-        if (timeout > 0)
-            initTimer();
-        else {
-            Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
-            if (map != null) {
+        Controller.getInstance().guiTimer.addObserver(this); // обработка repaintGUI
+        if (map != null) {
 
-                RESET_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_RESET);
-                LIST_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_LIST);
-                ADD_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_ADD);
-                DELETE_EVENT = (int) map.getObservableData().get(DBMap.NOTIFY_REMOVE);
+            RESET_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_RESET);
+            LIST_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_LIST);
+            ADD_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_ADD);
+            DELETE_EVENT = (int) map.getObservableData().get(DBTab.NOTIFY_REMOVE);
 
-                map.addObserver(this);
-            }
+            map.addObserver(this);
         }
-
     }
 
     public void deleteObservers() {
-        if (timeout > 0)
-            stopTimer();
-        else {
-            Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
-            if (map != null) {
-                map.deleteObserver(this);
-            }
+        Controller.getInstance().guiTimer.deleteObserver(this); // обработка repaintGUI
+        if (map != null) {
+            map.deleteObserver(this);
         }
-    }
-
-    public void stopTimer() {
-        if (this.timer != null){
-            this.timer.cancel();
-            this.timer = null;
-        }
-
     }
 
 }

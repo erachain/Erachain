@@ -1,15 +1,10 @@
 package org.erachain.gui;
 
 import org.erachain.controller.Controller;
-import org.erachain.database.DBMap;
-import org.erachain.utils.ObserverMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Observable;
 import java.util.Observer;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * только запускает событи - "обновиться"

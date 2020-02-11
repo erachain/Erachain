@@ -9,6 +9,10 @@
     color: #13ad00;
 }
 
+tr>th {
+    padding: 3px 10px;
+}
+
 ul.sel_curr {
     margin-top: -5px;
 
@@ -399,4 +403,11 @@ button.white-bgc[disabled]:focus,
     -webkit-animation: pulsate 1.5s linear infinite;
     animation: pulsate 1.5s linear infinite;
     color: chartreuse;
+}
+
+/* for MarkDown tables */
+td {
+    padding: 1px 5px !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
 }

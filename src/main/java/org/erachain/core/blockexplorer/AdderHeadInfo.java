@@ -54,7 +54,7 @@ public class AdderHeadInfo {
     public static void addHeadInfoCapBlocks(Map output, DCSet dcSet, JSONObject langObj) {
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert block number or signature", langObj));
 
-        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
+        output.put("unconfirmedTxs", dcSet.getTransactionTab().size());
         output.put("totaltransactions", dcSet.getTransactionFinalMap().size());
         output.put("Label_Unconfirmed_transactions",
                 Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
@@ -82,7 +82,7 @@ public class AdderHeadInfo {
     public static void addHeadInfoCapPersons(Map output, DCSet dcSet, JSONObject langObj) {
         output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Type searching words or person key", langObj));
 
-        output.put("unconfirmedTxs", dcSet.getTransactionMap().size());
+        output.put("unconfirmedTxs", dcSet.getTransactionTab().size());
         output.put("Label_Unconfirmed_transactions",
                 Lang.getInstance().translateFromLangObj("Unconfirmed transactions", langObj));
         output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));

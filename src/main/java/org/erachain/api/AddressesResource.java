@@ -10,6 +10,7 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
+import org.erachain.datachain.ItemAssetBalanceMap;
 import org.erachain.utils.APIUtils;
 import org.erachain.utils.Pair;
 import org.json.simple.JSONArray;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -95,14 +97,14 @@ public class AddressesResource {
         // GET ACCOUNT
         Account account = new Account(address);
 
-        Long lastTimestamp = account.getLastTimestamp();
+        long[] lastTimestamp = account.getLastTimestamp();
 
         // RETURN
 
         if (lastTimestamp == null) {
             return "false";
         } else {
-            return "" + lastTimestamp;
+            return "" + lastTimestamp[0];
         }
     }
 
@@ -124,43 +126,25 @@ public class AddressesResource {
 
         Controller cntrl = Controller.getInstance();
 
-        List<Transaction> transactions = Controller.getInstance().getUnconfirmedTransactions(0, 10, true);
-
         DCSet db = DCSet.getInstance();
-        Long lastTimestamp = account.getLastTimestamp(db);
-        byte[] signature;
-        if (!(lastTimestamp == null)) {
-            signature = cntrl.getSignatureByAddrTime(db, address, lastTimestamp);
-            transactions.add(cntrl.getTransaction(signature));
+        long[] lastTimestamp = account.getLastTimestamp(db);
+        if (lastTimestamp != null) {
+            return "" + lastTimestamp[0];
         }
 
-        for (Transaction tx : transactions) {
-            if (tx.getCreator().equals(account)) {
-                for (Transaction tx2 : transactions) {
-                    if (tx.getTimestamp() > tx2.getTimestamp()
-                            & tx.getCreator().getAddress().equals(tx2.getCreator().getAddress())) {
-                        // if same address and parent timestamp
-                        isSomeoneReference.add(tx.getSignature());
-                        break;
-                    }
-                }
-            }
-        }
+        byte[] signature;
 
         if (isSomeoneReference.isEmpty()) {
             return getLastReference(address);
         }
 
-        for (Transaction tx : cntrl.getUnconfirmedTransactions(0, 10, true)) {
-            if (tx.getCreator().equals(account)) {
-                if (!isSomeoneReference.contains(tx.getSignature())) {
-                    //return Base58.encode(tx.getSignature());
-                    return "" + tx.getTimestamp();
-                }
-            }
-        }
+        // TODO: тут надо скан взять сразу для заданного адреса и последний
+        // а вообще для чего нафиг это нужно?
+        List<Transaction> items = DCSet.getInstance().getTransactionTab().getTransactionsByAddressFast100(address);
+        if (items.isEmpty())
+            return "false";
 
-        return "false";
+        return "" + items.get(items.size()).getTimestamp();
     }
 
     @GET
@@ -208,7 +192,7 @@ public class AddressesResource {
 
     @GET
     @Path("/private/{address}")
-    public String getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
+    public Response getPrivate(@PathParam("address") String address, @QueryParam("password") String password) {
 
         // CHECK IF VALID ADDRESS
         if (!Crypto.getInstance().isValidAddress(address)) {
@@ -238,8 +222,11 @@ public class AddressesResource {
                     ApiErrorFactory.ERROR_WALLET_ADDRESS_NO_EXISTS);
         }
 
-        byte[] seed = Controller.getInstance().getPrivateKeyAccountByAddress(address).getPrivateKey();
-        return Base58.encode(seed);
+        byte[] privateKey = Controller.getInstance().getPrivateKeyAccountByAddress(address).getPrivateKey();
+        return Response.status(200).header("Content-Type", "text/html; charset=utf-8")
+                //.header("Access-Control-Allow-Origin", "*")
+                .entity(Base58.encode(privateKey)).build(); // " ! " + Base58.encode(privateKey) - норм работает
+
     }
 
     @GET
@@ -286,7 +273,7 @@ public class AddressesResource {
 
             return Controller.getInstance().generateNewAccount();
         } else {
-            APIUtils.askAPICallAllowed(password, "POST addresses import seed\n " + x, request, true);
+            APIUtils.askAPICallAllowed(password, "POST addresses import Account seed\n " + x, request, true);
 
             String seed = x;
 
@@ -305,7 +292,7 @@ public class AddressesResource {
             // DECODE SEED
             byte[] seedBytes;
             try {
-                seedBytes = Base58.decode(seed);
+                seedBytes = Base58.decode(seed, Crypto.HASH_LENGTH);
             } catch (Exception e) {
                 throw ApiErrorFactory.getInstance().createError(
                         ApiErrorFactory.ERROR_INVALID_SEED);
@@ -370,7 +357,7 @@ public class AddressesResource {
         Account account = new Account(address);
         return "" + BlockChain.calcWinValue(DCSet.getInstance(),
                 account, Controller.getInstance().getBlockChain().getHeight(DCSet.getInstance()),
-                account.getBalanceUSE(Transaction.RIGHTS_KEY, DCSet.getInstance()).intValue());
+                account.getBalanceUSE(Transaction.RIGHTS_KEY, DCSet.getInstance()).intValue(), null);
     }
 
     public JSONArray tuple5_toJson(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance) {
@@ -439,7 +426,8 @@ public class AddressesResource {
 
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = DCSet.getInstance().getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
 
         return tuple5_toJson(balance).toJSONString();
     }
@@ -476,7 +464,8 @@ public class AddressesResource {
 
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = DCSet.getInstance().getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
 
         return balance.a.b.toPlainString();
     }
@@ -513,7 +502,8 @@ public class AddressesResource {
 
         }
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = DCSet.getInstance().getAssetBalanceMap().get(address, assetAsLong);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance
+                = DCSet.getInstance().getAssetBalanceMap().get(Account.makeShortBytes(address), assetAsLong);
 
         return balance.a.a.toPlainString();
     }
@@ -530,13 +520,14 @@ public class AddressesResource {
 
         }
 
-        SortableList<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
-                = DCSet.getInstance().getAssetBalanceMap().getBalancesSortableList(new Account(address));
+        ItemAssetBalanceMap map = DCSet.getInstance().getAssetBalanceMap();
+        SortableList<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalances
+                = map.getBalancesSortableList(new Account(address));
 
         JSONObject assetsBalancesJSON = new JSONObject();
 
-        for (Pair<Tuple2<String, Long>, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
-            assetsBalancesJSON.put(assetsBalance.getA().b, tuple5_toJson(assetsBalance.getB()));
+        for (Pair<byte[], Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>> assetsBalance : assetsBalances) {
+            assetsBalancesJSON.put(ItemAssetBalanceMap.getAssetKeyFromKey(assetsBalance.getA()), tuple5_toJson(assetsBalance.getB()));
         }
 
         return assetsBalancesJSON.toJSONString();
@@ -684,6 +675,42 @@ public class AddressesResource {
         PublicKeyAccount publicKey = new PublicKeyAccount(publicKeyBytes);
 
         return publicKey.getAddress();
+    }
+
+    @GET
+    @Path("/importprivatekey/{privatekey}")
+    public String importPrivate(@PathParam("privatekey") String privateKey) {
+
+        // CHECK IF WALLET EXISTS
+        if (!Controller.getInstance().doesWalletExists()) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_NO_EXISTS);
+        }
+
+        // CHECK WALLET UNLOCKED
+        if (!Controller.getInstance().isWalletUnlocked()) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_WALLET_LOCKED);
+        }
+
+        // DECODE SEED
+        byte[] privatekeyBytes64;
+        try {
+            privatekeyBytes64 = Base58.decode(privateKey, Crypto.SIGNATURE_LENGTH);
+        } catch (Exception e) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_INVALID_SEED);
+        }
+
+        // CHECK SEED LENGTH
+        if (privatekeyBytes64 == null) {
+            throw ApiErrorFactory.getInstance().createError(
+                    ApiErrorFactory.ERROR_INVALID_SEED);
+
+        }
+
+        // CONVERT TO BYTE
+        return Controller.getInstance().importPrivateKey(privatekeyBytes64);
     }
 
 }

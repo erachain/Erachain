@@ -1,24 +1,18 @@
 package org.erachain.gui.items.persons;
 
-import org.erachain.controller.Controller;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSertifyPubKeys;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.database.SortableList;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.TransactionFinalMap;
 import org.erachain.gui.models.TimerTableModelCls;
-import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.Null;
 import java.util.*;
 
 public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKeys> implements Observer {
@@ -149,7 +143,7 @@ public class PersonVouchFromTableModel extends TimerTableModelCls<RSertifyPubKey
     }
 
     @Override
-    public void getIntervalThis(long start, long end) {
+    public void getIntervalThis(long start, int limit) {
     }
 
     public void addObservers() {

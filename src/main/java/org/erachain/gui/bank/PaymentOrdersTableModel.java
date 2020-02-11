@@ -42,7 +42,7 @@ public class PaymentOrdersTableModel extends SortedListTableModelCls<Tuple2<Long
         super(new String[]{"Confirmation", "Timestamp", "Type", "Creator", "Item",
                 "Amount", "Recipient", "Fee", "Size"}, true);
 
-        logger = LoggerFactory.getLogger(PaymentOrdersTableModel.class.getName());
+        logger = LoggerFactory.getLogger(PaymentOrdersTableModel.class);
     }
 
     @Override

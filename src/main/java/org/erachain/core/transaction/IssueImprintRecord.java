@@ -154,12 +154,6 @@ public class IssueImprintRecord extends IssueItemRecord {
 
     //PARSE CONVERT
 
-    @Override
-    public boolean isReferenced() {
-        // reference not used - because all imprint is unique
-        return false;
-    }
-
     //VALIDATE
     //
     @Override

@@ -16,7 +16,6 @@ import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
-import org.erachain.datachain.AddressTimeSignatureMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
@@ -42,30 +41,6 @@ import java.util.*;
 
 public abstract class Transaction implements ExplorerJsonLine {
 
-    public static final byte[][] DISCREDIR_ADDRESSES = new byte[][]{
-            Base58.decode("HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7"),
-            Base58.decode("AoPMZ3Q8u5q2g9aK8JZSQRnb6iS53FjUjrtT8hCfHg9F") // 7DedW8f87pSDiRnDArq381DNn1FsTBa68Y")
-    };
-    public static final byte[][] VALID_SIGN = new byte[][]{
-            Base58.decode("5DnTfBxw2y8fDshzkdqppB24y5P98vnc873z4cofQZ31JskfJbnpRPjU5uZMQwfSYJYkJZzMxMYq6EeNCys18sEq"),
-            Base58.decode("4CqzJSD9j4GNGcYVtNvMic98Zq9aQALLdkFkuXMLGnGqUTgdHqHcoSU7wJ24wvaAAukg2g1Kw1SA6UFQo7h3VasN"),
-            Base58.decode("E4pUUdCqQt6HWCJ1pUeEtCDngow7pEJjyRtLZTLEDWFEFwicvxVXAgJbUPyASueZVUobZ28xtX6ZgDLb5cxeXy2"),
-            Base58.decode("4UPo6sAF63fkqhgkAXh94tcF43XYz8d7f6PqBGSX13eo3UWCENptrk72qkLxtXYEEsHs1wS2eH6VnZEVctnPdUkb"),
-            Base58.decode("3aYMNRUVYxVaozihhGkxU8JTeAFT73Ua7JDqUfvrDUpDNPs7mS4pxHUaaDiZsGYi91fK5c2yVLWVQW9tqqDGCK2a"),
-            Base58.decode("KhVG9kHf4nttWSEvM6Rd99wuTtRtFAQvSwwo9ae4WFJ2fWaidY4jF33WTRDvYEtaWWu2cmh6x4tEX7ded6QDSGt"),
-            Base58.decode("2KW1mywfP99GcEo5hV8mdHxgPDkFJj5ABcVjNa7vQd1GPC13HRqBERUPKfLZ5HrQ3Dyp42u8PWrzBKUP3cUHG3N4"),
-            Base58.decode("2SsSCv8EuMnZrGYq4jFhvJ3gRdbdEU92Unp6u4JNwrw4D7SHHaRpH2b9VuLtTA3zuUVx1EqTB5wJQWxeuJbwxYvs"),
-            Base58.decode("4iM1HvHgSV3WTXJ3M4XVMZ4AcfrDaA3bdyFmZcX5BJJkacNTjVURWuhp2gLyhxCJok7eAHkd94nM4q3VcDAc2zCJ"),
-            Base58.decode("3THvTzHcyEDPGisprZAN955RMEhye84ygnBMPxrFRT6bCocQ84xt1jaSaNyD9px9dxq3zCNbebXnmL251JZhfCHm"),
-            Base58.decode("M7jNQ8w2fCjD3Mvo8cH2G5JYFTnGfLYSQv7xCCso7BsmMKJ7Ruc3pnr1rbpFwVrBkQG3auB5SGCmoWbCq9pw8hU"),
-            Base58.decode("m1ryu4QMHLaoALYwx35ugNtQec1QAS1KZe8kkx8bQ8UKcesGGbCbqRYhJrtrPDy3gsxVp4hTQGr7qY3NsndBebr"),
-            Base58.decode("3Lzamim6R4khdsVfpdsCzyuhqbguCM6yQTyJPJmvPC7agsaBk7UhYuRxZ8tduLpRhZEMpJwAVd5ucRAiXY8cX6ZE"),
-            Base58.decode("44chQvtt3NKgRjphBwKTgRfz4rD7YvpHs4k17w1Xvt6drmjBwJWXsFXBfHV97LbMx4kMkzpHCXgN7mNjDUZeTL6M"),
-            Base58.decode("xckfcdNWJN1uoGGTe5nXg5JmGUEyzoJQYkt3bUB6vGUGs8p9j8uhVKeYsY5g2sj67w4pz6CcxdhrVFPzGZnkba2"),
-            Base58.decode("2x8QSztNRFDKmMjotzfTvbAkDo7s7Uqh9HpyFVQTiDqYpfweV4z1wzcMjn6GtVHszqBZp6ynuUr4JP9PAEBPLtiy"),
-            Base58.decode("9UBPJ4XJzRkw7kQAdFvXbEZuroUszFPomH25UAmMkYyTFPfnbyo9qKKTMZffoSjoMHzMssszaTPiFVhxaxEwBrY"),
-            Base58.decode("4Vo6hmojFGgAJhfjyiN8PNYktpgrdHGF8Bqe12Pk3PvcvcH8tuJTcTnnCqyGChriHTuZX1u5Qwho8BuBPT4FJ53W")
-    };
 
     /*
      *  SEE in concrete TRANSACTIONS
@@ -92,6 +67,9 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int INVALID_WALLET_ADDRESS = 3;
     public static final int INVALID_MAKER_ADDRESS = 5;
     public static final int INVALID_REFERENCE = 6;
+    /**
+     * Если откат был в ДЕВЕЛОПе и в этом блоке была первая транзакция то потом откат
+     */
     public static final int INVALID_TIMESTAMP = 7;
     public static final int INVALID_ADDRESS = 8;
     public static final int INVALID_FEE_POWER = 9;
@@ -142,6 +120,11 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public static final int NO_INCLAIM_BALANCE = 49;
 
+    public static final int NOT_ENOUGH_ERA_OWN_10 = 101;
+    public static final int NOT_ENOUGH_ERA_USE_10 = 102;
+    public static final int NOT_ENOUGH_ERA_OWN_100 = 103;
+    public static final int NOT_ENOUGH_ERA_USE_100 = 104;
+
     public static final int INVALID_BACKWARD_ACTION = 117;
     public static final int NOT_SELF_PERSONALIZY = 118;
     public static final int PUB_KEY_NOT_PERSONALIZED = 119;
@@ -163,6 +146,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int NOT_HOLDABLE_ASSET = 172;
     public static final int NOT_SPENDABLE_ASSET = 173;
 
+    /**
+     * Прровека на коллизию ключа по подписи - проверяем только если усекаем его и нетпроверки на двойную трату -
+     * BlockChain#CHECK_DOUBLE_SPEND_DEEP
+     */
     public static final int KEY_COLLISION = 194;
 
     public static final int INVALID_MESSAGE_FORMAT = 195;
@@ -392,6 +379,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     protected long timestamp;
     protected PublicKeyAccount creator;
 
+    /**
+     * если да то значит взята из Пула трнзакций и на двойную трату проверялась
+     */
+    public boolean checkedByPool;
+
     // need for genesis
     protected Transaction(byte type, String type_name) {
         this.typeBytes = new byte[]{type, 0, 0, 0}; // for GENESIS
@@ -440,6 +432,15 @@ public abstract class Transaction implements ExplorerJsonLine {
         return false;
     }
 
+    public boolean trueEquals(Object transaction) {
+        if (transaction == null)
+            return false;
+        else if (transaction instanceof Transaction)
+            return Arrays.equals(this.toBytes(FOR_NETWORK, true),
+                    ((Transaction) transaction).toBytes(FOR_NETWORK, true));
+        return false;
+    }
+
     // reference in Map - or as signatire or as BlockHeight + seqNo
     public static Transaction findByDBRef(DCSet db, byte[] dbRef) {
 
@@ -451,7 +452,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             // soft or hard confirmations
             key = db.getTransactionFinalMapSigns().get(dbRef);
             if (key == null) {
-                return db.getTransactionMap().get(dbRef);
+                return db.getTransactionTab().get(dbRef);
             }
         } else {
             int heightBlock = Ints.fromByteArray(Arrays.copyOfRange(dbRef, 0, 4));
@@ -617,8 +618,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public long getDeadline() {
-        // 0,5 HOUR DEADLINE TO INCLUDE TRANSACTION IN BLOCK
-        return this.timestamp + BlockChain.UNCONFIRMED_DEADTIME_MS;
+        return this.timestamp + BlockChain.UNCONFIRMED_DEADTIME_MS(this.timestamp);
     }
 
     /// tyutuy jhg jhg jg j
@@ -675,7 +675,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public String getTitle() {
-        return null;
+        return viewTypeName();
     }
 
     /*
@@ -702,13 +702,8 @@ public abstract class Transaction implements ExplorerJsonLine {
         return this.reference;
     }
 
-    public List<byte[]> getSignatures() {
+    public List<byte[]> getOtherSignatures() {
         return null;
-    }
-
-    // for isValid - check reference value
-    public boolean isReferenced() {
-        return true;
     }
 
     public abstract boolean hasPublicText();
@@ -767,9 +762,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     // GET only INVITED FEE
     public long getInvitedFee() {
 
-        if (true)
+        if (!BlockChain.REFERAL_BONUS_FOR_PERSON(height)) {
             // SWITCH OFF REFERRAL
             return 0l;
+        }
 
         Tuple4<Long, Integer, Integer, Integer> personDuration = creator.getPersonDuration(this.dcSet);
         if (personDuration == null
@@ -781,9 +777,14 @@ public abstract class Transaction implements ExplorerJsonLine {
         long fee = this.fee.unscaledValue().longValue();
 
         // Если слишком большая комиссия, то и награду чуток увеличим
-        if (fee > BlockChain.BONUS_REFERAL << 3)
+        if (fee > BlockChain.BONUS_REFERAL << 4)
             return BlockChain.BONUS_REFERAL << 1;
+        else if (fee < BlockChain.BONUS_REFERAL << 2) {
+            // стандартно если обычная то половину отправим на подарки
+            return fee >> 1;
+        }
 
+        // если повышенная то не будем изменять
         return BlockChain.BONUS_REFERAL;
     }
 
@@ -830,7 +831,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (this.height > 0)
             return this.height;
 
-        return dc.getBlockMap().size() + 1;
+        return dc.getBlocksHeadsMap().size() + 1;
     }
 
     public int getSeqNo() {
@@ -839,6 +840,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public long getDBRef() {
         return this.dbRef;
+    }
+
+    public byte[] getDBRefAsBytes() {
+        return Longs.toByteArray(this.dbRef);
     }
 
     // reference in Map - or as signatire or as BlockHeight + seqNo
@@ -875,15 +880,22 @@ public abstract class Transaction implements ExplorerJsonLine {
     }
 
     public static Long parseDBRef(String refStr) {
+        if (refStr == null)
+            return null;
+
         try {
             String[] strA = refStr.split("\\-");
             int height = Integer.parseInt(strA[0]);
             int seq = Integer.parseInt(strA[1]);
             byte[] ref = Ints.toByteArray(height);
             return Longs.fromByteArray(Bytes.concat(ref, Ints.toByteArray(seq)));
-        } catch (Exception e1) {
-            return null;
+        } catch (Exception e) {
+            try {
+                return Long.parseLong(refStr);
+            } catch (Exception e1) {
+            }
         }
+        return null;
     }
 
     public static Tuple2<Integer, Integer> parseDBRef(Long dbRef) {
@@ -895,6 +907,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         return new Tuple2<Integer, Integer>(blockHeight, seqNo);
 
+    }
+
+    public static int parseDBRefHeight(long dbRef) {
+        return (int) (dbRef >> 32);
     }
 
     public boolean addCalculated(Block block, Account creator, long assetKey, BigDecimal amount,
@@ -1054,6 +1070,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (this.height > 0) {
                 transaction.put("height", this.height);
                 transaction.put("sequence", this.seqNo);
+                if (isWiped()) {
+                    transaction.put("wiped", true);
+                }
             }
         }
 
@@ -1174,14 +1193,11 @@ public abstract class Transaction implements ExplorerJsonLine {
     public abstract int getDataLength(int forDeal, boolean withSignature);
 
     // PROCESS/ORPHAN
-
     public boolean isWiped() {
-        for (byte[] wiped : BlockChain.WIPED_RECORDS) {
-            if (Arrays.equals(this.signature, wiped)) {
-                return true;
-            }
-        }
-        return false;
+        if (getType() == CALCULATED_TRANSACTION)
+            return false;
+
+        return BlockChain.isWiped(this.signature);
     }
 
     public boolean isSignatureValid(DCSet dcSet) {
@@ -1195,10 +1211,10 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (data == null)
             return false;
 
-        int height = dcSet.getBlocksHeadsMap().size();
-        if (height < 100000) {
+        int height = getBlockHeightByParentOrLast(dcSet);
+        if (height < BlockChain.SKIP_VALID_SIGN_BEFORE) {
             // for skip NOT VALID SIGNs
-            for (byte[] valid_item : VALID_SIGN) {
+            for (byte[] valid_item : BlockChain.VALID_SIGN) {
                 if (Arrays.equals(signature, valid_item)) {
                     if (dcSet.getTransactionFinalMapSigns().contains(signature))
                         return false;
@@ -1215,7 +1231,7 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         if (!Crypto.getInstance().verify(this.creator.getPublicKey(), this.signature, data)) {
             boolean wrong = true;
-            for (byte[] item : DISCREDIR_ADDRESSES) {
+            for (byte[] item : BlockChain.DISCREDIR_ADDRESSES) {
                 if (Arrays.equals(this.creator.getPublicKey(), item)
                         && height < 200000) {
                     byte[] digest = Crypto.getInstance().digest(data);
@@ -1245,16 +1261,42 @@ public abstract class Transaction implements ExplorerJsonLine {
 
         // CHECK IF REFERENCE IS OK
         //Long reference = asDeal == null ? this.creator.getLastTimestamp(dcSet) : asDeal;
-        if (asDeal > Transaction.FOR_MYPACK) {
-            Long reference = this.creator.getLastTimestamp(dcSet);
-            if (this.isReferenced() && reference.compareTo(this.timestamp) >= 0
-                    && height > BlockChain.VERS_4_11) {
-                return INVALID_TIMESTAMP;
+        if (asDeal > Transaction.FOR_MYPACK && height > BlockChain.ALL_BALANCES_OK_TO) {
+            if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+                /// вообще не проверяем в тесте
+                if (BlockChain.TEST_DB == 0 && timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - 1)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    if (BlockChain.CHECK_BUGS > 0)
+                        LOGGER.debug("diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    return INVALID_TIMESTAMP;
+                }
+            } else if (BlockChain.CHECK_DOUBLE_SPEND_DEEP > 0) {
+                if (timestamp < Controller.getInstance().getBlockChain().getTimestamp(height - BlockChain.CHECK_DOUBLE_SPEND_DEEP)) {
+                    // тут нет проверок на двойную трату поэтому только в текущем блоке транзакции принимаем
+                    if (BlockChain.CHECK_BUGS > 0)
+                        LOGGER.debug("diff sec: " + (Controller.getInstance().getBlockChain().getTimestamp(height) - timestamp) / 1000);
+                    return INVALID_TIMESTAMP;
+                }
+
+            } else {
+                long[] reference = this.creator.getLastTimestamp(dcSet);
+                if (reference != null && reference[0] >= this.timestamp
+                        && height > BlockChain.VERS_4_11
+                ) {
+                    if (BlockChain.TEST_DB == 0) {
+                        if (BlockChain.CHECK_BUGS > 1)
+                            LOGGER.debug("INVALID TIME!!! REFERENCE: " + DateTimeFormat.timestamptoString(reference[0])
+                                    + "  TX[timestamp]: " + viewTimestamp() + " diff: " + (this.timestamp - reference[0])
+                                    + " BLOCK time: " + Controller.getInstance().getBlockChain().getTimestamp(height));
+                    }
+
+                    return INVALID_TIMESTAMP;
+                }
             }
         }
 
         // CHECK CREATOR
-        if (!Crypto.getInstance().isValidAddress(this.creator.getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.creator.getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 
@@ -1270,26 +1312,18 @@ public abstract class Transaction implements ExplorerJsonLine {
             return NOT_ENOUGH_FEE;
         }
 
-        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0l
+        if ((flags & NOT_VALIDATE_FLAG_PUBLIC_TEXT) == 0L
                 && this.hasPublicText()
                 && !BlockChain.TRUSTED_ANONYMOUS.contains(this.creator.getAddress())
                 && !this.creator.isPerson(dcSet, height)) {
-            if (BlockChain.DEVELOP_USE) {
-                boolean good = false;
-                for (String admin : BlockChain.GENESIS_ADMINS) {
-                    if (this.creator.equals(admin)) {
-                        good = true;
-                        break;
-                    }
-                }
-                if (!good)
-                    return CREATOR_NOT_PERSONALIZED;
-            } else {
-                return CREATOR_NOT_PERSONALIZED;
-            }
+            return CREATOR_NOT_PERSONALIZED;
         }
 
-        if ((flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+        if (false &&  // теперь не проверяем так как ключ сделал длинный dbs.rocksDB.TransactionFinalSignsSuitRocksDB.KEY_LEN
+                (flags & NOT_VALIDATE_KEY_COLLISION) == 0l
+                && BlockChain.CHECK_DOUBLE_SPEND_DEEP == 0
+                && !checkedByPool // транзакция не существует в ожидании - иначе там уже проверили
+                && this.signature != null
                 && this.dcSet.getTransactionFinalMapSigns().contains(this.signature)) {
             // потому что мы ключ урезали до 12 байт - могут быть коллизии
             return KEY_COLLISION;
@@ -1303,7 +1337,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                                    long invitedPersonKey, boolean asOrphan,
                                    List<RCalculated> txCalculated, String message) {
 
-        if (fee_gift <= 0l)
+        if (fee_gift <= 0L)
             return;
 
         String messageLevel;
@@ -1316,18 +1350,22 @@ public abstract class Transaction implements ExplorerJsonLine {
         Transaction issueRecord = this.dcSet.getTransactionFinalMap().get(inviteredDBRef);
         Account issuerAccount = issueRecord.getCreator();
         Tuple4<Long, Integer, Integer, Integer> issuerPersonDuration = issuerAccount.getPersonDuration(this.dcSet);
-        long issuerPersonKey = issuerPersonDuration.a;
-
-        if (issuerPersonKey == invitedPersonKey) {
-            // loop ??
-            return;
+        long issuerPersonKey;
+        if (issuerPersonDuration == null) {
+            // в тестовой сети возможно что каждый создает с неудостоверенного
+            issuerPersonKey = -1;
+        } else {
+            issuerPersonKey = issuerPersonDuration.a;
         }
 
-        if (issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
+        if (issuerPersonKey < 0 // это возможно только для певой персоны и то если не она сама себя зарегала и в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey == invitedPersonKey // это возможно только в ДЕВЕЛОПЕ так что пусть там и будет
+                || issuerPersonKey <= BlockChain.BONUS_STOP_PERSON_KEY
         ) {
-            // IT IS ME - all fee to INVITED
+            // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
+
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
                 txCalculated.add(new RCalculated(invitedAccount, FEE_KEY, giftBG,
@@ -1350,9 +1388,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             long fee_gift_get = fee_gift - fee_gift_next;
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
             if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
@@ -1365,10 +1403,11 @@ public abstract class Transaction implements ExplorerJsonLine {
             // this is END LEVEL
             // GET REST of GIFT
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
-            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false);
+            issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY,
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
 
             if (txCalculated != null && !asOrphan) {
-                messageLevel = message + " level:" + level + " for @P:" + invitedPersonKey;
+                messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
             }
@@ -1388,7 +1427,8 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             // если рефералку никому не отдавать то она по сути исчезает - надо это отразить в общем балансе
             GenesisBlock.CREATOR.changeBalance(this.dcSet, !asOrphan, FEE_KEY,
-                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true);
+                    BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), true, false);
+
             return;
         }
 
@@ -1401,8 +1441,10 @@ public abstract class Transaction implements ExplorerJsonLine {
     // public abstract void process(DLSet db);
     public void process(Block block, int asDeal) {
 
-        if (this.signature != null && Base58.encode(this.signature)
-                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+        if (false
+                //this.signature != null && Base58.encode(this.signature)
+                //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+                ) {
             int error = 0;
             error++;
         }
@@ -1412,41 +1454,36 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true);
+                this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true, true);
 
             }
 
             // Multi Level Referal
-            long invitedFee = getInvitedFee();
-            if (invitedFee > 0)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
-                        block != null && block.txCalculated != null ?
-                                block.txCalculated : null, "@" + this.viewHeightSeq() + " referal");
-
-            String creatorAddress = this.creator.getAddress();
-            AddressTimeSignatureMap dbASmap = this.dcSet.getAddressTime_SignatureMap();
-            if (!dbASmap.contains(creatorAddress)) {
-                // for quick search public keys by address - use PUB_KEY from Person DATA owner
-                // used in - controller.Controller.getPublicKeyByAddress
-                dbASmap.set(creatorAddress, signature); // for quick search
-                // public keys
+            if (BlockChain.FEE_INVITED_DEEP > 0) {
+                long invitedFee = getInvitedFee();
+                if (invitedFee > 0) {
+                    if (BlockChain.CHECK_BUGS > 3 && height == 3104) {
+                        boolean debug = true;
+                    }
+                    process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, false,
+                            block != null && block.txCalculated != null ?
+                                    block.txCalculated : null, "Referal bonus " + "@" + this.viewHeightSeq());
+                }
             }
-            dbASmap.set(creatorAddress, timestamp, signature); // for search
-            // org.erachain.records by
-            // time
 
             // UPDATE REFERENCE OF SENDER
-            if (this.isReferenced())
-                // IT IS REFERENCED RECORD?
-                this.creator.setLastTimestamp(this.timestamp, this.dcSet);
+            this.creator.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
         }
 
     }
 
     public void orphan(Block block, int asDeal) {
 
-        if (Base58.encode(this.signature)
-                .equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")) {
+        if (false && BlockChain.CHECK_BUGS > 1
+            ///&& viewHeightSeq().equals("628853-1") // is forging 628853-1
+            //Base58.encode(this.signature)
+            //.equals("nQhYYc4tSM2sPLpiceCWGKhdt5MKhu82LrTM9hCKgh3iyQzUiZ8H7s4niZrgy4LR4Zav1zXD7kra4YWRd3Fstd")
+        ) {
             int error = 0;
             error++;
         }
@@ -1454,24 +1491,21 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (asDeal > Transaction.FOR_PACK) {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
-                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true);
+                this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true, true);
 
             }
 
             // calc INVITED FEE
-            long invitedFee = getInvitedFee();
-            if (invitedFee > 0)
-                process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
-                        null, null);
-
-            // UPDATE REFERENCE OF SENDER
-            if (this.isReferenced()) {
-                // IT IS REFERENCED RECORD?
-                // set last transaction signature for this ACCOUNT
-                this.creator.removeLastTimestamp(this.dcSet);
+            if (BlockChain.FEE_INVITED_DEEP > 0) {
+                long invitedFee = getInvitedFee();
+                if (invitedFee > 0)
+                    process_gifts(BlockChain.FEE_INVITED_DEEP, invitedFee, this.creator, true,
+                            null, null);
             }
 
-            this.dcSet.getAddressTime_SignatureMap().delete(creator, timestamp);
+            // UPDATE REFERENCE OF SENDER
+            // set last transaction signature for this ACCOUNT
+            this.creator.removeLastTimestamp(this.dcSet, timestamp);
 
         }
 
@@ -1499,7 +1533,12 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public abstract boolean isInvolved(Account account);
 
+    // TODO перевести все на проверку height
+    // Это используется только в ГУУИ поэтому по высоте можно делать точно
     public boolean isConfirmed(DCSet db) {
+        if (height > 0)
+            return true;
+
         if (this.getType() == Transaction.CALCULATED_TRANSACTION) {
             // USE referenced transaction
             return db.getTransactionFinalMap().contains(this.reference);
@@ -1510,21 +1549,20 @@ public abstract class Transaction implements ExplorerJsonLine {
 
     public int getConfirmations(int chainHeight) {
 
-        if (this.height == 0) {
+        if (this.height == 0)
             return 0;
-        } else {
-            return chainHeight - this.height;
-        }
+
+        return 1 + chainHeight - this.height;
     }
 
     public int getConfirmations(DCSet db) {
 
         // CHECK IF IN UNCONFIRMED TRANSACTION
 
-        if (this.height > 0)
-            return 1 + db.getBlockMap().size() - this.height;
+        if (this.height == 0)
+            return 0;
 
-        return 0;
+        return 1 + db.getBlockMap().size() - this.height;
 
     }
 
@@ -1533,7 +1571,7 @@ public abstract class Transaction implements ExplorerJsonLine {
         if (signature == null) {
             return getClass().getName() + ":" + viewFullTypeName();
         }
-        return Base58.encode(signature);
+        return getClass().getName() + ":" + viewFullTypeName() + Base58.encode(signature);
     }
 
 }

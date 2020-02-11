@@ -9,7 +9,10 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeMap;
 
 /** Общая сумма переданных средств в кредит на другой счет
  * Используется для проверки сумм которые отдаются или забираются у заемщика<br><br>
@@ -20,24 +23,24 @@ import java.util.*;
  *
  */
 
-public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigDecimal> {
+public class CreditAddressesMap extends DCUMap<Tuple3<String, Long, String>, BigDecimal> {
 
 
     public CreditAddressesMap(DCSet databaseSet, DB database) {
         super(databaseSet, database);
     }
 
-    public CreditAddressesMap(CreditAddressesMap parent) {
-        super(parent, null);
+    public CreditAddressesMap(CreditAddressesMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
-    protected void createIndexes(DB database) {
+    protected void createIndexes() {
     }
 
     @Override
-    protected Map<Tuple3<String, Long, String>, BigDecimal> getMap(DB database) {
+    public void openMap() {
         //OPEN MAP
-        return database.createTreeMap("credit_debt")
+        map = database.createTreeMap("credit_debt")
                 .keySerializer(BTreeKeySerializer.TUPLE3)
                 //.comparator(UnsignedBytes.lexicographicalComparator())
                 //.comparator(Fun.COMPARATOR)
@@ -47,18 +50,18 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
     }
 
     @Override
-    protected Map<Tuple3<String, Long, String>, BigDecimal> getMemoryMap() {
-        return new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
+    protected void getMemoryMap() {
+        map = new TreeMap<Tuple3<String, Long, String>, BigDecimal>();
     }
 
     @Override
-    protected BigDecimal getDefaultValue() {
+    public BigDecimal getDefaultValue() {
         return BigDecimal.ZERO;
     }
 
     public BigDecimal add(Tuple3<String, Long, String> key, BigDecimal amount) {
         BigDecimal summ = this.get(key).add(amount);
-        this.set(key, summ);
+        this.put(key, summ);
         return summ;
     }
 
@@ -68,7 +71,7 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
 
     public BigDecimal sub(Tuple3<String, Long, String> key, BigDecimal amount) {
         BigDecimal summ = this.get(key).subtract(amount);
-        this.set(key, summ);
+        this.put(key, summ);
         return summ;
     }
 
@@ -76,6 +79,12 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
         return this.get(new Tuple3<String, Long, String>(creditorAddress, key, debtorAddress));
     }
 
+    /**
+     * For GUI only
+     * @param creditorAddress
+     * @param key
+     * @return
+     */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public List<Tuple2<Tuple3<String, Long, String>, BigDecimal>> getList(String creditorAddress, long key) {
         BTreeMap map = (BTreeMap) this.map;
@@ -90,9 +99,6 @@ public class CreditAddressesMap extends DCMap<Tuple3<String, Long, String>, BigD
         for (Tuple3<String, Long, String> keyMap : keys) {
             result.add(new Tuple2<Tuple3<String, Long, String>, BigDecimal>(keyMap, this.get(keyMap)));
         }
-
-        if (this.parent != null)
-            result.addAll(((DCSet)this.parent.getDBSet()).getCredit_AddressesMap().getList(creditorAddress, key));
 
         return result;
     }

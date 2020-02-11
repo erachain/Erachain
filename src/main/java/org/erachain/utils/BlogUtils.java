@@ -37,7 +37,7 @@ public class BlogUtils {
     public static List<BlogProfile> getEnabledBlogs(String searchvalueOpt) {
 
         NameStorageMap nameMap = DCSet.getInstance().getNameStorageMap();
-        Set<String> names = nameMap.getKeys();
+        Set<String> names = nameMap.keySet();
 
         Map<String, List<String>> followMap = new HashMap<>();
         List<Profile> resultProfiles = new ArrayList<>();

@@ -12,21 +12,24 @@ import org.erachain.core.item.templates.TemplateCls;
 import org.erachain.core.item.unions.UnionCls;
 import org.erachain.core.transaction.*;
 import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionFinalMap;
+import org.erachain.datachain.TransactionFinalMapImpl;
 import org.erachain.gui.Gui;
 import org.erachain.gui.models.PollOptionsTableModel;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
 import org.erachain.utils.BigDecimalStringComparator;
 import org.erachain.utils.Converter;
 import org.erachain.utils.DateTimeFormat;
+import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class WebTransactionsHTML {
     private static WebTransactionsHTML instance;
@@ -44,8 +47,11 @@ public class WebTransactionsHTML {
     public HashMap get_HTML(Transaction transaction, JSONObject langObj) {
         // TODO: надо переделать тут так чтобы на строне клиента HTML собиралось с его локальным временм из timestamp
 
+        transaction.setDC(DCSet.getInstance());
+
         this.langObj = langObj;
         List<Transaction> tt = new ArrayList<Transaction>();
+        boolean wiped = transaction.isWiped();
         tt.add(transaction);
         LinkedHashMap json = new LinkedHashMap();
         BlockExplorer.getInstance().transactionsJSON(json, null, tt, 0, BlockExplorer.pageSize, "tx");
@@ -61,23 +67,34 @@ public class WebTransactionsHTML {
         // она и так в заголовке будет
         //out += "<br><b>" + Lang.getInstance().translateFromLangObj("Type", langObj) + ": </b>" + tras_json.get("type_name");
         out += "<br><b>" + Lang.getInstance().translateFromLangObj("Confirmations", langObj) + ": </b>" + tras_json.get("confirmations");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Size", langObj) + ": </b>" + tras_json.get("size");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
-        out += "<br><b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
-        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
-        out += "<br> ";
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
+
+        if (!(transaction instanceof RCalculated)) {
+            out += "<br><b>" + Lang.getInstance().translateFromLangObj("Size", langObj) + ": </b>" + tras_json.get("size");
+            out += "<br><b>" + Lang.getInstance().translateFromLangObj("Publick Key", langObj) + ": </b>" + tras_json.get("publickey");
+            out += "<br><b>" + Lang.getInstance().translateFromLangObj("Signature", langObj) + ": </b>" + tras_json.get("signature");
+            out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Fee", langObj) + ": </b>" + tras_json.get("fee");
+            if (wiped) {
+                out += "<BR><b>" + Lang.getInstance().translateFromLangObj("WIPED", langObj) + ": </b>" + "true";
+            }
+            out += "<br> ";
+            out += "<b>" + Lang.getInstance().translateFromLangObj("Creator", langObj) + ": </b><a href=?address=" + tras_json.get("creator_addr") + get_Lang(langObj) + ">" + tras_json.get("creator") + "</a>";
+        }
 
         output.put("head", out);
         output.put("timestampLabel", Lang.getInstance().translateFromLangObj("Date", langObj));
         output.put("timestamp", transaction.getTimestamp());
 
+        if (wiped)
+            return output;
+
         int type = transaction.getType();
         switch (type) {
+            case Transaction.CALCULATED_TRANSACTION:
+                output.put("body", r_Calculated_HTML(transaction, langObj));
+                break;
             case Transaction.SEND_ASSET_TRANSACTION:
                 output.put("body", r_Send_HTML(transaction, langObj));
                 output.put("message", ((RSend)transaction).viewData());
-
                 break;
             case Transaction.ISSUE_ASSET_TRANSACTION:
                 output.put("body", issue_Asset_HTML(transaction, langObj));
@@ -163,14 +180,14 @@ public class WebTransactionsHTML {
         String out = "";
         GenesisTransferAssetTransaction assetTransfer = (GenesisTransferAssetTransaction) transaction;
         boolean isCredit = false;
-        if (assetTransfer.getOwner() != null) {
-            if (assetTransfer.getOwner().getPerson() != null) {
+        if (assetTransfer.getCreator() != null) {
+            if (assetTransfer.getCreator().getPerson() != null) {
                 out += "<b>" + Lang.getInstance().translateFromLangObj("Creditor", langObj) + ":</b> <a href=?person="
-                        + assetTransfer.getOwner().getPerson().b.getKey() + get_Lang(langObj) + ">"
-                        + assetTransfer.getOwner().viewPerson() + "</a><br>";
+                        + assetTransfer.getCreator().getPerson().b.getKey() + get_Lang(langObj) + ">"
+                        + assetTransfer.getCreator().viewPerson() + "</a><br>";
             } else {
                 out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
-                        + assetTransfer.getOwner().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getOwner().getAddress()
+                        + assetTransfer.getCreator().getAddress() + get_Lang(langObj) + ">" + assetTransfer.getCreator().getAddress()
                         + "</a><br>";
             }
         }
@@ -210,8 +227,14 @@ public class WebTransactionsHTML {
         GenesisIssueAssetTransaction assetIssue = (GenesisIssueAssetTransaction) transaction;
         AssetCls asset = (AssetCls) assetIssue.getItem();
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ": </b>" + asset.getName();
-        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ": </b>"
-                + Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj);
+        out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ": </b>";
+
+        if (asset.getKey() > 0 && asset.getKey() < 1000) {
+            out += Lang.getInstance().translateFromLangObj(asset.viewDescription(), langObj);
+        } else {
+            out += asset.viewDescription();
+        }
+
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Quantity", langObj) + ": </b>" + asset.getQuantity().toString();
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Scale", langObj) + ": </b>" + Lang.getInstance().translateFromLangObj(asset.getScale() + "", langObj);
         out += "<BR><b>" + Lang.getInstance().translateFromLangObj("Asset Type", langObj) + ": </b>" + Lang.getInstance().translateFromLangObj(asset.viewAssetType() + "", langObj);
@@ -462,8 +485,12 @@ public class WebTransactionsHTML {
         String out = "";
         IssueUnionRecord unionIssue = (IssueUnionRecord) transaction;
         UnionCls union = (UnionCls) unionIssue.getItem();
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
-                + unionIssue.getItem().getName() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
+        //        + unionIssue.getItem().getName() + "<br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj)
+                + ":</b> <a href=?union=" + union.getKey()
+                + get_Lang(langObj) + ">" + union.viewName() + "</a><br>";
+
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
         //        + unionIssue.getItem().getDescription() + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Birthday", langObj) + ":</b> "
@@ -477,8 +504,11 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         IssueStatusRecord statusIssue = (IssueStatusRecord) transaction;
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
-                + statusIssue.getItem().getName() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
+        //        + statusIssue.getItem().getName() + "<br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj)
+                + ":</b> <a href=?status=" + statusIssue.getItem().getKey()
+                + get_Lang(langObj) + ">" + statusIssue.getItem().viewName() + "</a><br>";
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
         //        + statusIssue.getItem().getDescription() + "<br>";
 
@@ -489,8 +519,12 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         IssueTemplateRecord templateIssue = (IssueTemplateRecord) transaction;
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
-                + templateIssue.getItem().getName() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
+        //        + templateIssue.getItem().getName() + "<br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj)
+                + ":</b> <a href=?template=" + templateIssue.getItem().getKey()
+                + get_Lang(langObj) + ">" + templateIssue.getItem().viewName() + "</a><br>";
+
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
         //        + templateIssue.getItem().getDescription() + "<br>";
 
@@ -501,8 +535,11 @@ public class WebTransactionsHTML {
         // TODO Auto-generated method stub
         String out = "";
         IssueImprintRecord imprintIssue = (IssueImprintRecord) transaction;
-        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
-                + imprintIssue.getItem().getName() + "<br>";
+        //out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj) + ":</b> "
+        //        + imprintIssue.getItem().getName() + "<br>";
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Name", langObj)
+                + ":</b> <a href=?imprint=" + imprintIssue.getItem().getKey()
+                + get_Lang(langObj) + ">" + imprintIssue.getItem().viewName() + "</a><br>";
         //out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
         //        + imprintIssue.getItem().getDescription() + "<br>";
 
@@ -596,6 +633,29 @@ public class WebTransactionsHTML {
 
     }
 
+    private String r_Calculated_HTML(Transaction transaction, JSONObject langObj) {
+        // TODO Auto-generated method stub
+        RCalculated tr = (RCalculated) transaction;
+        String out = "";
+
+        out += "<b>" + Lang.getInstance().translateFromLangObj("Recipient", langObj) + ":</b> <a href=?address="
+                + tr.getRecipient().getAddress() + get_Lang(langObj) + ">" + tr.getRecipient().getPersonAsString()
+                + "</a><br>";
+
+        if (!tr.getMessage().equals(""))
+            out += "<h4>"+ tr.getMessage() + "</h4>";
+
+        if (tr.getAmount() != null) {
+            out += "<br><b>" + Lang.getInstance().translateFromLangObj("Amount", langObj) + ":</b> "
+                    + tr.getAmount().toPlainString()
+                    + " <a href=?asset=" + tr.getAbsKey() + get_Lang(langObj) + ">"
+                    + Controller.getInstance().getAsset(tr.getAbsKey()).getName() + "</a>";
+        }
+
+        return out;
+
+    }
+
     private String get_Lang(JSONObject langObj) {
         if (langObj == null)
             return "&lang=en";
@@ -609,7 +669,7 @@ public class WebTransactionsHTML {
         if (vouchesItem == null || vouchesItem.b.isEmpty())
             return "";
 
-        TransactionFinalMap map = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
 
         String out = "<b>" + Lang.getInstance().translateFromLangObj("Certified", langObj) + ":</b> ";
 
@@ -700,7 +760,7 @@ public class WebTransactionsHTML {
         }
 
 
-        TransactionFinalMap map = DCSet.getInstance().getTransactionFinalMap();
+        TransactionFinalMapImpl map = DCSet.getInstance().getTransactionFinalMap();
         String out;
 
         if (vouchesItem.b.size() == 1) {

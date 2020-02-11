@@ -1,11 +1,8 @@
 package org.erachain.datachain;
 
 import org.erachain.core.item.ItemCls;
-import org.erachain.database.serializer.ItemSerializer;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.DB;
-
-import java.util.Map;
 
 
 /**
@@ -15,29 +12,18 @@ import java.util.Map;
  */
 
 public class ItemImprintMap extends ItemMap {
-    static final String NAME = "item_imprints";
-    private static final int TYPE = ItemCls.IMPRINT_TYPE;
 
     public ItemImprintMap(DCSet databaseSet, DB database) {
         super(databaseSet, database,
-                "item_imprints",
-                ObserverMessage.RESET_IMPRINT_TYPE,
+                ItemCls.IMPRINT_TYPE, ObserverMessage.RESET_IMPRINT_TYPE,
                 ObserverMessage.ADD_IMPRINT_TYPE,
                 ObserverMessage.REMOVE_IMPRINT_TYPE,
                 ObserverMessage.LIST_IMPRINT_TYPE
         );
     }
 
-    public ItemImprintMap(ItemImprintMap parent) {
-        super(parent);
-    }
-
-    // type+name not initialized yet! - it call as Super in New
-    protected Map<Long, ItemCls> getMap(DB database) {
-        //OPEN MAP
-        return database.createTreeMap(NAME)
-                .valueSerializer(new ItemSerializer(TYPE))
-                .makeOrGet();
+    public ItemImprintMap(ItemImprintMap parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

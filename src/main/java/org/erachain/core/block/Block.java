@@ -3,33 +3,30 @@ package org.erachain.core.block;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-import org.apache.commons.net.util.Base64;
+import lombok.Getter;
 import org.erachain.at.ATBlock;
 import org.erachain.at.ATController;
 import org.erachain.at.ATException;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
+import org.erachain.core.TransactionsPool;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.blockexplorer.BlockExplorer;
 import org.erachain.core.blockexplorer.ExplorerJsonLine;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.RCalculated;
-import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
-import org.erachain.datachain.DCSet;
-import org.erachain.datachain.TransactionFinalMap;
-import org.erachain.datachain.TransactionFinalMapSigns;
-import org.erachain.datachain.TransactionMap;
+import org.erachain.datachain.*;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +34,13 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
  * обработка блоков - все что с ними связано. Без базы данных - сухие данные в вакууме
  */
-public class Block implements ExplorerJsonLine {
+    public class Block implements ExplorerJsonLine {
 
     static private HashMap totalCOMPUtest = new HashMap();
 
@@ -58,16 +56,14 @@ public class Block implements ExplorerJsonLine {
     public static final int TRANSACTION_SIZE_LENGTH = 4;
     public static final int HEIGHT_LENGTH = 4;
     public static final int WIN_VALUE_LENGTH = 8;
+    public static final int TOTAL_WIN_VALUE_LENGTH = 8;
     public static final int FEE_LENGTH = 8;
 
     public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
-            //+ GENERATING_BALANCE_LENGTH
             + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH + TRANSACTIONS_COUNT_LENGTH;
-    public static final int MAX_TRANSACTION_BYTES = BlockChain.MAX_BLOCK_BYTES - BASE_LENGTH;
-    //private static final int AT_FEES_LENGTH = 8;
-    //private static final int AT_LENGTH = AT_FEES_LENGTH + AT_BYTES_LENGTH;
     private static final int AT_LENGTH = 0 + AT_BYTES_LENGTH;
-    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getName());
+    public static final int DATA_SIGN_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + TRANSACTIONS_HASH_LENGTH;
+    static Logger LOGGER = LoggerFactory.getLogger(Block.class.getSimpleName());
     /// HEAD of BLOCK ///
     // FACE
     protected int version;
@@ -86,6 +82,7 @@ public class Block implements ExplorerJsonLine {
     protected long winValue;
     /// END of HEAD ///
     protected long target;
+    protected long totalWinValue;
     protected long totalFee;
     protected long emittedFee;
     public Block.BlockHead blockHead;
@@ -94,22 +91,26 @@ public class Block implements ExplorerJsonLine {
     // BODY
     protected List<Transaction> transactions;
     protected byte[] rawTransactions = null;
+    protected int rawTransactionsLength;
     //protected Long atFees;
     protected byte[] atBytes;
 
+    private boolean fromTrustedPeer = false;
     // FORGING INFO
     // при обработке трнзакций используем для запоминания что данные менялись
     protected List<Account> forgingInfoUpdate;
 
     // was validated
     protected boolean wasValidated;
+    @Getter
+    protected DCSet validatedForkDB;
 
     /////////////////////////////////////// BLOCK HEAD //////////////////////////////
-    public static class BlockHead {
+    public static class BlockHead implements ExplorerJsonLine {
 
         public static final int BASE_LENGTH = VERSION_LENGTH + REFERENCE_LENGTH + CREATOR_LENGTH
                 + TRANSACTIONS_COUNT_LENGTH + TRANSACTIONS_HASH_LENGTH + SIGNATURE_LENGTH
-                + HEIGHT_LENGTH + GENERATING_BALANCE_LENGTH + WIN_VALUE_LENGTH + WIN_VALUE_LENGTH
+                + HEIGHT_LENGTH + GENERATING_BALANCE_LENGTH + WIN_VALUE_LENGTH + TOTAL_WIN_VALUE_LENGTH + WIN_VALUE_LENGTH
                 + FEE_LENGTH + FEE_LENGTH;
 
         public final int version;
@@ -124,13 +125,14 @@ public class Block implements ExplorerJsonLine {
         public final int forgingValue;
         public final long winValue;
         public final long target;
+        public final long totalWinValue;
         public final long totalFee;
         public final long emittedFee;
 
         public BlockHead(int version, byte[] reference, PublicKeyAccount creator, int transactionCount,
                          byte[] transactionsHash, byte[] signature,
                          int heightBlock, int forgingValue, long winValue, long target,
-                         long totalFee, long emittedFee) {
+                         long totalWinValue, long totalFee, long emittedFee) {
             this.version = version;
             this.creator = creator;
             this.signature = signature;
@@ -142,12 +144,13 @@ public class Block implements ExplorerJsonLine {
             this.forgingValue = forgingValue;
             this.winValue = winValue;
             this.target = target;
+            this.totalWinValue = totalWinValue;
             this.totalFee = totalFee;
             this.emittedFee = emittedFee;
         }
 
         public BlockHead(Block block, int heightBlock, int forgingValue, long winValue, long target,
-                         long totalFee, long emittedFee) {
+                         long totalFee, long emittedFee, long totalWinValue) {
             this.version = block.version;
             this.reference = block.reference;
             this.creator = block.creator;
@@ -159,6 +162,7 @@ public class Block implements ExplorerJsonLine {
             this.forgingValue = forgingValue;
             this.winValue = winValue;
             this.target = target;
+            this.totalWinValue = totalWinValue;
             this.totalFee = totalFee;
             this.emittedFee = emittedFee;
         }
@@ -175,6 +179,7 @@ public class Block implements ExplorerJsonLine {
             this.forgingValue = block.forgingValue;
             this.winValue = block.winValue;
             this.target = block.target;
+            this.totalWinValue = block.totalWinValue;
             this.totalFee = totalFee;
             this.emittedFee = emittedFee;
         }
@@ -191,6 +196,7 @@ public class Block implements ExplorerJsonLine {
             this.forgingValue = block.forgingValue;
             this.winValue = block.winValue;
             this.target = block.target;
+            this.totalWinValue = block.totalWinValue;
             this.totalFee = block.totalFee;
             this.emittedFee = block.emittedFee;
         }
@@ -200,62 +206,85 @@ public class Block implements ExplorerJsonLine {
             return blockChain.getTimestamp(this.heightBlock);
         }
 
+        public String viewFeeAsBigDecimal() {
+            return NumberAsString.formatAsString(BigDecimal.valueOf(totalFee, BlockChain.FEE_SCALE));
+        }
+
         public byte[] toBytes() {
-            byte[] data = new byte[0];
+
+            int pos = 0;
+            byte[] data = new byte[BASE_LENGTH];
 
             //WRITE VERSION
             byte[] versionBytes = Ints.toByteArray(this.version);
             versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
-            data = Bytes.concat(data, versionBytes);
+            System.arraycopy(versionBytes, 0, data, pos, VERSION_LENGTH);
+            pos += VERSION_LENGTH;
 
             //WRITE REFERENCE
             byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-            data = Bytes.concat(data, referenceBytes);
+            System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+            pos += REFERENCE_LENGTH;
 
             //WRITE GENERATOR
             byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
-            data = Bytes.concat(data, generatorBytes);
+            System.arraycopy(generatorBytes, 0, data, pos, CREATOR_LENGTH);
+            pos += CREATOR_LENGTH;
 
             //WRITE TRANSACTION COUNT
             byte[] transactionCountBytes = Ints.toByteArray(this.transactionsCount);
             transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
-            data = Bytes.concat(data, transactionCountBytes);
+            System.arraycopy(transactionCountBytes, 0, data, pos, TRANSACTIONS_COUNT_LENGTH);
+            pos += TRANSACTIONS_COUNT_LENGTH;
 
             //WRITE TRANSACTIONS HASH
-            data = Bytes.concat(data, this.transactionsHash);
+            System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);
+            pos += TRANSACTIONS_HASH_LENGTH;
 
             //WRITE SIGNATURE
-            data = Bytes.concat(data, this.signature);
+            System.arraycopy(signature, 0, data, pos, SIGNATURE_LENGTH);
+            pos += SIGNATURE_LENGTH;
 
             //WRITE HEIGHT
             byte[] heightBytes = Ints.toByteArray(this.heightBlock);
             heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
-            data = Bytes.concat(data, heightBytes);
+            System.arraycopy(heightBytes, 0, data, pos, HEIGHT_LENGTH);
+            pos += HEIGHT_LENGTH;
 
             //WRITE GENERATING BALANCE
             byte[] generatingBalanceBytes = Ints.toByteArray(this.forgingValue);
             generatingBalanceBytes = Bytes.ensureCapacity(generatingBalanceBytes, GENERATING_BALANCE_LENGTH, 0);
-            data = Bytes.concat(data, generatingBalanceBytes);
+            System.arraycopy(generatingBalanceBytes, 0, data, pos, GENERATING_BALANCE_LENGTH);
+            pos += GENERATING_BALANCE_LENGTH;
 
             //WRITE WIN VALUE
             byte[] winValueBytes = Longs.toByteArray(this.winValue);
             winValueBytes = Bytes.ensureCapacity(winValueBytes, WIN_VALUE_LENGTH, 0);
-            data = Bytes.concat(data, winValueBytes);
+            System.arraycopy(winValueBytes, 0, data, pos, WIN_VALUE_LENGTH);
+            pos += WIN_VALUE_LENGTH;
 
             //WRITE TARGET
             byte[] targetBytes = Longs.toByteArray(this.target);
             targetBytes = Bytes.ensureCapacity(targetBytes, WIN_VALUE_LENGTH, 0);
-            data = Bytes.concat(data, targetBytes);
+            System.arraycopy(targetBytes, 0, data, pos, WIN_VALUE_LENGTH);
+            pos += WIN_VALUE_LENGTH;
+
+            //WRITE TOTAL WIN VALUE
+            byte[] totalWinValueBytes = Longs.toByteArray(this.totalWinValue);
+            totalWinValueBytes = Bytes.ensureCapacity(totalWinValueBytes, TOTAL_WIN_VALUE_LENGTH, 0);
+            System.arraycopy(totalWinValueBytes, 0, data, pos, TOTAL_WIN_VALUE_LENGTH);
+            pos += TOTAL_WIN_VALUE_LENGTH;
 
             //WRITE TOTAL FEE
             byte[] totalFeeBytes = Longs.toByteArray(this.totalFee);
             totalFeeBytes = Bytes.ensureCapacity(totalFeeBytes, FEE_LENGTH, 0);
-            data = Bytes.concat(data, totalFeeBytes);
+            System.arraycopy(totalFeeBytes, 0, data, pos, FEE_LENGTH);
+            pos += FEE_LENGTH;
 
             //WRITE EMITTED FEE
             byte[] emittedFeeBytes = Longs.toByteArray(this.emittedFee);
             emittedFeeBytes = Bytes.ensureCapacity(emittedFeeBytes, FEE_LENGTH, 0);
-            data = Bytes.concat(data, emittedFeeBytes);
+            System.arraycopy(emittedFeeBytes, 0, data, pos, FEE_LENGTH);
 
             return data;
         }
@@ -267,7 +296,7 @@ public class Block implements ExplorerJsonLine {
             }
 
             //CHECK IF WE HAVE MINIMUM BLOCK LENGTH
-            if (data.length < BlockHead.BASE_LENGTH) {
+            if (data.length < BASE_LENGTH) {
                 throw new Exception("Data is less then minimum blockHead length");
             }
 
@@ -321,6 +350,11 @@ public class Block implements ExplorerJsonLine {
             long target = Longs.fromByteArray(targetBytes);
             position += WIN_VALUE_LENGTH;
 
+            //READ TOTAL WIN VALUE
+            byte[] totalWinValueBytes = Arrays.copyOfRange(data, position, position + TOTAL_WIN_VALUE_LENGTH);
+            long tolalWinValue = Longs.fromByteArray(totalWinValueBytes);
+            position += TOTAL_WIN_VALUE_LENGTH;
+
             //READ TOTAL FEE
             byte[] totalFeeBytes = Arrays.copyOfRange(data, position, position + FEE_LENGTH);
             long totalFee = Longs.fromByteArray(totalFeeBytes);
@@ -332,7 +366,7 @@ public class Block implements ExplorerJsonLine {
             position += FEE_LENGTH;
 
             return new BlockHead(version, reference, creator, transactionCount, transactionsHash, signature,
-                    height, forgingValue, winValue, target, totalFee, emittedFee);
+                    height, forgingValue, winValue, target, tolalWinValue, totalFee, emittedFee);
 
         }
 
@@ -363,11 +397,36 @@ public class Block implements ExplorerJsonLine {
             return head;
         }
 
+        public JSONObject jsonForExplorerPage(JSONObject langObj) {
+            JSONObject blockJSON = new JSONObject();
+            blockJSON.put("height", heightBlock);
+            blockJSON.put("signature", Base58.encode(signature));
+            blockJSON.put("generator", creator.getAddress());
+            blockJSON.put("transactionsCount", transactionsCount);
+            blockJSON.put("timestamp", getTimestamp());
+
+            ///loadHeadMind(DCSet.getInstance());
+            blockJSON.put("totalFee", viewFeeAsBigDecimal());
+            Tuple3<Integer, Integer, Integer> forgingPoint = creator.getForgingData(DCSet.getInstance(), heightBlock);
+            if (forgingPoint != null) {
+                blockJSON.put("deltaHeight", heightBlock - forgingPoint.a);
+            }
+            blockJSON.put("generatingBalance", forgingValue);
+            blockJSON.put("target", target);
+            blockJSON.put("winValue", winValue);
+            blockJSON.put("winValueTargeted", calcWinValueTargeted());
+            return blockJSON;
+        }
 
     }
 
     public JSONObject jsonForExplorerPage(JSONObject langObj) {
         JSONObject blockJSON = new JSONObject();
+        if (blockHead == null) {
+            // LOAD HEAD
+            loadHeadMind((DCSet) DCSet.getInstance());
+        }
+
         blockJSON.put("height", heightBlock);
         blockJSON.put("signature", Base58.encode(signature));
         blockJSON.put("generator", creator.getAddress());
@@ -376,7 +435,7 @@ public class Block implements ExplorerJsonLine {
 
         ///loadHeadMind(DCSet.getInstance());
         blockJSON.put("totalFee", viewFeeAsBigDecimal());
-        Tuple2<Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
+        Tuple3<Integer, Integer, Integer> forgingPoint = blockHead.creator.getForgingData(DCSet.getInstance(), heightBlock);
         if (forgingPoint != null) {
             blockJSON.put("deltaHeight", blockHead.heightBlock - forgingPoint.a);
         }
@@ -428,28 +487,29 @@ public class Block implements ExplorerJsonLine {
         this.creator = creator;
         this.heightBlock = heightBlock;
 
-        this.transactionCount = transactionCount;
         this.transactionsHash = transactionsHash;
 
         this.signature = signature;
 
     }
 
-    public Block(int version, byte[] reference, PublicKeyAccount generator, int heightBlock,
+    public Block(int version, Block parentBlock, PublicKeyAccount generator, int heightBlock,
                  Tuple2<List<Transaction>, Integer> transactionsItem,
                  byte[] atBytes,
                  int forgingValue, long winValue, long target) {
         // TODO Auto-generated constructor stub
         this.version = version;
-        this.reference = reference;
+        this.reference = parentBlock.signature;
         this.creator = generator;
         this.heightBlock = heightBlock;
 
         this.transactions = transactionsItem.a;
-        this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, this.atBytes);
         this.transactionCount = transactionsItem.b;
         this.atBytes = atBytes;
 
+        makeTransactionsRAWandHASH();
+
+        this.parentBlockHead = parentBlock.blockHead;
         this.forgingValue = forgingValue;
         this.winValue = winValue;
         this.target = target;
@@ -459,7 +519,30 @@ public class Block implements ExplorerJsonLine {
     //GETTERS/SETTERS
 
 
-    public static byte[] makeTransactionsHash(byte[] creator, List<Transaction> transactions, byte[] atBytes) {
+    /**
+     * USE only for TESTS !
+     *
+     * @param resference
+     */
+    public void setReferenceForTests(byte[] resference) {
+        this.reference = resference;
+    }
+
+    /**
+     * Медленное создание и используется для Тестов (Старая версия)
+     * @param creator
+     * @param transactions
+     * @param atBytes
+     * @return
+     */
+    public static byte[] makeTransactionsHashForTests(byte[] creator, List<Transaction> transactions, byte[] atBytes) {
+
+        int atLength;
+        if (atBytes != null) {
+            atLength = atBytes.length;
+        } else {
+            atLength = 0;
+        }
 
         byte[] data = new byte[0];
 
@@ -471,17 +554,92 @@ public class Block implements ExplorerJsonLine {
             //MAKE TRANSACTIONS HASH
             for (Transaction transaction : transactions) {
                 data = Bytes.concat(data, transaction.getSignature());
-                transaction = null;
             }
-            transactions = null;
 
         }
 
-        if (atBytes != null)
+        if (atLength > 0)
             data = Bytes.concat(data, atBytes);
 
-
         return Crypto.getInstance().digest(data);
+
+    }
+
+    /**
+     * делает Хэш и сырые данные из набора транзакций
+     *
+     * @return
+     */
+    public void makeTransactionsRAWandHASH() {
+
+        int atBytesLength;
+        if (atBytes == null) {
+            atBytesLength = 0;
+        } else {
+            atBytesLength = atBytes.length;
+        }
+
+        byte[] hashData;
+        if (transactionCount == 0) {
+            // TODO: убрать в новой версии как ненужное - если трнзакций нету то не используем вообще
+            /**
+             * а на самом деле если нет трнзакций и AT_DATA пустая - а оана пустая
+             * то нет необходимости делать подпись на основе этого хэша -
+             * лучше его пустымх делать - и не использовать чтобы не тормозить лишний раз
+             * хотя когда блоки пустые особо и не тормозится
+             */
+            hashData = new byte[CREATOR_LENGTH + atBytesLength];
+            System.arraycopy(creator.getPublicKey(), 0, hashData, 0, CREATOR_LENGTH);
+            if (atBytesLength > 0) {
+                System.arraycopy(atBytes, 0, hashData, CREATOR_LENGTH, atBytesLength);
+            }
+
+            // SAVE RAW
+            rawTransactionsLength = 0;
+            rawTransactions = new byte[0];
+
+        } else {
+            hashData = new byte[transactionCount * SIGNATURE_LENGTH + atBytesLength];
+
+            rawTransactionsLength = getDataLengthTXs();
+            rawTransactions = new byte[rawTransactionsLength];
+
+            int rawPos = 0;
+            int hashPos = 0;
+
+            //MAKE TRANSACTIONS HASH
+            for (Transaction transaction : transactions) {
+                //WRITE TRANSACTION LENGTH
+                int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
+                transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
+                System.arraycopy(transactionLengthBytes, 0, rawTransactions, rawPos, TRANSACTION_SIZE_LENGTH);
+                rawPos += TRANSACTION_SIZE_LENGTH;
+
+                //WRITE TRANSACTION
+                System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, rawTransactions, rawPos, transactionLength);
+                rawPos += transactionLength;
+
+                // ACUMULATE SINGNs FOR HASH
+                System.arraycopy(transaction.getSignature(), 0, hashData, hashPos, SIGNATURE_LENGTH);
+                hashPos += SIGNATURE_LENGTH;
+
+            }
+
+            if (atBytesLength > 0) {
+                System.arraycopy(atBytes, 0, hashData, hashPos, atBytesLength);
+            }
+
+        }
+
+        transactionsHash = Crypto.getInstance().digest(hashData);
+        if (BlockChain.CHECK_BUGS > 0) {
+            byte[] hashTest = makeTransactionsHashForTests(creator.getPublicKey(), transactions, atBytes);
+            if (!Arrays.equals(transactionsHash, hashTest)) {
+                Long error = null;
+                error++;
+            }
+        }
 
     }
 
@@ -559,23 +717,16 @@ public class Block implements ExplorerJsonLine {
             block = new Block(version, reference, generator, height, transactionsHash, new byte[0], signature);
         }
 
-        //if (forDB)
-        //	block.setGeneratingBalance(generatingBalance);
-
         //READ TRANSACTIONS COUNT
         byte[] transactionCountBytes = Arrays.copyOfRange(data, position, position + TRANSACTIONS_COUNT_LENGTH);
         int transactionCount = Ints.fromByteArray(transactionCountBytes);
-        if (transactionCount < 0 || transactionCount > 20000) {
+        if (transactionCount < 0 || transactionCount > BlockChain.MAX_BLOCK_SIZE) {
             throw new Exception("Block parse - transactionCount error for useHeight[" + useHeight + "] with height:" + height);
         }
         position += TRANSACTIONS_COUNT_LENGTH;
 
         //SET TRANSACTIONDATA
-
         block.setTransactionData(transactionCount, Arrays.copyOfRange(data, position, data.length));
-
-        //SET TRANSACTIONS SIGNATURE
-        // transaction only in raw here - block.makeTransactionsHash();
 
         return block;
     }
@@ -594,6 +745,13 @@ public class Block implements ExplorerJsonLine {
         if (obj instanceof Block)
             return Arrays.equals(this.signature, ((Block) obj).signature);
         return false;
+    }
+
+    public void setFromTrustedPeer() {
+        this.fromTrustedPeer = true;
+    }
+    public boolean isFromTrustedPeer() {
+        return this.fromTrustedPeer;
     }
 
     public byte[] getSignature() {
@@ -659,7 +817,7 @@ public class Block implements ExplorerJsonLine {
         try {
             int parentHeight = dcSet.getBlockSignsMap().get(this.reference);
             //assert (parentHeight, this.heightBlock - 1);
-            return dcSet.getBlockMap().get(parentHeight);
+            return dcSet.getBlockMap().getAndProcess(parentHeight);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             return null;
@@ -677,37 +835,34 @@ public class Block implements ExplorerJsonLine {
         //this.version = blockHead.version;
     }
 
-	/*
-	// NEED CALCULATE BEFORE add in BlockMap
-	public void calcHeadMind(DCSet dcSet)
-	{
-		
-		if (this.version == 0) {
-			this.heightBlock = 1;
-			this.forgingValue = BlockChain.GENESIS_WIN_VALUE;
-			this.winValue = BlockChain.GENESIS_WIN_VALUE;
-			this.target = BlockChain.GENESIS_WIN_VALUE;
+    /**
+     * если parentBlockHead == null возьмет его из базы данных
+     *
+     * @param dcSet
+     */
+    public void makeHeadMind(DCSet dcSet) {
+        this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
-		} else { 
-			this.parentBlockHead = this.getParent(dcSet);
-			this.heightBlock = this.parentBlockHead.getHeight(dcSet) + 1;
-			//Tuple2<Integer, Integer> forgingPoint = this.creator.getForgingData(dcSet, this.heightBlock);
-			//this.creatorPreviousHeightBlock = forgingPoint.a;
-			this.forgingValue = this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
-			this.winValue = calcWinValue(dcSet);
-			this.target = BlockChain.calcTarget(heightBlock, parentBlockHead.getTarget(), this.winValue);
-		}
-	}
-	*/
+        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
 
-    public Tuple5<Integer, byte[], byte[], Integer, byte[]> getHeadFace() {
+        if (this.parentBlockHead == null) {
+            this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
+        }
 
-        return new Tuple5<Integer, byte[], byte[], Integer, byte[]>(
-                this.version, this.creator.getPublicKey(), this.signature, this.transactionCount, this.transactionsHash);
+        final long currentTarget = this.parentBlockHead.target;
+        int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
+        this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
+
+        // STORE in HEAD
+        this.blockHead = new BlockHead(this);
+    }
+
+    public void setParentHeadMind(BlockHead parentHead) {
+        this.parentBlockHead = parentHead;
     }
 
     public Block getChild(DCSet db) {
-        return db.getBlockMap().get(this.getHeight() + 1);
+        return db.getBlockMap().getAndProcess(this.getHeight() + 1);
     }
 
     public int compareWin(Block block) {
@@ -779,6 +934,7 @@ public class Block implements ExplorerJsonLine {
      * Копит все для каждого счета результирующее и потом разом в блоке изменим
      * Так обходится неопределенность при откате - если несколько транзакций для одного счета
      * меняли инфо по форжингу
+     *
      * @param account
      */
     public void addForgingInfoUpdate(Account account) {
@@ -789,7 +945,7 @@ public class Block implements ExplorerJsonLine {
         }
 
         // проверим может уже естьт ам такой счет
-        for (Account item: this.forgingInfoUpdate) {
+        for (Account item : this.forgingInfoUpdate) {
             if (account.equals(item))
                 return;
         }
@@ -815,7 +971,8 @@ public class Block implements ExplorerJsonLine {
             return BigDecimal.ZERO;
         }
 
-        int inDay30 = BlockChain.BLOCKS_PER_DAY * 30;
+        // in OLD protocol it USED - and heightBlock get AS 1
+        int inDay30 = BlockChain.BLOCKS_PER_DAY(1) * 30;
 
         BigDecimal bonusFee; // = BlockChain.MIN_FEE_IN_BLOCK;
 
@@ -827,10 +984,8 @@ public class Block implements ExplorerJsonLine {
                 return BigDecimal.valueOf(60000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else if (this.heightBlock < inDay30 << 3) // 16 mounth - 72000
                 return BigDecimal.valueOf(50000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (false && this.heightBlock < inDay30 << 4) //  64 mounth
-                return BigDecimal.valueOf(40000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
-            else if (false && this.heightBlock < inDay30 << 6) //  256 mounth
-                return BigDecimal.valueOf(30000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
+            else if (this.heightBlock > BlockChain.VERS_30SEC)
+                return BigDecimal.valueOf(2000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
             else
                 return BigDecimal.valueOf(20000, BlockChain.FEE_SCALE); // need SCALE for .unscaled()
         } else {
@@ -877,6 +1032,7 @@ public class Block implements ExplorerJsonLine {
 
         this.transactionCount = transactionCount;
         this.rawTransactions = rawTransactions;
+        this.rawTransactionsLength = rawTransactions.length;
     }
 
     public int getTransactionCount() {
@@ -899,7 +1055,6 @@ public class Block implements ExplorerJsonLine {
                     //PARSE TRANSACTION
                     byte[] transactionBytes = Arrays.copyOfRange(this.rawTransactions, position, position + transactionLength);
                     Transaction transaction = TransactionFactory.getInstance().parse(transactionBytes, Transaction.FOR_NETWORK);
-                    ///transaction.setBlock(this, i + 1);
 
                     //ADD TO TRANSACTIONS
                     this.transactions.add(transaction);
@@ -920,39 +1075,26 @@ public class Block implements ExplorerJsonLine {
         return this.transactions;
     }
 
-    public void setTransactions(List<Transaction> transactions) {
-        this.setTransactions(transactions, transactions == null ? 0 : transactions.size());
+    /**
+     * need only for TESTs
+     *
+     * @param transactions
+     */
+    public void setTransactionsForTests(List<Transaction> transactions) {
+        this.setTransactionsForTests(transactions, transactions == null ? 0 : transactions.size());
     }
 
-    public void setTransactions(List<Transaction> transactions, int count) {
+    /**
+     * clear old data and set new Transactions
+     *
+     * @param transactions
+     * @param count
+     */
+    public void setTransactionsForTests(List<Transaction> transactions, int count) {
         this.transactions = transactions;
         this.transactionCount = count;
-        //this.atBytes = null;
-        if (this.transactionsHash == null)
-            this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), transactions, null);
-    }
-
-	/*
-	public int getTransactionIndex(byte[] signature)
-	{
-
-		int i = 0;
-
-		for(Transaction transaction: this.getTransactions())
-		{
-			if(Arrays.equals(transaction.getSignature(), signature))
-			{
-				return i;
-			}
-			i++;
-		}
-
-		return -1;
-	}
-	 */
-
-    public void setATBytes(byte[] atBytes) {
-        this.atBytes = atBytes;
+        this.atBytes = null;
+        makeTransactionsRAWandHASH();
     }
 
     public int getTransactionSeq(byte[] signature) {
@@ -1006,10 +1148,6 @@ public class Block implements ExplorerJsonLine {
 
     //PARSE/CONVERT
 
-    public void makeTransactionsHash() {
-        this.transactionsHash = makeTransactionsHash(this.creator.getPublicKey(), this.getTransactions(), this.atBytes);
-    }
-
     @SuppressWarnings("unchecked")
     public JSONObject toJson() {
         JSONObject block = new JSONObject();
@@ -1050,30 +1188,37 @@ public class Block implements ExplorerJsonLine {
     }
 
     public byte[] toBytes(boolean withSign, boolean forDB) {
-        byte[] data = new byte[0];
+
+        int pos = 0;
+        byte[] data = new byte[getDataLength(forDB)];
 
         //WRITE VERSION
         byte[] versionBytes = Ints.toByteArray(this.version);
         versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
-        data = Bytes.concat(data, versionBytes);
+        System.arraycopy(versionBytes, 0, data, pos, VERSION_LENGTH);
+        pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
         byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+        pos += REFERENCE_LENGTH;
 
         //WRITE GENERATOR
         byte[] generatorBytes = Bytes.ensureCapacity(this.creator.getPublicKey(), CREATOR_LENGTH, 0);
-        data = Bytes.concat(data, generatorBytes);
+        System.arraycopy(generatorBytes, 0, data, pos, CREATOR_LENGTH);
+        pos += CREATOR_LENGTH;
 
         if (forDB) {
             //WRITE HEIGHT
             byte[] heightBytes = Ints.toByteArray(this.heightBlock);
             heightBytes = Bytes.ensureCapacity(heightBytes, HEIGHT_LENGTH, 0);
-            data = Bytes.concat(data, heightBytes);
+            System.arraycopy(heightBytes, 0, data, pos, HEIGHT_LENGTH);
+            pos += HEIGHT_LENGTH;
         }
 
         //WRITE TRANSACTIONS HASH
-        data = Bytes.concat(data, this.transactionsHash);
+        System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);
+        pos += TRANSACTIONS_HASH_LENGTH;
 
         if (!withSign) {
             // make HEAD data for signature
@@ -1081,21 +1226,25 @@ public class Block implements ExplorerJsonLine {
         }
 
         //WRITE GENERATOR SIGNATURE
-        data = Bytes.concat(data, this.signature);
+        System.arraycopy(signature, 0, data, pos, SIGNATURE_LENGTH);
+        pos += SIGNATURE_LENGTH;
 
         //ADD ATs BYTES
         if (this.version > 1) {
             if (atBytes != null) {
                 byte[] atBytesCount = Ints.toByteArray(atBytes.length);
-                data = Bytes.concat(data, atBytesCount);
+                System.arraycopy(atBytesCount, 0, data, pos, AT_BYTES_LENGTH);
+                pos += AT_BYTES_LENGTH;
 
-                data = Bytes.concat(data, atBytes);
+                System.arraycopy(atBytes, 0, data, pos, atBytes.length);
+                pos += atBytes.length;
 
                 //byte[] atByteFees = Longs.toByteArray(atFees);
                 //data = Bytes.concat(data,atByteFees);
             } else {
-                byte[] atBytesCount = Ints.toByteArray(0);
-                data = Bytes.concat(data, atBytesCount);
+                byte[] atBytesCount = new byte[AT_BYTES_LENGTH];
+                System.arraycopy(atBytesCount, 0, data, pos, AT_BYTES_LENGTH);
+                pos += AT_BYTES_LENGTH;
 
                 //byte[] atByteFees = Longs.toByteArray(0L);
                 //data = Bytes.concat(data,atByteFees);
@@ -1105,35 +1254,58 @@ public class Block implements ExplorerJsonLine {
         //WRITE TRANSACTION COUNT
         byte[] transactionCountBytes = Ints.toByteArray(this.getTransactionCount());
         transactionCountBytes = Bytes.ensureCapacity(transactionCountBytes, TRANSACTIONS_COUNT_LENGTH, 0);
-        data = Bytes.concat(data, transactionCountBytes);
+        System.arraycopy(transactionCountBytes, 0, data, pos, TRANSACTIONS_COUNT_LENGTH);
+        pos += TRANSACTIONS_COUNT_LENGTH;
 
-        for (Transaction transaction : this.getTransactions()) {
-            //WRITE TRANSACTION LENGTH
-            int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
-            byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
-            transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
-            data = Bytes.concat(data, transactionLengthBytes);
+        if (transactionCount > 0) {
+            if (rawTransactionsLength == 0) {
+                if (true) {
+                    assert(false);
+                } else {
+                    // нужно заново создавать
+                    // запомним откуда идет сборка чтобы потом перекатать в сырые данные
+                    int startRAW = pos;
+                    for (Transaction transaction : this.getTransactions()) {
+                        //WRITE TRANSACTION LENGTH
+                        int transactionLength = transaction.getDataLength(Transaction.FOR_NETWORK, true);
+                        byte[] transactionLengthBytes = Ints.toByteArray(transactionLength);
+                        transactionLengthBytes = Bytes.ensureCapacity(transactionLengthBytes, TRANSACTION_SIZE_LENGTH, 0);
+                        System.arraycopy(transactionLengthBytes, 0, data, pos, TRANSACTION_SIZE_LENGTH);
+                        pos += TRANSACTION_SIZE_LENGTH;
 
-            //WRITE TRANSACTION
-            data = Bytes.concat(data, transaction.toBytes(Transaction.FOR_NETWORK, true));
+                        //WRITE TRANSACTION
+                        System.arraycopy(transaction.toBytes(Transaction.FOR_NETWORK, true), 0, data, pos, transactionLength);
+                        pos += transactionLength;
+                    }
+                    // сырые данные теперь запомним на всякий случай
+                    System.arraycopy(data, startRAW, rawTransactions, 0, pos);
+                    rawTransactionsLength = pos - startRAW;
+                }
+            } else {
+                // уже есть готовые сырые данные
+                System.arraycopy(rawTransactions, 0, data, pos, rawTransactionsLength);
+            }
         }
 
         return data;
     }
 
     public byte[] toBytesForSign() {
-        byte[] data = new byte[0];
+        int pos = 0;
+        byte[] data = new byte[DATA_SIGN_LENGTH];
 
         //WRITE VERSION
         byte[] versionBytes = Ints.toByteArray(this.version);
         versionBytes = Bytes.ensureCapacity(versionBytes, VERSION_LENGTH, 0);
-        data = Bytes.concat(data, versionBytes);
+        System.arraycopy(versionBytes, 0, data, pos, VERSION_LENGTH);
+        pos += VERSION_LENGTH;
 
         //WRITE REFERENCE
         byte[] referenceBytes = Bytes.ensureCapacity(this.reference, REFERENCE_LENGTH, 0);
-        data = Bytes.concat(data, referenceBytes);
+        System.arraycopy(referenceBytes, 0, data, pos, REFERENCE_LENGTH);
+        pos += REFERENCE_LENGTH;
 
-        data = Bytes.concat(data, this.transactionsHash);
+        System.arraycopy(transactionsHash, 0, data, pos, TRANSACTIONS_HASH_LENGTH);
 
         return data;
     }
@@ -1143,14 +1315,23 @@ public class Block implements ExplorerJsonLine {
         this.signature = Crypto.getInstance().sign(account, data);
     }
 
+    public int getDataLengthTXs() {
+        int length = 0;
+        for (Transaction transaction : transactions) {
+            length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
+        }
+        return length;
+    }
+
     private int dataLength = -1;
-    public int getDataLength(boolean withHeight) {
+
+    public int getDataLength(boolean forDB) {
 
         if (dataLength >= 0)
             return dataLength;
 
         int length = BASE_LENGTH;
-        if (withHeight)
+        if (forDB)
             length += HEIGHT_LENGTH;
 
         if (this.version > 1) {
@@ -1160,39 +1341,17 @@ public class Block implements ExplorerJsonLine {
             }
         }
 
-        for (Transaction transaction : this.getTransactions()) {
-            length += TRANSACTION_SIZE_LENGTH + transaction.getDataLength(Transaction.FOR_NETWORK, true);
+        if (transactionCount > 0) {
+            if (rawTransactionsLength == 0) {
+                // прийдется с нуля собирать размер
+                length += getDataLengthTXs();
+            } else {
+                length += rawTransactionsLength;
+            }
         }
 
         return length;
     }
-
-    public byte[] getProofHash() {
-        //newSig = sha256(prevSig || pubKey)
-        byte[] data = Bytes.concat(this.reference, creator.getPublicKey());
-
-        return Crypto.getInstance().digest(data);
-    }
-
-	/*
-	public static int getPreviousForgingHeightForIncomes(DLSet dcSet, Account creator, int height) {
-
-		// IF BLOCK in the MAP
-		int previousForgingHeight = creator.getForgingData(dcSet, height);
-		if (previousForgingHeight == -1) {
-			// IF BLOCK not inserted in MAP
-			previousForgingHeight = creator.getLastForgingData(dcSet);
-			if (previousForgingHeight == -1) {
-				// if it is first payment to this account
-				return height;
-			}
-		}
-
-		return previousForgingHeight;
-
-	}
-	 */
-
 
     //VALIDATE
 
@@ -1243,12 +1402,10 @@ public class Block implements ExplorerJsonLine {
 
         if (this.version == 0 || this.creator == null) {
             // GENESIS
-            this.winValue = BlockChain.GENESIS_WIN_VALUE;
-            return this.winValue;
+            return this.winValue = BlockChain.GENESIS_WIN_VALUE;
         }
 
-        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
-        return this.winValue;
+        return this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
     }
 
     public int calcWinValueTargeted() {
@@ -1263,7 +1420,7 @@ public class Block implements ExplorerJsonLine {
 
     public boolean isValidHead(DCSet dcSet) {
 
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
         if (BlockChain.BLOCK_COUNT > 0 && this.heightBlock > BlockChain.BLOCK_COUNT) {
             LOGGER.debug("*** Block[" + this.heightBlock + "] - Max count reached");
@@ -1290,14 +1447,27 @@ public class Block implements ExplorerJsonLine {
             return false;
         }
 
+        if (transactionCount > BlockChain.MAX_BLOCK_SIZE) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE");
+            return false;
+        }
+        if (rawTransactionsLength > BlockChain.MAX_BLOCK_SIZE_BYTES) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] MAX_BLOCK_SIZE_BYTES");
+            return false;
+        }
+
         // TODO - show it to USER
         long blockTime = this.getTimestamp();
         long thisTimestamp = NTP.getTime();
         //logger.debug("*** Block[" + height + "] " + new Timestamp(myTime));
 
-        if (blockTime + (BlockChain.WIN_BLOCK_BROADCAST_WAIT_MS >> 2) > thisTimestamp) {
+        // необходимо разрешить более ранюю сборку - так чтобы мой собственный блок можно было собрать заранее
+        // и потом его провалидировать и послать куда подальше
+        // свой блок собирается аккурат мо моему NTP.getTime() и поэтому нет смысла вносить большие задержки от смещения мирового
+        // однако если блок прилетел из-вне то мещения мировые могут его сделать невалидными и норм
+        if (blockTime - 100 > thisTimestamp) {
             LOGGER.debug("*** Block[" + this.heightBlock + ":" + Base58.encode(this.signature).substring(0, 10) + "].timestamp invalid >NTP.getTime(): "
-                    + " \n " + " diff sec: " + (blockTime - thisTimestamp) / 1000);
+                    + " \n Block time: " + new Timestamp(blockTime) + " -- NTP: " + new Timestamp(thisTimestamp));
             return false;
         }
 
@@ -1331,21 +1501,39 @@ public class Block implements ExplorerJsonLine {
 
         this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
 
-        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue);
+        this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
         if (this.winValue < 1) {
-            LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue);
-            LOGGER.debug("*** forgingValue: " + this.forgingValue);
+            this.forgingValue = creator.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
+            this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
+
+            Tuple3<Integer, Integer, Integer> forgingPoint = creator.getLastForgingData(dcSet);
+            LOGGER.debug("*** Block[" + this.heightBlock + "] WIN_VALUE not in BASE RULES " + this.winValue
+                + " Creator: " + this.creator.getAddress());
+            LOGGER.debug("*** forging Value: " + this.forgingValue
+                    + " creator DataPoint: " + creator.getForgingData(dcSet, forgingPoint == null ? heightBlock : forgingPoint.a)
+                + " creator LAST Data: " + creator.getLastForgingData(dcSet));
             return false;
         }
 
         this.parentBlockHead = dcSet.getBlocksHeadsMap().get(this.heightBlock - 1);
+        if (parentBlockHead == null) {
+            LOGGER.debug("*** Block[" + this.heightBlock + "] not found Parent HEAD OR my BlocksHeadsMap was broken");
+            return false;
+        }
 
-        long currentTarget = this.parentBlockHead.target;
+        // вычислив всю силу цепочки
+        this.totalWinValue = this.parentBlockHead.totalWinValue + this.winValue;
+
+        final long currentTarget = this.parentBlockHead.target;
         int targetedWinValue = BlockChain.calcWinValueTargetedBase(dcSet, this.heightBlock, this.winValue, currentTarget);
         if (targetedWinValue < 1) {
-            //targetedWinValue = this.calcWinValueTargeted(dcSet);
-            LOGGER.debug("*** Block[" + this.heightBlock + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
-            return false;
+            if (BlockChain.validBlocks.contains(heightBlock)) {
+                targetedWinValue = (int) currentTarget >> 1;
+            } else {
+                //targetedWinValue = this.calcWinValueTargeted(dcSet);
+                LOGGER.debug("*** Block[" + this.heightBlock + "] targeted WIN_VALUE < MINIMAL TARGET " + targetedWinValue + " < " + currentTarget);
+                return false;
+            }
         }
         this.target = BlockChain.calcTarget(this.heightBlock, currentTarget, this.winValue);
         if (this.target == 0) {
@@ -1374,12 +1562,26 @@ public class Block implements ExplorerJsonLine {
         return true;
     }
 
-    public boolean isValid(DCSet dcSet, boolean andProcess) {
+    /**
+     * проверка блока с возможностью исполнения. При этом с заданной базой где делать форк.
+     * Если проверка одного блока то в памяти можно делать форк
+     *
+     * @param dcSetPlace DB place - make it outside
+     * @param andProcess and process it
+     * @return
+     */
+    public boolean isValid(DCSet dcSetPlace, boolean andProcess) {
+
+        if (validatedForkDB != null) {
+            LOGGER.error("is Valid validatedForkDB not NULL [" + heightBlock + "]");
+            close();
+        }
+        wasValidated = false;
 
         LOGGER.debug("*** Block[" + this.heightBlock + "] try Validate");
 
         // TRY CHECK HEAD
-        if (!this.isValidHead(dcSet))
+        if (!this.isValidHead(dcSetPlace))
             return false;
 
         Controller cnt = Controller.getInstance();
@@ -1388,17 +1590,34 @@ public class Block implements ExplorerJsonLine {
 
         //CHECK TRANSACTIONS
 
+        int atBytesLength;
+        if (atBytes != null && atBytes.length > 0) {
+            atBytesLength = atBytes.length;
+        } else {
+            atBytesLength = 0;
+        }
+        byte[] transactionsSignatures;
+        int transactionsSignaturesPos = 0;
+
         if (this.transactionCount == 0) {
-            // empty transactions
+            /**
+             * см. ниже - нет необходимости ХЭШ проверять для 0 транзакций - пиши сюда что хочешь
+             */
+            if (false) {
+                // empty transactions - USE CREATOR for HASH
+                transactionsSignatures = new byte[CREATOR_LENGTH + atBytesLength];
+                System.arraycopy(creator.getPublicKey(), 0, transactionsSignatures, 0, CREATOR_LENGTH);
+                transactionsSignaturesPos += CREATOR_LENGTH;
+            }
+
         } else {
 
-            byte[] blockSignature = this.getSignature();
+            transactionsSignatures = new byte[SIGNATURE_LENGTH * transactionCount + atBytesLength];
             byte[] transactionSignature;
-            byte[] transactionsSignatures = new byte[0];
 
             this.getTransactions();
 
-            boolean isPrimarySet = !dcSet.isFork();
+            boolean isPrimarySet = !dcSetPlace.isFork();
 
             long timerProcess = 0;
             long timerRefsMap_set = 0;
@@ -1406,29 +1625,22 @@ public class Block implements ExplorerJsonLine {
             long timerFinalMap_set = 0;
             long timerTransFinalMapSinds_set = 0;
 
-            long timestampEnd = this.getTimestamp()
-                    + (BlockChain.DEVELOP_USE ? BlockChain.GENERATING_MIN_BLOCK_TIME_MS : BlockChain.FLUSH_TIMEPOINT)
-                    - BlockChain.UNCONFIRMED_SORT_WAIT_MS
-                    + 10;
-            // because time filter used by parent block timestamp on core.BlockGenerator.run()
-            //long timestampBeg = this.getParent(dcSet).getTimestamp(dcSet);
+            long timestampEnd = this.getTimestamp() - BlockChain.UNCONFIRMED_SORT_WAIT_MS(heightBlock);
 
-            DCSet validatingDC;
-
-            // RESET forginf Info Updates
+            // RESET forging Info Updates
             this.forgingInfoUpdate = null;
 
             if (andProcess) {
-                validatingDC = dcSet;
-                if (dcSet.isFork() || cnt.noCalculated) {
+                if (cnt.noCalculated) {
                     this.txCalculated = null;
                 } else {
+                    // даже если это в Форке - если Полный Расчет то Калкулатед нужно вычислять
+                    // для последующего слива в цепочку
                     // make pool for calculated
                     this.txCalculated = new ArrayList<RCalculated>();
                 }
             } else {
                 long processTiming = System.nanoTime();
-                validatingDC = dcSet.fork();
                 processTiming = (System.nanoTime() - processTiming) / 1000;
                 if (processTiming < 999999999999l) {
                     LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
@@ -1441,17 +1653,17 @@ public class Block implements ExplorerJsonLine {
             long processTimingLocal;
             long processTimingLocalDiff;
 
-            //DLSet dbSet = Controller.getInstance().getDBSet();
-            TransactionMap unconfirmedMap = validatingDC.getTransactionMap();
-            TransactionFinalMap finalMap = validatingDC.getTransactionFinalMap();
-            TransactionFinalMapSigns transFinalMapSinds = validatingDC.getTransactionFinalMapSigns();
+            TransactionMap unconfirmedMap = dcSetPlace.getTransactionTab();
+            TransactionFinalMapImpl finalMap = dcSetPlace.getTransactionFinalMap();
+            TransactionFinalMapSigns transFinalMapSigns = dcSetPlace.getTransactionFinalMapSigns();
 
             int seqNo = 0;
             for (Transaction transaction : this.transactions) {
                 if (cnt.isOnStopping())
                     return false;
 
-                seqNo++; /// (!!)
+                seqNo++;
+                transactionSignature = transaction.getSignature();
 
                 if (!transaction.isWiped()) {
 
@@ -1466,29 +1678,56 @@ public class Block implements ExplorerJsonLine {
                         return false;
                     }
 
-                    if (!transaction.isSignatureValid(validatingDC)) {
-                        //
-                        LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
-                                + ":" + transaction.viewFullTypeName()
-                                + " signature  invalid!"
-                                + " " + Base58.encode(transaction.getSignature()));
-                        return false;
+                    boolean isSignatureValid = false;
+                    // TRY QUCK check SIGNATURE by FIND in POOL
+                    try {
+                        if (!unconfirmedMap.isClosed() && unconfirmedMap.contains(transactionSignature)) {
+                            if (isSignatureValid = transaction.trueEquals(unconfirmedMap.get(transactionSignature))) {
+                                // если трнзакция была в пуле ожидания - она уде провернная на Дубль
+                                transaction.checkedByPool = true;
+                            }
+                        } else {
+                            unconfirmedMap = dcSetPlace.getTransactionTab();
+                        }
+                    } catch (java.lang.Throwable e) {
+                        if (e instanceof java.lang.IllegalAccessError) {
+                            // налетели на закрытую таблицу
+                            unconfirmedMap = dcSetPlace.getTransactionTab();
+                        } else {
+                            LOGGER.error(e.getMessage(), e);
+                        }
+                    }
+
+                    if (!isSignatureValid) {
+                        if (!transaction.isSignatureValid(dcSetPlace)) {
+                            //
+                            LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
+                                    + ":" + transaction.viewFullTypeName()
+                                    + " signature  invalid!"
+                                    + " " + Base58.encode(transaction.getSignature()));
+                            if (BlockChain.CHECK_BUGS > 1
+                                //&& transaction.viewHeightSeq().equals("869431-1")
+                            ) {
+                                boolean debug = transaction.isSignatureValid(dcSetPlace);
+                            }
+                            return false;
+                        }
                     }
 
                     //CHECK TIMESTAMP AND DEADLINE
-                    if (this.heightBlock > 105999
-                            && transaction.getTimestamp() > timestampEnd
-                        //|| transaction.getDeadline() <= timestampBeg // не нужно так как при слиянии цепочек
-                        // могут и должны страрые транзакции заноситься
+                    if ((BlockChain.TEST_MODE || heightBlock > 278989) &&
+                            transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                     ) {
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()
-                                + " timestampEnd invalid"
-                                + " " + Base58.encode(transaction.getSignature()));
+                                + " timestamp Overhead"
+                                + " for diff: " + (transaction.getTimestamp() - timestampEnd)
+                                + " " + Base58.encode(transaction.getSignature())
+                        );
                         return false;
                     }
 
-                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //CHECK IF VALID
                     // так как мы в блоке такие транзакции уже проверяем то коллизию с неподтвержденными не проверяем
@@ -1520,25 +1759,39 @@ public class Block implements ExplorerJsonLine {
 
                 } else {
 
-                    transaction.setDC(validatingDC, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
+                    transaction.setDC(dcSetPlace, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                     //UPDATE REFERENCE OF SENDER
-                    if (transaction.isReferenced())
-                        // IT IS REFERENCED RECORD?
-                        transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), validatingDC);
+                    transaction.getCreator().setLastTimestamp(
+                            new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSetPlace);
                 }
-
-                transactionSignature = transaction.getSignature();
 
                 if (andProcess) {
 
                     //SET PARENT
                     ///logger.debug("[" + seqNo + "] try refsMap.set" );
-                    if (isPrimarySet) {
+                    if (true // в любом случае нужно просчитывать если Полный Просчет
+                            // - чтобы потом слить в основную цепочку
+                                || isPrimarySet) {
                         //REMOVE FROM UNCONFIRMED DATABASE
                         ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                         processTimingLocal = System.nanoTime();
-                        unconfirmedMap.delete(transactionSignature);
+                        try {
+                            if (!unconfirmedMap.isClosed()) {
+                                unconfirmedMap.delete(transactionSignature);
+                            } else {
+                                unconfirmedMap = dcSetPlace.getTransactionTab();
+                                unconfirmedMap.delete(transactionSignature);
+                            }
+                        } catch (java.lang.Throwable e) {
+                            if (e instanceof java.lang.IllegalAccessError) {
+                                // налетели на закрытую таблицу
+                                unconfirmedMap = dcSetPlace.getTransactionTab();
+                                unconfirmedMap.delete(transactionSignature);
+                            } else {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
                         processTimingLocalDiff = System.nanoTime() - processTimingLocal;
                         if (processTimingLocalDiff < 999999999999l)
                             timerUnconfirmedMap_delete += processTimingLocalDiff / 1000;
@@ -1547,79 +1800,58 @@ public class Block implements ExplorerJsonLine {
                     if (cnt.isOnStopping())
                         return false;
 
-                    if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                            && ((RSend)transaction).getAssetKey() != 1) {
-                        ;
-                    } else {
+                    ///logger.debug("[" + seqNo + "] try finalMap.set" );
+                    processTimingLocal = System.nanoTime();
+                    Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
+                    finalMap.put(key, transaction);
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerFinalMap_set += processTimingLocalDiff / 1000;
 
-                        ///logger.debug("[" + seqNo + "] try finalMap.set" );
-                        processTimingLocal = System.nanoTime();
-                        Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                        finalMap.set(key, transaction);
-                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                        if (processTimingLocalDiff < 999999999999l)
-                            timerFinalMap_set += processTimingLocalDiff / 1000;
-
-                        processTimingLocal = System.nanoTime();
-                        transFinalMapSinds.set(transactionSignature, key);
-                        List<byte[]> signatures = transaction.getSignatures();
-                        if (signatures != null) {
-                            for (byte[] itemSignature : signatures) {
-                                transFinalMapSinds.set(itemSignature, key);
-                            }
+                    processTimingLocal = System.nanoTime();
+                    transFinalMapSigns.put(transactionSignature, key);
+                    List<byte[]> signatures = transaction.getOtherSignatures();
+                    if (signatures != null) {
+                        for (byte[] itemSignature : signatures) {
+                            transFinalMapSigns.put(itemSignature, key);
                         }
-                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                        if (processTimingLocalDiff < 999999999999l)
-                            timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
-
                     }
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
 
                 } else {
 
-                    if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                            && ((RSend) transaction).getAssetKey() != 1) {
-                        ;
-                    } else {
+                    // for some TRANSACTIONs need add to FINAM MAP etc.
+                    // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
 
-                        // for some TRANSACTIONs need add to FINAM MAP etc.
-                        // RSertifyPubKeys - in same BLOCK with IssuePersonRecord
+                    processTimingLocal = System.nanoTime();
+                    Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
+                    finalMap.put(key, transaction);
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerFinalMap_set += processTimingLocalDiff / 1000;
 
-                        processTimingLocal = System.nanoTime();
-                        Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-                        finalMap.set(key, transaction);
-                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                        if (processTimingLocalDiff < 999999999999l)
-                            timerFinalMap_set += processTimingLocalDiff / 1000;
-
-                        processTimingLocal = System.nanoTime();
-                        transFinalMapSinds.set(transactionSignature, key);
-                        List<byte[]> signatures = transaction.getSignatures();
-                        if (signatures != null) {
-                            for (byte[] itemSignature : signatures) {
-                                transFinalMapSinds.set(itemSignature, key);
-                            }
+                    processTimingLocal = System.nanoTime();
+                    transFinalMapSigns.put(transactionSignature, key);
+                    List<byte[]> signatures = transaction.getOtherSignatures();
+                    if (signatures != null) {
+                        for (byte[] itemSignature : signatures) {
+                            transFinalMapSigns.put(itemSignature, key);
                         }
-                        processTimingLocalDiff = System.nanoTime() - processTimingLocal;
-                        if (processTimingLocalDiff < 999999999999l)
-                            timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                     }
+                    processTimingLocalDiff = System.nanoTime() - processTimingLocal;
+                    if (processTimingLocalDiff < 999999999999l)
+                        timerTransFinalMapSinds_set += processTimingLocalDiff / 1000;
                 }
 
-                transactionsSignatures = Bytes.concat(transactionsSignatures, transactionSignature);
+                System.arraycopy(transactionSignature, 0, transactionsSignatures, transactionsSignaturesPos, SIGNATURE_LENGTH);
+                transactionsSignaturesPos += SIGNATURE_LENGTH;
+
             }
 
-            if (validatingDC.isFork()) {
-                validatingDC.close();
-            }
-
-            transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
-            if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
-                LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid");
-                return false;
-            }
-
-            if (!dcSet.isFork()) {
-                // если это просчет уже для записи в нашу базу данных а не при выборе Цепочки для синхронизации
+            if (andProcess) {
+                // если это просчет уже для записи в нашу базу данных
                 processTiming = System.nanoTime() - processTiming;
                 if (processTiming < 999999999999l) {
                     // при переполнении может быть минус
@@ -1630,8 +1862,10 @@ public class Block implements ExplorerJsonLine {
                     // это тоже время требует...
                     Controller.getInstance().getBlockChain().updateTXValidateTimingAverage(processTiming, this.transactionCount);
                 }
+            }
 
-                long tickets = System.currentTimeMillis() - timerStart;
+            long tickets = System.currentTimeMillis() - timerStart;
+            if (isPrimarySet || tickets / (transactionCount + 1) > 1) {
                 LOGGER.debug("VALIDATING[" + this.heightBlock + "]="
                         + this.transactionCount + " " + tickets + "[ms] " + tickets / this.transactionCount + "[ms/tx]"
                         + " Proc[us]: " + timerProcess
@@ -1643,19 +1877,40 @@ public class Block implements ExplorerJsonLine {
                 );
             }
 
+            /**
+             * Только если есть транзакции тогда имеет смысл проверять их общий ХЭШ
+             * иначе - пиши туда что хочешь - он просто будет участвовать в подписи
+             * тогда можно разные подписи делать с его помощью?
+             * а может тогда иключить его из подписи если нет транзакций?
+             * Тогда нельзя будет генерировать разные подписи... да вроде пока и не используется это ни как
+             */
+
+            // ADD AT_BYTES
+            if (atBytesLength > 0) {
+                System.arraycopy(atBytes, 0, transactionsSignatures, transactionsSignaturesPos, atBytesLength);
+            }
+
+            transactionsSignatures = Crypto.getInstance().digest(transactionsSignatures);
+            if (!Arrays.equals(this.transactionsHash, transactionsSignatures)) {
+                LOGGER.debug("*** Block[" + this.heightBlock + "].digest(transactionsSignatures) invalid"
+                        + " transactionCount: " + transactionCount
+                        + (atBytesLength > 0 ? " atBytes: " + atBytesLength : ""));
+                return false;
+            }
+
         }
 
         //BLOCK IS VALID
         if (andProcess) {
             try {
-                this.process_after(cnt, dcSet);
+                this.process_after(cnt, dcSetPlace);
             } catch (Exception e) {
                 LOGGER.error(e.getMessage(), e);
                 return false;
             }
 
             timerStart = System.nanoTime();
-            dcSet.getBlockMap().add(this);
+            dcSetPlace.getBlockMap().putAndProcess(this);
             timerStart = System.nanoTime() - timerStart;
             if (timerStart < 999999999999l)
                 LOGGER.debug("BlockMap add timer [us]: " + timerStart / 1000 + " [" + this.heightBlock + "]");
@@ -1663,7 +1918,52 @@ public class Block implements ExplorerJsonLine {
         }
 
         this.wasValidated = true;
+        if (andProcess) {
+            validatedForkDB = dcSetPlace;
+        }
         return true;
+    }
+
+    /**
+     * Скорее всего база уже закрыта выше - очистим
+     */
+    public void clearValidatedForkDB() {
+        validatedForkDB = null;
+    }
+
+    private boolean isClosed;
+    /**
+     * Закрывает базу в котрой производилась проверка блока
+     */
+
+    public synchronized void close() {
+        if (validatedForkDB != null) {
+            try {
+                validatedForkDB.close();
+                ///LOGGER.debug("validatedForkDB [" + heightBlock + "] is closed");
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            validatedForkDB = null;
+        }
+        transactions = null;
+        isClosed = true;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (!isClosed) {
+            close();
+            if (BlockChain.CHECK_BUGS > 5) {
+                LOGGER.debug("validatedForkDB [" + heightBlock + "] is FINALIZED " + creator.getAddress());
+            }
+        }
+        super.finalize();
+    }
+
+    public void saveToChainFromvalidatedForkDB() {
+        validatedForkDB.writeToParent();
+        close();
     }
 
     //PROCESS/ORPHAN
@@ -1680,14 +1980,14 @@ public class Block implements ExplorerJsonLine {
 
         if (BlockChain.ROBINHOOD_USE) {
             // find rich account
-            String rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
+            byte[] rich = Account.getRichWithForks(dcSet, Transaction.FEE_KEY);
 
-            if (!rich.equals(this.creator.getAddress())) {
-                emittedFee = this.blockHead.totalFee>>1;
+            if (!this.creator.equals(rich)) {
+                emittedFee = this.blockHead.totalFee >> 1;
 
                 Account richAccount = new Account(rich);
                 richAccount.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
-                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+                        new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, true);
             } else {
                 emittedFee = this.blockHead.emittedFee;
             }
@@ -1700,10 +2000,10 @@ public class Block implements ExplorerJsonLine {
         if (this.blockHead.totalFee != 0) {
             BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
             this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
-                    totalFee, true);
+                    totalFee, true, false);
 
             // MAKE CALCULATED TRANSACTIONS
-            if (!dcSet.isFork() && !asOrphan && !Controller.getInstance().noCalculated) {
+            if (!asOrphan && !Controller.getInstance().noCalculated) {
                 if (this.txCalculated == null)
                     this.txCalculated = new ArrayList<RCalculated>();
 
@@ -1715,7 +2015,7 @@ public class Block implements ExplorerJsonLine {
         if (emittedFee != 0) {
             // SUBSTRACT from EMISSION (with minus)
             GenesisBlock.CREATOR.changeBalance(dcSet, !asOrphan, Transaction.FEE_KEY,
-                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true);
+                    new BigDecimal(emittedFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE), true, false);
         }
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #3");
@@ -1726,15 +2026,16 @@ public class Block implements ExplorerJsonLine {
 
         // TEST COMPU ORPHANs
         HashMap bals = new HashMap();
-        Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+        Collection<byte[]> keys = dcSet.getAssetBalanceMap().keySet();
         BigDecimal total = BigDecimal.ZERO;
         BigDecimal totalNeg = BigDecimal.ZERO;
-        for (Tuple2<String, Long> key : keys) {
-            if (key.b == 2l) {
-                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball = dcSet
-                        .getAssetBalanceMap().get(key);
+        ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
+        for (byte[] key : keys) {
+            if (ItemAssetBalanceMap.getAssetKeyFromKey(key) == 2l) {
+                Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
+                    map.get(key);
 
-                bals.put(key.a, ball.a.b);
+                bals.put(ItemAssetBalanceMap.getShortAccountFromKey(key), ball.a.b);
             }
         }
         totalCOMPUtest.put(height, bals);
@@ -1747,19 +2048,20 @@ public class Block implements ExplorerJsonLine {
         if (parentBalanses != null) {
             Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball;
             BigDecimal ballParent;
-            Collection<Tuple2<String, Long>> keys = dcSet.getAssetBalanceMap().getKeys();
+            Collection<byte[]> keys = dcSet.getAssetBalanceMap().keySet();
+            ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
             boolean error = false;
-            for (Tuple2<String, Long> key : keys) {
-                if (key.b == 2l) {
+            for (byte[] key : keys) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(key) == 2l) {
                     ball = dcSet.getAssetBalanceMap().get(key);
 
-                    ballParent = (BigDecimal) parentBalanses.get(key.a);
+                    ballParent = (BigDecimal) parentBalanses.get(ItemAssetBalanceMap.getShortAccountFromKey(key));
                     if (ballParent != null && ballParent.compareTo(ball.a.b) != 0
-                            ||  ballParent == null && ball.a.b.signum() != 0) {
-                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + key.a
-                                + " balParent : " + (ballParent==null?"NULL":ballParent.toPlainString())
-                                + " ---> " + (ball==null?"NULL":ball.a.b.toPlainString())
-                                + " == " + ball.a.b.subtract(ballParent==null?BigDecimal.ZERO:ballParent));
+                            || ballParent == null && ball.a.b.signum() != 0) {
+                        LOGGER.error(" WRONG COMPU orphan " + mess + " [" + (heightParent + 1) + "] for ADDR :" + ItemAssetBalanceMap.getShortAccountFromKey(key)
+                                + " balParent : " + (ballParent == null ? "NULL" : ballParent.toPlainString())
+                                + " ---> " + (ball == null ? "NULL" : ball.a.b.toPlainString())
+                                + " == " + ball.a.b.subtract(ballParent == null ? BigDecimal.ZERO : ballParent));
 
                         error = true;
                     }
@@ -1775,6 +2077,13 @@ public class Block implements ExplorerJsonLine {
         }
     }
 
+    /**
+     * Вызывается только если идет обработка попутно
+     *
+     * @param cnt
+     * @param dcSet
+     * @throws Exception
+     */
     // TODO - make it trownable
     public void process_after(Controller cnt, DCSet dcSet) throws Exception {
 
@@ -1789,13 +2098,19 @@ public class Block implements ExplorerJsonLine {
             // Так обходится неопределенность при откате - если несколько транзакций для одного счета
             // меняли инфо по форжингу
 
-            for (Account account: this.forgingInfoUpdate) {
+            for (Account account : this.forgingInfoUpdate) {
 
-                Tuple2<Integer, Integer> privousForgingPoint = account.getLastForgingData(dcSet);
+                Tuple3<Integer, Integer, Integer> privousForgingPoint = account.getLastForgingData(dcSet);
                 int currentForgingBalance = account.getBalanceUSE(Transaction.RIGHTS_KEY, dcSet).intValue();
                 if (privousForgingPoint == null) {
                     if (currentForgingBalance >= BlockChain.MIN_GENERATING_BALANCE) {
-                        account.setForgingData(dcSet, this.heightBlock, currentForgingBalance);
+                        if (BlockChain.ERA_COMPU_ALL_UP) {
+                            // запоминаем чтобы не было отказов в сборке блоков
+                            account.setForgingData(dcSet, this.heightBlock - BlockChain.DEVELOP_FORGING_START,
+                                    currentForgingBalance);
+                        } else {
+                            account.setForgingData(dcSet, this.heightBlock, currentForgingBalance);
+                        }
                     }
                 } else {
                     // если это не инициализация то может на счете ранее нулевой баланс был
@@ -1842,7 +2157,7 @@ public class Block implements ExplorerJsonLine {
                 index = i + indexStart;
                 txCalculated = this.txCalculated.get(i);
                 txCalculated.setHeightSeq(this.heightBlock, index);
-                finalMap.set(txCalculated);
+                finalMap.put(txCalculated);
 
             }
         }
@@ -1856,14 +2171,10 @@ public class Block implements ExplorerJsonLine {
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
+        long timerStart;
         long start = System.currentTimeMillis();
 
         //ADD TO DB
-        long timerStart = System.currentTimeMillis();
-
-        LOGGER.debug("getBlocksHeadMap().set timer: " + (System.currentTimeMillis() - timerStart));
-
-        //this.heightBlock = dcSet.getBlockSignsMap().getHeight(this.signature);
 
         if (BlockChain.TEST_FEE_ORPHAN > 0 && BlockChain.TEST_FEE_ORPHAN > this.heightBlock) {
             // TEST COMPU ORPHANs
@@ -1873,11 +2184,11 @@ public class Block implements ExplorerJsonLine {
         // for DEBUG
         if (this.heightBlock == 65431
                 || this.heightBlock == 86549) {
-            int rrrr =0;
+            int rrrr = 0;
         }
 
         //PROCESS TRANSACTIONS
-        byte[] blockSignature = this.getSignature();
+        //byte[] blockSignature = this.getSignature();
         byte[] transactionSignature;
 
         // RESET forginf Info Updates
@@ -1886,7 +2197,8 @@ public class Block implements ExplorerJsonLine {
         this.getTransactions();
 
         if (this.transactionCount > 0) {
-            if (dcSet.isFork() || cnt.noCalculated) {
+            if (/// теперь нужно счтитать так как у нас из Форка слив напрямую идет dcSet.isFork() ||
+                    cnt.noCalculated) {
                 this.txCalculated = null;
             } else {
                 // make pool for calculated
@@ -1894,8 +2206,8 @@ public class Block implements ExplorerJsonLine {
             }
 
             //DLSet dbSet = Controller.getInstance().getDBSet();
-            TransactionMap unconfirmedMap = dcSet.getTransactionMap();
-            TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+            TransactionMap unconfirmedMap = dcSet.getTransactionTab();
+            TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
             TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
 
             long timerProcess = 0;
@@ -1918,15 +2230,15 @@ public class Block implements ExplorerJsonLine {
                 transaction.setDC(dcSet, Transaction.FOR_NETWORK, this.heightBlock, seqNo);
 
                 //PROCESS
-                if (!transaction.isWiped()) {
+                if (transaction.isWiped()
+                ) {
+                    //UPDATE REFERENCE OF SENDER
+                    transaction.getCreator().setLastTimestamp(
+                            new long[]{transaction.getTimestamp(), transaction.getDBRef()}, dcSet);
+                } else {
                     timerStart = System.currentTimeMillis();
                     transaction.process(this, Transaction.FOR_NETWORK);
                     timerProcess += System.currentTimeMillis() - timerStart;
-                } else {
-                    //UPDATE REFERENCE OF SENDER
-                    if (transaction.isReferenced())
-                        // IT IS REFERENCED RECORD?
-                        transaction.getCreator().setLastTimestamp(transaction.getTimestamp(), dcSet);
                 }
 
                 transactionSignature = transaction.getSignature();
@@ -1937,34 +2249,41 @@ public class Block implements ExplorerJsonLine {
                 //REMOVE FROM UNCONFIRMED DATABASE
                 ///logger.debug("[" + seqNo + "] try unconfirmedMap delete" );
                 timerStart = System.currentTimeMillis();
-                unconfirmedMap.delete(transactionSignature);
+                try {
+                    if (!unconfirmedMap.isClosed()) {
+                        unconfirmedMap.delete(transactionSignature);
+                    } else {
+                        unconfirmedMap = dcSet.getTransactionTab();
+                    }
+                } catch (java.lang.Throwable e) {
+                    if (e instanceof java.lang.IllegalAccessError) {
+                        // налетели на закрытую таблицу
+                        unconfirmedMap = dcSet.getTransactionTab();
+                    } else {
+                        throw new Exception(e);
+                    }
+                }
                 timerUnconfirmedMap_delete += System.currentTimeMillis() - timerStart;
 
-                if (BlockChain.TEST_DB_TXS_OFF && transaction.getType() == Transaction.SEND_ASSET_TRANSACTION
-                        && ((RSend)transaction).getAssetKey() != 1) {
+                Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
 
-                } else {
+                if (cnt.isOnStopping())
+                    throw new Exception("on stoping");
 
-                    Long key = Transaction.makeDBRef(this.heightBlock, seqNo);
-
-                    if (cnt.isOnStopping())
-                        throw new Exception("on stoping");
-
-                    ///logger.debug("[" + seqNo + "] try finalMap.set" );
-                    timerStart = System.currentTimeMillis();
-                    finalMap.set(key, transaction);
-                    timerFinalMap_set += System.currentTimeMillis() - timerStart;
-                    //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
-                    timerStart = System.currentTimeMillis();
-                    transFinalMapSinds.set(transactionSignature, key);
-                    List<byte[]> signatures = transaction.getSignatures();
-                    if (signatures != null) {
-                        for (byte[] itemSignature : signatures) {
-                            transFinalMapSinds.set(itemSignature, key);
-                        }
+                ///LOGGER.debug("[" + seqNo + "] try finalMap.set" + transaction );
+                timerStart = System.currentTimeMillis();
+                finalMap.put(key, transaction);
+                timerFinalMap_set += System.currentTimeMillis() - timerStart;
+                //logger.debug("[" + seqNo + "] try transFinalMapSinds.set" );
+                timerStart = System.currentTimeMillis();
+                transFinalMapSinds.put(transactionSignature, key);
+                List<byte[]> signatures = transaction.getOtherSignatures();
+                if (signatures != null) {
+                    for (byte[] itemSignature : signatures) {
+                        transFinalMapSinds.put(itemSignature, key);
                     }
-                    timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
                 }
+                timerTransFinalMapSinds_set += System.currentTimeMillis() - timerStart;
 
             }
 
@@ -1972,33 +2291,38 @@ public class Block implements ExplorerJsonLine {
                     + "  timerUnconfirmedMap_delete: " + timerUnconfirmedMap_delete + "  timerFinalMap_set:" + timerFinalMap_set
                     + "  timerTransFinalMapSinds_set: " + timerTransFinalMapSinds_set);
 
-            long tickets = System.currentTimeMillis() - start;
-            LOGGER.debug("[" + this.heightBlock + "] processing time: " + tickets * 0.001
-                    + " TXs = " + this.transactionCount + " millsec/record:" + tickets / this.transactionCount);
-
         }
 
+        timerStart = System.currentTimeMillis();
         this.process_after(cnt, dcSet);
+        LOGGER.debug("BLOCK process_after: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
 
         timerStart = System.currentTimeMillis();
-        dcSet.getBlockMap().add(this);
+        dcSet.getBlockMap().putAndProcess(this);
         LOGGER.debug("BlockMap add timer: " + (System.currentTimeMillis() - timerStart) + " [" + this.heightBlock + "]");
+
+        long tickets = System.currentTimeMillis() - start;
+        if (transactionCount > 0 && tickets > 10 || tickets > 10) {
+            LOGGER.debug("[" + this.heightBlock + "] TOTAL processing time: " + tickets
+                    + " ms, TXs= " + this.transactionCount
+                    + (transactionCount == 0? "" : " - " + (this.transactionCount * 1000 / tickets) + " tx/sec"));
+        }
 
     }
 
-    public void orphan(DCSet dcSet) throws Exception {
+    public void orphan(DCSet dcSet, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
         if (cnt.isOnStopping())
             throw new Exception("on stoping");
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #0");
-        if (this.heightBlock == 1) {
-            // GENESIS BLOCK cannot be orphanED
+        if (this.heightBlock < 2) {
+            // GENESIS BLOCK cannot be orphaned
             return;
         }
 
-        if ( this.heightBlock > 162045 &&  this.heightBlock < 162050 ) {
+        if (BlockChain.CHECK_BUGS > 3 && this.heightBlock > 162045 && this.heightBlock < 162050) {
             LOGGER.error(" [" + this.heightBlock + "] BONUS = 0???");
         }
 
@@ -2009,12 +2333,9 @@ public class Block implements ExplorerJsonLine {
 
         long start = System.currentTimeMillis();
 
-        // RESET forginf Info Updates
-        this.forgingInfoUpdate = null;
-
         //ORPHAN TRANSACTIONS
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2 ORPHAN TRANSACTIONS");
-        this.orphanTransactions(dcSet, heightBlock);
+        this.orphanTransactions(dcSet, heightBlock, notStoreTXs);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #2f FEE");
 
@@ -2028,11 +2349,12 @@ public class Block implements ExplorerJsonLine {
             // и разом в тут блоке изменим
             // Так обходится неопределенность при откате - если несколько транзакций для одного счета
             // меняли инфо по форжингу
-            for (Account account: this.forgingInfoUpdate) {
+            for (Account account : this.forgingInfoUpdate) {
                 if (!this.getCreator().equals(account)) {
                     // если этот блок не собирался этим человеком
-                    Tuple2<Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
-                    if (lastForgingPoint != null && lastForgingPoint.a == heightBlock
+                    Tuple3<Integer, Integer, Integer> lastForgingPoint = account.getLastForgingData(dcSet);
+                    if (true // теперь можно удалять полностью - внутри идет проверка
+                            || lastForgingPoint != null && lastForgingPoint.a == heightBlock
                             && !this.getCreator().equals(account)) {
                         account.delForgingData(dcSet, heightBlock);
                     }
@@ -2040,8 +2362,11 @@ public class Block implements ExplorerJsonLine {
             }
         }
 
+        // RESET forging Info Updates
+        this.forgingInfoUpdate = null;
+
         //DELETE BLOCK FROM DB
-        dcSet.getBlockMap().remove(this.signature, this.reference, this.creator);
+        dcSet.getBlockMap().deleteAndProcess(this.signature, this.reference, this.creator, this.heightBlock);
 
         //logger.debug("<<< core.block.Block.orphan(DLSet) #4");
 
@@ -2066,24 +2391,30 @@ public class Block implements ExplorerJsonLine {
 
     }
 
-    private void orphanTransactions(DCSet dcSet, int height) throws Exception {
+    public void orphan(DCSet dcSet) throws Exception {
+        orphan(dcSet, false);
+    }
+
+    private void orphanTransactions(DCSet dcSet, int height, boolean notStoreTXs) throws Exception {
 
         Controller cnt = Controller.getInstance();
         //DLSet dbSet = Controller.getInstance().getDBSet();
 
         boolean notFork = !dcSet.isFork();
 
-        TransactionMap unconfirmedMap = dcSet.getTransactionMap();
-        TransactionFinalMap finalMap = dcSet.getTransactionFinalMap();
+        TransactionMap unconfirmedMap = dcSet.getTransactionTab();
+        TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
+        TransactionsPool pool = Controller.getInstance().transactionsPool;
 
         this.getTransactions();
         //ORPHAN ALL TRANSACTIONS IN DB BACK TO FRONT
         int seqNo;
         for (int i = this.transactionCount - 1; i >= 0; i--) {
             seqNo = i + 1;
-            if (cnt.isOnStopping())
+            if (cnt.isOnStopping()) {
                 throw new Exception("on stoping");
+            }
 
             Transaction transaction = transactions.get(i);
             //logger.debug("<<< core.block.Block.orphanTransactions\n" + transaction.toJson());
@@ -2095,21 +2426,38 @@ public class Block implements ExplorerJsonLine {
                 transaction.orphan(this, Transaction.FOR_NETWORK);
             } else {
                 // IT IS REFERENCED RECORD?
-                if (transaction.isReferenced()) {
-                    //UPDATE REFERENCE OF SENDER
-                    transaction.getCreator().removeLastTimestamp(dcSet);
-                }
+                transaction.getCreator().removeLastTimestamp(dcSet, transaction.getTimestamp());
             }
 
             if (notFork) {
-                //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-                unconfirmedMap.add(transaction);
+                if (!notStoreTXs) {
+                    if (true) {
+                        // тут учет сразу очистки базы происходит - что более правильно
+                        pool.offerMessage(transaction);
+                    } else {
+                        //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
+                        try {
+                            if (!unconfirmedMap.isClosed()) {
+                                unconfirmedMap.put(transaction);
+                            } else {
+                                unconfirmedMap = dcSet.getTransactionTab();
+                            }
+                        } catch (java.lang.Throwable e) {
+                            if (e instanceof java.lang.IllegalAccessError) {
+                                // налетели на закрытую таблицу
+                                unconfirmedMap = dcSet.getTransactionTab();
+                            } else {
+                                throw new Exception(e);
+                            }
+                        }
+                    }
+                }
 
                 Long key = Transaction.makeDBRef(height, seqNo);
 
                 finalMap.delete(key);
                 transFinalMapSinds.delete(transaction.getSignature());
-                List<byte[]> signatures = transaction.getSignatures();
+                List<byte[]> signatures = transaction.getOtherSignatures();
                 if (signatures != null) {
                     for (byte[] itemSignature : signatures) {
                         transFinalMapSinds.delete(itemSignature);
@@ -2130,5 +2478,5 @@ public class Block implements ExplorerJsonLine {
                 + " TX: " + this.transactionCount
                 + " CR:" + this.getCreator().getPersonAsString();
     }
-
 }
+

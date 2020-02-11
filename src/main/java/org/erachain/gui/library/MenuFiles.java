@@ -10,17 +10,18 @@ import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.settings.SettingsFrame;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.erachain.settings.Settings;
 import org.erachain.utils.URLViewer;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +35,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MenuFiles extends JMenu {
+
+    protected Logger logger;
+
     public  JMenuItem webServerItem;
     public  JMenuItem blockExplorerItem;
     public  JMenuItem lockItem;
@@ -43,6 +47,9 @@ public class MenuFiles extends JMenu {
 
     public MenuFiles() {
         super();
+
+        logger = LoggerFactory.getLogger(getClass());
+
         th = this;
         addMenuListener(new MenuListener() {
 
@@ -167,6 +174,7 @@ public class MenuFiles extends JMenu {
                         }
                         in.close();
                     } catch (IOException e1) {
+                        logger.error(e1.getMessage(), e1);
                         return;
                     }
   				
@@ -218,8 +226,7 @@ public class MenuFiles extends JMenu {
                     panel.jComboBox_Asset.setSelectedItem(asset);
                     panel.jComboBox_Asset.setEnabled(false);
                 } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
                
             }
@@ -242,7 +249,7 @@ public class MenuFiles extends JMenu {
 
             }
         });
-        if (BlockChain.DEVELOP_USE) add(writeTransItem);
+        if (BlockChain.TEST_MODE) add(writeTransItem);
 
         //WEB SERVER
         webServerItem = new JMenuItem(Lang.getInstance().translate("Decentralized Web server"));
@@ -254,8 +261,7 @@ public class MenuFiles extends JMenu {
                 try {
                     URLViewer.openWebpage(new URL("http://127.0.0.1:" + Settings.getInstance().getWebPort()));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
 
             }
@@ -274,8 +280,7 @@ public class MenuFiles extends JMenu {
                 try {
                     URLViewer.openWebpage(new URL("http://127.0.0.1:" + Settings.getInstance().getWebPort() + "/index/blockexplorer.html"));
                 } catch (MalformedURLException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                    logger.error(e1.getMessage(), e1);
                 }
 
             }

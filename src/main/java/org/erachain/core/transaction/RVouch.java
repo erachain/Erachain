@@ -226,12 +226,8 @@ public class RVouch extends Transaction {
 
     }
 
-    //@Override
     @Override
     public int isValid(int asDeal, long flags) {
-
-        if (BlockChain.TEST_DB_TXS_OFF)
-            return VALIDATE_OK;
 
         if (this.vouchHeight < 2) {
             //CHECK HEIGHT - not 0 and NOT GENESIS
@@ -246,21 +242,10 @@ public class RVouch extends Transaction {
         int result = super.isValid(asDeal, flags);
         if (result != Transaction.VALIDATE_OK) return result;
 
-		/*
-		//Block block1 = Controller.getInstance().getBlockByHeight(db, height);
-		byte[] b = db.getHeightMap().getBlockByHeight(height);
-		if (b == null )
-			return INVALID_BLOCK_HEIGHT_ERROR;
-
-		Block block = db.getBlocksHeadMap().get(b);
-		if (block == null)
-			return INVALID_BLOCK_HEIGHT_ERROR;
-		Transaction tx = block.get(seq);
-		if (tx == null )
-			return INVALID_BLOCK_TRANS_SEQ_ERROR;
-		 */
-        if (!this.dcSet.getTransactionFinalMap().contains(Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo))) {
-            return INVALID_BLOCK_TRANS_SEQ_ERROR;
+        Transaction transaction = this.dcSet.getTransactionFinalMap().get(Transaction.makeDBRef(this.vouchHeight, this.vouchSeqNo));
+        if (transaction == null || transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
+            if (height > BlockChain.ALL_BALANCES_OK_TO)
+                return INVALID_BLOCK_TRANS_SEQ_ERROR;
         }
 
         return Transaction.VALIDATE_OK;
@@ -299,7 +284,7 @@ public class RVouch extends Transaction {
                         amount,
                         listNew
                 );
-        this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
+        this.dcSet.getVouchRecordMap().put(recordKey, valueNew);
 
     }
 
@@ -322,7 +307,7 @@ public class RVouch extends Transaction {
                         value.a.subtract(this.creator.getBalanceUSE(Transaction.RIGHTS_KEY, this.dcSet)),
                         listNew
                 );
-        this.dcSet.getVouchRecordMap().set(recordKey, valueNew);
+        this.dcSet.getVouchRecordMap().put(recordKey, valueNew);
 
     }
 

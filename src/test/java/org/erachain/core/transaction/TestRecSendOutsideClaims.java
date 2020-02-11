@@ -73,7 +73,7 @@ public class TestRecSendOutsideClaims {
     // INIT ASSETS
     private void init() {
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         Controller.getInstance().setDCSet(db);
         gb = new GenesisBlock();
         try {
@@ -84,11 +84,11 @@ public class TestRecSendOutsideClaims {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
-        maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false);
-        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
-        recipient.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
-        recipient2.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
+        maker.changeBalance(db, false, ERM_KEY, BigDecimal.valueOf(100), false, false);
+        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
+        recipient.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
+        recipient2.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1), false, false);
 
         assetA = new AssetVenture(maker, "AAA", icon, image, ".", AssetCls.AS_OUTSIDE_OTHER_CLAIM, 2, 0L);
 

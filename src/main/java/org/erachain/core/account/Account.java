@@ -1,6 +1,7 @@
 package org.erachain.core.account;
 
 import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
@@ -16,18 +17,21 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ItemAssetBalanceMap;
-import org.erachain.datachain.OrderMap;
-import org.erachain.datachain.ReferenceMap;
+import org.erachain.datachain.OrderMapImpl;
+import org.erachain.datachain.ReferenceMapImpl;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.lang.Lang;
 import org.erachain.utils.NameUtils;
 import org.erachain.utils.NameUtils.NameResult;
 import org.erachain.utils.NumberAsString;
 import org.erachain.utils.Pair;
+import org.mapdb.Fun;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 import org.mapdb.Fun.Tuple4;
 import org.mapdb.Fun.Tuple5;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -41,9 +45,10 @@ import java.util.*;
  */
 public class Account {
 
+    public static final int ADDRESS_SHORT_LENGTH = 20;
     public static final int ADDRESS_LENGTH = 25;
     // private static final long ERA_KEY = Transaction.RIGHTS_KEY;
-    private static final long FEE_KEY = Transaction.FEE_KEY;
+    ///private static final long FEE_KEY = Transaction.FEE_KEY;
     // public static final long ALIVE_KEY = StatusCls.ALIVE_KEY;
     // public static String EMPTY_PUBLICK_ADDRESS = new PublicKeyAccount(new
     // byte[PublicKeyAccount.PUBLIC_KEY_LENGTH]).getAddress();
@@ -52,23 +57,37 @@ public class Account {
     protected byte[] bytes;
     protected byte[] shortBytes;
     // private long generatingBalance; //used for forging balance
-    Tuple4<Long, Integer, Integer, Integer> personDuration;
+    // нельзя тут запминать так как при откате данные не будут очищены Tuple4<Long, Integer, Integer, Integer> personDuration;
     Tuple2<Integer, PersonCls> person;
     int viewBalancePosition = 0;
 
-    protected Account() {
-        // this.generatingBalance = 0l;
-    }
-
     public Account(String address) {
-
-        // ///test address
-        assert (Base58.decode(address) instanceof byte[]);
         this.bytes = Base58.decode(address);
         this.shortBytes = Arrays.copyOfRange(this.bytes, 1, this.bytes.length - 4);
         this.address = address;
     }
 
+    public Account(byte[] addressBytes) {
+        if (addressBytes.length == ADDRESS_SHORT_LENGTH) {
+            // AS SHORT BYTES
+            this.shortBytes = addressBytes;
+            this.bytes = Crypto.getInstance().getAddressFromShortBytes(addressBytes);
+        } else if (addressBytes.length == ADDRESS_LENGTH) {
+            // AS FULL 25 byres
+            this.bytes = addressBytes;
+            this.shortBytes = Arrays.copyOfRange(addressBytes, 1, this.bytes.length - 4);
+
+        } else {
+            assert(addressBytes.length == ADDRESS_LENGTH);
+        }
+
+        /// make on demand this.address = Base58.encode(bytes);
+    }
+
+    public static byte[] makeShortBytes(String address) {
+        return Arrays.copyOfRange(Base58.decode(address), 1, ADDRESS_LENGTH - 4);
+
+    }
     public static Account makeAccountFromShort(byte[] addressShort) {
 
         String address = Crypto.getInstance().getAddressFromShort(addressShort);
@@ -186,19 +205,38 @@ public class Account {
 
     }
 
-    public static Map<String, BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
-                                                                  Map<String, BigDecimal> values) {
+    public static Map<byte[], BigDecimal> getKeyBalancesWithForks(DCSet dcSet, long key,
+                                                                  Map<byte[], BigDecimal> values) {
         ItemAssetBalanceMap map = dcSet.getAssetBalanceMap();
-        Iterator<Tuple2<String, Long>> iterator = map.getIterator(0, true);
+
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ballance;
 
-        Tuple2<String, Long> iteratorKey;
-        while (iterator.hasNext()) {
-            iteratorKey = iterator.next();
-            if (iteratorKey.b == key) {
-                ballance = map.get(iteratorKey);
-                values.put(iteratorKey.a, ballance.a.b);
+        if (true) {
+            // здесь нужен протокольный итератор! Берем TIMESTAMP_INDEX
+            for (byte[] mapKey: map.keySet()) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == key) {
+                    ballance = map.get(mapKey);
+                    values.put(ItemAssetBalanceMap.getShortAccountFromKey(mapKey), ballance.a.b);
+                }
             }
+
+        } else {
+
+            // здесь нужен протокольный итератор! его нету у балансов поэтому через перебор ключей
+            try (IteratorCloseable<byte[]> iterator = map.getIterator(0, true)) {
+
+                byte[] bytesKey;
+                while (iterator.hasNext()) {
+                    bytesKey = iterator.next();
+                    if (ItemAssetBalanceMap.getAssetKeyFromKey(bytesKey) == key) {
+                        ballance = map.get(bytesKey);
+                        values.put(ItemAssetBalanceMap.getShortAccountFromKey(bytesKey), ballance.a.b);
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
         DCSet dcParent = dcSet.getParent();
@@ -210,17 +248,20 @@ public class Account {
 
     }
 
-    public static Map<String, BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<String, BigDecimal> values) {
+    public static Map<byte[], BigDecimal> getKeyOrdersWithForks(DCSet dcSet, long key, Map<byte[], BigDecimal> values) {
 
-        OrderMap map = dcSet.getOrderMap();
-        Iterator<Long> iterator = map.getIterator(0, true);
+        OrderMapImpl map = dcSet.getOrderMap();
         Order order;
-        while (iterator.hasNext()) {
-            order = map.get(iterator.next());
-            if (order.getHaveAssetKey() == key) {
-                String address = order.getCreator().getAddress();
-                values.put(address, values.get(address).add(order.getAmountHave()));
+        try (IteratorCloseable<Long> iterator = map.getIterator(0, true)) {
+            while (iterator.hasNext()) {
+                order = map.get(iterator.next());
+                if (order.getHaveAssetKey() == key) {
+                    byte[] address = order.getCreator().getShortAddressBytes();
+                    values.put(address, values.get(address).add(order.getAmountHave()));
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         DCSet dcParent = dcSet.getParent();
@@ -233,9 +274,9 @@ public class Account {
     }
 
     // top balance + orders values
-    public static String getRichWithForks(DCSet dcSet, long key) {
+    public static byte[] getRichWithForks(DCSet dcSet, long key) {
 
-        Map<String, BigDecimal> values = new TreeMap<String, BigDecimal>();
+        Map<byte[], BigDecimal> values = new TreeMap<byte[], BigDecimal>();
 
         values = getKeyBalancesWithForks(dcSet, key, values);
 
@@ -243,9 +284,9 @@ public class Account {
         values = getKeyOrdersWithForks(dcSet, key, values);
 
         // search richest address
-        String rich = null;
+        byte[] rich = null;
         BigDecimal maxValue = BigDecimal.ZERO;
-        for (Map.Entry<String, BigDecimal> entry : values.entrySet()) {
+        for (Map.Entry<byte[], BigDecimal> entry : values.entrySet()) {
             BigDecimal value = entry.getValue();
             if (value.compareTo(maxValue) > 0) {
                 maxValue = value;
@@ -295,6 +336,9 @@ public class Account {
      */
 
     public String getAddress() {
+        if (address == null) {
+            this.address = Base58.encode(bytes);
+        }
         return address;
     }
 
@@ -401,6 +445,24 @@ public class Account {
         return null;
     }
 
+    static public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
+                                                                      int position) {
+        switch (position) {
+            case TransactionAmount.ACTION_SEND:
+                return balance.a;
+            case TransactionAmount.ACTION_DEBT:
+                return balance.b;
+            case TransactionAmount.ACTION_HOLD:
+                return balance.c;
+            case TransactionAmount.ACTION_SPEND:
+                return balance.d;
+            case TransactionAmount.ACTION_PLEDGE:
+                return balance.e;
+        }
+
+        return null;
+    }
+
 
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
             long key) {
@@ -412,8 +474,8 @@ public class Account {
                 .getBalance(dcSet, key);
         BigDecimal ownVol = balance.a.b;
 
-        if (!BlockChain.DEVELOP_USE && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
-            int[][] item = BlockChain.FREEZED_BALANCES.get(this.address);
+        if (!BlockChain.ERA_COMPU_ALL_UP && key == Transaction.RIGHTS_KEY && height > BlockChain.FREEZE_FROM) {
+            int[][] item = BlockChain.FREEZED_BALANCES.get(this.getAddress());
             if (item != null) {
                 if (item[0][0] < 0) {
                     return BigDecimal.ZERO;
@@ -493,24 +555,47 @@ public class Account {
      * }
      */
 
-    // REFERENCE
+
+    // Добавляем величины для тестовых режимов
+    public BigDecimal addDEVAmount(long key) {
+        if (BlockChain.ERA_COMPU_ALL_UP && key == 1)
+            return BigDecimal.valueOf(( 512000 + 500 * this.getShortAddressBytes()[10]) >> 6);
+        else if (BlockChain.ERA_COMPU_ALL_UP && key == 2)
+            return new BigDecimal("100.0");
+
+        return BigDecimal.ZERO;
+
+    }
+    public Tuple2<BigDecimal, BigDecimal> balAaddDEVAmount(long key, Tuple2<BigDecimal, BigDecimal> balA) {
+        BigDecimal addAmount = addDEVAmount(key);
+        if (addAmount.signum() == 0)
+            return balA;
+
+        return new Tuple2<>(balA.a, balA.b.add(addAmount));
+
+    }
+
+    public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+        balanceAddDEVAmount(long key, Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                            balance) {
+        BigDecimal addAmount = addDEVAmount(key);
+        if (addAmount.signum() == 0)
+            return balance;
+
+        return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addAmount)),
+                    balance.b, balance.c, balance.d, balance.e);
+    }
 
     public Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> getBalance(
             DCSet db, long key) {
         if (key < 0)
             key = -key;
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), key);
-        if (BlockChain.DEVELOP_USE) {
-            if (key == 1)
-                return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(10000))),
-                        balance.b, balance.c, balance.d, balance.e);
-            else if (key == 2)
-                return new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
-                        new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.TEN)), balance.b,
-                        balance.c, balance.d, balance.e);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                balance = db.getAssetBalanceMap().get(getShortAddressBytes(), key);
+        if (BlockChain.ERA_COMPU_ALL_UP) {
+            return balanceAddDEVAmount(key, balance);
         }
         return balance;
 
@@ -521,17 +606,15 @@ public class Account {
             key = -key;
 
         Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), key);
+                .getAssetBalanceMap().get(getShortAddressBytes(), key);
 
         if (actionType == TransactionAmount.ACTION_SEND) {
-            if (BlockChain.DEVELOP_USE) {
-                if (key == 1)
-                    return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.valueOf(1000)));
-                else if (key == 2)
-                    return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(BigDecimal.TEN));
+            if (BlockChain.ERA_COMPU_ALL_UP ) {
+                return new Tuple2<BigDecimal, BigDecimal>(balance.a.a, balance.a.b.add(addDEVAmount(key)));
             }
 
             return balance.a;
+
         } else if (actionType == TransactionAmount.ACTION_DEBT)
             return balance.b;
         else if (actionType == TransactionAmount.ACTION_HOLD)
@@ -550,9 +633,11 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
-                                                                    BigDecimal amount_in, boolean notUpdateIncomed) {
+                                    BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
         int actionType = actionType(key, amount_in);
+
+        ItemAssetBalanceMap map = db.getAssetBalanceMap();
 
         BigDecimal amount = amount_in.abs();
         long absKey;
@@ -572,10 +657,23 @@ public class Account {
         }
         */
 
-        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance = db
-                .getAssetBalanceMap().get(getAddress(), absKey);
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance =
+                map.get(getShortAddressBytes(), absKey);
 
         boolean updateIncomed = !notUpdateIncomed;
+
+        Tuple2<BigDecimal, BigDecimal> spendBalance;
+        if (spendUpdate) {
+            // обновим Потрачено = Произведено одновременно
+            if (substract) {
+                spendBalance = new Tuple2<BigDecimal, BigDecimal>(balance.d.a,  balance.d.b.add(amount));
+            } else {
+                // входит сумма плюс учет
+                spendBalance = new Tuple2<BigDecimal, BigDecimal>(balance.d.a.add(amount),  balance.d.b);
+            }
+        } else {
+            spendBalance = balance.d;
+        }
 
         if (actionType == TransactionAmount.ACTION_SEND) {
             // OWN + property
@@ -584,7 +682,7 @@ public class Account {
                             updateIncomed ? balance.a.a.subtract(amount) : balance.a.a, balance.a.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.a.a.add(amount) : balance.a.a,
                             balance.a.b.add(amount)),
-                    balance.b, balance.c, balance.d, balance.e);
+                    balance.b, balance.c, spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_DEBT) {
             // DEBT + CREDIT
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -593,7 +691,7 @@ public class Account {
                             updateIncomed ? balance.b.a.subtract(amount) : balance.b.a, balance.b.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.b.a.add(amount) : balance.b.a,
                             balance.b.b.add(amount)),
-                    balance.c, balance.d, balance.e);
+                    balance.c, spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_HOLD) {
             // HOLD + STOCK
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -602,7 +700,7 @@ public class Account {
                             updateIncomed ? balance.c.a.subtract(amount) : balance.c.a, balance.c.b.subtract(amount))
                             : new Tuple2<BigDecimal, BigDecimal>(updateIncomed ? balance.c.a.add(amount) : balance.c.a,
                             balance.c.b.add(amount)),
-                    balance.d, balance.e);
+                    spendBalance, balance.e);
         } else if (actionType == TransactionAmount.ACTION_SPEND) {
             // TODO - SPEND + PRODUCE
             balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
@@ -614,17 +712,17 @@ public class Account {
                     balance.e);
         }
 
-        db.getAssetBalanceMap().set(getAddress(), absKey, balance);
+        map.put(getShortAddressBytes(), absKey, balance);
 
         ////////////// DEBUG TOTAL COMPU
         // несотыковка из-за ордеров на бирже
         if (false && absKey == 2l && this.equals("73EotEbxvAo39tyugJSyL5nbcuMWs4aUpS")) {
-            Collection<Tuple2<String, Long>> addrs = db.getAssetBalanceMap().getKeys();
+            Collection<byte[]> addrs = db.getAssetBalanceMap().keySet();
             BigDecimal total = BigDecimal.ZERO;
-            for (Tuple2<String, Long> addr : addrs) {
-                if (addr.b == 2l) {
+            for (byte[] mapKey : addrs) {
+                if (ItemAssetBalanceMap.getAssetKeyFromKey(mapKey) == 2l) {
                     Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> ball =
-                            db.getAssetBalanceMap().get(addr);
+                            map.get(mapKey);
 
                     total = total.add(ball.a.b);
                 }
@@ -690,48 +788,147 @@ public class Account {
         return new Tuple3<BigDecimal, BigDecimal, BigDecimal>(own, rent, hold);
     }
 
-    public Long getLastTimestamp() {
+    public static BigDecimal totalForAddresses(DCSet dcSet, Set<String> addresses, Long assetKey, int pos) {
+
+        BigDecimal eraBalanceA = BigDecimal.ZERO;
+        for (String address : addresses) {
+
+            Account account = new Account(address);
+            Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>> balance
+                    = account.getBalance(dcSet, assetKey);
+
+            switch (pos) {
+                case 1:
+                    eraBalanceA = eraBalanceA.add(balance.a.b);
+                    break;
+                case 2:
+                    eraBalanceA = eraBalanceA.add(balance.b.b);
+                    break;
+                case 3:
+                    eraBalanceA = eraBalanceA.add(balance.c.b);
+                    break;
+                case 4:
+                    eraBalanceA = eraBalanceA.add(balance.d.b);
+                    break;
+                case 5:
+                    eraBalanceA = eraBalanceA.add(balance.e.b);
+                    break;
+            }
+        }
+
+        return eraBalanceA;
+
+    }
+
+    public long[] getLastTimestamp() {
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
+            return null;
         return this.getLastTimestamp(DCSet.getInstance());
     }
 
-    public Long getLastTimestamp(DCSet dcSet) {
-        return dcSet.getReferenceMap().getLast(this.getAddress());
+    /**
+     * account.address -> LAST[TX.timestamp + TX.dbRef]
+     *
+     * @param dcSet
+     * @return
+     */
+    public long[] getLastTimestamp(DCSet dcSet) {
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
+            return null;
+        return dcSet.getReferenceMap().get(shortBytes);
     }
 
-    public void setLastTimestamp(Long timestamp, DCSet dcSet) {
-        byte[] key = Base58.decode(this.getAddress());
-        ReferenceMap map = dcSet.getReferenceMap();
+    /**
+     * @param currentPoint [timestamp, dbRef]
+     * @param dcSet        DCSet
+     */
+    public void setLastTimestamp(long[] currentPoint, DCSet dcSet) {
+
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0)
+            return;
+
+        ReferenceMapImpl map = dcSet.getReferenceMap();
+
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            // SET NEW REFERENCE
+            map.put(shortBytes, currentPoint);
+            return;
+        }
 
         // GET CURRENT REFERENCE
-        Long reference = map.get(key);
+        long[] reference = map.get(shortBytes);
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(key, Longs.toByteArray(timestamp));
+        byte[] keyCurrentPoint = Bytes.concat(shortBytes, Longs.toByteArray(currentPoint[0]));
 
-        // set NEW LAST TIMESTAMP as REFERENCE
-        map.set(keyTimestamp, reference);
+        if (reference != null) {
+            // set NEW LAST TIMESTAMP as REFERENCE
+            map.put(keyCurrentPoint, reference);
+        }
 
         // SET NEW REFERENCE
-        map.set(key, timestamp);
+        map.put(shortBytes, currentPoint);
+
     }
 
     public void removeLastTimestamp(DCSet dcSet) {
-        byte[] key = Base58.decode(this.getAddress());
-        ReferenceMap map = dcSet.getReferenceMap();
+
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+            return;
+        }
+
+        ReferenceMapImpl map = dcSet.getReferenceMap();
+
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            map.delete(shortBytes);
+            return;
+        }
 
         // GET LAST TIMESTAMP
-        Long timestamp = map.get(key);
+        long[] lastPoint = map.get(shortBytes);
+
+        if (lastPoint == null)
+            return;
 
         // MAKE KEY for this TIMESTAMP
-        byte[] keyTimestamp = Bytes.concat(key, Longs.toByteArray(timestamp));
+        byte[] keyPrevPoint = Bytes.concat(shortBytes, Longs.toByteArray(lastPoint[0]));
 
         // GET REFERENCE
-        Long reference = map.get(keyTimestamp);
-
         // DELETE TIMESTAMP - REFERENCE
-        map.delete(keyTimestamp);
-        // SET OLD REFERENCE
-        map.set(key, reference);
+        long[] reference = map.remove(keyPrevPoint);
+        if (reference == null) {
+            map.delete(shortBytes);
+        } else {
+            // PUT OLD REFERENCE
+            map.put(shortBytes, reference);
+        }
+    }
+
+    public void removeLastTimestamp(DCSet dcSet, long timestamp) {
+
+        if (BlockChain.CHECK_DOUBLE_SPEND_DEEP < 0) {
+            return;
+        }
+
+        ReferenceMapImpl map = dcSet.getReferenceMap();
+
+        if (BlockChain.NOT_STORE_REFFS_HISTORY) {
+            map.delete(shortBytes);
+            return;
+        }
+
+        // MAKE KEY for this TIMESTAMP
+        byte[] keyPrevPoint = Bytes.concat(shortBytes, Longs.toByteArray(timestamp));
+
+        // GET REFERENCE
+        // DELETE TIMESTAMP - REFERENCE
+        long[] reference = map.remove(keyPrevPoint);
+        if (reference == null) {
+            map.delete(shortBytes);
+        } else {
+            // PUT OLD REFERENCE
+            map.put(shortBytes, reference);
+        }
     }
 
     // TOSTRING
@@ -755,7 +952,7 @@ public class Account {
 
     public String viewFEEbalance() {
 
-        long result = this.getBalanceUSE(FEE_KEY).unscaledValue().longValue();
+        long result = this.getBalanceUSE(Transaction.FEE_KEY).unscaledValue().longValue();
         result /= BlockChain.FEE_PER_BYTE;
         result >>= 8;
 
@@ -871,16 +1068,16 @@ public class Account {
 
     @Override
     public int hashCode() {
-        return address.hashCode();
+        return Ints.fromByteArray(shortBytes);
     }
 
     // EQUALS
     @Override
     public boolean equals(Object b) {
         if (b instanceof Account) {
-            return this.address.equals(((Account) b).getAddress());
+            return Arrays.equals(this.shortBytes, ((Account) b).getShortAddressBytes());
         } else if (b instanceof String) {
-            return this.address.equals(b);
+            return this.getAddress().equals(b);
         } else if (b instanceof byte[]) {
             byte[] bs = (byte[]) b;
             if (bs.length == ADDRESS_LENGTH) {
@@ -893,12 +1090,20 @@ public class Account {
         return false;
     }
 
-    public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
-        if (this.personDuration == null) {
-            this.personDuration =  db.getAddressPersonMap().getItem(address);
+    //public void resetPersonDuration() {
+    //    this.personDuration = null;
+    //}
 
-        }
-        return this.personDuration;
+    public Tuple4<Long, Integer, Integer, Integer> getPersonDuration(DCSet db) {
+        //    if (this.personDuration == null) {
+        //        нельзя использовать старые значения так как при откатах они не будут чиститься
+        //        this.personDuration = db.getAddressPersonMap().getItem(shortBytes);
+        //    }
+
+        //return this.personDuration;
+
+        return db.getAddressPersonMap().getItem(shortBytes);
+
     }
 
     public boolean isPerson(DCSet dcSet, int forHeight) {
@@ -993,8 +1198,8 @@ public class Account {
     }
 
     // previous forging block or changed ERA volume
-    public Tuple2<Integer, Integer> getForgingData(DCSet db, int height) {
-        return db.getAddressForging().get(this.address, height);
+    public Tuple3<Integer, Integer, Integer> getForgingData(DCSet db, int height) {
+        return db.getAddressForging().get(getAddress(), height);
     }
     /*
      * public void setLastForgingData(DCSet db, int height) { getAddressForging
@@ -1003,25 +1208,25 @@ public class Account {
      */
 
     public void setForgingData(DCSet db, int height, int forgingBalance) {
-        db.getAddressForging().set(this.address, height, forgingBalance);
+        db.getAddressForging().putAndProcess(getAddress(), height, forgingBalance);
     }
 
     public void delForgingData(DCSet db, int height) {
-        db.getAddressForging().delete(this.address, height);
+        db.getAddressForging().deleteAndProcess(getAddress(), height);
     }
 
-    public Tuple2<Integer, Integer> getLastForgingData(DCSet db) {
-        return db.getAddressForging().getLast(this.address);
+    public Tuple3<Integer, Integer, Integer> getLastForgingData(DCSet db) {
+        return db.getAddressForging().getLast(getAddress());
     }
 
     public Tuple2<String, String> getName() {
 
-        return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(this.getAddress());
+        return Controller.getInstance().wallet.database.getAccountsPropertisMap().get(getAddress());
 
     }
 
     public int getAccountNo() {
-        return Controller.getInstance().wallet.database.getAccountMap().getAccountNo(this.address);
+        return Controller.getInstance().wallet.database.getAccountMap().getAccountNo(getAddress());
     }
 
 }

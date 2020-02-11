@@ -8,7 +8,6 @@ import org.erachain.network.Peer;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun.Tuple2;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -51,8 +50,8 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
             @Override
             public int compare(Peer o1, Peer o2) {
                 int ret = 0;
-                PeerInfo peerInfo1 = Controller.getInstance().getDBSet().getPeerMap().getInfo(o1.getAddress());
-                PeerInfo peerInfo2 = Controller.getInstance().getDBSet().getPeerMap().getInfo(o2.getAddress());
+                PeerInfo peerInfo1 = Controller.getInstance().getDLSet().getPeerMap().getInfo(o1.getAddress());
+                PeerInfo peerInfo2 = Controller.getInstance().getDLSet().getPeerMap().getInfo(o2.getAddress());
                 if (sort == 0)
                     ret = peerInfo1.getWhitePingCouner() > peerInfo2.getWhitePingCouner() ? 1 : -1;
                 if (sort == 1)
@@ -116,7 +115,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
         if (peer == null || DCSet.getInstance().isStoped())
             return null;
 
-        PeerInfo peerInfo = Controller.getInstance().getDBSet().getPeerMap().getInfo(peer.getAddress());
+        PeerInfo peerInfo = Controller.getInstance().getDLSet().getPeerMap().getInfo(peer.getAddress());
         if (peerInfo == null)
             return null;
 
@@ -126,7 +125,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
 
             case COLUMN_HEIGHT:
                 if (!peer.isUsed()) {
-                    int banMinutes = Controller.getInstance().getDBSet().getPeerMap().getBanMinutes(peer);
+                    int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
                     if (banMinutes > 0) {
                         return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
                     } else {

@@ -4,7 +4,6 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.block.Block;
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple3;
@@ -49,7 +48,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
 
         //READ RECIPIENT
         byte[] recipientBytes = Arrays.copyOfRange(data, position, position + RECIPIENT_LENGTH);
-        Account recipient = new Account(Base58.encode(recipientBytes));
+        Account recipient = new Account(recipientBytes);
         position += RECIPIENT_LENGTH;
 
         //READ KEY
@@ -90,7 +89,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         byte[] data = super.toBytes(forDeal, withSignature);
 
         //WRITE RECIPIENT
-        data = Bytes.concat(data, Base58.decode(this.recipient.getAddress()));
+        data = Bytes.concat(data, this.recipient.getAddressBytes());
 
         //WRITE KEY
         byte[] keyBytes = Longs.toByteArray(this.key);
@@ -113,7 +112,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
     public int isValid(int asDeal, long flags) {
 
         //CHECK IF RECIPIENT IS VALID ADDRESS
-        if (!Crypto.getInstance().isValidAddress(this.recipient.getAddress())) {
+        if (!Crypto.getInstance().isValidAddress(this.recipient.getAddressBytes())) {
             return INVALID_ADDRESS;
         }
 
@@ -156,11 +155,11 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         // SET PERSON ADDRESS - end date as timestamp
         Tuple4<Long, Integer, Integer, Integer> itemA = new Tuple4<Long, Integer, Integer, Integer>(this.key, Integer.MAX_VALUE, blockIndex, transactionIndex);
         Tuple3<Integer, Integer, Integer> itemA1 = new Tuple3<Integer, Integer, Integer>(0, blockIndex, transactionIndex);
-        this.dcSet.getAddressPersonMap().addItem(this.recipient.getAddress(), itemA);
+        this.dcSet.getAddressPersonMap().addItem(this.recipient.getShortAddressBytes(), itemA);
         this.dcSet.getPersonAddressMap().addItem(this.key, this.recipient.getAddress(), itemA1);
 
         //UPDATE REFERENCE OF RECIPIENT
-        this.recipient.setLastTimestamp(this.timestamp, this.dcSet);
+        this.recipient.setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
     }
 
     @Override
@@ -170,7 +169,7 @@ public class GenesisCertifyPersonRecord extends GenesisRecord {
         //db.getPersonStatusMap().removeItem(this.key, StatusCls.ALIVE_KEY);
 
         //UPDATE RECIPIENT
-        this.dcSet.getAddressPersonMap().removeItem(this.recipient.getAddress());
+        this.dcSet.getAddressPersonMap().removeItem(this.recipient.getShortAddressBytes());
         this.dcSet.getPersonAddressMap().removeItem(this.key, this.recipient.getAddress());
 
         //UPDATE REFERENCE OF CREATOR

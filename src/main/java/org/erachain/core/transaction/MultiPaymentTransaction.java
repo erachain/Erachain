@@ -209,39 +209,43 @@ public class MultiPaymentTransaction extends Transaction {
         //REMOVE FEE
         // TODO REMOVE FORK!!!! - use calculate instead
         DCSet fork = this.dcSet.fork();
-        //this.creator.setBalance(FEE_KEY, this.creator.getBalance(fork, FEE_KEY).subtract(this.fee), fork);
-        this.creator.changeBalance(fork, true, FEE_KEY, this.fee, false);
+        try {
+            //this.creator.setBalance(FEE_KEY, this.creator.getBalance(fork, FEE_KEY).subtract(this.fee), fork);
+            this.creator.changeBalance(fork, true, FEE_KEY, this.fee, false, false);
 
-        //CHECK IF CREATOR HAS ENOUGH FEE BALANCE
-        if (this.creator.getBalance(fork, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) == -1) {
-            return NO_BALANCE;
-        }
-
-        //CHECK PAYMENTS
-        for (Payment payment : this.payments) {
-            //CHECK IF RECIPIENT IS VALID ADDRESS
-            if (!Crypto.getInstance().isValidAddress(payment.getRecipient().getAddress())) {
-                return INVALID_ADDRESS;
-            }
-
-            //CHECK IF AMOUNT IS POSITIVE
-            if (payment.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-                return NEGATIVE_AMOUNT;
-            }
-
-            //CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
-            if (this.creator.getBalance(fork, payment.getAsset()).a.b.compareTo(payment.getAmount()) == -1) {
+            //CHECK IF CREATOR HAS ENOUGH FEE BALANCE
+            if (this.creator.getBalance(fork, FEE_KEY).a.b.compareTo(BigDecimal.ZERO) == -1) {
                 return NO_BALANCE;
             }
 
-            // CHECK IF AMOUNT wrong SCALE
-            AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(payment.getAsset());
-            if (payment.getAmount().scale() != asset.getScale()) {
-                return AMOUNT_SCALE_WRONG;
-            }
+            //CHECK PAYMENTS
+            for (Payment payment : this.payments) {
+                //CHECK IF RECIPIENT IS VALID ADDRESS
+                if (!Crypto.getInstance().isValidAddress(payment.getRecipient().getAddressBytes())) {
+                    return INVALID_ADDRESS;
+                }
 
-            //PROCESS PAYMENT IN FORK
-            payment.process(this.creator, fork);
+                //CHECK IF AMOUNT IS POSITIVE
+                if (payment.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+                    return NEGATIVE_AMOUNT;
+                }
+
+                //CHECK IF CREATOR HAS ENOUGH ASSET BALANCE
+                if (this.creator.getBalance(fork, payment.getAsset()).a.b.compareTo(payment.getAmount()) == -1) {
+                    return NO_BALANCE;
+                }
+
+                // CHECK IF AMOUNT wrong SCALE
+                AssetCls asset = (AssetCls) this.dcSet.getItemAssetMap().get(payment.getAsset());
+                if (payment.getAmount().scale() != asset.getScale()) {
+                    return AMOUNT_SCALE_WRONG;
+                }
+
+                //PROCESS PAYMENT IN FORK
+                payment.process(this.creator, fork);
+            }
+        } finally {
+            fork.close();
         }
 
         return super.isValid(asDeal, flags);
@@ -261,7 +265,7 @@ public class MultiPaymentTransaction extends Transaction {
 
             //UPDATE REFERENCE OF RECIPIENT
             if (false && payment.getRecipient().getLastTimestamp(this.dcSet) == null) {
-                payment.getRecipient().setLastTimestamp(this.timestamp, this.dcSet);
+                payment.getRecipient().setLastTimestamp(new long[]{this.timestamp, dbRef}, this.dcSet);
             }
         }
     }
@@ -278,7 +282,7 @@ public class MultiPaymentTransaction extends Transaction {
 
             //UPDATE REFERENCE OF RECIPIENT
             if (false && payment.getRecipient().getLastTimestamp(this.dcSet).equals(this.timestamp)) {
-                payment.getRecipient().setLastTimestamp(this.reference, this.dcSet);
+                payment.getRecipient().setLastTimestamp(new long[]{this.reference, dbRef}, this.dcSet);
             }
         }
     }

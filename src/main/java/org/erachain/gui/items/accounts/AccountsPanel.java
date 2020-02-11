@@ -9,12 +9,10 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.RowSorter;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -131,7 +129,12 @@ public class AccountsPanel extends JPanel // implements ItemListener
         //sorter.setComparator(0, new IntegerComparator());
         RowSorter sorter = new TableRowSorter(tableModel);
         table.setRowSorter(sorter);
-        //sorter.setComparator(AccountsTableModel.COLUMN_NO, new BigDecimalStringComparator());
+
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>(4);
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        // IF NEED add SORTED ROW
+        //sortKeys.add(new RowSorter.SortKey(1, SortOrder.ASCENDING));
+        sorter.setSortKeys(sortKeys);
         //sorter.setComparator(AccountsTableModel.COLUMN_FEE_BALANCE, new BigDecimalStringComparator());
 
         // render

@@ -63,7 +63,7 @@ public class TestRecSend {
 
         System.setProperty("qwe","qw");
 
-        db = DCSet.createEmptyDatabaseSet();
+        db = DCSet.createEmptyDatabaseSet(0);
         Controller.getInstance().setDCSet(db);
         gb = new GenesisBlock();
         block = gb;
@@ -76,9 +76,9 @@ public class TestRecSend {
         }
 
         // FEE FUND
-        maker.setLastTimestamp(gb.getTimestamp(), db);
-        maker.changeBalance(db, false, ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
-        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.setLastTimestamp(new long[]{gb.getTimestamp(), 0}, db);
+        maker.changeBalance(db, false, ERA_KEY, BigDecimal.valueOf(100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
+        maker.changeBalance(db, false, FEE_KEY, BigDecimal.valueOf(1).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
     }
 
@@ -508,16 +508,16 @@ public class TestRecSend {
                 isText,
                 encrypted,
                 1547048069000l,//timestamp,
-                maker.getLastTimestamp(db)
+                maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
 
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags),Transaction.VALIDATE_OK ); //);
 
-        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
+        assertEquals((long) maker.getLastTimestamp(db)[0], gb.getTimestamp());
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
-        assertEquals((long) maker.getLastTimestamp(db), timestamp);
+        assertEquals((long) maker.getLastTimestamp(db)[0], timestamp);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(1090).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
@@ -547,7 +547,7 @@ public class TestRecSend {
 
         //// MESSAGE ONLY
         r_SendV3.orphan(block, Transaction.FOR_NETWORK);
-        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
+        assertEquals((long) maker.getLastTimestamp(db)[0], gb.getTimestamp());
 
         r_SendV3 = new RSend(
                 maker, FEE_POWER,
@@ -557,7 +557,7 @@ public class TestRecSend {
                 head, data,
                 isText,
                 encrypted,
-                timestamp, maker.getLastTimestamp(db)
+                timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
@@ -565,7 +565,7 @@ public class TestRecSend {
         assertEquals(r_SendV3.isValid(Transaction.FOR_NETWORK, flags), Transaction.VALIDATE_OK); //Transaction.VALIDATE_OK);
 
         r_SendV3.process(gb, Transaction.FOR_NETWORK);
-        assertEquals((long) maker.getLastTimestamp(db), timestamp);
+        assertEquals((long) maker.getLastTimestamp(db)[0], timestamp);
 
         //assertEquals(BigDecimal.valueOf(1).subtract(r_SendV3.getFee()).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(FEE_KEY, db));
         assertEquals(BigDecimal.valueOf(1100).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), maker.getBalanceUSE(ERA_KEY, db));
@@ -596,7 +596,7 @@ public class TestRecSend {
 
         //// AMOUNT ONLY
         r_SendV3.orphan(block, Transaction.FOR_NETWORK);
-        assertEquals((long) maker.getLastTimestamp(db), gb.getTimestamp());
+        assertEquals((long) maker.getLastTimestamp(db)[0], gb.getTimestamp());
 
         r_SendV3 = new RSend(
                 maker, FEE_POWER,
@@ -606,7 +606,7 @@ public class TestRecSend {
                 "", null,
                 null,
                 null,
-                timestamp, maker.getLastTimestamp(db)
+                timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
@@ -651,7 +651,7 @@ public class TestRecSend {
                 null, null,
                 null,
                 null,
-                timestamp, maker.getLastTimestamp(db)
+                timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
@@ -687,7 +687,7 @@ public class TestRecSend {
 
         // NEGATE for test HOLD ///////////////////
         amount = amount.negate();
-        recipient.changeBalance(db, false, -ERA_KEY, amount.negate(), false);
+        recipient.changeBalance(db, false, -ERA_KEY, amount.negate(), false, false);
         /// MESSAGE + AMOUNT
         r_SendV3 = new RSend(
                 maker, FEE_POWER,
@@ -697,7 +697,7 @@ public class TestRecSend {
                 head, data,
                 isText,
                 encrypted,
-                ++timestamp, maker.getLastTimestamp(db)
+                ++timestamp, maker.getLastTimestamp(db)[0]
         );
         r_SendV3.sign(maker, Transaction.FOR_NETWORK);
         r_SendV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
@@ -766,7 +766,7 @@ public class TestRecSend {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
         payments.add(new Payment(recipient1, assetKeyTest, BigDecimal.valueOf(110).setScale(BlockChain.AMOUNT_DEDAULT_SCALE)));
@@ -842,7 +842,7 @@ public class TestRecSend {
 
         //PROCESS GENESIS TRANSACTION TO MAKE SURE SENDER HAS FUNDS
 
-        maker.changeBalance(db, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false);
+        maker.changeBalance(db, false, assetKeyTest, BigDecimal.valueOf(1000).setScale(BlockChain.AMOUNT_DEDAULT_SCALE), false, false);
 
         List<Payment> payments = new ArrayList<Payment>();
 
@@ -850,7 +850,7 @@ public class TestRecSend {
                 maker, payments, 111,
                 data,
                 FEE_POWER,
-                timestamp, maker.getLastTimestamp(db)
+                timestamp, maker.getLastTimestamp(db)[0]
         );
         arbitraryTransactionV3.sign(maker, Transaction.FOR_NETWORK);
         arbitraryTransactionV3.setDC(db, Transaction.FOR_NETWORK, 1, 1);
@@ -891,7 +891,7 @@ public class TestRecSend {
     public void makeMessageTransactionV3_DISCREDIR_ADDRESSES() {
 
         // HPftF6gmSH3mn9dKSAwSEoaxW2Lb6SVoguhKyHXbyjr7 -
-        PublicKeyAccount maker = new PublicKeyAccount(Transaction.DISCREDIR_ADDRESSES[0]);
+        PublicKeyAccount maker = new PublicKeyAccount(BlockChain.DISCREDIR_ADDRESSES[0]);
         Account recipient = new Account("7R2WUFaS7DF2As6NKz13Pgn9ij4sFw6ymZ");
         BigDecimal amount = BigDecimal.valueOf(49800).setScale(BlockChain.AMOUNT_DEDAULT_SCALE);
 

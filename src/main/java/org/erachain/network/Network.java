@@ -24,12 +24,20 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Network extends Observable {
 
-    public static final int SEND_WAIT = 20000;
-    public static final int PEER_SLEEP_TIME = BlockChain.HARD_WORK ? 0 : 1;
-    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 8 : 1024 << 3;
-    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = BlockChain.HARD_WORK ? 1024 << 6 : 1024 << 1;
-    private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = BlockChain.HARD_WORK ? 100 : 300;
-    private static final Logger LOGGER = LoggerFactory.getLogger(Network.class);
+    private static final int MAX_HANDLED_TELEGRAM_MESSAGES_SIZE = 1024 << (3 + Controller.HARD_WORK);
+    private static final int MAX_HANDLED_TRANSACTION_MESSAGES_SIZE = 256 + BlockChain.MAX_BLOCK_SIZE_GEN;
+    private static final int MAX_HANDLED_WIN_BLOCK_MESSAGES_SIZE = 128 >> (Controller.HARD_WORK >> 1);
+
+    /**
+     * Если включено то при входящем запросе на коннект от пира, который уже на связи
+     * разрываем текущий коннект и пересоздаем на новый входящий. Таким обраом если под одним IP
+     * будет к нам стучасять несколько отдельных нод то каждая из них будет забирать себе соединение.
+     * Но на самом деле сначала происходит обрыв на некотрое время - поэтому кодна нод мало - это плохо.
+     * Так что лучше не включать. И зачем разрывать - по-новой слать транзакции накладно.
+     */
+    private static final boolean BREAK_PEER_ON_NEW_INCOME = false;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Network.class.getSimpleName());
 
     private Controller controller;
     private static InetAddress myselfAddress;
@@ -38,6 +46,7 @@ public class Network extends Observable {
     private MessagesProcessor messagesProcessor;
     PeerManager peerManager;
     public TelegramManager telegramer;
+    private LocalPeerScanner localPeerScanner;
     CopyOnWriteArrayList<Peer> knownPeers;
 
     //private SortedSet<String> handledTelegramMessages;
@@ -47,7 +56,6 @@ public class Network extends Observable {
 
     public AtomicLong missedSendes = new AtomicLong(0);
     public AtomicLong missedTelegrams = new AtomicLong(0);
-    public AtomicLong missedTransactions = new AtomicLong(0);
     public AtomicLong missedWinBlocks = new AtomicLong(0);
     public AtomicLong missedMessages = new AtomicLong(0);
 
@@ -110,24 +118,32 @@ public class Network extends Observable {
 
     private void start() {
 
-
         //START ConnectionCreator THREAD
         creator = new ConnectionCreator(this);
-        creator.start();
+        if (controller.useNet)
+            creator.start();
 
         //START ConnectionAcceptor THREAD
         acceptor = new ConnectionAcceptor(this);
-        acceptor.start();
+        if (controller.useNet)
+            acceptor.start();
 
         peerManager = new PeerManager(this);
-        peerManager.start();
+        if (controller.useNet)
+            peerManager.start();
 
         telegramer = new TelegramManager(controller,
                 controller.getBlockChain(),
                 DCSet.getInstance(),
                 this);
 
-        this.messagesProcessor = new MessagesProcessor(this);
+        messagesProcessor = new MessagesProcessor(this);
+
+        if (Settings.getInstance().isLocalPeersScannerEnabled()) {
+            localPeerScanner = new LocalPeerScanner(this);
+            if (controller.useNet)
+                localPeerScanner.start();
+        }
 
     }
 
@@ -222,7 +238,7 @@ public class Network extends Observable {
     // IF PEER in exist in NETWORK - get it
     public Peer getKnownPeer(Peer peer, int type) {
 
-        Peer knowmPeer = null;
+        //Peer knowmPeer = null;
         try {
             byte[] address = peer.getAddress().getAddress();
             //FOR ALL connectedPeers
@@ -230,7 +246,7 @@ public class Network extends Observable {
                 //CHECK IF ADDRESS IS THE SAME
                 if (Arrays.equals(address, knownPeer.getAddress().getAddress())
                         && (type == ANY_TYPE || type == WHITE_TYPE && knownPeer.isWhite()
-                        || !knowmPeer.isWhite())
+                        || !knownPeer.isWhite())
                 ) {
                     // иначе тут не сработате правильно org.erachain.network.Network.onConnect
                     // поэтому сразу выдаем первый что нашли без каких либо условий
@@ -331,7 +347,7 @@ public class Network extends Observable {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
         if (!controller.isOnStopping()) {
-            knownPeers = controller.getDBSet().getPeerMap().getBestPeers(
+            knownPeers = controller.getDLSet().getPeerMap().getBestPeers(
                     0, true);
         }
 
@@ -374,7 +390,7 @@ public class Network extends Observable {
         return incomedPeers;
     }
 
-    public boolean addTelegram(TelegramMessage telegram) {
+    public int addTelegram(TelegramMessage telegram) {
         return this.telegramer.add(telegram);
     }
 
@@ -393,8 +409,8 @@ public class Network extends Observable {
         return this.telegramer.deleteForRecipient(recipient, timestamp, title);
     }
 
-    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter) {
-        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter);
+    public List<TelegramMessage> getTelegramsFromTimestamp(long timestamp, String recipient, String filter, boolean outcomes) {
+        return this.telegramer.getTelegramsFromTimestamp(timestamp, recipient, filter, outcomes);
     }
     //public TelegramMessage getTelegram64(String signature) {
     //	return this.telegramer.getTelegram64(signature);
@@ -426,8 +442,13 @@ public class Network extends Observable {
             //CHECK IF ADDRESS IS THE SAME
             if (Arrays.equals(addressIP, knownPeer.getAddress().getAddress())) {
 
-                if (knownPeer.isUsed()) {
-                    knownPeer.close("before accept anew");
+                if (knownPeer.isUsed() || knownPeer.isOnUsed()) {
+                    if (BREAK_PEER_ON_NEW_INCOME) {
+                        knownPeer.close("before accept anew");
+                    } else {
+                        /// зачем разрывать - поновой слать транзакции накладн - используем его же
+                        return knownPeer;
+                    }
                 }
                 // IF PEER not USED and not onUSED
                 knownPeer.connect(socket, this, "connected by restore!!! ");
@@ -463,11 +484,7 @@ public class Network extends Observable {
         Long key = TelegramMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledTelegramMessages.addHandledItem(key, sender, forThisPeer)) {
-            return true;
-        }
-
-        return false;
+        return this.handledTelegramMessages.addHandledItem(key, sender, forThisPeer);
 
     }
 
@@ -477,11 +494,7 @@ public class Network extends Observable {
         Long key = TransactionMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledTransactionMessages.addHandledItem(key, sender, forThisPeer)) {
-            return true;
-        }
-
-        return false;
+        return this.handledTransactionMessages.addHandledItem(key, sender, forThisPeer);
 
     }
 
@@ -492,11 +505,7 @@ public class Network extends Observable {
         Integer key = BlockWinMessage.getHandledID(data);
 
         //ADD TO HANDLED MESSAGES
-        if (this.handledWinBlockMessages.addHandledItem(key, sender, forThisPeer)) {
-            return true;
-        }
-
-        return false;
+        return this.handledWinBlockMessages.addHandledItem(key, sender, forThisPeer);
 
     }
 
@@ -564,25 +573,29 @@ public class Network extends Observable {
 
             case Message.TELEGRAM_TYPE:
 
-                this.telegramer.offerMessage(message);
+                if (telegramer != null)
+                    this.telegramer.offerMessage(message);
 
                 return;
 
             case Message.TRANSACTION_TYPE:
 
-                controller.transactionsPool.offerMessage(message);
+                if (controller.transactionsPool != null)
+                    controller.transactionsPool.offerMessage(message);
 
                 return;
 
             case Message.WIN_BLOCK_TYPE:
 
-                controller.winBlockSelector.offerMessage(message);
+                if (controller.winBlockSelector != null)
+                    controller.winBlockSelector.offerMessage(message);
 
                 return;
 
             case Message.GET_BLOCK_TYPE:
 
-                controller.blockRequester.offerMessage(message);
+                if (controller.blockRequester != null)
+                    controller.blockRequester.offerMessage(message);
 
                 return;
 
@@ -731,6 +744,9 @@ public class Network extends Observable {
     public void stop() {
 
         this.run = false;
+        if (localPeerScanner != null) {
+            localPeerScanner.interrupt();
+        }
 
         // STOP MESSAGES PROCESSOR
         messagesProcessor.halt();

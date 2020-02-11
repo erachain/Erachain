@@ -19,9 +19,9 @@ public class WinBlockSelector extends MonitoredThread {
     private final static boolean logPings = true;
     private boolean runned;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WinBlockSelector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WinBlockSelector.class.getSimpleName());
 
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE ? 20 : 100;
+    private static final int QUEUE_LENGTH = 8 + (64 >> (Controller.HARD_WORK>>1));
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Controller controller;
@@ -74,13 +74,15 @@ public class WinBlockSelector extends MonitoredThread {
 
         if (!newBlock.isValidHead(dcSet)) {
             // то проверим заголовок
-            info = "Block[" + newBlock.toString() + "] HEAD is Invalid - ignore";
+            info = "Block HEAD is Invalid - ignore " + newBlock.toString();
             LOGGER.info(info);
             return;
         }
 
         // тут внутри проверка полной валидности
-        if (blockChain.setWaitWinBuffer(dcSet, newBlock, message.getSender())) {
+        if (blockChain.setWaitWinBuffer(dcSet, newBlock,
+                message.getSender() // тут забаним пир если не сошелся так ка заголовок то верный был
+        )) {
             // IF IT WIN
             // BROADCAST
             //List<Peer> excludes = new ArrayList<Peer>();
@@ -106,17 +108,21 @@ public class WinBlockSelector extends MonitoredThread {
     public void run() {
 
         runned = true;
-        //Message message;
+
         while (runned) {
             try {
                 processMessage(blockingQueue.take());
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(86);
-                return;
+                blockingQueue = null;
+                Controller.getInstance().stopAll(66);
+                break;
             } catch (java.lang.IllegalMonitorStateException e) {
+                blockingQueue = null;
+                Controller.getInstance().stopAll(67);
                 break;
             } catch (java.lang.InterruptedException e) {
+                blockingQueue = null;
                 break;
             }
 

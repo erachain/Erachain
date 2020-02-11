@@ -23,8 +23,8 @@ public class PersonAssetsBalance extends BalanceMap {
         );
     }
 
-    public PersonAssetsBalance(PersonAssetsBalance parent) {
-        super(parent);
+    public PersonAssetsBalance(PersonAssetsBalance parent, DCSet dcSet) {
+        super(parent, dcSet);
     }
 
 }

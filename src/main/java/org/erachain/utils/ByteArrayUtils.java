@@ -48,4 +48,66 @@ public class ByteArrayUtils {
     public static float ByteArray2float(byte[] array) {
         return ByteBuffer.wrap(array).getFloat();
     }
+
+    /**
+     * If Mask equal to first bytes of Array
+     *
+     * @param a
+     * @param mask
+     * @return
+     */
+    public static boolean areEqualMask(
+            byte[] a,
+            byte[] mask) {
+        if (a == mask) {
+            return true;
+        }
+
+        if (a == null || mask == null) {
+            return false;
+        }
+
+        if (a.length < mask.length) {
+            return false;
+        }
+
+        for (int i = 0; i != mask.length; i++) {
+            if (a[i] != mask[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * compare without compare length
+     *
+     * @param a
+     * @param b
+     * @return
+     */
+    public static int compareUnsignedAsMask(byte[] a, byte[] b) {
+        if (a == b) {
+            return 0;
+        }
+        if (a == null) {
+            return -1;
+        }
+        if (b == null) {
+            return 1;
+        }
+        int minLen = Math.min(a.length, b.length);
+        for (int i = 0; i < minLen; ++i) {
+            int aVal = a[i] & 0xFF, bVal = b[i] & 0xFF;
+            if (aVal < bVal) {
+                return -1;
+            }
+            if (aVal > bVal) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
 }

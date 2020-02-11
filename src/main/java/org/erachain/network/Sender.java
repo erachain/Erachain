@@ -1,8 +1,7 @@
-package org.erachain.network;
+ package org.erachain.network;
 // 30/03
 
 import org.erachain.controller.Controller;
-import org.erachain.core.BlockChain;
 import org.erachain.network.message.BlockWinMessage;
 import org.erachain.network.message.GetHWeightMessage;
 import org.erachain.network.message.HWeightMessage;
@@ -27,8 +26,8 @@ public class Sender extends MonitoredThread {
     private final static boolean USE_MONITOR = false;
     private final static boolean logPings = false;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
-    private static final int QUEUE_LENGTH = BlockChain.DEVELOP_USE? 200 : 40;
+    private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class.getSimpleName());
+    private static final int QUEUE_LENGTH = 256 << (Controller.HARD_WORK >> 1);
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Peer peer;
@@ -43,6 +42,8 @@ public class Sender extends MonitoredThread {
     static final int MAX_FLUSH_TIME = 500;
     private int out_flush_length;
     private long out_flush_time;
+
+    private long loggedPoint;
 
     public Sender(Peer peer) {
         this.peer = peer;
@@ -243,8 +244,9 @@ public class Sender extends MonitoredThread {
             return false;
 
         checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime - 3 > (bytes.length >> 3)
+        if (checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
                 || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
+            loggedPoint = System.currentTimeMillis();
             LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
         }
 

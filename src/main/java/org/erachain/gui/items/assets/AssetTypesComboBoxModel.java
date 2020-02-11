@@ -14,10 +14,10 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
     
     public AssetTypesComboBoxModel() {
         // INSERT ALL ACCOUNTS
-        
+
         ArrayList<AssetType> list = new ArrayList<AssetType>();
-        
-        if (BlockChain.DEVELOP_USE) {
+
+        if (BlockChain.TEST_MODE) {
             list.add(new AssetType(AssetCls.AS_OUTSIDE_GOODS));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_IMMOVABLE));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_CURRENCY));
@@ -26,7 +26,7 @@ public class AssetTypesComboBoxModel extends DefaultComboBoxModel<AssetType> {
             list.add(new AssetType(AssetCls.AS_OUTSIDE_BILL));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_BILL_EX));
             list.add(new AssetType(AssetCls.AS_OUTSIDE_OTHER_CLAIM));
-            
+
             list.add(new AssetType(AssetCls.AS_INSIDE_ASSETS));
             list.add(new AssetType(AssetCls.AS_INSIDE_CURRENCY));
             list.add(new AssetType(AssetCls.AS_INSIDE_UTILITY));

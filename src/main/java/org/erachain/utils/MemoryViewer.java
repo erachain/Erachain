@@ -53,8 +53,8 @@ public class MemoryViewer extends Thread {
                         continue;
                     }
 
-                    if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 2)
-                        Controller.getInstance().stopAll(99);
+                    if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL >> 1)
+                        Controller.getInstance().stopAll(1000);
                 }
             }
 

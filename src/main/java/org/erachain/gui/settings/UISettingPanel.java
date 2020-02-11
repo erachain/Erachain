@@ -28,6 +28,8 @@ import org.erachain.lang.Lang;
 import org.erachain.lang.LangFile;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -39,6 +41,8 @@ import org.erachain.utils.DateTimeFormat;
  * @author Саша
  */
 public class UISettingPanel extends javax.swing.JPanel {
+
+    protected Logger logger;
 
     public ButtonGroup group;
     public javax.swing.JComboBox<String> font_Name;
@@ -69,6 +73,9 @@ public class UISettingPanel extends javax.swing.JPanel {
      * Creates new form UISetting_Panel
      */
     public UISettingPanel() {
+
+        logger = LoggerFactory.getLogger(getClass());
+
         initComponents();
     }
 
@@ -307,7 +314,7 @@ public class UISettingPanel extends javax.swing.JPanel {
                                 InputStream in = u.openStream();
                                 stringFromInternet = IOUtils.toString(in, Charsets.UTF_8);
                             } catch (Exception e1) {
-                                e1.printStackTrace();
+                                logger.error(e1.getMessage(), e1);
                             }
                             JSONObject inernetLangsJSON = (JSONObject) JSONValue.parse(stringFromInternet);
 
@@ -350,7 +357,7 @@ public class UISettingPanel extends javax.swing.JPanel {
                                                 FileUtils.copyURLToFile(new URL(url), new File(Settings.getInstance().getLangDir(), langFileName));
 
                                             } catch (Exception e1) {
-                                                e1.printStackTrace();
+                                                logger.error(e1.getMessage(), e1);
                                             }
 
                                             jComboBox_Lang.removeAllItems();

@@ -1,10 +1,7 @@
 package org.erachain.core.account;
 
-import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.utils.Pair;
-
-import java.util.Arrays;
 
 public class PrivateKeyAccount extends PublicKeyAccount {
 
@@ -16,6 +13,15 @@ public class PrivateKeyAccount extends PublicKeyAccount {
         this.seed = seed;
         this.keyPair = Crypto.getInstance().createKeyPair(seed);
     }
+
+    /*
+    public PrivateKeyAccount(byte[] privateKey, byte[] publicKey) {
+        super(publicKey);
+        /// null this.seed = privateKey;
+        this.keyPair = new Pair(privateKey, publicKey);
+    }
+
+     */
 
     public byte[] getSeed() {
         return this.seed;
