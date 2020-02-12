@@ -1632,7 +1632,6 @@ public class BlockExplorer {
                 statusJSON.put("status_key", item.a);
                 statusJSON.put("status_icon", Base64.encodeBase64String(status.getIcon()));
 
-                ///statusJSON.put("status_name", status.viewName());
                 statusJSON.put("status_name", status.toString(dcSet, item.c.c));
 
                 statusJSON.put("status_period", StatusCls.viewPeriod(item.c.a, item.c.b));
