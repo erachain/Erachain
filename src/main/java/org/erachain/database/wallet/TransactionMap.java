@@ -5,6 +5,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.AutoKeyDBMap;
+import org.erachain.database.IndexIterator;
 import org.erachain.database.serializer.LongAndTransactionSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
@@ -47,6 +48,7 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
             this.observableData.put(DBTab.NOTIFY_ADD, ObserverMessage.WALLET_ADD_TRANSACTION_TYPE);
             this.observableData.put(DBTab.NOTIFY_REMOVE, ObserverMessage.WALLET_REMOVE_TRANSACTION_TYPE);
         }
+
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -113,10 +115,10 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
         this.typeKey = database.createTreeSet("type_txs").comparator(Fun.TUPLE2_COMPARATOR)
                 .makeOrGet();
         Bind.secondaryKey((Bind.MapWithModificationListener) map, this.typeKey,
-                new Fun.Function2<Tuple2<Byte, Tuple2<Long, Long>>, Tuple2<Long, Long>, Transaction>() {
+                new Fun.Function2<Tuple2<Byte, Tuple2<Long, Long>>, Tuple2<Long, Long>, Tuple2<Long, Transaction>>() {
                     @Override
-                    public Tuple2<Byte, Tuple2<Long, Long>> run(Tuple2<Long, Long> key, Transaction transaction) {
-                        return new Tuple2<>((byte) transaction.getType(), key);
+                    public Tuple2<Byte, Tuple2<Long, Long>> run(Tuple2<Long, Long> key, Tuple2<Long, Transaction> value) {
+                        return new Tuple2<>((byte) value.b.getType(), key);
                     }
                 });
 
@@ -176,13 +178,13 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     public Iterator<Tuple2<Long, Long>> getTypeIterator(Byte type, boolean descending) {
 
         if (descending) {
-            return typeKey.descendingSet().subSet(
-                    Fun.t2(type, null),
-                    Fun.t2(type, Fun.HI())).iterator();
+            return new IndexIterator((NavigableSet) typeKey.descendingSet().subSet(
+                    Fun.t2(new Tuple2(type, Fun.HI()), Fun.HI()),
+                    Fun.t2(new Tuple2(type, null), null)));
         } else {
-            return typeKey.subSet(
-                    Fun.t2(type, null),
-                    Fun.t2(type, Fun.HI())).iterator();
+            return new IndexIterator((NavigableSet) typeKey.subSet(
+                    Fun.t2(new Tuple2(type, null), null),
+                    Fun.t2(new Tuple2(type, Fun.HI()), Fun.HI())));
         }
 
     }

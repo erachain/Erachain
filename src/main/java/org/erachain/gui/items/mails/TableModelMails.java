@@ -1,5 +1,6 @@
 package org.erachain.gui.items.mails;
 
+import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.RSend;
@@ -10,6 +11,8 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
 import org.mapdb.Fun;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -17,17 +20,20 @@ import java.util.*;
 
 @SuppressWarnings("serial")
 public class TableModelMails extends AbstractTableModel implements Observer {
+
+    static Logger LOGGER = LoggerFactory.getLogger(TableModelMails.class.getName());
+
     public static final int COLUMN_CONFIRMATION = 0;
     public static final int COLUMN_DATA = 1;
     public static final int COLUMN_SENDER = 3;
     public static final int COLUMN_RECIEVER = 4;
     public static final int COLUMN_HEAD = 2;
-//	public static final int COLUMN_CONFIRM = 5;
+    //	public static final int COLUMN_CONFIRM = 5;
     boolean incoming;
     private ArrayList<RSend> transactions;
     private String[] columnNames = Lang.getInstance()
             .translate(new String[]{"Confirmation", "Date", "Title", "Sender", "Reciever"});//, "Confirm" });
-    private Boolean[] column_AutuHeight = new Boolean[]{false, true, true, false};
+    private Boolean[] column_AutuHeight = new Boolean[]{true, false, true, true, false};
 
     public TableModelMails(boolean incoming) {
 
@@ -119,6 +125,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
             this.syncUpdate(o, arg);
         } catch (Exception e) {
             // GUI ERROR
+            LOGGER.error(e.getMessage(), e);
         }
     }
 
@@ -198,22 +205,30 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
         } else {
             Wallet wallet = Controller.getInstance().wallet;
-            Iterator<Fun.Tuple2<Long, Long>> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, false);
+            Iterator<Fun.Tuple2<Long, Long>> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, true);
             if (iterator == null) {
                 transactions = new ArrayList<RSend>();
                 return;
             }
 
             RSend rsend;
+            boolean outcome;
+            Fun.Tuple2<Long, Long> key;
             while (iterator.hasNext()) {
-                rsend = (RSend) wallet.getTransaction(iterator.next()).b;
+                key = iterator.next();
+                rsend = (RSend) wallet.getTransaction(key).b;
                 if (rsend == null)
                     continue;
                 if (rsend.hasAmount())
                     continue;
-                transactions.add(rsend);
+
+                // это исходящее письмо?
+                outcome = key.a.equals(Longs.fromByteArray(rsend.getCreator().getShortAddressBytes()));
+
+                if (incoming ^ outcome) {
+                    transactions.add(rsend);
+                }
             }
         }
-
     }
 }
