@@ -365,11 +365,17 @@ public class BlockExplorer {
                     }
                     if (param.equals("person")) {
                         if (!assetKey) {
+                            int side = 1;
+                            try {
+                                side = new Integer(info.getQueryParameters().getFirst("side"));
+                            } catch (Exception e) {
+
+                            }
                             // персона раньше в параметрах - значит покажем баланс по активу у персоны
                             output.putAll(jsonQueryPersonBalance(new Long(info.getQueryParameters().getFirst("person")),
                                     new Long(info.getQueryParameters().getFirst("asset")),
-                                    new Integer(info.getQueryParameters().getFirst("position"))
-                            ));
+                                    new Integer(info.getQueryParameters().getFirst("position")),
+                                    side));
                             return output;
                         }
                     }
@@ -1339,7 +1345,7 @@ public class BlockExplorer {
         return output;
     }
 
-    private Map jsonQueryPersonBalance(Long personKey, Long assetKey, int position) {
+    private Map jsonQueryPersonBalance(Long personKey, Long assetKey, int position, int side) {
 
         output.put("type", "person_asset");
         output.put("search", "persons");
@@ -1368,6 +1374,9 @@ public class BlockExplorer {
         output.put("Label_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("Label_name", Lang.getInstance().translateFromLangObj("Name", langObj));
 
+        output.put("position", position);
+        output.put("side", side);
+
         output.put("person_img", a);
         output.put("person_key", person.getKey());
         output.put("person_name", person.getName());
@@ -1378,9 +1387,14 @@ public class BlockExplorer {
         output.put("Label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
         output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
 
+        output.put("Label_Sides", Lang.getInstance().translateFromLangObj("Balance Sides", langObj));
+        output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Total Debit", langObj));
+        output.put("Label_Left", Lang.getInstance().translateFromLangObj("Left # остаток", langObj));
+        output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj("Total Credit", langObj));
+
         output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
         output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
-        BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position);
+        BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position, side);
         output.put("sum", sum);
 
         return output;
