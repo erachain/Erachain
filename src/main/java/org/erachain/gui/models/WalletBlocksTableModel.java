@@ -82,7 +82,7 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
                 || message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE) {
             needUpdate = false;
             list = new ArrayList<>();
-            try (IteratorCloseable iterator = map.getIterator(BlocksHeadMap.TIMESTAMP_INDEX, true)) {
+            try (IteratorCloseable iterator = map.getIterator(BlocksHeadMap.TIMESTAMP_INDEX, false)) {
                 int count = 50;
                 while (iterator.hasNext() && --count > 0) {
                     list.add((Block.BlockHead) map.get(iterator.next()));

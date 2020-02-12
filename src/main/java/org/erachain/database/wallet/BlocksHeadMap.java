@@ -85,69 +85,71 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
         удалить бы их - чтобы не тормозили лишний раз
         */
 
-        //GENERATOR INDEX
-        NavigableSet<String> generatorIndex = database.createTreeSet("blocks_index_generator")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+        if (false) {
+            //GENERATOR INDEX
+            NavigableSet<String> generatorIndex = database.createTreeSet("blocks_index_generator")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        NavigableSet<String> descendingGeneratorIndex = database.createTreeSet("blocks_index_generator_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
+            NavigableSet<String> descendingGeneratorIndex = database.createTreeSet("blocks_index_generator_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
 
-        createIndex(GENERATOR_INDEX, generatorIndex, descendingGeneratorIndex, new Fun.Function2<String, Integer, Block.BlockHead>() {
-            @Override
-            public String run(Integer key, Block.BlockHead value) {
-                return value.creator.getAddress();
-            }
-        });
+            createIndex(GENERATOR_INDEX, generatorIndex, descendingGeneratorIndex, new Fun.Function2<String, Integer, Block.BlockHead>() {
+                @Override
+                public String run(Integer key, Block.BlockHead value) {
+                    return value.creator.getAddress();
+                }
+            });
 
-        //BALANCE INDEX
-        NavigableSet<Integer> balanceIndex = database.createTreeSet("blocks_index_balance")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+            //BALANCE INDEX
+            NavigableSet<Integer> balanceIndex = database.createTreeSet("blocks_index_balance")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        NavigableSet<Integer> descendingBalanceIndex = database.createTreeSet("blocks_index_balance_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
+            NavigableSet<Integer> descendingBalanceIndex = database.createTreeSet("blocks_index_balance_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
 
-        createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
-            @Override
-            public Integer run(Integer key, Block.BlockHead value) {
-                return value.forgingValue;
-            }
-        });
+            createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
+                @Override
+                public Integer run(Integer key, Block.BlockHead value) {
+                    return value.forgingValue;
+                }
+            });
 
-        //TRANSACTIONS INDEX
-        NavigableSet<Integer> transactionsIndex = database.createTreeSet("blocks_index_transactions")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+            //TRANSACTIONS INDEX
+            NavigableSet<Integer> transactionsIndex = database.createTreeSet("blocks_index_transactions")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        NavigableSet<Integer> descendingTransactionsIndex = database.createTreeSet("blocks_index_transactions_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
+            NavigableSet<Integer> descendingTransactionsIndex = database.createTreeSet("blocks_index_transactions_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
 
-        createIndex(TRANSACTIONS_INDEX, transactionsIndex, descendingTransactionsIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
-            @Override
-            public Integer run(Integer key, Block.BlockHead value) {
-                return value.transactionsCount;
-            }
-        });
+            createIndex(TRANSACTIONS_INDEX, transactionsIndex, descendingTransactionsIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
+                @Override
+                public Integer run(Integer key, Block.BlockHead value) {
+                    return value.transactionsCount;
+                }
+            });
 
-        //FEE INDEX
-        NavigableSet<Long> feeIndex = database.createTreeSet("blocks_index_fee")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+            //FEE INDEX
+            NavigableSet<Long> feeIndex = database.createTreeSet("blocks_index_fee")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        NavigableSet<Long> descendingFeeIndex = database.createTreeSet("blocks_index_fee_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
+            NavigableSet<Long> descendingFeeIndex = database.createTreeSet("blocks_index_fee_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
 
-        createIndex(FEE_INDEX, feeIndex, descendingFeeIndex, new Fun.Function2<Long, Integer, Block.BlockHead>() {
-            @Override
-            public Long run(Integer key, Block.BlockHead value) {
-                return value.totalFee;
-            }
-        });
+            createIndex(FEE_INDEX, feeIndex, descendingFeeIndex, new Fun.Function2<Long, Integer, Block.BlockHead>() {
+                @Override
+                public Long run(Integer key, Block.BlockHead value) {
+                    return value.totalFee;
+                }
+            });
+        }
 
     }
 
@@ -169,7 +171,7 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
 
     public Block.BlockHead getLast() {
 
-        try (IteratorCloseable<Integer> iterator = this.getIterator(TIMESTAMP_INDEX, true)) {
+        try (IteratorCloseable<Integer> iterator = this.getIterator(TIMESTAMP_INDEX, false)) {
             if (!iterator.hasNext())
                 return null;
 

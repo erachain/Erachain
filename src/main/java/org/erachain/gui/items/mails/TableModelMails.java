@@ -35,8 +35,11 @@ public class TableModelMails extends AbstractTableModel implements Observer {
             .translate(new String[]{"Confirmation", "Date", "Title", "Sender", "Reciever"});//, "Confirm" });
     private Boolean[] column_AutuHeight = new Boolean[]{true, false, true, true, false};
 
+    DCSet dcSet;
+
     public TableModelMails(boolean incoming) {
 
+        dcSet = DCSet.getInstance();
         this.incoming = incoming;
         transactions = new ArrayList<RSend>();
         if (Controller.getInstance().doesWalletDatabaseExists())
@@ -91,7 +94,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
         switch (column) {
             case COLUMN_CONFIRMATION:
 
-                return tran.getConfirmations(DCSet.getInstance());
+                return tran.getConfirmations(dcSet);
 
             case COLUMN_DATA:
 
@@ -143,7 +146,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
     public void removeObservers() {
 
         if (Controller.getInstance().doesWalletDatabaseExists())
-            DCSet.getInstance().getTransactionTab().deleteObserver(this);
+            dcSet.getTransactionTab().deleteObserver(this);
     }
 
     public void filter(ObserverMessage message) {
@@ -153,7 +156,7 @@ public class TableModelMails extends AbstractTableModel implements Observer {
 
         if (false) {
             for (Account account : Controller.getInstance().getAccounts()) {
-                all_transactions.addAll(DCSet.getInstance().getTransactionFinalMap()
+                all_transactions.addAll(dcSet.getTransactionFinalMap()
                         .getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
             }
 
@@ -226,6 +229,8 @@ public class TableModelMails extends AbstractTableModel implements Observer {
                 outcome = key.a.equals(Longs.fromByteArray(rsend.getCreator().getShortAddressBytes()));
 
                 if (incoming ^ outcome) {
+                    if (rsend.getSignature() != null)
+                        rsend.setDC_HeightSeq(dcSet);
                     transactions.add(rsend);
                 }
             }

@@ -81,8 +81,8 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             this.getMemoryMap();
         } else {
             this.openMap();
+            createIndexes();
         }
-        createIndexes();
 
     }
 
