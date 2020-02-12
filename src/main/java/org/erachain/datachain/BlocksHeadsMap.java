@@ -46,10 +46,6 @@ public class BlocksHeadsMap extends DCUMap<Integer, Block.BlockHead> {
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     protected void getMemoryMap() {
         map = new HashMap<Integer, Block.BlockHead>();
     }

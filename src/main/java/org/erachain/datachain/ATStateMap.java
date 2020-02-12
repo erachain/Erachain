@@ -25,9 +25,6 @@ public class ATStateMap extends DCUMap<Tuple2<Integer, String>, byte[]> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         map = this.openMap(database);

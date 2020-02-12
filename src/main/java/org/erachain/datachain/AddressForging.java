@@ -41,10 +41,6 @@ public class AddressForging extends DCUMap<Tuple2<String, Integer>, Tuple3<Integ
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     public void openMap() {
         //OPEN MAP
         ////return database.createHashMap("address_forging").makeOrGet();

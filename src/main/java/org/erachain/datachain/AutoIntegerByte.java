@@ -69,9 +69,6 @@ public abstract class AutoIntegerByte extends DCUMap<Integer, byte[]> {
         this.key = size;
     }
 
-    protected void createIndexes() {
-    }
-
     public long add(byte[] item) {
         // INCREMENT ATOMIC KEY IF EXISTS
         if (this.atomicKey != null) {

@@ -32,10 +32,6 @@ public class OrphanNameStorageMap extends DCUMap<byte[], Map<String, String>> {
         map = new HashMap<byte[], Map<String, String>>();
     }
 
-    @Override
-    protected void createIndexes() {
-    }
-
     public void add(byte[] txAndName, String key, String value) {
         Map<String, String> keyValueMap = this.get(txAndName);
         if (keyValueMap == null) {

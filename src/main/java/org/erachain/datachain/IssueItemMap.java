@@ -52,9 +52,6 @@ public abstract class IssueItemMap extends DCUMap<byte[], Long> {
         }
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     protected void getMemoryMap() {
         map = new TreeMap<>(UnsignedBytes.lexicographicalComparator());

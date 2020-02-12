@@ -7,7 +7,6 @@ import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
@@ -27,11 +26,11 @@ import java.util.*;
 
 public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
     // нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
-    public static final int TIMESTAMP_INDEX = 1;
-    public static final int GENERATOR_INDEX = 2;
-    public static final int BALANCE_INDEX = 3;
-    public static final int TRANSACTIONS_INDEX = 4;
-    public static final int FEE_INDEX = 5;
+    //public static final int TIMESTAMP_INDEX = 1;
+    //public static final int GENERATOR_INDEX = 2;
+    //public static final int BALANCE_INDEX = 3;
+    //public static final int TRANSACTIONS_INDEX = 4;
+    //public static final int FEE_INDEX = 5;
 
     static Logger logger = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
 
@@ -47,7 +46,7 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
 
         // for sort in SortedList
         // in gui.models.WalletBlocksTableModel.syncUpdate
-        DEFAULT_INDEX = TIMESTAMP_INDEX;
+        ///DEFAULT_INDEX = TIMESTAMP_INDEX;
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
@@ -60,30 +59,12 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
 
-        //TIMESTAMP INDEX
-        NavigableSet<Integer> timestampIndex = database.createTreeSet("blocks_index_timestamp")
-                .comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-
-        NavigableSet<Integer> descendingTimestampIndex = database.createTreeSet("blocks_index_timestamp_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
-
-        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Integer, Integer,
-                Block.BlockHead>() {
-            @Override
-            public Integer run(Integer key, Block.BlockHead value) {
-                return value.heightBlock;
-            }
-        });
-
         // TODO это все лишние индексы, только в РПС используются для статистики
         /* это все не используемые индексы которые нафиг не нужны в кошельке - чисто для статистики
         удалить бы их - чтобы не тормозили лишний раз
         */
 
-        if (false) {
+        /*
             //GENERATOR INDEX
             NavigableSet<String> generatorIndex = database.createTreeSet("blocks_index_generator")
                     .comparator(Fun.COMPARATOR)
@@ -147,7 +128,8 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
                     return value.totalFee;
                 }
             });
-        }
+
+         */
 
     }
 

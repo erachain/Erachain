@@ -41,9 +41,6 @@ public class VoteOnItemPollMap extends DCUMap<Tuple3<Long, Integer, BigInteger>,
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

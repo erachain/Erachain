@@ -51,10 +51,6 @@ public class KKKMap extends DCUMap<
         super(parent, dcSet);
     }
 
-
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

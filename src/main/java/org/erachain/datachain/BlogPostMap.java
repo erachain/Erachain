@@ -32,10 +32,6 @@ public class BlogPostMap extends DCUMap<String, List<byte[]>> {
         map = new HashMap<>();
     }
 
-    @Override
-    protected void createIndexes() {
-    }
-
     public void add(String blogname, byte[] signature) {
         List<byte[]> list;
         if (blogname == null) {

@@ -55,9 +55,6 @@ public class ATMap extends DCUMapImpl<String, AT> {
 
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

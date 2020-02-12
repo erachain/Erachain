@@ -30,9 +30,6 @@ public class NameStorageMap extends DCUMap<String, Map<String, String>> {
         map = new HashMap<String, Map<String, String>>();
     }
 
-    protected void createIndexes() {
-    }
-
     public void add(String name, String key, String value) {
         Map<String, String> keyValueMap = this.get(name);
         if (keyValueMap == null) {
