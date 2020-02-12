@@ -1963,7 +1963,7 @@ public class BlockExplorer {
 
 
     @SuppressWarnings("static-access")
-    private LinkedHashMap balanceJSON(Account account) {
+    private LinkedHashMap balanceJSON(Account account, int side) {
 
         // balance assets from
         LinkedHashMap output = new LinkedHashMap();
@@ -1998,15 +1998,16 @@ public class BlockExplorer {
                     bal.put("asset_key", assetKey);
                     bal.put("asset_name", asset.viewName());
 
-                    if (BlockChain.ERA_COMPU_ALL_UP) {
-                        bal.put("balance_1", itemBals.a.b.add(account.addDEVAmount(assetKey)));
+
+                    if (BlockChain.ERA_COMPU_ALL_UP && side == 1) {
+                        bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side).add(account.addDEVAmount(assetKey)));
                     } else {
-                        bal.put("balance_1", itemBals.a.b);
+                        bal.put("balance_1", Account.balanceInPositionAndSide(itemBals, 1, side));
                     }
 
-                    bal.put("balance_2", itemBals.b.b);
-                    bal.put("balance_3", itemBals.c.b);
-                    bal.put("balance_4", itemBals.d.b);
+                    bal.put("balance_2", Account.balanceInPositionAndSide(itemBals, 2, side));
+                    bal.put("balance_3", Account.balanceInPositionAndSide(itemBals, 3, side));
+                    bal.put("balance_4", Account.balanceInPositionAndSide(itemBals, 4, side));
                     balAssets.put("" + assetKey, bal);
                 }
             }
@@ -2015,6 +2016,11 @@ public class BlockExplorer {
         }
 
         output.put("balances", balAssets);
+        output.put("side", side);
+
+        output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Total Debit", langObj));
+        output.put("Label_Left", Lang.getInstance().translateFromLangObj("Left # остаток", langObj));
+        output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj("Total Credit", langObj));
 
         output.put("label_Balance_table", Lang.getInstance().translateFromLangObj("Balance", langObj));
         output.put("label_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
@@ -2702,51 +2708,13 @@ public class BlockExplorer {
         output.put("label_account", Lang.getInstance().translateFromLangObj("Account", langObj));
 
         // balance assets from
-        output.put("Balance", balanceJSON(new Account(address)));
-
-        return output;
-    }
-
-    public Map jsonQueryAddress_old(String address, int start, UriInfo info) {
-
-        output.put("type", "address");
-        output.put("search", "addresses");
-        output.put("search_placeholder", Lang.getInstance().translateFromLangObj("Insert searching address", langObj));
-        output.put("search_message", address);
-
-        Object forge = info == null ? false : info.getQueryParameters().getFirst("forge");
-        boolean useForge = forge != null && (forge.toString().toLowerCase().equals("yes")
-                || forge.toString().toLowerCase().equals("1"));
-
-        int limit = 100;
-        List<Transaction> transactions = dcSet.getTransactionFinalMap().getTransactionsByAddressLimit(Account.makeShortBytes(address), limit, !useForge);
-        LinkedHashMap output = new LinkedHashMap();
-        output.put("address", address);
-
-        Account acc = new Account(address);
-        Tuple2<Integer, PersonCls> person = acc.getPerson();
-
-        if (person != null) {
-            output.put("label_person_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-            output.put("person_Img", Base64.encodeBase64String(person.b.getImage()));
-            output.put("person", person.b.getName());
-            output.put("person_key", person.b.getKey());
-
-            Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balabce_LIA = acc.getBalance(AssetCls.LIA_KEY);
-            output.put("registered", balabce_LIA.a.b.toPlainString());
-            output.put("certified", balabce_LIA.b.b.toPlainString());
-            output.put("label_registered", Lang.getInstance().translateFromLangObj("Registered", langObj));
-            output.put("label_certified", Lang.getInstance().translateFromLangObj("Certified", langObj));
+        int side = 1;
+        try {
+            side = new Integer(info.getQueryParameters().getFirst("side"));
+        } catch (Exception e) {
         }
 
-        output.put("label_account", Lang.getInstance().translateFromLangObj("Account", langObj));
-
-        // balance assets from
-        output.put("Balance", balanceJSON(new Account(address)));
-
-        // Transactions view
-        transactionsJSON(output, acc, transactions, start, pageSize,
-                Lang.getInstance().translateFromLangObj("Last XX transactions", langObj).replace("XX", "" + limit));
+        output.put("Balance", balanceJSON(new Account(address), side));
 
         return output;
     }
