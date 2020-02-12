@@ -200,7 +200,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         NavigableSet<Fun.Tuple2<?, T>> indexSet = getIndex(index, descending);
         if (indexSet != null) {
 
-            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(this.indexes.get(index));
+            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(indexSet);
             this.outUses();
             return u;
 

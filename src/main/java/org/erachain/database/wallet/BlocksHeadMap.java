@@ -5,7 +5,6 @@ import org.erachain.core.block.Block;
 import org.erachain.database.serializer.BlockHeadSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
-import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
@@ -15,7 +14,6 @@ import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 
 /*
@@ -170,16 +168,7 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
     }
 
     public Block.BlockHead getLast() {
-
-        try (IteratorCloseable<Integer> iterator = this.getIterator(TIMESTAMP_INDEX, false)) {
-            if (!iterator.hasNext())
-                return null;
-
-            return this.get(iterator.next());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return get(size());
     }
 
     // TODO - SORT by HEIGHT !!!
