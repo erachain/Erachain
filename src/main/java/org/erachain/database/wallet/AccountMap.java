@@ -43,10 +43,6 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     public void openMap() {
         this.publickKeys = database.createTreeSet(ADDRESSES)
                 .comparator(UnsignedBytes.lexicographicalComparator())

@@ -138,31 +138,6 @@ public abstract class ItemMap extends DCUMap<Long, ItemCls> implements FilteredB
                 });
     }
 
-
-    @SuppressWarnings("unchecked")
-    protected void createIndexes() {
-        if (Controller.getInstance().onlyProtocolIndexing) {
-            // NOT USE SECONDARY INDEXES
-            return;
-        }
-
-        /*
-        //NAME INDEX
-        nameIndex = database.createTreeSet(name + "_name_keys")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
-
-        nameDescendingIndex = database.createTreeSet(name + "_name_desc_keys")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
-
-        createIndexes(NAME_INDEX, nameIndex, nameDescendingIndex, (key, item) -> {
-            return item.getName().toLowerCase().split(" ");
-        });
-
-*/
-    }
-
     @Override
     protected void getMemoryMap() {
         map = new TreeMap<Long, ItemCls>();

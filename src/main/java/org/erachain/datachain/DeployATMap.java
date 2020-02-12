@@ -17,9 +17,6 @@ public class DeployATMap extends DCUMap<byte[], Long> {
         super(parent, null);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

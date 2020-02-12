@@ -33,17 +33,10 @@ public class CommentPostMap extends DCUMap<byte[], byte[]> {
         put(signatureOfComment, signatureOfBlogPost);
     }
 
-    public void delete(byte[] signatureOfComment) {
-        this.delete(signatureOfComment);
-    }
-
     @Override
     protected void getMemoryMap() {
         map = new HashMap<>();
     }
 
-    @Override
-    protected void createIndexes() {
-    }
 }
 
