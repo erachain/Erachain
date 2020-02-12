@@ -10,10 +10,7 @@ import org.erachain.dbs.DBTab;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
 import org.erachain.utils.ReverseComparator;
-import org.mapdb.BTreeKeySerializer;
-import org.mapdb.BTreeMap;
-import org.mapdb.DB;
-import org.mapdb.Fun;
+import org.mapdb.*;
 import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +20,7 @@ import java.util.*;
 /**
  * Транзакции относящиеся к моим счетам. Сюда же записываться должны и неподтвержденные<br>
  * А когда они подтверждаются они будут перезаписываться поверх.
- * Тогда неподтвержденные будут показывать что они не сиполнились.
+ * Тогда неподтвержденные будут показывать что они не исполнились.
  * И их пользователь сможет сам удалить вручную или командой - удалить все неподтвержденные.
  * Вообще тут реализация как СТЕК - удалить можно только если это верхний элемент.
  * Добавление вверх или обновляем существующий по AUTOKEY_INDEX
@@ -36,6 +33,8 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     public static final int TIMESTAMP_INDEX = 1;
     //public static final int ADDRESS_INDEX = 2;
     //public static final int AMOUNT_INDEX = 3;
+
+    NavigableSet typeKey;
 
     static Logger LOGGER = LoggerFactory.getLogger(TransactionMap.class.getName());
 
@@ -111,6 +110,17 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
         });
         */
 
+        this.typeKey = database.createTreeSet("type_txs").comparator(Fun.TUPLE2_COMPARATOR)
+                .makeOrGet();
+        Bind.secondaryKey((Bind.MapWithModificationListener) map, this.typeKey,
+                new Fun.Function2<Tuple2<Byte, Tuple2<Long, Long>>, Tuple2<Long, Long>, Transaction>() {
+                    @Override
+                    public Tuple2<Byte, Tuple2<Long, Long>> run(Tuple2<Long, Long> key, Transaction transaction) {
+                        return new Tuple2<>((byte) transaction.getType(), key);
+                    }
+                });
+
+
     }
 
     @Override
@@ -163,9 +173,24 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
+    public Iterator<Tuple2<Long, Long>> getTypeIterator(Byte type, boolean descending) {
+
+        if (descending) {
+            return typeKey.descendingSet().subSet(
+                    Fun.t2(type, null),
+                    Fun.t2(type, Fun.HI())).iterator();
+        } else {
+            return typeKey.subSet(
+                    Fun.t2(type, null),
+                    Fun.t2(type, Fun.HI())).iterator();
+        }
+
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterator<Tuple2<Long, Long>> getAddressIterator(Account account) {
 
-        Set<Tuple2<Long, Long>> accountKeys = ((NavigableMap) this.map).subMap(
+        Set<Tuple2<Long, Long>> accountKeys = ((BTreeMap) this.map).subMap(
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
 
@@ -181,12 +206,14 @@ public class TransactionMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI()));
          */
 
-        Set<Tuple2<Long, Long>> accountKeys = ((NavigableMap) this.map).subMap(
+        Set<Tuple2<Long, Long>> accountKeys = ((BTreeMap) this.map).subMap(
                 Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), null),
-                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).keySet();
+                Fun.t2(Longs.fromByteArray(account.getShortAddressBytes()), Fun.HI())).descendingKeySet();
 
 
-        return ((NavigableSet<Tuple2<Long, Long>>) accountKeys).descendingIterator();
+        //return ((NavigableSet<Tuple2<Long, Long>>) accountKeys).descendingIterator();
+        return accountKeys.iterator();
+
     }
 
     public List<Pair<Account, Transaction>> get(List<Account> accounts, int limit) {

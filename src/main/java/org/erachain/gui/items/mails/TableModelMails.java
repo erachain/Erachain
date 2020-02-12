@@ -4,10 +4,12 @@ import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
@@ -142,56 +144,76 @@ public class TableModelMails extends AbstractTableModel implements Observer {
         ArrayList<Transaction> all_transactions = new ArrayList<Transaction>();
 
 
-        for (Account account : Controller.getInstance().getAccounts()) {
-            all_transactions.addAll(DCSet.getInstance().getTransactionFinalMap()
-                    .getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
-        }
-
-        for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(300, true)) {
-            if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
-                all_transactions.add(transaction);
+        if (false) {
+            for (Account account : Controller.getInstance().getAccounts()) {
+                all_transactions.addAll(DCSet.getInstance().getTransactionFinalMap()
+                        .getTransactionsByAddressAndType(account.getShortAddressBytes(), Transaction.SEND_ASSET_TRANSACTION, 0, 0));
             }
-        }
+
+            for (Transaction transaction : Controller.getInstance().getUnconfirmedTransactions(300, true)) {
+                if (transaction.getType() == Transaction.SEND_ASSET_TRANSACTION) {
+                    all_transactions.add(transaction);
+                }
+            }
 
 
-        for (Transaction messagetx : all_transactions) {
-            boolean is = false;
-            if (!this.transactions.isEmpty()) {
-                for (RSend message1 : this.transactions) {
-                    if (Arrays.equals(messagetx.getSignature(), message1.getSignature())) {
-                        is = true;
-                        break;
+            for (Transaction messagetx : all_transactions) {
+                boolean is = false;
+                if (!this.transactions.isEmpty()) {
+                    for (RSend message1 : this.transactions) {
+                        if (Arrays.equals(messagetx.getSignature(), message1.getSignature())) {
+                            is = true;
+                            break;
+                        }
+                    }
+                }
+                if (!is) {
+
+                    if (messagetx.getAssetKey() == 0) {
+                        for (Account account1 : Controller.getInstance().getAccounts()) {
+                            RSend a = (RSend) messagetx;
+                            if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
+                                this.transactions.add(a);
+                            }
+
+                            if (a.getCreator().getAddress().equals(account1.getAddress()) && !incoming) {
+                                this.transactions.add(a);
+                            }
+
+                        }
                     }
                 }
             }
-            if (!is) {
 
-                if (messagetx.getAssetKey() == 0) {
-                    for (Account account1 : Controller.getInstance().getAccounts()) {
-                        RSend a = (RSend) messagetx;
-                        if (a.getRecipient().getAddress().equals(account1.getAddress()) && incoming) {
-                            this.transactions.add(a);
-                        }
 
-                        if (a.getCreator().getAddress().equals(account1.getAddress()) && !incoming) {
-                            this.transactions.add(a);
-                        }
+            this.transactions.sort(new Comparator<Transaction>() {
 
-                    }
+
+                public int compare(Transaction o1, Transaction o2) {
+                    // TODO Auto-generated method stub
+
+                    return (int) (o2.getTimestamp() - o1.getTimestamp());
                 }
+            });
+
+        } else {
+            Wallet wallet = Controller.getInstance().wallet;
+            Iterator<Fun.Tuple2<Long, Long>> iterator = wallet.getTransactionsIteratorByType(Transaction.SEND_ASSET_TRANSACTION, false);
+            if (iterator == null) {
+                transactions = new ArrayList<RSend>();
+                return;
+            }
+
+            RSend rsend;
+            while (iterator.hasNext()) {
+                rsend = (RSend) wallet.getTransaction(iterator.next()).b;
+                if (rsend == null)
+                    continue;
+                if (rsend.hasAmount())
+                    continue;
+                transactions.add(rsend);
             }
         }
-
-
-        this.transactions.sort(new Comparator<Transaction>() {
-
-
-            public int compare(Transaction o1, Transaction o2) {
-                // TODO Auto-generated method stub
-
-                return (int) (o2.getTimestamp() - o1.getTimestamp());
-            }
-        });
 
     }
 }
