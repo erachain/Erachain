@@ -2025,10 +2025,11 @@ public class BlockExplorer {
         output.put("label_Balance_table", Lang.getInstance().translateFromLangObj("Balance", langObj));
         output.put("label_asset_key", Lang.getInstance().translateFromLangObj("Key", langObj));
         output.put("label_asset_name", Lang.getInstance().translateFromLangObj("Name", langObj));
-        output.put("label_Balance_1", Lang.getInstance().translateFromLangObj("Balance", langObj) + " 1");
-        output.put("label_Balance_2", Lang.getInstance().translateFromLangObj("Balance", langObj) + " 2");
-        output.put("label_Balance_3", Lang.getInstance().translateFromLangObj("Balance", langObj) + " 3");
-        output.put("label_Balance_4", Lang.getInstance().translateFromLangObj("Balance", langObj) + " 4");
+
+        output.put("label_Balance_1", Lang.getInstance().translateFromLangObj("Balance 1 (OWN)", langObj));
+        output.put("label_Balance_2", Lang.getInstance().translateFromLangObj("Balance 2 (DEBT)", langObj));
+        output.put("label_Balance_3", Lang.getInstance().translateFromLangObj("Balance 3 (HOLD)", langObj));
+        output.put("label_Balance_4", Lang.getInstance().translateFromLangObj("Balance 4 (SPEND)", langObj));
 
         return output;
 
