@@ -9,12 +9,12 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.*;
 import org.erachain.gui.transaction.RecDetailsFrame;
 import org.erachain.lang.Lang;
+import org.erachain.utils.MenuPopupUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
-import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import java.math.BigDecimal;
@@ -43,7 +43,7 @@ public class StatementInfo extends javax.swing.JPanel {
     RSignNote statement;
     Transaction transaction;
     private MAttachedFilesPanel file_Panel;
-    private VoushLibraryPanel voush_Library_Panel;
+    private VouchLibraryPanel voush_Library_Panel;
     private javax.swing.JLabel jLabel_Title;
     private javax.swing.JPanel jPanel1;
     private MSplitPane jSplitPane1;
@@ -267,7 +267,7 @@ public class StatementInfo extends javax.swing.JPanel {
         gridBagConstraints.weightx = 0.1;
         gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 11, 11, 11);
-        voush_Library_Panel = new VoushLibraryPanel(transaction);
+        voush_Library_Panel = new VouchLibraryPanel(transaction);
         jPanel2.add(voush_Library_Panel, gridBagConstraints);
         //
 

@@ -30,7 +30,7 @@ public class StatementsVouchTableModel extends TimerTableModelCls<RVouch> {
     public StatementsVouchTableModel(Transaction transaction) {
 
         super(DCSet.getInstance().getVouchRecordMap(),
-                new String[]{"Timestamp", "Creator", "Height"}, null, false);
+                new String[]{"Timestamp", "Voucher / Signatory", "Height"}, null, false);
 
         if (transaction != null) {
             blockNo = transaction.getBlockHeight();
