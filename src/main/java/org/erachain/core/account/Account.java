@@ -445,6 +445,59 @@ public class Account {
         return null;
     }
 
+    public static BigDecimal balanceInPositionAndSide(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
+                                                      int position, int side) {
+        switch (position) {
+            case TransactionAmount.ACTION_SEND:
+                switch (side) {
+                    case 0:
+                        return balance.a.a;
+                    case 1:
+                        return balance.a.b;
+                    case 2:
+                        return balance.a.a.subtract(balance.a.b);
+                }
+            case TransactionAmount.ACTION_DEBT:
+                switch (side) {
+                    case 0:
+                        return balance.b.a;
+                    case 1:
+                        return balance.b.b;
+                    case 2:
+                        return balance.b.a.subtract(balance.b.b);
+                }
+            case TransactionAmount.ACTION_HOLD:
+                switch (side) {
+                    case 0:
+                        return balance.c.a;
+                    case 1:
+                        return balance.c.b;
+                    case 2:
+                        return balance.c.a.subtract(balance.c.b);
+                }
+            case TransactionAmount.ACTION_SPEND:
+                switch (side) {
+                    case 0:
+                        return balance.d.a;
+                    case 1:
+                        return balance.d.b;
+                    case 2:
+                        return balance.d.a.subtract(balance.d.b);
+                }
+            case TransactionAmount.ACTION_PLEDGE:
+                switch (side) {
+                    case 0:
+                        return balance.e.a;
+                    case 1:
+                        return balance.e.b;
+                    case 2:
+                        return balance.e.a.subtract(balance.e.b);
+                }
+        }
+
+        return null;
+    }
+
     static public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
                                                                       int position) {
         switch (position) {

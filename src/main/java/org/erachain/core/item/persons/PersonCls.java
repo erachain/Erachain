@@ -193,7 +193,7 @@ public abstract class PersonCls extends ItemCls {
         return dcSet.getPersonAddressMap().getItems(this.getKey(dcSet)).keySet();
     }
 
-    public static BigDecimal getBalance(long personKey, long assetKey, int pos) {
+    public static BigDecimal getBalance(long personKey, long assetKey, int pos, int side) {
 
         Set<String> addresses = DCSet.getInstance().getPersonAddressMap().getItems(personKey).keySet();
 
@@ -206,15 +206,60 @@ public abstract class PersonCls extends ItemCls {
                 .map((balances) -> {
                     switch (pos) {
                         case 1:
-                            return balances.a.b;
+                            switch (side) {
+                                case 0:
+                                    return balances.a.a;
+                                case 1:
+                                    return balances.a.b;
+                                case 2:
+                                    return balances.a.a.subtract(balances.a.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         case 2:
-                            return balances.b.b;
+                            switch (side) {
+                                case 0:
+                                    return balances.b.a;
+                                case 1:
+                                    return balances.b.b;
+                                case 2:
+                                    return balances.b.a.subtract(balances.b.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         case 3:
-                            return balances.c.b;
+                            switch (side) {
+                                case 0:
+                                    return balances.c.a;
+                                case 1:
+                                    return balances.c.b;
+                                case 2:
+                                    return balances.c.a.subtract(balances.c.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         case 4:
-                            return balances.d.b;
+                            switch (side) {
+                                case 0:
+                                    return balances.d.a;
+                                case 1:
+                                    return balances.d.b;
+                                case 2:
+                                    return balances.d.a.subtract(balances.d.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         case 5:
-                            return balances.e.b;
+                            switch (side) {
+                                case 0:
+                                    return balances.e.a;
+                                case 1:
+                                    return balances.e.b;
+                                case 2:
+                                    return balances.e.a.subtract(balances.e.b);
+                                default:
+                                    return BigDecimal.ZERO;
+                            }
                         default:
                             return BigDecimal.ZERO;
                     }
