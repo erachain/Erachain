@@ -2018,6 +2018,8 @@ public class BlockExplorer {
         output.put("balances", balAssets);
         output.put("side", side);
 
+        output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help", langObj));
+
         output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Total Debit", langObj));
         output.put("Label_Left", Lang.getInstance().translateFromLangObj("Left # остаток", langObj));
         output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj("Total Credit", langObj));

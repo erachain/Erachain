@@ -691,6 +691,8 @@ button.white-bgc[disabled]:focus,
 
             output += '</table>';
             output += '<table width="1280" border=0><tr><td align=left>';
+
+            output += '<span style="font-size:1.2em">';
             output += data.Balance.label_Balance_table;
 
             if (data.Balance.side == '0')
@@ -708,6 +710,10 @@ button.white-bgc[disabled]:focus,
             else
                 output +=  ' &nbsp&nbsp <a href ="?address=' + data.address + '&side=2' + get_lang() + '">' + data.Balance.Label_TotalCredit + '</a>';
 
+            output +=  ' &nbsp&nbsp <span id="side-help" style="display:none;"><br>' + data.Balance.Side_Help + '</span>';
+            output +=  ' &nbsp&nbsp <a href ="#" onclick="$(\'#side-help\').toggle();"><span class="glyphicon glyphicon-question-sign"></span></a>';
+
+            output += '</span>';
 
             output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
                 ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
