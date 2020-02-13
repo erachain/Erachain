@@ -1506,7 +1506,8 @@ public class Controller extends Observable {
 
         if (this.status == STATUS_NO_CONNECTIONS) {
             // UPDATE STATUS
-            this.status = STATUS_SYNCHRONIZING;
+            /////this.status = STATUS_SYNCHRONIZING;
+            this.status = STATUS_OK; // возможно была быстрая осечка иначе убивает блок в генераторе и дает "need UPDATE! skip FLUSH BLOCK"
 
             // NOTIFY
             this.setChanged();

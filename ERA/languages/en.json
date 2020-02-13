@@ -628,7 +628,7 @@
 	"Settings": "Settings",
 	"Skin Color": "Skin Color",
 	"Short Info": "Short version",
-	"Side_Help": "Each account has several balance positions: 'Own', 'Debt', 'Hold', 'Spent'. Each balance item has sides: 'Total Debit' - how much was received on this account, 'Balance' - the current balance on the account, 'Total Credit' - how much everything was issued from the account. Moreover, the COMPU asset on the balance position 'Spent' 'Total Debit' - reflects how many bonuses came to the account, and 'Total Credit' - how much was spent on transaction fees.",
+	"Side_Help": "Each account has several balance positions: 'Own', 'Debt', 'Hold', 'Spent'. Each balance item has sides: 'Total Debit' - how much was received on this account, 'Balance' - the current balance on the account, 'Total Credit' - how much everything was issued from the account. Moreover, for COMPU asset on the balance position 'Spent' 'Total Debit' - reflects how many bonuses came to the account, and 'Total Credit' - how much was spent on transaction fees.",
 	"Size": "Size",
 	"Sign": "Sign",
 	"Signature": "Signature",
