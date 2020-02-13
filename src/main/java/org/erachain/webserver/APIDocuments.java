@@ -19,15 +19,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -135,11 +133,11 @@ public class APIDocuments {
     @GET
     @Path("getFile")
     @Produces("application/zip")
-    public Response getFile(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
+    public Response getFile(@Context UriInfo info, @QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
                             @QueryParam("txt") int seqNo_old,
-                            @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
-       JSONObject result = new JSONObject();
-       byte[] resultByte = null;
+                            @QueryParam("name") String name, @QueryParam("download") String downloadParam) {
+        JSONObject result = new JSONObject();
+        byte[] resultByte = null;
         try {
             if (seqNo == 0 && seqNo_old > 0) {
                 seqNo = seqNo_old;
@@ -189,18 +187,6 @@ public class APIDocuments {
                                }
                                // ifdownloadParam
 
-                               if (false) {
-                                   // convert shar to ANSI
-                                   Charset utf8charset = Charset.forName("UTF-8");
-                                   Charset iso88591charset = Charset.forName("ISO-8859-1");
-                                   ByteBuffer inputBuffer = ByteBuffer.wrap(name.getBytes());
-                                   // decode UTF-8
-                                   CharBuffer data1 = utf8charset.decode(inputBuffer);
-                                   // encode ISO-8559-1
-                                   ByteBuffer outputBuffer = iso88591charset.encode(data1);
-                                   byte[] outputData = outputBuffer.array();
-                                   String ss = new String(outputData);
-                               }
                                //  mime TYPE
                                InputStream is = new BufferedInputStream(new ByteArrayInputStream(resultByte));
                                String mm = null;
@@ -215,10 +201,15 @@ public class APIDocuments {
                                if (downloadParam != null) {
 
                                    if (downloadParam.equals("true")) {
+                                       String nameEncode = name.replace(" ", "_");
+                                       try {
+                                           nameEncode = URLEncoder.encode(nameEncode, "UTF-8");
+                                       } catch (Exception e) {
+                                           e.printStackTrace();
+                                       }
                                        return Response.status(200).header("Content-Type", mm)
                                                .header("Access-Control-Allow-Origin", "*")
-                                               ///.header("Content-disposition", "attachment; filename=" + new String(outputData).replace(" ", "_"))
-                                               .header("Content-disposition", "attachment; filename=" + URLEncoder.encode(name.replace(" ", "_")))
+                                               .header("Content-disposition", "attachment; filename=" + nameEncode)
                                                .entity(new ByteArrayInputStream(resultByte))
                                                .build();
                                    }
