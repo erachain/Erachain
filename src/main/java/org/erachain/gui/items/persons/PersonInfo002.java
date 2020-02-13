@@ -32,7 +32,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     public StatusesLibraryPanel statuses_Library_Panel;
     public AccountsLibraryPanel accounts_Library_Panel;
-    public VoushLibraryPanel voush_Library_Panel;
+    public VouchLibraryPanel voush_Library_Panel;
     public PersonOwnerPanel person_Owner_Panel;
     public PersonVouchedPanel person_Vouched_Panel;
     /**
@@ -486,7 +486,7 @@ public class PersonInfo002 extends javax.swing.JPanel {
         jTabbedPane1.add(accounts_Library_Panel);
 
         // vouch panel
-        voush_Library_Panel = new VoushLibraryPanel(issue_record);
+        voush_Library_Panel = new VouchLibraryPanel(issue_record);
         jTabbedPane1.add(voush_Library_Panel);
 
 

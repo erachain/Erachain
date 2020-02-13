@@ -23,7 +23,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class VoushLibraryPanel extends JPanel {
+public class VouchLibraryPanel extends JPanel {
 
     /**
      * view VOUSH PANEL
@@ -34,7 +34,7 @@ public class VoushLibraryPanel extends JPanel {
     private JScrollPane jScrollPane_Tab_Vouches;
     private GridBagConstraints gridBagConstraints;
 
-    public VoushLibraryPanel(Transaction transaction) {
+    public VouchLibraryPanel(Transaction transaction) {
 
         this.setName(Lang.getInstance().translate("Certified"));
         model = new StatementsVouchTableModel(transaction);
