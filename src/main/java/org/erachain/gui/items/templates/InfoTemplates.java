@@ -94,6 +94,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         add(jLabel_Account_Creator, gridBagConstraints);
 
         jTextField_Account_Creator = new MAccoutnTextField(template.getOwner());
+        jTextField_Account_Creator.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
@@ -114,6 +115,7 @@ public class InfoTemplates extends javax.swing.JPanel {
         add(jLabel_Title, gridBagConstraints);
 
         jTextField_Title.setToolTipText("");
+        jTextField_Title.setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 2;
