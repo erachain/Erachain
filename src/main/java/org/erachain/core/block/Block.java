@@ -2002,6 +2002,9 @@ import java.util.*;
             this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
                     totalFee, true, false);
 
+            // учтем что нафоржили
+            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, totalFee, Transaction.BALANCE_SIDE_DEBIT);
+
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && !Controller.getInstance().noCalculated) {
                 if (this.txCalculated == null)

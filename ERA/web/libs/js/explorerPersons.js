@@ -13,11 +13,11 @@ function person_asset(data) {
     output += '<img src="data:image/gif;base64,' + data.person_img + '" width = "350" /></td><td style ="padding-left:20px">';
 
     var sideName;
-    if (data.side == 0)
-        sideName = data.Label_TotalDebit;
     if (data.side == 1)
-        sideName = data.Label_Left;
+        sideName = data.Label_TotalDebit;
     if (data.side == 2)
+        sideName = data.Label_Left;
+    if (data.side == 3)
         sideName = data.Label_TotalCredit;
 
     if (data.sum > 0) {
@@ -42,10 +42,29 @@ function person_asset(data) {
     output += data.Label_asset + ': <a href ="?asset=' +
         data.asset_key + get_lang() + '">[' + data.asset_key + ']' + data.asset_name + '</a><br>';
 
-    output += data.Label_Sides + ': &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=0' + get_lang()
-        + '">' + data.Label_TotalDebit + '</a> &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=1' + get_lang()
-        + '">' + data.Label_Left + '</a> &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=2' + get_lang()
-        + '">' + data.Label_TotalCredit + '</a>';
+    output += '<span style="font-size:1.2em">' + data.Label_Sides + ': &nbsp&nbsp ';
+
+    if (data.side == '1')
+        output +=  ': &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalDebit + '</span></b>';
+    else
+        output +=  ': &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=1' + get_lang()
+                                 + '">' + data.Label_TotalDebit + '</a>';
+
+    if (data.side == '2')
+        output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_Left + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=2' + get_lang()
+                                        + '">' + data.Label_Left + '</a>';
+
+    if (data.side == '3')
+        output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalCredit + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=3' + get_lang()
+                                        + '">' + data.Label_TotalCredit + '</a>';
+
+    output +=  ' &nbsp&nbsp <span id="side-help" style="display:none;"><br>' + data.Side_Help + '</span>';
+    output +=  ' &nbsp&nbsp <a href ="#" onclick="$(\'#side-help\').toggle();"><span class="glyphicon glyphicon-question-sign"></span></a>';
+    output += '</span>';
 
     output += '<br>';
     output += '<br>';

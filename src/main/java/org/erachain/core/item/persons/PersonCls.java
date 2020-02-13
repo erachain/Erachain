@@ -5,6 +5,7 @@ import com.google.common.primitives.Longs;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.item.ItemCls;
+import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.IssueItemMap;
 import org.erachain.datachain.ItemAssetBalanceMap;
@@ -207,55 +208,55 @@ public abstract class PersonCls extends ItemCls {
                     switch (pos) {
                         case 1:
                             switch (side) {
-                                case 0:
+                                case Transaction.BALANCE_SIDE_DEBIT:
                                     return balances.a.a;
-                                case 1:
+                                case Transaction.BALANCE_SIDE_LEFT:
                                     return balances.a.b;
-                                case 2:
+                                case Transaction.BALANCE_SIDE_CREDIT:
                                     return balances.a.a.subtract(balances.a.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 2:
                             switch (side) {
-                                case 0:
+                                case Transaction.BALANCE_SIDE_DEBIT:
                                     return balances.b.a;
-                                case 1:
+                                case Transaction.BALANCE_SIDE_LEFT:
                                     return balances.b.b;
-                                case 2:
+                                case Transaction.BALANCE_SIDE_CREDIT:
                                     return balances.b.a.subtract(balances.b.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 3:
                             switch (side) {
-                                case 0:
+                                case Transaction.BALANCE_SIDE_DEBIT:
                                     return balances.c.a;
-                                case 1:
+                                case Transaction.BALANCE_SIDE_LEFT:
                                     return balances.c.b;
-                                case 2:
+                                case Transaction.BALANCE_SIDE_CREDIT:
                                     return balances.c.a.subtract(balances.c.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 4:
                             switch (side) {
-                                case 0:
+                                case Transaction.BALANCE_SIDE_DEBIT:
                                     return balances.d.a;
-                                case 1:
+                                case Transaction.BALANCE_SIDE_LEFT:
                                     return balances.d.b;
-                                case 2:
+                                case Transaction.BALANCE_SIDE_CREDIT:
                                     return balances.d.a.subtract(balances.d.b);
                                 default:
                                     return BigDecimal.ZERO;
                             }
                         case 5:
                             switch (side) {
-                                case 0:
+                                case Transaction.BALANCE_SIDE_DEBIT:
                                     return balances.e.a;
-                                case 1:
+                                case Transaction.BALANCE_SIDE_LEFT:
                                     return balances.e.b;
-                                case 2:
+                                case Transaction.BALANCE_SIDE_CREDIT:
                                     return balances.e.a.subtract(balances.e.b);
                                 default:
                                     return BigDecimal.ZERO;

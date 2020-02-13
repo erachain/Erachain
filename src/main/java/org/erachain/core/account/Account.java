@@ -679,6 +679,28 @@ public class Account {
 
     }
 
+    public void changeCOMPUBonusBalances(DCSet dcSet, boolean asOrphan, BigDecimal amount, int side) {
+        if (side == 1) {
+            // учтем что нафоржили
+            this.changeBalance(dcSet, asOrphan, -Transaction.FEE_KEY,
+                    amount.negate(), false, false);
+            this.changeBalance(dcSet, !asOrphan, -Transaction.FEE_KEY,
+                    amount.negate(), true, false); // вернем назад баланс в Бонусами
+        } else if (side == 2) {
+            // учтем бонусы
+            this.changeBalance(dcSet, asOrphan, -Transaction.FEE_KEY,
+                    amount.negate(), true, false);
+        } else {
+            // учтем что потратили
+            this.changeBalance(dcSet, !asOrphan, -Transaction.FEE_KEY,
+                    amount.negate(), true, false);
+            this.changeBalance(dcSet, asOrphan, -Transaction.FEE_KEY,
+                    amount.negate(), false, false); // вернем назад баланс в Бонусами
+
+        }
+
+    }
+
     /*
      * public void setLastReference(Long timestamp) {
      * this.setLastReference(timestamp, DBSet.getInstance()); }
@@ -686,7 +708,7 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
-                                    BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
+                                                                    BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
         int actionType = actionType(key, amount_in);
 
