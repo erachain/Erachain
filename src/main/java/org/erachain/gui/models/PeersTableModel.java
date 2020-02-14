@@ -137,7 +137,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                         }
                     }
                 } else {
-                    return res.a.toString() + " " + res.b.toString();
+                    return "" + res.a.toString() + " " + res.b.toString();
                 }
 
             case COLUMN_PINGMC:
@@ -151,7 +151,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 } else if (peer.getPing() > 1000000) {
                     return Lang.getInstance().translate("Waiting...");
                 } else {
-                    return peer.getPing();
+                    return "" + peer.getPing();
                 }
 
             case COLUMN_REILABLE:

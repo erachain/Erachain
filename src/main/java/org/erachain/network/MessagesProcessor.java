@@ -27,8 +27,6 @@ public class MessagesProcessor extends MonitoredThread {
     private static final int QUEUE_LENGTH = 1024 + 256 << (Controller.HARD_WORK >> 1);
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
-    private long unconfigmedMessageTimingAverage;
-
     public MessagesProcessor(Network network) {
 
         this.network = network;
@@ -91,9 +89,9 @@ public class MessagesProcessor extends MonitoredThread {
                 // CREATE RESPONSE WITH SAME ID
                 response.setId(message.getId());
 
-                timeCheck = System.currentTimeMillis() - timeCheck;
+                timeCheck = (System.nanoTime() - timeCheck) / 1000000;
                 if (timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
+                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck + "ms");
                 }
 
                 //SEND BACK TO SENDER
@@ -123,15 +121,6 @@ public class MessagesProcessor extends MonitoredThread {
                 Controller.getInstance().onMessage(message);
                 break;
 
-        }
-
-            onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-        if (onMessageProcessTiming < 999999999999l) {
-            // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            onMessageProcessTiming /= 1000;
-            this.unconfigmedMessageTimingAverage = ((this.unconfigmedMessageTimingAverage << 8)
-                    + onMessageProcessTiming - this.unconfigmedMessageTimingAverage) >> 8;
         }
 
         return;

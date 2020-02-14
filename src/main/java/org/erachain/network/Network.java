@@ -207,12 +207,17 @@ public class Network extends Observable {
         //PASS TO CONTROLLER
         controller.afterDisconnect(peer);
 
-        //NOTIFY OBSERVERS
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));
+        try {
+            // внутри могут быть ошибки отображения
+            //NOTIFY OBSERVERS
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));
 
-        //this.setChanged();
-        //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+            //this.setChanged();
+            //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {

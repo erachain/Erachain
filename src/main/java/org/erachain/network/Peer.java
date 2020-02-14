@@ -702,8 +702,8 @@ public class Peer extends MonitoredThread {
         }
 
         /// этот метод блокирует доступ к пиру - и его нельзя делать внутри synchronized методов
-        this.setName(this.getName()
-                + " banned for " + banForMinutes + " " + message);
+        //// this.setName(this.getName()
+        ////         + " banned for " + banForMinutes + " " + message);
 
         banMessage = message;
 
@@ -791,7 +791,7 @@ public class Peer extends MonitoredThread {
         this.pinger.close();
         this.startReading.offer(-1);
         this.close("halt");
-        this.setName(this.getName() + " halted");
+        ////this.setName(this.getName() + " halted"); // может блокировать
 
     }
 
