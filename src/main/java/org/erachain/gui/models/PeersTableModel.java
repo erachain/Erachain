@@ -36,7 +36,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
     public PeersTableModel() {
         super(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
                         "Online Time", "Version"},
-                null, false);
+                new Boolean[]{true, true, true, true, true, true, true, false}, false);
 
         addObservers();
 
@@ -165,7 +165,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 return DateTimeFormat.timeAgo(peer.getConnectionTime());
 
             case COLUMN_VERSION:
-                return peer.getVersion() + " b: " + DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd", "UTC");
+                return peer.getVersion() + " " + DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd", "UTC");
 
         }
 
