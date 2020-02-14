@@ -170,8 +170,11 @@ public class PeersResource {
         if (Controller.getInstance().getPeerHWeights().containsKey(peer)) {
             o.put("height", Controller.getInstance().getHWeightOfPeer(peer));
         }
+
         o.put("version", peer.getVersion());
-        o.put("buildTime", DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd HH:mm:ss z", "UTC"));
+        o.put("buildTime", peer.getBuildTime() > 0 ?
+                DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd", "UTC")
+                : "");
         if (peer.isPinger()) {
             o.put("ping", peer.getPing());
         }
