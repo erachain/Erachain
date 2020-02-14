@@ -12,6 +12,8 @@ function person_asset(data) {
 
     output += '<img src="data:image/gif;base64,' + data.person_img + '" width = "350" /></td><td style ="padding-left:20px">';
 
+    output += '<h2><center>' + data.label_Balance_Pos + '</center></h2>';
+
     var sideName;
     if (data.side == 1)
         sideName = data.Label_TotalDebit;
@@ -19,6 +21,8 @@ function person_asset(data) {
         sideName = data.Label_Left;
     if (data.side == 3)
         sideName = data.Label_TotalCredit;
+    if (data.side == 4)
+        sideName = data.Label_TotalForged;
 
     if (data.sum > 0) {
         output += '<b><span style="font-size:2em; color:#0cb70c"> &nbsp&nbsp ' + sideName + '</span></b><br>';

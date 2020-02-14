@@ -450,47 +450,47 @@ public class Account {
         switch (position) {
             case TransactionAmount.ACTION_SEND:
                 switch (side) {
-                    case 0:
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
                         return balance.a.a;
-                    case 1:
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
                         return balance.a.b;
-                    case 2:
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
                         return balance.a.a.subtract(balance.a.b);
                 }
             case TransactionAmount.ACTION_DEBT:
                 switch (side) {
-                    case 0:
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
                         return balance.b.a;
-                    case 1:
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
                         return balance.b.b;
-                    case 2:
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
                         return balance.b.a.subtract(balance.b.b);
                 }
             case TransactionAmount.ACTION_HOLD:
                 switch (side) {
-                    case 0:
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
                         return balance.c.a;
-                    case 1:
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
                         return balance.c.b;
-                    case 2:
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
                         return balance.c.a.subtract(balance.c.b);
                 }
             case TransactionAmount.ACTION_SPEND:
                 switch (side) {
-                    case 0:
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
                         return balance.d.a;
-                    case 1:
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
                         return balance.d.b;
-                    case 2:
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
                         return balance.d.a.subtract(balance.d.b);
                 }
             case TransactionAmount.ACTION_PLEDGE:
                 switch (side) {
-                    case 0:
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
                         return balance.e.a;
-                    case 1:
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
                         return balance.e.b;
-                    case 2:
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
                         return balance.e.a.subtract(balance.e.b);
                 }
         }
@@ -722,14 +722,15 @@ public class Account {
         if (side == Transaction.BALANCE_SIDE_DEBIT) {
             // БОНУСЫ всего полученные
             return balance.d.a;
-        } else if (side == Transaction.BALANCE_SIDE_LEFT) {
+        } else if (side == Transaction.BALANCE_SIDE_CREDIT) {
             // все потрачено на комиссии
             return balance.d.b;
-        } else {
+        } else if (side == Transaction.BALANCE_SIDE_FORGED) {
             // всего нафоржено
-            return balance.d.b;
+            return balance.e.b;
         }
 
+        return balance.e.a;
     }
 
     /*
