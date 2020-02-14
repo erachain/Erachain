@@ -55,6 +55,7 @@ public class Peer extends MonitoredThread {
     private int requestKey = 0;
     private String version = "";
     private long buildDateTime;
+    private String banMessage;
 
     Map<Integer, BlockingQueue<Message>> messages;
 
@@ -293,6 +294,10 @@ public class Peer extends MonitoredThread {
 
     public String getVersion() {
         return version;
+    }
+
+    public String getBanMessage() {
+        return banMessage;
     }
 
     public void setBuildTime(long build) {
@@ -688,8 +693,10 @@ public class Peer extends MonitoredThread {
         }
 
         if (!runed) {
-            if (banForMinutes > this.getBanMinutes())
+            if (banForMinutes > this.getBanMinutes()) {
+                banMessage = message;
                 this.network.afterDisconnect(this, banForMinutes, message);
+            }
 
             return;
         }
@@ -697,6 +704,8 @@ public class Peer extends MonitoredThread {
         /// этот метод блокирует доступ к пиру - и его нельзя делать внутри synchronized методов
         this.setName(this.getName()
                 + " banned for " + banForMinutes + " " + message);
+
+        banMessage = message;
 
         // если там уже было закрыто то не вызывать After
         // или если нужно забанить

@@ -119,11 +119,15 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
             case COLUMN_HEIGHT:
                 Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
                 if (res == null) {
-                    int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
-                    if (banMinutes > 0) {
-                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
-                    } else {
+                    if (peer.isUsed()) {
                         return Lang.getInstance().translate("Waiting...");
+                    } else {
+                        int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
+                        if (banMinutes > 0) {
+                            return "(" + peer.getBanMessage() + ")";
+                        } else {
+                            return Lang.getInstance().translate("Broken");
+                        }
                     }
                 } else {
                     return res.a.toString() + " " + res.b.toString();
