@@ -6,6 +6,7 @@ import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
+import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +57,8 @@ public class Peer extends MonitoredThread {
     private String version = "";
     private long buildDateTime;
     private String banMessage;
+    private Tuple2<Integer, Long> hWeight;
+    private int mute;
 
     Map<Integer, BlockingQueue<Message>> messages;
 
@@ -306,6 +309,22 @@ public class Peer extends MonitoredThread {
 
     public long getBuildTime() {
         return buildDateTime;
+    }
+
+    public Tuple2<Integer, Long> getHWeight() {
+        return hWeight;
+    }
+
+    public void setHWeight(Tuple2<Integer, Long> hWeight) {
+        this.hWeight = hWeight;
+    }
+
+    public int getMute() {
+        return mute;
+    }
+
+    public void setMute(int mute) {
+        this.mute = mute;
     }
 
     public long resetErrors() {

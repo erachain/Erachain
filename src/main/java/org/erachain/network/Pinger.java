@@ -105,7 +105,7 @@ public class Pinger extends Thread {
             HWeightMessage hWeightMessage = (HWeightMessage) response;
             Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
 
-            Controller.getInstance().setWeightOfPeer(peer, hW);
+            peer.setHWeight(hW);
         }
 
         return ping >= 0;

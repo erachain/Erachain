@@ -85,7 +85,6 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -151,8 +150,8 @@ public class Controller extends Observable {
     private byte[] foundMyselfID = new byte[128];
     private byte[] messageMagic;
     private long toOfflineTime;
-    private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>(20, 1);
-    private ConcurrentHashMap<Peer, Integer> peerHWeightMute = new ConcurrentHashMap<Peer, Integer>(20, 1);
+    //private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>(20, 1);
+    //private ConcurrentHashMap<Peer, Integer> peerHWeightMute = new ConcurrentHashMap<Peer, Integer>(20, 1);
 
     public DLSet dlSet; // = DLSet.getInstance();
     private DCSet dcSet; // = DLSet.getInstance();
@@ -484,33 +483,6 @@ public class Controller extends Observable {
         return transactionCreator;
     }
 
-    public Map<Peer, Tuple2<Integer, Long>> getPeerHWeights() {
-        return peerHWeight;
-    }
-
-    public Tuple2<Integer, Long> getHWeightOfPeer(Peer peer) {
-        if (peerHWeight != null && peerHWeight.containsKey(peer)) {
-            return peerHWeight.get(peer);
-        } else {
-            return null;
-        }
-    }
-
-    public void setWeightOfPeer(Peer peer, Tuple2<Integer, Long> hWeight) {
-        if (hWeight != null) {
-            peerHWeight.put(peer, hWeight);
-            Integer countMute = peerHWeightMute.get(peer);
-            if (countMute != null && countMute > 0) {
-                peerHWeightMute.put(peer, peerHWeightMute.get(peer) - 1);
-            } else {
-                peerHWeightMute.remove(peer);
-            }
-        } else {
-            peerHWeight.remove(peer);
-            peerHWeightMute.remove(peer);
-        }
-    }
-
     /**
      * set my getHWeightFull to PEER
      *
@@ -518,16 +490,9 @@ public class Controller extends Observable {
      * @param setMute
      */
     public void resetWeightOfPeer(Peer peer, Integer setMute) {
-        peerHWeight.put(peer, this.blockChain.getHWeightFull(this.dcSet));
+        peer.setHWeight(this.blockChain.getHWeightFull(this.dcSet));
         if (setMute != null)
-            peerHWeightMute.put(peer, setMute);
-
-    }
-
-    public void updateWeightOfPeerMutes(int add) {
-        for (Peer peer : peerHWeightMute.keySet()) {
-            peerHWeightMute.put(peer, peerHWeightMute.get(peer) + add);
-        }
+            peer.setMute(setMute);
 
     }
 
@@ -1541,10 +1506,7 @@ public class Controller extends Observable {
     // used from NETWORK
     public void afterDisconnect(Peer peer) {
 
-        this.peerHWeight.remove(peer);
-        this.peerHWeightMute.remove(peer);
-
-        if (this.peerHWeight.isEmpty()) {
+        if (network.noActivePeers(false)) {
 
             if (this.getToOfflineTime() == 0L) {
                 // SET START OFFLINE TIME
@@ -1603,7 +1565,7 @@ public class Controller extends Observable {
                 }
 
                 // ADD TO LIST
-                this.peerHWeight.put(hWeightMessage.getSender(), hWeightMessage.getHWeight());
+                hWeightMessage.getSender().setHWeight(hWeightMessage.getHWeight());
 
                 // this.checkStatusAndObserve(0);
 
@@ -1668,7 +1630,7 @@ public class Controller extends Observable {
                     }
                     Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
                     Long peerWeight = Long.parseLong(peerIhfo.get("w").toString());
-                    peerHWeight.put(peer, new Tuple2<>(peerHeight, peerWeight));
+                    peer.setHWeight(new Tuple2<>(peerHeight, peerWeight));
                     peer.setVersion(peerIhfo.get("v").toString());
 
                 } catch (Exception e) {
@@ -1793,7 +1755,7 @@ public class Controller extends Observable {
             return true;
         }
 
-        if (this.peerHWeight.isEmpty()) {
+        if (network.noActivePeers(false)) {
             this.status = STATUS_NO_CONNECTIONS;
             return true;
         }
@@ -1954,7 +1916,7 @@ public class Controller extends Observable {
         //blockGenerator.checkWeightPeers();
         Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false, false);
         if (betterPeerHW != null) {
-            Tuple2<Integer, Long> currentHW = getHWeightOfPeer(currentBetterPeer);
+            Tuple2<Integer, Long> currentHW = currentBetterPeer.getHWeight();
             if (currentHW != null && (currentHW.a >= betterPeerHW.a
                     || currentBetterPeer.equals(betterPeerHW.c))) {
                 // новый пир не лучше - продолжим синхронизацию не прерываясь
@@ -2041,7 +2003,7 @@ public class Controller extends Observable {
                 // берем пир который нашли в генераторе при осмотре более сильных цепочек
                 // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
                 // так как тут не подвергаются исследованию точность, как это делается в checkWeightPeers
-                peerHWdata = this.getHWeightOfPeer(blockGenerator.betterPeer);
+                peerHWdata = blockGenerator.betterPeer.getHWeight();
                 if (peerHWdata == null) {
                     // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
                     peerHW = this.getMaxPeerHWeight(shift, false, false);
@@ -2056,7 +2018,7 @@ public class Controller extends Observable {
                 peer = peerHW.c;
                 if (peer != null) {
                     info = "update from MaxHeightPeer:" + peer + " WH: "
-                            + getHWeightOfPeer(peer);
+                            + peer.getHWeight();
                     LOGGER.info(info);
                     this.setChanged();
                     this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate(info)));
@@ -2098,7 +2060,7 @@ public class Controller extends Observable {
 
         } while (!this.isStopping && !isUpToDate);
 
-        if (this.peerHWeight.isEmpty() || peer == null) {
+        if (network.noActivePeers(false) || peer == null) {
             // UPDATE STATUS
             this.status = STATUS_NO_CONNECTIONS;
             // } else if (!this.isUpToDate()) {
@@ -2173,7 +2135,7 @@ public class Controller extends Observable {
         long maxHeight = blockChain.getHeightOnTimestamp(NTP.getTime());
 
         try {
-            for (Peer peer : this.peerHWeight.keySet()) {
+            for (Peer peer : network.getActivePeers(false)) {
                 if (peer.getPing() < 0) {
                     // не использовать пиры которые не в быстром коннекте
                     // - так как иначе они заморозят синхронизацию совсем
@@ -2181,17 +2143,16 @@ public class Controller extends Observable {
                     continue;
                 }
                 if (excludeMute) {
-                    Integer muteCount = peerHWeightMute.get(peer);
-                    if (muteCount != null && muteCount > 0) {
+                    int muteCount = peer.getMute();
+                    if (muteCount > 0) {
                         ///// и не использовать те кому мы заткнули - они данные по Силе блока завышенные дают
                         continue;
                     }
                 }
-                Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
+                Tuple2<Integer, Long> whPeer = peer.getHWeight();
                 if (maxHeight < whPeer.a) {
                     // Этот пир дает цепочку из будущего - не берем его
                     banPeerOnError(peer, "FROM FUTURE: " + whPeer, 5);
-                    this.peerHWeight.remove(peer);
                     continue;
                 }
 
@@ -2217,7 +2178,7 @@ public class Controller extends Observable {
         } else {
             hWeightMy = new Tuple2<Integer, Long>(peerHeight, hWeightMy.b - 10000l);
         }
-        this.peerHWeight.put(peer, hWeightMy);
+        peer.setHWeight(hWeightMy);
         //// blockchainSyncStatusUpdate(this.getMyHeight());
     }
 
