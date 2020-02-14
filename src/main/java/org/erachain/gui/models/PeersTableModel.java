@@ -124,6 +124,19 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 return peer.getAddress().getHostAddress();
 
             case COLUMN_HEIGHT:
+                Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
+                if (res == null) {
+                    int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
+                    if (banMinutes > 0) {
+                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
+                    } else {
+                        return Lang.getInstance().translate("Waiting...");
+                    }
+                } else {
+                    return res.a.toString() + " " + res.b.toString();
+                }
+
+            case COLUMN_PINGMC:
                 if (!peer.isUsed()) {
                     int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
                     if (banMinutes > 0) {
@@ -131,17 +144,6 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                     } else {
                         return Lang.getInstance().translate("Broken");
                     }
-                }
-                Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
-                if (res == null) {
-                    return Lang.getInstance().translate("Waiting...");
-                } else {
-                    return res.a.toString() + " " + res.b.toString();
-                }
-
-            case COLUMN_PINGMC:
-                if (!peer.isUsed()) {
-                    return Lang.getInstance().translate("Broken");
                 } else if (peer.getPing() > 1000000) {
                     return Lang.getInstance().translate("Waiting...");
                 } else {
