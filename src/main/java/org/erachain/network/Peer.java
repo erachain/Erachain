@@ -312,11 +312,17 @@ public class Peer extends MonitoredThread {
     }
 
     public Tuple2<Integer, Long> getHWeight() {
+        if (hWeight == null)
+            hWeight = new Tuple2<Integer, Long>(0, 0L);
+
         return hWeight;
     }
 
     public void setHWeight(Tuple2<Integer, Long> hWeight) {
-        this.hWeight = hWeight;
+        if (hWeight == null)
+            this.hWeight = new Tuple2<Integer, Long>(0, 0L);
+        else
+            this.hWeight = hWeight;
     }
 
     public int getMute() {

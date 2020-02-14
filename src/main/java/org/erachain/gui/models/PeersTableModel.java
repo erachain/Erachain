@@ -125,7 +125,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
 
             case COLUMN_HEIGHT:
                 Tuple2<Integer, Long> res = peer.getHWeight();
-                if (res == null) {
+                if (res == null || res.a == 0) {
                     if (peer.isUsed()) {
                         return Lang.getInstance().translate("Waiting...");
                     } else {
