@@ -87,11 +87,7 @@ public class Pinger extends Thread {
             if (this.ping < -10 -20/(1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
 
-                if (true) {
-                    this.ping = Integer.MAX_VALUE;
-                    return true;
-                }
-
+                // И если тут не оборать, то на этапе получения подписей по блокам тогда разрыв будет - ответ не получается
                 this.peer.ban("on PING FAILES");
             }
 
