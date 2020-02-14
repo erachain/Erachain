@@ -51,6 +51,7 @@ public abstract class Transaction implements ExplorerJsonLine {
     public static final int BALANCE_SIDE_DEBIT = 1;
     public static final int BALANCE_SIDE_LEFT = 2;
     public static final int BALANCE_SIDE_CREDIT = 3;
+    public static final int BALANCE_SIDE_FORGED = 4;
 
     // toBYTE & PARSE fields for different DEALs
     public static final int FOR_MYPACK = 1; // not use this.timestamp & this.feePow
@@ -1370,7 +1371,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
             // учтем что получили бонусы
-            invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_LEFT);
+            invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
@@ -1398,7 +1399,7 @@ public abstract class Transaction implements ExplorerJsonLine {
             issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
 
             // учтем что получили бонусы
-            issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_LEFT);
+            issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
@@ -1418,7 +1419,7 @@ public abstract class Transaction implements ExplorerJsonLine {
                     BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
 
             // учтем что получили бонусы
-            issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_LEFT);
+            issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);

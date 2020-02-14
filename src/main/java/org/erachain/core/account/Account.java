@@ -679,24 +679,55 @@ public class Account {
 
     }
 
-    public void changeCOMPUBonusBalances(DCSet dcSet, boolean asOrphan, BigDecimal amount, int side) {
-        if (side == 1) {
-            // учтем что нафоржили
-            this.changeBalance(dcSet, asOrphan, -Transaction.FEE_KEY,
-                    amount.negate(), false, false);
-            this.changeBalance(dcSet, !asOrphan, -Transaction.FEE_KEY,
-                    amount.negate(), true, false); // вернем назад баланс в Бонусами
-        } else if (side == 2) {
-            // учтем бонусы
-            this.changeBalance(dcSet, asOrphan, -Transaction.FEE_KEY,
-                    amount.negate(), true, false);
-        } else {
-            // учтем что потратили
-            this.changeBalance(dcSet, !asOrphan, -Transaction.FEE_KEY,
-                    amount.negate(), true, false);
-            this.changeBalance(dcSet, asOrphan, -Transaction.FEE_KEY,
-                    amount.negate(), false, false); // вернем назад баланс в Бонусами
+    public void changeCOMPUBonusBalances(DCSet dcSet, boolean substract, BigDecimal amount, int side) {
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                balance = dcSet.getAssetBalanceMap().get(getShortAddressBytes(), Transaction.FEE_KEY);
 
+        if (side == Transaction.BALANCE_SIDE_DEBIT) {
+            // учтем Всего бонусы
+            // это Баланс 4-й сторона 1
+            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    balance.a, balance.b, balance.c,
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(balance.d.a.subtract(amount), balance.d.b)
+                            : new Tuple2<BigDecimal, BigDecimal>(balance.d.a.add(amount), balance.d.b),
+                    balance.e);
+        } else if (side == Transaction.BALANCE_SIDE_CREDIT) {
+            // учтем что Всего потратили
+            // это Баланс 4-й сторона 1
+            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    balance.a, balance.b, balance.c,
+                    !substract ? new Tuple2<BigDecimal, BigDecimal>(balance.d.a, balance.d.b.subtract(amount))
+                            : new Tuple2<BigDecimal, BigDecimal>(balance.d.a, balance.d.b.add(amount)),
+                    balance.e);
+        } else if (side == Transaction.BALANCE_SIDE_FORGED) {
+            // учтем что Всего нафоржили
+            // это Баланс 5-й
+            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    balance.a, balance.b, balance.c, balance.d,
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(balance.e.a, balance.e.b.subtract(amount))
+                            : new Tuple2<BigDecimal, BigDecimal>(balance.e.a, balance.e.b.add(amount))
+            );
+        } else {
+            return;
+        }
+
+        dcSet.getAssetBalanceMap().put(getShortAddressBytes(), Transaction.FEE_KEY, balance);
+
+    }
+
+    public BigDecimal getCOMPUBonusBalances(DCSet dcSet, boolean substract, BigDecimal amount, int side) {
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                balance = dcSet.getAssetBalanceMap().get(getShortAddressBytes(), Transaction.FEE_KEY);
+
+        if (side == Transaction.BALANCE_SIDE_DEBIT) {
+            // БОНУСЫ всего полученные
+            return balance.d.a;
+        } else if (side == Transaction.BALANCE_SIDE_LEFT) {
+            // все потрачено на комиссии
+            return balance.d.b;
+        } else {
+            // всего нафоржено
+            return balance.d.b;
         }
 
     }

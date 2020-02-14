@@ -2003,7 +2003,7 @@ import java.util.*;
                     totalFee, true, false);
 
             // учтем что нафоржили
-            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, totalFee, Transaction.BALANCE_SIDE_DEBIT);
+            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, totalFee, Transaction.BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && !Controller.getInstance().noCalculated) {

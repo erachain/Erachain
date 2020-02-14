@@ -62,6 +62,15 @@ function person_asset(data) {
         output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=3' + get_lang()
                                         + '">' + data.Label_TotalCredit + '</a>';
 
+    if (data.hasOwnProperty('Label_TotalForged')) {
+        if (data.side == '4')
+            output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalForged + '</span></b>';
+        else
+            output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=4' + get_lang()
+                                           + '">' + data.Label_TotalForged + '</a>';
+   }
+
+
     output +=  ' &nbsp&nbsp <span id="side-help" style="display:none;"><br>' + data.Side_Help + '</span>';
     output +=  ' &nbsp&nbsp <a href ="#" onclick="$(\'#side-help\').toggle();"><span class="glyphicon glyphicon-question-sign"></span></a>';
     output += '</span>';

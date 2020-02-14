@@ -1387,12 +1387,23 @@ public class BlockExplorer {
         output.put("Label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
         output.put("Label_person", Lang.getInstance().translateFromLangObj("Person", langObj));
 
+        output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
+        output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
+
         output.put("Label_Sides", Lang.getInstance().translateFromLangObj("Balance Sides", langObj));
         output.put("Side_Help", Lang.getInstance().translateFromLangObj("Side_Help", langObj));
         if (assetKey.equals(Transaction.FEE_KEY)) {
-            output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Bonus", langObj));
-            output.put("Label_Left", Lang.getInstance().translateFromLangObj("Forged", langObj));
-            output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj("Spend", langObj));
+            if (position == TransactionAmount.ACTION_SPEND) {
+                output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Bonus", langObj));
+                output.put("Label_Left", Lang.getInstance().translateFromLangObj("Spend", langObj));
+                output.put("Label_TotalCredit", Lang.getInstance().translateFromLangObj("Bonus-Spend", langObj));
+                output.put("Label_TotalForged", Lang.getInstance().translateFromLangObj("Forged", langObj));
+                if (side == 4) {
+                    // Это запрос на баланса Нафоржили - он в 5-й позиции на стороне 2
+                    position = 5;
+                    side = 2;
+                }
+            }
         } else {
             output.put("Label_TotalDebit", Lang.getInstance().translateFromLangObj("Total Debit", langObj));
             output.put("Label_Left", Lang.getInstance().translateFromLangObj("Left # остаток", langObj));
@@ -1400,8 +1411,6 @@ public class BlockExplorer {
         }
 
 
-        output.put("Label_denied", Lang.getInstance().translateFromLangObj("DENIED", langObj));
-        output.put("Label_sum", Lang.getInstance().translateFromLangObj("SUM", langObj));
         BigDecimal sum = PersonCls.getBalance(personKey, assetKey, position, side);
         output.put("sum", sum);
 
