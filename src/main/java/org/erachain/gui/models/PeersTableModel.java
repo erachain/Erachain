@@ -165,7 +165,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 return DateTimeFormat.timeAgo(peer.getConnectionTime());
 
             case COLUMN_VERSION:
-                return Controller.getInstance().getVersionOfPeer(peer).getA();
+                return peer.getVersion() + " b: " + DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd HH:mm:ss z", "UTC");
 
         }
 

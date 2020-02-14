@@ -53,6 +53,8 @@ public class Peer extends MonitoredThread {
     private boolean runed;
     private int errors;
     private int requestKey = 0;
+    private String version = "";
+    private long buildDateTime;
 
     Map<Integer, BlockingQueue<Message>> messages;
 
@@ -275,7 +277,7 @@ public class Peer extends MonitoredThread {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Peer) {
-            return Arrays.equals(((Peer)obj).getAddress().getAddress(),
+            return Arrays.equals(((Peer) obj).getAddress().getAddress(),
                     address.getAddress());
         }
         return false;
@@ -283,6 +285,22 @@ public class Peer extends MonitoredThread {
 
     public int getErrors() {
         return this.errors;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setBuildTime(long build) {
+        this.buildDateTime = build;
+    }
+
+    public long getBuildTime() {
+        return buildDateTime;
     }
 
     public long resetErrors() {

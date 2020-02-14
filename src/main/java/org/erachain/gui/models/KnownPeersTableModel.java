@@ -5,18 +5,21 @@ import org.erachain.database.PeerMap.PeerInfo;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class KnownPeersTableModel extends AbstractTableModel implements Observer {
 
@@ -155,7 +158,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
                 return DateTimeFormat.timeAgo(peer.getConnectionTime());
 
             case COLUMN_VERSION:
-                return Controller.getInstance().getVersionOfPeer(peer).getA();
+                return peer.getVersion() + " b: " + DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd HH:mm:ss z", "UTC");
         }
         return null;
 

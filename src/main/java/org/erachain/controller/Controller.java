@@ -151,7 +151,6 @@ public class Controller extends Observable {
     private byte[] messageMagic;
     private long toOfflineTime;
     private ConcurrentHashMap<Peer, Tuple2<Integer, Long>> peerHWeight = new ConcurrentHashMap<Peer, Tuple2<Integer, Long>>(20, 1);
-    private ConcurrentHashMap<Peer, Pair<String, Long>> peersVersions = new ConcurrentHashMap<Peer, Pair<String, Long>>(20, 1);
     private ConcurrentHashMap<Peer, Integer> peerHWeightMute = new ConcurrentHashMap<Peer, Integer>(20, 1);
 
     public DLSet dlSet; // = DLSet.getInstance();
@@ -529,28 +528,6 @@ public class Controller extends Observable {
             peerHWeightMute.put(peer, peerHWeightMute.get(peer) + add);
         }
 
-    }
-
-
-    /*
-     * public static Controller getInstance(boolean withObserver, boolean
-     * dynamicGUI) { if (instance == null) { instance = new Controller();
-     * instance.setDCSetWithObserver(withObserver);
-     * instance.setDynamicGUI(dynamicGUI); }
-     *
-     * return instance; }
-     *
-     */
-
-    public Map<Peer, Pair<String, Long>> getPeersVersions() {
-        return peersVersions;
-    }
-
-    public Pair<String, Long> getVersionOfPeer(Peer peer) {
-        if (peersVersions != null && peersVersions.containsKey(peer)) {
-            return peersVersions.get(peer);
-        }
-        return new Pair<String, Long>("", 0L);
     }
 
     public int getStatus() {
@@ -1573,7 +1550,6 @@ public class Controller extends Observable {
     public void afterDisconnect(Peer peer) {
 
         this.peerHWeight.remove(peer);
-        this.peersVersions.remove(peer);
         this.peerHWeightMute.remove(peer);
 
         if (this.peerHWeight.isEmpty()) {
@@ -1688,8 +1664,9 @@ public class Controller extends Observable {
                 VersionMessage versionMessage = (VersionMessage) message;
 
                 // ADD TO LIST
-                this.peersVersions.put(versionMessage.getSender(), new Pair<String, Long>(
-                        versionMessage.getStrVersion(), versionMessage.getBuildDateTime()));
+                Peer peer = versionMessage.getSender();
+                peer.setVersion(versionMessage.getStrVersion());
+                peer.setBuildTime(versionMessage.getBuildDateTime());
 
                 break;
 
