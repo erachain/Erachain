@@ -55,6 +55,7 @@ import org.erachain.utils.*;
 import org.erachain.webserver.Status;
 import org.erachain.webserver.WebService;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.mapdb.DB;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
@@ -1435,29 +1436,20 @@ public class Controller extends Observable {
         }
 
         // SEND VERSION MESSAGE
+        JSONObject peerInfo = new JSONObject();
+        peerInfo.put("v", Controller.getVersion(true));
+        Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
+        peerInfo.put("h", myHWeight.a);
+        peerInfo.put("w", myHWeight.b);
+
+        // CheckPointSign
+        peerInfo.put("cps", Base58.encode(dcSet.getBlocksHeadsMap()
+                .get(BlockChain.getCheckPoint(dcSet, false)).signature));
+
         if (!peer.directSendMessage(
-                MessageFactory.getInstance().createVersionMessage(Controller.getVersion(true), buildTimestamp))) {
+                MessageFactory.getInstance().createVersionMessage(peerInfo.toString(), buildTimestamp))) {
             peer.ban(network.banForActivePeersCounter(), "connection - break on Version send");
             return;
-        }
-
-        // TODO в новой версии 4.11.9 включить это обратно
-        if (false) {
-            // CHECK GENESIS BLOCK on CONNECT
-            Message mess = MessageFactory.getInstance()
-                    .createGetHeadersMessage(this.blockChain.getGenesisBlock().getSignature());
-            SignaturesMessage response = (SignaturesMessage) peer.getResponse(mess, 10000); // AWAIT!
-
-            if (this.isStopping)
-                return;
-            if (response == null) {
-                peer.ban(network.banForActivePeersCounter(), "connection - break on POINTs get");
-                return;
-            } else if (response.getSignatures().isEmpty()) {
-                // NO
-                peer.ban(Synchronizer.BAN_BLOCK_TIMES << 1, "connection - wrong GENESIS BLOCK");
-                return;
-            }
         }
 
         if (false && BlockChain.TEST_MODE) {
@@ -1662,11 +1654,26 @@ public class Controller extends Observable {
             case Message.VERSION_TYPE:
 
                 VersionMessage versionMessage = (VersionMessage) message;
+                Peer peer = versionMessage.getSender();
+                peer.setBuildTime(versionMessage.getBuildDateTime());
 
                 // ADD TO LIST
-                Peer peer = versionMessage.getSender();
-                peer.setVersion(versionMessage.getStrVersion());
-                peer.setBuildTime(versionMessage.getBuildDateTime());
+                String infoStr = versionMessage.getStrVersion();
+                try {
+                    JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
+                    byte[] checkPointSign = Base58.decode(peerIhfo.get("cps").toString());
+                    if (!dcSet.getBlockSignsMap().contains(checkPointSign)) {
+                        banPeerOnError(peer, "NOT FOUND CHECKPOINT!", 30);
+                        return;
+                    }
+                    Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
+                    Long peerWeight = Long.parseLong(peerIhfo.get("w").toString());
+                    peerHWeight.put(peer, new Tuple2<>(peerHeight, peerWeight));
+                    peer.setVersion(peerIhfo.get("v").toString());
+
+                } catch (Exception e) {
+                    peer.setVersion(infoStr);
+                }
 
                 break;
 
@@ -2010,7 +2017,7 @@ public class Controller extends Observable {
         // Block lastBlock = getLastBlock();
         // int lastTrueBlockHeight = this.getMyHeight() -
         // Settings.BLOCK_MAX_SIGNATURES;
-        int checkPointHeight = BlockChain.getCheckPoint(dcSet);
+        int checkPointHeight = BlockChain.getCheckPoint(dcSet, true);
 
         Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
 
