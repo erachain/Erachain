@@ -86,6 +86,12 @@ public class Pinger extends Thread {
             // чем меньше пиров на связи тем дольше пингуем перед разрывом
             if (this.ping < -10 -20/(1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
+
+                if (true) {
+                    this.ping = Integer.MAX_VALUE;
+                    return true;
+                }
+
                 this.peer.ban("on PING FAILES");
             }
 
