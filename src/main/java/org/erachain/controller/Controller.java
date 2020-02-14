@@ -1506,8 +1506,16 @@ public class Controller extends Observable {
 
         if (this.status == STATUS_NO_CONNECTIONS) {
             // UPDATE STATUS
-            /////this.status = STATUS_SYNCHRONIZING;
-            this.status = STATUS_OK; // возможно была быстрая осечка иначе убивает блок в генераторе и дает "need UPDATE! skip FLUSH BLOCK"
+            int myHeight = getMyHeight();
+            if (blockChain.getTimestamp(myHeight)
+                    + (BlockChain.GENERATING_MIN_BLOCK_TIME_MS(myHeight) >> 1)
+                    < NTP.getTime()) {
+                // мы не во воремени - надо синхронизироваться
+                this.status = STATUS_SYNCHRONIZING;
+            } else {
+                // время не ушло вперед - можно не синронизироваться
+                this.status = STATUS_OK;
+            }
 
             // NOTIFY
             this.setChanged();
@@ -2196,10 +2204,10 @@ public class Controller extends Observable {
                     }
                 }
                 Tuple2<Integer, Long> whPeer = this.peerHWeight.get(peer);
-                // TODO потом убрать +1 когда перейдем на новый +30 сдвиг - а нет цепочка наша встанет и будет ждать!
                 if (maxHeight < whPeer.a) {
                     // Этот пир дает цепочку из будущего - не берем его
-                    this.resetWeightOfPeer(peer, 4);
+                    banPeerOnError(peer, "FROM FUTURE: " + whPeer, 5);
+                    this.peerHWeight.remove(peer);
                     continue;
                 }
 
