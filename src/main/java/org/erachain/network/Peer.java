@@ -32,9 +32,10 @@ public class Peer extends MonitoredThread {
     private final static boolean USE_MONITOR = false;
     /**
      * <..... - receive просроченный ответ на Мо запрос<br>
-     *    see -  org.erachain.network.message.Message#viewPref(boolean)
+     * see -  org.erachain.network.message.Message#viewPref(boolean)
      */
-    private final static boolean logPings = true; // "185.195.26.245"
+    private final static boolean LOG_GET_HWEIGHT_TYPE = true; // "185.195.26.245"
+    private byte[] DEBUG_PEER = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245};
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getSimpleName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
@@ -469,8 +470,11 @@ public class Peer extends MonitoredThread {
 
                 if (USE_MONITOR) this.setMonitorStatus("in.message process");
 
-                if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
+                if (LOG_GET_HWEIGHT_TYPE && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
                 ) {
+                    if (Arrays.equals(address.getAddress(), DEBUG_PEER)) {
+                        boolean debug = true;
+                    }
                     LOGGER.debug(this + message.viewPref(false) + message);
                 }
 
@@ -480,9 +484,9 @@ public class Peer extends MonitoredThread {
                     if (!this.messages.containsKey(message.getId())) {
                         // просроченное сообщение
                         // это ответ на наш запрос с ID
-                        if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
+                        if (LOG_GET_HWEIGHT_TYPE && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
                         ) {
-                            LOGGER.debug(this + " <<late " + message);
+                            LOGGER.debug(this + " << LATE " + message);
                         }
                         continue;
                     }
@@ -547,6 +551,11 @@ public class Peer extends MonitoredThread {
     }
 
     public boolean offerMessage(Message message) {
+        if (LOG_GET_HWEIGHT_TYPE && message.getType() == Message.HWEIGHT_TYPE) {
+            boolean isSend = this.sender.offer(message);
+            LOGGER.debug(message.viewPref(true) + message + (isSend ? "" : " NOT SEND "));
+            return isSend;
+        }
         return this.sender.offer(message);
     }
 

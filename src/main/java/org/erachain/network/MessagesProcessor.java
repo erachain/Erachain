@@ -19,6 +19,7 @@ public class MessagesProcessor extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE ? true : false;
+    private boolean LOG_GET_HWEIGHT_TYPE = true;
     private boolean runned;
 
     private Network network;
@@ -83,6 +84,10 @@ public class MessagesProcessor extends MonitoredThread {
 
             case Message.GET_HWEIGHT_TYPE:
 
+                if (LOG_GET_HWEIGHT_TYPE) {
+                    LOGGER.debug("prepare: " + message.viewPref(true) + message);
+                }
+
                 Fun.Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
                 if (HWeight == null)
                     HWeight = new Fun.Tuple2<Integer, Long>(-1, -1L);
@@ -97,7 +102,7 @@ public class MessagesProcessor extends MonitoredThread {
                 }
 
                 //SEND BACK TO SENDER
-                message.getSender().offerMessage(response);
+                message.getSender().sendHWeight(response);
 
                 break;
 
@@ -152,6 +157,8 @@ public class MessagesProcessor extends MonitoredThread {
                 break;
             } catch (InterruptedException e) {
                 break;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
 
         }

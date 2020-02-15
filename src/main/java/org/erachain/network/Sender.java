@@ -27,7 +27,7 @@ public class Sender extends MonitoredThread {
     private final static boolean logPings = true;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class.getSimpleName());
-    private static final int QUEUE_LENGTH = 256 << (Controller.HARD_WORK >> 1);
+    private static final int QUEUE_LENGTH = 1024 + (256 << (Controller.HARD_WORK >> 1));
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
 
     private Peer peer;
