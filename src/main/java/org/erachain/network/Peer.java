@@ -109,7 +109,7 @@ public class Peer extends MonitoredThread {
             // START PINGER
             this.pinger = new Pinger(this);
 
-            //START COMMUNICATON THREAD
+            //START COMMUNICATION THREAD
             this.start();
 
             // IT is STARTED
