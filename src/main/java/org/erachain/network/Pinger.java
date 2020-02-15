@@ -119,11 +119,6 @@ public class Pinger extends Thread {
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
 
-        int sleepTimestep = 100;
-        int sleepsteps = DEFAULT_PING_TIMEOUT / sleepTimestep;
-        int sleepStepTimeCounter;
-        boolean resultSend;
-
         Integer deal = 0;
         while (this.peer.network.run) {
 

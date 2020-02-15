@@ -1695,6 +1695,8 @@ public class Controller extends Observable {
 
             default:
 
+                LOGGER.debug(" UNKNOWN: " + message.viewPref(false) + message);
+
                 Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(dcSet);
                 if (HWeight == null)
                     HWeight = new Tuple2<Integer, Long>(-1, -1L);
