@@ -121,25 +121,18 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
                 if (res == null || res.a == 0) {
                     if (peer.isUsed()) {
                         return Lang.getInstance().translate("Waiting...");
-                    } else {
-                        int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
-                        if (banMinutes > 0) {
-                            return "(" + peer.getBanMessage() + ")";
-                        } else {
-                            return Lang.getInstance().translate("Broken");
-                        }
                     }
-                } else {
-                    return res.a.toString() + " " + res.b.toString();
+                    return Lang.getInstance().translate("");
                 }
+                return res.a.toString() + " " + res.b.toString() + (peer.getMute() > 0 ? " mute:" + peer.getMute() : "");
 
             case COLUMN_PINGMC:
                 if (!peer.isUsed()) {
                     int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
                     if (banMinutes > 0) {
-                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
+                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m" + " (" + peer.getBanMessage() + ")";
                     } else {
-                        return Lang.getInstance().translate("Broken");
+                        return Lang.getInstance().translate("Broken") + " (" + peer.getBanMessage() + ")";
                     }
                 } else if (peer.getPing() > 1000000) {
                     return Lang.getInstance().translate("Waiting...");

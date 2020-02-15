@@ -1408,8 +1408,7 @@ public class Controller extends Observable {
         peerInfo.put("w", myHWeight.b);
 
         // CheckPointSign
-        peerInfo.put("cps", Base58.encode(dcSet.getBlocksHeadsMap()
-                .get(BlockChain.getCheckPoint(dcSet, false)).signature));
+        peerInfo.put("cps", Base58.encode(blockChain.getMyHardCheckPointSign()));
 
         if (!peer.directSendMessage(
                 MessageFactory.getInstance().createVersionMessage(peerInfo.toString(), buildTimestamp))) {
@@ -1623,8 +1622,7 @@ public class Controller extends Observable {
                 String infoStr = versionMessage.getStrVersion();
                 try {
                     JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
-                    byte[] checkPointSign = Base58.decode(peerIhfo.get("cps").toString());
-                    if (!dcSet.getBlockSignsMap().contains(checkPointSign)) {
+                    if (blockChain.validageHardCheckPointPeerSign(peerIhfo.get("cps").toString())) {
                         banPeerOnError(peer, "NOT FOUND CHECKPOINT!", 30);
                         return;
                     }
@@ -1755,7 +1753,7 @@ public class Controller extends Observable {
             return true;
         }
 
-        if (network.noActivePeers(false)) {
+        if (network != null && network.noActivePeers(false)) {
             this.status = STATUS_NO_CONNECTIONS;
             return true;
         }

@@ -786,6 +786,26 @@ public class BlockChain {
         return heightCheckPoint;
     }
 
+    public byte[] getMyHardCheckPointSign() {
+        byte[] mySign;
+        if (CHECKPOINT.a > 1) {
+            return CHECKPOINT.b;
+        } else {
+            return genesisBlock.getSignature();
+        }
+    }
+
+    public boolean validageHardCheckPointPeerSign(String peerSign) {
+        byte[] mySign;
+        if (CHECKPOINT.a > 1) {
+            mySign = CHECKPOINT.b;
+        } else {
+            mySign = genesisBlock.getSignature();
+        }
+
+        return Arrays.equals(mySign, Base58.decode(peerSign));
+    }
+
     public boolean isPeerTrusted(Peer peer) {
         return trustedPeers.contains(peer.getAddress().getHostAddress());
     }
