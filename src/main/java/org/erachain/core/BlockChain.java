@@ -796,14 +796,7 @@ public class BlockChain {
     }
 
     public boolean validageHardCheckPointPeerSign(String peerSign) {
-        byte[] mySign;
-        if (CHECKPOINT.a > 1) {
-            mySign = CHECKPOINT.b;
-        } else {
-            mySign = genesisBlock.getSignature();
-        }
-
-        return Arrays.equals(mySign, Base58.decode(peerSign));
+        return Arrays.equals(getMyHardCheckPointSign(), Base58.decode(peerSign));
     }
 
     public boolean isPeerTrusted(Peer peer) {

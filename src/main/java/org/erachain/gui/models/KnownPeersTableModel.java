@@ -132,7 +132,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
                     if (banMinutes > 0) {
                         return Lang.getInstance().translate("Banned") + " " + banMinutes + "m" + " (" + peer.getBanMessage() + ")";
                     } else {
-                        return Lang.getInstance().translate("Broken") + " (" + peer.getBanMessage() + ")";
+                        return Lang.getInstance().translate("Broken") + (peer.getBanMessage() == null ? "" : " (" + peer.getBanMessage() + ")");
                     }
                 } else if (peer.getPing() > 1000000) {
                     return Lang.getInstance().translate("Waiting...");

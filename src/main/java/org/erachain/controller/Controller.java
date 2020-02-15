@@ -1622,7 +1622,7 @@ public class Controller extends Observable {
                 String infoStr = versionMessage.getStrVersion();
                 try {
                     JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
-                    if (blockChain.validageHardCheckPointPeerSign(peerIhfo.get("cps").toString())) {
+                    if (!blockChain.validageHardCheckPointPeerSign(peerIhfo.get("cps").toString())) {
                         banPeerOnError(peer, "NOT FOUND CHECKPOINT!", 30);
                         return;
                     }
