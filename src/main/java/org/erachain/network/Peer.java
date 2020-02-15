@@ -23,14 +23,18 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-/** верт (процесс)
+/**
+ * верт (процесс)
  * вертает общение с внешним пиром - чтение и запись
- *
  */
 public class Peer extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = false;
+    /**
+     * <..... - receive просроченный ответ на Мо запрос<br>
+     *    see -  org.erachain.network.message.Message#viewPref(boolean)
+     */
+    private final static boolean logPings = true; // "185.195.26.245"
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getSimpleName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
@@ -213,8 +217,12 @@ public class Peer extends MonitoredThread {
                 return false;
             }
 
-            this.pinger.setPing(Integer.MAX_VALUE);
-            this.pinger.setName("Pinger-" + this.pinger.getId() + " for: " + this.getName());
+            if (false) {
+                this.pinger.setPing(Integer.MAX_VALUE);
+                this.pinger.setName("Pinger-" + this.pinger.getId() + " for: " + this.getName());
+            } else {
+                this.pinger = new Pinger(this);
+            }
 
         }
 
@@ -269,13 +277,14 @@ public class Peer extends MonitoredThread {
 
     @Override
     public int hashCode() {
-        return new BigInteger(this.address.getAddress()).hashCode();
+        int hash = new BigInteger(this.address.getAddress()).hashCode();
+        return white ? -hash : hash;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Peer) {
-            return Arrays.equals(((Peer)obj).getAddress().getAddress(),
+        if (obj instanceof Peer && obj.hashCode() == hashCode()) {
+            return Arrays.equals(((Peer) obj).getAddress().getAddress(),
                     address.getAddress());
         }
         return false;
@@ -443,6 +452,7 @@ public class Peer extends MonitoredThread {
 
                 if (message == null) {
                     // уже обрабатывали такое сообщение - игнорируем
+                    LOGGER.debug("ALREADY processed: " + message.toString());
                     continue;
                 }
 
@@ -451,7 +461,7 @@ public class Peer extends MonitoredThread {
                     if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 1000
                             || parsePoint > 1009000
                     ) {
-                            LOGGER.debug(this + message.viewPref(false) + message
+                        LOGGER.debug(this + message.viewPref(false) + message
                                 + " PARSE: " + parsePoint + "[us]");
                     }
                     countAlarmMess = System.currentTimeMillis();
@@ -459,26 +469,25 @@ public class Peer extends MonitoredThread {
 
                 if (USE_MONITOR) this.setMonitorStatus("in.message process");
 
+                if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
+                ) {
+                    LOGGER.debug(this + message.viewPref(false) + message);
+                }
+
                 //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
                 if (!message.isRequest() && message.hasId()) {
 
                     if (!this.messages.containsKey(message.getId())) {
                         // просроченное сообщение
                         // это ответ на наш запрос с ID
-                        if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                                && message.getType() != Message.TELEGRAM_TYPE
+                        if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
                         ) {
-                            LOGGER.debug(this + " <... " + message);
+                            LOGGER.debug(this + " <<late " + message);
                         }
                         continue;
                     }
 
                     // это ответ на наш запрос с ID
-                    if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                            && message.getType() != Message.TELEGRAM_TYPE
-                    ) {
-                        LOGGER.debug(this + message.viewPref(false) + message);
-                    }
 
                     try {
 
@@ -498,12 +507,6 @@ public class Peer extends MonitoredThread {
                     }
 
                 } else {
-
-                    if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                            && message.getType() != Message.TELEGRAM_TYPE
-                    ) {
-                        LOGGER.debug(this + message.viewPref(false) + message);
-                    }
 
                     long timeStart = System.currentTimeMillis();
 

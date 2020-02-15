@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = false;
+    private final static boolean logPings = true;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class.getSimpleName());
     private static final int QUEUE_LENGTH = 256 << (Controller.HARD_WORK >> 1);
