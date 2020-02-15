@@ -193,67 +193,71 @@ public class Sender extends MonitoredThread {
             return false;
         }
 
-        if (logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-            LOGGER.debug(this.peer + message.viewPref(true) + message);
-        }
+        int messageType = message.getType();
 
-        if (peer.getPing() < -10 && message.getType() == Message.WIN_BLOCK_TYPE) {
+        if (peer.getPing() < -10 && messageType == Message.WIN_BLOCK_TYPE) {
             // если пинг хреновый то ничего не шлем кроме пингования
             return false;
         }
 
         if (USE_MONITOR) this.setMonitorStatusBefore("write");
+        try {
 
-        byte[] bytes = message.toBytes();
+            byte[] bytes = message.toBytes();
 
-        // проверим - может уже такое сообщение было нами принято, или
-        // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений
-        // и не будет повторно обрабатываться при прилете к нас опять
-        if (message.isHandled()) {
-            switch (message.getId()) {
-                case Message.TELEGRAM_TYPE:
-                    // может быть это повтор?
+            // проверим - может уже такое сообщение было нами принято, или
+            // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений
+            // и не будет повторно обрабатываться при прилете к нас опять
+            if (message.isHandled()) {
+                switch (message.getId()) {
+                    case Message.TELEGRAM_TYPE:
+                        // может быть это повтор?
 
-                    if (!this.peer.network.checkHandledTelegramMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Telegram ALREADY SENDED...");
-                        return true;
-                    }
-                    break;
-                case Message.TRANSACTION_TYPE:
-                    // может быть это повтор?
-                    if (!this.peer.network.checkHandledTransactionMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Transaction ALREADY SENDED...");
-                        return true;
-                    }
-                    break;
-                case Message.WIN_BLOCK_TYPE:
-                    // может быть это повтор?
-                    if (!this.peer.network.checkHandledWinBlockMessages(message.getLoadBytes(), this.peer, true)) {
-                        LOGGER.debug(this.peer + " --> Win Block ALREADY SENDED...");
-                        return true;
-                    }
-                    break;
+                        if (!this.peer.network.checkHandledTelegramMessages(message.getLoadBytes(), this.peer, true)) {
+                            LOGGER.debug(this.peer + " --> Telegram ALREADY SENDED...");
+                            return true;
+                        }
+                        break;
+                    case Message.TRANSACTION_TYPE:
+                        // может быть это повтор?
+                        if (!this.peer.network.checkHandledTransactionMessages(message.getLoadBytes(), this.peer, true)) {
+                            LOGGER.debug(this.peer + " --> Transaction ALREADY SENDED...");
+                            return true;
+                        }
+                        break;
+                    case Message.WIN_BLOCK_TYPE:
+                        // может быть это повтор?
+                        if (!this.peer.network.checkHandledWinBlockMessages(message.getLoadBytes(), this.peer, true)) {
+                            LOGGER.debug(this.peer + " --> Win Block ALREADY SENDED...");
+                            return true;
+                        }
+                        break;
+                }
             }
+
+            long checkTime = System.currentTimeMillis();
+
+            if (!writeAndFlush(bytes, messageType == Message.GET_HWEIGHT_TYPE
+                    || messageType == Message.HWEIGHT_TYPE
+                    || messageType == Message.WIN_BLOCK_TYPE)) {
+                LOGGER.debug(this.peer + message.viewPref(true) + message + " NOT send ((");
+                return false;
+            }
+
+            checkTime = System.currentTimeMillis() - checkTime;
+            if (logPings && (messageType == Message.GET_HWEIGHT_TYPE || messageType == Message.HWEIGHT_TYPE)
+                    || checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
+            ) {
+                loggedPoint = System.currentTimeMillis();
+                LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
+            }
+
+            return true;
+
+        } finally {
+            if (USE_MONITOR) this.setMonitorStatusAfter();
         }
 
-        long checkTime = System.currentTimeMillis();
-
-        if (!writeAndFlush(bytes, message.getType() == Message.GET_HWEIGHT_TYPE
-                || message.getType() == Message.HWEIGHT_TYPE
-                || message.getType() == Message.WIN_BLOCK_TYPE))
-            return false;
-
-        checkTime = System.currentTimeMillis() - checkTime;
-        if (checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
-                || logPings && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
-            loggedPoint = System.currentTimeMillis();
-            LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
-        }
-
-        if (USE_MONITOR) this.setMonitorStatusAfter();
-
-
-        return true;
     }
 
     public void run() {
