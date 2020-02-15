@@ -268,55 +268,58 @@ public class Sender extends MonitoredThread {
 
         while (this.peer.network.run) {
 
-            if (this.out == null) {
-                // очистить остатки запросов если обнулили вывод
-                blockingQueue.clear();
-            }
-
             try {
-                message = blockingQueue.poll(100, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                break;
-            }
+                if (this.out == null) {
+                    // очистить остатки запросов если обнулили вывод
+                    blockingQueue.clear();
+                }
 
-            if (getHWeightMessage != null) {
-                if (!sendMessage(getHWeightMessage)) {
+                try {
+                    message = blockingQueue.poll(100, TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    break;
+                }
+
+                if (getHWeightMessage != null) {
+                    if (!sendMessage(getHWeightMessage)) {
+                        getHWeightMessage = null;
+                    }
                     getHWeightMessage = null;
                 }
-                getHWeightMessage = null;
-            }
 
-            if (hWeightMessage != null) {
-                if (!sendMessage(hWeightMessage)) {
+                if (hWeightMessage != null) {
+                    if (!sendMessage(hWeightMessage)) {
+                        hWeightMessage = null;
+                    }
                     hWeightMessage = null;
                 }
-                hWeightMessage = null;
-            }
 
-            if (winBlockToSend != null) {
-                if (!sendMessage(winBlockToSend)) {
+                if (winBlockToSend != null) {
+                    if (!sendMessage(winBlockToSend)) {
+                        winBlockToSend = null;
+                    }
                     winBlockToSend = null;
                 }
-                winBlockToSend = null;
-            }
 
-            if (message == null) {
-                // FLUSH if NEED
-                if (out_flush_length > 0 && System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME) {
-                    writeAndFlush(null, true);
+                if (message == null) {
+                    // FLUSH if NEED
+                    if (out_flush_length > 0 && System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME) {
+                        writeAndFlush(null, true);
+                    }
+                    continue;
                 }
-                continue;
+
+                if (message.isRequest() && !this.peer.messages.containsKey(message.getId())) {
+                    // просроченный запрос - можно не отправлять его
+                    continue;
+                }
+
+                if (!sendMessage(message))
+                    continue;
+
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
-
-            if (message.isRequest() && !this.peer.messages.containsKey(message.getId())) {
-                // просроченный запрос - можно не отправлять его
-                continue;
-            }
-
-            if (!sendMessage(message))
-                continue;
-
-
         }
 
         //logger.debug(this + " - halted");
