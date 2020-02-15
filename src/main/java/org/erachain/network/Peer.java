@@ -217,9 +217,9 @@ public class Peer extends MonitoredThread {
                 return false;
             }
 
-            if (false) {
-                this.pinger.setPing(Integer.MAX_VALUE);
+            if (true) {
                 this.pinger.setName("Pinger-" + this.pinger.getId() + " for: " + this.getName());
+                this.pinger.setPing(Integer.MAX_VALUE);
             } else {
                 this.pinger = new Pinger(this);
             }
