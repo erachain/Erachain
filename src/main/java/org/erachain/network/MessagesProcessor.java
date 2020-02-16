@@ -85,7 +85,8 @@ public class MessagesProcessor extends MonitoredThread {
             case Message.GET_HWEIGHT_TYPE:
 
                 if (LOG_GET_HWEIGHT_TYPE) {
-                    LOGGER.debug("prepare: " + message.viewPref(true) + message);
+                    // делаем обработку запроса
+                    LOGGER.debug(message.viewPref(false) + ">" + message);
                 }
 
                 Fun.Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
@@ -96,9 +97,9 @@ public class MessagesProcessor extends MonitoredThread {
                 // CREATE RESPONSE WITH SAME ID
                 response.setId(message.getId());
 
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
+                timeCheck = (System.nanoTime() - timeCheck) / 1000000;
+                if (LOG_GET_HWEIGHT_TYPE || timeCheck > 100) {
+                    LOGGER.debug(message.viewPref(false) + ">" + message + " solved by us: " + timeCheck);
                 }
 
                 //SEND BACK TO SENDER

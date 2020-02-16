@@ -264,13 +264,14 @@ public class Sender extends MonitoredThread {
 
         //Controller cnt = Controller.getInstance();
 
-        Message message = null;
+        Message message;
 
         while (this.peer.network.run) {
 
             try {
                 if (this.out == null) {
                     // очистить остатки запросов если обнулили вывод
+                    // и стандартное ожидание пуска дальше. То есть Сендер должен ожидать прилета на вход чего-то
                     blockingQueue.clear();
                 }
 
