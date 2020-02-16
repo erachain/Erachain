@@ -6,6 +6,7 @@ import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.MonitoredThread;
+import org.mapdb.Fun.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,11 @@ public class Peer extends MonitoredThread {
     private boolean runed;
     private int errors;
     private int requestKey = 0;
+    private String version = "";
+    private long buildDateTime;
+    private String banMessage;
+    private Tuple2<Integer, Long> hWeight;
+    private int mute;
 
     Map<Integer, BlockingQueue<Message>> messages;
 
@@ -108,7 +114,7 @@ public class Peer extends MonitoredThread {
             // START PINGER
             this.pinger = new Pinger(this);
 
-            //START COMMUNICATON THREAD
+            //START COMMUNICATION THREAD
             this.start();
 
             // IT is STARTED
@@ -293,6 +299,48 @@ public class Peer extends MonitoredThread {
 
     public int getErrors() {
         return this.errors;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getBanMessage() {
+        return banMessage;
+    }
+
+    public void setBuildTime(long build) {
+        this.buildDateTime = build;
+    }
+
+    public long getBuildTime() {
+        return buildDateTime;
+    }
+
+    public Tuple2<Integer, Long> getHWeight() {
+        if (hWeight == null)
+            hWeight = new Tuple2<Integer, Long>(0, 0L);
+
+        return hWeight;
+    }
+
+    public void setHWeight(Tuple2<Integer, Long> hWeight) {
+        if (hWeight == null)
+            this.hWeight = new Tuple2<Integer, Long>(0, 0L);
+        else
+            this.hWeight = hWeight;
+    }
+
+    public int getMute() {
+        return mute;
+    }
+
+    public void setMute(int mute) {
+        this.mute = mute;
     }
 
     public long resetErrors() {
@@ -682,15 +730,19 @@ public class Peer extends MonitoredThread {
         }
 
         if (!runed) {
-            if (banForMinutes > this.getBanMinutes())
+            if (banForMinutes > this.getBanMinutes()) {
+                banMessage = message;
                 this.network.afterDisconnect(this, banForMinutes, message);
+            }
 
             return;
         }
 
         /// этот метод блокирует доступ к пиру - и его нельзя делать внутри synchronized методов
-        this.setName(this.getName()
-                + " banned for " + banForMinutes + " " + message);
+        //// this.setName(this.getName()
+        ////         + " banned for " + banForMinutes + " " + message);
+
+        banMessage = message;
 
         // если там уже было закрыто то не вызывать After
         // или если нужно забанить
@@ -776,7 +828,7 @@ public class Peer extends MonitoredThread {
         this.pinger.close();
         this.startReading.offer(-1);
         this.close("halt");
-        this.setName(this.getName() + " halted");
+        ////this.setName(this.getName() + " halted"); // может блокировать
 
     }
 

@@ -5,18 +5,21 @@ import org.erachain.database.PeerMap.PeerInfo;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.network.Peer;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.mapdb.Fun.Tuple2;
 import org.erachain.settings.Settings;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
+import org.mapdb.Fun.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 public class KnownPeersTableModel extends AbstractTableModel implements Observer {
 
@@ -114,24 +117,23 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
                 return peer.getAddress().getHostAddress();
 
             case COLUMN_HEIGHT:
-                if (!peer.isUsed()) {
-                    int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
-                    if (banMinutes > 0) {
-                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m";
-                    } else {
-                        return Lang.getInstance().translate("Broken");
+                Tuple2<Integer, Long> res = peer.getHWeight();
+                if (res == null || res.a == 0) {
+                    if (peer.isUsed()) {
+                        return Lang.getInstance().translate("Waiting...");
                     }
+                    return Lang.getInstance().translate("");
                 }
-                Tuple2<Integer, Long> res = Controller.getInstance().getHWeightOfPeer(peer);
-                if (res == null) {
-                    return Lang.getInstance().translate("Waiting...");
-                } else {
-                    return res.a.toString() + " " + res.b.toString();
-                }
+                return res.a.toString() + " " + res.b.toString() + (peer.getMute() > 0 ? " mute:" + peer.getMute() : "");
 
             case COLUMN_PINGMC:
                 if (!peer.isUsed()) {
-                    return Lang.getInstance().translate("Broken");
+                    int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
+                    if (banMinutes > 0) {
+                        return Lang.getInstance().translate("Banned") + " " + banMinutes + "m" + " (" + peer.getBanMessage() + ")";
+                    } else {
+                        return Lang.getInstance().translate("Broken") + (peer.getBanMessage() == null ? "" : " (" + peer.getBanMessage() + ")");
+                    }
                 } else if (peer.getPing() > 1000000) {
                     return Lang.getInstance().translate("Waiting...");
                 } else {
@@ -155,7 +157,8 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
                 return DateTimeFormat.timeAgo(peer.getConnectionTime());
 
             case COLUMN_VERSION:
-                return Controller.getInstance().getVersionOfPeer(peer).getA();
+                return peer.getBuildTime() > 0 ? peer.getVersion() + " " + DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd", "UTC")
+                        : "";
         }
         return null;
 

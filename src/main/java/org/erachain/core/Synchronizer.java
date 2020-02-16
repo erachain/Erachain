@@ -1269,7 +1269,7 @@ public class Synchronizer extends Thread {
 
 
                 // снизим ожижание блокировки с "сильных но таких же как мы" узлов
-                cnt.updateWeightOfPeerMutes(-1);
+                cnt.network.decrementWeightOfPeerMutes();
 
                 if (!cnt.isStatusOK())
                     continue;

@@ -83,9 +83,11 @@ public class Pinger extends Thread {
                 this.ping = -1;
 
             //PING FAILES
-            // чем меньше пиров на связи тем дольше пингуем перед разрвом
+            // чем меньше пиров на связи тем дольше пингуем перед разрывом
             if (this.ping < -10 -20/(1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
+
+                // И если тут не оборать, то на этапе получения подписей по блокам тогда разрыв будет - ответ не получается
                 this.peer.ban("on PING FAILES");
             }
 
@@ -103,7 +105,7 @@ public class Pinger extends Thread {
             HWeightMessage hWeightMessage = (HWeightMessage) response;
             Tuple2<Integer, Long> hW = hWeightMessage.getHWeight();
 
-            Controller.getInstance().setWeightOfPeer(peer, hW);
+            peer.setHWeight(hW);
         }
 
         return ping >= 0;

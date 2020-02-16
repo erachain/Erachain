@@ -207,12 +207,17 @@ public class Network extends Observable {
         //PASS TO CONTROLLER
         controller.afterDisconnect(peer);
 
-        //NOTIFY OBSERVERS
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));
+        try {
+            // внутри могут быть ошибки отображения
+            //NOTIFY OBSERVERS
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));
 
-        //this.setChanged();
-        //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+            //this.setChanged();
+            //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
@@ -337,6 +342,24 @@ public class Network extends Observable {
                     counter++;
         }
         return counter;
+    }
+
+    public boolean noActivePeers(boolean onlyWhite) {
+
+        int counter = 0;
+        for (Peer peer : this.knownPeers) {
+            if (peer.isUsed())
+                if (!onlyWhite || peer.isWhite())
+                    counter++;
+        }
+        return counter == 0;
+    }
+
+    public void decrementWeightOfPeerMutes() {
+        for (Peer peer : knownPeers) {
+            if (peer.getMute() > 0)
+                peer.setMute(peer.getMute() - 1);
+        }
     }
 
     public List<Peer> getBestPeers() {
@@ -623,7 +646,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                peerHWeight = controller.getHWeightOfPeer(peer);
+                peerHWeight = peer.getHWeight();
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
@@ -677,7 +700,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = controller.getHWeightOfPeer(peer);
+                Tuple2<Integer, Long> peerHWeight = peer.getHWeight();
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
@@ -711,7 +734,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = controller.getHWeightOfPeer(peer);
+                Tuple2<Integer, Long> peerHWeight = peer.getHWeight();
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
