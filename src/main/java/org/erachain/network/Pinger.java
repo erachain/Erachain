@@ -18,7 +18,7 @@ public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class.getSimpleName());
     private int DEFAULT_PING_TIMEOUT;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = 10000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 4;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000;
 
     private Peer peer;
     //private boolean needPing = false;
@@ -31,7 +31,7 @@ public class Pinger extends Thread {
         this.ping = Integer.MAX_VALUE;
         this.setName("Pinger-" + this.getId() + " for: " + peer.getName());
 
-        DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight());
+        DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight()) << 1;
 
         this.start();
     }
