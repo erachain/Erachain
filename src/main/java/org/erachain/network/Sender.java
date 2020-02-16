@@ -249,7 +249,7 @@ public class Sender extends MonitoredThread {
                     || checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
             ) {
                 loggedPoint = System.currentTimeMillis();
-                LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by period: " + checkTime);
+                LOGGER.debug(this.peer + message.viewPref(true) + message + " sended by ms: " + checkTime);
             }
 
             return true;
