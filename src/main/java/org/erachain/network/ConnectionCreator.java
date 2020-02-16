@@ -189,7 +189,7 @@ public class ConnectionCreator extends MonitoredThread {
             if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
 
                 //GET LIST OF KNOWN PEERS
-                knownPeers = network.getKnownPeers();
+                knownPeers = network.getAllPeers();
 
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {

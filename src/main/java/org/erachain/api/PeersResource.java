@@ -100,7 +100,7 @@ public class PeersResource {
     @GET
     @Path("detail/knownpeers")
     public String getDetailKnownPeers() {
-        List<Peer> knownPeers = Controller.getInstance().network.getKnownPeers();
+        List<Peer> knownPeers = Controller.getInstance().network.getAllPeers();
         Map output = getMapPeers(knownPeers);
         return JSONValue.toJSONString(output);
     }
