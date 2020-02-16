@@ -56,7 +56,9 @@ public class Pinger extends Thread {
 
     private boolean tryPing(long timeSOT) {
 
-        //logger.info("try PING " + this.peer);
+        if (peer.LOG_GET_HWEIGHT_TYPE) {
+            LOGGER.info("try PING " + this.peer);
+        }
 
         peer.addPingCounter();
 

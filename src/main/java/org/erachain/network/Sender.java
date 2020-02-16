@@ -310,7 +310,7 @@ public class Sender extends MonitoredThread {
                     continue;
                 }
 
-                if (message.isRequest() && !this.peer.messages.containsKey(message.getId())) {
+                if (message.isRequest() && !this.peer.requests.containsKey(message.getId())) {
                     // просроченный запрос - можно не отправлять его
                     continue;
                 }

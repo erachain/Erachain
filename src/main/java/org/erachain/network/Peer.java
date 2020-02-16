@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * верт (процесс)
@@ -35,7 +36,7 @@ public class Peer extends MonitoredThread {
      * <..... - receive просроченный ответ на Мо запрос<br>
      * see -  org.erachain.network.message.Message#viewPref(boolean)
      */
-    private final static boolean LOG_GET_HWEIGHT_TYPE = true; // "185.195.26.245"
+    public final static boolean LOG_GET_HWEIGHT_TYPE = true; // "185.195.26.245"
     private byte[] DEBUG_PEER = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245};
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getSimpleName());
@@ -58,18 +59,19 @@ public class Peer extends MonitoredThread {
     private long connectionTime;
     private boolean runed;
     private int errors;
-    private int requestKey = 0;
+    Map<Integer, BlockingQueue<Message>> requests;
+    private int requestKey;
+
     private String version = "";
     private long buildDateTime;
     private String banMessage;
     private Tuple2<Integer, Long> hWeight;
     private int mute;
-
-    Map<Integer, BlockingQueue<Message>> messages;
+    private AtomicInteger requestKeyAtomic = new AtomicInteger(0);
 
     public Peer(InetAddress address) {
         this.address = address;
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+        this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
         this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
@@ -90,7 +92,7 @@ public class Peer extends MonitoredThread {
             this.network = network;
             this.socket = socket;
             this.address = socket.getInetAddress();
-            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+            this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
             this.white = false;
             this.pingCounter = 0;
             this.connectionTime = NTP.getTime();
@@ -158,7 +160,7 @@ public class Peer extends MonitoredThread {
         if (networkIn != null)
             this.network = networkIn;
 
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+        this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;
@@ -503,7 +505,7 @@ public class Peer extends MonitoredThread {
 
                     if (message == null) {
                         // уже обрабатывали такое сообщение - игнорируем
-                        String mess = " ALREADY processed:" + message.viewPref(false) + message.toString();
+                        String mess = " ALREADY processed!";
                         if (USE_MONITOR) this.setMonitorStatus(mess);
                         LOGGER.debug(this + mess);
                         continue;
@@ -533,7 +535,7 @@ public class Peer extends MonitoredThread {
                     //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
                     if (!message.isRequest() && message.hasId()) {
 
-                        if (!this.messages.containsKey(message.getId())) {
+                        if (!this.requests.containsKey(message.getId())) {
                             // просроченное сообщение
                             // это ответ на наш запрос с ID
                             if (LOG_GET_HWEIGHT_TYPE && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
@@ -549,7 +551,7 @@ public class Peer extends MonitoredThread {
                         try {
 
                             // get WAITING POLL
-                            BlockingQueue<Message> poll = this.messages.remove(message.getId());
+                            BlockingQueue<Message> poll = this.requests.remove(message.getId());
                             // invoke WAITING POLL
                             poll.add(message);
 
@@ -589,8 +591,9 @@ public class Peer extends MonitoredThread {
             }
         } finally {
             if (USE_MONITOR) {
-                this.setMonitorStatus("halted");
-                LOGGER.debug(this + " - halted");
+                String mess = " HALTED by " + (network.run ? "error" : "network.STOP");
+                this.setMonitorStatus(mess);
+                LOGGER.debug(this + mess);
             }
         }
     }
@@ -636,42 +639,67 @@ public class Peer extends MonitoredThread {
      */
     private synchronized int incrementKey() {
 
-        if (this.requestKey == 99999) {
+        if (this.requestKey > 9999) {
             this.requestKey = 1;
         } else {
             this.requestKey++;
         }
 
-        if (USE_MONITOR) this.setMonitorStatus("incrementKey: " + this.requestKey);
         return this.requestKey;
 
     }
 
     public Message getResponse(Message message, long timeSOT) {
 
-        BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
+        Integer localRequestKey;
+        BlockingQueue<Message> blockingQueue;
+        long checkTime;
 
-        int localRequestKey = incrementKey(); // быстро и без колллизий
+        // ЭТО ТОЖЕ НЕ ПОМОГАЕТ
+        ///synchronized (blockingQueue = new ArrayBlockingQueue<Message>(1)) {
+        blockingQueue = new ArrayBlockingQueue<Message>(1);
 
+        if (true) {
+            // неа - иногда без увеличения на 1 делает 2 запроса с одинаковым Номером
+            // проверено - и обмен запросами встает и пинг не проходит! И Бан
+            localRequestKey = incrementKey(); // быстро и без колллизий
+        } else {
+            // тут тоже по 2 раза печатает в лог
+            // "response.write GET_HWEIGHT_TYPE[5], messages.size: 0",
+            localRequestKey = requestKeyAtomic.incrementAndGet();
+        }
+
+        if (USE_MONITOR) {
+            this.setMonitorStatus("incrementKey: " + localRequestKey);
+        }
+        if (LOG_GET_HWEIGHT_TYPE) {
+            LOGGER.debug("incrementKey: " + localRequestKey);
+        }
         message.setId(localRequestKey);
 
-        long checkTime = System.currentTimeMillis();
+        checkTime = System.currentTimeMillis();
 
 
-        if (USE_MONITOR) this.setMonitorStatusBefore("response.write " + message.toString() + ", messages.size: " + messages.size());
+        if (USE_MONITOR) {
+            this.setMonitorStatusBefore("response.write " + message.toString() + ", requests.size: " + requests.size());
+        }
+        if (LOG_GET_HWEIGHT_TYPE) {
+            LOGGER.debug("response.write " + message.toString() + ", requests.size: " + requests.size());
+        }
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.messages.put(localRequestKey, blockingQueue);
+        this.requests.put(localRequestKey, blockingQueue);
 
         if (!this.offerMessage(message)) {
             //WHEN FAILED TO SEND MESSAGE
-            this.messages.remove(localRequestKey);
+            this.requests.remove(localRequestKey);
             if (USE_MONITOR) this.setMonitorStatusAfter();
             return null;
         }
         if (USE_MONITOR) this.setMonitorStatusAfter();
 
-        Message response = null;
+
+        Message response;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
         } catch (java.lang.OutOfMemoryError e) {
@@ -679,26 +707,28 @@ public class Peer extends MonitoredThread {
             Controller.getInstance().stopAll(86);
             return null;
         } catch (InterruptedException e) {
-            this.messages.remove(localRequestKey);
+            this.requests.remove(localRequestKey);
             return null;
         } catch (Exception e) {
-            this.messages.remove(localRequestKey);
+            this.requests.remove(localRequestKey);
             LOGGER.error(e.getMessage(), e);
             return null;
         }
 
         if (response == null) {
             // НУЛЬ значит не дождались - пора удалять идентификатор запроса из списка
-            this.messages.remove(localRequestKey);
+            this.requests.remove(localRequestKey);
         } else if (this.getPing() < 0) {
             // если ответ есть то в читателе уже удалили его из очереди
             // SET PING by request period
-            this.setPing((int)(System.currentTimeMillis() - checkTime));
+            this.setPing((int) (System.currentTimeMillis() - checkTime));
         }
 
-        if (USE_MONITOR) this.setMonitorStatus("response.done " + message.toString());
+        if (USE_MONITOR)
+            this.setMonitorStatus("response.done for: " + message.toString() + " RESPONSE: " + response);
 
         return response;
+        ///}
     }
 
     public Message getResponse(Message message) {
