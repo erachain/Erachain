@@ -86,7 +86,7 @@ public class MessagesProcessor extends MonitoredThread {
 
                 if (LOG_GET_HWEIGHT_TYPE) {
                     // делаем обработку запроса
-                    LOGGER.debug(message.viewPref(false) + ">" + message);
+                    LOGGER.debug(message.getSender() + message.viewPref(false) + ">" + message);
                 }
 
                 Fun.Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
@@ -99,7 +99,7 @@ public class MessagesProcessor extends MonitoredThread {
 
                 timeCheck = (System.nanoTime() - timeCheck) / 1000000;
                 if (LOG_GET_HWEIGHT_TYPE || timeCheck > 100) {
-                    LOGGER.debug(message.viewPref(false) + ">" + message + " solved by us: " + timeCheck);
+                    LOGGER.debug(message.getSender() + message.viewPref(false) + ">" + message + " solved by us: " + timeCheck);
                 }
 
                 //SEND BACK TO SENDER
