@@ -505,9 +505,11 @@ public class Peer extends MonitoredThread {
 
                     if (message == null) {
                         // уже обрабатывали такое сообщение - игнорируем
-                        String mess = " ALREADY processed!";
-                        if (USE_MONITOR) this.setMonitorStatus(mess);
-                        LOGGER.debug(this + mess);
+                        if (false) {
+                            String mess = " ALREADY processed!";
+                            if (USE_MONITOR) this.setMonitorStatus(mess);
+                            LOGGER.debug(this + mess);
+                        }
                         continue;
                     }
 
@@ -524,7 +526,8 @@ public class Peer extends MonitoredThread {
 
                     if (USE_MONITOR) this.setMonitorStatus("in.message process: " + message.viewPref(false) + message);
 
-                    if (LOG_GET_HWEIGHT_TYPE && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
+                    if (LOG_GET_HWEIGHT_TYPE && (//message.getType() == Message.GET_HWEIGHT_TYPE ||
+                            message.getType() == Message.HWEIGHT_TYPE)
                     ) {
                         if (Arrays.equals(address.getAddress(), DEBUG_PEER)) {
                             boolean debug = true;
@@ -538,7 +541,8 @@ public class Peer extends MonitoredThread {
                         if (!this.requests.containsKey(message.getId())) {
                             // просроченное сообщение
                             // это ответ на наш запрос с ID
-                            if (LOG_GET_HWEIGHT_TYPE && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)
+                            if (LOG_GET_HWEIGHT_TYPE && (//message.getType() == Message.GET_HWEIGHT_TYPE ||
+                                    message.getType() == Message.HWEIGHT_TYPE)
                             ) {
                                 if (USE_MONITOR) this.setMonitorStatus(" << LATE " + message);
                                 LOGGER.debug(this + " << LATE " + message);
@@ -673,22 +677,21 @@ public class Peer extends MonitoredThread {
             this.setMonitorStatus("incrementKey: " + localRequestKey);
         }
         if (LOG_GET_HWEIGHT_TYPE) {
-            LOGGER.debug("incrementKey: " + localRequestKey);
+            LOGGER.debug(this + " incrementKey: " + localRequestKey);
         }
         message.setId(localRequestKey);
 
         checkTime = System.currentTimeMillis();
 
+        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
+        this.requests.put(localRequestKey, blockingQueue);
 
         if (USE_MONITOR) {
             this.setMonitorStatusBefore("response.write " + message.toString() + ", requests.size: " + requests.size());
         }
         if (LOG_GET_HWEIGHT_TYPE) {
-            LOGGER.debug("response.write " + message.toString() + ", requests.size: " + requests.size());
+            LOGGER.debug(this + " response.write " + message.toString() + ", requests.size: " + requests.size());
         }
-
-        //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.requests.put(localRequestKey, blockingQueue);
 
         if (!this.offerMessage(message)) {
             //WHEN FAILED TO SEND MESSAGE

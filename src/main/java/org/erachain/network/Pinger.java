@@ -18,7 +18,7 @@ public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class.getSimpleName());
     private int DEFAULT_PING_TIMEOUT;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 4;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 10000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 4;
 
     private Peer peer;
     //private boolean needPing = false;
@@ -86,7 +86,7 @@ public class Pinger extends Thread {
 
             //PING FAILES
             // чем меньше пиров на связи тем дольше пингуем перед разрывом
-            if (this.ping < -10 -20/(1 + peer.network.banForActivePeersCounter())) {
+            if (this.ping < -30 - 60 / (1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
 
                 // И если тут не оборать, то на этапе получения подписей по блокам тогда разрыв будет - ответ не получается
