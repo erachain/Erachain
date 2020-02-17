@@ -32,7 +32,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -410,7 +410,7 @@ public class RSendResource {
                         Transaction transaction = cnt.r_Send(creator,
                                 0, recipient,
                                 2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                                 new byte[]{(byte) 1}, 0);
 
                         if (cnt.isOnStopping())
@@ -452,9 +452,9 @@ public class RSendResource {
                         }
                     } else {
 
-                        RSend transaction = new RSend(creator, (byte) 0, recipient,2l, null,
+                        RSend transaction = new RSend(creator, (byte) 0, recipient, 2l, null,
                                 "LoadTest_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                                 new byte[]{(byte) 1}, NTP.getTime(), 0l);
 
                         transaction.sign(creator, Transaction.FOR_NETWORK);
@@ -600,7 +600,7 @@ public class RSendResource {
                         Transaction transaction = cnt.r_Send(creator,
                                 0, recipient,
                                 2l, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), encryptMessage,
+                                (address + counter + "TEST SEND ERA").getBytes(StandardCharsets.UTF_8), encryptMessage,
                                 new byte[]{(byte) 1}, 0);
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);

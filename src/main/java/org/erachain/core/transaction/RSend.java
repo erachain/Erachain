@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -358,16 +357,16 @@ public class RSend extends TransactionAmount {
                 return "encrypted";
             } else {
                 if (this.data.length > MAX_DATA_VIEW << 4) {
-                    return new String(data, Charset.forName("UTF-8")); // "{{" +
+                    return new String(data, StandardCharsets.UTF_8); // "{{" +
                     // new
                     // String(Arrays.copyOfRange(data,
                     // 0,
                     // MAX_DATA_VIEW),
-                    // Charset.forName("UTF-8"))
+                    // StandardCharsets.UTF_8)
                     // +
                     // "...}}";
                 }
-                return new String(this.data, Charset.forName("UTF-8"));
+                return new String(this.data, StandardCharsets.UTF_8);
             }
         } else {
             if (this.data.length > MAX_DATA_VIEW) {
@@ -414,7 +413,7 @@ public class RSend extends TransactionAmount {
             return false;
 
         if (this.isText() && !this.isEncrypted()) {
-            String text = new String(this.data, Charset.forName("UTF-8"));
+            String text = new String(this.data, StandardCharsets.UTF_8);
             if (text.contains(" ") || text.contains("_"))
                 return true;
         }
@@ -439,7 +438,7 @@ public class RSend extends TransactionAmount {
             // ADD CREATOR/SERVICE/DATA
             if (this.isText() && !this.isEncrypted()) {
                 transaction.put("message", new String(this.data, StandardCharsets.UTF_8));
-                //transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
+                //transaction.put("data", new String(this.data, StandardCharsets.UTF_8));
             } else {
                 transaction.put("message", Base58.encode(this.data));
                 // transaction.put("data", Base58.encode(this.data));

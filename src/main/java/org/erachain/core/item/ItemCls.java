@@ -22,7 +22,6 @@ import org.mapdb.Fun.Tuple6;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 //import java.math.BigDecimal;
@@ -458,17 +457,17 @@ public abstract class ItemCls implements ExplorerJsonLine {
             str = str.replace("%2", "");
 
         if (str.contains("%3") && tuple.c != null)
-            str = str.replace("%3", new String(tuple.c, Charset.forName("UTF-8")));
+            str = str.replace("%3", new String(tuple.c, StandardCharsets.UTF_8));
         else
             str = str.replace("%3", "");
 
         if (str.contains("%4") && tuple.d != null)
-            str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
+            str = str.replace("%4", new String(tuple.d, StandardCharsets.UTF_8));
         else
             str = str.replace("%4", "");
 
         if (str.contains("%D") && tuple.f != null)
-            str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
+            str = str.replace("%D", new String(new String(tuple.f, StandardCharsets.UTF_8)));
         else
             str = str.replace("%D", "");
 
@@ -485,11 +484,11 @@ public abstract class ItemCls implements ExplorerJsonLine {
         if (str.contains("%2") && tuple.b != null)
             str = str.replace("%2", tuple.b.toString());
         if (str.contains("%3") && tuple.c != null)
-            str = str.replace("%3", new String(tuple.c, Charset.forName("UTF-8")));
+            str = str.replace("%3", new String(tuple.c, StandardCharsets.UTF_8));
         if (str.contains("%4") && tuple.d != null)
-            str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
+            str = str.replace("%4", new String(tuple.d, StandardCharsets.UTF_8));
         if (str.contains("%D") && tuple.f != null)
-            str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
+            str = str.replace("%D", new String(new String(tuple.f, StandardCharsets.UTF_8)));
 
         return str;
     }

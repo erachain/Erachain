@@ -1,34 +1,6 @@
 package org.erachain.gui.create;
 
-import java.awt.Dimension;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
-
-import javax.swing.JDialog;
-import javax.swing.JTextPane;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-import org.mapdb.Fun.Tuple4;
-
 import com.github.rjeschke.txtmark.Processor;
-
 import org.erachain.controller.Controller;
 import org.erachain.core.exdata.ExData;
 import org.erachain.core.item.templates.TemplateCls;
@@ -38,6 +10,23 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+import org.mapdb.Fun.Tuple2;
+import org.mapdb.Fun.Tuple3;
+import org.mapdb.Fun.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class LicenseJFrame1 extends JDialog {
     
@@ -115,17 +104,17 @@ public class LicenseJFrame1 extends JDialog {
                         Tuple3<String, String, JSONObject> a = note.parse_Data_V2_Without_Files();
                         message = (String) a.c.get("MS");
                     } catch (Exception e) {
-                        message = new String(note.getData(), Charset.forName("UTF-8"));
+                        message = new String(note.getData(), StandardCharsets.UTF_8);
                     }
                     
                 } else {
                     
                     try {
                         JSONObject dataJSON = (JSONObject) JSONValue
-                                .parseWithException(new String(note.getData(), Charset.forName("UTF-8")));
+                                .parseWithException(new String(note.getData(), StandardCharsets.UTF_8));
                         message = (String) dataJSON.get("Message");
                     } catch (Exception e) {
-                        message = new String(note.getData(), Charset.forName("UTF-8"));
+                        message = new String(note.getData(), StandardCharsets.UTF_8);
                     }
                 }
             } else if (record.getType() == Transaction.ISSUE_TEMPLATE_TRANSACTION) {

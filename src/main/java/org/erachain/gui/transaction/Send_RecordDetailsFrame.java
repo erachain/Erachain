@@ -4,19 +4,19 @@ package org.erachain.gui.transaction;
 import org.erachain.controller.Controller;
 import org.erachain.core.transaction.RSend;
 import org.erachain.gui.PasswordPane;
-import org.erachain.gui.library.MTextPane;
 import org.erachain.gui.library.MAccoutnTextField;
+import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.Converter;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.erachain.utils.MenuPopupUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("serial")
 public class Send_RecordDetailsFrame extends RecDetailsFrame {
@@ -145,7 +145,7 @@ public class Send_RecordDetailsFrame extends RecDetailsFrame {
                                 jTextArea_Messge.setText(Lang.getInstance().translate("Decrypt Error!"));
                             } else {
                                 jTextArea_Messge.setText(r_Send.isText() ?
-                                        new String(decryptedData, Charset.forName("UTF-8"))
+                                        new String(decryptedData, StandardCharsets.UTF_8)
                                         : Converter.toHex(decryptedData));
 
                                 encrypted.setSelected(!encrypted.isSelected());

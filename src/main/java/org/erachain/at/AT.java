@@ -9,7 +9,7 @@ import org.json.simple.JSONObject;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 public class AT extends ATMachineState {
@@ -74,22 +74,22 @@ public class AT extends ATMachineState {
         int nameSize = bf.getInt();
         byte[] bname = new byte[nameSize];
         bf.get(bname);
-        String name = new String(bname, Charset.forName("UTF-8"));
+        String name = new String(bname, StandardCharsets.UTF_8);
 
         int descSize = bf.getInt();
         byte[] bdesc = new byte[descSize];
         bf.get(bdesc);
-        String description = new String(bdesc, Charset.forName("UTF-8"));
+        String description = new String(bdesc, StandardCharsets.UTF_8);
 
         int typeSize = bf.getInt();
         byte[] btype = new byte[typeSize];
         bf.get(btype);
-        String type = new String(btype, Charset.forName("UTF-8"));
+        String type = new String(btype, StandardCharsets.UTF_8);
 
         int tagsSize = bf.getInt();
         byte[] btags = new byte[tagsSize];
         bf.get(btags);
-        String tags = new String(btags, Charset.forName("UTF-8"));
+        String tags = new String(btags, StandardCharsets.UTF_8);
 
         byte[] atId = new byte[ATConstants.AT_ID_SIZE];
         bf.get(atId);
@@ -122,10 +122,10 @@ public class AT extends ATMachineState {
     public byte[] toBytes(boolean b) {
 
 
-        byte[] bname = getName().getBytes(Charset.forName("UTF-8"));
-        byte[] bdesc = description.getBytes(Charset.forName("UTF-8"));
-        byte[] btype = type.getBytes(Charset.forName("UTF-8"));
-        byte[] btags = tags.getBytes(Charset.forName("UTF-8"));
+        byte[] bname = getName().getBytes(StandardCharsets.UTF_8);
+        byte[] bdesc = description.getBytes(StandardCharsets.UTF_8);
+        byte[] btype = type.getBytes(StandardCharsets.UTF_8);
+        byte[] btags = tags.getBytes(StandardCharsets.UTF_8);
 
         ByteBuffer bf = ByteBuffer.allocate(4 + bname.length + 4 + bdesc.length + getSize() + 4 + btype.length + 4 + btags.length);
         bf.order(ByteOrder.LITTLE_ENDIAN);
@@ -149,10 +149,10 @@ public class AT extends ATMachineState {
     }
 
     public int getCreationLength() {
-        byte[] bname = getName().getBytes(Charset.forName("UTF-8"));
-        byte[] bdesc = description.getBytes(Charset.forName("UTF-8"));
-        byte[] btype = type.getBytes(Charset.forName("UTF-8"));
-        byte[] btags = tags.getBytes(Charset.forName("UTF-8"));
+        byte[] bname = getName().getBytes(StandardCharsets.UTF_8);
+        byte[] bdesc = description.getBytes(StandardCharsets.UTF_8);
+        byte[] btype = type.getBytes(StandardCharsets.UTF_8);
+        byte[] btags = tags.getBytes(StandardCharsets.UTF_8);
 
         return 4 + bname.length + 4 + bdesc.length + 4 + btype.length + 4 + btags.length + getSize();
     }

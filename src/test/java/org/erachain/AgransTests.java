@@ -1,22 +1,21 @@
 package org.erachain;
 
+import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.AEScrypto;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Base64;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.network.Peer;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.erachain.utils.Pair;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.erachain.utils.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -171,7 +170,7 @@ public class AgransTests {
 
         byte[] messageBytes;
 
-        messageBytes = StartMessage.getBytes(Charset.forName("UTF-8"));
+        messageBytes = StartMessage.getBytes(StandardCharsets.UTF_8);
 
         messageBytes = AEScrypto.dataEncrypt(messageBytes, senderPrivateKey, recipientPublicKey);
 
@@ -181,7 +180,7 @@ public class AgransTests {
             LOGGER.error(e.getMessage(), e);
         }
 
-        String EndMessage = new String(messageBytes, Charset.forName("UTF-8"));
+        String EndMessage = new String(messageBytes, StandardCharsets.UTF_8);
 
         assertEquals(EndMessage, StartMessage);
 

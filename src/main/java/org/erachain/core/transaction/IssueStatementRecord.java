@@ -13,7 +13,7 @@ import org.erachain.core.crypto.Base58;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -365,7 +365,7 @@ public class IssueStatementRecord extends Transaction {
 
             //ADD CREATOR/SERVICE/DATA
             if (this.isText() && !this.isEncrypted()) {
-                transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
+                transaction.put("data", new String(this.data, StandardCharsets.UTF_8));
             } else {
                 transaction.put("data", Base58.encode(this.data));
             }
