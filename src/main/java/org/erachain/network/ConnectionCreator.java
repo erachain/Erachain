@@ -66,7 +66,7 @@ public class ConnectionCreator extends MonitoredThread {
                 return 0;
 
             // если произошел полныцй разрыв сети - то прекратим поиск по рекурсии
-            if (network.getActivePeersCounter(false) == 0 && foreignPeersCounter > 4)
+            if (network.noActivePeers(false) && foreignPeersCounter > 4)
                 return 0;
 
             if (maxReceivePeers > 0 && foreignPeersCounter >= maxReceivePeers) {
@@ -132,7 +132,7 @@ public class ConnectionCreator extends MonitoredThread {
 
             this.setMonitorStatusAfter();
 
-            newPeer.setNeedPing();
+            ///newPeer.setNeedPing();
 
             if (newPeer.isUsed() && maxReceivePeers > 1) {
                 // RECURSE to OTHER PEERS
@@ -238,7 +238,7 @@ public class ConnectionCreator extends MonitoredThread {
 
                     if (peer.isUsed()) {
 
-                        peer.setNeedPing();
+                        ///peer.setNeedPing();
 
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4, true);
@@ -258,7 +258,7 @@ public class ConnectionCreator extends MonitoredThread {
                         break;
 
                     // если произошел полныцй разрыв сети - то прекратим поиск тут
-                    if (network.getActivePeersCounter(false) == 0)
+                    if (network.noActivePeers(false))
                         break;
 
                     if (peer.isBanned())

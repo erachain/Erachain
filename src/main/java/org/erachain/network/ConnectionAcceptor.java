@@ -140,7 +140,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                     continue;
                 }
 
-                peer.setNeedPing();
+                ////peer.setNeedPing();
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
                 if (Settings.getInstance().getMaxConnections() <= network.getActivePeersCounter(false)) {

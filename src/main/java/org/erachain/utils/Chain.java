@@ -10,7 +10,7 @@ public class Chain {
     public static int hw_Test() {
 
         Controller cnt = Controller.getInstance();
-        if (cnt.getPeerHWeights().isEmpty()) {
+        if (cnt.network.noActivePeers(false)) {
             return 0;
         }
 

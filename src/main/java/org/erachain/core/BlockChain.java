@@ -104,7 +104,7 @@ public class BlockChain {
     public static final boolean ROBINHOOD_USE = false;
     public static final boolean ANONIM_SERT_USE = TEST_MODE || BlockChain.ERA_COMPU_ALL_UP ? true : false;
 
-    public static final int MAX_ORPHAN = 1000; // max orphan blocks in chain
+    public static final int MAX_ORPHAN = 10000; // max orphan blocks in chain for 30 sec
     public static final int SYNCHRONIZE_PACKET = 300; // when synchronize - get blocks packet by transactions
     public static final int TARGET_COUNT_SHIFT = 10;
     public static final int TARGET_COUNT = 1 << TARGET_COUNT_SHIFT;
@@ -765,7 +765,7 @@ public class BlockChain {
         return TEST_MODE || height > REFERAL_BONUS_FOR_PERSON_4_21;
     }
 
-    public static int getCheckPoint(DCSet dcSet) {
+    public static int getCheckPoint(DCSet dcSet, boolean useDynamic) {
 
         int heightCheckPoint = 1;
         if (CHECKPOINT.a > 1) {
@@ -776,11 +776,27 @@ public class BlockChain {
             heightCheckPoint = item;
         }
 
+        if (!useDynamic)
+            return heightCheckPoint;
+
         int dynamicCheckPoint = getHeight(dcSet) - BlockChain.MAX_ORPHAN;
 
         if (dynamicCheckPoint > heightCheckPoint)
             return dynamicCheckPoint;
         return heightCheckPoint;
+    }
+
+    public byte[] getMyHardCheckPointSign() {
+        byte[] mySign;
+        if (CHECKPOINT.a > 1) {
+            return CHECKPOINT.b;
+        } else {
+            return genesisBlock.getSignature();
+        }
+    }
+
+    public boolean validageHardCheckPointPeerSign(String peerSign) {
+        return Arrays.equals(getMyHardCheckPointSign(), Base58.decode(peerSign));
     }
 
     public boolean isPeerTrusted(Peer peer) {
