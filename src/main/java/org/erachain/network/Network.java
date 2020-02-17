@@ -333,6 +333,11 @@ public class Network extends Observable {
         return activePeers;
     }
 
+    public List<Peer> getKnownPeers() {
+
+        return this.knownPeers;
+    }
+
     public int getActivePeersCounter(boolean onlyWhite) {
 
         int counter = 0;
@@ -366,7 +371,7 @@ public class Network extends Observable {
         return this.peerManager.getBestPeers();
     }
 
-    public List<Peer> getKnownPeers() {
+    public List<Peer> getAllPeers() {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
         if (!controller.isOnStopping()) {

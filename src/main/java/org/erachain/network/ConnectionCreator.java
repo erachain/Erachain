@@ -132,7 +132,11 @@ public class ConnectionCreator extends MonitoredThread {
 
             this.setMonitorStatusAfter();
 
-            ///newPeer.setNeedPing();
+
+            if (false) {
+                // не надо - так внутри же все запускается!
+                newPeer.setNeedPing();
+            }
 
             if (newPeer.isUsed() && maxReceivePeers > 1) {
                 // RECURSE to OTHER PEERS
@@ -185,7 +189,7 @@ public class ConnectionCreator extends MonitoredThread {
             if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
 
                 //GET LIST OF KNOWN PEERS
-                knownPeers = network.getKnownPeers();
+                knownPeers = network.getAllPeers();
 
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {
@@ -238,7 +242,10 @@ public class ConnectionCreator extends MonitoredThread {
 
                     if (peer.isUsed()) {
 
-                        ///peer.setNeedPing();
+                        if (false) {
+                            // не надо - так внутри же все запускается!
+                            peer.setNeedPing();
+                        }
 
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4, true);

@@ -23,15 +23,21 @@ import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
-/** верт (процесс)
+/**
+ * верт (процесс)
  * вертает общение с внешним пиром - чтение и запись
- *
  */
 public class Peer extends MonitoredThread {
 
-    private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = false;
+    private final static boolean USE_MONITOR = true;
+    /**
+     * <..... - receive просроченный ответ на Мо запрос<br>
+     * see -  org.erachain.network.message.Message#viewPref(boolean)
+     */
+    public final static boolean LOG_GET_HWEIGHT_TYPE = true; // "185.195.26.245"
+    private byte[] DEBUG_PEER = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245};
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getSimpleName());
     // Слишком бльшой буфер позволяет много посылок накидать не ожидая их приема. Но запросы с возратом остаются в очереди на долго
@@ -53,18 +59,19 @@ public class Peer extends MonitoredThread {
     private long connectionTime;
     private boolean runed;
     private int errors;
-    private int requestKey = 0;
+    Map<Integer, BlockingQueue<Message>> requests;
+    private int requestKey;
+
     private String version = "";
     private long buildDateTime;
     private String banMessage;
     private Tuple2<Integer, Long> hWeight;
     private int mute;
-
-    Map<Integer, BlockingQueue<Message>> messages;
+    private AtomicInteger requestKeyAtomic = new AtomicInteger(0);
 
     public Peer(InetAddress address) {
         this.address = address;
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+        this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
         this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
@@ -85,7 +92,7 @@ public class Peer extends MonitoredThread {
             this.network = network;
             this.socket = socket;
             this.address = socket.getInetAddress();
-            this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+            this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
             this.white = false;
             this.pingCounter = 0;
             this.connectionTime = NTP.getTime();
@@ -153,7 +160,7 @@ public class Peer extends MonitoredThread {
         if (networkIn != null)
             this.network = networkIn;
 
-        this.messages = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+        this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;
@@ -219,8 +226,12 @@ public class Peer extends MonitoredThread {
                 return false;
             }
 
-            this.pinger.setPing(Integer.MAX_VALUE);
-            this.pinger.setName("Pinger-" + this.pinger.getId() + " for: " + this.getName());
+            if (true) {
+                this.pinger.setName("Pinger-" + this.pinger.getId() + " for: " + this.getName());
+                this.pinger.setPing(Integer.MAX_VALUE);
+            } else {
+                this.pinger = new Pinger(this);
+            }
 
         }
 
@@ -275,12 +286,13 @@ public class Peer extends MonitoredThread {
 
     @Override
     public int hashCode() {
-        return new BigInteger(this.address.getAddress()).hashCode();
+        int hash = new BigInteger(this.address.getAddress()).hashCode();
+        return white ? -hash : hash;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Peer) {
+        if (obj instanceof Peer && obj.hashCode() == hashCode()) {
             return Arrays.equals(((Peer) obj).getAddress().getAddress(),
                     address.getAddress());
         }
@@ -391,192 +403,203 @@ public class Peer extends MonitoredThread {
      */
     private static long countAlarmMess = 0;
     public void run() {
-        byte[] messageMagic = null;
+        byte[] messageMagic;
 
         long parsePoint;
 
         this.initMonitor();
-        while (this.network.run) {
-            if (USE_MONITOR) this.setMonitorPoint();
+        try {
+            while (this.network.run) {
+                if (USE_MONITOR) this.setMonitorPoint();
 
-            DataInputStream in = null;
-            Object starter;
-            try {
-                starter = startReading.take();
-                if (starter instanceof DataInputStream) {
-                    in = (DataInputStream) starter;
-                } else
-                    break;
-
-                // INIT PINGER
-                pinger.init();
-            } catch (InterruptedException e) {
-                break;
-            }
-
-            MessageFactory messageFactory = MessageFactory.getInstance();
-            byte[] messageMagicChain = Controller.getInstance().getMessageMagic();
-            while (this.runed && this.network.run) {
-
-                //READ FIRST 4 BYTES
-                messageMagic = new byte[Message.MAGIC_LENGTH];
-
-                if (USE_MONITOR) this.setMonitorStatus("in.readFully");
-
-                // MORE EFFECTIVE
-                // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
-                // java.net.Socket.setSoTimeout(30000)
-                // после чего ловим событие SocketTimeoutException т поаторяем ожидание
-                // это работает без задержек и более эффективно и не ест время процессора
+                DataInputStream in;
+                Object starter;
                 try {
-                    in.readFully(messageMagic);
-                } catch (java.net.SocketTimeoutException timeOut) {
-                    /// просто дальше ждем - все нормально
-                    continue;
-                } catch (java.lang.OutOfMemoryError e) {
-                    LOGGER.error(e.getMessage(), e);
-                    Controller.getInstance().stopAll(82);
-                    return;
-                } catch (EOFException e) {
-                    if (this.runed)
-                        // на ТОМ конце произошло отключение - делаем тоже дисконект
-                        ban(0, "peer is shutdownInput");
+                    starter = startReading.take();
+                    if (starter instanceof DataInputStream) {
+                        in = (DataInputStream) starter;
+                    } else
+                        break;
 
-                    break;
-                } catch (java.net.SocketException e) {
-                    if (this.runed)
-                        ban(network.banForActivePeersCounter(), "read-2 " + e.getMessage());
-                    break;
-                } catch (java.io.IOException e) {
-                    if (this.runed)
-                        // это наш дисконект
-                        ban(network.banForActivePeersCounter(), "read-3 " + e.getMessage());
+                    // INIT PINGER
+                    pinger.init();
+                } catch (InterruptedException e) {
                     break;
                 }
 
-                if (!Arrays.equals(messageMagic, messageMagicChain)) {
-                    //ERROR and BAN
-                    ban(30, "parse - received message with wrong magic");
-                    break;
-                }
+                MessageFactory messageFactory = MessageFactory.getInstance();
+                byte[] messageMagicChain = Controller.getInstance().getMessageMagic();
+                while (this.runed && this.network.run) {
 
-                parsePoint = System.nanoTime();
-                //PROCESS NEW MESSAGE
-                Message message;
-                try {
-                    message = messageFactory.parse(this, in);
-                } catch (java.net.SocketTimeoutException timeOut) {
-                    ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
-                    break;
-                } catch (java.lang.OutOfMemoryError e) {
-                    LOGGER.error(e.getMessage(), e);
-                    Controller.getInstance().stopAll(83);
-                    break;
-                } catch (EOFException e) {
-                    if (this.runed)
-                        // на ТОМ конце произошло отключение - делаем тоже дисконект
-                        ban(network.banForActivePeersCounter(), "peer is shutdownInput");
-                    break;
-                } catch (IOException e) {
-                    if (this.runed)
-                        // на ТОМ конце произошло отключение - делаем тоже дисконект
-                        ban(network.banForActivePeersCounter(), e.getMessage());
-                    break;
-                } catch (Exception e) {
-                    //DISCONNECT and BAN
-                    LOGGER.error(e.getMessage(), e);
-                    //ban(network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
-                    continue;
-                }
+                    //READ FIRST 4 BYTES
+                    messageMagic = new byte[Message.MAGIC_LENGTH];
 
-                if (message == null) {
-                    // уже обрабатывали такое сообщение - игнорируем
-                    continue;
-                }
+                    if (USE_MONITOR) this.setMonitorStatus("in.readFully(messageMagic)");
 
-                parsePoint = (System.nanoTime() - parsePoint) / 1000;
-                if (System.currentTimeMillis() - countAlarmMess > 1000 && parsePoint < 999999999l) {
-                    if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 1000
-                            || parsePoint > 1009000
-                    ) {
-                            LOGGER.debug(this + message.viewPref(false) + message
-                                + " PARSE: " + parsePoint + "[us]");
+                    // MORE EFFECTIVE
+                    // в этом случае просто ожидаем прилета байтов в течении заданного времени ожидания
+                    // java.net.Socket.setSoTimeout(30000)
+                    // после чего ловим событие SocketTimeoutException т поаторяем ожидание
+                    // это работает без задержек и более эффективно и не ест время процессора
+                    try {
+                        in.readFully(messageMagic);
+                    } catch (java.net.SocketTimeoutException timeOut) {
+                        /// просто дальше ждем - все нормально
+                        continue;
+                    } catch (java.lang.OutOfMemoryError e) {
+                        LOGGER.error(e.getMessage(), e);
+                        Controller.getInstance().stopAll(82);
+                        return;
+                    } catch (EOFException e) {
+                        if (this.runed)
+                            // на ТОМ конце произошло отключение - делаем тоже дисконект
+                            ban(0, "peer is shutdownInput");
+
+                        break;
+                    } catch (java.net.SocketException e) {
+                        if (this.runed)
+                            ban(network.banForActivePeersCounter(), "read-2 " + e.getMessage());
+                        break;
+                    } catch (java.io.IOException e) {
+                        if (this.runed)
+                            // это наш дисконект
+                            ban(network.banForActivePeersCounter(), "read-3 " + e.getMessage());
+                        break;
                     }
-                    countAlarmMess = System.currentTimeMillis();
-                }
 
-                if (USE_MONITOR) this.setMonitorStatus("in.message process");
+                    if (!Arrays.equals(messageMagic, messageMagicChain)) {
+                        //ERROR and BAN
+                        ban(30, "parse - received message with wrong magic");
+                        break;
+                    }
 
-                //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
-                if (!message.isRequest() && message.hasId()) {
+                    parsePoint = System.nanoTime();
+                    //PROCESS NEW MESSAGE
+                    Message message;
+                    try {
+                        if (USE_MONITOR) this.setMonitorStatus("messageFactory.parse");
+                        message = messageFactory.parse(this, in);
+                    } catch (java.net.SocketTimeoutException timeOut) {
+                        ban(network.banForActivePeersCounter(), "peer in TimeOut and -ping");
+                        break;
+                    } catch (java.lang.OutOfMemoryError e) {
+                        LOGGER.error(e.getMessage(), e);
+                        Controller.getInstance().stopAll(83);
+                        break;
+                    } catch (EOFException e) {
+                        if (this.runed)
+                            // на ТОМ конце произошло отключение - делаем тоже дисконект
+                            ban(network.banForActivePeersCounter(), "peer is shutdownInput");
+                        break;
+                    } catch (IOException e) {
+                        if (this.runed)
+                            // на ТОМ конце произошло отключение - делаем тоже дисконект
+                            ban(network.banForActivePeersCounter(), e.getMessage());
+                        break;
+                    } catch (Exception e) {
+                        //DISCONNECT and BAN
+                        LOGGER.error(e.getMessage(), e);
+                        //ban(network.banForActivePeersCounter(), "parse message wrong - " + e.getMessage());
+                        continue;
+                    }
 
-                    if (!this.messages.containsKey(message.getId())) {
-                        // просроченное сообщение
-                        // это ответ на наш запрос с ID
-                        if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                                && message.getType() != Message.TELEGRAM_TYPE
-                        ) {
-                            LOGGER.debug(this + " <... " + message);
+                    if (message == null) {
+                        // уже обрабатывали такое сообщение - игнорируем
+                        if (false) {
+                            String mess = " ALREADY processed!";
+                            if (USE_MONITOR) this.setMonitorStatus(mess);
+                            LOGGER.debug(this + mess);
                         }
                         continue;
                     }
 
-                    // это ответ на наш запрос с ID
-                    if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                            && message.getType() != Message.TELEGRAM_TYPE
-                    ) {
-                        LOGGER.debug(this + message.viewPref(false) + message);
-                    }
-
-                    try {
-
-                        // get WAITING POLL
-                        BlockingQueue<Message> poll = this.messages.remove(message.getId());
-                        // invoke WAITING POLL
-                        poll.add(message);
-
-                    } catch (java.lang.OutOfMemoryError e) {
-                        LOGGER.error(e.getMessage(), e);
-                        Controller.getInstance().stopAll(84);
-                        break;
-
-                    } catch (Exception e) {
-                        LOGGER.error(this + message.viewPref(false) + message);
-                        LOGGER.error(e.getMessage(), e);
-                    }
-
-                } else {
-
-                    if (logPings && message.getType() != Message.TRANSACTION_TYPE
-                            && message.getType() != Message.TELEGRAM_TYPE
-                    ) {
-                        LOGGER.debug(this + message.viewPref(false) + message);
-                    }
-
-                    long timeStart = System.currentTimeMillis();
-
-                    try {
-                        this.network.onMessage(message);
-                    } catch (java.lang.OutOfMemoryError e) {
-                        LOGGER.error(e.getMessage(), e);
-                        Controller.getInstance().stopAll(88);
-                        break;
-                    }
-
-                    timeStart = System.currentTimeMillis() - timeStart;
-                    if (System.currentTimeMillis() - countAlarmMess > 1000
-                            && (timeStart > 1
-                                || message.getType() == Message.WIN_BLOCK_TYPE && timeStart > 100)) {
+                    parsePoint = (System.nanoTime() - parsePoint) / 1000;
+                    if (System.currentTimeMillis() - countAlarmMess > 1000 && parsePoint < 999999999l) {
+                        if ((message.getType() == Message.TELEGRAM_TYPE || message.getType() == Message.TRANSACTION_TYPE) && parsePoint > 1000
+                                || parsePoint > 1009000
+                        ) {
+                            LOGGER.debug(this + message.viewPref(false) + message
+                                    + " PARSE: " + parsePoint + "[us]");
+                        }
                         countAlarmMess = System.currentTimeMillis();
-                        LOGGER.debug(this + message.viewPref(false) + message + " solved by period: " + timeStart);
+                    }
+
+                    if (USE_MONITOR) this.setMonitorStatus("in.message process: " + message.viewPref(false) + message);
+
+                    if (LOG_GET_HWEIGHT_TYPE && (//message.getType() == Message.GET_HWEIGHT_TYPE ||
+                            message.getType() == Message.HWEIGHT_TYPE)
+                    ) {
+                        if (Arrays.equals(address.getAddress(), DEBUG_PEER)) {
+                            boolean debug = true;
+                        }
+                        LOGGER.debug(this + message.viewPref(false) + message);
+                    }
+
+                    //CHECK IF WE ARE WAITING FOR A RESPONSE WITH THAT ID
+                    if (!message.isRequest() && message.hasId()) {
+
+                        if (!this.requests.containsKey(message.getId())) {
+                            // просроченное сообщение
+                            // это ответ на наш запрос с ID
+                            if (LOG_GET_HWEIGHT_TYPE && (//message.getType() == Message.GET_HWEIGHT_TYPE ||
+                                    message.getType() == Message.HWEIGHT_TYPE)
+                            ) {
+                                if (USE_MONITOR) this.setMonitorStatus(" << LATE " + message);
+                                LOGGER.debug(this + " << LATE " + message);
+                            }
+                            continue;
+                        }
+
+                        // это ответ на наш запрос с ID
+
+                        try {
+
+                            // get WAITING POLL
+                            BlockingQueue<Message> poll = this.requests.remove(message.getId());
+                            // invoke WAITING POLL
+                            poll.add(message);
+
+                        } catch (java.lang.OutOfMemoryError e) {
+                            LOGGER.error(e.getMessage(), e);
+                            Controller.getInstance().stopAll(84);
+                            break;
+
+                        } catch (Exception e) {
+                            LOGGER.error(this + message.viewPref(false) + message);
+                            LOGGER.error(e.getMessage(), e);
+                        }
+
+                    } else {
+
+                        long timeStart = System.currentTimeMillis();
+
+                        try {
+                            if (USE_MONITOR)
+                                this.setMonitorStatus("network.onMessage: " + message.viewPref(false) + message);
+                            this.network.onMessage(message);
+                        } catch (java.lang.OutOfMemoryError e) {
+                            LOGGER.error(e.getMessage(), e);
+                            Controller.getInstance().stopAll(88);
+                            break;
+                        }
+
+                        timeStart = System.currentTimeMillis() - timeStart;
+                        if (System.currentTimeMillis() - countAlarmMess > 1000
+                                && (timeStart > 1
+                                || message.getType() == Message.WIN_BLOCK_TYPE && timeStart > 100)) {
+                            countAlarmMess = System.currentTimeMillis();
+                            LOGGER.debug(this + message.viewPref(false) + message + " solved by period: " + timeStart);
+                        }
                     }
                 }
             }
+        } finally {
+            if (USE_MONITOR) {
+                String mess = " HALTED by " + (network.run ? "error" : "network.STOP");
+                this.setMonitorStatus(mess);
+                LOGGER.debug(this + mess);
+            }
         }
-
-        if (USE_MONITOR) this.setMonitorStatus("halted");
-        //logger.debug(this + " - halted");
-
     }
 
     public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
@@ -592,6 +615,11 @@ public class Peer extends MonitoredThread {
     }
 
     public boolean offerMessage(Message message) {
+        if (LOG_GET_HWEIGHT_TYPE && message.getType() == Message.HWEIGHT_TYPE) {
+            boolean isSend = this.sender.offer(message);
+            LOGGER.debug(message.viewPref(true) + message + (isSend ? "" : " NOT SEND "));
+            return isSend;
+        }
         return this.sender.offer(message);
     }
 
@@ -615,42 +643,66 @@ public class Peer extends MonitoredThread {
      */
     private synchronized int incrementKey() {
 
-        if (this.requestKey == 99999) {
+        if (this.requestKey > 9999) {
             this.requestKey = 1;
-        }
-        else
+        } else {
             this.requestKey++;
+        }
 
-        if (USE_MONITOR) this.setMonitorStatus("incrementKey: " + this.requestKey);
         return this.requestKey;
 
     }
 
     public Message getResponse(Message message, long timeSOT) {
 
-        BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(1);
+        Integer localRequestKey;
+        BlockingQueue<Message> blockingQueue;
+        long checkTime;
 
-        int localRequestKey = incrementKey(); // быстро и без колллизий
+        // ЭТО ТОЖЕ НЕ ПОМОГАЕТ
+        ///synchronized (blockingQueue = new ArrayBlockingQueue<Message>(1)) {
+        blockingQueue = new ArrayBlockingQueue<Message>(1);
 
+        if (true) {
+            // неа - иногда без увеличения на 1 делает 2 запроса с одинаковым Номером
+            // проверено - и обмен запросами встает и пинг не проходит! И Бан
+            localRequestKey = incrementKey(); // быстро и без колллизий
+        } else {
+            // тут тоже по 2 раза печатает в лог
+            // "response.write GET_HWEIGHT_TYPE[5], messages.size: 0",
+            localRequestKey = requestKeyAtomic.incrementAndGet();
+        }
+
+        if (USE_MONITOR) {
+            this.setMonitorStatus("incrementKey: " + localRequestKey);
+        }
+        if (LOG_GET_HWEIGHT_TYPE) {
+            LOGGER.debug(this + " incrementKey: " + localRequestKey);
+        }
         message.setId(localRequestKey);
 
-        long checkTime = System.currentTimeMillis();
-
-
-        if (USE_MONITOR) this.setMonitorStatusBefore("response.write " + message.toString() + ", messages.size: " + messages.size());
+        checkTime = System.currentTimeMillis();
 
         //PUT QUEUE INTO MAP SO WE KNOW WE ARE WAITING FOR A RESPONSE
-        this.messages.put(localRequestKey, blockingQueue);
+        this.requests.put(localRequestKey, blockingQueue);
+
+        if (USE_MONITOR) {
+            this.setMonitorStatusBefore("response.write " + message.toString() + ", requests.size: " + requests.size());
+        }
+        if (LOG_GET_HWEIGHT_TYPE) {
+            LOGGER.debug(this + " response.write " + message.toString() + ", requests.size: " + requests.size());
+        }
 
         if (!this.offerMessage(message)) {
             //WHEN FAILED TO SEND MESSAGE
-            this.messages.remove(localRequestKey);
+            this.requests.remove(localRequestKey);
             if (USE_MONITOR) this.setMonitorStatusAfter();
             return null;
         }
         if (USE_MONITOR) this.setMonitorStatusAfter();
 
-        Message response = null;
+
+        Message response;
         try {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
         } catch (java.lang.OutOfMemoryError e) {
@@ -658,26 +710,28 @@ public class Peer extends MonitoredThread {
             Controller.getInstance().stopAll(86);
             return null;
         } catch (InterruptedException e) {
-            this.messages.remove(localRequestKey);
+            this.requests.remove(localRequestKey);
             return null;
         } catch (Exception e) {
-            this.messages.remove(localRequestKey);
+            this.requests.remove(localRequestKey);
             LOGGER.error(e.getMessage(), e);
             return null;
         }
 
         if (response == null) {
             // НУЛЬ значит не дождались - пора удалять идентификатор запроса из списка
-            this.messages.remove(localRequestKey);
+            this.requests.remove(localRequestKey);
         } else if (this.getPing() < 0) {
             // если ответ есть то в читателе уже удалили его из очереди
             // SET PING by request period
-            this.setPing((int)(System.currentTimeMillis() - checkTime));
+            this.setPing((int) (System.currentTimeMillis() - checkTime));
         }
 
-        if (USE_MONITOR) this.setMonitorStatus("response.done " + message.toString());
+        if (USE_MONITOR)
+            this.setMonitorStatus("response.done for: " + message.toString() + " RESPONSE: " + response);
 
         return response;
+        ///}
     }
 
     public Message getResponse(Message message) {
@@ -711,6 +765,8 @@ public class Peer extends MonitoredThread {
      * @param message
      */
     public /* synchronized */ void ban(int banForMinutes, String message) {
+
+        if (USE_MONITOR) this.setMonitorStatus("BAN: " + message);
 
         if (blockBuffer != null) {
             blockBuffer.stopThread();
@@ -813,9 +869,9 @@ public class Peer extends MonitoredThread {
 
     public void halt() {
 
-        this.pinger.close();
-        this.startReading.offer(-1);
+        //this.pinger.close();
         this.close("halt");
+        this.startReading.offer(-1);
         ////this.setName(this.getName() + " halted"); // может блокировать
 
     }

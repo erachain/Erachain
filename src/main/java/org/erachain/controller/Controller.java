@@ -1639,6 +1639,8 @@ public class Controller extends Observable {
 
             default:
 
+                LOGGER.debug(" UNKNOWN: " + message.viewPref(false) + message);
+
                 Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(dcSet);
                 if (HWeight == null)
                     HWeight = new Tuple2<Integer, Long>(-1, -1L);
@@ -2122,8 +2124,8 @@ public class Controller extends Observable {
 
     public Tuple3<Integer, Long, Peer> getMaxPeerHWeight(int shift, boolean useWeight, boolean excludeMute) {
 
-        if (this.isStopping || this.dcSet.isStoped())
-            return null;
+        if (this.isStopping || this.dcSet.isStoped() || this.network == null)
+            return new Tuple3<Integer, Long, Peer>(0, 0L, null);
 
         Tuple2<Integer, Long> myHWeight = this.getBlockChain().getHWeightFull(dcSet);
         int height = myHWeight.a + shift;

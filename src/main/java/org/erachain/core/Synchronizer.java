@@ -1233,6 +1233,7 @@ public class Synchronizer extends Thread {
 
         DCSet dcSet = DCSet.getInstance();
         while (!cnt.isOnStopping()) {
+
             try {
 
                 try {
@@ -1242,11 +1243,30 @@ public class Synchronizer extends Thread {
                 }
 
                 timeTmp = bchain.getTimestamp(dcSet) + shiftPoint;
-
-                if (timePoint == timeTmp || timeTmp > NTP.getTime())
+                if (timeTmp > NTP.getTime())
                     continue;
 
+                if (timeTmp + (blockTime << 1) < NTP.getTime()) {
+                    // мы встали - проверяем в любом случае
+                    needCheck = true;
+                    try {
+                        // подождем чуток еще иначе очень часто будет опрос
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                } else {
+
+                    if (timePoint == timeTmp)
+                        // новый блок не прилетал - ждем
+                        continue;
+
+                    // иначе просиходит сброс и синхронизация новая
+                    if (blockGenerator.getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT)
+                        continue;
+                }
                 timePoint = timeTmp;
+
 
                 // снизим ожижание блокировки с "сильных но таких же как мы" узлов
                 cnt.network.decrementWeightOfPeerMutes();
@@ -1254,12 +1274,8 @@ public class Synchronizer extends Thread {
                 if (!cnt.isStatusOK())
                     continue;
 
-                // иначе просиходит сброс и синхронизация новая
-                if (blockGenerator.getForgingStatus() == BlockGenerator.ForgingStatus.FORGING_WAIT)
-                    continue;
 
-
-                if (BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
+                if (needCheck || BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS < 2) {
                     // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                     needCheck = true;
                 } else {

@@ -18,7 +18,7 @@ public class Pinger extends Thread {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Pinger.class.getSimpleName());
     private int DEFAULT_PING_TIMEOUT;
-    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000; // BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) >> 4;
+    private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000;
 
     private Peer peer;
     //private boolean needPing = false;
@@ -56,7 +56,9 @@ public class Pinger extends Thread {
 
     private boolean tryPing(long timeSOT) {
 
-        //logger.info("try PING " + this.peer);
+        if (peer.LOG_GET_HWEIGHT_TYPE) {
+            LOGGER.info("try PING " + this.peer);
+        }
 
         peer.addPingCounter();
 
@@ -120,11 +122,6 @@ public class Pinger extends Thread {
 
         Controller cnt = Controller.getInstance();
         BlockChain chain = cnt.getBlockChain();
-
-        int sleepTimestep = 100;
-        int sleepsteps = DEFAULT_PING_TIMEOUT / sleepTimestep;
-        int sleepStepTimeCounter;
-        boolean resultSend;
 
         Integer deal = 0;
         while (this.peer.network.run) {
