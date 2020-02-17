@@ -142,7 +142,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
 
                 if (false) {
-                    // может не нао - та внутри же все запускается!
+                    // не надо тут сразу пинговать - так внутри же все запускается пингер сразу
                     peer.setNeedPing();
                 }
 

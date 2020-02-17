@@ -134,7 +134,7 @@ public class ConnectionCreator extends MonitoredThread {
 
 
             if (false) {
-                // может не нао - та внутри же все запускается!
+                // не надо - так внутри же все запускается!
                 newPeer.setNeedPing();
             }
 
@@ -243,7 +243,7 @@ public class ConnectionCreator extends MonitoredThread {
                     if (peer.isUsed()) {
 
                         if (false) {
-                            // может не нао - та внутри же все запускается!
+                            // не надо - так внутри же все запускается!
                             peer.setNeedPing();
                         }
 

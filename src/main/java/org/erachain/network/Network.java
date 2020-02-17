@@ -657,7 +657,7 @@ public class Network extends Observable {
                 }
             }
 
-            peer.setNeedPing();
+            ///peer.setNeedPing();
 
         }
 
