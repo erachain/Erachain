@@ -31,7 +31,7 @@ public class Pinger extends Thread {
         this.ping = Integer.MAX_VALUE;
         this.setName("Pinger-" + this.getId() + " for: " + peer.getName());
 
-        DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight());
+        DEFAULT_PING_TIMEOUT = BlockChain.GENERATING_MIN_BLOCK_TIME_MS(Controller.getInstance().getMyHeight()) << 2;
 
         this.start();
     }
@@ -82,13 +82,13 @@ public class Pinger extends Thread {
             } else
                 this.ping = -1;
 
-            //PING FAILES
+            //PING FAILS
             // чем меньше пиров на связи тем дольше пингуем перед разрывом
-            if (this.ping < -10 -20/(1 + peer.network.banForActivePeersCounter())) {
+            if (this.ping < -30 - 60 / (1 + peer.network.banForActivePeersCounter())) {
                 // если полный отказ уже больше чем ХХХ секнд то ИМЕННО БАН
 
                 // И если тут не оборать, то на этапе получения подписей по блокам тогда разрыв будет - ответ не получается
-                this.peer.ban("on PING FAILES");
+                this.peer.ban("on PING FAILS");
             }
 
             return false;
