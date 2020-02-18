@@ -132,6 +132,13 @@ public class Pinger extends Thread {
                 break;
             }
 
+            try {
+                // дадм время на запуск с той тороны
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                return;
+            }
+
             Controller.getInstance().onConnect(this.peer);
 
             while (this.peer.isUsed() && this.peer.network.run) {
