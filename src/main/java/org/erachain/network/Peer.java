@@ -614,7 +614,8 @@ public class Peer extends MonitoredThread {
     }
 
     public boolean offerMessage(Message message) {
-        if (LOG_GET_HWEIGHT_TYPE && message.getType() == Message.HWEIGHT_TYPE) {
+        if (LOG_GET_HWEIGHT_TYPE && message.hasId()
+                && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
             boolean isSend = this.sender.offer(message);
             LOGGER.debug(message.viewPref(true) + message + (isSend ? "" : " NOT SEND "));
             return isSend;
@@ -688,16 +689,21 @@ public class Peer extends MonitoredThread {
         if (USE_MONITOR) {
             this.setMonitorStatusBefore("response.write " + message.toString() + ", requests.size: " + requests.size());
         }
-        if (LOG_GET_HWEIGHT_TYPE) {
+        if (LOG_GET_HWEIGHT_TYPE && message.getType() == Message.GET_HWEIGHT_TYPE) {
             LOGGER.debug(this + " response.write " + message.toString() + ", requests.size: " + requests.size());
         }
 
-        if (!this.offerMessage(message)) {
-            //WHEN FAILED TO SEND MESSAGE
-            this.requests.remove(localRequestKey);
-            if (USE_MONITOR) this.setMonitorStatusAfter();
-            return null;
+        if (message.getType() == Message.GET_HWEIGHT_TYPE) {
+            sender.sendGetHWeight((GetHWeightMessage) message);
+        } else {
+            if (!this.offerMessage(message)) {
+                //WHEN FAILED TO SEND MESSAGE
+                this.requests.remove(localRequestKey);
+                if (USE_MONITOR) this.setMonitorStatusAfter();
+                return null;
+            }
         }
+
         if (USE_MONITOR) this.setMonitorStatusAfter();
 
 
