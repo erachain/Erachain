@@ -139,6 +139,8 @@ public class Sender extends MonitoredThread {
                     this.out.flush();
                     out_flush_time = System.currentTimeMillis();
                     out_flush_length = 0;
+                    if (logPings) LOGGER.debug(peer + " FLUSHED OUT");
+                    if (USE_MONITOR) this.setMonitorStatus("FLUSHED OUT");
                 }
 
             } catch (java.lang.OutOfMemoryError e) {
@@ -237,9 +239,9 @@ public class Sender extends MonitoredThread {
 
             long checkTime = System.currentTimeMillis();
 
-            if (!writeAndFlush(bytes, messageType == Message.GET_HWEIGHT_TYPE
-                    || messageType == Message.HWEIGHT_TYPE
-                    || messageType == Message.WIN_BLOCK_TYPE)) {
+            if (!writeAndFlush(bytes,
+                    message.hasId() // все что связано с запросами ужно быстро отправлять
+                            || messageType == Message.WIN_BLOCK_TYPE)) {
                 LOGGER.debug(this.peer + message.viewPref(true) + message + " NOT send ((");
                 return false;
             }
