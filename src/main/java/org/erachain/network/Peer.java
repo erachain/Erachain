@@ -17,11 +17,10 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -71,7 +70,7 @@ public class Peer extends MonitoredThread {
 
     public Peer(InetAddress address) {
         this.address = address;
-        this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+        this.requests = new ConcurrentHashMap<Integer, BlockingQueue<Message>>(256, 1);
         this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
@@ -92,7 +91,7 @@ public class Peer extends MonitoredThread {
             this.network = network;
             this.socket = socket;
             this.address = socket.getInetAddress();
-            this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+            this.requests = new ConcurrentHashMap<Integer, BlockingQueue<Message>>(256, 1);
             this.white = false;
             this.pingCounter = 0;
             this.connectionTime = NTP.getTime();
@@ -160,7 +159,7 @@ public class Peer extends MonitoredThread {
         if (networkIn != null)
             this.network = networkIn;
 
-        this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+        this.requests = new ConcurrentHashMap<Integer, BlockingQueue<Message>>(256, 1);
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;

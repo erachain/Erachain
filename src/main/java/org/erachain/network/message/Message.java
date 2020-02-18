@@ -210,10 +210,10 @@ public abstract class Message {
 
         byte[] data = new byte[0];
 
-        //WRITE MAGIC
+        //WRITE MAGIC - 4
         data = Bytes.concat(data, Controller.getInstance().getMessageMagic());
 
-        //WRITE MESSAGE TYPE
+        //WRITE MESSAGE TYPE 8
         byte[] typeBytes = Ints.toByteArray(this.type);
         typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
         data = Bytes.concat(data, typeBytes);
@@ -223,7 +223,7 @@ public abstract class Message {
             byte[] hasIdBytes = new byte[]{1};
             data = Bytes.concat(data, hasIdBytes);
 
-            //WRITE ID
+            //WRITE ID - 13
             byte[] idBytes = Ints.toByteArray(this.id);
             idBytes = Bytes.ensureCapacity(idBytes, ID_LENGTH, 0);
             data = Bytes.concat(data, idBytes);
@@ -232,7 +232,7 @@ public abstract class Message {
             data = Bytes.concat(data, hasIdBytes);
         }
 
-        //WRITE LENGTH
+        //WRITE LENGTH 17 or 13 (if not has ID)
         byte[] lengthBytes = Ints.toByteArray(this.getDataLength());
         data = Bytes.concat(data, lengthBytes);
 
