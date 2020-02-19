@@ -23,12 +23,22 @@ public interface OrderMap extends DBTab<Long, Order> {
     long getCountOrders(long haveWant);
 
     HashMap<Long, Order> getProtocolEntries(long have, long want, BigDecimal limit, Map deleted);
+
     List<Order> getOrdersForTradeWithFork(long have, long want, BigDecimal limit);
 
     List<Order> getOrdersForTrade(long have, long want, boolean reverse);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     List<Order> getOrders(long have, long want, int limit);
+
+    /**
+     * Первый выгодный ордер - для Инфо по паре
+     *
+     * @param have
+     * @param want
+     * @return
+     */
+    Order getHaveWanFirst(long have, long want);
 
     List<Order> getOrdersForAddress(String address, Long have, Long want, int limit);
 

@@ -26,7 +26,7 @@ public class VersionMessage extends Message {
         int position = 0;
         //READ LENGTH
         byte[] buildDateTimeBytes = Arrays.copyOfRange(data, position, position + TIMESTAMP_LENGTH);
-        long buildDateTime = Ints.fromByteArray(buildDateTimeBytes);
+        long buildDateTime = Longs.fromByteArray(buildDateTimeBytes);
 
         position += TIMESTAMP_LENGTH;
 

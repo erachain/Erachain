@@ -39,17 +39,22 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
 
     public DCUMapImpl(DBASet databaseSet) {
         super(databaseSet);
+        createIndexes();
     }
 
     public DCUMapImpl(DBASet databaseSet, DB database, String tabName, Serializer tabSerializer, boolean sizeEnable) {
         super(databaseSet, database, tabName, tabSerializer, sizeEnable);
+        createIndexes();
     }
 
     public DCUMapImpl(DBASet databaseSet, DB database, boolean sizeEnable) {
         super(databaseSet, database, sizeEnable);
+        createIndexes();
     }
     public DCUMapImpl(DBASet databaseSet, DB database) {
         super(databaseSet, database, false);
+        createIndexes();
+
     }
 
     public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet, boolean sizeEnable) {
@@ -76,7 +81,9 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             this.getMemoryMap();
         } else {
             this.openMap();
+            createIndexes();
         }
+
     }
 
     public DCUMapImpl(DCUMapImpl<T, U> parent, DBASet dcSet) {
@@ -193,7 +200,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         NavigableSet<Fun.Tuple2<?, T>> indexSet = getIndex(index, descending);
         if (indexSet != null) {
 
-            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(this.indexes.get(index));
+            org.erachain.datachain.IndexIterator<T> u = new org.erachain.datachain.IndexIterator<T>(indexSet);
             this.outUses();
             return u;
 

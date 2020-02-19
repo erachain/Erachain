@@ -7,7 +7,7 @@ import org.erachain.datachain.DCSet;
 import org.erachain.gui.library.HoldersLibraryPanel;
 import org.erachain.gui.library.HyperLinkAccount;
 import org.erachain.gui.library.Library;
-import org.erachain.gui.library.VoushLibraryPanel;
+import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 import org.erachain.utils.NumberAsString;
@@ -207,7 +207,7 @@ public class AssetInfo extends JTextPane {
         try {
             javax.swing.JTabbedPane jTabbedPane1 = new javax.swing.JTabbedPane();
             // vouches
-            jTabbedPane1.add(new VoushLibraryPanel(transaction));
+            jTabbedPane1.add(new VouchLibraryPanel(transaction));
             // holders
             jTabbedPane1.add(new HoldersLibraryPanel(asset, -1));
 //            jTabbedPane1.add(new HoldersLibraryPanel(asset, 2));

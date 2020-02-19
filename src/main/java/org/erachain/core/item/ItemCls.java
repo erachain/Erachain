@@ -449,14 +449,28 @@ public abstract class ItemCls implements ExplorerJsonLine {
 
         if (str.contains("%1") && tuple.a != null)
             str = str.replace("%1", tuple.a.toString());
+        else
+            str = str.replace("%1", "");
+
         if (str.contains("%2") && tuple.b != null)
             str = str.replace("%2", tuple.b.toString());
+        else
+            str = str.replace("%2", "");
+
         if (str.contains("%3") && tuple.c != null)
             str = str.replace("%3", new String(tuple.c, Charset.forName("UTF-8")));
+        else
+            str = str.replace("%3", "");
+
         if (str.contains("%4") && tuple.d != null)
             str = str.replace("%4", new String(tuple.d, Charset.forName("UTF-8")));
+        else
+            str = str.replace("%4", "");
+
         if (str.contains("%D") && tuple.f != null)
             str = str.replace("%D", new String(new String(tuple.f, Charset.forName("UTF-8"))));
+        else
+            str = str.replace("%D", "");
 
         return str;
     }

@@ -60,10 +60,6 @@ public class WItemMap extends AutoKeyDBMap<Tuple2<Long, Long>, Tuple2<Long, Item
         }
     }
 
-    //@SuppressWarnings({ "unchecked", "rawtypes" })
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

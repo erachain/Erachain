@@ -134,6 +134,20 @@ public class OrdersSuitMapDB extends DBMapSuit<Long, Order> implements OrderSuit
     }
 
     @Override
+    public Order getHaveWanFirst(long have, long want) {
+
+        Map.Entry<Fun.Tuple4, Long> first = ((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(
+                Fun.t4(have, want, null, null),
+                Fun.t4(have, want, Fun.HI(), Fun.HI())).firstEntry();
+
+        if (first == null)
+            return null;
+
+        return get(first.getValue());
+
+    }
+
+    @Override
     public IteratorCloseable<Long> getHaveWantIterator(long have, long want) {
 
         return new IteratorCloseableImpl(((BTreeMap<Fun.Tuple4, Long>) this.haveWantKeyMap).subMap(

@@ -47,10 +47,6 @@ public abstract class BalanceMap extends DCUMap<Tuple2<Long, Long>,
         super(parent, dcSet);
     }
 
-    @Override
-    protected void createIndexes() {
-    }
-
     @SuppressWarnings({"unchecked"})
     @Override
     public void openMap() {

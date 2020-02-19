@@ -20,9 +20,6 @@ public class UpdateNameMap extends DCUMap<byte[], Name> {
         super(parent, null);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

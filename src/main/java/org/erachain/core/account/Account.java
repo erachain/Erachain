@@ -445,6 +445,59 @@ public class Account {
         return null;
     }
 
+    public static BigDecimal balanceInPositionAndSide(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
+                                                      int position, int side) {
+        switch (position) {
+            case TransactionAmount.ACTION_SEND:
+                switch (side) {
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                        return balance.a.a;
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                        return balance.a.b;
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                        return balance.a.a.subtract(balance.a.b);
+                }
+            case TransactionAmount.ACTION_DEBT:
+                switch (side) {
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                        return balance.b.a;
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                        return balance.b.b;
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                        return balance.b.a.subtract(balance.b.b);
+                }
+            case TransactionAmount.ACTION_HOLD:
+                switch (side) {
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                        return balance.c.a;
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                        return balance.c.b;
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                        return balance.c.a.subtract(balance.c.b);
+                }
+            case TransactionAmount.ACTION_SPEND:
+                switch (side) {
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                        return balance.d.a;
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                        return balance.d.b;
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                        return balance.d.a.subtract(balance.d.b);
+                }
+            case TransactionAmount.ACTION_PLEDGE:
+                switch (side) {
+                    case TransactionAmount.BALANCE_SIDE_CREDIT:
+                        return balance.e.a;
+                    case TransactionAmount.BALANCE_SIDE_LEFT:
+                        return balance.e.b;
+                    case TransactionAmount.BALANCE_SIDE_DEBIT:
+                        return balance.e.a.subtract(balance.e.b);
+                }
+        }
+
+        return null;
+    }
+
     static public Tuple2<BigDecimal, BigDecimal> getBalanceInPosition(Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>> balance,
                                                                       int position) {
         switch (position) {
@@ -626,6 +679,60 @@ public class Account {
 
     }
 
+    public void changeCOMPUBonusBalances(DCSet dcSet, boolean substract, BigDecimal amount, int side) {
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                balance = dcSet.getAssetBalanceMap().get(getShortAddressBytes(), Transaction.FEE_KEY);
+
+        if (side == Transaction.BALANCE_SIDE_DEBIT) {
+            // учтем Всего бонусы
+            // это Баланс 4-й сторона 1
+            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    balance.a, balance.b, balance.c,
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(balance.d.a.subtract(amount), balance.d.b)
+                            : new Tuple2<BigDecimal, BigDecimal>(balance.d.a.add(amount), balance.d.b),
+                    balance.e);
+        } else if (side == Transaction.BALANCE_SIDE_CREDIT) {
+            // учтем что Всего потратили
+            // это Баланс 4-й сторона 1
+            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    balance.a, balance.b, balance.c,
+                    !substract ? new Tuple2<BigDecimal, BigDecimal>(balance.d.a, balance.d.b.subtract(amount))
+                            : new Tuple2<BigDecimal, BigDecimal>(balance.d.a, balance.d.b.add(amount)),
+                    balance.e);
+        } else if (side == Transaction.BALANCE_SIDE_FORGED) {
+            // учтем что Всего нафоржили
+            // это Баланс 5-й
+            balance = new Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>(
+                    balance.a, balance.b, balance.c, balance.d,
+                    substract ? new Tuple2<BigDecimal, BigDecimal>(balance.e.a, balance.e.b.subtract(amount))
+                            : new Tuple2<BigDecimal, BigDecimal>(balance.e.a, balance.e.b.add(amount))
+            );
+        } else {
+            return;
+        }
+
+        dcSet.getAssetBalanceMap().put(getShortAddressBytes(), Transaction.FEE_KEY, balance);
+
+    }
+
+    public BigDecimal getCOMPUBonusBalances(DCSet dcSet, boolean substract, BigDecimal amount, int side) {
+        Tuple5<Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>, Tuple2<BigDecimal, BigDecimal>>
+                balance = dcSet.getAssetBalanceMap().get(getShortAddressBytes(), Transaction.FEE_KEY);
+
+        if (side == Transaction.BALANCE_SIDE_DEBIT) {
+            // БОНУСЫ всего полученные
+            return balance.d.a;
+        } else if (side == Transaction.BALANCE_SIDE_CREDIT) {
+            // все потрачено на комиссии
+            return balance.d.b;
+        } else if (side == Transaction.BALANCE_SIDE_FORGED) {
+            // всего нафоржено
+            return balance.e.b;
+        }
+
+        return balance.e.a;
+    }
+
     /*
      * public void setLastReference(Long timestamp) {
      * this.setLastReference(timestamp, DBSet.getInstance()); }
@@ -633,7 +740,7 @@ public class Account {
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
-                                    BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
+                                                                    BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
         int actionType = actionType(key, amount_in);
 

@@ -12,7 +12,6 @@ import org.erachain.utils.DateTimeFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.mapdb.Fun.Tuple2;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -73,14 +72,13 @@ public class PeersResource {
     @GET
     @Path("height")
     public String getTest() {
-        Map<Peer, Tuple2<Integer, Long>> peers = Controller.getInstance().getPeerHWeights();
         JSONArray array = new JSONArray();
 
-        for (Map.Entry<Peer, Tuple2<Integer, Long>> peer : peers.entrySet()) {
+        for (Peer peer : Controller.getInstance().network.getActivePeers(false)) {
             JSONObject o = new JSONObject();
-            o.put("peer", peer.getKey().getAddress().getHostAddress());
-            o.put("height", peer.getValue().a);
-            o.put("weight", peer.getValue().b);
+            o.put("peer", peer.getAddress().getHostAddress());
+            o.put("height", peer.getHWeight().a);
+            o.put("weight", peer.getHWeight().b);
             array.add(o);
         }
 
@@ -102,7 +100,7 @@ public class PeersResource {
     @GET
     @Path("detail/knownpeers")
     public String getDetailKnownPeers() {
-        List<Peer> knownPeers = Controller.getInstance().network.getKnownPeers();
+        List<Peer> knownPeers = Controller.getInstance().network.getAllPeers();
         Map output = getMapPeers(knownPeers);
         return JSONValue.toJSONString(output);
     }
@@ -161,19 +159,17 @@ public class PeersResource {
     public JSONObject getDetail(Peer peer) {
         JSONObject o = new JSONObject();
 
-        if (Controller.getInstance().getActivePeers().contains(peer)) {
+        if (peer.isUsed()) {
             o.put("status", "connected");
         } else if (Controller.getInstance().getDLSet().getPeerMap().contains(peer.getAddress().getAddress())) {
             o.put("status", "known disconnected");
         }
 
-        if (Controller.getInstance().getPeerHWeights().containsKey(peer)) {
-            o.put("height", Controller.getInstance().getHWeightOfPeer(peer));
-        }
-        if (Controller.getInstance().getPeersVersions().containsKey(peer)) {
-            o.put("version", Controller.getInstance().getVersionOfPeer(peer).getA());
-            o.put("buildTime", DateTimeFormat.timestamptoString(Controller.getInstance().getVersionOfPeer(peer).getB(), "yyyy-MM-dd HH:mm:ss z", "UTC"));
-        }
+        o.put("height", peer.getHWeight());
+        o.put("version", peer.getVersion());
+        o.put("buildTime", peer.getBuildTime() > 0 ?
+                DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd", "UTC")
+                : "");
         if (peer.isPinger()) {
             o.put("ping", peer.getPing());
         }

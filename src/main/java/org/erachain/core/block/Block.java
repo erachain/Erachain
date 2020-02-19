@@ -1715,7 +1715,8 @@ import java.util.*;
                     }
 
                     //CHECK TIMESTAMP AND DEADLINE
-                    if (transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
+                    if ((BlockChain.TEST_MODE || heightBlock > 278989) &&
+                            transaction.getTimestamp() > timestampEnd + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(heightBlock)
                     ) {
                         LOGGER.debug("*** " + this.heightBlock + "-" + seqNo
                                 + ":" + transaction.viewFullTypeName()
@@ -1780,11 +1781,13 @@ import java.util.*;
                                 unconfirmedMap.delete(transactionSignature);
                             } else {
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
+                                unconfirmedMap.delete(transactionSignature);
                             }
                         } catch (java.lang.Throwable e) {
                             if (e instanceof java.lang.IllegalAccessError) {
                                 // налетели на закрытую таблицу
                                 unconfirmedMap = dcSetPlace.getTransactionTab();
+                                unconfirmedMap.delete(transactionSignature);
                             } else {
                                 LOGGER.error(e.getMessage(), e);
                             }
@@ -1998,6 +2001,9 @@ import java.util.*;
             BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
             this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
                     totalFee, true, false);
+
+            // учтем что нафоржили
+            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, totalFee, Transaction.BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && !Controller.getInstance().noCalculated) {

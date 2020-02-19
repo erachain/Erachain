@@ -48,6 +48,11 @@ public abstract class Transaction implements ExplorerJsonLine {
      * };
      */
 
+    public static final int BALANCE_SIDE_DEBIT = 1;
+    public static final int BALANCE_SIDE_LEFT = 2;
+    public static final int BALANCE_SIDE_CREDIT = 3;
+    public static final int BALANCE_SIDE_FORGED = 4;
+
     // toBYTE & PARSE fields for different DEALs
     public static final int FOR_MYPACK = 1; // not use this.timestamp & this.feePow
     public static final int FOR_PACK = 2; // not use feePow
@@ -1365,11 +1370,14 @@ public abstract class Transaction implements ExplorerJsonLine {
             // break loop
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             invitedAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
+            // учтем что получили бонусы
+            invitedAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " top level";
                 txCalculated.add(new RCalculated(invitedAccount, FEE_KEY, giftBG,
                         messageLevel, this.dbRef));
+
             }
             return;
         }
@@ -1389,6 +1397,10 @@ public abstract class Transaction implements ExplorerJsonLine {
 
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift_get, BlockChain.FEE_SCALE);
             issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY, giftBG, false, true);
+
+            // учтем что получили бонусы
+            issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
+
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
                 txCalculated.add(new RCalculated(issuerAccount, FEE_KEY, giftBG,
@@ -1405,6 +1417,9 @@ public abstract class Transaction implements ExplorerJsonLine {
             BigDecimal giftBG = BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE);
             issuerAccount.changeBalance(this.dcSet, asOrphan, FEE_KEY,
                     BigDecimal.valueOf(fee_gift, BlockChain.FEE_SCALE), false, true);
+
+            // учтем что получили бонусы
+            issuerAccount.changeCOMPUBonusBalances(dcSet, asOrphan, giftBG, Transaction.BALANCE_SIDE_DEBIT);
 
             if (txCalculated != null && !asOrphan) {
                 messageLevel = message + " @P:" + invitedPersonKey + " level." + (1 + BlockChain.FEE_INVITED_DEEP - level);
@@ -1455,7 +1470,8 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
                 this.creator.changeBalance(this.dcSet, true, FEE_KEY, this.fee, true, true);
-
+                // учтем траты
+                this.creator.changeCOMPUBonusBalances(this.dcSet, true, this.fee, BALANCE_SIDE_CREDIT);
             }
 
             // Multi Level Referal
@@ -1492,6 +1508,8 @@ public abstract class Transaction implements ExplorerJsonLine {
             if (this.fee != null && this.fee.compareTo(BigDecimal.ZERO) != 0) {
                 // NOT update INCOME balance
                 this.creator.changeBalance(this.dcSet, false, FEE_KEY, this.fee, true, true);
+                // учтем траты
+                this.creator.changeCOMPUBonusBalances(this.dcSet, false, this.fee, BALANCE_SIDE_CREDIT);
 
             }
 

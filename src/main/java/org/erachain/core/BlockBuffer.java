@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class BlockBuffer extends Thread {
     private static final int BUFFER_SIZE = 5 + (256 >> Controller.HARD_WORK);
     private final Logger LOGGER;
+    private boolean logOn = false;
     private List<byte[]> signatures;
     private Peer peer;
     private int counter;
@@ -127,7 +128,7 @@ public class BlockBuffer extends Thread {
                 //CHECK IF WE GOT RESPONSE
                 if (response == null) {
                     //ERROR
-                    if (peer.isUsed()) {
+                    if (peer.isUsed() && logOn) {
                         LOGGER.debug("ERROR block BUFFER response == null, timeSOT[s]:" + timeSOT / 1000
                                 + " " + peer
                                 + " " + BlockBuffer.this.getName() + " :: " + getName());
@@ -139,7 +140,7 @@ public class BlockBuffer extends Thread {
                 Block block = response.getBlock();
                 //CHECK BLOCK SIGNATURE
                 if (block == null) {
-                    if (peer.isUsed()) {
+                    if (peer.isUsed() && logOn) {
                         LOGGER.debug("ERROR block BUFFER block");
                     }
                     error = true;
@@ -149,11 +150,13 @@ public class BlockBuffer extends Thread {
                 //ADD TO LIST
                 blockingQueue.add(block);
 
-                LOGGER.debug("block BUFFER added: "
-                        + block.getTransactionCount() + "tx, "
-                        + response.getLength() / 1000 + "kB, "
-                        + (System.currentTimeMillis() - timePoint) + "ms"
-                );
+                if (logOn) {
+                    LOGGER.debug("block BUFFER added: "
+                            + block.getTransactionCount() + "tx, "
+                            + response.getLength() / 1000 + "kB, "
+                            + (System.currentTimeMillis() - timePoint) + "ms"
+                    );
+                }
 
             }
         }.start();

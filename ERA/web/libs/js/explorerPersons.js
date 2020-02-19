@@ -12,22 +12,72 @@ function person_asset(data) {
 
     output += '<img src="data:image/gif;base64,' + data.person_img + '" width = "350" /></td><td style ="padding-left:20px">';
 
+    output += '<h2><center>' + data.label_Balance_Pos + '</center></h2>';
+
+    var sideName;
+    if (data.side == 1)
+        sideName = data.Label_TotalDebit;
+    if (data.side == 2)
+        sideName = data.Label_Left;
+    if (data.side == 3)
+        sideName = data.Label_TotalCredit;
+    if (data.side == 4)
+        sideName = data.Label_TotalForged;
+
     if (data.sum > 0) {
+        output += '<b><span style="font-size:2em; color:#0cb70c"> &nbsp&nbsp ' + sideName + '</span></b><br>';
         output += '<img src="img/check-yes.png" style="height:110px">'
         output += '<b><span style="font-size:4em; color:#0cb70c"> &nbsp&nbsp +' + data.sum + '</span></b><br>';
         output += '<br>';
     } else if (data.sum == 0) {
+        output += '<b><span style="font-size:2em; color:crimson"> &nbsp&nbsp ' + sideName + '</span></b><br>';
         output += '<img src="img/check-no.png" style="height:120px">'
         output += '<br><br>';
     } else {
+        output += '<b><span style="font-size:2em; color:crimson"> &nbsp&nbsp ' + sideName + '</span></b><br>';
         output += '<img src="img/check-no.png" style="height:120px">'
         output += '<b><span style="font-size:3em; color:crimson"> &nbsp&nbsp ' + data.sum + '</span></b><br>';
         output += '<br>';
     }
 
-    output += data.Label_asset + ': <fon_t size=10> &nbsp&nbsp' + data.asset_name + '</fon_t><br>';
     output += data.Label_person + ': <a href ="?person=' +
-        data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a>';
+        data.person_key + get_lang() + '">[' + data.person_key + ']' + data.person_name + '</a><br>';
+
+    output += data.Label_asset + ': <a href ="?asset=' +
+        data.asset_key + get_lang() + '">[' + data.asset_key + ']' + data.asset_name + '</a><br>';
+
+    output += '<span style="font-size:1.2em">' + data.Label_Sides + ': &nbsp&nbsp ';
+
+    if (data.side == '1')
+        output +=  ': &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalDebit + '</span></b>';
+    else
+        output +=  ': &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=1' + get_lang()
+                                 + '">' + data.Label_TotalDebit + '</a>';
+
+    if (data.side == '2')
+        output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_Left + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=2' + get_lang()
+                                        + '">' + data.Label_Left + '</a>';
+
+    if (data.side == '3')
+        output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalCredit + '</span></b>';
+    else
+        output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=3' + get_lang()
+                                        + '">' + data.Label_TotalCredit + '</a>';
+
+    if (data.hasOwnProperty('Label_TotalForged')) {
+        if (data.side == '4')
+            output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Label_TotalForged + '</span></b>';
+        else
+            output +=  ' &nbsp&nbsp <a href ="?person=' + data.person_key + '&asset=' + data.asset_key + '&position=' + data.position + '&side=4' + get_lang()
+                                           + '">' + data.Label_TotalForged + '</a>';
+   }
+
+
+    output +=  ' &nbsp&nbsp <span id="side-help" style="display:none;"><br>' + data.Side_Help + '</span>';
+    output +=  ' &nbsp&nbsp <a href ="#" onclick="$(\'#side-help\').toggle();"><span class="glyphicon glyphicon-question-sign"></span></a>';
+    output += '</span>';
 
     output += '<br>';
     output += '<br>';

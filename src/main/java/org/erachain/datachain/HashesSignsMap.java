@@ -37,9 +37,6 @@ public class HashesSignsMap extends DCUMap<byte[], Stack<Tuple3<
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

@@ -68,9 +68,6 @@ public class TransactionFinalCalculatedMap extends DCUMap<Tuple3<Integer, Intege
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @SuppressWarnings("unchecked")
     private Map<Tuple3<Integer, Integer, Long>, Calculated> openMap(DB database) {
 
