@@ -3613,7 +3613,7 @@ public class BlockExplorer {
                     out.put("seqNo", transaction.getSeqNo());
 
                     out.put("title", transaction.getTitle());
-                    out.put("confirmations", transaction.getConfirmations(height));
+                    //out.put("confirmations", transaction.getConfirmations(height));
 
                     if (transaction.getType() == Transaction.CALCULATED_TRANSACTION) {
                         RCalculated txCalculated = (RCalculated) transaction;
@@ -3737,7 +3737,7 @@ public class BlockExplorer {
         outputTXs.put("label_atside", Lang.getInstance().translateFromLangObj("Side", langObj));
         outputTXs.put("label_asset", Lang.getInstance().translateFromLangObj("Asset", langObj));
         outputTXs.put("label_amount", Lang.getInstance().translateFromLangObj("Amount", langObj));
-        outputTXs.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
+        //outputTXs.put("label_confirmations", Lang.getInstance().translateFromLangObj("Confirmations", langObj));
         outputTXs.put("label_recipient", Lang.getInstance().translateFromLangObj("Recipient", langObj));
         outputTXs.put("label_size", Lang.getInstance().translateFromLangObj("Size", langObj));
         outputTXs.put("label_seqNo", Lang.getInstance().translateFromLangObj("SeqNo", langObj));

@@ -366,7 +366,8 @@ function transactions_Table(data) {
         data.Transactions.label_title + '<td><b>' + data.Transactions.label_type_transaction + '<td><b>' +
         data.Transactions.label_amount_key + '<td><b>' + data.Transactions.label_date + '<td><b>' +
         data.Transactions.label_atside + '<td><b>' + data.Transactions.label_size + '<td><b>' +
-        data.Transactions.label_fee + '<td><b>' + data.Transactions.label_confirmations + '</tr>';
+        data.Transactions.label_fee + '</tr>';
+         //+ '<td><b>' + data.Transactions.label_confirmations + '</tr>';
 
     for (key in data.Transactions.transactions) {
         var item = data.Transactions.transactions[key];
@@ -401,7 +402,7 @@ function transactions_Table(data) {
             cut(cutBlank(item.creator, 40), 35) + '</a><td>';
         output += item.size
             + '<td>'+ item.fee
-            + '<td>' + item.confirmations + '</td>'
+            //+ '<td>' + item.confirmations + '</td>'
             + '</tr>';
 
     }

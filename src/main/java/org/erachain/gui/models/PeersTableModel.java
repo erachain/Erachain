@@ -32,12 +32,16 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
      */
     private List<Peer> peersView = new ArrayList<Peer>();
     private int view = 1;
+    Controller cnt;
+    DCSet dcSet;
 
     public PeersTableModel() {
         super(new String[]{"IP", "Height", "Ping mc", "Reliable", "Initiator", "Finding ago",
                         "Online Time", "Version"},
                 new Boolean[]{true, true, true, true, true, true, true, false}, false);
 
+        cnt = Controller.getInstance();
+        dcSet = DCSet.getInstance();
         addObservers();
 
     }
@@ -50,8 +54,8 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
             @Override
             public int compare(Peer o1, Peer o2) {
                 int ret = 0;
-                PeerInfo peerInfo1 = Controller.getInstance().getDLSet().getPeerMap().getInfo(o1.getAddress());
-                PeerInfo peerInfo2 = Controller.getInstance().getDLSet().getPeerMap().getInfo(o2.getAddress());
+                PeerInfo peerInfo1 = cnt.getDLSet().getPeerMap().getInfo(o1.getAddress());
+                PeerInfo peerInfo2 = cnt.getDLSet().getPeerMap().getInfo(o2.getAddress());
                 if (sort == 0)
                     ret = peerInfo1.getWhitePingCouner() > peerInfo2.getWhitePingCouner() ? 1 : -1;
                 if (sort == 1)
@@ -105,17 +109,17 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
             return null;
         }
 
-        if (Controller.getInstance().isOnStopping()) {
+        if (cnt.isOnStopping()) {
             this.deleteObservers();
             return null;
         }
 
         Peer peer = peersView.get(row);
 
-        if (peer == null || DCSet.getInstance().isStoped())
+        if (peer == null || dcSet.isStoped())
             return null;
 
-        PeerInfo peerInfo = Controller.getInstance().getDLSet().getPeerMap().getInfo(peer.getAddress());
+        PeerInfo peerInfo = cnt.getDLSet().getPeerMap().getInfo(peer.getAddress());
         if (peerInfo == null)
             return null;
 
@@ -131,11 +135,12 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                     }
                     return Lang.getInstance().translate("");
                 }
-                return res.a.toString() + " " + res.b.toString() + (peer.getMute() > 0 ? " mute:" + peer.getMute() : "");
+                long diffWeight = (res.b - cnt.blockChain.getHWeightFull(dcSet).b);
+                return "H:=" + res.a.toString() + " W:" + (diffWeight > 0 ? "+" + diffWeight : diffWeight) + (peer.getMute() > 0 ? " mute:" + peer.getMute() : "");
 
             case COLUMN_PINGMC:
                 if (!peer.isUsed()) {
-                    int banMinutes = Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(peer);
+                    int banMinutes = cnt.getDLSet().getPeerMap().getBanMinutes(peer);
                     if (banMinutes > 0) {
                         return Lang.getInstance().translate("Banned") + " " + banMinutes + "m" + " (" + peer.getBanMessage() + ")";
                     } else {
@@ -176,7 +181,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
     public synchronized void syncUpdate(Observable o, Object arg) {
         ObserverMessage message = (ObserverMessage) arg;
 
-        if (Controller.getInstance().isOnStopping()) {
+        if (cnt.isOnStopping()) {
             deleteObservers();
             return;
         }
@@ -216,11 +221,11 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
     }
 
     public void addObservers() {
-        Controller.getInstance().addActivePeersObserver(this);
+        cnt.addActivePeersObserver(this);
     }
 
     public void deleteObservers() {
-        Controller.getInstance().removeActivePeersObserver(this);
+        cnt.removeActivePeersObserver(this);
     }
 
 }
