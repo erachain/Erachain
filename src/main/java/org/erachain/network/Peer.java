@@ -17,11 +17,10 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,12 +30,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Peer extends MonitoredThread {
 
-    private final static boolean USE_MONITOR = true;
+    private final static boolean USE_MONITOR = false;
     /**
      * <..... - receive просроченный ответ на Мо запрос<br>
      * see -  org.erachain.network.message.Message#viewPref(boolean)
      */
-    public final static boolean LOG_GET_HWEIGHT_TYPE = true; // "185.195.26.245"
+    public final static boolean LOG_GET_HWEIGHT_TYPE = false; // "185.195.26.245"
     private byte[] DEBUG_PEER = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245};
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getSimpleName());
@@ -71,7 +70,7 @@ public class Peer extends MonitoredThread {
 
     public Peer(InetAddress address) {
         this.address = address;
-        this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+        this.requests = new ConcurrentHashMap<Integer, BlockingQueue<Message>>(256, 1);
         this.setName("Peer-" + this.getId() + " as address " + address.getHostAddress());
 
     }
@@ -92,7 +91,7 @@ public class Peer extends MonitoredThread {
             this.network = network;
             this.socket = socket;
             this.address = socket.getInetAddress();
-            this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+            this.requests = new ConcurrentHashMap<Integer, BlockingQueue<Message>>(256, 1);
             this.white = false;
             this.pingCounter = 0;
             this.connectionTime = NTP.getTime();
@@ -160,7 +159,7 @@ public class Peer extends MonitoredThread {
         if (networkIn != null)
             this.network = networkIn;
 
-        this.requests = Collections.synchronizedMap(new HashMap<Integer, BlockingQueue<Message>>(300, 1));
+        this.requests = new ConcurrentHashMap<Integer, BlockingQueue<Message>>(256, 1);
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;
@@ -226,12 +225,8 @@ public class Peer extends MonitoredThread {
                 return false;
             }
 
-            if (true) {
-                this.pinger.setName("Pinger-" + this.pinger.getId() + " for: " + this.getName());
-                this.pinger.setPing(Integer.MAX_VALUE);
-            } else {
-                this.pinger = new Pinger(this);
-            }
+            this.pinger.setName("Pinger-" + this.pinger.getId() + " for: " + this.getName());
+            this.pinger.setPing(Integer.MAX_VALUE);
 
         }
 
@@ -615,7 +610,8 @@ public class Peer extends MonitoredThread {
     }
 
     public boolean offerMessage(Message message) {
-        if (LOG_GET_HWEIGHT_TYPE && message.getType() == Message.HWEIGHT_TYPE) {
+        if (LOG_GET_HWEIGHT_TYPE && message.hasId()
+                && (message.getType() == Message.GET_HWEIGHT_TYPE || message.getType() == Message.HWEIGHT_TYPE)) {
             boolean isSend = this.sender.offer(message);
             LOGGER.debug(message.viewPref(true) + message + (isSend ? "" : " NOT SEND "));
             return isSend;
@@ -689,16 +685,21 @@ public class Peer extends MonitoredThread {
         if (USE_MONITOR) {
             this.setMonitorStatusBefore("response.write " + message.toString() + ", requests.size: " + requests.size());
         }
-        if (LOG_GET_HWEIGHT_TYPE) {
+        if (LOG_GET_HWEIGHT_TYPE && message.getType() == Message.GET_HWEIGHT_TYPE) {
             LOGGER.debug(this + " response.write " + message.toString() + ", requests.size: " + requests.size());
         }
 
-        if (!this.offerMessage(message)) {
-            //WHEN FAILED TO SEND MESSAGE
-            this.requests.remove(localRequestKey);
-            if (USE_MONITOR) this.setMonitorStatusAfter();
-            return null;
+        if (message.getType() == Message.GET_HWEIGHT_TYPE) {
+            sender.sendGetHWeight((GetHWeightMessage) message);
+        } else {
+            if (!this.offerMessage(message)) {
+                //WHEN FAILED TO SEND MESSAGE
+                this.requests.remove(localRequestKey);
+                if (USE_MONITOR) this.setMonitorStatusAfter();
+                return null;
+            }
         }
+
         if (USE_MONITOR) this.setMonitorStatusAfter();
 
 

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = true;
+    private final static boolean logPings = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class.getSimpleName());
     private static final int QUEUE_LENGTH = 1024 + (256 << (Controller.HARD_WORK >> 1));
@@ -76,8 +76,16 @@ public class Sender extends MonitoredThread {
     public void sendGetHWeight(GetHWeightMessage getHWeightMessage) {
         if (true) {
             if (this.blockingQueue.isEmpty()) {
+                if (logPings)
+                    LOGGER.debug(this.peer + " to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+                if (USE_MONITOR)
+                    this.setMonitorStatus("to blockingQueue " + getHWeightMessage.viewPref(true) + getHWeightMessage);
                 blockingQueue.offer(getHWeightMessage);
             } else {
+                if (logPings)
+                    LOGGER.debug(this.peer + " to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
+                if (USE_MONITOR)
+                    this.setMonitorStatus("to getHWeightMessage " + getHWeightMessage.viewPref(true) + getHWeightMessage);
                 this.getHWeightMessage = getHWeightMessage;
             }
         } else
@@ -87,8 +95,16 @@ public class Sender extends MonitoredThread {
     public void sendHWeight(HWeightMessage hWeightMessage) {
         if (true) {
             if (this.blockingQueue.isEmpty()) {
+                if (logPings)
+                    LOGGER.debug(this.peer + " to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
+                if (USE_MONITOR)
+                    this.setMonitorStatus("to blockingQueue " + hWeightMessage.viewPref(true) + getHWeightMessage);
                 blockingQueue.offer(hWeightMessage);
             } else {
+                if (logPings)
+                    LOGGER.debug(this.peer + " to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
+                if (USE_MONITOR)
+                    this.setMonitorStatus("to getHWeightMessage " + hWeightMessage.viewPref(true) + getHWeightMessage);
                 this.hWeightMessage = hWeightMessage;
             }
         } else
@@ -128,15 +144,20 @@ public class Sender extends MonitoredThread {
                 }
 
                 // FLUSH if NEED
+                long currentTime = System.currentTimeMillis();
                 if (needFlush
                         || blockingQueue.isEmpty() ?
-                        System.currentTimeMillis() - out_flush_time > MAX_FLUSH_TIME
+                        currentTime - out_flush_time > MAX_FLUSH_TIME
                                 || out_flush_length > MAX_FLUSH_LENGTH_EMPTY
                         :
                         out_flush_length > MAX_FLUSH_LENGTH
 
                 ) {
                     this.out.flush();
+                    if (logPings)
+                        LOGGER.debug(peer + " FLUSHED OUT sizs:" + out_flush_length + " time: " + (currentTime - out_flush_time));
+                    if (USE_MONITOR)
+                        this.setMonitorStatus("FLUSHED OUT size: " + out_flush_length + " time: " + (currentTime - out_flush_time));
                     out_flush_time = System.currentTimeMillis();
                     out_flush_length = 0;
                 }
@@ -204,6 +225,8 @@ public class Sender extends MonitoredThread {
         try {
 
             byte[] bytes = message.toBytes();
+            if (logPings && message.hasId() && (messageType == Message.GET_HWEIGHT_TYPE || messageType == Message.HWEIGHT_TYPE))
+                LOGGER.debug(this.peer + message.viewPref(true) + message + " to BYTES");
 
             // проверим - может уже такое сообщение было нами принято, или
             // если нет - то оно будет запомнено уже в списке обработанных входящих сообщений
@@ -237,15 +260,15 @@ public class Sender extends MonitoredThread {
 
             long checkTime = System.currentTimeMillis();
 
-            if (!writeAndFlush(bytes, messageType == Message.GET_HWEIGHT_TYPE
-                    || messageType == Message.HWEIGHT_TYPE
-                    || messageType == Message.WIN_BLOCK_TYPE)) {
+            if (!writeAndFlush(bytes,
+                    message.quickSend() // все что нужно быстро отправлять
+            )) {
                 LOGGER.debug(this.peer + message.viewPref(true) + message + " NOT send ((");
                 return false;
             }
 
             checkTime = System.currentTimeMillis() - checkTime;
-            if (logPings && (messageType == Message.GET_HWEIGHT_TYPE || messageType == Message.HWEIGHT_TYPE)
+            if (logPings && message.hasId() && (messageType == Message.GET_HWEIGHT_TYPE || messageType == Message.HWEIGHT_TYPE)
                     || checkTime - 3 > (bytes.length >> 3) && loggedPoint - System.currentTimeMillis() > 1000
             ) {
                 loggedPoint = System.currentTimeMillis();

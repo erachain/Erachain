@@ -21,7 +21,6 @@ public class Pinger extends Thread {
     private static final int DEFAULT_QUICK_PING_TIMEOUT = 5000;
 
     private Peer peer;
-    //private boolean needPing = false;
     private int ping;
 
     BlockingQueue<Integer> startPinging = new ArrayBlockingQueue<Integer>(1);
@@ -130,6 +129,13 @@ public class Pinger extends Thread {
                 startPinging.take();
             } catch (InterruptedException e) {
                 break;
+            }
+
+            try {
+                // дадм время на запуск с той тороны
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                return;
             }
 
             Controller.getInstance().onConnect(this.peer);
