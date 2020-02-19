@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class Sender extends MonitoredThread {
 
     private final static boolean USE_MONITOR = false;
-    private final static boolean logPings = true;
+    private final static boolean logPings = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class.getSimpleName());
     private static final int QUEUE_LENGTH = 1024 + (256 << (Controller.HARD_WORK >> 1));
@@ -261,8 +261,8 @@ public class Sender extends MonitoredThread {
             long checkTime = System.currentTimeMillis();
 
             if (!writeAndFlush(bytes,
-                    message.hasId() // все что связано с запросами ужно быстро отправлять
-                            || messageType == Message.WIN_BLOCK_TYPE)) {
+                    message.quickSend() // все что нужно быстро отправлять
+            )) {
                 LOGGER.debug(this.peer + message.viewPref(true) + message + " NOT send ((");
                 return false;
             }

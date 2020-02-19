@@ -88,7 +88,7 @@ public abstract class Message {
 
     private int type;
     private Peer sender;
-    private int id;
+    protected int id;
     private int length;
     private byte[] loadBytes;
 
@@ -154,6 +154,15 @@ public abstract class Message {
 
     public boolean hasId() {
         return this.id > 0;
+    }
+
+    /**
+     * Если нужно отсылать без задержки и накопления пакета
+     *
+     * @return
+     */
+    public boolean quickSend() {
+        return true;
     }
 
     public int getType() {

@@ -30,12 +30,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Peer extends MonitoredThread {
 
-    private final static boolean USE_MONITOR = true;
+    private final static boolean USE_MONITOR = false;
     /**
      * <..... - receive просроченный ответ на Мо запрос<br>
      * see -  org.erachain.network.message.Message#viewPref(boolean)
      */
-    public final static boolean LOG_GET_HWEIGHT_TYPE = true; // "185.195.26.245"
+    public final static boolean LOG_GET_HWEIGHT_TYPE = false; // "185.195.26.245"
     private byte[] DEBUG_PEER = new byte[]{(byte) 185, (byte) 195, (byte) 26, (byte) 245};
 
     static Logger LOGGER = LoggerFactory.getLogger(Peer.class.getSimpleName());

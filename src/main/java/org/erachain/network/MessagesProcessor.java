@@ -19,7 +19,7 @@ public class MessagesProcessor extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE ? true : false;
-    private boolean LOG_GET_HWEIGHT_TYPE = true;
+    private boolean LOG_GET_HWEIGHT_TYPE = false;
     private boolean runned;
 
     private Network network;
