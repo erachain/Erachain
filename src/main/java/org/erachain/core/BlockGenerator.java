@@ -125,6 +125,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         while (counter++ < 30) {
 
             Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+            if (myHW.a < 5)
+                break;
             byte[] lastSignature = dcSet.getBlocksHeadsMap().get(myHW.a - 2).signature;
             //byte[] lastSignature = bchain.getLastBlockSignature(dcSet);
 
