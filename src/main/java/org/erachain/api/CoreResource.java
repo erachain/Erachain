@@ -147,7 +147,7 @@ public class CoreResource {
 
     @GET
     @Path("/cwv")
-    public String checkWinVal() {
+    public String checkWinVal(@QueryParam("update") boolean update) {
         DCSet dcSet = DCSet.getInstance();
         BlocksHeadsMap mapHeads = dcSet.getBlocksHeadsMap();
         BlocksMapImpl mapBlock = dcSet.getBlockMap();
@@ -164,22 +164,51 @@ public class CoreResource {
                 return "ERROR on Height: " + height + ", tCREATOR diff: " + block.getCreator() + " - " + head.creator;
             }
 
-            totalWV += head.winValue;
-            if (totalWV != head.totalWinValue) {
-                return "ERROR on Height: " + height + ", total WinValue diff: " + (totalWV - head.totalWinValue);
-            }
-
             // берем текущую - там есть предыдущая
             Fun.Tuple3<Integer, Integer, Integer> forgingData = head.creator.getForgingData(dcSet, height);
             long winValue = BlockChain.calcWinValue(dcSet, head.creator, height, forgingData.c, null);
             if (winValue != head.winValue) {
+                if (update) {
+                    totalWV += winValue;
+                    final long parentTarget = mapHeads.get(height - 1).target;
+                    long newTarget = BlockChain.calcTarget(height, parentTarget, winValue);
+                    head = new Block.BlockHead(block, head.heightBlock,
+                            head.forgingValue, // его посреди цепочки не получится пересчитать - бем что тут сохранено
+                            winValue, newTarget,
+                            head.totalFee, head.emittedFee, totalWV);
+                    mapHeads.put(height, head);
+                    block.setWinValue(winValue);
+                    block.setTotalWinValue(totalWV);
+                    block.setTarget(newTarget);
+                    mapBlock.put(height, block);
+                    continue;
+                }
                 return "ERROR on Height: " + height + ", WinValue diff: " + (winValue - head.winValue);
             }
+
+            if (totalWV != head.totalWinValue) {
+                if (update) {
+                    final long parentTarget = mapHeads.get(height - 1).target;
+                    long newTarget = BlockChain.calcTarget(height, parentTarget, winValue);
+                    head = new Block.BlockHead(block, head.heightBlock,
+                            head.forgingValue, // его посреди цепочки не получится пересчитать - бем что тут сохранено
+                            winValue, newTarget,
+                            head.totalFee, head.emittedFee, totalWV);
+                    mapHeads.put(height, head);
+                    block.setWinValue(winValue);
+                    block.setTotalWinValue(totalWV);
+                    block.setTarget(newTarget);
+                    mapBlock.put(height, block);
+                    continue;
+                }
+                return "ERROR on Height: " + height + ", total WinValue diff: " + (totalWV - head.totalWinValue);
+            }
+
 
         } while (true);
 
         if (out.isEmpty())
-            return "height: " + (height - 1) + ", totalWV: " + totalWV;
+            return "GOOD! height: " + (height - 1) + ", totalWV: " + totalWV;
 
         return out;
     }

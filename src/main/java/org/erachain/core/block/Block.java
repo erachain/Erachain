@@ -1408,6 +1408,18 @@ import java.util.*;
         return this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
     }
 
+    public void setWinValue(long newWinValue) {
+        this.winValue = newWinValue;
+    }
+
+    public void setTarget(long newTarget) {
+        this.target = newTarget;
+    }
+
+    public void setTotalWinValue(long newTotalWinValue) {
+        this.totalWinValue = newTotalWinValue;
+    }
+
     public int calcWinValueTargeted() {
 
         if (this.version == 0 || this.creator == null) {
