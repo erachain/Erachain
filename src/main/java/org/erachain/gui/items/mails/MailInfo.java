@@ -19,7 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -316,7 +316,7 @@ public class MailInfo extends javax.swing.JPanel {
                 jTextArea_Messge.setText(Lang.getInstance().translate("Decrypt Error!"));
             } else {
                 jTextArea_Messge.setText(trans.isText() ?
-                        new String(decryptedData, Charset.forName("UTF-8"))
+                        new String(decryptedData, StandardCharsets.UTF_8)
                         : Converter.toHex(decryptedData));
 
                 jButton1.setText(Lang.getInstance().translate("Encrypt message"));
@@ -349,7 +349,7 @@ public class MailInfo extends javax.swing.JPanel {
         if ( trans.isText() ) {
             //jTextArea_Messge.setContentType("text");
             //jTextArea_Messge.setContentType("text/html");
-            return Processor.process(new String(trans.getData(), Charset.forName("UTF-8")));
+            return Processor.process(new String(trans.getData(), StandardCharsets.UTF_8));
         }
         //jTextArea_Messge.setContentType("text/html");
 

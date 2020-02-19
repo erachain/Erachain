@@ -31,7 +31,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
 
@@ -522,7 +522,7 @@ public class AccountTransactionsTable extends JTable implements Observer {
                 if (decryptedData == null) {
                     messageBufs.get(row).setDecryptedMessage(Lang.getInstance().translate("Decrypt Error!"));
                 } else {
-                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decryptedData, Charset.forName("UTF-8")) : Converter.toHex(decryptedData));
+                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decryptedData, StandardCharsets.UTF_8) : Converter.toHex(decryptedData));
                     messageBufs.get(row).setOpend(true);
                     menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
                 }
@@ -629,7 +629,7 @@ public class AccountTransactionsTable extends JTable implements Observer {
                     this.decryptedMessage = "Encrypted";
                 }
                 if (!this.encrypted) {
-                    this.decryptedMessage = (isText) ? new String(this.rawMessage, Charset.forName("UTF-8")) : Converter.toHex(this.rawMessage);
+                    this.decryptedMessage = (isText) ? new String(this.rawMessage, StandardCharsets.UTF_8) : Converter.toHex(this.rawMessage);
                 }
             }
             return this.decryptedMessage;

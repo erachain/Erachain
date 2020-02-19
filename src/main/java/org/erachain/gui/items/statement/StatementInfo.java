@@ -18,7 +18,7 @@ import org.mapdb.Fun.Tuple4;
 
 import javax.swing.*;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -90,7 +90,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
             try {
                 JSONObject data = (JSONObject) JSONValue
-                        .parseWithException(new String(statement.getData(), Charset.forName("UTF-8")));
+                        .parseWithException(new String(statement.getData(), StandardCharsets.UTF_8));
                 // params
 
                 if (data.containsKey("Statement_Params")) {
@@ -131,7 +131,7 @@ public class StatementInfo extends javax.swing.JPanel {
                 List<String> vars = template.getVarNames();
                 if (vars != null && !vars.isEmpty()) {
                     // try replace variables
-                    String dataVars = new String(statement.getData(), Charset.forName("UTF-8"));
+                    String dataVars = new String(statement.getData(), StandardCharsets.UTF_8);
                     String[] rows = dataVars.split("\n");
                     Map<String, String> varsArray = new HashMap<String, String>();
                     for (String row : rows) {
@@ -151,7 +151,7 @@ public class StatementInfo extends javax.swing.JPanel {
 
                 jTextArea_Body.setText(template.viewName() + "<br><br>"
                         + Library.to_HTML(description) + "<br><br>"
-                        + new String(statement.getData(), Charset.forName("UTF-8")));
+                        + new String(statement.getData(), StandardCharsets.UTF_8));
 
             }
 

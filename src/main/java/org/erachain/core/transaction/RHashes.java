@@ -17,7 +17,6 @@ import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -286,12 +285,12 @@ public class RHashes extends Transaction {
 
         //ADD CREATOR/SERVICE/DATA
         if (data != null && data.length > 0) {
-            transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
-            transaction.put("message", new String(this.data, Charset.forName("UTF-8")));
+            transaction.put("data", new String(this.data, StandardCharsets.UTF_8));
+            transaction.put("message", new String(this.data, StandardCharsets.UTF_8));
             //transaction.put("data", Base58.encode(this.data));
         }
         if (url != null && url.length > 0) {
-            //transaction.put("url", new String(this.url, Charset.forName("UTF-8")));
+            //transaction.put("url", new String(this.url, StandardCharsets.UTF_8));
             transaction.put("url", new String(this.url, StandardCharsets.UTF_8));
             //transaction.put("data", Base58.encode(this.data));
         }

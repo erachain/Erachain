@@ -40,7 +40,7 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -3194,7 +3194,7 @@ public class BlockExplorer {
                     if (template != null) {
                         description = template.getDescription();
                         data = (JSONObject) JSONValue
-                                .parseWithException(new String(trans.getData(), Charset.forName("UTF-8")));
+                                .parseWithException(new String(trans.getData(), StandardCharsets.UTF_8));
 
                         output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
                         output.put("title", data.get("Title"));
@@ -3229,7 +3229,7 @@ public class BlockExplorer {
 
                     output.put("Label_title", Lang.getInstance().translateFromLangObj("Title", langObj));
                     output.put("title", trans.getTitle());
-                    output.put("statement", new String(trans.getData(), Charset.forName("UTF-8")));
+                    output.put("statement", new String(trans.getData(), StandardCharsets.UTF_8));
 
                 }
             }

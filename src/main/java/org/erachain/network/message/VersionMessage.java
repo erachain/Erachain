@@ -4,7 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class VersionMessage extends Message {
@@ -43,9 +43,9 @@ public class VersionMessage extends Message {
 
         //READ STRVERSION
         byte[] strVersionBytes = Arrays.copyOfRange(data, position, position + length);
-        String strVersion = new String(strVersionBytes, Charset.forName("UTF-8"));
+        String strVersion = new String(strVersionBytes, StandardCharsets.UTF_8);
 
-        // message.getBytes( Charset.forName("UTF-8") );
+        // message.getBytes( StandardCharsets.UTF_8 );
 
         return new VersionMessage(strVersion, buildDateTime);
     }
@@ -72,7 +72,7 @@ public class VersionMessage extends Message {
         data = Bytes.concat(data, buildDateTimeBytes);
 
         // STR VERSION
-        byte[] strVersionBytes = this.strVersion.getBytes(Charset.forName("UTF-8"));
+        byte[] strVersionBytes = this.strVersion.getBytes(StandardCharsets.UTF_8);
         //WRITE LENGTH
         int length = strVersionBytes.length;
         byte[] lengthBytes = Ints.toByteArray(length);
@@ -88,6 +88,6 @@ public class VersionMessage extends Message {
 
     @Override
     public int getDataLength() {
-        return TIMESTAMP_LENGTH + DATA_LENGTH + this.strVersion.getBytes(Charset.forName("UTF-8")).length;
+        return TIMESTAMP_LENGTH + DATA_LENGTH + this.strVersion.getBytes(StandardCharsets.UTF_8).length;
     }
 }

@@ -5,7 +5,7 @@ import org.erachain.lang.Lang;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("serial")
 public class HashesDetailsFrame extends RecDetailsFrame {
@@ -19,7 +19,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
 
         //NAME
         ++detailGBC.gridy;
-        JTextField name = new JTextField(new String(r_Hashes.getURL(), Charset.forName("UTF-8")));
+        JTextField name = new JTextField(new String(r_Hashes.getURL(), StandardCharsets.UTF_8));
         name.setEditable(false);
         MenuPopupUtil.installContextMenu(name);
         this.add(name, detailGBC);
@@ -35,7 +35,7 @@ public class HashesDetailsFrame extends RecDetailsFrame {
         txtAreaDescription.setContentType("text/html");
         //	txtAreaDescription.setBackground(MainFrame.getFrames()[0].getBackground());
 
-        txtAreaDescription.setText(new String(r_Hashes.getData(), Charset.forName("UTF-8")));
+        txtAreaDescription.setText(new String(r_Hashes.getData(), StandardCharsets.UTF_8));
 		/*
 		txtAreaDescription.setRows(4);
 		txtAreaDescription.setColumns(4);

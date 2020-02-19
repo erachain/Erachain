@@ -3,14 +3,13 @@ package org.erachain.gui.transaction;
 import org.erachain.core.item.ItemCls;
 import org.erachain.core.item.statuses.StatusCls;
 import org.erachain.core.transaction.RSetStatusToItem;
-import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTextPane;
 import org.erachain.lang.Lang;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("serial")
 public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
@@ -91,7 +90,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
             this.add(new JLabel(Lang.getInstance().translate("DATA") + " 1:"), labelGBC);
             //DATA
             ++detailGBC.gridy;
-            JTextField statusAData = new JTextField(new String(setStatusToItem.getData1(), Charset.forName("UTF-8")));
+            JTextField statusAData = new JTextField(new String(setStatusToItem.getData1(), StandardCharsets.UTF_8));
             statusAData.setEditable(false);
             MenuPopupUtil.installContextMenu(statusAData);
             this.add(statusAData, detailGBC);
@@ -103,7 +102,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
             this.add(new JLabel(Lang.getInstance().translate("DATA") + " 2:"), labelGBC);
             //DATA
             ++detailGBC.gridy;
-            JTextField statusAData = new JTextField(new String(setStatusToItem.getData2(), Charset.forName("UTF-8")));
+            JTextField statusAData = new JTextField(new String(setStatusToItem.getData2(), StandardCharsets.UTF_8));
             statusAData.setEditable(false);
             MenuPopupUtil.installContextMenu(statusAData);
             this.add(statusAData, detailGBC);
@@ -129,7 +128,7 @@ public class SetStatusToItemDetailsFrame extends RecDetailsFrame {
             this.add(new JLabel(Lang.getInstance().translate("Description") + ":"), labelGBC);
             //DATA
             ++detailGBC.gridy;
-            JTextArea descrData = new JTextArea(new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")));
+            JTextArea descrData = new JTextArea(new String(setStatusToItem.getDescription(), StandardCharsets.UTF_8));
             descrData.setRows(4);
             descrData.setBorder(statusName.getBorder());
             descrData.setEditable(false);
