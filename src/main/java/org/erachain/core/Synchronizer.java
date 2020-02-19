@@ -45,11 +45,11 @@ public class Synchronizer extends Thread {
     // private boolean run = true;
     // private Block runedBlock;
     private Peer fromPeer;
-    Controller cnt;
+    Controller ctrl;
     BlockChain bchain;
 
-    public Synchronizer(Controller cnt, BlockChain bchain) {
-        this.cnt = cnt;
+    public Synchronizer(Controller ctrl, BlockChain bchain) {
+        this.ctrl = ctrl;
         this.bchain = bchain;
 
         this.start();
@@ -117,7 +117,7 @@ public class Synchronizer extends Thread {
 
         LOGGER.debug("*** core.Synchronizer.checkNewBlocks - START");
 
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
         BlockMap blockMap = fork.getBlockMap();
 
         // ORPHAN MY BLOCKS IN FORK TO VALIDATE THE NEW BLOCKS
@@ -158,7 +158,7 @@ public class Synchronizer extends Thread {
             }
             // logger.debug("*** core.Synchronizer.checkNewBlocks - try orphan:
             // " + lastBlock.getHeight(fork));
-            if (cnt.isOnStopping())
+            if (ctrl.isOnStopping())
                 throw new Exception("on stopping");
 
             int height = lastBlock.getHeight();
@@ -221,7 +221,7 @@ public class Synchronizer extends Thread {
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
-        boolean isFromTrustedPeer = cnt.getBlockChain().isPeerTrusted(peer);
+        boolean isFromTrustedPeer = ctrl.getBlockChain().isPeerTrusted(peer);
 
         for (Block block : newBlocks) {
             int height = block.getHeight();
@@ -302,9 +302,11 @@ public class Synchronizer extends Thread {
             }
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки чуть больше нашей
-            if (///!BlockChain.ERA_COMPU_ALL_UP && // в таком режиме не проверяем так как нод и так мало
+            if (false && // короче не проверяем тут - если мы уже отстали то будем догонять в любом случае
+
+                    ///!BlockChain.ERA_COMPU_ALL_UP && // в таком режиме не проверяем так как нод и так мало
                     myHeight == height && myHeight + 2 // чем меньше разлет цепочек тем реже такая ситуация будет обработана
-                            > newHeight) {
+                    > newHeight) {
                 if (myWeight > block.blockHead.totalWinValue) {
                     // суть в том что тут цепочка на этой высоте слабже моей,
                     // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
@@ -315,7 +317,11 @@ public class Synchronizer extends Thread {
                     String mess = "Dishonest peer by weak FullWeight, height: " + height
                             + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
                     LOGGER.debug(peer + " " + mess);
-                    cnt.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
+                    if (false) {
+                        ctrl.resetWeightOfPeer(peer, 0);
+                    } else {
+                        peer.setMute(Controller.MUTE_PEER_COUNT);
+                    }
                     //peer.ban(mess);
                     ///throw new Exception(mess);
                     return null; // там по этому флагу MUTE peer
@@ -333,9 +339,9 @@ public class Synchronizer extends Thread {
     // process new BLOCKS to DB and orphan DB
     public void synchronizeNewBlocks(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
                                      List<Block> newBlocks, Peer peer) throws Exception {
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
-        Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
+        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
 
         /**
          * если в конце взведено - значит в момент слива какие-то таблицы не залились
@@ -370,10 +376,10 @@ public class Synchronizer extends Thread {
 
             // теперь все транзакции в пул опять закидываем
             for (Transaction transaction: orphanedTransactions.values()) {
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     throw new Exception("on stopping");
 
-                Controller.getInstance().transactionsPool.offerMessage(transaction);
+                ctrl.transactionsPool.offerMessage(transaction);
             }
 
         } finally {
@@ -393,9 +399,9 @@ public class Synchronizer extends Thread {
     public List<Transaction> synchronizeNewBlocks_old(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
                                                 List<Block> newBlocks, Peer peer) throws Exception {
         ConcurrentHashMap<Long, Transaction> orphanedTransactions = new ConcurrentHashMap<Long, Transaction>();
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
-        Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
+        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
 
         DCSet fork;
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
@@ -422,16 +428,16 @@ public class Synchronizer extends Thread {
         byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
         int countOrphanedTransactions = 0;
         while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
-            if (cnt.isOnStopping())
+            if (ctrl.isOnStopping())
                 throw new Exception("on stopping");
 
             // THROWN is new Better Peer
-            cnt.checkNewBetterPeer(peer);
+            ctrl.checkNewBetterPeer(peer);
 
             // ADD ORPHANED TRANSACTIONS
             // orphanedTransactions.addAll(lastBlock.getTransactions());
             for (Transaction transaction : lastBlock.getTransactions()) {
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     throw new Exception("on stopping");
                 if (countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
                     countOrphanedTransactions++;
@@ -459,9 +465,9 @@ public class Synchronizer extends Thread {
         for (Block block : newBlocks) {
 
             // THROWN is new Better Peer
-            cnt.checkNewBetterPeer(peer);
+            ctrl.checkNewBetterPeer(peer);
 
-            if (cnt.isOnStopping())
+            if (ctrl.isOnStopping())
                 throw new Exception("on stopping");
 
             if (dcSet.getBlockSignsMap().contains(block.getSignature())) {
@@ -480,7 +486,7 @@ public class Synchronizer extends Thread {
 
             LOGGER.debug("*** begin REMOVE orphanedTransactions");
             for (Transaction transaction : block.getTransactions()) {
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     throw new Exception("on stopping");
 
                 String key = new BigInteger(1, transaction.getSignature()).toString(16);
@@ -494,7 +500,7 @@ public class Synchronizer extends Thread {
         TransactionMap map = dcSet.getTransactionTab();
         List<Transaction> orphanedTransactionsList = new ArrayList<Transaction>();
         for (Transaction transaction : orphanedTransactions.values()) {
-            if (cnt.isOnStopping())
+            if (ctrl.isOnStopping())
                 throw new Exception("on stopping");
 
             // CHECK IF DEADLINE PASSED
@@ -516,10 +522,10 @@ public class Synchronizer extends Thread {
 
     public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception {
 
-        Controller cnt = Controller.getInstance();
-        boolean isFromTrustedPeer = cnt.getBlockChain().isPeerTrusted(peer);
+        //Controller cnt = Controller.getInstance();
+        boolean isFromTrustedPeer = ctrl.getBlockChain().isPeerTrusted(peer);
 
-        if (cnt.isOnStopping())
+        if (ctrl.isOnStopping())
             throw new Exception("on stopping");
 
         /*
@@ -563,14 +569,14 @@ public class Synchronizer extends Thread {
 
                 // GET AND PROCESS BLOCK BY BLOCK
                 for (byte[] signature : signatures) {
-                    if (cnt.isOnStopping()) {
+                    if (ctrl.isOnStopping()) {
                         // STOP BLOCKBUFFER
                         blockBuffer.stopThread();
                         throw new Exception("on stopping");
                     }
 
                     // THROWN is new Better Peer
-                    cnt.checkNewBetterPeer(peer);
+                    ctrl.checkNewBetterPeer(peer);
 
                     // GET BLOCK
                     LOGGER.debug("try get BLOCK from BUFFER");
@@ -595,7 +601,7 @@ public class Synchronizer extends Thread {
                         break;
                     }
 
-                    if (cnt.isOnStopping()) {
+                    if (ctrl.isOnStopping()) {
                         // STOP BLOCKBUFFER
                         blockBuffer.stopThread();
                         throw new Exception("on stopping");
@@ -604,7 +610,7 @@ public class Synchronizer extends Thread {
                     ///blockFromPeer.setCalcGeneratingBalance(dcSet); // NEED SET it
                     ///logger.debug("BLOCK Calc Generating Balance");
 
-                    if (cnt.isOnStopping()) {
+                    if (ctrl.isOnStopping()) {
                         // STOP BLOCKBUFFER
                         blockBuffer.stopThread();
                         throw new Exception("on stopping");
@@ -676,7 +682,7 @@ public class Synchronizer extends Thread {
                         LOGGER.debug("BLOCK is Valid");
                     }
 
-                    if (cnt.isOnStopping()) {
+                    if (ctrl.isOnStopping()) {
                         blockBuffer.stopThread();
                         throw new Exception("on stopping");
                     }
@@ -697,7 +703,7 @@ public class Synchronizer extends Thread {
                         // STOP BLOCKBUFFER
                         blockBuffer.stopThread();
 
-                        if (cnt.isOnStopping()) {
+                        if (ctrl.isOnStopping()) {
                             throw new Exception("on stopping");
                         } else {
                             throw new Exception(e);
@@ -718,7 +724,7 @@ public class Synchronizer extends Thread {
                 throw new Exception(mess);
             }
 
-            if (cnt.isOnStopping()) {
+            if (ctrl.isOnStopping()) {
                 throw new Exception("on stopping");
             }
 
@@ -734,7 +740,7 @@ public class Synchronizer extends Thread {
             // GET THE BLOCKS FROM SIGNATURES
             List<Block> blocks = this.getBlocks(dcSet, signatures, peer);
 
-            if (cnt.isOnStopping()) {
+            if (ctrl.isOnStopping()) {
                 throw new Exception("on stopping");
             }
 
@@ -745,7 +751,7 @@ public class Synchronizer extends Thread {
                     + "] for blocks: " + blocks.size());
             synchronizeNewBlocks(dcSet, lastCommonBlock, checkPointHeight, blocks, peer);
 
-            if (cnt.isOnStopping()) {
+            if (ctrl.isOnStopping()) {
                 throw new Exception("on stopping");
             }
         }
@@ -800,7 +806,6 @@ public class Synchronizer extends Thread {
                                                      int checkPointHeight) throws Exception {
 
         DCSet dcSet = DCSet.getInstance();
-        Controller cnt = Controller.getInstance();
 
         LOGGER.info("findHeaders(Peer: " + peer + ", peerHeight: " + peerHeight
                 + ", checkPointHeight: " + checkPointHeight);
@@ -863,7 +868,7 @@ public class Synchronizer extends Thread {
         int step = 2;
         int currentCheckChainHeight = myChainHeight;
         do {
-            if (cnt.isOnStopping()) {
+            if (ctrl.isOnStopping()) {
                 throw new Exception("on stopping");
             }
 
@@ -927,11 +932,11 @@ public class Synchronizer extends Thread {
         LOGGER.debug("try get BLOCKS from common block SIZE:" + signatures.size() + " - " + peer);
 
         List<Block> blocks = new ArrayList<Block>();
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
         int bytesGet = 0;
         for (byte[] signature : signatures) {
-            if (cnt.isOnStopping()) {
+            if (ctrl.isOnStopping()) {
                 throw new Exception("on stopping");
             }
 
@@ -964,17 +969,17 @@ public class Synchronizer extends Thread {
     public synchronized void pipeProcessOrOrphan(DCSet dcSet, Block block, boolean doOrphan, boolean hardFlush,
                                                  boolean notStoreTXs)
             throws Exception {
-        Controller cnt = Controller.getInstance();
+        //Controller cnt = Controller.getInstance();
 
         // CHECK IF WE ARE STILL PROCESSING BLOCKS
-        if (cnt.isOnStopping()) {
+        if (ctrl.isOnStopping()) {
             throw new Exception("on stopping");
         }
 
         long processTiming = System.nanoTime();
 
         dcSet.getBlockMap().setProcessing(true);
-        boolean observOn = cnt.doesWalletExists() && cnt.useGui;
+        boolean observOn = ctrl.doesWalletExists() && ctrl.useGui;
         Integer countObserv_ADD = null;
         Integer countObserv_REMOVE = null;
         Integer countObserv_COUNT = null;
@@ -997,7 +1002,7 @@ public class Synchronizer extends Thread {
                 int blockSize = 3 + block.getTransactionCount();
                 dcSet.flush(blockSize, false, doOrphan);
 
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     return;
 
             } catch (IOException e) {
@@ -1006,21 +1011,21 @@ public class Synchronizer extends Thread {
 
             } catch (Exception e) {
 
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     return;
                 } else {
                     LOGGER.error(e.getMessage(), e);
                     error = new Exception(e);
                 }
             } catch (Throwable e) {
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     return;
                 } else {
                     thrown = new Throwable(e);
                 }
             } finally {
 
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     // was BREAK - try ROLLBACK
                     dcSet.rollback();
                     throw new Exception("on stopping");
@@ -1033,15 +1038,15 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(22);
+                        ctrl.stopAll(22);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(27);
+                        ctrl.stopAll(27);
                         return;
                     }
 
-                    cnt.stopAll(22);
+                    ctrl.stopAll(22);
 
                     throw error;
 
@@ -1054,15 +1059,15 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(22);
+                        ctrl.stopAll(22);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(27);
+                        ctrl.stopAll(27);
                         return;
                     }
 
-                    cnt.stopAll(27);
+                    ctrl.stopAll(27);
 
                     throw new Exception(thrown);
 
@@ -1113,14 +1118,14 @@ public class Synchronizer extends Thread {
 
                 dcSet.flush(blockSize, false, doOrphan);
 
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     return;
 
                 if (Settings.getInstance().getNotifyIncomingConfirmations() > 0) {
-                    cnt.NotifyIncoming(block.getTransactions());
+                    ctrl.NotifyIncoming(block.getTransactions());
                 }
 
-                if (cnt.isOnStopping())
+                if (ctrl.isOnStopping())
                     return;
 
             } catch (IOException e) {
@@ -1128,20 +1133,20 @@ public class Synchronizer extends Thread {
 
             } catch (Exception e) {
 
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     return;
                 } else {
                     error = new Exception(e);
                 }
             } catch (Throwable e) {
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     return;
                 } else {
                     thrown = new Throwable(e);
                 }
             } finally {
 
-                if (cnt.isOnStopping()) {
+                if (ctrl.isOnStopping()) {
                     // was BREAK - try ROLLBACK
                     dcSet.rollback();
                     throw new Exception("on stopping");
@@ -1155,11 +1160,11 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(22);
+                        ctrl.stopAll(22);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(27);
+                        ctrl.stopAll(27);
                         return;
                     }
 
@@ -1174,11 +1179,11 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(22);
+                        ctrl.stopAll(22);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        cnt.stopAll(27);
+                        ctrl.stopAll(27);
                         return;
                     }
 
@@ -1214,7 +1219,7 @@ public class Synchronizer extends Thread {
             if (processTiming < 999999999999l) {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
-                cnt.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
+                ctrl.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
             }
         }
 
@@ -1240,13 +1245,13 @@ public class Synchronizer extends Thread {
                 return;
             }
 
-            blockGenerator = cnt.getBlockGenerator();
+            blockGenerator = ctrl.getBlockGenerator();
         } while (blockGenerator == null);
 
         boolean needCheck = false;
 
         DCSet dcSet = DCSet.getInstance();
-        while (!cnt.isOnStopping()) {
+        while (!ctrl.isOnStopping()) {
 
             try {
 
@@ -1283,9 +1288,9 @@ public class Synchronizer extends Thread {
 
 
                 // снизим ожижание блокировки с "сильных но таких же как мы" узлов
-                cnt.network.decrementWeightOfPeerMutes();
+                ctrl.network.decrementWeightOfPeerMutes();
 
-                if (!cnt.isStatusOK())
+                if (!ctrl.isStatusOK())
                     continue;
 
 
@@ -1293,7 +1298,7 @@ public class Synchronizer extends Thread {
                     // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                     needCheck = true;
                 } else {
-                    Tuple2<Integer, Long> myHW = cnt.getBlockChain().getHWeightFull(dcSet);
+                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
                     if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
                         // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                         needCheck = true;
@@ -1311,7 +1316,7 @@ public class Synchronizer extends Thread {
 
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(46);
+                ctrl.stopAll(46);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;
