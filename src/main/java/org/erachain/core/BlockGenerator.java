@@ -178,7 +178,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
             if (headers.isEmpty()) {
                 // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
                 ///LOGGER.debug("peer has same Weight " + maxPeer);
-                ctrl.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
+                ctrl.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT >> 1);
                 // продолжим поиск дальше
                 continue;
             } else {

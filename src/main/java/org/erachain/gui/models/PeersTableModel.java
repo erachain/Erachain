@@ -136,7 +136,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                     return Lang.getInstance().translate("");
                 }
                 long diffWeight = (res.b - cnt.blockChain.getHWeightFull(dcSet).b);
-                return "H:=" + res.a.toString() + " W:" + (diffWeight > 0 ? "+" + diffWeight : diffWeight) + (peer.getMute() > 0 ? " mute:" + peer.getMute() : "");
+                return "H=" + res.a.toString() + " W" + (diffWeight > 0 ? "+" + diffWeight : diffWeight) + (peer.getMute() > 0 ? " mute:" + peer.getMute() : "");
 
             case COLUMN_PINGMC:
                 if (!peer.isUsed()) {

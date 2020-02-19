@@ -302,9 +302,10 @@ public class Synchronizer extends Thread {
             }
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки чуть больше нашей
-            if (!BlockChain.ERA_COMPU_ALL_UP // в таком режиме не проверяем так как нод и так мало
-                    && myHeight == height && myHeight > newHeight - 2) {
-                if (myWeight > fork.getBlocksHeadsMap().getFullWeight()) {
+            if (///!BlockChain.ERA_COMPU_ALL_UP && // в таком режиме не проверяем так как нод и так мало
+                    myHeight == height && myHeight + 2 // чем меньше разлет цепочек тем реже такая ситуация будет обработана
+                            > newHeight) {
+                if (myWeight > block.blockHead.totalWinValue) {
                     // суть в том что тут цепочка на этой высоте слабже моей,
                     // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
                     // - может мы лучше цепочку собрем еще
@@ -313,8 +314,11 @@ public class Synchronizer extends Thread {
                     // INVALID BLOCK THROW EXCEPTION
                     String mess = "Dishonest peer by weak FullWeight, height: " + height
                             + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
-                    peer.ban(mess);
-                    throw new Exception(mess);
+                    LOGGER.debug(peer + " " + mess);
+                    cnt.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
+                    //peer.ban(mess);
+                    ///throw new Exception(mess);
+                    return null; // там по этому флагу MUTE peer
                 }
             }
 
@@ -347,6 +351,10 @@ public class Synchronizer extends Thread {
             ConcurrentHashMap<Long, Transaction> orphanedTransactions
                     = checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
 
+            if (orphanedTransactions == null) {
+                // это такая же как у нас цепочка - MUTE ее
+                return;
+            }
             // сюда может прити только если проверка прошла успешно
 
             // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
@@ -812,8 +820,10 @@ public class Synchronizer extends Thread {
             if (headers.isEmpty()) {
                 cnt.resetWeightOfPeer(peer, Controller.MUTE_PEER_COUNT);
                 String mess = "Peer is SAME as me";
+                LOGGER.debug(peer + " " + mess);
                 //peer.ban(0, mess);
-                throw new Exception(mess);
+                //throw new Exception(mess);
+                return new Tuple2<byte[], List<byte[]>>(null, null);
             }
 
             // null - not need orphan my CHAIN
