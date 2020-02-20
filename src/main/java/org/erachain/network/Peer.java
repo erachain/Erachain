@@ -65,6 +65,7 @@ public class Peer extends MonitoredThread {
     private long buildDateTime;
     private String banMessage;
     private Tuple2<Integer, Long> hWeight;
+    private long correctWeight;
     private int mute;
     private AtomicInteger requestKeyAtomic = new AtomicInteger(0);
 
@@ -163,6 +164,10 @@ public class Peer extends MonitoredThread {
         this.pingCounter = 0;
         this.connectionTime = NTP.getTime();
         this.errors = 0;
+
+        this.hWeight = null;
+        this.correctWeight = 0;
+        this.mute = 0;
 
         int step = 0;
         try {
@@ -318,9 +323,12 @@ public class Peer extends MonitoredThread {
         return buildDateTime;
     }
 
-    public Tuple2<Integer, Long> getHWeight() {
+    public Tuple2<Integer, Long> getHWeight(boolean useCorrection) {
         if (hWeight == null)
             hWeight = new Tuple2<Integer, Long>(0, 0L);
+
+        if (useCorrection && correctWeight != 0)
+            return new Tuple2<>(hWeight.a, hWeight.b + correctWeight);
 
         return hWeight;
     }
@@ -330,6 +338,10 @@ public class Peer extends MonitoredThread {
             this.hWeight = new Tuple2<Integer, Long>(0, 0L);
         else
             this.hWeight = hWeight;
+    }
+
+    public void setCorrectionWeight(Tuple2<Integer, Long> myHWeight) {
+        this.correctWeight = this.hWeight.b - myHWeight.b;
     }
 
     public int getMute() {

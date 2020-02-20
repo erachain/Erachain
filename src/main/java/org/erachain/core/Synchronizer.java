@@ -302,30 +302,20 @@ public class Synchronizer extends Thread {
             }
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки чуть больше нашей
-            if (false && // короче не проверяем тут - если мы уже отстали то будем догонять в любом случае
+            if (myHeight + 1 == newHeight && newHeight == height && myWeight > block.blockHead.totalWinValue
+                // все остальные ситуации не баним и не обрабатываем
+            ) {
+                // суть в том что тут цепочка на этой высоте слабже моей,
+                // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
+                // - может мы лучше цепочку собрем еще
+                // тут нельзя НЕ банить - будет циклическая синхронизация с этим узлом
 
-                    ///!BlockChain.ERA_COMPU_ALL_UP && // в таком режиме не проверяем так как нод и так мало
-                    myHeight == height && myHeight + 2 // чем меньше разлет цепочек тем реже такая ситуация будет обработана
-                    > newHeight) {
-                if (myWeight > block.blockHead.totalWinValue) {
-                    // суть в том что тут цепочка на этой высоте слабже моей,
-                    // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
-                    // - может мы лучше цепочку собрем еще
-                    // тут нельзя НЕ банить - будет циклическая синхронизация с этим узлом
-
-                    // INVALID BLOCK THROW EXCEPTION
-                    String mess = "Dishonest peer by weak FullWeight, height: " + height
-                            + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
-                    LOGGER.debug(peer + " " + mess);
-                    if (false) {
-                        ctrl.resetWeightOfPeer(peer, 0);
-                    } else {
-                        peer.setMute(Controller.MUTE_PEER_COUNT);
-                    }
-                    //peer.ban(mess);
-                    ///throw new Exception(mess);
-                    return null; // там по этому флагу MUTE peer
-                }
+                // INVALID BLOCK THROW EXCEPTION
+                String mess = "Dishonest peer by weak FullWeight, height: " + height
+                        + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
+                LOGGER.debug(peer + " " + mess);
+                peer.ban(mess);
+                throw new Exception(mess);
             }
 
             ///тут ключ по старому значению - просто так не получится найти orphanedTransactions.remove();
@@ -823,11 +813,8 @@ public class Synchronizer extends Thread {
             } while (headers.size() > 0 && dcSet.getBlockSignsMap().contains(headers.get(0)));
 
             if (headers.isEmpty()) {
-                if (false) {
-                    ctrl.resetWeightOfPeer(peer, 0);
-                } else {
-                    peer.setMute(Controller.MUTE_PEER_COUNT);
-                }
+                peer.setMute(Controller.MUTE_PEER_COUNT);
+
                 String mess = "Peer is SAME as me";
                 LOGGER.debug(peer + " " + mess);
                 //peer.ban(0, mess);

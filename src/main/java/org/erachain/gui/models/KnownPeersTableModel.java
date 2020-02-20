@@ -117,7 +117,7 @@ public class KnownPeersTableModel extends AbstractTableModel implements Observer
                 return peer.getAddress().getHostAddress();
 
             case COLUMN_HEIGHT:
-                Tuple2<Integer, Long> res = peer.getHWeight();
+                Tuple2<Integer, Long> res = peer.getHWeight(false);
                 if (res == null || res.a == 0) {
                     if (peer.isUsed()) {
                         return Lang.getInstance().translate("Waiting...");

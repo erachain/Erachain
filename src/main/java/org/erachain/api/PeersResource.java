@@ -77,8 +77,8 @@ public class PeersResource {
         for (Peer peer : Controller.getInstance().network.getActivePeers(false)) {
             JSONObject o = new JSONObject();
             o.put("peer", peer.getAddress().getHostAddress());
-            o.put("height", peer.getHWeight().a);
-            o.put("weight", peer.getHWeight().b);
+            o.put("height", peer.getHWeight(false).a);
+            o.put("weight", peer.getHWeight(false).b);
             array.add(o);
         }
 
@@ -165,7 +165,7 @@ public class PeersResource {
             o.put("status", "known disconnected");
         }
 
-        o.put("height", peer.getHWeight());
+        o.put("height", peer.getHWeight(true));
         o.put("version", peer.getVersion());
         o.put("buildTime", peer.getBuildTime() > 0 ?
                 DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd", "UTC")

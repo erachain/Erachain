@@ -651,7 +651,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                peerHWeight = peer.getHWeight();
+                peerHWeight = peer.getHWeight(false);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
@@ -705,7 +705,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = peer.getHWeight();
+                Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
@@ -739,7 +739,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = peer.getHWeight();
+                Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }

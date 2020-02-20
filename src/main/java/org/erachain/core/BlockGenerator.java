@@ -148,24 +148,16 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         MessageFactory.getInstance().createGetHeadersMessage(lastSignature),
                         Synchronizer.GET_BLOCK_TIMEOUT >> 2);
             } catch (Exception e) {
-                ///LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
+                LOGGER.debug("RESPONSE error " + peer + " " + e.getMessage());
                 // remove HW from peers
-                if (false) {
-                    ctrl.resetWeightOfPeer(peer, 0);
-                } else {
-                    peer.setMute(Controller.MUTE_PEER_COUNT >> 1);
-                }
+                peer.setCorrectionWeight(myHW);
                 continue;
             }
 
             if (response == null) {
-                ///LOGGER.debug("peer RESPONSE is null " + peer);
+                LOGGER.debug("peer RESPONSE is null " + peer);
                 // remove HW from peers
-                if (false) {
-                    ctrl.resetWeightOfPeer(peer, 0);
-                } else {
-                    peer.setMute(Controller.MUTE_PEER_COUNT >> 1);
-                }
+                peer.setCorrectionWeight(myHW);
                 continue;
             }
 
@@ -185,12 +177,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
             if (headers.isEmpty()) {
                 // если прилетели данные с этого ПИРА - сброим их в то что мы сами вычислили
-                ///LOGGER.debug("peer has same Weight " + maxPeer);
-                if (false) {
-                    ctrl.resetWeightOfPeer(peer, 0);
-                } else {
-                    peer.setMute(Controller.MUTE_PEER_COUNT >> 1);
-                }
+                LOGGER.debug("peer has same Weight " + maxPeer);
+                peer.setCorrectionWeight(myHW);
                 // продолжим поиск дальше
                 continue;
             } else {

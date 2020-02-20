@@ -482,19 +482,6 @@ public class Controller extends Observable {
         return transactionCreator;
     }
 
-    /**
-     * set my getHWeightFull to PEER
-     *
-     * @param peer
-     * @param setMute
-     */
-    public void resetWeightOfPeer(Peer peer, Integer setMute) {
-        peer.setHWeight(this.blockChain.getHWeightFull(this.dcSet));
-        if (setMute != null)
-            peer.setMute(setMute);
-
-    }
-
     public int getStatus() {
         return this.status;
     }
@@ -1915,7 +1902,7 @@ public class Controller extends Observable {
         //blockGenerator.checkWeightPeers();
         Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false, false);
         if (betterPeerHW != null) {
-            Tuple2<Integer, Long> currentHW = currentBetterPeer.getHWeight();
+            Tuple2<Integer, Long> currentHW = currentBetterPeer.getHWeight(true);
             if (currentHW != null && (currentHW.a >= betterPeerHW.a
                     || currentBetterPeer.equals(betterPeerHW.c))) {
                 // новый пир не лучше - продолжим синхронизацию не прерываясь
@@ -2002,7 +1989,7 @@ public class Controller extends Observable {
                 // берем пир который нашли в генераторе при осмотре более сильных цепочек
                 // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
                 // так как тут не подвергаются исследованию точность, как это делается в checkWeightPeers
-                peerHWdata = blockGenerator.betterPeer.getHWeight();
+                peerHWdata = blockGenerator.betterPeer.getHWeight(true);
                 if (peerHWdata == null) {
                     // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
                     peerHW = this.getMaxPeerHWeight(shift, false, false);
@@ -2017,7 +2004,7 @@ public class Controller extends Observable {
                 peer = peerHW.c;
                 if (peer != null) {
                     info = "update from MaxHeightPeer:" + peer + " WH: "
-                            + peer.getHWeight();
+                            + peer.getHWeight(true);
                     LOGGER.info(info);
                     this.setChanged();
                     this.notifyObservers(new ObserverMessage(ObserverMessage.GUI_ABOUT_TYPE, Lang.getInstance().translate(info)));
@@ -2148,7 +2135,7 @@ public class Controller extends Observable {
                         continue;
                     }
                 }
-                Tuple2<Integer, Long> whPeer = peer.getHWeight();
+                Tuple2<Integer, Long> whPeer = peer.getHWeight(true);
                 if (maxHeight < whPeer.a) {
                     // Этот пир дает цепочку из будущего - не берем его
                     banPeerOnError(peer, "FROM FUTURE: " + whPeer, 5);
