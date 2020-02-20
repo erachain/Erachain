@@ -128,7 +128,7 @@ public class PeersTableModel extends TimerTableModelCls<Peer> implements Observe
                 return peer.getAddress().getHostAddress();
 
             case COLUMN_HEIGHT:
-                Tuple2<Integer, Long> res = peer.getHWeight(false);
+                Tuple2<Integer, Long> res = peer.getHWeight(true);
                 if (res == null || res.a == 0) {
                     if (peer.isUsed()) {
                         return Lang.getInstance().translate("Waiting...");

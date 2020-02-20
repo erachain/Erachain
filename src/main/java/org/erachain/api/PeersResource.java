@@ -165,7 +165,7 @@ public class PeersResource {
             o.put("status", "known disconnected");
         }
 
-        o.put("height", peer.getHWeight(true));
+        o.put("height", peer.getHWeight(false));
         o.put("version", peer.getVersion());
         o.put("buildTime", peer.getBuildTime() > 0 ?
                 DateTimeFormat.timestamptoString(peer.getBuildTime(), "yyyy-MM-dd", "UTC")
