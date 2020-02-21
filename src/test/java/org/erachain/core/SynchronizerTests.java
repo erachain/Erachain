@@ -12,6 +12,8 @@ import org.erachain.datachain.DCSet;
 import org.erachain.network.Network;
 import org.erachain.network.Peer;
 import org.erachain.ntp.NTP;
+import org.erachain.settings.Settings;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mapdb.Fun;
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,29 +37,41 @@ public class SynchronizerTests {
 
     static Logger LOGGER = LoggerFactory.getLogger(SynchronizerTests.class.getName());
 
+    Peer peer = new Peer(InetAddress.getByAddress(new byte[]{126, 2, 3, 4}));
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;
     byte FEE_POWER = (byte) 0;
     byte[] assetReference = new byte[64];
     long timestamp = NTP.getTime();
-    DCSet databaseSet = DCSet.createEmptyDatabaseSet(0);
-    GenesisBlock genesisBlock = new GenesisBlock();
+    DCSet databaseSet;
+    GenesisBlock genesisBlock;
     BlockChain blockChain;
 
     Fun.Tuple2<List<Transaction>, Integer> orderedTransactions = new Fun.Tuple2<>(new ArrayList<Transaction>(), 0);
 
     byte[] transactionsHash = new byte[Crypto.HASH_LENGTH];
 
-    @Ignore
-    //TODO actualize the test
-    @Test
-    public void synchronizeNoCommonBlock() {
-        //GENERATE 5 BLOCKS FROM ACCOUNT 1
+    public SynchronizerTests() throws UnknownHostException {
+    }
 
+    @Before
+    public void init() {
+        Settings.genesisStamp = Settings.DEFAULT_DEMO_NET_STAMP;
+        databaseSet = DCSet.createEmptyDatabaseSet(0);
+        genesisBlock = new GenesisBlock();
         try {
             blockChain = new BlockChain(databaseSet);
         } catch (Exception e1) {
         }
+        Controller.getInstance().blockChain = blockChain;
+
+    }
+
+    @Ignore
+    //TODO actualize the test
+    @Test
+    public void synchronizeNoCommonBlock() {
+
 
         //CREATE KNOWN ACCOUNT
         byte[] seed = Crypto.getInstance().digest("test".getBytes());
@@ -68,16 +83,16 @@ public class SynchronizerTests {
         //transaction.process(databaseSet, false);
         generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
 
+        //GENERATE 5 BLOCKS FROM ACCOUNT 1
         //GENERATE 5 NEXT BLOCKS
         Block lastBlock = genesisBlock;
         BlockGenerator blockGenerator = new BlockGenerator(databaseSet,blockChain, false);
         List<Block> firstBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            int height = i + 1;
             Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
-                    height,  1000, 1000l, 1000l);
+                    1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -98,6 +113,7 @@ public class SynchronizerTests {
             lastBlock = newBlock;
         }
 
+        Block lastOne = lastBlock;
         //GENERATE NEXT 5 BLOCK FROM ACCOUNT 2 ON FORK
         seed = Crypto.getInstance().digest("test2".getBytes());
         privateKey = Crypto.getInstance().createKeyPair(seed).getA();
@@ -110,6 +126,7 @@ public class SynchronizerTests {
 
         //FORK
         DCSet fork = databaseSet.fork();
+        lastBlock = fork.getBlockMap().last();
 
         BlockGenerator blockGeneratorFork = new BlockGenerator(fork,blockChain, false);
         //GENERATE NEXT 5 BLOCKS
@@ -118,7 +135,7 @@ public class SynchronizerTests {
             //GENERATE NEXT BLOCK
             Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
-                    i + 1,  1000, 1000l, 1000l);
+                    1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -140,34 +157,35 @@ public class SynchronizerTests {
         }
 
         //SYNCHRONIZE DB FROM ACCOUNT 1 WITH NEXT 5 BLOCKS OF ACCOUNT 2
-        Synchronizer synchronizer = new Synchronizer(Controller.getInstance(), blockChain);
+        Synchronizer synchronizer = new Synchronizer(Controller.getInstance());
 
         try {
-            synchronizer.synchronizeNewBlocks(databaseSet, null, 1, newBlocks, null);
-
-            //CHECK LAST 5 BLOCKS
-            lastBlock = databaseSet.getBlockMap().last();
-            for (int i = 4; i >= 0; i--) {
-                //CHECK LAST BLOCK
-                assertEquals(true, Arrays.equals(newBlocks.get(i).getSignature(), lastBlock.getSignature()));
-                lastBlock = lastBlock.getParent(databaseSet);
-            }
-
-            //CHECK LAST 5 BLOCKS
-            for (int i = 4; i >= 0; i--) {
-                //CHECK LAST BLOCK
-                assertEquals(true, Arrays.equals(firstBlocks.get(i).getSignature(), lastBlock.getSignature()));
-                lastBlock = lastBlock.getParent(databaseSet);
-            }
-
-            //CHECK LAST BLOCK
-            assertEquals(true, Arrays.equals(lastBlock.getSignature(), genesisBlock.getSignature()));
-
-            //CHECK HEIGHT
-            assertEquals(11, databaseSet.getBlockMap().last().getHeight());
+            synchronizer.synchronizeNewBlocks(databaseSet, lastOne, 1, newBlocks, peer);
         } catch (Exception e) {
-            fail("Exception during synchronize");
+            e.printStackTrace();
+            fail("Exception during synchronize: " + e.getMessage());
         }
+
+        //CHECK LAST 5 BLOCKS
+        lastBlock = databaseSet.getBlockMap().last();
+        for (int i = 4; i >= 0; i--) {
+            //CHECK LAST BLOCK
+            assertEquals(true, Arrays.equals(newBlocks.get(i).getSignature(), lastBlock.getSignature()));
+            lastBlock = lastBlock.getParent(databaseSet);
+        }
+
+        //CHECK LAST 5 BLOCKS
+        for (int i = 4; i >= 0; i--) {
+            //CHECK LAST BLOCK
+            assertEquals(true, Arrays.equals(firstBlocks.get(i).getSignature(), lastBlock.getSignature()));
+            lastBlock = lastBlock.getParent(databaseSet);
+        }
+
+        //CHECK LAST BLOCK
+        assertEquals(true, Arrays.equals(lastBlock.getSignature(), genesisBlock.getSignature()));
+
+        //CHECK HEIGHT
+        assertEquals(11, databaseSet.getBlockMap().last().getHeight());
     }
 
     @Test
@@ -237,7 +255,7 @@ public class SynchronizerTests {
             //GENERATE NEXT BLOCK
             Block newBlock = blockGenerator1.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
-                    i + 1,  1000, 1000l, 1000l);
+                    1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -264,7 +282,7 @@ public class SynchronizerTests {
             //GENERATE NEXT BLOCK
             Block newBlock = blockGenerator2.generateNextBlock(generator2,
                     lastBlock, orderedTransactions,
-                    i + 1,  1000, 1000l, 1000l);
+                    1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator2, newBlock.getSignature());
@@ -287,7 +305,7 @@ public class SynchronizerTests {
         }
 
         //SYNCHRONIZE DB FROM ACCOUNT 1 WITH NEXT 5 BLOCKS OF ACCOUNT 2
-        Synchronizer synchronizer = new Synchronizer(Controller.getInstance(), blockChain);
+        Synchronizer synchronizer = new Synchronizer(Controller.getInstance());
 
         try {
             synchronizer.synchronizeNewBlocks(databaseSet1, gb1, 1, newBlocks, null);
@@ -334,7 +352,7 @@ public class SynchronizerTests {
             cnt.blockChain = new BlockChain(dcSet);
 
             // CREATE SYNCHRONIZOR
-            cnt.synchronizer = new Synchronizer(cnt, cnt.blockChain);
+            cnt.synchronizer = new Synchronizer(cnt);
 
             Peer peer = null;
             try {

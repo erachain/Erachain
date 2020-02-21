@@ -133,7 +133,7 @@ public class GeneratorTests {
             //GENERATE NEXT BLOCK
             Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
-                    height,  1000, 1000l, 1000l);
+                    1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             //byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -402,7 +402,7 @@ public class GeneratorTests {
             //GENERATE NEXT BLOCK
             Block newBlock = blockGenerator.generateNextBlock(generator,
                     lastBlock, orderedTransactions,
-                    height,  1000, 1000l, 1000l);
+                    1000, 1000l, 1000l);
 
             //ADD TRANSACTION SIGNATURE
             byte[] transactionsSignature = Crypto.getInstance().sign(generator, newBlock.getSignature());
@@ -587,7 +587,7 @@ public class GeneratorTests {
         BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
         Block newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
 
 
         int height = 2;
@@ -620,7 +620,7 @@ public class GeneratorTests {
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
         newBlock.setTransactionsForTests(transactions);
 
         //CHECK IF BLOCK IS VALID
@@ -660,7 +660,7 @@ public class GeneratorTests {
         BlockGenerator blockGenerator = new BlockGenerator(dcSet, null, false);
         Block newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
 
         int height = 2;
         // get timestamp for block
@@ -702,7 +702,7 @@ public class GeneratorTests {
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(generator,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
         newBlock.setTransactionsForTests(transactions);
 
         //CHECK THAT NOT ALL TRANSACTIONS WERE ADDED TO BLOCK
@@ -744,7 +744,7 @@ public class GeneratorTests {
         BlockGenerator blockGenerator = new BlockGenerator(dcSet, blockchain, false);
         Block newBlock = blockGenerator.generateNextBlock(userAccount1,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
 
         int height = 2;
         // get timestamp for block
@@ -769,7 +769,7 @@ public class GeneratorTests {
         //ADD UNCONFIRMED TRANSACTIONS TO BLOCK
         newBlock = blockGenerator.generateNextBlock(userAccount1,
                 genesisBlock, orderedTransactions,
-                2,  1000, 1000l, 1000l);
+                1000, 1000l, 1000l);
         newBlock.setTransactionsForTests(transactions);
         try {
             newBlock.process(dcSet);

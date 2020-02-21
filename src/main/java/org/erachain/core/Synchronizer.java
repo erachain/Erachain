@@ -45,9 +45,9 @@ public class Synchronizer extends Thread {
     Controller ctrl;
     BlockChain bchain;
 
-    public Synchronizer(Controller ctrl, BlockChain bchain) {
+    public Synchronizer(Controller ctrl) {
         this.ctrl = ctrl;
-        this.bchain = bchain;
+        this.bchain = ctrl.getBlockChain();
 
         this.start();
     }
@@ -218,13 +218,13 @@ public class Synchronizer extends Thread {
 
         LOGGER.debug("*** checkNewBlocks - VALIDATE THE NEW BLOCKS in FORK");
 
-        boolean isFromTrustedPeer = ctrl.getBlockChain().isPeerTrusted(peer);
+        boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
 
         for (Block block : newBlocks) {
             int height = block.getHeight();
-            int bbb = fork.getBlockMap().size();
-            int hhh = fork.getBlocksHeadsMap().size();
-            int sss = fork.getBlockSignsMap().size();
+            int bbb = fork.getBlockMap().size() + 1;
+            int hhh = fork.getBlocksHeadsMap().size() + 1;
+            int sss = fork.getBlockSignsMap().size() + 1;
             assert (height == hhh);
             assert (bbb == hhh);
             assert (sss == hhh);
@@ -333,18 +333,16 @@ public class Synchronizer extends Thread {
                                      List<Block> newBlocks, Peer peer) throws Exception {
         //Controller cnt = Controller.getInstance();
 
-        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+        Tuple2<Integer, Long> myHW = bchain.getHWeightFull(dcSet);
 
         /**
          * если в конце взведено - значит в момент слива какие-то таблицы не залились
          */
-        boolean broken = false;
+        boolean dbsBroken = false;
 
-        DCSet fork;
         // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
         DB database = DCSet.getHardBaseForFork();
-        fork = dcSet.fork(database);
-        try {
+        try (DCSet fork = dcSet.fork(database)) {
 
             ConcurrentHashMap<Long, Transaction> orphanedTransactions
                     = checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
@@ -353,18 +351,20 @@ public class Synchronizer extends Thread {
                 // это такая же как у нас цепочка - MUTE ее
                 return;
             }
+
             // сюда может прити только если проверка прошла успешно
 
             // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
+
             // если проверка прошла успешно то значит Форк базы готов для слива в оснонвую
             // И без пересчета заново сделаем слив
             // Но сначала откаченные транзакции сохраним
             // соберем транзакции с блоков которые будут откачены в нашей цепочке
 
             // теперь сливаем изменения
-            broken = true; // если останется взведенным значит что-то не залилось правильно
+            dbsBroken = true; // если останется взведенным значит что-то не залилось правильно
             fork.writeToParent();
-            broken = false;
+            dbsBroken = false;
 
             // теперь все транзакции в пул опять закидываем
             for (Transaction transaction: orphanedTransactions.values()) {
@@ -373,15 +373,9 @@ public class Synchronizer extends Thread {
 
                 ctrl.transactionsPool.offerMessage(transaction);
             }
-
-        } finally {
-            // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
-            // и файл надо освободить
-            fork.close();
-
         }
 
-        if (broken) {
+        if (dbsBroken) {
             // TODO: нужно откатить чтоли все или там и так атомарно - но у кадой таблицы своя атомарность ((
         }
 
@@ -390,7 +384,7 @@ public class Synchronizer extends Thread {
     public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception {
 
         //Controller cnt = Controller.getInstance();
-        boolean isFromTrustedPeer = ctrl.getBlockChain().isPeerTrusted(peer);
+        boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
 
         if (ctrl.isOnStopping())
             throw new Exception("on stopping");
@@ -1083,7 +1077,7 @@ public class Synchronizer extends Thread {
             if (processTiming < 999999999999l) {
                 // при переполнении может быть минус
                 // в миеросекундах подсчет делаем
-                ctrl.getBlockChain().updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
+                bchain.updateTXProcessTimingAverage(processTiming, block.getTransactionCount());
             }
         }
 
@@ -1162,7 +1156,7 @@ public class Synchronizer extends Thread {
                     // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                     needCheck = true;
                 } else {
-                    Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
+                    Tuple2<Integer, Long> myHW = bchain.getHWeightFull(dcSet);
                     if (myHW.a % BlockChain.CHECK_PEERS_WEIGHT_AFTER_BLOCKS == 0) {
                         // проверим силу других цепочек - и если есть сильнее то сделаем откат у себя так чтобы к ней примкнуть
                         needCheck = true;
