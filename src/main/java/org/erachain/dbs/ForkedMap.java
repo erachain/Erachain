@@ -12,4 +12,5 @@ public interface ForkedMap {
      * @return true - были добавление или удаление - запустить событие для ГУИ
      */
     boolean writeToParent();
+
 }
