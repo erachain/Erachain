@@ -21,7 +21,6 @@ import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -207,34 +206,6 @@ public class SynchronizerTests {
             return;
         }
 
-        //CREATE KNOWN ACCOUNT
-        byte[] seed = Crypto.getInstance().digest("test".getBytes());
-        byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-        PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
-
-        //PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-        //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
-        //transaction.process(databaseSet, false);
-        //transaction.process(databaseSet2, false);
-        generator.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
-        generator.changeBalance(databaseSet1, false, FEE_KEY, BigDecimal.valueOf(10), false, false);
-        generator.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
-        generator.changeBalance(databaseSet2, false, FEE_KEY, BigDecimal.valueOf(10), false, false);
-
-
-        //CREATE KNOWN ACCOUNT 2
-        byte[] seed2 = Crypto.getInstance().digest("test2".getBytes());
-        byte[] privateKey2 = Crypto.getInstance().createKeyPair(seed2).getA();
-        PrivateKeyAccount generator2 = new PrivateKeyAccount(privateKey2);
-
-        //PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR2 HAS FUNDS
-        //transaction = new GenesisTransaction(generator2, BigDecimal.valueOf(1000), NTP.getTime());
-        //GenesisTransferAssetTransaction transaction = new GenesisTransferAssetTransaction(generator2, ERM_KEY, BigDecimal.valueOf(1000));
-        //transaction.process(databaseSet, false);
-        //transaction.process(databaseSet2, false);
-        generator2.changeBalance(databaseSet1, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
-        generator2.changeBalance(databaseSet2, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
-
         try {
             blockChain = new BlockChain(databaseSet);
         } catch (Exception e1) {
@@ -245,7 +216,7 @@ public class SynchronizerTests {
         BlockGenerator blockGenerator1 = new BlockGenerator(databaseSet1, null, false);
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = blockGenerator1.generateNextBlock(generator,
+            Block newBlock = blockGenerator1.generateNextBlock(privKeys.get(lastBlock.heightBlock),
                     lastBlock, orderedTransactions,
                     1000, 1000l, 1000l);
 
@@ -272,7 +243,7 @@ public class SynchronizerTests {
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 10; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = blockGenerator2.generateNextBlock(generator2,
+            Block newBlock = blockGenerator2.generateNextBlock(privKeys.get(lastBlock.heightBlock),
                     lastBlock, orderedTransactions,
                     1000, 1000l, 1000l);
 
