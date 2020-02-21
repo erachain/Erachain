@@ -7,6 +7,7 @@ import org.erachain.core.block.Block;
 import org.erachain.core.block.GenesisBlock;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
 import org.erachain.database.DLSet;
 import org.erachain.datachain.DCSet;
 import org.erachain.network.Network;
@@ -37,6 +38,9 @@ public class SynchronizerTests {
 
     static Logger LOGGER = LoggerFactory.getLogger(SynchronizerTests.class.getName());
 
+    //CREATE KNOWN ACCOUNT
+    List<PrivateKeyAccount> privKeys = new ArrayList<>();
+
     Peer peer = new Peer(InetAddress.getByAddress(new byte[]{126, 2, 3, 4}));
     long ERM_KEY = Transaction.RIGHTS_KEY;
     long FEE_KEY = Transaction.FEE_KEY;
@@ -65,23 +69,19 @@ public class SynchronizerTests {
         }
         Controller.getInstance().blockChain = blockChain;
 
+        //CREATE KNOWN ACCOUNT
+        byte[] seed = Crypto.getInstance().digest("test 456".getBytes());
+        int nonce = 0;
+        while (nonce++ < 20) {
+            privKeys.add(new PrivateKeyAccount(Wallet.generateAccountSeed(seed, nonce)));
+        }
+
     }
 
     @Ignore
     //TODO actualize the test
     @Test
     public void synchronizeNoCommonBlock() {
-
-
-        //CREATE KNOWN ACCOUNT
-        byte[] seed = Crypto.getInstance().digest("test".getBytes());
-        byte[] privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-        PrivateKeyAccount generator = new PrivateKeyAccount(privateKey);
-
-        //PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-        //Transaction transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
-        //transaction.process(databaseSet, false);
-        generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
 
         //GENERATE 5 BLOCKS FROM ACCOUNT 1
         //GENERATE 5 NEXT BLOCKS
@@ -90,7 +90,7 @@ public class SynchronizerTests {
         List<Block> firstBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = blockGenerator.generateNextBlock(generator,
+            Block newBlock = blockGenerator.generateNextBlock(privKeys.get(lastBlock.heightBlock),
                     lastBlock, orderedTransactions,
                     1000, 1000l, 1000l);
 
@@ -115,14 +115,6 @@ public class SynchronizerTests {
 
         Block lastOne = lastBlock;
         //GENERATE NEXT 5 BLOCK FROM ACCOUNT 2 ON FORK
-        seed = Crypto.getInstance().digest("test2".getBytes());
-        privateKey = Crypto.getInstance().createKeyPair(seed).getA();
-        generator = new PrivateKeyAccount(privateKey);
-
-        //PROCESS GENESIS TRANSACTION TO MAKE SURE GENERATOR HAS FUNDS
-        //transaction = new GenesisTransaction(generator, BigDecimal.valueOf(1000), NTP.getTime());
-        //transaction.process(databaseSet, false);
-        generator.changeBalance(databaseSet, false, ERM_KEY, BigDecimal.valueOf(1000), false, false);
 
         //FORK
         DCSet fork = databaseSet.fork();
@@ -133,7 +125,7 @@ public class SynchronizerTests {
         List<Block> newBlocks = new ArrayList<Block>();
         for (int i = 0; i < 5; i++) {
             //GENERATE NEXT BLOCK
-            Block newBlock = blockGenerator.generateNextBlock(generator,
+            Block newBlock = blockGenerator.generateNextBlock(privKeys.get(lastBlock.heightBlock),
                     lastBlock, orderedTransactions,
                     1000, 1000l, 1000l);
 
