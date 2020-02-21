@@ -1,6 +1,5 @@
 package org.erachain.core;
 
-import com.google.common.primitives.Longs;
 import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Base58;
@@ -8,7 +7,6 @@ import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.BlockMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.ReferenceMapImpl;
-import org.erachain.datachain.TransactionMap;
 import org.erachain.dbs.DBTab;
 import org.erachain.network.Peer;
 import org.erachain.network.message.BlockMessage;
@@ -23,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -310,12 +307,17 @@ public class Synchronizer extends Thread {
                 // - может мы лучше цепочку собрем еще
                 // тут нельзя НЕ банить - будет циклическая синхронизация с этим узлом
 
-                // INVALID BLOCK THROW EXCEPTION
                 String mess = "Dishonest peer by weak FullWeight, height: " + height
                         + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
                 LOGGER.debug(peer + " " + mess);
-                peer.ban(mess);
-                throw new Exception(mess);
+                if (false) {
+                    // INVALID BLOCK THROW EXCEPTION
+                    peer.ban(mess);
+                    throw new Exception(mess);
+                } else {
+                    peer.setMute(Controller.MUTE_PEER_COUNT);
+                    return null;
+                }
             }
 
             ///тут ключ по старому значению - просто так не получится найти orphanedTransactions.remove();
@@ -383,131 +385,6 @@ public class Synchronizer extends Thread {
             // TODO: нужно откатить чтоли все или там и так атомарно - но у кадой таблицы своя атомарность ((
         }
 
-    }
-
-    // process new BLOCKS to DB and orphan DB
-    public List<Transaction> synchronizeNewBlocks_old(DCSet dcSet, Block lastCommonBlock, int checkPointHeight,
-                                                List<Block> newBlocks, Peer peer) throws Exception {
-        ConcurrentHashMap<Long, Transaction> orphanedTransactions = new ConcurrentHashMap<Long, Transaction>();
-        //Controller cnt = Controller.getInstance();
-
-        Tuple2<Integer, Long> myHW = ctrl.getBlockChain().getHWeightFull(dcSet);
-
-        DCSet fork;
-        // VERIFY ALL BLOCKS TO PREVENT ORPHANING INCORRECTLY
-        DB database = DCSet.getHardBaseForFork();
-        fork = dcSet.fork(database);
-        boolean blocksChecked = false;
-        try {
-            checkNewBlocks(myHW, fork, lastCommonBlock, checkPointHeight, newBlocks, peer);
-            blocksChecked = true;
-        } finally {
-            //blocksChecked
-            // здесь нужно закрывать весь набор - так как он на диске с внешнимии СУБД может быть
-            fork.close();
-        }
-
-        // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
-        //// Map<String, byte[]> states = new TreeMap<String, byte[]>();
-
-        // GET LAST BLOCK
-        Block lastBlock = dcSet.getBlockMap().last();
-
-        // ORPHAN LAST BLOCK UNTIL WE HAVE REACHED COMMON BLOCK - in MAIN DB
-        // ============ by EQUAL SIGNATURE !!!!!
-        byte[] lastCommonBlockSignature = lastCommonBlock.getSignature();
-        int countOrphanedTransactions = 0;
-        while (!Arrays.equals(lastBlock.getSignature(), lastCommonBlockSignature)) {
-            if (ctrl.isOnStopping())
-                throw new Exception("on stopping");
-
-            // THROWN is new Better Peer
-            ctrl.checkNewBetterPeer(peer);
-
-            // ADD ORPHANED TRANSACTIONS
-            // orphanedTransactions.addAll(lastBlock.getTransactions());
-            for (Transaction transaction : lastBlock.getTransactions()) {
-                if (ctrl.isOnStopping())
-                    throw new Exception("on stopping");
-                if (countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
-                    countOrphanedTransactions++;
-                    orphanedTransactions.put(Longs.fromByteArray(transaction.getSignature()), transaction);
-                }
-            }
-
-            LOGGER.debug("*** synchronize - orphanedTransactions.size:" + orphanedTransactions.size());
-            LOGGER.debug("*** synchronize - orphan block... " + dcSet.getBlockMap().size());
-
-            // так как выше мы запоминаем откаченные транзакции то тут их не будем сохранять в базу
-
-            // Надо очистить что брали базу форкнутую - она уже закрыта
-            lastBlock.clearValidatedForkDB();
-            this.pipeProcessOrOrphan(dcSet, lastBlock, true, false, true);
-
-            lastBlock = dcSet.getBlockMap().last();
-        }
-
-        LOGGER.debug("*** chain size after orphan " + dcSet.getBlockMap().size());
-
-
-        // PROCESS THE NEW BLOCKS
-        LOGGER.debug("*** synchronize PROCESS NEW blocks.size:" + newBlocks.size());
-        for (Block block : newBlocks) {
-
-            // THROWN is new Better Peer
-            ctrl.checkNewBetterPeer(peer);
-
-            if (ctrl.isOnStopping())
-                throw new Exception("on stopping");
-
-            if (dcSet.getBlockSignsMap().contains(block.getSignature())) {
-                LOGGER.error("*** add CHAIN - DUPLICATE SIGN! [" + block.getHeight() + "] "
-                        + Base58.encode(block.getSignature())
-                        + " from peer: " + peer);
-                continue;
-            }
-
-            // SYNCHRONIZED PROCESSING
-            LOGGER.debug("*** begin PIPE");
-
-            // Надо очистить что брали базу форкнутую - она уже закрыта
-            block.clearValidatedForkDB();
-            this.pipeProcessOrOrphan(dcSet, block, false, false, false);
-
-            LOGGER.debug("*** begin REMOVE orphanedTransactions");
-            for (Transaction transaction : block.getTransactions()) {
-                if (ctrl.isOnStopping())
-                    throw new Exception("on stopping");
-
-                String key = new BigInteger(1, transaction.getSignature()).toString(16);
-                if (orphanedTransactions.containsKey(key))
-                    orphanedTransactions.remove(key);
-            }
-
-        }
-
-        // CLEAR for DEADs
-        TransactionMap map = dcSet.getTransactionTab();
-        List<Transaction> orphanedTransactionsList = new ArrayList<Transaction>();
-        for (Transaction transaction : orphanedTransactions.values()) {
-            if (ctrl.isOnStopping())
-                throw new Exception("on stopping");
-
-            // CHECK IF DEADLINE PASSED
-            try {
-                if (!map.isClosed() && !map.contains(transaction.getSignature())) {
-                    orphanedTransactionsList.add(transaction);
-                }
-            } catch (java.lang.Throwable e) {
-                if (e instanceof java.lang.IllegalAccessError) {
-                    // налетели на закрытую таблицу
-                } else {
-                    LOGGER.error(e.getMessage(), e);
-                }
-            }
-        }
-
-        return orphanedTransactionsList;
     }
 
     public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception {
