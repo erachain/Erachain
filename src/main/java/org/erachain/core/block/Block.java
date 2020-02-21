@@ -493,7 +493,7 @@ import java.util.*;
 
     }
 
-    public Block(int version, Block parentBlock, PublicKeyAccount generator, int heightBlock,
+    public Block(int version, Block parentBlock, PublicKeyAccount generator,
                  Tuple2<List<Transaction>, Integer> transactionsItem,
                  byte[] atBytes,
                  int forgingValue, long winValue, long target) {
@@ -501,7 +501,7 @@ import java.util.*;
         this.version = version;
         this.reference = parentBlock.signature;
         this.creator = generator;
-        this.heightBlock = heightBlock;
+        this.heightBlock = parentBlock.heightBlock + 1;
 
         this.transactions = transactionsItem.a;
         this.transactionCount = transactionsItem.b;

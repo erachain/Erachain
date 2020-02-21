@@ -231,6 +231,14 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
         return list;
     }
 
+    public void makeDeletedMap(T key) {
+        if (key instanceof byte[]) {
+            this.deleted = new TreeMap(Fun.BYTE_ARRAY_COMPARATOR);
+        } else {
+            this.deleted = new HashMap(1024, 0.75f);
+        }
+    }
+
     // ERROR if key is not unique for each value:
     // After removing the key from the fork, which is in the parent, an incorrect post occurs
     //since from.deleted the key is removed and there is no parent in the parent and that
@@ -439,11 +447,7 @@ public abstract class DCUMapImpl<T, U> extends DBTabImpl<T, U> implements Forked
             // это форкнутая таблица
 
             if (this.deleted == null) {
-                if (key instanceof byte[]) {
-                    this.deleted = new TreeMap(Fun.BYTE_ARRAY_COMPARATOR);
-                } else {
-                    this.deleted = new HashMap(1024, 0.75f);
-                }
+                makeDeletedMap(key);
             }
 
             // добавляем в любом случае, так как

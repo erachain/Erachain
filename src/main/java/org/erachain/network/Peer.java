@@ -2,6 +2,7 @@ package org.erachain.network;
 
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockBuffer;
+import org.erachain.database.DLSet;
 import org.erachain.network.message.*;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
@@ -768,7 +769,9 @@ public class Peer extends MonitoredThread {
         return Controller.getInstance().getDLSet().getPeerMap().isBanned(address.getAddress());
     }
     public int getBanMinutes() {
-        return Controller.getInstance().getDLSet().getPeerMap().getBanMinutes(this);
+        DLSet dlSet = Controller.getInstance().getDLSet();
+        if (dlSet == null) return 0;
+        return dlSet.getPeerMap().getBanMinutes(this);
     }
 
     /**

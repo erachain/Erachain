@@ -90,6 +90,14 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         return u;
     }
 
+    public void makeDeletedMap(T key) {
+        if (key instanceof byte[]) {
+            this.deleted = new TreeMap(Fun.BYTE_ARRAY_COMPARATOR);
+        } else {
+            this.deleted = new HashMap(1024, 0.75f);
+        }
+    }
+
     @Override
     public U get(T key) {
 
@@ -184,11 +192,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         U value = this.map.remove(key);
 
         if (this.deleted == null) {
-            if (key instanceof byte[]) {
-                this.deleted = new TreeMap(Fun.BYTE_ARRAY_COMPARATOR);
-            } else {
-                this.deleted = new HashMap(1024, 0.75f);
-            }
+            makeDeletedMap(key);
         }
 
         // добавляем в любом случае, так как
@@ -218,8 +222,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         U value = this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            makeDeletedMap(key);
         }
 
         // добавляем в любом случае, так как
@@ -249,8 +252,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            makeDeletedMap(key);
         }
 
         // добавляем в любом случае, так как
@@ -273,8 +275,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
         this.map.remove(key);
 
         if (this.deleted == null) {
-            //this.deleted = new HashMap<T, Boolean>(1024 , 0.75f);
-            this.deleted = new TreeMap<T, Boolean>();
+            makeDeletedMap(key);
         }
 
         // добавляем в любом случае, так как

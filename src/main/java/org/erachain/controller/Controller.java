@@ -761,7 +761,7 @@ public class Controller extends Observable {
         this.winBlockSelector = new WinBlockSelector(this, blockChain, dcSet);
 
         // CREATE SYNCHRONIZOR
-        this.synchronizer = new Synchronizer(this, blockChain);
+        this.synchronizer = new Synchronizer(this);
 
         // CREATE Block REQUESTER
         this.blockRequester = new BlocksRequest(this, blockChain, dcSet);

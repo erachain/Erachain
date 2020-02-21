@@ -194,7 +194,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     }
 
     public Block generateNextBlock(PrivateKeyAccount account,
-                                   Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int height, int forgingValue, long winValue, long previousTarget) {
+                                   Block parentBlock, Tuple2<List<Transaction>, Integer> transactionsItem, int forgingValue, long winValue, long previousTarget) {
 
         if (transactionsItem == null) {
             return null;
@@ -205,7 +205,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         atBytes = new byte[0];
 
         //CREATE NEW BLOCK
-        Block newBlock = new Block(version, parentBlock, account, height,
+        Block newBlock = new Block(version, parentBlock, account,
                 transactionsItem, atBytes,
                 forgingValue, winValue, previousTarget);
         newBlock.sign(account);
@@ -1052,7 +1052,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         processTiming = System.nanoTime();
                                         generatedBlock = generateNextBlock(acc_winner, solvingBlock,
                                                 unconfirmedTransactions,
-                                                height, winned_forgingValue, winned_winValue, previousTarget);
+                                                winned_forgingValue, winned_winValue, previousTarget);
 
                                         processTiming = System.nanoTime() - processTiming;
 
