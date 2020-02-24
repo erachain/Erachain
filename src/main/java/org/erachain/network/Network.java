@@ -615,6 +615,12 @@ public class Network extends Observable {
 
             case Message.WIN_BLOCK_TYPE:
 
+                Peer syncFromPeer = controller.synchronizer.getPeer();
+                if (syncFromPeer != null && !syncFromPeer.equals(message.getSender())) {
+                    // если синхримся то победные от других пиров не принимаем так как они нас в форк уводят
+                    return;
+                }
+
                 if (controller.winBlockSelector != null)
                     controller.winBlockSelector.offerMessage(message);
 
