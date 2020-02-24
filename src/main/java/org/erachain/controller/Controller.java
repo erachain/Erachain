@@ -1545,7 +1545,7 @@ public class Controller extends Observable {
                 String errorMess = this.getBlockChain().blockFromFuture(hW.a - 2);
                 if (errorMess != null) {
                     // IT PEER from FUTURE
-                    this.banPeerOnError(hWeightMessage.getSender(), errorMess);
+                    hWeightMessage.getSender().ban(errorMess);
                     return;
                 }
 
@@ -1609,7 +1609,7 @@ public class Controller extends Observable {
                 try {
                     JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
                     if (!blockChain.validageHardCheckPointPeerSign(peerIhfo.get("cps").toString())) {
-                        banPeerOnError(peer, "NOT FOUND CHECKPOINT!", 30);
+                        peer.ban(30, "NOT FOUND CHECKPOINT!");
                         return;
                     }
                     Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
@@ -1642,14 +1642,6 @@ public class Controller extends Observable {
 
         }
 
-    }
-
-    public void banPeerOnError(Peer peer, String mess) {
-        peer.ban("ban PeerOnError - " + mess);
-    }
-
-    public void banPeerOnError(Peer peer, String mess, int minutes) {
-        peer.ban(minutes, "ban PeerOnError - " + mess);
     }
 
     public void addActivePeersObserver(Observer o) {
@@ -2139,7 +2131,7 @@ public class Controller extends Observable {
                 Tuple2<Integer, Long> whPeer = peer.getHWeight(true);
                 if (maxHeight < whPeer.a) {
                     // Этот пир дает цепочку из будущего - не берем его
-                    banPeerOnError(peer, "FROM FUTURE: " + whPeer, 5);
+                    peer.ban(5, "FROM FUTURE: " + whPeer);
                     continue;
                 }
 

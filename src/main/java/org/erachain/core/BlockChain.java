@@ -1166,7 +1166,7 @@ public class BlockChain {
 
             LOGGER.info("new winBlock is BAD!");
             if (peer != null)
-                Controller.getInstance().banPeerOnError(peer, "invalid block", 10);
+                peer.ban(10, "invalid block");
             else
                 LOGGER.error("MY WinBlock is INVALID! ignore...");
 
