@@ -108,7 +108,7 @@ public class Controller extends Observable {
     public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 1 << 23;
 
-    public static final Integer MUTE_PEER_COUNT = 8;
+    public static final Integer MUTE_PEER_COUNT = 6;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
@@ -409,7 +409,7 @@ public class Controller extends Observable {
 
         if (network != null) {
             jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
-            jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false));
+            jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false, false));
             jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
             jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
             jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
@@ -1208,7 +1208,7 @@ public class Controller extends Observable {
 
     public int getActivePeersCounter() {
         // GET ACTIVE PEERS
-        return this.network.getActivePeersCounter(false);
+        return this.network.getActivePeersCounter(false, false);
     }
 
     public void walletSyncStatusUpdate(int height) {

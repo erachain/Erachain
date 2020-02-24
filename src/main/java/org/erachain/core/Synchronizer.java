@@ -298,25 +298,30 @@ public class Synchronizer extends Thread {
                 }
             }
 
-            // проверка силы цепочки на уровне нашего блока и если высота новой цепочки чуть больше нашей
-            if (myHeight + 1 == newHeight && newHeight == height && myWeight > block.blockHead.totalWinValue
-                // все остальные ситуации не баним и не обрабатываем
+            // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
+            if (height > myHeight && myWeight > block.blockHead.totalWinValue
             ) {
+                String mess = "Dishonest peer by weak FullWeight, height: " + height
+                        + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
+                LOGGER.debug(peer + " " + mess);
                 // суть в том что тут цепочка на этой высоте слабже моей,
                 // поэтому мы ее пока забаним чтобы с ней постоянно не синхронизироваться
                 // - может мы лучше цепочку собрем еще
                 // тут нельзя НЕ банить - будет циклическая синхронизация с этим узлом
-
-                String mess = "Dishonest peer by weak FullWeight, height: " + height
-                        + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
-                LOGGER.debug(peer + " " + mess);
-                if (false) {
-                    // INVALID BLOCK THROW EXCEPTION
+                int peersCount = ctrl.network.getActivePeersCounter(false, true);
+                if (peersCount < Settings.getInstance().getMinConnections()) {
+                    // ничего не делаем - пиров и так мало - синхримся с этого пира иначе будет нестабильная вся сеть
+                    // догонять и откатываться все узлы начнут
+                    ;
+                } else if (peersCount > Settings.getInstance().getMaxConnections() - 3) {
+                    // и так дофига пиров - можно и забанить
                     peer.ban(mess);
                     throw new Exception(mess);
                 } else {
+                    // пиров еще достаточно но заткнем ему рот - не будем по нему ориентироваться
                     peer.setMute(Controller.MUTE_PEER_COUNT);
                     return null;
+
                 }
             }
 
