@@ -1900,7 +1900,7 @@ public class Controller extends Observable {
 
         // нам не важно отличие в последнем блоке тут - главное чтобы цепочка была длиньше?
         //blockGenerator.checkWeightPeers();
-        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false, false);
+        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false, true);
         if (betterPeerHW != null) {
             Tuple2<Integer, Long> currentHW = currentBetterPeer.getHWeight(true);
             if (currentHW != null && (currentHW.a >= betterPeerHW.a
@@ -1984,7 +1984,7 @@ public class Controller extends Observable {
             Tuple3<Integer, Long, Peer> peerHW;
             Tuple2<Integer, Long> peerHWdata = null;
             if (blockGenerator.betterPeer == null) {
-                peerHW = this.getMaxPeerHWeight(shift, false, false);
+                peerHW = this.getMaxPeerHWeight(shift, false, true);
             } else {
                 // берем пир который нашли в генераторе при осмотре более сильных цепочек
                 // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
@@ -1992,7 +1992,8 @@ public class Controller extends Observable {
                 peerHWdata = blockGenerator.betterPeer.getHWeight(true);
                 if (peerHWdata == null) {
                     // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
-                    peerHW = this.getMaxPeerHWeight(shift, false, false);
+                    peerHW = this.getMaxPeerHWeight(shift, false, true);
+                    LOGGER.info(info);
                 } else {
                     peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
                 }

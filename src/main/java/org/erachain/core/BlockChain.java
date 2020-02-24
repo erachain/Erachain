@@ -1139,11 +1139,15 @@ public class BlockChain {
 
         LOGGER.info("try set new winBlock: " + block.toString());
 
-        if (this.waitWinBuffer != null && block.compareWin(waitWinBuffer) <= 0) {
+        byte[] lastSignature = dcSet.getBlockMap().getLastBlockSignature();
+        if (!Arrays.equals(lastSignature, block.getReference())) {
+            LOGGER.info("new winBlock from FORK!");
+            return false;
+        }
 
+        if (this.waitWinBuffer != null && block.compareWin(waitWinBuffer) <= 0) {
             LOGGER.info("new winBlock is POOR!");
             return false;
-
         }
 
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
