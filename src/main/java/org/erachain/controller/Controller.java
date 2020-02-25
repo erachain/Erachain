@@ -108,7 +108,7 @@ public class Controller extends Observable {
     public final String APP_NAME;
     public final static long MIN_MEMORY_TAIL = 1 << 23;
 
-    public static final Integer MUTE_PEER_COUNT = 8;
+    public static final Integer MUTE_PEER_COUNT = 6;
     // used in controller.Controller.startFromScratchOnDemand() - 0 uses in
     // code!
     // for reset DB if DB PROTOCOL is CHANGED
@@ -409,7 +409,7 @@ public class Controller extends Observable {
 
         if (network != null) {
             jsonObj.put("missedTelegrams", cnt.getInstance().network.missedTelegrams.get());
-            jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false));
+            jsonObj.put("activePeersCounter", cnt.getInstance().network.getActivePeersCounter(false, false));
             jsonObj.put("missedWinBlocks", cnt.getInstance().network.missedWinBlocks.get());
             jsonObj.put("missedMessages", cnt.getInstance().network.missedMessages.get());
             jsonObj.put("missedSendes", cnt.getInstance().network.missedSendes.get());
@@ -1208,7 +1208,7 @@ public class Controller extends Observable {
 
     public int getActivePeersCounter() {
         // GET ACTIVE PEERS
-        return this.network.getActivePeersCounter(false);
+        return this.network.getActivePeersCounter(false, false);
     }
 
     public void walletSyncStatusUpdate(int height) {
@@ -1545,7 +1545,7 @@ public class Controller extends Observable {
                 String errorMess = this.getBlockChain().blockFromFuture(hW.a - 2);
                 if (errorMess != null) {
                     // IT PEER from FUTURE
-                    this.banPeerOnError(hWeightMessage.getSender(), errorMess);
+                    hWeightMessage.getSender().ban(errorMess);
                     return;
                 }
 
@@ -1609,7 +1609,7 @@ public class Controller extends Observable {
                 try {
                     JSONObject peerIhfo = (JSONObject) JSONValue.parse(infoStr);
                     if (!blockChain.validageHardCheckPointPeerSign(peerIhfo.get("cps").toString())) {
-                        banPeerOnError(peer, "NOT FOUND CHECKPOINT!", 30);
+                        peer.ban(30, "NOT FOUND CHECKPOINT!");
                         return;
                     }
                     Integer peerHeight = Integer.parseInt(peerIhfo.get("h").toString());
@@ -1642,14 +1642,6 @@ public class Controller extends Observable {
 
         }
 
-    }
-
-    public void banPeerOnError(Peer peer, String mess) {
-        peer.ban("ban PeerOnError - " + mess);
-    }
-
-    public void banPeerOnError(Peer peer, String mess, int minutes) {
-        peer.ban(minutes, "ban PeerOnError - " + mess);
     }
 
     public void addActivePeersObserver(Observer o) {
@@ -1900,7 +1892,7 @@ public class Controller extends Observable {
 
         // нам не важно отличие в последнем блоке тут - главное чтобы цепочка была длиньше?
         //blockGenerator.checkWeightPeers();
-        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false, false);
+        Tuple3<Integer, Long, Peer> betterPeerHW = this.getMaxPeerHWeight(0, false, true);
         if (betterPeerHW != null) {
             Tuple2<Integer, Long> currentHW = currentBetterPeer.getHWeight(true);
             if (currentHW != null && (currentHW.a >= betterPeerHW.a
@@ -1984,7 +1976,7 @@ public class Controller extends Observable {
             Tuple3<Integer, Long, Peer> peerHW;
             Tuple2<Integer, Long> peerHWdata = null;
             if (blockGenerator.betterPeer == null) {
-                peerHW = this.getMaxPeerHWeight(shift, false, false);
+                peerHW = this.getMaxPeerHWeight(shift, false, true);
             } else {
                 // берем пир который нашли в генераторе при осмотре более сильных цепочек
                 // иначе тут будет взято опять значение накрученное самим пировм ипереданое нам
@@ -1992,7 +1984,8 @@ public class Controller extends Observable {
                 peerHWdata = blockGenerator.betterPeer.getHWeight(true);
                 if (peerHWdata == null) {
                     // почемуто там пусто - уже произошла обработка что этот пир как мы оказался и его удалили
-                    peerHW = this.getMaxPeerHWeight(shift, false, false);
+                    peerHW = this.getMaxPeerHWeight(shift, false, true);
+                    LOGGER.info(info);
                 } else {
                     peerHW = new Tuple3<Integer, Long, Peer>(peerHWdata.a, peerHWdata.b, blockGenerator.betterPeer);
                 }
@@ -2138,7 +2131,7 @@ public class Controller extends Observable {
                 Tuple2<Integer, Long> whPeer = peer.getHWeight(true);
                 if (maxHeight < whPeer.a) {
                     // Этот пир дает цепочку из будущего - не берем его
-                    banPeerOnError(peer, "FROM FUTURE: " + whPeer, 5);
+                    peer.ban(5, "FROM FUTURE: " + whPeer);
                     continue;
                 }
 

@@ -147,7 +147,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                 }
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
-                if (Settings.getInstance().getMaxConnections() <= network.getActivePeersCounter(false)) {
+                if (Settings.getInstance().getMaxConnections() <= network.getActivePeersCounter(false, false)) {
                     // get only income peers;
                     List<Peer> incomePeers = network.getIncomedPeers();
                     if (incomePeers != null && !incomePeers.isEmpty()) {

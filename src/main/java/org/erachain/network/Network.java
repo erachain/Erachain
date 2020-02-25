@@ -338,13 +338,15 @@ public class Network extends Observable {
         return this.knownPeers;
     }
 
-    public int getActivePeersCounter(boolean onlyWhite) {
+    public int getActivePeersCounter(boolean onlyWhite, boolean excludeMute) {
 
         int counter = 0;
         for (Peer peer : this.knownPeers) {
             if (peer.isUsed())
-                if (!onlyWhite || peer.isWhite())
-                    counter++;
+                if (!onlyWhite || peer.isWhite()) {
+                    if (!excludeMute || peer.getMute() > 0)
+                        counter++;
+                }
         }
         return counter;
     }
@@ -395,7 +397,7 @@ public class Network extends Observable {
      */
     public int banForActivePeersCounter() {
 
-        int active = getActivePeersCounter(false);
+        int active = getActivePeersCounter(false, false);
         int difference = Settings.getInstance().getMinConnections() - active;
         if (difference > 0)
             return 0;
@@ -485,7 +487,7 @@ public class Network extends Observable {
         }
 
         // Если пустых мест уже мало то начинаем переиспользовать
-        if (this.getActivePeersCounter(false) + 3 > Settings.getInstance().getMaxConnections() ) {
+        if (this.getActivePeersCounter(false, false) + 3 > Settings.getInstance().getMaxConnections()) {
             // use UNUSED peers
             for (Peer knownPeer : this.knownPeers) {
                 if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
@@ -614,6 +616,12 @@ public class Network extends Observable {
                 return;
 
             case Message.WIN_BLOCK_TYPE:
+
+                Peer syncFromPeer = controller.synchronizer.getPeer();
+                if (syncFromPeer != null && !syncFromPeer.equals(message.getSender())) {
+                    // если синхримся то победные от других пиров не принимаем так как они нас в форк уводят
+                    return;
+                }
 
                 if (controller.winBlockSelector != null)
                     controller.winBlockSelector.offerMessage(message);
