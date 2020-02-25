@@ -1620,7 +1620,7 @@ public class DCSet extends DBASet implements Closeable {
      * Нужно незабыть переменные внктри каждой таблицы тоже в Родителя скинуть
      */
     @Override
-    public void writeToParent() {
+    public synchronized void writeToParent() {
 
         // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
         // иначе размер больше будет в форке и не то значение
