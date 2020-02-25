@@ -99,7 +99,7 @@ public class TransactionsPool extends MonitoredThread {
             if (transaction.getCreator() == null
                     || !transaction.isSignatureValid(DCSet.getInstance())) {
                 // DISHONEST PEER
-                this.controller.banPeerOnError(transactionMessage.getSender(), "invalid transaction signature");
+                transactionMessage.getSender().ban("invalid transaction signature");
 
                 return;
             }
