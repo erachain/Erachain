@@ -1206,6 +1206,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                         waitWin = bchain.getWaitWinBuffer();
                         if (waitWin != null) {
+                            LOGGER.debug("wait WniBlock get: " + waitWin);
                             break;
                         }
 
