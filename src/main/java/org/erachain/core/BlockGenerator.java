@@ -54,6 +54,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private int orphanto = 0;
     private static List<byte[]> needRemoveInvalids;
 
+    private int syncTo = 0;
+    private Peer syncFromPeer;
+
+
     private final DCSet dcSet;
     private final BlockChain bchain;
 
@@ -620,12 +624,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
     }
 
-    public int getOrphanTo() {
-        return this.orphanto;
-    }
-
     public void setOrphanTo(int height) {
         this.orphanto = height;
+    }
+
+    public void setSyncTo(int height, Peer peer) {
+        this.syncTo = height;
+        this.syncFromPeer = peer;
     }
 
     public void addObserver() {
@@ -774,51 +779,79 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     ctrl.pingAllPeers(false);
                 }
 
-                if (this.orphanto > 0) {
-                    this.setMonitorStatusBefore("orphan to " + orphanto);
-                    local_status = 9;
-                    ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
-
-                    // обязательно нужно чтобы память освобождать
-                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
-                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
-                    dcSet.clearCache();
-
-                    // и перед всем этим необходимо слить все изменения на диск чтобы потом когда откат закончился
-                    // не было остаков в пакетах RocksDB и трынзакциях MapDB
-                    dcSet.flush(0, true, true);
-
-                    while (bchain.getHeight(dcSet) >= this.orphanto
-                        //    && bchain.getHeight(dcSet) > 157044
-                    ) {
-                        //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
-                        //    long iii = 11;
-                        //}
-                        //Block block = bchain.getLastBlock(dcSet);
-                        try {
-                            ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        } catch (Exception e) {
-                            // если ошибка то выход делаем чтобы зарегистрировать ошибку
-                            LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(1004);
-                            return;
-
+                if (this.syncTo > 0) {
+                    try {
+                        this.setMonitorStatusBefore("Synchronize to " + syncTo + (syncFromPeer == null ? "" : " from: " + peer));
+                        if (syncFromPeer == null) {
+                            Tuple3<Integer, Long, Peer> maxPeerHW = ctrl.getMaxPeerHWeight(-5, false, false);
+                            syncFromPeer = maxPeerHW.c;
                         }
+                        if (syncFromPeer != null) {
+
+                            try {
+                                // SYNCHRONIZE FROM PEER
+                                ctrl.synchronizer.synchronize(dcSet, syncTo, syncFromPeer, syncFromPeer.getHWeight(true).a,
+                                        dcSet.getBlocksHeadsMap().get(syncTo).signature);
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
+                        LOGGER.info("SyncTo: peer not found");
+
+                    } finally {
+                        syncTo = 0;
+                        syncFromPeer = null;
+                        this.setMonitorStatusAfter();
                     }
 
-                    if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
-                        // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
-                        ReferenceMapImpl map = dcSet.getReferenceMap();
+                } else if (this.orphanto > 0) {
+                    try {
+                        this.setMonitorStatusBefore("orphan to " + orphanto);
+                        local_status = 9;
+                        ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
 
-                        return;
+                        // обязательно нужно чтобы память освобождать
+                        // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+                        // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+                        dcSet.clearCache();
+
+                        // и перед всем этим необходимо слить все изменения на диск чтобы потом когда откат закончился
+                        // не было остаков в пакетах RocksDB и трынзакциях MapDB
+                        dcSet.flush(0, true, true);
+
+                        while (bchain.getHeight(dcSet) >= this.orphanto
+                            //    && bchain.getHeight(dcSet) > 157044
+                        ) {
+                            //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
+                            //    long iii = 11;
+                            //}
+                            //Block block = bchain.getLastBlock(dcSet);
+                            try {
+                                ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                            } catch (Exception e) {
+                                // если ошибка то выход делаем чтобы зарегистрировать ошибку
+                                LOGGER.error(e.getMessage(), e);
+                                ctrl.stopAll(1004);
+                                return;
+
+                            }
+                        }
+
+                        if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
+                            // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
+                            ReferenceMapImpl map = dcSet.getReferenceMap();
+
+                            return;
+                        }
+
+
+                    } finally {
+                        this.orphanto = 0;
+                        ctrl.checkStatusAndObserve(0);
+
+                        this.setMonitorStatusAfter();
+
                     }
-
-
-                    this.orphanto = 0;
-                    ctrl.checkStatusAndObserve(0);
-
-                    this.setMonitorStatusAfter();
-
                 }
 
                 timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height);
@@ -1022,14 +1055,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         }
 
                                     }
-                                    while (this.orphanto <= 0 && wait_step-- > 0
+                                    while (this.orphanto <= 0 && this.syncTo <= 0 && wait_step-- > 0
                                             && NTP.getTime() < timePoint + wait_new_block_broadcast
                                             && betterPeer == null && !ctrl.needUpToDate());
                                 }
 
                             }
 
-                            if (this.orphanto > 0) {
+                            if (this.orphanto > 0 || this.syncTo > 0) {
                                 continue;
                             } else if (ctrl.needUpToDate()) {
                                 LOGGER.info("skip GENERATING block - need UPDATE");
@@ -1133,7 +1166,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем
                 ctrl.checkStatusAndObserve(0);
-                if (betterPeer != null || orphanto > 0
+                if (betterPeer != null || orphanto > 0 || this.syncTo > 0
                         || timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()
                         && ctrl.needUpToDate()) {
 
@@ -1153,7 +1186,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
 
                     // ждем основное время просто
-                    while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
+                    while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && this.syncTo <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
@@ -1165,7 +1198,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
                     }
 
-                    if (this.orphanto > 0)
+                    if (this.orphanto > 0 || this.syncTo > 0)
                         continue;
 
                     // если нет ничего в буфере то еще несного подождем
@@ -1185,13 +1218,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         if (ctrl.isOnStopping()) {
                             return;
                         }
-                    } while (this.orphanto <= 0
+                    } while (this.orphanto <= 0 && this.syncTo <= 0
                             && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime()
                             // возможно уже надо обновиться - мы отстали
                             && betterPeer == null
                             && !ctrl.needUpToDate());
 
-                    if (this.orphanto > 0)
+                    if (this.orphanto > 0 || this.syncTo > 0)
                         continue;
 
                     if (waitWin == null && afterUpdatePeer != null) {
@@ -1295,7 +1328,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////// UPDATE ////////////////////
 
-                if (orphanto > 0 || betterPeer == null &&
+                if (orphanto > 0 || syncTo > 0 || betterPeer == null &&
                         timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime())
                     continue;
 

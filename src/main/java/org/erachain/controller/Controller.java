@@ -94,7 +94,7 @@ import java.util.jar.Manifest;
  */
 public class Controller extends Observable {
 
-    public static String version = "4.22.03 beta";
+    public static String version = "4.22.03 hf beta";
     public static String buildTime = "2020-02-20 13:33:33 UTC";
 
     public static final char DECIMAL_SEPARATOR = '.';
@@ -2004,7 +2004,7 @@ public class Controller extends Observable {
                     try {
                         // SYNCHRONIZE FROM PEER
                         if (!this.isOnStopping())
-                            this.synchronizer.synchronize(dcSet, checkPointHeight, peer, peerHW.a);
+                            this.synchronizer.synchronize(dcSet, checkPointHeight, peer, peerHW.a, null);
                         if (this.isOnStopping())
                             return null;
                     } catch (Exception e) {

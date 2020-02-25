@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -241,11 +242,9 @@ public class Network extends Observable {
     }
 
     // IF PEER in exist in NETWORK - get it
-    public Peer getKnownPeer(Peer peer, int type) {
+    public Peer getKnownPeer(byte[] address, int type) {
 
-        //Peer knowmPeer = null;
         try {
-            byte[] address = peer.getAddress().getAddress();
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
@@ -262,7 +261,27 @@ public class Network extends Observable {
             //logger.error(e.getMessage(),e);
         }
 
-        return peer;
+        return null;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownPeer(Peer peer, int type) {
+        Peer findPeer = getKnownPeer(peer.getAddress().getAddress(), type);
+        if (findPeer == null) {
+            return peer;
+        }
+        return findPeer;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownPeer(String peerIP, int type) {
+        InetAddress address = null;
+        try {
+            address = InetAddress.getByName(peerIP);
+        } catch (UnknownHostException e) {
+            return null;
+        }
+        return getKnownPeer(address.getAddress(), type);
     }
 
     // IF PEER in exist in NETWORK - get it

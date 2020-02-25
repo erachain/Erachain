@@ -7,6 +7,7 @@ import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.BlocksMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.network.Network;
 import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
@@ -200,4 +201,18 @@ public class CoreResource {
         return out;
     }
 
+    //@GET
+    //@Path("/monitor/{path}")
+    //public String getMonitorPath(@PathParam("path") String path, @QueryParam("log") String log) {
+
+    @GET
+    @Path("/sync/{toHeight}")
+    public String sync(@PathParam("toHeight") int to, @QueryParam("peer") String peerStr) {
+        Thread thread = new Thread(() -> {
+            Controller.getInstance().getBlockGenerator().setSyncTo(to, Controller.getInstance().network.getKnownPeer(peerStr, Network.ANY_TYPE));
+        });
+        thread.setName("sync to " + to);
+        thread.start();
+        return "run";
+    }
 }
