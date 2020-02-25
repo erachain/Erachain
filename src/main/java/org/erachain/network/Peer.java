@@ -342,7 +342,7 @@ public class Peer extends MonitoredThread {
     }
 
     public void setCorrectionWeight(Tuple2<Integer, Long> myHWeight) {
-        this.correctWeight = this.hWeight.b - myHWeight.b;
+        this.correctWeight = myHWeight.b - this.hWeight.b;
     }
 
     public int getMute() {
