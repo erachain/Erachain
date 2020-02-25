@@ -403,18 +403,10 @@ public class Synchronizer extends Thread {
              * peer);
              */
 
-        byte[] lastCommonBlockSignature;
-        List<byte[]> signatures;
-        if (lastCommonBlockSignature_in == null) {
-            Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
-            lastCommonBlockSignature = headers.a;
-            signatures = headers.b;
-        } else {
-            // уже задана точка отката - тест
-            lastCommonBlockSignature = lastCommonBlockSignature_in;
-            signatures = this.getBlockSignatures(lastCommonBlockSignature, peer);
-            signatures.remove(0);
-        }
+            // освободим HEAP и память - нам не нужна она все равно
+            dcSet.clearCache();
+
+            fromPeer = peer;
 
             byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
 
@@ -424,9 +416,18 @@ public class Synchronizer extends Thread {
                         + " my HEIGHT: " + dcSet.getBlocksHeadsMap().size());
             }
 
-            Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
-            byte[] lastCommonBlockSignature = headers.a;
-            List<byte[]> signatures = headers.b;
+            byte[] lastCommonBlockSignature;
+            List<byte[]> signatures;
+            if (lastCommonBlockSignature_in == null) {
+                Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
+                lastCommonBlockSignature = headers.a;
+                signatures = headers.b;
+            } else {
+                // уже задана точка отката - тест
+                lastCommonBlockSignature = lastCommonBlockSignature_in;
+                signatures = this.getBlockSignatures(lastCommonBlockSignature, peer);
+                signatures.remove(0);
+            }
 
             if (lastCommonBlockSignature == null) {
                 // simple ACCEPT tail CHAIN - MY LAST block founded in PEER
@@ -443,7 +444,6 @@ public class Synchronizer extends Thread {
                 int banTime = BAN_BLOCK_TIMES >> 2;
 
                 try {
-
 
                     // GET AND PROCESS BLOCK BY BLOCK
                     for (byte[] signature : signatures) {
