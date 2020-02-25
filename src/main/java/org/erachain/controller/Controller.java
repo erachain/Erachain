@@ -2004,7 +2004,7 @@ public class Controller extends Observable {
                     try {
                         // SYNCHRONIZE FROM PEER
                         if (!this.isOnStopping())
-                            this.synchronizer.synchronize(dcSet, checkPointHeight, peer, peerHW.a);
+                            this.synchronizer.synchronize(dcSet, checkPointHeight, peer, peerHW.a, null);
                         if (this.isOnStopping())
                             return null;
                     } catch (Exception e) {

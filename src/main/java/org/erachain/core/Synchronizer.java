@@ -387,7 +387,7 @@ public class Synchronizer extends Thread {
 
     }
 
-    public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception {
+    public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight, byte[] lastCommonBlockSignature_in) throws Exception {
 
         try {
             fromPeer = peer;
@@ -403,8 +403,18 @@ public class Synchronizer extends Thread {
              * peer);
              */
 
-            // освободим HEAP и память - нам не нужна она все равно
-            dcSet.clearCache();
+        byte[] lastCommonBlockSignature;
+        List<byte[]> signatures;
+        if (lastCommonBlockSignature_in == null) {
+            Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
+            lastCommonBlockSignature = headers.a;
+            signatures = headers.b;
+        } else {
+            // уже задана точка отката - тест
+            lastCommonBlockSignature = lastCommonBlockSignature_in;
+            signatures = this.getBlockSignatures(lastCommonBlockSignature, peer);
+            signatures.remove(0);
+        }
 
             byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
 
@@ -967,14 +977,19 @@ public class Synchronizer extends Thread {
                 if (block.getValidatedForkDB() == null) {
                     block.process(dcSet);
                 } else {
-                    // здесь просто заливаем все данные из Форка в цепочку - без процессинга - он уже был в Валидации
-                    long start = System.currentTimeMillis();
-                    block.saveToChainFromvalidatedForkDB();
-                    long tickets = System.currentTimeMillis() - start;
-                    if (block.blockHead.transactionsCount > 0 || tickets > 10) {
-                        LOGGER.debug("[" + block.heightBlock + "] TOTAL processing time: " + tickets
-                                + " ms, TXs= " + block.blockHead.transactionsCount
-                                + (block.blockHead.transactionsCount == 0 ? "" : " - " + (block.blockHead.transactionsCount * 1000 / tickets) + " tx/sec"));
+                    try {
+                        // здесь просто заливаем все данные из Форка в цепочку - без процессинга - он уже был в Валидации
+                        long start = System.currentTimeMillis();
+                        block.saveToChainFromvalidatedForkDB();
+                        long tickets = System.currentTimeMillis() - start;
+                        if (block.blockHead.transactionsCount > 0 || tickets > 10) {
+                            LOGGER.debug("[" + block.heightBlock + "] TOTAL processing time: " + tickets
+                                    + " ms, TXs= " + block.blockHead.transactionsCount
+                                    + (block.blockHead.transactionsCount == 0 ? "" : " - " + (block.blockHead.transactionsCount * 1000 / tickets) + " tx/sec"));
+                        }
+                    } finally {
+                        // закрываем чуть позже тут - а то в MapDB в кэше ошибка может вылететь что база уже закрыта
+                        block.close();
                     }
                 }
 

@@ -1973,9 +1973,8 @@ import java.util.*;
         super.finalize();
     }
 
-    public void saveToChainFromvalidatedForkDB() {
+    public synchronized void saveToChainFromvalidatedForkDB() {
         validatedForkDB.writeToParent();
-        close();
     }
 
     //PROCESS/ORPHAN
