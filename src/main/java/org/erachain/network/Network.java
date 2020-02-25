@@ -748,7 +748,7 @@ public class Network extends Observable {
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
                 Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
-                if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
+                if (peerHWeight == null || peerHWeight.a + 5 < myHeight) {
                     continue;
                 }
             }
