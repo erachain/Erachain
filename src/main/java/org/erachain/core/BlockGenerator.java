@@ -790,7 +790,8 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                             try {
                                 // SYNCHRONIZE FROM PEER
-                                ctrl.synchronizer.synchronize(dcSet, syncTo, syncFromPeer, syncFromPeer.getHWeight(true).a, null);
+                                ctrl.synchronizer.synchronize(dcSet, syncTo, syncFromPeer, syncFromPeer.getHWeight(true).a,
+                                        dcSet.getBlocksHeadsMap().get(syncTo).signature);
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                             }
