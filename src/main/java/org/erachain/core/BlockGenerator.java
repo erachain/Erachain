@@ -624,17 +624,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         }
     }
 
-    public int getOrphanTo() {
-        return this.orphanto;
-    }
-
     public void setOrphanTo(int height) {
         this.orphanto = height;
     }
 
     public void setSyncTo(int height, Peer peer) {
         this.syncTo = height;
-        syncFromPeer = peer;
+        this.syncFromPeer = peer;
     }
 
     public void addObserver() {
@@ -787,18 +783,20 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     try {
                         this.setMonitorStatusBefore("Synchronize to " + syncTo + (syncFromPeer == null ? "" : " from: " + peer));
                         if (syncFromPeer == null) {
-                            Tuple3<Integer, Long, Peer> maxPeerHW = ctrl.getMaxPeerHWeight(0, false, false);
+                            Tuple3<Integer, Long, Peer> maxPeerHW = ctrl.getMaxPeerHWeight(-5, false, false);
                             syncFromPeer = maxPeerHW.c;
                         }
                         if (syncFromPeer != null) {
 
                             try {
                                 // SYNCHRONIZE FROM PEER
-                                ctrl.synchronizer.synchronize(dcSet, syncTo, peer, syncFromPeer.getHWeight(true).a, null);
+                                ctrl.synchronizer.synchronize(dcSet, syncTo, syncFromPeer, syncFromPeer.getHWeight(true).a, null);
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                             }
                         }
+                        LOGGER.info("SyncTo: peer not found");
+
                     } finally {
                         syncTo = 0;
                         syncFromPeer = null;
@@ -1056,14 +1054,14 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                                         }
 
                                     }
-                                    while (this.orphanto <= 0 && wait_step-- > 0
+                                    while (this.orphanto <= 0 && this.syncTo <= 0 && wait_step-- > 0
                                             && NTP.getTime() < timePoint + wait_new_block_broadcast
                                             && betterPeer == null && !ctrl.needUpToDate());
                                 }
 
                             }
 
-                            if (this.orphanto > 0) {
+                            if (this.orphanto > 0 || this.syncTo > 0) {
                                 continue;
                             } else if (ctrl.needUpToDate()) {
                                 LOGGER.info("skip GENERATING block - need UPDATE");
@@ -1167,7 +1165,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                 ////////////////////////////  FLUSH NEW BLOCK /////////////////////////
                 // сдвиг 0 делаем
                 ctrl.checkStatusAndObserve(0);
-                if (betterPeer != null || orphanto > 0
+                if (betterPeer != null || orphanto > 0 || this.syncTo > 0
                         || timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) < NTP.getTime()
                         && ctrl.needUpToDate()) {
 
@@ -1187,7 +1185,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
 
                     // ждем основное время просто
-                    while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
+                    while (BlockChain.TEST_DB == 0 && this.orphanto <= 0 && this.syncTo <= 0 && flushPoint > NTP.getTime() && betterPeer == null && !ctrl.needUpToDate()) {
                         try {
                             Thread.sleep(WAIT_STEP_MS);
                         } catch (InterruptedException e) {
@@ -1199,7 +1197,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         }
                     }
 
-                    if (this.orphanto > 0)
+                    if (this.orphanto > 0 || this.syncTo > 0)
                         continue;
 
                     // если нет ничего в буфере то еще несного подождем
@@ -1219,13 +1217,13 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                         if (ctrl.isOnStopping()) {
                             return;
                         }
-                    } while (this.orphanto <= 0
+                    } while (this.orphanto <= 0 && this.syncTo <= 0
                             && timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime()
                             // возможно уже надо обновиться - мы отстали
                             && betterPeer == null
                             && !ctrl.needUpToDate());
 
-                    if (this.orphanto > 0)
+                    if (this.orphanto > 0 || this.syncTo > 0)
                         continue;
 
                     if (waitWin == null && afterUpdatePeer != null) {
@@ -1329,7 +1327,7 @@ public class BlockGenerator extends MonitoredThread implements Observer {
 
                 ////////////////////////// UPDATE ////////////////////
 
-                if (orphanto > 0 || betterPeer == null &&
+                if (orphanto > 0 || syncTo > 0 || betterPeer == null &&
                         timePoint + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height) > NTP.getTime())
                     continue;
 
