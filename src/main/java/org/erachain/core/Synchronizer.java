@@ -299,9 +299,9 @@ public class Synchronizer extends Thread {
             }
 
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
-            if (height > myHeight && myWeight > block.blockHead.totalWinValue
+            if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
             ) {
-                String mess = "Dishonest peer by weak FullWeight, height: " + height
+                String mess = "Weak FullWeight, height: " + height
                         + " myWeight > ext.Weight: " + myWeight + " > " + fork.getBlocksHeadsMap().getFullWeight();
                 LOGGER.debug(peer + " " + mess);
                 // суть в том что тут цепочка на этой высоте слабже моей,
@@ -315,6 +315,7 @@ public class Synchronizer extends Thread {
                     ;
                 } else if (peersCount > Settings.getInstance().getMaxConnections() - 3) {
                     // и так дофига пиров - можно и забанить
+                    mess = "Dishonest peer by " + mess;
                     peer.ban(mess);
                     throw new Exception(mess);
                 } else {
