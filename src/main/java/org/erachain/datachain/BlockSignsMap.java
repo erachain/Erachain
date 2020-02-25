@@ -27,10 +27,6 @@ public class BlockSignsMap extends DCUMap<Long, Integer> {
     }
 
     @Override
-    protected void createIndexes() {
-    }
-
-    @Override
     public void openMap() {
 
         sizeEnable = true; // разрешаем счет размера - это будет немного тормозить работу

@@ -1,22 +1,19 @@
 package org.erachain.core.transCalculated;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-
-import org.json.simple.JSONObject;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
+import org.json.simple.JSONObject;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /*
 
@@ -225,16 +222,16 @@ public class CSend extends CalculatedAmount {
                 return "encrypted";
             } else {
                 if (this.data.length > MAX_DATA_VIEW << 4) {
-                    return new String(data, Charset.forName("UTF-8")); // "{{" +
+                    return new String(data, StandardCharsets.UTF_8); // "{{" +
                     // new
                     // String(Arrays.copyOfRange(data,
                     // 0,
                     // MAX_DATA_VIEW),
-                    // Charset.forName("UTF-8"))
+                    // StandardCharsets.UTF_8)
                     // +
                     // "...}}";
                 }
-                return new String(this.data, Charset.forName("UTF-8"));
+                return new String(this.data, StandardCharsets.UTF_8);
             }
         } else {
             if (this.data.length > MAX_DATA_VIEW) {
@@ -278,7 +275,7 @@ public class CSend extends CalculatedAmount {
 
             // ADD CREATOR/SERVICE/DATA
             if (this.isText() && !this.isEncrypted()) {
-                transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
+                transaction.put("data", new String(this.data, StandardCharsets.UTF_8));
             } else {
                 transaction.put("data", Base58.encode(this.data));
             }

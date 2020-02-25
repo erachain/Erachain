@@ -27,6 +27,7 @@ import org.mapdb.DBMaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOError;
 import java.nio.file.Files;
@@ -38,7 +39,7 @@ import java.util.Random;
  * а в ней уже хранится объект набора DCSet
  */
 @Slf4j
-public class DCSet extends DBASet {
+public class DCSet extends DBASet implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DCSet.class);
     private static final int ACTIONS_BEFORE_COMMIT = BlockChain.MAX_BLOCK_SIZE_GEN
@@ -1619,7 +1620,7 @@ public class DCSet extends DBASet {
      * Нужно незабыть переменные внктри каждой таблицы тоже в Родителя скинуть
      */
     @Override
-    public void writeToParent() {
+    public synchronized void writeToParent() {
 
         // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
         // иначе размер больше будет в форке и не то значение

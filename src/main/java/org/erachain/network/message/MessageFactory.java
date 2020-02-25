@@ -1,7 +1,6 @@
 package org.erachain.network.message;
 
 import com.google.common.primitives.Ints;
-import org.erachain.controller.Controller;
 import org.erachain.core.block.Block;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.transaction.Transaction;
@@ -109,8 +108,6 @@ public class MessageFactory {
             idBytes = new byte[Message.ID_LENGTH];
             inputStream.readFully(idBytes);
             id = Ints.fromByteArray(idBytes);
-        } else {
-            idBytes = null;
         }
 
         //READ LENGTH
@@ -157,8 +154,6 @@ public class MessageFactory {
             if (!Arrays.equals(checksum, digest)) {
                 throw new Exception(Lang.getInstance().translate("Invalid data checksum length=") + length);
             }
-        } else {
-            checksum = null;
         }
 
         Message message = null;

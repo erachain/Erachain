@@ -57,6 +57,11 @@ public class HWeightMessage extends Message {
     }
 
     @Override
+    public boolean quickSend() {
+        return this.id > 0;
+    }
+
+    @Override
     public byte[] toBytes() {
         byte[] data = new byte[0];
 

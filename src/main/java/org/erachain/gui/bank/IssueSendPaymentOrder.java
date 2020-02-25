@@ -24,7 +24,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class IssueSendPaymentOrder extends javax.swing.JPanel {
@@ -146,7 +145,7 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
 
         if (message != null && message.length() > 0) {
             if (isTextB) {
-                messageBytes = message.getBytes(Charset.forName("UTF-8"));
+                messageBytes = message.getBytes(StandardCharsets.UTF_8);
             } else {
                 try {
                     messageBytes = Converter.parseHexString(message);
@@ -303,10 +302,10 @@ public class IssueSendPaymentOrder extends javax.swing.JPanel {
         jSON_Message.put("3", issue_Panel.jTextField_Doc_Num.getText());
         jSON_Message.put("4", issue_Panel.jTextField_Doc_Date.getText()); // date
 
-        byte[] messageBytes = StrJSonFine.convert(jSON_Message).getBytes(Charset.forName("UTF-8"));
+        byte[] messageBytes = StrJSonFine.convert(jSON_Message).getBytes(StandardCharsets.UTF_8);
 
 
-        String a = new String(messageBytes, Charset.forName("UTF-8"));
+        String a = new String(messageBytes, StandardCharsets.UTF_8);
         return a;
     }
 }

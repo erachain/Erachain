@@ -493,7 +493,7 @@ import java.util.*;
 
     }
 
-    public Block(int version, Block parentBlock, PublicKeyAccount generator, int heightBlock,
+    public Block(int version, Block parentBlock, PublicKeyAccount generator,
                  Tuple2<List<Transaction>, Integer> transactionsItem,
                  byte[] atBytes,
                  int forgingValue, long winValue, long target) {
@@ -501,7 +501,7 @@ import java.util.*;
         this.version = version;
         this.reference = parentBlock.signature;
         this.creator = generator;
-        this.heightBlock = heightBlock;
+        this.heightBlock = parentBlock.heightBlock + 1;
 
         this.transactions = transactionsItem.a;
         this.transactionCount = transactionsItem.b;
@@ -1408,6 +1408,18 @@ import java.util.*;
         return this.winValue = BlockChain.calcWinValue(dcSet, this.creator, this.heightBlock, this.forgingValue, null);
     }
 
+    public void setWinValue(long newWinValue) {
+        this.winValue = newWinValue;
+    }
+
+    public void setTarget(long newTarget) {
+        this.target = newTarget;
+    }
+
+    public void setTotalWinValue(long newTotalWinValue) {
+        this.totalWinValue = newTotalWinValue;
+    }
+
     public int calcWinValueTargeted() {
 
         if (this.version == 0 || this.creator == null) {
@@ -1961,9 +1973,8 @@ import java.util.*;
         super.finalize();
     }
 
-    public void saveToChainFromvalidatedForkDB() {
+    public synchronized void saveToChainFromvalidatedForkDB() {
         validatedForkDB.writeToParent();
-        close();
     }
 
     //PROCESS/ORPHAN
@@ -2001,6 +2012,9 @@ import java.util.*;
             BigDecimal totalFee = new BigDecimal(this.blockHead.totalFee).movePointLeft(BlockChain.AMOUNT_DEDAULT_SCALE);
             this.creator.changeBalance(dcSet, asOrphan, Transaction.FEE_KEY,
                     totalFee, true, false);
+
+            // учтем что нафоржили
+            this.creator.changeCOMPUBonusBalances(dcSet, asOrphan, totalFee, Transaction.BALANCE_SIDE_FORGED);
 
             // MAKE CALCULATED TRANSACTIONS
             if (!asOrphan && !Controller.getInstance().noCalculated) {

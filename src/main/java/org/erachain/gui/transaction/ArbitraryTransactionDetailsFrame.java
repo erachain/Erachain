@@ -10,7 +10,7 @@ import org.erachain.utils.MenuPopupUtil;
 
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("serial")
 public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
@@ -57,7 +57,7 @@ public class ArbitraryTransactionDetailsFrame extends RecDetailsFrame {
 
         //DATA AS TEXT
         ++detailGBC.gridy;
-        JTextArea txtAreaDataText = new JTextArea(new String(arbitraryTransaction.getData(), Charset.forName("UTF-8")));
+        JTextArea txtAreaDataText = new JTextArea(new String(arbitraryTransaction.getData(), StandardCharsets.UTF_8));
         txtAreaDataText.setRows(6);
         txtAreaData.setColumns(63);
         txtAreaDataText.setBorder(service.getBorder());

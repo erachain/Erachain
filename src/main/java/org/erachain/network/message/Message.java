@@ -88,7 +88,7 @@ public abstract class Message {
 
     private int type;
     private Peer sender;
-    private int id;
+    protected int id;
     private int length;
     private byte[] loadBytes;
 
@@ -156,6 +156,15 @@ public abstract class Message {
         return this.id > 0;
     }
 
+    /**
+     * Если нужно отсылать без задержки и накопления пакета
+     *
+     * @return
+     */
+    public boolean quickSend() {
+        return true;
+    }
+
     public int getType() {
         return this.type;
     }
@@ -210,10 +219,10 @@ public abstract class Message {
 
         byte[] data = new byte[0];
 
-        //WRITE MAGIC
+        //WRITE MAGIC - 4
         data = Bytes.concat(data, Controller.getInstance().getMessageMagic());
 
-        //WRITE MESSAGE TYPE
+        //WRITE MESSAGE TYPE 8
         byte[] typeBytes = Ints.toByteArray(this.type);
         typeBytes = Bytes.ensureCapacity(typeBytes, TYPE_LENGTH, 0);
         data = Bytes.concat(data, typeBytes);
@@ -223,7 +232,7 @@ public abstract class Message {
             byte[] hasIdBytes = new byte[]{1};
             data = Bytes.concat(data, hasIdBytes);
 
-            //WRITE ID
+            //WRITE ID - 13
             byte[] idBytes = Ints.toByteArray(this.id);
             idBytes = Bytes.ensureCapacity(idBytes, ID_LENGTH, 0);
             data = Bytes.concat(data, idBytes);
@@ -232,7 +241,7 @@ public abstract class Message {
             data = Bytes.concat(data, hasIdBytes);
         }
 
-        //WRITE LENGTH
+        //WRITE LENGTH 17 or 13 (if not has ID)
         byte[] lengthBytes = Ints.toByteArray(this.getDataLength());
         data = Bytes.concat(data, lengthBytes);
 

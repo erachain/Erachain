@@ -14,7 +14,7 @@ import org.mapdb.Fun.Tuple3;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -226,14 +226,14 @@ public class WebStatementsTableModelSearch extends AbstractTableModel implements
                     String str = "";
                     try {
                         JSONObject data = (JSONObject) JSONValue
-                                .parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
+                                .parseWithException(new String(record.getData(), StandardCharsets.UTF_8));
                         str = (String) data.get("!!&_Title");
                         if (str == null)
                             str = (String) data.get("Title");
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
 
-                        str = new String(record.getData(), Charset.forName("UTF-8"));
+                        str = new String(record.getData(), StandardCharsets.UTF_8);
                     }
                     if (str == null)
                         return "??";

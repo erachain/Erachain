@@ -39,8 +39,8 @@ public class ConnectionCreator extends MonitoredThread {
             return 0;
 
         //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-        if (Settings.getInstance().getMinConnections() < network.getActivePeersCounter(true)
-            || (Settings.getInstance().getMaxConnections() >> 1) < network.getActivePeersCounter(false))
+        if (Settings.getInstance().getMinConnections() < network.getActivePeersCounter(true, false)
+                || (Settings.getInstance().getMaxConnections() >> 1) < network.getActivePeersCounter(false, false))
             return 0;
 
         LOGGER.info("GET peers from: " + peer + " get max: " + maxReceivePeers);
@@ -66,7 +66,7 @@ public class ConnectionCreator extends MonitoredThread {
                 return 0;
 
             // если произошел полныцй разрыв сети - то прекратим поиск по рекурсии
-            if (network.getActivePeersCounter(false) == 0 && foreignPeersCounter > 4)
+            if (network.noActivePeers(false) && foreignPeersCounter > 4)
                 return 0;
 
             if (maxReceivePeers > 0 && foreignPeersCounter >= maxReceivePeers) {
@@ -79,8 +79,8 @@ public class ConnectionCreator extends MonitoredThread {
             }
 
             //CHECK IF WE ALREADY HAVE MAX CONNECTIONS for WHITE
-            if (Settings.getInstance().getMinConnections() < network.getActivePeersCounter(true)
-                    || (Settings.getInstance().getMaxConnections() >> 1) < network.getActivePeersCounter(false))
+            if (Settings.getInstance().getMinConnections() < network.getActivePeersCounter(true, false)
+                    || (Settings.getInstance().getMaxConnections() >> 1) < network.getActivePeersCounter(false, false))
                 break;
 
             //CHECK IF THAT PEER IS NOT BLACKLISTED
@@ -132,7 +132,11 @@ public class ConnectionCreator extends MonitoredThread {
 
             this.setMonitorStatusAfter();
 
-            newPeer.setNeedPing();
+
+            if (false) {
+                // не надо - так внутри же все запускается!
+                newPeer.setNeedPing();
+            }
 
             if (newPeer.isUsed() && maxReceivePeers > 1) {
                 // RECURSE to OTHER PEERS
@@ -168,8 +172,8 @@ public class ConnectionCreator extends MonitoredThread {
                 break;
 
             this.setName("ConnectionCreator - " + this.getId()
-                    + " white:" + network.getActivePeersCounter(true)
-                    + " total:" + network.getActivePeersCounter(false));
+                    + " white:" + network.getActivePeersCounter(true, false)
+                    + " total:" + network.getActivePeersCounter(false, false));
 
             if (BlockChain.START_PEER != null) {
                 // TRY CONNECT to WHITE peers of this PEER
@@ -182,16 +186,16 @@ public class ConnectionCreator extends MonitoredThread {
             }
 
             //CHECK IF WE NEED NEW CONNECTIONS
-            if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
+            if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true, false)) {
 
                 //GET LIST OF KNOWN PEERS
-                knownPeers = network.getKnownPeers();
+                knownPeers = network.getAllPeers();
 
                 //ITERATE knownPeers
                 for (Peer peer : knownPeers) {
 
                     //CHECK IF WE ALREADY HAVE MIN CONNECTIONS
-                    if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true)) {
+                    if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
                         // stop use KNOWN peers
                         break;
                     }
@@ -238,7 +242,10 @@ public class ConnectionCreator extends MonitoredThread {
 
                     if (peer.isUsed()) {
 
-                        peer.setNeedPing();
+                        if (false) {
+                            // не надо - так внутри же все запускается!
+                            peer.setNeedPing();
+                        }
 
                         // TRY CONNECT to WHITE peers of this PEER
                         connectToPeersOfThisPeer(peer, 4, true);
@@ -248,23 +255,23 @@ public class ConnectionCreator extends MonitoredThread {
 
             //CHECK IF WE STILL NEED NEW CONNECTIONS
             // USE unknown peers from known peers
-            if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true)) {
+            if (this.network.run && Settings.getInstance().getMinConnections() > network.getActivePeersCounter(true, false)) {
                 //OLD SCHOOL ITERATE activeConnections
                 //avoids Exception when adding new elements
                 List<Peer> peers = network.getActivePeers(false);
-                for (Peer peer: peers) {
+                for (Peer peer : peers) {
 
                     if (!this.network.run)
                         break;
 
                     // если произошел полныцй разрыв сети - то прекратим поиск тут
-                    if (network.getActivePeersCounter(false) == 0)
+                    if (network.noActivePeers(false))
                         break;
 
                     if (peer.isBanned())
                         continue;
 
-                    if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true)) {
+                    if (Settings.getInstance().getMinConnections() <= network.getActivePeersCounter(true, false)) {
                         break;
                     }
 
@@ -278,7 +285,7 @@ public class ConnectionCreator extends MonitoredThread {
             }
 
             //SLEEP
-            int counter = network.getActivePeersCounter(true);
+            int counter = network.getActivePeersCounter(true, false);
             if (counter == 0
                     || counter < 6 && !BlockChain.TEST_MODE)
                 continue;
@@ -286,7 +293,7 @@ public class ConnectionCreator extends MonitoredThread {
             int needMinConnections = Settings.getInstance().getMinConnections();
 
             this.setName("Thread ConnectionCreator - " + this.getId() + " white:" + counter
-                    + " total:" + network.getActivePeersCounter(false));
+                    + " total:" + network.getActivePeersCounter(false, false));
 
             if (!this.network.run)
                 break;

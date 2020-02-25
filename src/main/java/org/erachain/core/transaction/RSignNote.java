@@ -21,7 +21,7 @@ import org.mapdb.Fun.Tuple4;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -297,8 +297,8 @@ public class RSignNote extends Transaction implements Itemable {
 
         byte[] titleByte = Arrays.copyOfRange(data, position, position + titleSize);
 
-        String title = new String(titleByte, Charset.forName("UTF-8"));
-        String version = new String(version_Byte, Charset.forName("UTF-8"));
+        String title = new String(titleByte, StandardCharsets.UTF_8);
+        String version = new String(version_Byte, StandardCharsets.UTF_8);
 
         if (onlyTitle) {
             return new Tuple4(version, title, null, null);
@@ -312,7 +312,7 @@ public class RSignNote extends Transaction implements Itemable {
         position += Transaction.DATA_JSON_PART_LENGTH;
         //READ JSON
         byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
-        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, Charset.forName("UTF-8")));
+        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
 
         position += JSONSize;
         HashMap<String, Tuple2<Boolean, byte[]>> out_Map = new HashMap<String, Tuple2<Boolean, byte[]>>();
@@ -369,10 +369,10 @@ public class RSignNote extends Transaction implements Itemable {
     public static byte[] Json_Files_to_Byte_V2(String title, JSONObject json, HashMap<String, Tuple2<Boolean, byte[]>> files) throws Exception {
 
         ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-        outStream.write("v 2.00".getBytes(Charset.forName("UTF-8"))); // only 6 simbols!!!
-        byte[] title_Bytes = "".getBytes(Charset.forName("UTF-8"));
+        outStream.write("v 2.00".getBytes(StandardCharsets.UTF_8)); // only 6 simbols!!!
+        byte[] title_Bytes = "".getBytes(StandardCharsets.UTF_8);
         if (title != null) {
-            title_Bytes = title.getBytes(Charset.forName("UTF-8"));
+            title_Bytes = title.getBytes(StandardCharsets.UTF_8);
         }
 
 
@@ -387,7 +387,7 @@ public class RSignNote extends Transaction implements Itemable {
         byte[] size_Json;
 
         if (files == null || files.isEmpty()) {
-            JSON_Bytes = json.toString().getBytes(Charset.forName("UTF-8"));
+            JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
             // convert int to byte
             size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
             outStream.write(size_Json);
@@ -410,7 +410,7 @@ public class RSignNote extends Transaction implements Itemable {
             i++;
         }
         json.put("F", files_Json);
-        JSON_Bytes = json.toString().getBytes(Charset.forName("UTF-8"));
+        JSON_Bytes = json.toString().getBytes(StandardCharsets.UTF_8);
         // convert int to byte
         size_Json = ByteBuffer.allocate(Transaction.DATA_JSON_PART_LENGTH).putInt(JSON_Bytes.length).array();
         outStream.write(size_Json);
@@ -496,7 +496,7 @@ public class RSignNote extends Transaction implements Itemable {
         } else {
 
             // version 1
-            String text = new String(getData(), Charset.forName("UTF-8"));
+            String text = new String(getData(), StandardCharsets.UTF_8);
 
             try {
                 JSONObject data = new JSONObject();
@@ -577,7 +577,7 @@ public class RSignNote extends Transaction implements Itemable {
         if (data != null && data.length > 0) {
 
             if (getVersion() == 0 && this.isText() && !this.isEncrypted()) {
-                transaction.put("data", new String(this.data, Charset.forName("UTF-8")));
+                transaction.put("data", new String(this.data, StandardCharsets.UTF_8));
             } else {
                 transaction.put("data", Base64.encode(this.data));
             }
@@ -755,10 +755,10 @@ public class RSignNote extends Transaction implements Itemable {
         position += Transaction.DATA_JSON_PART_LENGTH;
         //READ JSON
         byte[] arbitraryData = Arrays.copyOfRange(data, position, position + JSONSize);
-        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, Charset.forName("UTF-8")));
+        JSONObject json = (JSONObject) JSONValue.parseWithException(new String(arbitraryData, StandardCharsets.UTF_8));
 
-        String title = new String(titleByte, Charset.forName("UTF-8"));
-        String version = new String(version_Byte, Charset.forName("UTF-8"));
+        String title = new String(titleByte, StandardCharsets.UTF_8);
+        String version = new String(version_Byte, StandardCharsets.UTF_8);
 
 
         return new Tuple3(version, title, json);

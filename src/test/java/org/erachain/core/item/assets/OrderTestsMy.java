@@ -2846,7 +2846,7 @@ public class OrderTestsMy {
                 // CHECK BALANCES
                 // THIS ORDER must not be RESOLVED
                 // и будет возврат так как сработает org.erachain.core.item.assets.Order.isUnResolved
-                assertEquals(accountA.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(44501).setScale(assetA.getScale())); // BALANCE
+                assertEquals(accountA.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(28973).setScale(assetA.getScale())); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -2878,8 +2878,8 @@ public class OrderTestsMy {
                 Assert.assertEquals(1, orderB.getFulfilledHave().compareTo(BigDecimal.valueOf(104)));
                 Assert.assertEquals(true, orderB.isFulfilled());
 
-                Order orderD = dcSet.getCompletedOrderMap().get(orderID_D);
-                Assert.assertEquals(false, dcSet.getOrderMap().contains(orderD.getId()));
+                Order orderD = dcSet.getOrderMap().get(orderID_D);
+                Assert.assertEquals(false, dcSet.getCompletedOrderMap().contains(orderD.getId()));
                 Assert.assertEquals(1, orderD.getFulfilledHave().compareTo(BigDecimal.valueOf(24)));
                 Assert.assertEquals(false, orderD.isFulfilled());
 
@@ -2894,7 +2894,7 @@ public class OrderTestsMy {
 
                 //// TOTALS
                 assertEquals(accountA.getBalanceUSE(keyA, dcSet).add(accountB.getBalanceUSE(keyA, dcSet)),
-                        BigDecimal.valueOf(50000).setScale(assetA.getScale())); // BALANCE
+                        BigDecimal.valueOf(34472).setScale(assetA.getScale())); // BALANCE
 
                 // еще активные ордера
                 List<Order> ordersAll = dcSet.getOrderMap().getOrdersForTradeWithFork(keyB, keyA, null);
@@ -3063,7 +3063,7 @@ public class OrderTestsMy {
                 Long orderID_B = orderCreation.makeOrder().getId();
 
                 // CHECK BALANCES
-                Assert.assertEquals(accountA.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(49989).setScale(assetA.getScale())); // BALANCE
+                Assert.assertEquals(accountA.getBalanceUSE(keyA, dcSet), BigDecimal.valueOf(49000).setScale(assetA.getScale())); // BALANCE
                 // A
                 // FOR
                 // ACCOUNT
@@ -3085,8 +3085,8 @@ public class OrderTestsMy {
                 // B
 
                 // CHECK ORDERS
-                Order orderA = dcSet.getCompletedOrderMap().get(orderID_A);
-                Assert.assertEquals(false, dcSet.getOrderMap().contains(orderA.getId()));
+                Order orderA = dcSet.getOrderMap().get(orderID_A);
+                Assert.assertEquals(false, dcSet.getCompletedOrderMap().contains(orderA.getId()));
                 Assert.assertEquals(orderA.getFulfilledHave(), BigDecimal.valueOf(11));
                 Assert.assertEquals(false, orderA.isFulfilled());
 

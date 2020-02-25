@@ -33,9 +33,4 @@ public class LocalDataMap extends DCUMap<String, String> {
         map = new HashMap<String, String>();
     }
 
-
-    @Override
-    protected void createIndexes() {
-    }
-
 }

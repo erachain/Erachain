@@ -19,15 +19,14 @@ public class MessagesProcessor extends MonitoredThread {
 
     private final static boolean USE_MONITOR = true;
     private static final boolean LOG_UNCONFIRMED_PROCESS = BlockChain.TEST_MODE ? true : false;
+    private boolean LOG_GET_HWEIGHT_TYPE = false;
     private boolean runned;
 
     private Network network;
     private static final Logger LOGGER = LoggerFactory.getLogger(MessagesProcessor.class.getSimpleName());
 
-    private static final int QUEUE_LENGTH = 128 << (Controller.HARD_WORK >> 1);
+    private static final int QUEUE_LENGTH = 1024 + 256 << (Controller.HARD_WORK >> 1);
     BlockingQueue<Message> blockingQueue = new ArrayBlockingQueue<Message>(QUEUE_LENGTH);
-
-    private long unconfigmedMessageTimingAverage;
 
     public MessagesProcessor(Network network) {
 
@@ -83,6 +82,11 @@ public class MessagesProcessor extends MonitoredThread {
 
             case Message.GET_HWEIGHT_TYPE:
 
+                if (LOG_GET_HWEIGHT_TYPE) {
+                    // делаем обработку запроса
+                    LOGGER.debug(message.getSender() + message.viewPref(false) + ">" + message);
+                }
+
                 Fun.Tuple2<Integer, Long> HWeight = Controller.getInstance().getBlockChain().getHWeightFull(DCSet.getInstance());
                 if (HWeight == null)
                     HWeight = new Fun.Tuple2<Integer, Long>(-1, -1L);
@@ -91,13 +95,13 @@ public class MessagesProcessor extends MonitoredThread {
                 // CREATE RESPONSE WITH SAME ID
                 response.setId(message.getId());
 
-                timeCheck = System.currentTimeMillis() - timeCheck;
-                if (timeCheck > 10) {
-                    LOGGER.debug(message.getSender() + ": " + message + " solved by period: " + timeCheck);
+                timeCheck = (System.nanoTime() - timeCheck) / 1000000;
+                if (LOG_GET_HWEIGHT_TYPE || timeCheck > 100) {
+                    LOGGER.debug(message.getSender() + message.viewPref(false) + ">" + message + " solved by us: " + timeCheck);
                 }
 
                 //SEND BACK TO SENDER
-                message.getSender().offerMessage(response);
+                message.getSender().sendHWeight(response);
 
                 break;
 
@@ -125,15 +129,6 @@ public class MessagesProcessor extends MonitoredThread {
 
         }
 
-            onMessageProcessTiming = System.nanoTime() - onMessageProcessTiming;
-        if (onMessageProcessTiming < 999999999999l) {
-            // при переполнении может быть минус
-            // в миеросекундах подсчет делаем
-            onMessageProcessTiming /= 1000;
-            this.unconfigmedMessageTimingAverage = ((this.unconfigmedMessageTimingAverage << 8)
-                    + onMessageProcessTiming - this.unconfigmedMessageTimingAverage) >> 8;
-        }
-
         return;
     }
 
@@ -152,6 +147,8 @@ public class MessagesProcessor extends MonitoredThread {
                 break;
             } catch (InterruptedException e) {
                 break;
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
 
         }

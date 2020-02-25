@@ -1,20 +1,20 @@
 package org.erachain.webserver;
 // 30/03
 
+import com.google.common.collect.Lists;
+import org.bouncycastle.util.encoders.Hex;
 import org.erachain.at.AT;
 import org.erachain.at.ATAPIHelper;
 import org.erachain.at.ATTransaction;
-import com.google.common.collect.Lists;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-import org.bouncycastle.util.encoders.Hex;
 import org.erachain.utils.Converter;
 
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ATWebResource {
@@ -105,7 +105,7 @@ public class ATWebResource {
     }
 
     public Long getLong(String atId, String startPos) {
-        int start = Integer.valueOf(startPos);
+        int start = Integer.parseInt(startPos);
         AT at = getAT(atId);
 
         return ATAPIHelper.getLong(Arrays.copyOfRange(at.getAp_data().array(), start, start + 8));
@@ -162,7 +162,7 @@ public class ATWebResource {
             RSend message = tx;
             if ((!message.isEncrypted())) {
                 return (message.isText()) ?
-                        new String(message.getData(), Charset.forName("UTF-8")) :
+                        new String(message.getData(), StandardCharsets.UTF_8) :
                         Converter.toHex(message.getData());
             } else {
                 return "encrypted";

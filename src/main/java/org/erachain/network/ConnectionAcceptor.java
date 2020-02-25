@@ -115,6 +115,7 @@ public class ConnectionAcceptor extends MonitoredThread {
                     // сообщим об закрытии на тот конец
                     connectionSocket.shutdownOutput();
                     connectionSocket.close();
+                    LOGGER.debug("CLOSE as TWIN");
                 } catch (IOException e) {
                 }
                 continue;
@@ -140,10 +141,13 @@ public class ConnectionAcceptor extends MonitoredThread {
                     continue;
                 }
 
-                peer.setNeedPing();
+                if (false) {
+                    // не надо тут сразу пинговать - так внутри же все запускается пингер сразу
+                    peer.setNeedPing();
+                }
 
                 //CHECK IF WE HAVE MAX CONNECTIONS CONNECTIONS
-                if (Settings.getInstance().getMaxConnections() <= network.getActivePeersCounter(false)) {
+                if (Settings.getInstance().getMaxConnections() <= network.getActivePeersCounter(false, false)) {
                     // get only income peers;
                     List<Peer> incomePeers = network.getIncomedPeers();
                     if (incomePeers != null && !incomePeers.isEmpty()) {

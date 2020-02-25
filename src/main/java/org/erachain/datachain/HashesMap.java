@@ -18,9 +18,6 @@ public class HashesMap extends DCUMap<byte[], byte[]> {
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

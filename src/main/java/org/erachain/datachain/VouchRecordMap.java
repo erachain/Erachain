@@ -41,9 +41,6 @@ public class VouchRecordMap extends DCUMap<Long, Tuple2<BigDecimal, List<Long>>>
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     //@SuppressWarnings("unchecked")
     private Map<Long, Tuple2<BigDecimal, List<Long>>> openMap(DB database) {
 

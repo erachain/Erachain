@@ -25,7 +25,7 @@ import org.mapdb.Fun;
 import javax.swing.*;
 import javax.swing.table.TableRowSorter;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -373,9 +373,9 @@ public class WebTransactionsHTML {
         String out = "";
         RHashes r_Hashes = (RHashes) transaction;
         out += "<b>" + Lang.getInstance().translateFromLangObj("URL", langObj) + ":</b> "
-                + new String(r_Hashes.getURL(), Charset.forName("UTF-8")) + "<br>";
+                + new String(r_Hashes.getURL(), StandardCharsets.UTF_8) + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                + new String(r_Hashes.getData(), Charset.forName("UTF-8")) + "<br>";
+                + new String(r_Hashes.getData(), StandardCharsets.UTF_8) + "<br>";
         out += "<b>" + Lang.getInstance().translateFromLangObj("HASHES", langObj) + ":</b> "
                 + String.join("<br />", r_Hashes.getHashesB58()) + "<br>";
         return out;
@@ -406,11 +406,11 @@ public class WebTransactionsHTML {
         }
         if (setStatusToItem.getData1() != null) {
             out += "<b>" + Lang.getInstance().translateFromLangObj("DATA", langObj) + " 1:</b> "
-                    + new String(setStatusToItem.getData1(), Charset.forName("UTF-8")) + "<br>";
+                    + new String(setStatusToItem.getData1(), StandardCharsets.UTF_8) + "<br>";
         }
         if (setStatusToItem.getData2() != null) {
             out += "<b>" + Lang.getInstance().translateFromLangObj("DATA", langObj) + " 2:</b> "
-                    + new String(setStatusToItem.getData2(), Charset.forName("UTF-8")) + "<br>";
+                    + new String(setStatusToItem.getData2(), StandardCharsets.UTF_8) + "<br>";
         }
         if (setStatusToItem.getRefParent() != 0l) {
             out += "<b>" + Lang.getInstance().translateFromLangObj("Parent", langObj) + ":</b> "
@@ -418,7 +418,7 @@ public class WebTransactionsHTML {
         }
         if (setStatusToItem.getDescription() != null) {
             out += "<b>" + Lang.getInstance().translateFromLangObj("Description", langObj) + ":</b> "
-                    + new String(setStatusToItem.getDescription(), Charset.forName("UTF-8")) + "<br>";
+                    + new String(setStatusToItem.getDescription(), StandardCharsets.UTF_8) + "<br>";
         }
         out += "<b>" + Lang.getInstance().translateFromLangObj("Item Name", langObj) + ":</b> "
                 + item.getItemTypeName() + " - " + item.getItemSubType()
@@ -454,7 +454,7 @@ public class WebTransactionsHTML {
                     + Controller.getInstance().getTemplate(r_Statement.getKey()).toString() + "<br>";
         }
         if (r_Statement.getData() != null) {
-            String ss = ((r_Statement.isText()) ? new String(r_Statement.getData(), Charset.forName("UTF-8")) : Converter.toHex(r_Statement.getData()));
+            String ss = ((r_Statement.isText()) ? new String(r_Statement.getData(), StandardCharsets.UTF_8) : Converter.toHex(r_Statement.getData()));
             ss = "<div  style='word-wrap: break-word;'>" + ss;
             out += "<b>" + Lang.getInstance().translateFromLangObj("Message", langObj) + ":</b> "
                     + ss + "<br>";

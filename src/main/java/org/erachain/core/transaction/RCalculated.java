@@ -4,6 +4,7 @@ import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
+import org.erachain.core.block.Block;
 import org.json.simple.JSONObject;
 
 import java.math.BigDecimal;
@@ -223,11 +224,27 @@ public class RCalculated extends TransactionAmount {
         return data;
     }
 
+    //PROCESS/ORPHAN
+
+    @Override
+    public void process(Block block, int asDeal) {
+        // ввобщето тут вызов ошибки должен быть
+        Long error = null;
+        error++;
+    }
+
+    @Override
+    public void orphan(Block block, int asDeal) {
+        // ввобщето тут вызов ошибки должен быть
+        Long error = null;
+        error++;
+    }
+
     @Override
     public int getDataLength(int forDeal, boolean withSignature) {
 
         return TYPE_LENGTH + REFERENCE_LENGTH + RECIPIENT_LENGTH
-                + (this.amount == null? 0 : AMOUNT_LENGTH + KEY_LENGTH)
+                + (this.amount == null ? 0 : AMOUNT_LENGTH + KEY_LENGTH)
                 + 1 + message.getBytes(StandardCharsets.UTF_8).length;
     }
 

@@ -38,9 +38,6 @@ public class ATTransactionMap extends DCUMap<Tuple2<Integer, Integer>, ATTransac
 
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

@@ -33,7 +33,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -310,7 +309,7 @@ public class TelegramsResource {
 
         if (message != null && message.length() > 0) {
             if (encoding == 0) {
-                messageBytes = message.getBytes(Charset.forName("UTF-8"));
+                messageBytes = message.getBytes(StandardCharsets.UTF_8);
             } else {
                 try {
                     if (encoding == 16) {
@@ -719,7 +718,7 @@ public class TelegramsResource {
 
                     // MAKE TELEGRAM
                     Transaction transaction = new RSend(creator, (byte) 0, recipient, 0, null,
-                            "TEST 1", "TEST TEST TEST".getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                            "TEST 1", "TEST TEST TEST".getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                             new byte[]{(byte) 1},
                             NTP.getTime(), 0l);
                     transaction.sign(creator, Transaction.FOR_NETWORK);

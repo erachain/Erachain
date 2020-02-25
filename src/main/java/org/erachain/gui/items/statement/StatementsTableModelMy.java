@@ -8,16 +8,16 @@ import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.utils.ObserverMessage;
+import org.erachain.utils.Pair;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple3;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.Pair;
 
 import javax.swing.table.AbstractTableModel;
 import javax.validation.constraints.Null;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class StatementsTableModelMy extends AbstractTableModel implements Observer {
@@ -129,13 +129,13 @@ public class StatementsTableModelMy extends AbstractTableModel implements Observ
 
                     String str = "";
                     try {
-                        JSONObject data = (JSONObject) JSONValue.parseWithException(new String(record.getData(), Charset.forName("UTF-8")));
+                        JSONObject data = (JSONObject) JSONValue.parseWithException(new String(record.getData(), StandardCharsets.UTF_8));
                         str = (String) data.get("!!&_Title");
                         if (str == null) str = (String) data.get("Title");
                     } catch (Exception e) {
                         // TODO Auto-generated catch block
 
-                        str = new String(record.getData(), Charset.forName("UTF-8"));
+                        str = new String(record.getData(), StandardCharsets.UTF_8);
                     }
                     if (str == null) return "";
                     if (str.length() > 50) return str.substring(0, 50) + "...";

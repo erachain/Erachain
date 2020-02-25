@@ -688,9 +688,36 @@ button.white-bgc[disabled]:focus,
                     ': <a href="?address=' + data.address + get_lang() +
                     '">' + data.address + '</a></font>';
             }
+
             output += '</table>';
             output += '<table width="1280" border=0><tr><td align=left>';
-            output += data.Balance.label_Balance_table + ':<br>';
+
+            output += '<span style="font-size:1.2em">';
+            output += data.Balance.label_Balance_table;
+
+            if (false) {
+                // убреме пока переключение по сторонам
+                if (data.Balance.side == '1')
+                    output +=  ': &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Balance.Label_TotalDebit + '</span></b>';
+                else
+                    output +=  ': &nbsp&nbsp <a href ="?address=' + data.address + '&side=1' + get_lang() + '">' + data.Balance.Label_TotalDebit + '</a>';
+
+                if (data.Balance.side == '2')
+                    output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Balance.Label_Left + '</span></b>';
+                else
+                    output +=  ' &nbsp&nbsp <a href ="?address=' + data.address + '&side=2' + get_lang() + '">' + data.Balance.Label_Left + '</a>';
+
+                if (data.Balance.side == '3')
+                    output +=  ' &nbsp&nbsp <span style="font-size:1.2em; color:#0cb70c"> &nbsp&nbsp ' + data.Balance.Label_TotalCredit + '</span></b>';
+                else
+                    output +=  ' &nbsp&nbsp <a href ="?address=' + data.address + '&side=3' + get_lang() + '">' + data.Balance.Label_TotalCredit + '</a>';
+
+                output +=  ' &nbsp&nbsp <span id="side-help" style="display:none;"><br>' + data.Balance.Side_Help + '</span>';
+                output +=  ' &nbsp&nbsp <a href ="#" onclick="$(\'#side-help\').toggle();"><span class="glyphicon glyphicon-question-sign"></span></a>';
+            }
+
+            output += ':</span>';
+
             output += '<table id="balance" id=balance BORDER=0 cellpadding=15 cellspacing=0 width="800" ' +
                 ' class="tiny table table-striped" style="border: 1px solid #ddd; word-wrap: break-word;" >';
             output += '<tr bgcolor="f1f1f1"><td><b>' + data.Balance.label_asset_key +

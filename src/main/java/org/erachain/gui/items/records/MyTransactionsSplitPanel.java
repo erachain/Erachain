@@ -7,7 +7,7 @@ import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
 import org.erachain.gui.library.SetIntervalPanel;
-import org.erachain.gui.library.VoushLibraryPanel;
+import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.gui.models.WalletTransactionsTableModel;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
 import org.erachain.lang.Lang;
@@ -34,7 +34,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
     private static final long serialVersionUID = 2717571093561259483L;
 
     private static MyTransactionsSplitPanel instance;
-    public VoushLibraryPanel voush_Library_Panel;
+    public VouchLibraryPanel voush_Library_Panel;
     protected Tuple2<Long, Long> selectedTransactionKey;
     protected Transaction selectedTransaction;
     private JPanel records_Info_Panel;
@@ -330,7 +330,7 @@ public class MyTransactionsSplitPanel extends SplitPanel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new VoushLibraryPanel(trans);
+                    voush_Library_Panel = new VouchLibraryPanel(trans);
                     records_Info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }

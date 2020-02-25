@@ -6,6 +6,7 @@ import org.erachain.core.account.Account;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
+import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.web.ServletUtils;
@@ -32,7 +33,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -410,7 +411,7 @@ public class RSendResource {
                         Transaction transaction = cnt.r_Send(creator,
                                 0, recipient,
                                 2l, null, "LoadTest_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                                 new byte[]{(byte) 1}, 0);
 
                         if (cnt.isOnStopping())
@@ -452,9 +453,9 @@ public class RSendResource {
                         }
                     } else {
 
-                        RSend transaction = new RSend(creator, (byte) 0, recipient,2l, null,
+                        RSend transaction = new RSend(creator, (byte) 0, recipient, 2l, null,
                                 "LoadTest_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST TEST TEST").getBytes(Charset.forName("UTF-8")), new byte[]{(byte) 1},
+                                (address + counter + "TEST TEST TEST").getBytes(StandardCharsets.UTF_8), new byte[]{(byte) 1},
                                 new byte[]{(byte) 1}, NTP.getTime(), 0l);
 
                         transaction.sign(creator, Transaction.FOR_NETWORK);
@@ -600,7 +601,7 @@ public class RSendResource {
                         Transaction transaction = cnt.r_Send(creator,
                                 0, recipient,
                                 2l, amount, "LoadTestSend_" + address.substring(1, 5) + " " + counter,
-                                (address + counter + "TEST SEND ERA").getBytes(Charset.forName("UTF-8")), encryptMessage,
+                                (address + counter + "TEST SEND ERA").getBytes(StandardCharsets.UTF_8), encryptMessage,
                                 new byte[]{(byte) 1}, 0);
 
                         Integer result = cnt.getTransactionCreator().afterCreate(transaction, Transaction.FOR_NETWORK);
@@ -682,6 +683,7 @@ public class RSendResource {
     /**
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1036/2?amount=0.001&title=probe-multi&onlyperson=true&activeafter=1577712486&password=123
      * GET r_send/multisend/7LSN788zgesVYwvMhaUbaJ11oRGjWYagNA/1069/1036?amount=0.001&title=probe-multi&onlyperson=true&activeafter=2018-01-01 00:00&activebefore=2019-01-01 00:00&greatequal=0&activetypetx=24&password=1
+     * GET r_send/multisend/7A94JWgdnNPZtbmbphhpMQdseHpKCxbrZ1/1/2?amount=0.001&title=probe-multi&onlyperson=true&gender=0&password=1
      *
      * @param fromAddress     my address in Wallet
      * @param assetKey        asset Key that send
@@ -709,6 +711,7 @@ public class RSendResource {
                             @DefaultValue("true") @QueryParam("test") Boolean test,
                             @DefaultValue("true") @QueryParam("selfpay") Boolean selfPay,
                             @DefaultValue("0") @QueryParam("feePow") Integer feePow,
+                            @DefaultValue("-1") @QueryParam("gender") Byte gender,
                             @DefaultValue("0") @QueryParam("activeafter") String activeAfterStr,
                             @DefaultValue("0") @QueryParam("activebefore") String activeBeforeStr,
                             @DefaultValue("0") @QueryParam("activetypetx") int activeTypeTX, // активность по заданному типу транзакции
@@ -796,6 +799,7 @@ public class RSendResource {
             HashSet<Long> usedPersons = new HashSet<>();
             boolean needAmount = true;
             long timestampThis = NTP.getTime() - 10000L;
+            PersonCls person;
 
             try (IteratorCloseable<byte[]> iterator = balancesMap.getIteratorByAsset(forAssetKey)) {
                 while (iterator.hasNext()) {
@@ -824,8 +828,17 @@ public class RSendResource {
                                 continue;
                             if (usedPersons.contains(addressDuration.a))
                                 continue;
+
+                            person = (PersonCls) dcSet.getItemPersonMap().get(addressDuration.a);
+
+                            if (gender >= 0) {
+                                if (person.getGender() != gender) {
+                                    continue;
+                                }
+                            }
                         } else {
                             addressDuration = null;
+                            person = null;
                         }
 
                         /// если задано то проверим - входит ли в в диаппазон
@@ -852,6 +865,9 @@ public class RSendResource {
                         String recipientStr = Crypto.getInstance().getAddressFromShort(recipentShort);
                         resultOne.add(recipientStr);
                         resultOne.add(sendAmount.toPlainString());
+                        if (person != null) {
+                            resultOne.add(person.toString());
+                        }
 
 
                         Pair<Integer, Transaction> result = cntr.make_R_Send(null, accountFrom, recipientStr, feePow,
@@ -866,6 +882,7 @@ public class RSendResource {
                             if (test) {
                                 // просчитаем тоже даже если ошибка
                                 totalSendAmount = totalSendAmount.add(sendAmount);
+                                ///totalFee = totalFee.add(transaction.getFee());
                                 count++;
                             }
 

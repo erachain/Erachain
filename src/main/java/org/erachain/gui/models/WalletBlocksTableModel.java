@@ -3,7 +3,6 @@ package org.erachain.gui.models;
 import org.erachain.controller.Controller;
 import org.erachain.core.BlockChain;
 import org.erachain.core.block.Block;
-import org.erachain.database.wallet.BlocksHeadMap;
 import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.DateTimeFormat;
 import org.erachain.utils.ObserverMessage;
@@ -82,7 +81,7 @@ public class WalletBlocksTableModel extends WalletTableModel<Block.BlockHead> {
                 || message.getType() == ObserverMessage.WALLET_RESET_BLOCK_TYPE) {
             needUpdate = false;
             list = new ArrayList<>();
-            try (IteratorCloseable iterator = map.getIterator(BlocksHeadMap.TIMESTAMP_INDEX, true)) {
+            try (IteratorCloseable iterator = map.getIterator(0,true)) {
                 int count = 50;
                 while (iterator.hasNext() && --count > 0) {
                     list.add((Block.BlockHead) map.get(iterator.next()));

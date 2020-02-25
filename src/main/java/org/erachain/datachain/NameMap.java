@@ -18,9 +18,6 @@ public class NameMap extends DCUMap<String, Name> {
         super(parent, null);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

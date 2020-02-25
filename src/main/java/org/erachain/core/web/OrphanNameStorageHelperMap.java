@@ -33,10 +33,6 @@ public class OrphanNameStorageHelperMap extends DCUMap<String, List<byte[]>> {
         map = new HashMap<>();
     }
 
-    @Override
-    protected void createIndexes() {
-    }
-
     public void add(String name, byte[] signatureOfTx) {
         List<byte[]> list = this.get(name);
         if (list == null) {

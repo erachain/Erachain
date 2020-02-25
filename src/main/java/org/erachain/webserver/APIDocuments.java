@@ -5,13 +5,11 @@ import org.erachain.core.exdata.ExData;
 import org.erachain.core.transaction.RSignNote;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.datachain.DCSet;
-
+import org.erachain.utils.StrJSonFine;
+import org.erachain.utils.ZipBytes;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun.Tuple2;
 import org.mapdb.Fun.Tuple4;
-
-import org.erachain.utils.StrJSonFine;
-import org.erachain.utils.ZipBytes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -21,16 +19,17 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
+import javax.ws.rs.core.UriInfo;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.util.*;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.DataFormatException;
 
@@ -134,11 +133,11 @@ public class APIDocuments {
     @GET
     @Path("getFile")
     @Produces("application/zip")
-    public Response getFile(@QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
+    public Response getFile(@Context UriInfo info, @QueryParam("block") int block, @QueryParam("seqNo") int seqNo,
                             @QueryParam("txt") int seqNo_old,
-                            @QueryParam("name") String name, @QueryParam("download") String downloadParam ) {
-       JSONObject result = new JSONObject();
-       byte[] resultByte = null;
+                            @QueryParam("name") String name, @QueryParam("download") String downloadParam) {
+        JSONObject result = new JSONObject();
+        byte[] resultByte = null;
         try {
             if (seqNo == 0 && seqNo_old > 0) {
                 seqNo = seqNo_old;
@@ -151,12 +150,12 @@ public class APIDocuments {
                if (statement.getVersion() == 2) {
                    byte[] data = statement.getData();
                    Tuple4<String, String, JSONObject, HashMap<String, Tuple2<Boolean, byte[]>>> map;
-                try {
-                    map = ExData.parse_Data_V2(data);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
-                }
+                   try {
+                       map = ExData.parse_Data_V2(data);
+                   } catch (Exception e) {
+                       // TODO Auto-generated catch block
+                       throw ApiErrorFactory.getInstance().createError(ApiErrorFactory.ERROR_JSON);
+                   }
 
                    JSONObject jSON = map.c;
 
@@ -167,77 +166,73 @@ public class APIDocuments {
                        while (it_Files.hasNext()) {
                            Entry<String, Tuple2<Boolean, byte[]>> file = it_Files.next();
                            JSONObject jsonFile = new JSONObject();
-                           if (name.equals((String) file.getKey())){
+                           if (name.equals((String) file.getKey())) {
                                i++;
-                              
+
                                // if ZIP
-                              if(file.getValue().a){
-                                  // надо сделать
-                                 
-                                  try {
-                                      resultByte = ZipBytes.decompress(file.getValue().b);
-                                  } catch (DataFormatException e1) {
-                                      // TODO Auto-generated catch block
-                                      e1.printStackTrace();
-                                  } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                              }else{
-                                  resultByte = file.getValue().b;
-                              }
-                  // ifdownloadParam
-                              
-                              // convert shar to ANSI 
-                              Charset utf8charset = Charset.forName("UTF-8");
-                              Charset iso88591charset = Charset.forName("ISO-8859-1");
-                              ByteBuffer inputBuffer = ByteBuffer.wrap(name.getBytes());
-                              // decode UTF-8
-                              CharBuffer data1 = utf8charset.decode(inputBuffer);
-                              // encode ISO-8559-1
-                              ByteBuffer outputBuffer = iso88591charset.encode(data1);
-                              byte[] outputData = outputBuffer.array();
-                              String ss = new String(outputData);
-                             //  mime TYPE
-                              InputStream is = new BufferedInputStream(new ByteArrayInputStream(resultByte));
+                               if (file.getValue().a) {
+                                   // надо сделать
+
+                                   try {
+                                       resultByte = ZipBytes.decompress(file.getValue().b);
+                                   } catch (DataFormatException e1) {
+                                       // TODO Auto-generated catch block
+                                       e1.printStackTrace();
+                                   } catch (IOException e) {
+                                       // TODO Auto-generated catch block
+                                       e.printStackTrace();
+                                   }
+                               } else {
+                                   resultByte = file.getValue().b;
+                               }
+                               // ifdownloadParam
+
+                               //  mime TYPE
+                               InputStream is = new BufferedInputStream(new ByteArrayInputStream(resultByte));
                                String mm = null;
-                            try {
-                                mm = URLConnection.guessContentTypeFromStream(is);
-                            } catch (IOException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                            
-                            //if downloadParam
-                            if(downloadParam!=null){
-                                
-                               if (downloadParam.equals("true")){
-                                    return Response.status(200).header("Content-Type", mm)
-                                            .header("Access-Control-Allow-Origin", "*")
-                                            .header("Content-disposition", "attachment; filename=" + new String(outputData).replace(" ", "_"))
-                                            .entity(new ByteArrayInputStream(resultByte))
-                                            .build();
-                                }
-                            }
-                            return Response.status(200).header("Content-Type", mm)
-                                    .header("Access-Control-Allow-Origin", "*")
-                                //    .header("Content-disposition", "attachment; filename=" + new String(outputData).replace(" ", "_"))
-                                    .entity(new ByteArrayInputStream(resultByte))
-                                    .build();
+                               try {
+                                   mm = URLConnection.guessContentTypeFromStream(is);
+                               } catch (IOException e) {
+                                   // TODO Auto-generated catch block
+                                   e.printStackTrace();
+                               }
+
+                               //if downloadParam
+                               if (downloadParam != null) {
+
+                                   if (downloadParam.equals("true")) {
+                                       String nameEncode = name.replace(" ", "_");
+                                       try {
+                                           nameEncode = URLEncoder.encode(nameEncode, "UTF-8");
+                                       } catch (Exception e) {
+                                           e.printStackTrace();
+                                       }
+                                       return Response.status(200).header("Content-Type", mm)
+                                               .header("Access-Control-Allow-Origin", "*")
+                                               .header("Content-disposition", "attachment; filename=" + nameEncode)
+                                               .entity(new ByteArrayInputStream(resultByte))
+                                               .build();
+                                   }
+                               }
+
+                               return Response.status(200).header("Content-Type", mm)
+                                       .header("Access-Control-Allow-Origin", "*")
+                                       //    .header("Content-disposition", "attachment; filename=" + new String(outputData).replace(" ", "_"))
+                                       .entity(new ByteArrayInputStream(resultByte))
+                                       .build();
                            }
                        }
-                          
-                   }else{
+
+                   } else {
                        result.put("code", 4);
                        result.put("message", "Document not include files");
                    }
-                       
-                   
-               }
-               else{
-               // view version 1
-               result.put("code", 3);
-               result.put("message", "Document version 1 (not include files)");
+
+
+               } else {
+                   // view version 1
+                   result.put("code", 3);
+                   result.put("message", "Document version 1 (not include files)");
                }
                
            } else{

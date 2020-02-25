@@ -252,6 +252,48 @@ public class Wallet extends Observable implements Observer {
 		return this.database.getTransactionMap().get(accounts, limit);
 	}
 
+	public List<Transaction> getTransactionsByType(int type, int offset, int limit, boolean descending) {
+		if (!this.exists()) {
+			new ArrayList<Transaction>();
+		}
+
+		Iterator<Tuple2<Long, Long>> iterator = this.database.getTransactionMap().getTypeIterator((byte) type, descending);
+		List<Transaction> result = new ArrayList<Transaction>();
+		int count = limit;
+		while (iterator.hasNext()) {
+			if (offset > 0) {
+				offset--;
+				iterator.next();
+				continue;
+			}
+			if (limit > 0) {
+				if (count-- == 0)
+					break;
+			}
+			result.add(this.database.getTransactionMap().get(iterator.next()).b);
+		}
+
+		return result;
+	}
+
+	public Iterator<Tuple2<Long, Long>> getTransactionsIteratorByType(int type, boolean descending) {
+		if (!this.exists()) {
+			return null;
+		}
+
+		return this.database.getTransactionMap().getTypeIterator((byte) type, descending);
+
+	}
+
+	public Tuple2<Long, Transaction> getTransaction(Tuple2<Long, Long> key) {
+		if (!this.exists()) {
+			return null;
+		}
+
+		return this.database.getTransactionMap().get(key);
+
+	}
+
 	public List<Transaction> getLastTransactions(Account account, int limit) {
 		if (!this.exists()) {
 			return new ArrayList<Transaction>();

@@ -29,9 +29,6 @@ public class PeerMap extends DCUMapImpl<byte[], byte[]> {
         super(databaseSet, database);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

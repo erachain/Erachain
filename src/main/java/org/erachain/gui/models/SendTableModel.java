@@ -1,10 +1,26 @@
 package org.erachain.gui.models;
 // 30/03
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.Toolkit;
+import org.erachain.controller.Controller;
+import org.erachain.core.account.Account;
+import org.erachain.core.account.PublicKeyAccount;
+import org.erachain.core.transaction.RSend;
+import org.erachain.core.transaction.Transaction;
+import org.erachain.core.wallet.Wallet;
+import org.erachain.datachain.DCSet;
+import org.erachain.gui.PasswordPane;
+import org.erachain.lang.Lang;
+import org.erachain.utils.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -12,45 +28,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
-
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-
-import org.erachain.core.account.PublicKeyAccount;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import org.erachain.controller.Controller;
-import org.erachain.core.account.Account;
-import org.erachain.core.transaction.RSend;
-import org.erachain.core.transaction.Transaction;
-import org.erachain.core.wallet.Wallet;
-import org.erachain.datachain.DCSet;
-import org.erachain.gui.PasswordPane;
-import org.erachain.lang.Lang;
-import org.erachain.utils.Converter;
-import org.erachain.utils.DateTimeFormat;
-import org.erachain.utils.NumberAsString;
-import org.erachain.utils.ObserverMessage;
-import org.erachain.utils.TableMenuPopupUtil;
+import java.util.*;
 
 @SuppressWarnings("serial")
 public class SendTableModel extends JTable implements Observer {
@@ -431,7 +411,7 @@ public class SendTableModel extends JTable implements Observer {
                 if (decryptedData == null) {
                     messageBufs.get(row).setDecryptedMessage(Lang.getInstance().translate("Decrypt Error!"));
                 } else {
-                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decryptedData, Charset.forName("UTF-8")) : Converter.toHex(decryptedData));
+                    messageBufs.get(row).setDecryptedMessage((messageBufs.get(row).isText()) ? new String(decryptedData, StandardCharsets.UTF_8) : Converter.toHex(decryptedData));
                     messageBufs.get(row).setOpend(true);
                     menuDecrypt.setText(Lang.getInstance().translate("Hide decrypted"));
                 }
@@ -519,7 +499,7 @@ public class SendTableModel extends JTable implements Observer {
                     this.decryptedMessage = "Encrypted";
                 }
                 if (!this.encrypted) {
-                    this.decryptedMessage = (isText) ? new String(this.rawMessage, Charset.forName("UTF-8")) : Converter.toHex(this.rawMessage);
+                    this.decryptedMessage = (isText) ? new String(this.rawMessage, StandardCharsets.UTF_8) : Converter.toHex(this.rawMessage);
                 }
             }
             return this.decryptedMessage;

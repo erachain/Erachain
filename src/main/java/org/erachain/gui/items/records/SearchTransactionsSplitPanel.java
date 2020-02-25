@@ -8,7 +8,7 @@ import org.erachain.gui.MainFrame;
 import org.erachain.gui.SplitPanel;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.library.MTable;
-import org.erachain.gui.library.VoushLibraryPanel;
+import org.erachain.gui.library.VouchLibraryPanel;
 import org.erachain.gui.models.SearchTransactionsTableModel;
 import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui.transaction.TransactionDetailsFactory;
@@ -36,7 +36,7 @@ import java.util.List;
 public class SearchTransactionsSplitPanel extends SplitPanel {
 
     public JPanel info_Panel;
-    public VoushLibraryPanel voush_Library_Panel;
+    public VouchLibraryPanel voush_Library_Panel;
     SearchTransactionsTableModel transactionsTableModel;
     JScrollPane jScrollPane4;
     private JTextField searchString;
@@ -295,7 +295,7 @@ public class SearchTransactionsSplitPanel extends SplitPanel {
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.FIRST_LINE_START;
                     gridBagConstraints.weightx = 1.0;
                     gridBagConstraints.weighty = 1.0;
-                    voush_Library_Panel = new VoushLibraryPanel(voting);
+                    voush_Library_Panel = new VouchLibraryPanel(voting);
                     info_Panel.add(voush_Library_Panel, gridBagConstraints);
 
                 }

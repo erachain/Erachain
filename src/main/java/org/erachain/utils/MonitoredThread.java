@@ -136,7 +136,7 @@ public class MonitoredThread extends Thread {
         if (status != null) {
             JSONArray statusJson = new JSONArray();
             statusJson.add(0, this.status[0]);
-            statusJson.add(1, this.status[1]);
+            statusJson.add(1, DateTimeFormat.timestamptoString((Long) this.status[1], "yyyy-MM-dd HH:mm:ss z", "UTC"));
             info.put("status", statusJson);
         }
 
@@ -146,7 +146,7 @@ public class MonitoredThread extends Thread {
             for (Object[] item : this.statusLog) {
                 JSONArray statusItemLogJson = new JSONArray();
                 statusItemLogJson.add(0, item[0]);
-                statusItemLogJson.add(1, item[1]);
+                statusItemLogJson.add(1, DateTimeFormat.timestamptoString((Long) item[1], "yyyy-MM-dd HH:mm:ss z", "UTC"));
 
                 statusLogJson.add(statusItemLogJson);
 

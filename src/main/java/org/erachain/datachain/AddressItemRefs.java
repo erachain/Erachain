@@ -41,9 +41,6 @@ public abstract class AddressItemRefs extends DCUMap<Tuple2<byte[], Long>, byte[
         super(parent, dcSet);
     }
 
-    protected void createIndexes() {
-    }
-
     @Override
     public void openMap() {
         //OPEN MAP

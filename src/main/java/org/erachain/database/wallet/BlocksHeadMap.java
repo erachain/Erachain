@@ -5,17 +5,14 @@ import org.erachain.core.block.Block;
 import org.erachain.database.serializer.BlockHeadSerializer;
 import org.erachain.dbs.DBTab;
 import org.erachain.dbs.DCUMapImpl;
-import org.erachain.dbs.IteratorCloseable;
 import org.erachain.utils.ObserverMessage;
 import org.erachain.utils.Pair;
-import org.erachain.utils.ReverseComparator;
 import org.mapdb.BTreeMap;
 import org.mapdb.DB;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 
 /*
@@ -29,11 +26,11 @@ import java.util.*;
 
 public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
     // нужно сделать так: public class BlocksHeadMap extends DCMap<Integer, Block.BlockHead> {
-    public static final int TIMESTAMP_INDEX = 1;
-    public static final int GENERATOR_INDEX = 2;
-    public static final int BALANCE_INDEX = 3;
-    public static final int TRANSACTIONS_INDEX = 4;
-    public static final int FEE_INDEX = 5;
+    //public static final int TIMESTAMP_INDEX = 1;
+    //public static final int GENERATOR_INDEX = 2;
+    //public static final int BALANCE_INDEX = 3;
+    //public static final int TRANSACTIONS_INDEX = 4;
+    //public static final int FEE_INDEX = 5;
 
     static Logger logger = LoggerFactory.getLogger(BlocksHeadMap.class.getName());
 
@@ -49,7 +46,7 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
 
         // for sort in SortedList
         // in gui.models.WalletBlocksTableModel.syncUpdate
-        DEFAULT_INDEX = TIMESTAMP_INDEX;
+        ///DEFAULT_INDEX = TIMESTAMP_INDEX;
 
         if (databaseSet.isWithObserver()) {
             this.observableData.put(DBTab.NOTIFY_RESET, ObserverMessage.WALLET_RESET_BLOCK_TYPE);
@@ -62,92 +59,77 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void createIndexes() {
 
-        //TIMESTAMP INDEX
-        NavigableSet<Integer> timestampIndex = database.createTreeSet("blocks_index_timestamp")
-                .comparator(Fun.COMPARATOR)
-                .counterEnable()
-                .makeOrGet();
-
-        NavigableSet<Integer> descendingTimestampIndex = database.createTreeSet("blocks_index_timestamp_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
-
-        createIndex(TIMESTAMP_INDEX, timestampIndex, descendingTimestampIndex, new Fun.Function2<Integer, Integer,
-                Block.BlockHead>() {
-            @Override
-            public Integer run(Integer key, Block.BlockHead value) {
-                return value.heightBlock;
-            }
-        });
-
         // TODO это все лишние индексы, только в РПС используются для статистики
         /* это все не используемые индексы которые нафиг не нужны в кошельке - чисто для статистики
         удалить бы их - чтобы не тормозили лишний раз
         */
 
-        //GENERATOR INDEX
-        NavigableSet<String> generatorIndex = database.createTreeSet("blocks_index_generator")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+        /*
+            //GENERATOR INDEX
+            NavigableSet<String> generatorIndex = database.createTreeSet("blocks_index_generator")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        NavigableSet<String> descendingGeneratorIndex = database.createTreeSet("blocks_index_generator_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
+            NavigableSet<String> descendingGeneratorIndex = database.createTreeSet("blocks_index_generator_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
 
-        createIndex(GENERATOR_INDEX, generatorIndex, descendingGeneratorIndex, new Fun.Function2<String, Integer, Block.BlockHead>() {
-            @Override
-            public String run(Integer key, Block.BlockHead value) {
-                return value.creator.getAddress();
-            }
-        });
+            createIndex(GENERATOR_INDEX, generatorIndex, descendingGeneratorIndex, new Fun.Function2<String, Integer, Block.BlockHead>() {
+                @Override
+                public String run(Integer key, Block.BlockHead value) {
+                    return value.creator.getAddress();
+                }
+            });
 
-        //BALANCE INDEX
-        NavigableSet<Integer> balanceIndex = database.createTreeSet("blocks_index_balance")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+            //BALANCE INDEX
+            NavigableSet<Integer> balanceIndex = database.createTreeSet("blocks_index_balance")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        NavigableSet<Integer> descendingBalanceIndex = database.createTreeSet("blocks_index_balance_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
+            NavigableSet<Integer> descendingBalanceIndex = database.createTreeSet("blocks_index_balance_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
 
-        createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
-            @Override
-            public Integer run(Integer key, Block.BlockHead value) {
-                return value.forgingValue;
-            }
-        });
+            createIndex(BALANCE_INDEX, balanceIndex, descendingBalanceIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
+                @Override
+                public Integer run(Integer key, Block.BlockHead value) {
+                    return value.forgingValue;
+                }
+            });
 
-        //TRANSACTIONS INDEX
-        NavigableSet<Integer> transactionsIndex = database.createTreeSet("blocks_index_transactions")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+            //TRANSACTIONS INDEX
+            NavigableSet<Integer> transactionsIndex = database.createTreeSet("blocks_index_transactions")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        NavigableSet<Integer> descendingTransactionsIndex = database.createTreeSet("blocks_index_transactions_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
+            NavigableSet<Integer> descendingTransactionsIndex = database.createTreeSet("blocks_index_transactions_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
 
-        createIndex(TRANSACTIONS_INDEX, transactionsIndex, descendingTransactionsIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
-            @Override
-            public Integer run(Integer key, Block.BlockHead value) {
-                return value.transactionsCount;
-            }
-        });
+            createIndex(TRANSACTIONS_INDEX, transactionsIndex, descendingTransactionsIndex, new Fun.Function2<Integer, Integer, Block.BlockHead>() {
+                @Override
+                public Integer run(Integer key, Block.BlockHead value) {
+                    return value.transactionsCount;
+                }
+            });
 
-        //FEE INDEX
-        NavigableSet<Long> feeIndex = database.createTreeSet("blocks_index_fee")
-                .comparator(Fun.COMPARATOR)
-                .makeOrGet();
+            //FEE INDEX
+            NavigableSet<Long> feeIndex = database.createTreeSet("blocks_index_fee")
+                    .comparator(Fun.COMPARATOR)
+                    .makeOrGet();
 
-        NavigableSet<Long> descendingFeeIndex = database.createTreeSet("blocks_index_fee_descending")
-                .comparator(new ReverseComparator(Fun.COMPARATOR))
-                .makeOrGet();
+            NavigableSet<Long> descendingFeeIndex = database.createTreeSet("blocks_index_fee_descending")
+                    .comparator(new ReverseComparator(Fun.COMPARATOR))
+                    .makeOrGet();
 
-        createIndex(FEE_INDEX, feeIndex, descendingFeeIndex, new Fun.Function2<Long, Integer, Block.BlockHead>() {
-            @Override
-            public Long run(Integer key, Block.BlockHead value) {
-                return value.totalFee;
-            }
-        });
+            createIndex(FEE_INDEX, feeIndex, descendingFeeIndex, new Fun.Function2<Long, Integer, Block.BlockHead>() {
+                @Override
+                public Long run(Integer key, Block.BlockHead value) {
+                    return value.totalFee;
+                }
+            });
+
+         */
 
     }
 
@@ -168,16 +150,7 @@ public class BlocksHeadMap extends DCUMapImpl<Integer, Block.BlockHead> {
     }
 
     public Block.BlockHead getLast() {
-
-        try (IteratorCloseable<Integer> iterator = this.getIterator(TIMESTAMP_INDEX, true)) {
-            if (!iterator.hasNext())
-                return null;
-
-            return this.get(iterator.next());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return get(size());
     }
 
     // TODO - SORT by HEIGHT !!!

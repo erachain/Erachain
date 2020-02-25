@@ -7,6 +7,7 @@ import org.erachain.datachain.BlocksHeadsMap;
 import org.erachain.datachain.BlocksMapImpl;
 import org.erachain.datachain.DCSet;
 import org.erachain.lang.Lang;
+import org.erachain.network.Network;
 import org.erachain.network.Peer;
 import org.erachain.settings.Settings;
 import org.erachain.utils.APIUtils;
@@ -109,9 +110,15 @@ public class CoreResource {
             return cnt.network.getCreator().monitorToJson("true".equals(log)).toJSONString();
         else if (path.equals("block_generator"))
             return cnt.getBlockGenerator().monitorToJson("true".equals(log)).toJSONString();
-        else
+        else {
+            for (Peer peer : Controller.getInstance().network.getKnownPeers()) {
+                if (peer.getName().startsWith(path)) {
+                    return peer.monitorToJson("true".equals(log)).toJSONString();
+                }
+            }
+        }
 
-            return getMonitor(log);
+        return getMonitor(log);
 
     }
 
@@ -126,7 +133,7 @@ public class CoreResource {
         jsonObject.put("network_creator", cnt.network.getCreator().monitorToJson("true".equals(log)));
         jsonObject.put("block_generator", cnt.getBlockGenerator().monitorToJson("true".equals(log)));
 
-        for (Peer peer: Controller.getInstance().network.getActivePeers(false)) {
+        for (Peer peer : Controller.getInstance().network.getKnownPeers()) {
             jsonObject.put(peer.toString(), peer.monitorToJson("true".equals(log)));
         }
 
@@ -141,7 +148,7 @@ public class CoreResource {
 
     @GET
     @Path("/cwv")
-    public String checkWinVal() {
+    public String checkWinVal(@QueryParam("update") boolean update) {
         DCSet dcSet = DCSet.getInstance();
         BlocksHeadsMap mapHeads = dcSet.getBlocksHeadsMap();
         BlocksMapImpl mapBlock = dcSet.getBlockMap();
@@ -158,24 +165,54 @@ public class CoreResource {
                 return "ERROR on Height: " + height + ", tCREATOR diff: " + block.getCreator() + " - " + head.creator;
             }
 
-            totalWV += head.winValue;
-            if (totalWV != head.totalWinValue) {
-                return "ERROR on Height: " + height + ", total WinValue diff: " + (totalWV - head.totalWinValue);
-            }
-
             // берем текущую - там есть предыдущая
             Fun.Tuple3<Integer, Integer, Integer> forgingData = head.creator.getForgingData(dcSet, height);
             long winValue = BlockChain.calcWinValue(dcSet, head.creator, height, forgingData.c, null);
+            totalWV += winValue;
+            if (update) {
+                final long parentTarget = mapHeads.get(height - 1).target;
+                long newTarget = BlockChain.calcTarget(height, parentTarget, winValue);
+                head = new Block.BlockHead(block, head.heightBlock,
+                        head.forgingValue, // его посреди цепочки не получится пересчитать - бем что тут сохранено
+                        winValue, newTarget,
+                        head.totalFee, head.emittedFee, totalWV);
+                mapHeads.put(height, head);
+                block.setWinValue(winValue);
+                block.setTotalWinValue(totalWV);
+                block.setTarget(newTarget);
+                mapBlock.put(height, block);
+                continue;
+            }
+
             if (winValue != head.winValue) {
                 return "ERROR on Height: " + height + ", WinValue diff: " + (winValue - head.winValue);
             }
 
+            if (totalWV != head.totalWinValue) {
+                return "ERROR on Height: " + height + ", total WinValue diff: " + (totalWV - head.totalWinValue);
+            }
+
+
         } while (true);
 
         if (out.isEmpty())
-            return "height: " + (height - 1) + ", totalWV: " + totalWV;
+            return "GOOD! height: " + (height - 1) + ", totalWV: " + totalWV;
 
         return out;
     }
 
+    //@GET
+    //@Path("/monitor/{path}")
+    //public String getMonitorPath(@PathParam("path") String path, @QueryParam("log") String log) {
+
+    @GET
+    @Path("/sync/{toHeight}")
+    public String sync(@PathParam("toHeight") int to, @QueryParam("peer") String peerStr) {
+        Thread thread = new Thread(() -> {
+            Controller.getInstance().getBlockGenerator().setSyncTo(to, Controller.getInstance().network.getKnownPeer(peerStr, Network.ANY_TYPE));
+        });
+        thread.setName("sync to " + to);
+        thread.start();
+        return "run";
+    }
 }

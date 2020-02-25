@@ -39,7 +39,6 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -499,7 +498,7 @@ public void onSendClick() {
    
     if (message != null && message.length() > 0) {
         if (isTextB) {
-            messageBytes = message.getBytes(Charset.forName("UTF-8"));
+            messageBytes = message.getBytes(StandardCharsets.UTF_8);
         } else {
             try {
                 messageBytes = Converter.parseHexString(message);

@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
@@ -207,12 +208,17 @@ public class Network extends Observable {
         //PASS TO CONTROLLER
         controller.afterDisconnect(peer);
 
-        //NOTIFY OBSERVERS
-        this.setChanged();
-        this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));
+        try {
+            // внутри могут быть ошибки отображения
+            //NOTIFY OBSERVERS
+            this.setChanged();
+            this.notifyObservers(new ObserverMessage(ObserverMessage.UPDATE_PEER_TYPE, peer));
 
-        //this.setChanged();
-        //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+            //this.setChanged();
+            //this.notifyObservers(new ObserverMessage(ObserverMessage.LIST_PEER_TYPE, this.knownPeers));
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+        }
     }
 
     public boolean isKnownAddress(InetAddress address, boolean andUsed) {
@@ -236,11 +242,9 @@ public class Network extends Observable {
     }
 
     // IF PEER in exist in NETWORK - get it
-    public Peer getKnownPeer(Peer peer, int type) {
+    public Peer getKnownPeer(byte[] address, int type) {
 
-        //Peer knowmPeer = null;
         try {
-            byte[] address = peer.getAddress().getAddress();
             //FOR ALL connectedPeers
             for (Peer knownPeer : knownPeers) {
                 //CHECK IF ADDRESS IS THE SAME
@@ -257,7 +261,27 @@ public class Network extends Observable {
             //logger.error(e.getMessage(),e);
         }
 
-        return peer;
+        return null;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownPeer(Peer peer, int type) {
+        Peer findPeer = getKnownPeer(peer.getAddress().getAddress(), type);
+        if (findPeer == null) {
+            return peer;
+        }
+        return findPeer;
+    }
+
+    // IF PEER in exist in NETWORK - get it
+    public Peer getKnownPeer(String peerIP, int type) {
+        InetAddress address = null;
+        try {
+            address = InetAddress.getByName(peerIP);
+        } catch (UnknownHostException e) {
+            return null;
+        }
+        return getKnownPeer(address.getAddress(), type);
     }
 
     // IF PEER in exist in NETWORK - get it
@@ -328,7 +352,25 @@ public class Network extends Observable {
         return activePeers;
     }
 
-    public int getActivePeersCounter(boolean onlyWhite) {
+    public List<Peer> getKnownPeers() {
+
+        return this.knownPeers;
+    }
+
+    public int getActivePeersCounter(boolean onlyWhite, boolean excludeMute) {
+
+        int counter = 0;
+        for (Peer peer : this.knownPeers) {
+            if (peer.isUsed())
+                if (!onlyWhite || peer.isWhite()) {
+                    if (!excludeMute || peer.getMute() > 0)
+                        counter++;
+                }
+        }
+        return counter;
+    }
+
+    public boolean noActivePeers(boolean onlyWhite) {
 
         int counter = 0;
         for (Peer peer : this.knownPeers) {
@@ -336,14 +378,21 @@ public class Network extends Observable {
                 if (!onlyWhite || peer.isWhite())
                     counter++;
         }
-        return counter;
+        return counter == 0;
+    }
+
+    public void decrementWeightOfPeerMutes() {
+        for (Peer peer : knownPeers) {
+            if (peer.getMute() > 0)
+                peer.setMute(peer.getMute() - 1);
+        }
     }
 
     public List<Peer> getBestPeers() {
         return this.peerManager.getBestPeers();
     }
 
-    public List<Peer> getKnownPeers() {
+    public List<Peer> getAllPeers() {
         List<Peer> knownPeers = new ArrayList<Peer>();
         //ASK DATABASE FOR A LIST OF PEERS
         if (!controller.isOnStopping()) {
@@ -367,7 +416,7 @@ public class Network extends Observable {
      */
     public int banForActivePeersCounter() {
 
-        int active = getActivePeersCounter(false);
+        int active = getActivePeersCounter(false, false);
         int difference = Settings.getInstance().getMinConnections() - active;
         if (difference > 0)
             return 0;
@@ -457,7 +506,7 @@ public class Network extends Observable {
         }
 
         // Если пустых мест уже мало то начинаем переиспользовать
-        if (this.getActivePeersCounter(false) + 3 > Settings.getInstance().getMaxConnections() ) {
+        if (this.getActivePeersCounter(false, false) + 3 > Settings.getInstance().getMaxConnections()) {
             // use UNUSED peers
             for (Peer knownPeer : this.knownPeers) {
                 if (!knownPeer.isOnUsed() && !knownPeer.isUsed()) {
@@ -587,6 +636,12 @@ public class Network extends Observable {
 
             case Message.WIN_BLOCK_TYPE:
 
+                Peer syncFromPeer = controller.synchronizer.getPeer();
+                if (syncFromPeer != null && !syncFromPeer.equals(message.getSender())) {
+                    // если синхримся то победные от других пиров не принимаем так как они нас в форк уводят
+                    return;
+                }
+
                 if (controller.winBlockSelector != null)
                     controller.winBlockSelector.offerMessage(message);
 
@@ -623,13 +678,13 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                peerHWeight = controller.getHWeightOfPeer(peer);
+                peerHWeight = peer.getHWeight(false);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
             }
 
-            peer.setNeedPing();
+            ///peer.setNeedPing();
 
         }
 
@@ -677,7 +732,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = controller.getHWeightOfPeer(peer);
+                Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
@@ -711,7 +766,7 @@ public class Network extends Observable {
 
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
-                Tuple2<Integer, Long> peerHWeight = controller.getHWeightOfPeer(peer);
+                Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
                 if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
                     continue;
                 }
