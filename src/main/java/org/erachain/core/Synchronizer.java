@@ -381,7 +381,7 @@ public class Synchronizer extends Thread {
 
     }
 
-    public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight) throws Exception {
+    public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight, byte[] lastCommonBlockSignature_in) throws Exception {
 
         //Controller cnt = Controller.getInstance();
         boolean isFromTrustedPeer = bchain.isPeerTrusted(peer);
@@ -407,9 +407,18 @@ public class Synchronizer extends Thread {
                     + " my HEIGHT: " + dcSet.getBlocksHeadsMap().size());
         }
 
-        Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
-        byte[] lastCommonBlockSignature = headers.a;
-        List<byte[]> signatures = headers.b;
+        byte[] lastCommonBlockSignature;
+        List<byte[]> signatures;
+        if (lastCommonBlockSignature_in == null) {
+            Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
+            lastCommonBlockSignature = headers.a;
+            signatures = headers.b;
+        } else {
+            // уже задана точка отката - тест
+            lastCommonBlockSignature = lastCommonBlockSignature_in;
+            signatures = this.getBlockSignatures(lastCommonBlockSignature, peer);
+            signatures.remove(0);
+        }
 
         if (lastCommonBlockSignature == null) {
             // simple ACCEPT tail CHAIN - MY LAST block founded in PEER

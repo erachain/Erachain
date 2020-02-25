@@ -54,6 +54,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
     private int orphanto = 0;
     private static List<byte[]> needRemoveInvalids;
 
+    private int syncTo = 0;
+    private Peer syncFromPeer;
+
+
     private final DCSet dcSet;
     private final BlockChain bchain;
 
@@ -628,6 +632,11 @@ public class BlockGenerator extends MonitoredThread implements Observer {
         this.orphanto = height;
     }
 
+    public void setSyncTo(int height, Peer peer) {
+        this.syncTo = height;
+        syncFromPeer = peer;
+    }
+
     public void addObserver() {
         new Thread("try syncForgingStatus") {
             @Override
@@ -774,51 +783,76 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     ctrl.pingAllPeers(false);
                 }
 
-                if (this.orphanto > 0) {
-                    this.setMonitorStatusBefore("orphan to " + orphanto);
-                    local_status = 9;
-                    ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
-
-                    // обязательно нужно чтобы память освобождать
-                    // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
-                    // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
-                    dcSet.clearCache();
-
-                    // и перед всем этим необходимо слить все изменения на диск чтобы потом когда откат закончился
-                    // не было остаков в пакетах RocksDB и трынзакциях MapDB
-                    dcSet.flush(0, true, true);
-
-                    while (bchain.getHeight(dcSet) >= this.orphanto
-                        //    && bchain.getHeight(dcSet) > 157044
-                    ) {
-                        //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
-                        //    long iii = 11;
-                        //}
-                        //Block block = bchain.getLastBlock(dcSet);
-                        try {
-                            ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
-                        } catch (Exception e) {
-                            // если ошибка то выход делаем чтобы зарегистрировать ошибку
-                            LOGGER.error(e.getMessage(), e);
-                            ctrl.stopAll(1004);
-                            return;
-
+                if (this.syncTo > 0) {
+                    try {
+                        this.setMonitorStatusBefore("Synchronize to " + syncTo + (syncFromPeer == null ? "" : " from: " + peer));
+                        if (syncFromPeer == null) {
+                            Tuple3<Integer, Long, Peer> maxPeerHW = ctrl.getMaxPeerHWeight(0, false, false);
+                            syncFromPeer = maxPeerHW.c;
                         }
+                        if (syncFromPeer != null) {
+
+                            try {
+                                // SYNCHRONIZE FROM PEER
+                                ctrl.synchronizer.synchronize(dcSet, syncTo, peer, syncFromPeer.getHWeight(true).a, null);
+                            } catch (Exception e) {
+                                LOGGER.error(e.getMessage(), e);
+                            }
+                        }
+                    } finally {
+                        syncTo = 0;
+                        syncFromPeer = null;
+                        this.setMonitorStatusAfter();
                     }
 
-                    if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
-                        // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
-                        ReferenceMapImpl map = dcSet.getReferenceMap();
+                } else if (this.orphanto > 0) {
+                    try {
+                        this.setMonitorStatusBefore("orphan to " + orphanto);
+                        local_status = 9;
+                        ctrl.setForgingStatus(ForgingStatus.FORGING_ENABLED);
 
-                        return;
+                        // обязательно нужно чтобы память освобождать
+                        // и если объект был изменен (с тем же ключем у него удалили поле внутри - чтобы это не выдавлось
+                        // при новом запросе - иначе изменения прилетают в другие потоки и ошибку вызываю
+                        dcSet.clearCache();
+
+                        // и перед всем этим необходимо слить все изменения на диск чтобы потом когда откат закончился
+                        // не было остаков в пакетах RocksDB и трынзакциях MapDB
+                        dcSet.flush(0, true, true);
+
+                        while (bchain.getHeight(dcSet) >= this.orphanto
+                            //    && bchain.getHeight(dcSet) > 157044
+                        ) {
+                            //if (bchain.getHeight(dcSet) > 157045 && bchain.getHeight(dcSet) < 157049) {
+                            //    long iii = 11;
+                            //}
+                            //Block block = bchain.getLastBlock(dcSet);
+                            try {
+                                ctrl.orphanInPipe(bchain.getLastBlock(dcSet));
+                            } catch (Exception e) {
+                                // если ошибка то выход делаем чтобы зарегистрировать ошибку
+                                LOGGER.error(e.getMessage(), e);
+                                ctrl.stopAll(1004);
+                                return;
+
+                            }
+                        }
+
+                        if (BlockChain.NOT_STORE_REFFS_HISTORY && BlockChain.CHECK_DOUBLE_SPEND_DEEP >= 0) {
+                            // TODO тут нужно обновить за последние 3-10 блоков значения  если проверка используется
+                            ReferenceMapImpl map = dcSet.getReferenceMap();
+
+                            return;
+                        }
+
+
+                    } finally {
+                        this.orphanto = 0;
+                        ctrl.checkStatusAndObserve(0);
+
+                        this.setMonitorStatusAfter();
+
                     }
-
-
-                    this.orphanto = 0;
-                    ctrl.checkStatusAndObserve(0);
-
-                    this.setMonitorStatusAfter();
-
                 }
 
                 timeTmp = bchain.getTimestamp(dcSet) + BlockChain.GENERATING_MIN_BLOCK_TIME_MS(height);
