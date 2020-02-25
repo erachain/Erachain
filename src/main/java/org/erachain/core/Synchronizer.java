@@ -403,18 +403,20 @@ public class Synchronizer extends Thread {
              * peer);
              */
 
-        byte[] lastCommonBlockSignature;
-        List<byte[]> signatures;
-        if (lastCommonBlockSignature_in == null) {
-            Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
-            lastCommonBlockSignature = headers.a;
-            signatures = headers.b;
-        } else {
-            // уже задана точка отката - тест
-            lastCommonBlockSignature = lastCommonBlockSignature_in;
-            signatures = this.getBlockSignatures(lastCommonBlockSignature, peer);
-            signatures.remove(0);
-        }
+            dcSet.clearCache();
+
+            byte[] lastCommonBlockSignature;
+            List<byte[]> signatures;
+            if (lastCommonBlockSignature_in == null) {
+                Tuple2<byte[], List<byte[]>> headers = this.findHeaders(peer, peerHeight, lastBlockSignature, checkPointHeight);
+                lastCommonBlockSignature = headers.a;
+                signatures = headers.b;
+            } else {
+                // уже задана точка отката - тест
+                lastCommonBlockSignature = lastCommonBlockSignature_in;
+                signatures = this.getBlockSignatures(lastCommonBlockSignature, peer);
+                signatures.remove(0);
+            }
 
             byte[] lastBlockSignature = dcSet.getBlockMap().getLastBlockSignature();
 
