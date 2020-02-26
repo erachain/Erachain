@@ -164,7 +164,7 @@ public class Sender extends MonitoredThread {
 
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(85);
+                Controller.getInstance().stopAll(277);
                 return false;
             } catch (java.lang.NullPointerException e) {
                 return false;

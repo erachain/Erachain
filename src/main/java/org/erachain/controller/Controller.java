@@ -719,7 +719,7 @@ public class Controller extends Observable {
                 reCreateDC(inMemoryDC);
             } catch (Throwable e) {
                 LOGGER.error(e.getMessage(), e);
-                stopAll(5);
+                stopAll(6);
             }
         }
 
@@ -1054,7 +1054,7 @@ public class Controller extends Observable {
         return this.isStopping;
     }
 
-    public void stopAll(Integer par) {
+    public void stopAll(int par) {
         // PREVENT MULTIPLE CALLS
         if (this.isStopping)
             return;
@@ -1431,6 +1431,7 @@ public class Controller extends Observable {
                     < NTP.getTime()) {
                 // мы не во воремени - надо синхронизироваться
                 this.status = STATUS_SYNCHRONIZING;
+                LOGGER.debug("status = STATUS_SYNCHRONIZING by " + peer);
             } else {
                 // время не ушло вперед - можно не синронизироваться
                 this.status = STATUS_OK;
@@ -1756,6 +1757,7 @@ public class Controller extends Observable {
 
         if (maxHW.a > thisHW.a + shift) {
             this.status = STATUS_SYNCHRONIZING;
+            LOGGER.debug("status = STATUS_SYNCHRONIZING by check maxHW: " + maxHW.a + " - shift: " + shift);
             return false;
             // } else if (maxHW.a < thisHW.a) {
         } else {

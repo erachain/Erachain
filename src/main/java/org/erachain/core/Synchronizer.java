@@ -916,15 +916,15 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(22);
+                        ctrl.stopAll(322);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(27);
+                        ctrl.stopAll(327);
                         return;
                     }
 
-                    ctrl.stopAll(22);
+                    ctrl.stopAll(323);
 
                     throw error;
 
@@ -937,15 +937,15 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(22);
+                        ctrl.stopAll(324);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(27);
+                        ctrl.stopAll(337);
                         return;
                     }
 
-                    ctrl.stopAll(27);
+                    ctrl.stopAll(335);
 
                     throw new Exception(thrown);
 
@@ -1043,11 +1043,11 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(22);
+                        ctrl.stopAll(342);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(27);
+                        ctrl.stopAll(347);
                         return;
                     }
 
@@ -1062,11 +1062,11 @@ public class Synchronizer extends Thread {
                         dcSet.rollback();
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(22);
+                        ctrl.stopAll(352);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(27);
+                        ctrl.stopAll(355);
                         return;
                     }
 
@@ -1199,7 +1199,7 @@ public class Synchronizer extends Thread {
 
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                ctrl.stopAll(46);
+                ctrl.stopAll(396);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;

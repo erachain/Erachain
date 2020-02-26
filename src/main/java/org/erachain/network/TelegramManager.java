@@ -714,7 +714,7 @@ public class TelegramManager extends Thread {
                     processMessage(blockingQueue.poll(1000, TimeUnit.MILLISECONDS));
                 } catch (java.lang.OutOfMemoryError e) {
                     LOGGER.error(e.getMessage(), e);
-                    Controller.getInstance().stopAll(81);
+                    Controller.getInstance().stopAll(281);
                     break;
                 } catch (java.lang.IllegalMonitorStateException e) {
                     break;
@@ -744,7 +744,7 @@ public class TelegramManager extends Thread {
                 }
             } catch (java.lang.OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(82);
+                Controller.getInstance().stopAll(282);
                 break;
             }
 

@@ -767,7 +767,8 @@ public class Network extends Observable {
             if (onlySynchronized) {
                 // USE PEERS than SYNCHRONIZED to ME
                 Tuple2<Integer, Long> peerHWeight = peer.getHWeight(false);
-                if (peerHWeight == null || !peerHWeight.a.equals(myHeight)) {
+                /// Сейчас нужно всем передавать свой победный блок - так как они сразу его подхватывают
+                if (peerHWeight == null || peerHWeight.a + 100 < myHeight) {
                     continue;
                 }
             }

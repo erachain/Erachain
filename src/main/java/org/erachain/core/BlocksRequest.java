@@ -125,7 +125,7 @@ public class BlocksRequest extends MonitoredThread {
                 counter += processMessage(blockingQueue.take());
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(76);
+                Controller.getInstance().stopAll(276);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;

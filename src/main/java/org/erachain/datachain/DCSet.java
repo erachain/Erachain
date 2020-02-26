@@ -1601,7 +1601,7 @@ public class DCSet extends DBASet implements Closeable {
 
             this.outUses();
 
-            Controller.getInstance().stopAll(13);
+            Controller.getInstance().stopAll(1113);
             return null;
         }
 
