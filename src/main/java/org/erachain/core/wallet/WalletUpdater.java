@@ -68,7 +68,7 @@ public class WalletUpdater extends MonitoredThread {
                 processMessage(blockingQueue.take());
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(86);
+                Controller.getInstance().stopAll(686);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;

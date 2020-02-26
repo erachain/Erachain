@@ -719,7 +719,7 @@ public class Controller extends Observable {
                 reCreateDC(inMemoryDC);
             } catch (Throwable e) {
                 LOGGER.error(e.getMessage(), e);
-                stopAll(5);
+                stopAll(6);
             }
         }
 
@@ -1054,7 +1054,7 @@ public class Controller extends Observable {
         return this.isStopping;
     }
 
-    public void stopAll(Integer par) {
+    public void stopAll(int par) {
         // PREVENT MULTIPLE CALLS
         if (this.isStopping)
             return;

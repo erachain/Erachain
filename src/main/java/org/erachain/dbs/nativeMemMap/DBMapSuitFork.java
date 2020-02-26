@@ -49,7 +49,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
                 databaseSet.clearCache();
                 System.gc();
                 if (Runtime.getRuntime().freeMemory() < Controller.MIN_MEMORY_TAIL)
-                    Controller.getInstance().stopAll(1391);
+                    Controller.getInstance().stopAll(1021);
             }
         }
 

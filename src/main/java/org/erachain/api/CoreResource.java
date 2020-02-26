@@ -34,8 +34,10 @@ public class CoreResource {
             APIUtils.askAPICallAllowed(null, "GET core/stop", request, true);
 
         //STOP
-        Controller.getInstance().stopAll(0);
-        //	System.exit(0);
+        Thread thread = new Thread(() -> {
+            Controller.getInstance().stopAll(0);
+        });
+        thread.start();
 
         //RETURN
         return String.valueOf(true);

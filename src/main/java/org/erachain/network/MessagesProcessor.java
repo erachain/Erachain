@@ -141,7 +141,7 @@ public class MessagesProcessor extends MonitoredThread {
                 processMessage(blockingQueue.take());
             } catch (OutOfMemoryError e) {
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(356);
+                Controller.getInstance().stopAll(244);
                 return;
             } catch (IllegalMonitorStateException e) {
                 break;

@@ -456,7 +456,7 @@ public class Peer extends MonitoredThread {
                         continue;
                     } catch (java.lang.OutOfMemoryError e) {
                         LOGGER.error(e.getMessage(), e);
-                        Controller.getInstance().stopAll(82);
+                        Controller.getInstance().stopAll(250);
                         return;
                     } catch (EOFException e) {
                         if (this.runed)
@@ -492,7 +492,7 @@ public class Peer extends MonitoredThread {
                         break;
                     } catch (java.lang.OutOfMemoryError e) {
                         LOGGER.error(e.getMessage(), e);
-                        Controller.getInstance().stopAll(83);
+                        Controller.getInstance().stopAll(252);
                         break;
                     } catch (EOFException e) {
                         if (this.runed)
@@ -569,7 +569,7 @@ public class Peer extends MonitoredThread {
 
                         } catch (java.lang.OutOfMemoryError e) {
                             LOGGER.error(e.getMessage(), e);
-                            Controller.getInstance().stopAll(84);
+                            Controller.getInstance().stopAll(254);
                             break;
 
                         } catch (Exception e) {
@@ -587,7 +587,7 @@ public class Peer extends MonitoredThread {
                             this.network.onMessage(message);
                         } catch (java.lang.OutOfMemoryError e) {
                             LOGGER.error(e.getMessage(), e);
-                            Controller.getInstance().stopAll(88);
+                            Controller.getInstance().stopAll(256);
                             break;
                         }
 
@@ -721,7 +721,7 @@ public class Peer extends MonitoredThread {
             response = blockingQueue.poll(timeSOT, TimeUnit.MILLISECONDS);
         } catch (java.lang.OutOfMemoryError e) {
             LOGGER.error(e.getMessage(), e);
-            Controller.getInstance().stopAll(86);
+            Controller.getInstance().stopAll(260);
             return null;
         } catch (InterruptedException e) {
             this.requests.remove(localRequestKey);
