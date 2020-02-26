@@ -301,7 +301,7 @@ public class TransactionsPool extends MonitoredThread {
                     }
                 } catch (OutOfMemoryError e) {
                     LOGGER.error(e.getMessage(), e);
-                    Controller.getInstance().stopAll(56);
+                    Controller.getInstance().stopAll(156);
                     return;
                 } catch (IllegalMonitorStateException e) {
                     break;
@@ -319,11 +319,11 @@ public class TransactionsPool extends MonitoredThread {
             } catch (OutOfMemoryError e) {
                 blockingQueue = null;
                 LOGGER.error(e.getMessage(), e);
-                Controller.getInstance().stopAll(56);
+                Controller.getInstance().stopAll(157);
                 return;
             } catch (IllegalMonitorStateException e) {
                 blockingQueue = null;
-                Controller.getInstance().stopAll(57);
+                Controller.getInstance().stopAll(158);
                 break;
             } catch (InterruptedException e) {
                 blockingQueue = null;
