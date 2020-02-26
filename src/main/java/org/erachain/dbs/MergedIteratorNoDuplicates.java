@@ -72,9 +72,9 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
             if (nextIter.hasNext()) {
                 queue.add(nextIter);
             }
-            if (itemComparator.compare(next, lastNext) != 0
+            if ((lastNext == null || itemComparator.compare(next, lastNext) != 0)
                     // и если есть таблица удаленных записей то исключим их
-                    && (deleted == null || deleted.containsKey(next))
+                    && (deleted == null || !deleted.containsKey(next))
             ) {
                 lastNext = next;
                 break;

@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 @Slf4j
 public class TradeMapImplTest {
@@ -165,7 +166,23 @@ public class TradeMapImplTest {
                 TradeMapImpl forkedTradesMap = forked.getTradeMap();
 
                 iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
+                assertEquals(1, Iterators.size(iterator));
+
+                // ADD to FORK
+                trade = new Trade(initiatorID, Transaction.makeDBRef(stop, 4), haveKey, wantKey,
+                        new BigDecimal("25"), new BigDecimal("44"),
+                        3, 5, index++);
+                forkedTradesMap.put(trade);
+
+                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
                 assertEquals(2, Iterators.size(iterator));
+
+                // DELETE in FORK
+                Trade removed = forkedTradesMap.remove(new Fun.Tuple2<Long, Long>(initiatorID, targetID));
+                assertNotEquals(null, removed);
+                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
+                assertEquals(1, Iterators.size(iterator));
+
 
             } finally {
                 dcSet.close();
