@@ -2,7 +2,6 @@ package org.erachain.dbs.mapDB;
 
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.controller.Controller;
-import org.erachain.core.item.assets.Order;
 import org.erachain.core.item.assets.Trade;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.DBASet;
@@ -160,15 +159,16 @@ public class TradeSuitMapDB extends DBMapSuit<Tuple2<Long, Long>, Trade> impleme
 
     /**
      * поиск ключей для протокольных вторичных индексов с учетом Родительской таблицы (если база форкнута)
-     * @param order
+     *
+     * @param orderID
      * @return
      */
     @Override
-    public IteratorCloseable<Tuple2<Long, Long>> getIterator(Order order) {
+    public IteratorCloseable<Tuple2<Long, Long>> getIteratorByInitiator(Long orderID) {
         //FILTER ALL KEYS
         return new IteratorCloseableImpl(((BTreeMap<Tuple2<Long, Long>, Trade>) map).subMap(
-                Fun.t2(order.getId(), null),
-                Fun.t2(order.getId(), Long.MAX_VALUE)).keySet().iterator());
+                Fun.t2(orderID, null),
+                Fun.t2(orderID, Long.MAX_VALUE)).keySet().iterator());
     }
 
     @Override

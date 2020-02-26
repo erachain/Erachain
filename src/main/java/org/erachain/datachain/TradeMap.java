@@ -12,7 +12,7 @@ import java.util.List;
 public interface TradeMap extends DBTab<Fun.Tuple2<Long, Long>, Trade> {
     void put(Trade trade);
 
-    IteratorCloseable<Fun.Tuple2<Long, Long>> getIterator(Order order);
+    IteratorCloseable<Fun.Tuple2<Long, Long>> getIteratorByInitiator(Long orderID);
 
     List<Trade> getInitiatedTrades(Order order);
 
