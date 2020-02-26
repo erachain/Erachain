@@ -9,7 +9,6 @@ import org.erachain.dbs.*;
 import org.mapdb.Fun;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -23,6 +22,8 @@ import java.util.*;
 
  */
 public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements ForkedMap {
+
+    Comparator<? super T> comparator;
 
     @Getter
     protected DBTab<T, U> parent;
@@ -307,21 +308,9 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     public IteratorCloseable<T> getIterator() {
         this.addUses();
 
-        List<T> list = new ArrayList<>();
-        try (IteratorCloseable<T> parentIterator = parent.getIterator()) {
-            while (parentIterator.hasNext()) {
-                T key = parentIterator.next();
-                // пропустим если он есть в удаленных
-                if (deleted != null && deleted.containsKey(key)
-                        || map.containsKey(key))
-                    continue;
-                list.add(key);
-            }
-        } catch (IOException e) {
-        }
-
-        //Map uncastedMap = this.map;
-        IteratorCloseable<T> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), map.keySet().iterator()), Fun.COMPARATOR);
+        Iterator<T> parentIterator = parent.getIterator();
+        IteratorCloseable<T> iterator = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                parentIterator, map.keySet().iterator()), Fun.COMPARATOR, deleted);
 
         this.outUses();
         return iterator;
@@ -333,19 +322,7 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
     public IteratorCloseable<T> getIterator(int index, boolean descending) {
         this.addUses();
 
-        List<T> list = new ArrayList<>();
-        try (IteratorCloseable<T> parentIterator = parent.getIterator(index, descending)) {
-            while (parentIterator.hasNext()) {
-                T key = parentIterator.next();
-                // пропустим если он есть в удаленных
-                if (deleted != null && deleted.containsKey(key)
-                        || map.containsKey(key))
-                    continue;
-                list.add(key);
-            }
-        } catch (IOException e) {
-        }
-
+        Iterator<T> parentIterator = parent.getIterator(index, descending);
         IteratorCloseable<T> iterator;
 
         if (index > 0) {
@@ -368,7 +345,8 @@ public abstract class DBMapSuitFork<T, U> extends DBMapSuit<T, U> implements For
             }
         }
 
-        IteratorCloseable iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(list.iterator(), iterator), Fun.COMPARATOR);
+        IteratorCloseable iteratorMerged = new MergedIteratorNoDuplicates((Iterable) ImmutableList.of(
+                parentIterator, iterator), Fun.COMPARATOR, deleted);
 
         this.outUses();
         return iteratorMerged;
