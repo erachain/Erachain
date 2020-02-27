@@ -55,7 +55,7 @@ public class IssuePollRecord extends IssueItemRecord {
     // RETURN START KEY in tot GEMESIS
 
     @Override
-    public long getStartKey(int height) {
+    public long getStartKey() {
         return START_KEY;
     }
 

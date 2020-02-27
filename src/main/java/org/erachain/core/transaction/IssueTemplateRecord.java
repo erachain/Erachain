@@ -53,9 +53,8 @@ public class IssueTemplateRecord extends IssueItemRecord {
 
     //GETTERS/SETTERS
 
-    // RETURN START KEY in not GENESIS
     @Override
-    public long getStartKey(int height) {
+    public long getStartKey() {
         return START_KEY;
     }
 

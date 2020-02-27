@@ -58,9 +58,8 @@ public class IssueAssetTransaction extends IssueItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
 
-    // RETURN START KEY in not GENESIS
     @Override
-    public long getStartKey(int height) {
+    public long getStartKey() {
         return START_KEY;
     }
 
