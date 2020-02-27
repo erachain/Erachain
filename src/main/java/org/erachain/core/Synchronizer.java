@@ -178,6 +178,7 @@ public class Synchronizer extends Thread {
                 countOrphanedTransactions += lastBlock.getTransactionCount();
             }
 
+            // Так как откаченные транзакций мы копим тут локально в orphanedTransactions
             lastBlock.orphan(fork, true);
 
             DCSet.getInstance().clearCache();

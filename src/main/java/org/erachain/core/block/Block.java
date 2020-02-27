@@ -2414,8 +2414,6 @@ import java.util.*;
         Controller cnt = Controller.getInstance();
         //DLSet dbSet = Controller.getInstance().getDBSet();
 
-        boolean notFork = !dcSet.isFork();
-
         TransactionMap unconfirmedMap = dcSet.getTransactionTab();
         TransactionFinalMapImpl finalMap = dcSet.getTransactionFinalMap();
         TransactionFinalMapSigns transFinalMapSinds = dcSet.getTransactionFinalMapSigns();
@@ -2443,39 +2441,20 @@ import java.util.*;
                 transaction.getCreator().removeLastTimestamp(dcSet, transaction.getTimestamp());
             }
 
-            if (notFork) {
-                if (!notStoreTXs) {
-                    if (true) {
-                        // тут учет сразу очистки базы происходит - что более правильно
-                        pool.offerMessage(transaction);
-                    } else {
-                        //ADD ORPHANED TRANASCTIONS BACK TO DATABASE
-                        try {
-                            if (!unconfirmedMap.isClosed()) {
-                                unconfirmedMap.put(transaction);
-                            } else {
-                                unconfirmedMap = dcSet.getTransactionTab();
-                            }
-                        } catch (java.lang.Throwable e) {
-                            if (e instanceof java.lang.IllegalAccessError) {
-                                // налетели на закрытую таблицу
-                                unconfirmedMap = dcSet.getTransactionTab();
-                            } else {
-                                throw new Exception(e);
-                            }
-                        }
-                    }
-                }
+            if (!notStoreTXs) {
+                pool.offerMessage(transaction);
+            }
 
-                Long key = Transaction.makeDBRef(height, seqNo);
+            Long key = Transaction.makeDBRef(height, seqNo);
 
-                finalMap.delete(key);
-                transFinalMapSinds.delete(transaction.getSignature());
-                List<byte[]> signatures = transaction.getOtherSignatures();
-                if (signatures != null) {
-                    for (byte[] itemSignature : signatures) {
-                        transFinalMapSinds.delete(itemSignature);
-                    }
+            finalMap.delete(key);
+            transFinalMapSinds.delete(transaction.getSignature());
+
+            // Обязательно надо делать иначе некоторые тразакции будут потом невалидны (удостоверение ключей и регистрация подписанной персоны)
+            List<byte[]> signatures = transaction.getOtherSignatures();
+            if (signatures != null) {
+                for (byte[] itemSignature : signatures) {
+                    transFinalMapSinds.delete(itemSignature);
                 }
             }
 
