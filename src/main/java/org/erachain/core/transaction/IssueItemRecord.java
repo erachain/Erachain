@@ -20,8 +20,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
-    public static final long START_KEY = 0; // << 20;
-
     protected ItemCls item;
     protected Long key;
 
@@ -64,6 +62,10 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         }
 
         return key;
+    }
+
+    public long getStartKey() {
+        return 0L;
     }
 
     @Override
@@ -219,7 +221,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
-        long key = this.item.deleteFromMap(this.dcSet, START_KEY);
+        long key = this.item.deleteFromMap(this.dcSet, getStartKey());
         //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
     }
 

@@ -16,7 +16,7 @@ public abstract class AddressItemRefs extends Transaction {
 
     private ItemCls item;
 
-    public static final long START_KEY = 1000l; // << 20;
+    public static final long START_KEY = 1000L; // << 20;
 
     public AddressItemRefs(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, feePow, timestamp, reference);

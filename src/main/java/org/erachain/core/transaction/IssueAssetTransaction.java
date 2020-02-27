@@ -18,7 +18,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_ASSET_TRANSACTION;
     private static final String NAME_ID = "Issue Asset";
 
-    public static final long START_KEY = 1000l; // << 20;
+    public static final long START_KEY = 1000L;
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
@@ -26,7 +26,6 @@ public class IssueAssetTransaction extends IssueItemRecord {
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, asset, feePow, timestamp, reference);
-        //this.asset = asset;
     }
 
     public IssueAssetTransaction(byte[] typeBytes, PublicKeyAccount creator, AssetCls asset, byte feePow, long timestamp, Long reference, byte[] signature) {
@@ -59,13 +58,10 @@ public class IssueAssetTransaction extends IssueItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Asset"; }
 
-    // RETURN START KEY in tot GEMESIS
+    // RETURN START KEY in not GENESIS
+    @Override
     public long getStartKey(int height) {
-        if (height < BlockChain.VERS_4_11) {
-            return 1000L;
-        }
         return START_KEY;
-
     }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {

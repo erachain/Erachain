@@ -54,15 +54,9 @@ public class IssueUnionRecord extends IssueItemRecord {
     //GETTERS/SETTERS
     //public static String getName() { return "Issue Union"; }
 
-    // RETURN START KEY in tot GEMESIS
+    // RETURN START KEY in not GENESIS
     public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 0l;
-        }
-
         return START_KEY;
-
     }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {

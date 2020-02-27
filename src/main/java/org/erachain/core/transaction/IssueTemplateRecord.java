@@ -16,7 +16,7 @@ public class IssueTemplateRecord extends IssueItemRecord {
     private static final byte TYPE_ID = (byte) ISSUE_TEMPLATE_TRANSACTION;
     private static final String NAME_ID = "Issue Template";
 
-    public static final long START_KEY = 1000l; // << 20;
+    public static final long START_KEY = 1000L;
 
     public IssueTemplateRecord(byte[] typeBytes, PublicKeyAccount creator, TemplateCls template, byte feePow, long timestamp, Long reference) {
         super(typeBytes, NAME_ID, creator, template, feePow, timestamp, reference);
@@ -53,15 +53,10 @@ public class IssueTemplateRecord extends IssueItemRecord {
 
     //GETTERS/SETTERS
 
-    // RETURN START KEY in tot GEMESIS
+    // RETURN START KEY in not GENESIS
+    @Override
     public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 1000l;
-        }
-
         return START_KEY;
-
     }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {

@@ -54,14 +54,9 @@ public class IssuePollRecord extends IssueItemRecord {
 
     // RETURN START KEY in tot GEMESIS
 
+    @Override
     public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 0l;
-        }
-
         return START_KEY;
-
     }
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {
