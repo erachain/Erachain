@@ -172,7 +172,7 @@ public class Synchronizer extends Thread {
 
             if (++countOrphanedTransactions < MAX_ORPHAN_TRANSACTIONS_MY) {
                 // сохраним откаченные транзакции - может их потом включим в очередь
-                for (Transaction transaction: lastBlock.getTransactions()) {
+                for (Transaction transaction : lastBlock.getTransactions()) {
                     orphanedTransactions.put(transaction.getDBRef(), transaction);
                 }
                 countOrphanedTransactions += lastBlock.getTransactionCount();
@@ -180,7 +180,12 @@ public class Synchronizer extends Thread {
 
             // Так как откаченные транзакций мы копим тут локально в orphanedTransactions
             // И с учетом что ниже сразу процессим
-            lastBlock.orphan(fork, true);
+            try {
+                lastBlock.orphan(fork, true);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                ctrl.stopAll(311);
+            }
 
             DCSet.getInstance().clearCache();
 
