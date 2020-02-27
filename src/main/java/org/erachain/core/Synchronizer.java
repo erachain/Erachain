@@ -179,6 +179,7 @@ public class Synchronizer extends Thread {
             }
 
             // Так как откаченные транзакций мы копим тут локально в orphanedTransactions
+            // И с учетом что ниже сразу процессим
             lastBlock.orphan(fork, true);
 
             DCSet.getInstance().clearCache();
@@ -200,7 +201,12 @@ public class Synchronizer extends Thread {
         }
 
         LOGGER.debug("*** checkNewBlocks - lastBlock[" + lastBlock.getHeight() + "]");
+        if (false) {
+            // Тест откатов чтобы откатиться 1 раз и больше не синхриться - для проверки удаления
+            test2 = true;
+            return orphanedTransactions;
 
+        }
         // VALIDATE THE NEW BLOCKS
 
         //////// здесь надо обновить для валидании ссылки счетов на поледние трнзакции за последние Х блоков\
@@ -388,6 +394,7 @@ public class Synchronizer extends Thread {
 
     }
 
+    boolean test2;
     public void synchronize(DCSet dcSet, int checkPointHeight, Peer peer, int peerHeight, byte[] lastCommonBlockSignature_in) throws Exception {
 
         try {
@@ -431,6 +438,11 @@ public class Synchronizer extends Thread {
             }
 
             if (lastCommonBlockSignature == null) {
+
+                if (test2) {
+                    throw new Exception("STOP on DEBUG");
+                }
+
                 // simple ACCEPT tail CHAIN - MY LAST block founded in PEER
                 if (signatures == null || signatures.isEmpty())
                     return;

@@ -1,5 +1,6 @@
 package org.erachain.core.block;
 
+import com.google.common.collect.Iterators;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
 import com.google.common.primitives.Longs;
@@ -20,6 +21,7 @@ import org.erachain.core.transaction.RCalculated;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionFactory;
 import org.erachain.datachain.*;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.utils.Converter;
 import org.erachain.utils.NumberAsString;
@@ -2457,11 +2459,20 @@ import java.util.*;
                     transFinalMapSinds.delete(itemSignature);
                 }
             }
-
         }
 
         // DELETE ALL CALCULATED
-        finalMap.delete(height);
+        if (dcSet.isFork()) {
+            /// если форк их тут вообще нету - нужно выцепить из Родительской таблицы
+            try (IteratorCloseable<Long> iterator = dcSet.getParent().getTransactionFinalMap().getIteratorByBlock(height)) {
+                Iterators.advance(iterator, this.transactionCount);
+                while (iterator.hasNext()) {
+                    finalMap.delete(iterator.next());
+                }
+            }
+        } else {
+            finalMap.delete(height);
+        }
     }
 
     @Override

@@ -192,6 +192,11 @@ public class TransactionFinalMapImpl extends DBTabImpl<Long, Transaction> implem
     }
 
     @Override
+    public IteratorCloseable<Long> getIteratorByBlock(Integer block) {
+        return ((TransactionFinalSuit) map).getBlockIterator(block);
+    }
+
+    @Override
     public Collection<Transaction> getTransactionsByBlock(Integer block) {
         return getTransactionsByBlock(block, 0, 0);
     }
