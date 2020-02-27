@@ -18,7 +18,7 @@ import org.erachain.lang.Lang;
 public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Confiscate Debt", assetIn, null, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
+        super(-1, "Confiscate Debt", assetIn, null, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         this.jButton_ok.setText(Lang.getInstance().translate(asset.isOutsideType()? "Подтвердить погашение требования" : "Confiscate Debt"));
         this.title = asset.isOutsideType() ? "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму"

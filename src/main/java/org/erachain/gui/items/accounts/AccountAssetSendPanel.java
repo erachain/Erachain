@@ -20,7 +20,7 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
     public boolean noRecive;
 
     public AccountAssetSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super("Send", assetIn, "If You want to send asset %asset%, fill in this form", balancePosition, accountFrom, accountTo, message);
+        super(-1, null, assetIn, "If You want to send asset %asset%, fill in this form", balancePosition, accountFrom, accountTo, message);
 
         //  icon.setIcon(null);
 

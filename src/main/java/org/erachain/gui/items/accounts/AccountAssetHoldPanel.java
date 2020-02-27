@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super("Take on Hold", assetIn, "If You want to take on hold issued asset %asset%, fill in this form", TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
+        super(-1, "Take on Hold", assetIn, "If You want to take on hold issued asset %asset%, fill in this form", TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
 
         //	icon.setIcon(null);
         this.jButton_ok.setText(Lang.getInstance().translate("Hold Asset"));

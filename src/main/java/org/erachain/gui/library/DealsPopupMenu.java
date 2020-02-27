@@ -345,7 +345,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.debtAssetBackward.setVisible(true);
 
                 break;
-                
+
             case AssetCls.AS_OUTSIDE_BILL_EX:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать вексель в собственность"));
 
@@ -361,7 +361,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.debtAssetBackward.setVisible(true);
 
                 break;
-                
+
             case AssetCls.AS_OUTSIDE_OTHER_CLAIM:
                 this.sendAsset.setText(Lang.getInstance().translate("Передать в собственность требование"));
 
@@ -456,6 +456,37 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.debtAssetReturn.setText(Lang.getInstance().translate("Return delegate vote"));
                 this.debtAssetReturn.setVisible(true);
                 this.debtAssetBackward.setText(Lang.getInstance().translate("To confiscate a delegated vote"));
+                this.debtAssetBackward.setVisible(true);
+
+                break;
+
+            case AssetCls.AS_BANK_GUARANTEE:
+                this.sendAsset.setText(Lang.getInstance().translate("Передать банковскую гарантию"));
+
+                this.holdAsset.setText(Lang.getInstance().translate("Акцептовать банковскую гарантию"));
+                this.holdAsset.setVisible(true);
+
+                this.debtAsset.setText(Lang.getInstance().translate("Выдать банковскую гарантию"));
+                this.debtAsset.setVisible(true);
+                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть банковскую гарантию"));
+                this.debtAssetReturn.setVisible(true);
+                //this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Отозвать банковскую гарантию"));
+                this.debtAssetBackward.setVisible(true);
+
+                break;
+
+            case AssetCls.AS_BANK_GUARANTEE_TOTAL:
+                this.sendAsset.setText(Lang.getInstance().translate("Передать учетную банковскую гарантию"));
+
+                //this.holdAsset.setText(Lang.getInstance().translate("Акцептовать учетную банковскую гарантию"));
+                this.holdAsset.setVisible(false);
+
+                this.debtAsset.setText(Lang.getInstance().translate("Выдать учетную банковскую гарантию"));
+                this.debtAsset.setVisible(true);
+                //this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть учетную банковскую гарантию"));
+                this.debtAssetReturn.setVisible(false);
+                this.debtAssetBackward.setText(Lang.getInstance().translate("Отозвать учетную банковскую гарантию"));
                 this.debtAssetBackward.setVisible(true);
 
                 break;

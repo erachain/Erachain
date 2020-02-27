@@ -74,14 +74,18 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(String panelName, AssetCls assetIn, String title, int balancePosition,
+    public AccountAssetActionPanelCls(int actionType, String panelName, AssetCls assetIn, String title, int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
-        setName(Lang.getInstance().translate(panelName));
         if (assetIn == null)
             this.asset = Controller.getInstance().getAsset(2);
         else
             this.asset = assetIn;
+
+        if (panelName == null)
+            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(actionType)));
+        else
+            setName(Lang.getInstance().translate(panelName));
 
         this.title = title;
 
@@ -92,10 +96,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         initComponents(message);
 
         if (title != null) {
-            if (asset == null)
-                this.jLabel_Title.setText(Lang.getInstance().translate(title));
-            else
-                this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+            this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
         }
 
         //this.jComboBox_Asset.setEnabled(assetIn != null);
@@ -217,13 +218,23 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         if (recipient != null) {
             if (recipient instanceof PublicKeyAccount) {
-                jTextField_To.setText(((PublicKeyAccount)recipient).getBase58());
+                jTextField_To.setText(((PublicKeyAccount) recipient).getBase58());
             } else {
                 jTextField_To.setText(recipient.getAddress());
             }
             //refreshReceiverDetails()
 
         }
+
+        this.jButton_ok.setText(Lang.getInstance().translate(asset.isOutsideType() ? "Подтвердить погашение требования" : "Confiscate Debt"));
+        this.title = asset.isOutsideType() ? "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму"
+                : "If You want to confiscate in debt issued asset %asset%, fill in this form";
+        this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+
+        // icon.setIcon(null);
+
+        this.jLabel_To.setText(Lang.getInstance().translate(asset.isOutsideType() ? "Счет эмитента" : "Debtor Account") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(asset.isOutsideType() ? "Детали эмитента" : "Debtor Details") + ":");
 
         ///this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
         this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
