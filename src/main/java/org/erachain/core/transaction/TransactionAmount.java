@@ -81,6 +81,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     // 0 - not used
     public static final int ACTION_SEND = 1;
     public static final int ACTION_DEBT = 2;
+    public static final int ACTION_REPAY_DEBT = -2; // чисто для другого отображения а так = ACTION_DEBT
     public static final int ACTION_HOLD = 3;
     public static final int ACTION_SPEND = 4;
     public static final int ACTION_PLEDGE = 5;

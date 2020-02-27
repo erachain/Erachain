@@ -20,12 +20,9 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
     public boolean noRecive;
 
     public AccountAssetSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(-1, null, assetIn, "If You want to send asset %asset%, fill in this form", balancePosition, accountFrom, accountTo, message);
+        super(false, -1, null, assetIn, null, balancePosition, accountFrom, accountTo, message);
 
         //  icon.setIcon(null);
-
-        this.jButton_ok.setText(Lang.getInstance().translate("Send"));
-        this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)") + ":");
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
 
     }

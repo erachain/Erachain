@@ -74,7 +74,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
     private AccountsComboBoxModel accountsModel;
 
-    public AccountAssetActionPanelCls(int actionType, String panelName, AssetCls assetIn, String title, int balancePosition,
+    public AccountAssetActionPanelCls(boolean backward, int actionType, String panelName, AssetCls assetIn, String title, int balancePosition,
                                       Account accountFrom, Account accountTo, String message) {
 
         if (assetIn == null)
@@ -82,22 +82,32 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         else
             this.asset = assetIn;
 
-        if (panelName == null)
-            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(actionType)));
-        else
+        if (panelName == null) {
+            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, actionType)));
+        } else {
             setName(Lang.getInstance().translate(panelName));
-
-        this.title = title;
+        }
 
         this.account = accountFrom;
         recipient = accountTo;
         this.balancePosition = balancePosition;
 
+        if (title == null) {
+            this.title = asset.viewAssetTypeActionTitle(backward, actionType);
+        } else {
+            this.title = title;
+        }
+        this.jLabel_Title.setText(Lang.getInstance().translate(this.title).replace("%asset%", asset.viewName()));
+
         initComponents(message);
 
-        if (title != null) {
-            this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
-        }
+        // icon.setIcon(null);
+        this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, actionType)) + ":");
+
+        this.jLabel_To.setText(Lang.getInstance().translate(asset.viewAssetTypeTarget(backward, actionType) + ":"));
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Details") + ":");
+
+        this.jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, actionType)));
 
         //this.jComboBox_Asset.setEnabled(assetIn != null);
 
@@ -226,20 +236,6 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         }
 
-        this.jButton_ok.setText(Lang.getInstance().translate(asset.isOutsideType() ? "Подтвердить погашение требования" : "Confiscate Debt"));
-        this.title = asset.isOutsideType() ? "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму"
-                : "If You want to confiscate in debt issued asset %asset%, fill in this form";
-        this.jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
-
-        // icon.setIcon(null);
-
-        this.jLabel_To.setText(Lang.getInstance().translate(asset.isOutsideType() ? "Счет эмитента" : "Debtor Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(asset.isOutsideType() ? "Детали эмитента" : "Debtor Details") + ":");
-
-        ///this.jLabel_Title.setText(Lang.getInstance().translate("Title"));
-        this.jLabel_Account.setText(Lang.getInstance().translate("Select account") + ":");
-        this.jLabel_To.setText(Lang.getInstance().translate("To: (address or name)"));
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");
         this.jLabel_Mess_Title.setText(Lang.getInstance().translate("Title") + ":");
         this.jLabel_Mess.setText(Lang.getInstance().translate("Message") + ":");
         this.jCheckBox_Enscript.setText(Lang.getInstance().translate("Encrypt message") + ":");

@@ -658,74 +658,7 @@ public abstract class AssetCls extends ItemCls {
         return "";
     }
 
-    public String viewAssetTypeAction(int actionType) {
-        switch (assetType) {
-            case AS_OUTSIDE_IMMOVABLE:
-                switch (actionType) {
-                    case TransactionAmount.ACTION_SEND:
-                        return "Send";
-                    case TransactionAmount.ACTION_DEBT:
-                        return "Debt";
-                    case TransactionAmount.ACTION_HOLD:
-                        return "Hold";
-                    case TransactionAmount.ACTION_SPEND:
-                        return "Spend";
-                }
-            case AS_OUTSIDE_CURRENCY:
-                return "Outside Currency";
-            case AS_OUTSIDE_SERVICE:
-                return "Outside Service";
-            case AS_OUTSIDE_SHARE:
-                return "Outside Share Rights";
-            case AS_OUTSIDE_BILL:
-                return "Promissory Note";
-            case AS_OUTSIDE_BILL_EX:
-                return "Bill of Exchange";
-            case AS_OUTSIDE_OTHER_CLAIM:
-                return "Оther Outside Right of Claim";
-
-            case AS_INSIDE_ASSETS:
-                return "Digital Asset";
-            case AS_INSIDE_CURRENCY:
-                return "Digital Currency";
-            case AS_INSIDE_UTILITY:
-                return "Digital Utility";
-            case AS_INSIDE_SHARE:
-                return "Digital Share";
-            case AS_INSIDE_BONUS:
-                return "Bonuses, Loyalty Points";
-            case AS_INSIDE_ACCESS:
-                return "Digital Access Rights";
-            case AS_INSIDE_VOTE:
-                return "Digital Vote";
-            case AS_BANK_GUARANTEE:
-                return "Bank Guarantee";
-            case AS_BANK_GUARANTEE_TOTAL:
-                return "Bank Guarantee Total";
-            case AS_INDEX:
-                return "Digital Index";
-            case AS_INSIDE_OTHER_CLAIM:
-                return "Other Digital Right of Claim";
-
-            case AS_ACCOUNTING:
-                return "Accounting";
-        }
-
-        switch (actionType) {
-            case TransactionAmount.ACTION_SEND:
-                return "Send";
-            case TransactionAmount.ACTION_DEBT:
-                return "Debt";
-            case TransactionAmount.ACTION_HOLD:
-                return "Hold";
-            case TransactionAmount.ACTION_SPEND:
-                return "Spend";
-        }
-
-        return "unknown";
-    }
-
-    public String viewAssetTypeActionOK(boolean backward, int actionType) {
+    public String viewAssetTypeAction(boolean backward, int actionType) {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
@@ -782,11 +715,307 @@ public abstract class AssetCls extends ItemCls {
             case TransactionAmount.ACTION_SEND:
                 return "Send";
             case TransactionAmount.ACTION_DEBT:
-                return backward ? "Confiscate Debt" : "Debt";
+                return "Debt";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "Repay Debt";
             case TransactionAmount.ACTION_HOLD:
                 return "Hold";
             case TransactionAmount.ACTION_SPEND:
                 return "Spend";
+        }
+
+        return "unknown";
+    }
+
+    public String viewAssetTypeActionTitle(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Send";
+                    case TransactionAmount.ACTION_DEBT:
+                        return "Debt";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Hold";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spend";
+                }
+            case AS_OUTSIDE_CURRENCY:
+                return "Outside Currency";
+            case AS_OUTSIDE_SERVICE:
+                return "Outside Service";
+            case AS_OUTSIDE_SHARE:
+                return "Outside Share Rights";
+            case AS_OUTSIDE_BILL:
+                return "Promissory Note";
+            case AS_OUTSIDE_BILL_EX:
+                return "Bill of Exchange";
+            case AS_OUTSIDE_OTHER_CLAIM:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Send";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "If You want to give the borrowed asset %asset%, fill in this form"
+                                : "Если Вы хотите подтвердить погашение требования %asset%, заполните эту форму";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Take on hold %asset%";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spend";
+                }
+
+            case AS_INSIDE_ASSETS:
+                return "Digital Asset";
+            case AS_INSIDE_CURRENCY:
+                return "Digital Currency";
+            case AS_INSIDE_UTILITY:
+                return "Digital Utility";
+            case AS_INSIDE_SHARE:
+                return "Digital Share";
+            case AS_INSIDE_BONUS:
+                return "Bonuses, Loyalty Points";
+            case AS_INSIDE_ACCESS:
+                return "Digital Access Rights";
+            case AS_INSIDE_VOTE:
+                return "Digital Vote";
+            case AS_BANK_GUARANTEE:
+                return "Bank Guarantee";
+            case AS_BANK_GUARANTEE_TOTAL:
+                return "Bank Guarantee Total";
+            case AS_INDEX:
+                return "Digital Index";
+            case AS_INSIDE_OTHER_CLAIM:
+                return "Other Digital Right of Claim";
+
+            case AS_ACCOUNTING:
+                return "Accounting";
+        }
+
+        switch (actionType) {
+            case TransactionAmount.ACTION_SEND:
+                return "If You want to send asset %asset%, fill in this form";
+            case TransactionAmount.ACTION_DEBT:
+                return backward ? "If You want to give the borrowed asset %asset%, fill in this form"
+                        : "If You want to confiscate in debt issued asset %asset%, fill in this form";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "If You want to give the repay debt asset %asset%, fill in this form";
+            case TransactionAmount.ACTION_HOLD:
+                return "If You want to take on hold issued asset %asset%, fill in this form";
+            case TransactionAmount.ACTION_SPEND:
+                return "Spend";
+        }
+
+        return "unknown";
+    }
+
+    public String viewAssetTypeCreator(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Send";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Confiscate Debt" : "Debt";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Hold";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spend";
+                }
+            case AS_OUTSIDE_CURRENCY:
+                return "Outside Currency";
+            case AS_OUTSIDE_SERVICE:
+                return "Outside Service";
+            case AS_OUTSIDE_SHARE:
+                return "Outside Share Rights";
+            case AS_OUTSIDE_BILL:
+                return "Promissory Note";
+            case AS_OUTSIDE_BILL_EX:
+                return "Bill of Exchange";
+            case AS_OUTSIDE_OTHER_CLAIM:
+                return "Оther Outside Right of Claim";
+
+            case AS_INSIDE_ASSETS:
+                return "Digital Asset";
+            case AS_INSIDE_CURRENCY:
+                return "Digital Currency";
+            case AS_INSIDE_UTILITY:
+                return "Digital Utility";
+            case AS_INSIDE_SHARE:
+                return "Digital Share";
+            case AS_INSIDE_BONUS:
+                return "Bonuses, Loyalty Points";
+            case AS_INSIDE_ACCESS:
+                return "Digital Access Rights";
+            case AS_INSIDE_VOTE:
+                return "Digital Vote";
+            case AS_BANK_GUARANTEE:
+                return "Bank Guarantee";
+            case AS_BANK_GUARANTEE_TOTAL:
+                return "Bank Guarantee Total";
+            case AS_INDEX:
+                return "Digital Index";
+            case AS_INSIDE_OTHER_CLAIM:
+                return "Other Digital Right of Claim";
+
+            case AS_ACCOUNTING:
+                return "Accounting";
+        }
+
+        switch (actionType) {
+            case TransactionAmount.ACTION_SEND:
+                return "Recipient";
+            case TransactionAmount.ACTION_DEBT:
+                return "Debitor";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "Lender Account";
+            case TransactionAmount.ACTION_HOLD:
+                return "Giver";
+            case TransactionAmount.ACTION_SPEND:
+                return "Spender";
+        }
+
+        return "unknown";
+    }
+
+    public String viewAssetTypeTarget(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Send";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Confiscate Debt" : "Debt";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Hold";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spend";
+                }
+            case AS_OUTSIDE_CURRENCY:
+                return "Outside Currency";
+            case AS_OUTSIDE_SERVICE:
+                return "Outside Service";
+            case AS_OUTSIDE_SHARE:
+                return "Outside Share Rights";
+            case AS_OUTSIDE_BILL:
+                return "Promissory Note";
+            case AS_OUTSIDE_BILL_EX:
+                return "Bill of Exchange";
+            case AS_OUTSIDE_OTHER_CLAIM:
+                return "Оther Outside Right of Claim";
+
+            case AS_INSIDE_ASSETS:
+                return "Digital Asset";
+            case AS_INSIDE_CURRENCY:
+                return "Digital Currency";
+            case AS_INSIDE_UTILITY:
+                return "Digital Utility";
+            case AS_INSIDE_SHARE:
+                return "Digital Share";
+            case AS_INSIDE_BONUS:
+                return "Bonuses, Loyalty Points";
+            case AS_INSIDE_ACCESS:
+                return "Digital Access Rights";
+            case AS_INSIDE_VOTE:
+                return "Digital Vote";
+            case AS_BANK_GUARANTEE:
+                return "Bank Guarantee";
+            case AS_BANK_GUARANTEE_TOTAL:
+                return "Bank Guarantee Total";
+            case AS_INDEX:
+                return "Digital Index";
+            case AS_INSIDE_OTHER_CLAIM:
+                return "Other Digital Right of Claim";
+
+            case AS_ACCOUNTING:
+                return "Accounting";
+        }
+
+        switch (actionType) {
+            case TransactionAmount.ACTION_SEND:
+                return "Recipient Account";
+            case TransactionAmount.ACTION_DEBT:
+                return "Vendor Account";
+            case TransactionAmount.ACTION_REPAY_DEBT:
+                return "Lender Account";
+            case TransactionAmount.ACTION_HOLD:
+                return "Giver Account";
+            case TransactionAmount.ACTION_SPEND:
+                return "Spender Account";
+        }
+
+        return "unknown";
+    }
+
+    public String viewAssetTypeActionOK(boolean backward, int actionType) {
+        switch (assetType) {
+            case AS_OUTSIDE_IMMOVABLE:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Send";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Confiscate Debt" : "Debt";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Hold";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spend";
+                }
+            case AS_OUTSIDE_CURRENCY:
+                return "Outside Currency";
+            case AS_OUTSIDE_SERVICE:
+                return "Outside Service";
+            case AS_OUTSIDE_SHARE:
+                return "Outside Share Rights";
+            case AS_OUTSIDE_BILL:
+                return "Promissory Note";
+            case AS_OUTSIDE_BILL_EX:
+                return "Bill of Exchange";
+            case AS_OUTSIDE_OTHER_CLAIM:
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Send";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Подтвердить погашение требования" : "Debt";
+                    case TransactionAmount.ACTION_HOLD:
+                        return "Hold";
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spend";
+                }
+
+            case AS_INSIDE_ASSETS:
+                return "Digital Asset";
+            case AS_INSIDE_CURRENCY:
+                return "Digital Currency";
+            case AS_INSIDE_UTILITY:
+                return "Digital Utility";
+            case AS_INSIDE_SHARE:
+                return "Digital Share";
+            case AS_INSIDE_BONUS:
+                return "Bonuses, Loyalty Points";
+            case AS_INSIDE_ACCESS:
+                return "Digital Access Rights";
+            case AS_INSIDE_VOTE:
+                return "Digital Vote";
+            case AS_BANK_GUARANTEE:
+                return "Bank Guarantee";
+            case AS_BANK_GUARANTEE_TOTAL:
+                return "Bank Guarantee Total";
+            case AS_INDEX:
+                return "Digital Index";
+            case AS_INSIDE_OTHER_CLAIM:
+                return "Other Digital Right of Claim";
+
+            case AS_ACCOUNTING:
+                return "Accounting";
+        }
+
+        switch (actionType) {
+            case TransactionAmount.ACTION_SEND:
+                return "Send Asset";
+            case TransactionAmount.ACTION_DEBT:
+                return backward ? "Confiscate Debt" : "Debt";
+            case TransactionAmount.ACTION_HOLD:
+                return "Hold Asset";
+            case TransactionAmount.ACTION_SPEND:
+                return "Spend Asset";
         }
 
         return "unknown";
