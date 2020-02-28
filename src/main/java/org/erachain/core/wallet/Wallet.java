@@ -632,7 +632,7 @@ public class Wallet extends Observable implements Observer {
 
         for (Tuple2<Account, Long> account_asset : accounts_assets) {
             this.database.getAccountMap().changeBalance(account_asset.a.getAddress(), false, account_asset.b,
-					BigDecimal.ZERO, isBackward);
+					BigDecimal.ZERO, false);
         }
 
 	}

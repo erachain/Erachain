@@ -262,7 +262,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
                     new BigDecimal(quantity).setScale(0), false, false);
 
             // make HOLD balance
-            creator.changeBalance(dcSet, false, false, asset.getKey(dcSet),
+            creator.changeBalance(dcSet, false, true, asset.getKey(dcSet),
                     new BigDecimal(-quantity).setScale(0), false, false);
 
         } else if (quantity == 0) {
@@ -284,7 +284,7 @@ public class IssueAssetTransaction extends IssueItemRecord {
         AssetCls asset = (AssetCls) this.getItem();
         long quantity = asset.getQuantity();
         if (quantity > 0) {
-            this.creator.changeBalance(this.dcSet, true, false, asset.getKey(this.dcSet),
+            this.creator.changeBalance(this.dcSet, true, true, asset.getKey(this.dcSet),
                     new BigDecimal(quantity).setScale(0), false, false);
 
             // на балансе На Руках - добавляем тоже
