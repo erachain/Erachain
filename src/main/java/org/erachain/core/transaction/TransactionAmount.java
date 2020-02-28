@@ -231,7 +231,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward) {
-        int type = Account.actionType(assetKey, amount);
+        int type = Account.actionType(assetKey, amount, isBackward);
         return type * (isBackward ? -1 : 1);
     }
     public int getActionType() {
@@ -295,8 +295,8 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         
         if (amount == null || amount.signum() == 0)
             return "";
-        
-        int actionType = Account.actionType(assetKey, amount);
+
+        int actionType = Account.actionType(assetKey, amount, isBackward);
         
         switch (actionType) {
             case ACTION_SEND:
@@ -556,27 +556,14 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                     }
                 }
 
-                int actionType = Account.actionType(this.key, this.amount);
+                // BACKWARD - CONFISCATE
+                boolean backward = isBackward();
+
+                int actionType = Account.actionType(this.key, this.amount, backward);
                 int assetType = this.asset.getAssetType();
                 BigDecimal balance;
-                
-                // BACKWARD - CONFISCATE
-                boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
 
                 if (asset.isAccounting()) {
-
-                    switch ((int) absKey) {
-                        case ACTION_SEND:
-                            if (backward)
-                                return INVALID_BACKWARD_ACTION;
-                        case ACTION_DEBT:
-                            ;
-                        case ACTION_HOLD:
-                            if (!backward)
-                                return INVALID_HOLD_DIRECTION;
-                        case ACTION_SPEND:
-                            ;
-                    }
 
                     switch ((int) absKey) {
                         case 111:
@@ -987,7 +974,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     
     @Override
     public void process(Block block, int asDeal) {
-        
+
         super.process(block, asDeal);
 
         if (this.amount == null)
@@ -998,13 +985,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
             return;
-        
-        long absKey = getAbsKey();
-        int actionType = Account.actionType(key, amount);
-        boolean incomeReverse = actionType == ACTION_HOLD;
-        
+
         // BACKWARD - CONFISCATE
-        boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+        boolean backward = isBackward();
+        long absKey = getAbsKey();
+        int actionType = Account.actionType(key, amount, backward);
+        boolean incomeReverse = actionType == ACTION_HOLD;
 
         // ASSET ACTIONS PROCESS - 18165-1
         if (this.asset.isOutsideType()) {
@@ -1100,22 +1086,21 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     public void orphan(Block block, int asDeal) {
 
         super.orphan(block, asDeal);
-        
+
         if (this.amount == null)
             return;
 
         DCSet db = this.dcSet;
-        
+
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
             return;
-        
-        long absKey = getAbsKey();
-        int actionType = Account.actionType(key, amount);
-        boolean incomeReverse = actionType == ACTION_HOLD;
-        
+
         // BACKWARD - CONFISCATE
-        boolean backward = typeBytes[1] == 1 || typeBytes[1] > 1 && (typeBytes[2] & BACKWARD_MASK) > 0;
+        boolean backward = isBackward();
+        long absKey = getAbsKey();
+        int actionType = Account.actionType(key, amount, backward);
+        boolean incomeReverse = actionType == ACTION_HOLD;
 
         String creatorStr = this.creator.getAddress();
         // ASSET TYPE ORPHAN

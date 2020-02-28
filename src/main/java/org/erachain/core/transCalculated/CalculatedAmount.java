@@ -1,15 +1,7 @@
 package org.erachain.core.transCalculated;
 
-import java.math.BigDecimal;
-import java.util.HashSet;
-
-import org.json.simple.JSONObject;
-import org.mapdb.Fun.Tuple2;
-import org.mapdb.Fun.Tuple3;
-
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
-
 import org.erachain.core.BlockChain;
 import org.erachain.core.account.Account;
 import org.erachain.core.crypto.Base58;
@@ -17,6 +9,11 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.utils.NumberAsString;
+import org.json.simple.JSONObject;
+import org.mapdb.Fun.Tuple3;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
 
 /*
 
@@ -100,7 +97,7 @@ public abstract class CalculatedAmount extends Calculated {
     }
     
     public int getActionType() {
-        int type = Account.actionType(this.assetKey, this.amount);
+        int type = Account.actionType(this.assetKey, this.amount, isBackward());
         return type * (isBackward() ? -1 : 1);
     }
     
@@ -258,21 +255,21 @@ public abstract class CalculatedAmount extends Calculated {
     }
         
     public void process() {
-                
+
         if (this.amount == null)
             return;
-        
+
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
             return;
-        
-        long absKey = getAbsKey();
-        int actionType = Account.actionType(this.assetKey, amount);
-        boolean incomeReverse = actionType == TransactionAmount.ACTION_HOLD;
-        
+
         // BACKWARD - CONFISCATE
         boolean backward = this.isBackward();
-        
+
+        long absKey = getAbsKey();
+        int actionType = Account.actionType(this.assetKey, amount, backward);
+        boolean incomeReverse = actionType == TransactionAmount.ACTION_HOLD;
+
         // ASSET ACTIONS PROCESS
         if (this.asset.isOutsideType()) {
             if (actionType == TransactionAmount.ACTION_SEND && backward) {
@@ -381,23 +378,23 @@ public abstract class CalculatedAmount extends Calculated {
     
     @Override
     public void orphan() {
-                
+
         if (this.amount == null)
             return;
-        
+
         //DCSet db = this.dcSet;
-        
+
         int amount_sign = this.amount.compareTo(BigDecimal.ZERO);
         if (amount_sign == 0)
             return;
-        
-        long absKey = getAbsKey();
-        int actionType = Account.actionType(this.assetKey, amount);
-        boolean incomeReverse = actionType == TransactionAmount.ACTION_HOLD;
-        
+
         // BACKWARD - CONFISCATE
         boolean backward = this.isBackward();
-        
+
+        long absKey = getAbsKey();
+        int actionType = Account.actionType(this.assetKey, amount, backward);
+        boolean incomeReverse = actionType == TransactionAmount.ACTION_HOLD;
+
         // ASSET TYPE ORPHAN
         if (this.asset.isOutsideType()) {
             if (actionType == TransactionAmount.ACTION_SEND && backward) {
