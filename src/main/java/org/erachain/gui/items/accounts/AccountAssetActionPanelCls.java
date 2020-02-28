@@ -93,7 +93,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         this.balancePosition = balancePosition;
 
         if (title == null) {
-            this.title = asset.viewAssetTypeActionTitle(backward, actionType);
+            this.title = asset.viewAssetTypeActionTitle(backward, actionType) + ": " + asset.getName();
         } else {
             this.title = title;
         }

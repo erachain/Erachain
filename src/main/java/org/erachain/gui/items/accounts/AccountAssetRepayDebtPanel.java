@@ -21,8 +21,6 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
                 TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);
-        this.jLabel_To.setText(Lang.getInstance().translate("Lender Account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Lender Details") + ":");
 
     }
 

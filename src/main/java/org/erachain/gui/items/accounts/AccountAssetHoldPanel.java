@@ -13,10 +13,6 @@ import org.erachain.lang.Lang;
 
 import java.math.BigDecimal;
 
-//import org.erachain.settings.Settings;
-
-@SuppressWarnings("serial")
-
 public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
