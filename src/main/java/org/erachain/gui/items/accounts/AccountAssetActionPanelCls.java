@@ -104,8 +104,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         // icon.setIcon(null);
         this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, actionType)) + ":");
 
-        this.jLabel_To.setText(Lang.getInstance().translate(asset.viewAssetTypeTarget(backward, actionType) + ":"));
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Details") + ":");
+        this.jLabel_To.setText(Lang.getInstance().translate(
+                asset.viewAssetTypeTarget(backward, actionType) + " " + "Account") + ":");
+        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate(
+                asset.viewAssetTypeTarget(backward, actionType) + " " + "Details") + ":");
 
         this.jButton_ok.setText(Lang.getInstance().translate(asset.viewAssetTypeActionOK(backward, actionType)));
 

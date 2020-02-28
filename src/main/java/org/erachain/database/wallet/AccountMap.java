@@ -147,7 +147,7 @@ public class AccountMap extends DCUMapImpl<String, Integer> {
     }
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(String address, boolean subtract, long key, BigDecimal amount) {
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(String address, boolean subtract, long key, BigDecimal amount, boolean isBackward) {
 
         int actionType = Account.actionType(key, amount, isBackward);
         long absKey;
