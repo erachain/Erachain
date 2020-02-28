@@ -739,7 +739,7 @@ public class Account {
      */
 
     // change BALANCE - add or subtract amount by KEY + AMOUNT = TYPE
-    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, long key,
+    public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, boolean isBackward, long key,
                                                                     BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
         int actionType = actionType(key, amount_in, isBackward);
