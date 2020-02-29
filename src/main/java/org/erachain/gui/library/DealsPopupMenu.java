@@ -12,6 +12,7 @@ import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 import org.erachain.settings.Settings;
 import org.erachain.utils.URLViewer;
+import org.mapdb.Fun;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -237,7 +239,13 @@ public class DealsPopupMenu extends JPopupMenu {
     }
     
     public void init() {
-        
+
+        this.sendAsset.setEnabled(true);
+        this.holdAsset.setEnabled(true)
+        this.debtAsset.setEnabled(true);
+        this.debtAssetReturn.setEnabled(true);
+        this.debtAssetBackward.setEnabled(true);
+
         switch (this.asset.getAssetType()) {
             case AssetCls.AS_OUTSIDE_GOODS:
                 this.sendAsset.setText(Lang.getInstance().translate("Transfer to the ownership"));
@@ -473,6 +481,20 @@ public class DealsPopupMenu extends JPopupMenu {
                 //this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
                 this.debtAssetBackward.setText(Lang.getInstance().translate("Отозвать банковскую гарантию"));
                 this.debtAssetBackward.setVisible(true);
+
+                Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                        balance = pubKey.getBalance(asset.getKey());
+                if (balance.a.b.signum() > 0) {
+                    if (balance.b.b.signum() < 1) {
+                        this.holdAsset.setEnabled(false);
+                        this.debtAssetReturn.setEnabled(false);
+                    }
+                } else if (balance.b.b.signum() > 1) {
+                    this.sendAsset.setEnabled(false);
+                    this.debtAsset.setEnabled(false);
+                    this.holdAsset.setEnabled(false);
+                    this.debtAssetReturn.setEnabled(false);
+                }
 
                 break;
 
