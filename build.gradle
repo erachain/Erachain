@@ -158,6 +158,7 @@ task CopyResourse {
         into 'build/libs/Erachain'
         include 'Erachain Licence*'
         include 'peers*'
+        include '*.bat'
     }
 
     copy {
