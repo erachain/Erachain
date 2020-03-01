@@ -231,8 +231,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward) {
-        int type = Account.actionType(assetKey, amount, isBackward);
-        return type * (isBackward ? -1 : 1);
+        return Account.actionType(assetKey, amount, isBackward);
     }
     public int getActionType() {
         return getActionType(this.key, this.amount, this.isBackward());
@@ -369,9 +368,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
             transaction.put("asset", this.getAbsKey());
             transaction.put("assetKey", this.getAbsKey());
             transaction.put("amount", this.amount.toPlainString());
-            ///transaction.put("action_key", this.getActionType());
             transaction.put("actionKey", this.getActionType());
-            //transaction.put("action_name", this.viewActionType());
             transaction.put("actionName", this.viewActionType());
             if (this.isBackward())
                 transaction.put("backward", this.isBackward());
