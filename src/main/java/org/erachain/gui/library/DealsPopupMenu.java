@@ -522,18 +522,18 @@ public class DealsPopupMenu extends JPopupMenu {
                     } else {
                         this.debtAssetBackward.setEnabled(false);
                     }
-                } else if (balance.b.b.signum() > 1) {
-                    this.sendAsset.setEnabled(false);
-                    this.debtAsset.setEnabled(false);
-                    if (balance.c.b.signum() > 1) {
-                        this.holdAsset.setEnabled(false);
-                    }
                 } else {
                     this.sendAsset.setEnabled(false);
-                    this.holdAsset.setEnabled(false);
                     this.debtAsset.setEnabled(false);
-                    this.debtAssetReturn.setEnabled(false);
                     this.debtAssetBackward.setEnabled(false);
+                    if (balance.b.b.signum() <= 0) {
+                        this.debtAssetReturn.setEnabled(false);
+                        this.holdAsset.setEnabled(false);
+                    } else {
+                        if (balance.c.b.signum() > 0) {
+                            this.holdAsset.setEnabled(false);
+                        }
+                    }
                 }
 
                 break;
