@@ -959,9 +959,31 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
                 return "Digital Vote";
             case AS_BANK_GUARANTEE:
-                return "Bank Guarantee";
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Recipient";
+                    case TransactionAmount.ACTION_DEBT:
+                        return "Beneficiary";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Guarantee";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Guarantee" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spender";
+                }
             case AS_BANK_GUARANTEE_TOTAL:
-                return "Bank Guarantee Total";
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Recipient";
+                    case TransactionAmount.ACTION_DEBT:
+                        return "Principal";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Guarantee";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Guarantee" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Spender";
+                }
             case AS_INDEX:
                 return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:

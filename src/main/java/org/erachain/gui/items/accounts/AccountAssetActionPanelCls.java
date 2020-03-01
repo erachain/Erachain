@@ -82,8 +82,14 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         else
             this.asset = assetIn;
 
+        if (title == null) {
+            this.title = asset.viewAssetTypeActionTitle(backward, actionType);
+        } else {
+            this.title = title;
+        }
+
         if (panelName == null) {
-            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, actionType)));
+            setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, actionType) + " [" + asset.getKey() + " ]"));
         } else {
             setName(Lang.getInstance().translate(panelName));
         }
@@ -92,14 +98,10 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
         recipient = accountTo;
         this.balancePosition = balancePosition;
 
-        if (title == null) {
-            this.title = asset.viewAssetTypeActionTitle(backward, actionType) + ": " + asset.getName();
-        } else {
-            this.title = title;
-        }
-        this.jLabel_Title.setText(Lang.getInstance().translate(this.title).replace("%asset%", asset.viewName()));
 
         initComponents(message);
+
+        this.jLabel_Title.setText(Lang.getInstance().translate(this.title).replace("%asset%", asset.viewName()));
 
         // icon.setIcon(null);
         this.jLabel_Account.setText(Lang.getInstance().translate(asset.viewAssetTypeCreator(backward, actionType)) + ":");
@@ -129,6 +131,7 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
 
         // favorite combo box
         jComboBox_Asset.setModel(new ComboBoxAssetsModel());
+        jComboBox_Asset.setEditable(false);
 
         if (asset.getKey() > 0 && asset.getKey() < 1000) {
             this.jTextArea_Account_Description.setText(Lang.getInstance().translate(asset.viewDescription()));
@@ -183,8 +186,11 @@ public class AccountAssetActionPanelCls extends javax.swing.JPanel {
                         jComboBox_Account.repaint();
                     }
 
-                    if (title != null) {
-                        jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+                    jLabel_Title.setText(Lang.getInstance().translate(title).replace("%asset%", asset.viewName()));
+                    if (panelName == null) {
+                        setName(Lang.getInstance().translate(asset.viewAssetTypeAction(backward, actionType) + " ]" + asset.getKey() + " ]"));
+                    } else {
+                        setName(Lang.getInstance().translate(panelName));
                     }
 
                     // set scale

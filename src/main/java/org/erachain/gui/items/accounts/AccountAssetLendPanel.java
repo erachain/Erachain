@@ -18,12 +18,11 @@ import org.erachain.lang.Lang;
 public class AccountAssetLendPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetLendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(false, -1, "Lend", assetIn, "If You want to give a loan asset %asset%, fill in this form", TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
+        // "If You want to give a loan asset %asset%, fill in this form"
+        super(false, -1, null, assetIn,
+                null, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         //	icon.setIcon(null);
-        this.jButton_ok.setText(Lang.getInstance().translate("Lend"));
-        this.jLabel_To.setText(Lang.getInstance().translate("Debtor account") + ":");
-        this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Debtor details") + ":");
 
     }
 
