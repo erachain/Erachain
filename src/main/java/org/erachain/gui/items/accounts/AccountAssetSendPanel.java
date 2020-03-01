@@ -20,7 +20,7 @@ public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
     public boolean noRecive;
 
     public AccountAssetSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(false, -1, null, assetIn, null, balancePosition, accountFrom, accountTo, message);
+        super(false, null, assetIn, null, balancePosition, accountFrom, accountTo, message);
 
         //  icon.setIcon(null);
         this.jLabel_Recive_Detail.setText(Lang.getInstance().translate("Receiver details") + ":");

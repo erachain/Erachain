@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public class AccountAssetHoldPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetHoldPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(true, TransactionAmount.ACTION_HOLD, null, assetIn, null, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
+        super(true, null, assetIn, null, TransactionAmount.ACTION_HOLD, accountFrom, accountTo, null);
 
         //	icon.setIcon(null);
 

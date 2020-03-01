@@ -17,7 +17,7 @@ public class AccountAssetRepayDebtPanel extends AccountAssetActionPanelCls {
     // private final MessagesTableModel messagesTableModel;
 
     public AccountAssetRepayDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(false, TransactionAmount.ACTION_REPAY_DEBT, null, assetIn, null,
+        super(false, null, assetIn, null,
                 TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);

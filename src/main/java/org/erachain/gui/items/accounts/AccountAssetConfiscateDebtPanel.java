@@ -18,11 +18,12 @@ import org.erachain.lang.Lang;
 public class AccountAssetConfiscateDebtPanel extends AccountAssetActionPanelCls {
 
     public AccountAssetConfiscateDebtPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person) {
-        super(false, -1, "Confiscate Debt", assetIn, null, TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
+        super(true, null, assetIn, null,
+                TransactionAmount.ACTION_DEBT, accountFrom, accountTo, null);
 
         // icon.setIcon(null);
 
-      }
+    }
 
     @Override
     public void onSendClick() {
