@@ -699,9 +699,29 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
                 return "Digital Vote";
             case AS_BANK_GUARANTEE:
-                return "Bank Guarantee";
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать банковскую гарантию";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозвать банковскую гарантию" : "Выдать банковскую гарантию";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Вернуть банковскую гарантию";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Акцептовать банковскую гарантию" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return null;
+                }
             case AS_BANK_GUARANTEE_TOTAL:
-                return "Bank Guarantee Total";
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передать учетную банковскую гарантию";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Выдать учетную банковскую гарантию" : "Забрать учетную банковскую гарантию";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Вернуть учетную банковскую гарантию";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Hold" : null;
+                }
             case AS_INDEX:
                 return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:
@@ -724,7 +744,7 @@ public abstract class AssetCls extends ItemCls {
                 return "Spend";
         }
 
-        return "unknown";
+        return null;
     }
 
     public String viewAssetTypeActionTitle(boolean backward, int actionType) {
@@ -778,9 +798,31 @@ public abstract class AssetCls extends ItemCls {
             case AS_INSIDE_VOTE:
                 return "Digital Vote";
             case AS_BANK_GUARANTEE:
-                return "Bank Guarantee";
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передача банковской гарантии";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозыв банковской гарантии" : "Выдача банковской гарантии";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Возврат банковской гарантии";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Акцептование банковской гарантии" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Погашение банковской гарантии";
+                }
             case AS_BANK_GUARANTEE_TOTAL:
-                return "Bank Guarantee Total";
+                switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Передача учетной банковскую гарантию";
+                    case TransactionAmount.ACTION_DEBT:
+                        return backward ? "Отозыв учетной банковской гарантии" : "Выдача учетной банковской гарантии";
+                    case TransactionAmount.ACTION_REPAY_DEBT:
+                        return "Возврат учетной банковскую гарантию";
+                    case TransactionAmount.ACTION_HOLD:
+                        return backward ? "Акцептование учетной банковской гарантии" : null;
+                    case TransactionAmount.ACTION_SPEND:
+                        return "Погашение учетной банковской гарантии";
+                }
             case AS_INDEX:
                 return "Digital Index";
             case AS_INSIDE_OTHER_CLAIM:

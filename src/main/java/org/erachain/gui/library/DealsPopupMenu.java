@@ -241,10 +241,53 @@ public class DealsPopupMenu extends JPopupMenu {
     public void init() {
 
         this.sendAsset.setEnabled(true);
-        this.holdAsset.setEnabled(true)
+        this.holdAsset.setEnabled(true);
         this.debtAsset.setEnabled(true);
         this.debtAssetReturn.setEnabled(true);
         this.debtAssetBackward.setEnabled(true);
+
+        String actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SEND);
+        if (actionName == null) {
+            this.sendAsset.setVisible(false);
+        } else {
+            this.sendAsset.setText(Lang.getInstance().translate(actionName));
+            this.sendAsset.setVisible(true);
+        }
+
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_HOLD);
+        if (actionName == null) {
+            this.holdAsset.setVisible(false);
+        } else {
+            this.holdAsset.setText(Lang.getInstance().translate(actionName));
+            this.holdAsset.setVisible(true);
+        }
+
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_DEBT);
+        if (actionName == null) {
+            this.debtAsset.setVisible(false);
+        } else {
+            this.debtAsset.setText(Lang.getInstance().translate(actionName));
+            this.debtAsset.setVisible(true);
+        }
+
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_REPAY_DEBT);
+        if (actionName == null) {
+            this.debtAssetReturn.setVisible(false);
+        } else {
+            this.debtAssetReturn.setText(Lang.getInstance().translate(actionName));
+            this.debtAssetReturn.setVisible(true);
+        }
+
+        actionName = asset.viewAssetTypeAction(true, TransactionAmount.ACTION_DEBT);
+        if (actionName == null) {
+            this.debtAssetBackward.setVisible(false);
+        } else {
+            this.debtAssetBackward.setText(Lang.getInstance().translate(actionName));
+            this.debtAssetBackward.setVisible(true);
+        }
+
+        Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
+                balance;
 
         switch (this.asset.getAssetType()) {
             case AssetCls.AS_OUTSIDE_GOODS:
@@ -469,62 +512,42 @@ public class DealsPopupMenu extends JPopupMenu {
                 break;
 
             case AssetCls.AS_BANK_GUARANTEE:
-                this.sendAsset.setText(Lang.getInstance().translate("Передать банковскую гарантию"));
 
-                this.holdAsset.setText(Lang.getInstance().translate("Акцептовать банковскую гарантию"));
-                this.holdAsset.setVisible(true);
-
-                this.debtAsset.setText(Lang.getInstance().translate("Выдать банковскую гарантию"));
-                this.debtAsset.setVisible(true);
-                this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть банковскую гарантию"));
-                this.debtAssetReturn.setVisible(true);
-                //this.debtAssetBackward.setText(Lang.getInstance().translate("Подтвердить получение выплаты"));
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Отозвать банковскую гарантию"));
-                this.debtAssetBackward.setVisible(true);
-
-                Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>
-                        balance = pubKey.getBalance(asset.getKey());
+                balance = pubKey.getBalance(asset.getKey());
                 if (balance.a.b.signum() > 0) {
-                    if (balance.b.b.signum() < 1) {
-                        this.holdAsset.setEnabled(false);
-                        this.debtAssetReturn.setEnabled(false);
+                    this.holdAsset.setEnabled(false);
+                    this.debtAssetReturn.setEnabled(false);
+                    if (balance.b.b.signum() < 0) {
+                        this.debtAsset.setEnabled(false);
+                    } else {
+                        this.debtAssetBackward.setEnabled(false);
                     }
                 } else if (balance.b.b.signum() > 1) {
                     this.sendAsset.setEnabled(false);
                     this.debtAsset.setEnabled(false);
+                    if (balance.c.b.signum() > 1) {
+                        this.holdAsset.setEnabled(false);
+                    }
+                } else {
+                    this.sendAsset.setEnabled(false);
                     this.holdAsset.setEnabled(false);
+                    this.debtAsset.setEnabled(false);
                     this.debtAssetReturn.setEnabled(false);
+                    this.debtAssetBackward.setEnabled(false);
                 }
 
                 break;
 
             case AssetCls.AS_BANK_GUARANTEE_TOTAL:
-                this.sendAsset.setText(Lang.getInstance().translate("Передать учетную банковскую гарантию"));
 
-                //this.holdAsset.setText(Lang.getInstance().translate("Акцептовать учетную банковскую гарантию"));
-                this.holdAsset.setVisible(false);
+                balance = pubKey.getBalance(asset.getKey());
+                if (pubKey.equals(asset.getOwner()) || balance.a.b.signum() > 0) {
 
-                this.debtAsset.setText(Lang.getInstance().translate("Выдать учетную банковскую гарантию"));
-                this.debtAsset.setVisible(true);
-                //this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть учетную банковскую гарантию"));
-                this.debtAssetReturn.setVisible(false);
-                this.debtAssetBackward.setText(Lang.getInstance().translate("Отозвать учетную банковскую гарантию"));
-                this.debtAssetBackward.setVisible(true);
-
-                break;
-
-            case AssetCls.AS_INDEX:
-                this.sendAsset.setText(Lang.getInstance().translate("Transfer index to the ownership"));
-
-                this.holdAsset.setText(Lang.getInstance().translate("Take the reception into balance"));
-                this.holdAsset.setVisible(true);
-
-                //this.debtAsset.setText(Lang.getInstance().translate("Передать в долг"));
-                this.debtAsset.setVisible(false);
-                //this.debtAssetReturn.setText(Lang.getInstance().translate("Вернуть долг"));
-                this.debtAssetReturn.setVisible(false);
-                //this.debtAssetBackward.setText(Lang.getInstance().translate("Конфисковать долг"));
-                this.debtAssetBackward.setVisible(false);
+                } else {
+                    this.sendAsset.setEnabled(false);
+                    this.debtAsset.setEnabled(false);
+                    this.debtAssetReturn.setEnabled(false);
+                }
 
                 break;
 
@@ -542,6 +565,7 @@ public class DealsPopupMenu extends JPopupMenu {
                 this.debtAssetBackward.setVisible(true);
 
                 break;
+
         }
     }
 }
