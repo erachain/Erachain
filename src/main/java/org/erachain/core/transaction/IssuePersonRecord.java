@@ -66,17 +66,6 @@ public class IssuePersonRecord extends IssueItemRecord {
         return 0L;
     }
 
-    // RETURN START KEY in tot GEMESIS
-    public long getStartKey(int height) {
-
-        if (height < BlockChain.VERS_4_11) {
-            return 0l;
-        }
-
-        return START_KEY;
-
-    }
-
     //PARSE CONVERT
 
     public static Transaction Parse(byte[] data, int asDeal) throws Exception {

@@ -369,4 +369,9 @@ public class TransactionFinalMapImplTest {
 
     }
 
+    // тут нет проверок
+    @Test
+    public void deleteHeight() {
+    }
+
 }

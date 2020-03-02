@@ -11,9 +11,11 @@ import org.erachain.datachain.CompletedOrderMap;
 import org.erachain.datachain.DCSet;
 import org.erachain.datachain.OrderMap;
 import org.erachain.datachain.TradeMap;
+import org.erachain.dbs.IteratorCloseable;
 import org.json.simple.JSONObject;
 import org.mapdb.Fun;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -1068,46 +1070,53 @@ public class Order implements Comparable<Order> {
         BigDecimal thisAmountFulfilledWant = BigDecimal.ZERO;
 
         //ORPHAN TRADES
-        for (Trade trade : this.getInitiatedTrades(this.dcSet)) {
-            Order target = trade.getTargetOrder(this.dcSet);
+        Trade trade;
+        try (IteratorCloseable<Fun.Tuple2<Long, Long>> iterator = tradesMap.getIteratorByInitiator(this.id)) {
+            while (iterator.hasNext()) {
 
-            //REVERSE FUNDS
-            BigDecimal tradeAmountHave = trade.getAmountHave();
-            BigDecimal tradeAmountWant = trade.getAmountWant();
+                trade = tradesMap.get(iterator.next());
+                Order target = trade.getTargetOrder(this.dcSet);
 
-            //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
-            // - на всякий случай удалим его в любом случае
-            completedMap.delete(target);
+                //REVERSE FUNDS
+                BigDecimal tradeAmountHave = trade.getAmountHave();
+                BigDecimal tradeAmountWant = trade.getAmountWant();
 
-            //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
-            /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
-            ordersMap.delete(target);
+                //DELETE FROM COMPLETED ORDERS- он может быть был отменен, поэтому нельзя проверять по Fulfilled
+                // - на всякий случай удалим его в любом случае
+                completedMap.delete(target);
 
-            //REVERSE FULFILLED
-            target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
-            thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
+                //// Пока не изменились Остатки и цена по Остаткм не съехала, удалим из таблицы ордеров
+                /// иначе вторичный ключ останется так как он не будет найден из-за измененой "цены по остаткам"
+                ordersMap.delete(target);
 
-            target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey, tradeAmountWant, false, false);
+                //REVERSE FULFILLED
+                target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
+                thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-            // Учтем что у стороны ордера обновилась форжинговая информация
-            if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
-                block.addForgingInfoUpdate(target.getCreator());
-            }
+                target.getCreator().changeBalance(this.dcSet, true, target.wantAssetKey, tradeAmountWant, false, false);
+                target.getCreator().changeBalance(this.dcSet, true, true, target.wantAssetKey, tradeAmountWant, false, false);
 
-            //UPDATE ORDERS
-            ordersMap.put(target);
-
-            //REMOVE TRADE FROM DATABASE
-            tradesMap.delete(trade);
-
-            if (BlockChain.CHECK_BUGS > 3) {
-                if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
-                    Long err = null;
-                    err++;
+                // Учтем что у стороны ордера обновилась форжинговая информация
+                if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
+                    block.addForgingInfoUpdate(target.getCreator());
                 }
+
+                //UPDATE ORDERS
+                ordersMap.put(target);
+
+                //REMOVE TRADE FROM DATABASE
+                tradesMap.delete(trade);
+
+                if (BlockChain.CHECK_BUGS > 3) {
+                    if (tradesMap.contains(new Fun.Tuple2<>(trade.getInitiator(), trade.getTarget()))) {
+                        Long err = null;
+                        err++;
+                    }
+                }
+
+
             }
-
-
+        } catch (IOException e) {
         }
 
         //// тут нужно получить остатки все из текущего состояния иначе индексы по измененой цене с остатков не удалятся

@@ -1,5 +1,6 @@
 package org.erachain.datachain;
 
+import com.google.common.collect.Iterators;
 import lombok.extern.slf4j.Slf4j;
 import org.erachain.core.account.PrivateKeyAccount;
 import org.erachain.core.block.GenesisBlock;
@@ -11,6 +12,7 @@ import org.erachain.core.transaction.CreateOrderTransaction;
 import org.erachain.core.transaction.IssueAssetTransaction;
 import org.erachain.core.transaction.Transaction;
 import org.erachain.database.IDB;
+import org.erachain.dbs.IteratorCloseable;
 import org.erachain.ntp.NTP;
 import org.erachain.settings.Settings;
 import org.erachain.utils.SimpleFileVisitorForRecursiveFolderDeletion;
@@ -24,6 +26,7 @@ import java.util.Iterator;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 @Slf4j
 public class TradeMapImplTest {
@@ -116,6 +119,75 @@ public class TradeMapImplTest {
         orderCreation = new CreateOrderTransaction(accountA, keyA, 3l, BigDecimal.valueOf(10), BigDecimal.valueOf(100),
                 (byte) 0, timestamp, 0l);
 
+    }
+
+    @Test
+    public void getIteratorInForkByOrder() {
+
+        for (int dbs : TESTED_DBS) {
+
+            try {
+                init(dbs);
+
+                IteratorCloseable<Fun.Tuple2<Long, Long>> iterator;
+                int index = 1;
+
+                TradeMap tradesMap = dcSet.getTradeMap();
+                long haveKey = 2L;
+                long wantKey = 1L;
+
+                int start = 444;
+                int stop = 433;
+
+                long initiatorID = Transaction.makeDBRef(start, 3);
+
+                long targetID = Transaction.makeDBRef(10, 1);
+                Trade trade = new Trade(initiatorID, targetID, haveKey, wantKey,
+                        new BigDecimal("22"), new BigDecimal("44"),
+                        3, 5, index++);
+                tradesMap.put(trade);
+
+                trade = new Trade(Transaction.makeDBRef(start - 1, 3), targetID, haveKey, wantKey,
+                        new BigDecimal("22"), new BigDecimal("44"),
+                        3, 5, index++);
+                tradesMap.put(trade);
+
+                trade = new Trade(Transaction.makeDBRef(stop + 1, 4), targetID, haveKey, wantKey,
+                        new BigDecimal("22"), new BigDecimal("44"),
+                        3, 5, index++);
+                tradesMap.put(trade);
+
+                trade = new Trade(Transaction.makeDBRef(stop, 4), targetID, haveKey, wantKey,
+                        new BigDecimal("22"), new BigDecimal("44"),
+                        3, 5, index++);
+                tradesMap.put(trade);
+
+                DCSet forked = dcSet.fork();
+                TradeMapImpl forkedTradesMap = forked.getTradeMap();
+
+                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
+                assertEquals(1, Iterators.size(iterator));
+
+                // ADD to FORK
+                trade = new Trade(initiatorID, Transaction.makeDBRef(stop, 4), haveKey, wantKey,
+                        new BigDecimal("25"), new BigDecimal("44"),
+                        3, 5, index++);
+                forkedTradesMap.put(trade);
+
+                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
+                assertEquals(2, Iterators.size(iterator));
+
+                // DELETE in FORK
+                Trade removed = forkedTradesMap.remove(new Fun.Tuple2<Long, Long>(initiatorID, targetID));
+                assertNotEquals(null, removed);
+                iterator = forkedTradesMap.getIteratorByInitiator(initiatorID);
+                assertEquals(1, Iterators.size(iterator));
+
+
+            } finally {
+                dcSet.close();
+            }
+        }
     }
 
     @Test

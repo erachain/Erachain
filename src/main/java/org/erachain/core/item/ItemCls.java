@@ -647,7 +647,7 @@ public abstract class ItemCls implements ExplorerJsonLine {
             map.decrementDelete(thisKey);
 
             if (BlockChain.CHECK_BUGS > 1
-                    && map.getLastKey() != thisKey - 1) {
+                    && map.getLastKey() != thisKey - 1 && !BlockChain.isNovaAsset(thisKey)) {
                 LOGGER.error("After delete KEY: " + key + " != map.value.key - 1: " + map.getLastKey());
                 Long error = null;
                 error++;

@@ -20,8 +20,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
     //private static final int BASE_LENGTH = Transaction.BASE_LENGTH;
 
-    public static final long START_KEY = 0; // << 20;
-
     protected ItemCls item;
     protected Long key;
 
@@ -39,7 +37,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     }
 
     public IssueItemRecord(byte[] typeBytes, String NAME_ID, PublicKeyAccount creator, ItemCls item, byte[] signature) {
-        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0l, null);
+        this(typeBytes, NAME_ID, creator, item, (byte) 0, 0L, null);
         this.signature = signature;
         if (this.item.getReference() == null) this.item.setReference(signature);
         //item.resolveKey(DLSet.getInstance());
@@ -66,6 +64,11 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
         return key;
     }
 
+    // RETURN START KEY if not GENESIS
+    public long getStartKey() {
+        return 0L;
+    }
+
     @Override
     public String getTitle() {
         return TYPE_NAME + ": " + this.item.getName();
@@ -79,9 +82,6 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
     public String getItemDescription() {
         return item.getDescription();
     }
-
-    // RETURN START KEY in tot GEMESIS
-    public abstract long getStartKey(int height);
 
     @Override
     public boolean hasPublicText() {
@@ -207,7 +207,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
             this.item.setReference(this.signature);
 
         //INSERT INTO DATABASE
-        key = this.item.insertToMap(this.dcSet, this.getStartKey(this.height));
+        key = this.item.insertToMap(this.dcSet, this.getStartKey());
 
     }
 
@@ -219,7 +219,7 @@ public abstract class IssueItemRecord extends Transaction implements Itemable {
 
         //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 1");
         //DELETE FROM DATABASE
-        long key = this.item.deleteFromMap(this.dcSet, START_KEY);
+        long key = this.item.deleteFromMap(this.dcSet, getStartKey());
         //logger.debug("<<<<< org.erachain.core.transaction.IssueItemRecord.orphan 2");
     }
 

@@ -103,7 +103,7 @@ public class GenesisIssueItemRecord extends GenesisRecord {
     public void process(Block block, int asDeal) {
 
         //INSERT INTO DATABASE
-        this.item.insertToMap(this.dcSet, 0l);
+        this.item.insertToMap(this.dcSet, 0L);
 
     }
 
@@ -112,7 +112,7 @@ public class GenesisIssueItemRecord extends GenesisRecord {
     public void orphan(Block block, int asDeal) {
 
         //DELETE FROM DATABASE
-        this.item.deleteFromMap(this.dcSet, 0l);
+        this.item.deleteFromMap(this.dcSet, 0L);
 
     }
 

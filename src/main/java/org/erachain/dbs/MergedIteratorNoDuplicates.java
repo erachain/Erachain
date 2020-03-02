@@ -2,10 +2,7 @@ package org.erachain.dbs;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * пробегает по итератором сортируя значения и пи этом пропуская дублирующие значения на входе
@@ -20,6 +17,7 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
     protected T lastNext;
     final Comparator<? super T> itemComparator;
     protected boolean isClosed;
+    Map deleted;
 
     protected MergedIteratorNoDuplicates() {
         queue = null;
@@ -55,6 +53,12 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
         }
     }
 
+    public MergedIteratorNoDuplicates(Iterable<? extends IteratorCloseable<? extends T>> iterators,
+                                      final Comparator<? super T> itemComparator, Map deleted) {
+        this(iterators, itemComparator);
+        this.deleted = deleted;
+    }
+
     @Override
     public boolean hasNext() {
         return !queue.isEmpty();
@@ -68,7 +72,10 @@ public class MergedIteratorNoDuplicates<T> extends IteratorCloseableImpl<T> {
             if (nextIter.hasNext()) {
                 queue.add(nextIter);
             }
-            if (itemComparator.compare(next, lastNext) != 0) {
+            if ((lastNext == null || itemComparator.compare(next, lastNext) != 0)
+                    // и если есть таблица удаленных записей то исключим их
+                    && (deleted == null || !deleted.containsKey(next))
+            ) {
                 lastNext = next;
                 break;
             }
