@@ -488,6 +488,10 @@ public class Synchronizer extends Thread {
                                 blockFromPeer.setFromTrustedPeer();
                             }
                         } catch (Exception e) {
+                            if (ctrl.isOnStopping()) {
+                                throw new Exception("on stopping");
+                            }
+
                             blockBuffer.stopThread();
                             peer.ban("get block BUFFER - " + e.getMessage());
                             throw new Exception(e);
@@ -545,6 +549,10 @@ public class Synchronizer extends Thread {
                                 // тут может парсинг транзакций упасть
                                 blockFromPeer.getTransactions();
                             } catch (Exception e) {
+                                if (ctrl.isOnStopping()) {
+                                    throw new Exception("on stopping");
+                                }
+
                                 LOGGER.debug(e.getMessage(), e);
                                 errorMess = "invalid PARSE! " + e.getMessage();
                                 banTime = BAN_BLOCK_TIMES << 1;
@@ -553,6 +561,7 @@ public class Synchronizer extends Thread {
                                 LOGGER.debug(e.getMessage(), e);
                                 errorMess = "invalid PARSE! " + e.getMessage();
                                 banTime = BAN_BLOCK_TIMES << 1;
+                                ctrl.stopAll(339);
                                 break;
                             }
 
@@ -569,14 +578,21 @@ public class Synchronizer extends Thread {
                                     database.close();
                                 }
                             } catch (Exception e) {
+
+                                if (ctrl.isOnStopping()) {
+                                    throw new Exception("on stopping");
+                                }
+
                                 LOGGER.debug(e.getMessage(), e);
                                 errorMess = "error io isValid! " + e.getMessage();
                                 banTime = BAN_BLOCK_TIMES;
+                                ctrl.stopAll(340);
                                 break;
                             } catch (Throwable e) {
                                 LOGGER.debug(e.getMessage(), e);
                                 errorMess = "error io isValid! " + e.getMessage();
                                 banTime = BAN_BLOCK_TIMES;
+                                ctrl.stopAll(341);
                                 break;
                             }
                             LOGGER.debug("BLOCK is Valid");
@@ -608,6 +624,14 @@ public class Synchronizer extends Thread {
                             } else {
                                 throw new Exception(e);
                             }
+                        } catch (Throwable e) {
+
+                            // STOP BLOCKBUFFER
+                            blockBuffer.stopThread();
+
+                            LOGGER.error(e.getMessage(), e);
+                            ctrl.stopAll(343);
+
                         }
 
                     }
