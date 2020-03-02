@@ -370,6 +370,8 @@ public class Synchronizer extends Thread {
                 return;
             }
 
+            LOGGER.debug("*** TRY writeToParent");
+
             // сюда может прити только если проверка прошла успешно
 
             // NEW BLOCKS ARE ALL VALID SO WE CAN ORPHAN THEM FOR REAL NOW
@@ -385,12 +387,14 @@ public class Synchronizer extends Thread {
             dbsBroken = false;
 
             // теперь все транзакции в пул опять закидываем
-            for (Transaction transaction: orphanedTransactions.values()) {
+            for (Transaction transaction : orphanedTransactions.values()) {
                 if (ctrl.isOnStopping())
                     throw new Exception("on stopping");
 
                 ctrl.transactionsPool.offerMessage(transaction);
             }
+        } finally {
+            LOGGER.debug("*** END writeToParent");
         }
 
         if (dbsBroken) {

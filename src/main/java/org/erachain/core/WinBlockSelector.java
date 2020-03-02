@@ -62,14 +62,18 @@ public class WinBlockSelector extends MonitoredThread {
         // ASK BLOCK FROM BLOCKCHAIN
         Block newBlock = blockWinMessage.getBlock();
 
+        String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
+                + newBlock.toString();
+
         // если мы синхронизируемся - то берем победный блок а потои
         // его перепроверим при выходе из синхронизации
         if (this.controller.isStatusSynchronizing()) {
+            LOGGER.info("ADD unchecked on Synchronizing - " + info);
             blockChain.setWaitWinBufferUnchecked(newBlock);
+            // и разошлем его дальше тоже, так как если мы выпали в оставание то всем свои перешлем все равно
+            message.getSender().network.broadcastWinBlock(blockWinMessage, false);
             return;
         }
-        String info = " received new WIN Block from " + blockWinMessage.getSender().getAddress() + " "
-                + newBlock.toString();
         LOGGER.info(info);
 
         if (!newBlock.isValidHead(dcSet)) {

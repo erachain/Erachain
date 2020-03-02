@@ -795,8 +795,10 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             } catch (Exception e) {
                                 LOGGER.error(e.getMessage(), e);
                             }
+
+                        } else {
+                            LOGGER.info("SyncTo: peer not found");
                         }
-                        LOGGER.info("SyncTo: peer not found");
 
                     } finally {
                         syncTo = 0;
@@ -1312,8 +1314,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                             LOGGER.error(e.getMessage(), e);
                         }
 
-                        bchain.clearWaitWinBuffer();
-
                         if (needRemoveInvalids != null) {
                             clearInvalids();
                         } else {
@@ -1349,7 +1349,6 @@ public class BlockGenerator extends MonitoredThread implements Observer {
                     this.setMonitorStatus("local_status " + viewStatus());
 
                     this.solvingReference = null;
-                    bchain.clearWaitWinBuffer();
 
                     afterUpdatePeer = ctrl.update(shift_height);
 

@@ -1197,7 +1197,9 @@ public class BlockChain {
      * @param block
      */
     public void setWaitWinBufferUnchecked(Block block) {
-        if (this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
+        if (true || // тут же мы без проверки должны вносить любой блок
+                // иначе просто прилетевший блок в момент синхронизации не будет принят
+                this.waitWinBuffer == null || block.compareWin(waitWinBuffer) > 0) {
             if (this.waitWinBuffer != null) {
                 waitWinBuffer.close();
             }
