@@ -1093,8 +1093,7 @@ public class Order implements Comparable<Order> {
                 target.setFulfilledHave(target.getFulfilledHave().subtract(tradeAmountHave));
                 thisAmountFulfilledWant = thisAmountFulfilledWant.add(tradeAmountHave);
 
-                target.getCreator().changeBalance(this.dcSet, true, target.wantAssetKey, tradeAmountWant, false, false);
-                target.getCreator().changeBalance(this.dcSet, true, true, target.wantAssetKey, tradeAmountWant, false, false);
+                target.getCreator().changeBalance(this.dcSet, true, false, target.wantAssetKey, tradeAmountWant, false, false);
 
                 // Учтем что у стороны ордера обновилась форжинговая информация
                 if (target.wantAssetKey == Transaction.RIGHTS_KEY && block != null) {
