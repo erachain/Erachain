@@ -1088,17 +1088,18 @@ public class Synchronizer extends Thread {
                     try {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
+                        ctrl.stopAll(345);
+                        return;
+
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(342);
+                        ctrl.stopAll(346);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
                         ctrl.stopAll(347);
                         return;
                     }
-
-                    throw error;
 
                 } else if (thrown != null) {
 
@@ -1107,17 +1108,17 @@ public class Synchronizer extends Thread {
                     try {
                         // was BREAK - try ROLLBACK
                         dcSet.rollback();
+                        ctrl.stopAll(351);
+                        return;
                     } catch (Exception e) {
                         LOGGER.error(e.getMessage(), e);
                         ctrl.stopAll(352);
                         return;
                     } catch (Throwable e) {
                         LOGGER.error(e.getMessage(), e);
-                        ctrl.stopAll(355);
+                        ctrl.stopAll(353);
                         return;
                     }
-
-                    throw new Exception(thrown);
 
                 }
 

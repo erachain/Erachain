@@ -323,6 +323,8 @@ public class RVouch extends Transaction {
     public HashSet<Account> getRecipientAccounts() {
 
         HashSet<Account> accounts = new HashSet<Account>(2, 1);
+        if (isWiped())
+            return accounts;
 
         Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
         if (record == null) {
