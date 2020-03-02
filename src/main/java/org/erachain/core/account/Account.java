@@ -136,7 +136,7 @@ public class Account {
     }
 
     // make TYPE of transactionAmount by signs of KEY and AMOUNT
-    public static int actionType(long key, BigDecimal amount, boolean isBackward) {
+    public static int balancePosition(long key, BigDecimal amount, boolean isBackward) {
         if (key == 0l || amount == null || amount.signum() == 0)
             return 0;
 
@@ -742,7 +742,7 @@ public class Account {
     public Tuple3<BigDecimal, BigDecimal, BigDecimal> changeBalance(DCSet db, boolean substract, boolean isBackward, long key,
                                                                     BigDecimal amount_in, boolean notUpdateIncomed, boolean spendUpdate) {
 
-        int actionType = actionType(key, amount_in, isBackward);
+        int actionType = balancePosition(key, amount_in, isBackward);
 
         ItemAssetBalanceMap map = db.getAssetBalanceMap();
 

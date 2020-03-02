@@ -670,13 +670,16 @@ public abstract class AssetCls extends ItemCls {
         switch (assetType) {
             case AS_OUTSIDE_IMMOVABLE:
                 switch (actionType) {
+                    case TransactionAmount.ACTION_SEND:
+                        return "Transfer in own";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Backward from rent" : "Transfer to rent";
+                        return backward ? "Confiscate from rent" : "Transfer to rent";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Return from rent";
                     case TransactionAmount.ACTION_HOLD:
                         return "The employment security/received from security";
                 }
+                break;
             case AS_OUTSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -689,6 +692,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_HOLD:
                         return "Take the reception into balance";
                 }
+                break;
             case AS_OUTSIDE_SERVICE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -701,6 +705,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_HOLD:
                         return "Take the reception into balance";
                 }
+                break;
             case AS_OUTSIDE_SHARE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -713,6 +718,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_HOLD:
                         return "Take the reception into balance";
                 }
+                break;
             case AS_OUTSIDE_BILL:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -728,6 +734,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_OUTSIDE_BILL_EX:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -743,6 +750,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_OUTSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -758,6 +766,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_INSIDE_CURRENCY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -768,6 +777,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_INSIDE_UTILITY:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -778,6 +788,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_INSIDE_SHARE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -788,6 +799,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_INSIDE_BONUS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -798,6 +810,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_INSIDE_ACCESS:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -813,6 +826,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_INSIDE_VOTE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -828,6 +842,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
+                break;
             case AS_BANK_GUARANTEE:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -841,6 +856,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SPEND:
                         return null;
                 }
+                break;
             case AS_BANK_GUARANTEE_TOTAL:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -852,8 +868,9 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_HOLD:
                         return backward ? "Hold" : null;
                 }
+                break;
             case AS_INDEX:
-                ;
+                break;
             case AS_INSIDE_OTHER_CLAIM:
                 switch (actionType) {
                     case TransactionAmount.ACTION_SEND:
@@ -869,9 +886,9 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_PLEDGE:
                         return null;
                 }
-
+                break;
             case AS_ACCOUNTING:
-                ;
+                break;
         }
 
         switch (actionType) {

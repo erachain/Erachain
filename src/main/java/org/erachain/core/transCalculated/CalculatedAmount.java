@@ -97,7 +97,7 @@ public abstract class CalculatedAmount extends Calculated {
     }
     
     public int getActionType() {
-        int type = Account.actionType(this.assetKey, this.amount, isBackward());
+        int type = Account.balancePosition(this.assetKey, this.amount, isBackward());
         return type * (isBackward() ? -1 : 1);
     }
     
@@ -267,7 +267,7 @@ public abstract class CalculatedAmount extends Calculated {
         boolean backward = this.isBackward();
 
         long absKey = getAbsKey();
-        int actionType = Account.actionType(this.assetKey, amount, backward);
+        int actionType = Account.balancePosition(this.assetKey, amount, backward);
         boolean incomeReverse = actionType == TransactionAmount.ACTION_HOLD;
 
         // ASSET ACTIONS PROCESS
@@ -392,7 +392,7 @@ public abstract class CalculatedAmount extends Calculated {
         boolean backward = this.isBackward();
 
         long absKey = getAbsKey();
-        int actionType = Account.actionType(this.assetKey, amount, backward);
+        int actionType = Account.balancePosition(this.assetKey, amount, backward);
         boolean incomeReverse = actionType == TransactionAmount.ACTION_HOLD;
 
         // ASSET TYPE ORPHAN

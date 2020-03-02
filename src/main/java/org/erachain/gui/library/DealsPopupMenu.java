@@ -44,6 +44,7 @@ public class DealsPopupMenu extends JPopupMenu {
     private JMenuItem debtAssetReturn;
     private JMenuItem debtAssetBackward;
     private JMenuItem holdAsset;
+    private JMenuItem spendAsset;
 
     public DealsPopupMenu(AccountsTableModel tableModel, MTable table, JComboBox<ItemCls> assetSelector) {
 
@@ -117,6 +118,18 @@ public class DealsPopupMenu extends JPopupMenu {
             }
         });
         this.add(holdAsset);
+
+        this.addSeparator();
+
+        spendAsset = new JMenuItem(Lang.getInstance().translate("Spend"));
+        spendAsset.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+
+                MainPanel.getInstance().insertTab(new AccountAssetSpendPanel(asset, pubKey, null, null, null));
+
+            }
+        });
+        this.add(spendAsset);
 
         this.addSeparator();
 
@@ -245,6 +258,7 @@ public class DealsPopupMenu extends JPopupMenu {
         this.debtAsset.setEnabled(true);
         this.debtAssetReturn.setEnabled(true);
         this.debtAssetBackward.setEnabled(true);
+        this.spendAsset.setEnabled(true);
 
         this.sendMail.setText(Lang.getInstance().translate("Send Mail"));
 
@@ -286,6 +300,14 @@ public class DealsPopupMenu extends JPopupMenu {
         } else {
             this.debtAssetBackward.setText(Lang.getInstance().translate(actionName));
             this.debtAssetBackward.setVisible(true);
+        }
+
+        actionName = asset.viewAssetTypeAction(false, TransactionAmount.ACTION_SPEND);
+        if (actionName == null) {
+            this.spendAsset.setVisible(false);
+        } else {
+            this.spendAsset.setText(Lang.getInstance().translate(actionName));
+            this.spendAsset.setVisible(true);
         }
 
         Fun.Tuple5<Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>, Fun.Tuple2<BigDecimal, BigDecimal>>

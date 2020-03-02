@@ -231,7 +231,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
     }
 
     public static int getActionType(long assetKey, BigDecimal amount, boolean isBackward) {
-        return Account.actionType(assetKey, amount, isBackward);
+        return Account.balancePosition(assetKey, amount, isBackward);
     }
     public int getActionType() {
         return getActionType(this.key, this.amount, this.isBackward());
@@ -295,7 +295,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         if (amount == null || amount.signum() == 0)
             return "";
 
-        int actionType = Account.actionType(assetKey, amount, isBackward);
+        int actionType = Account.balancePosition(assetKey, amount, isBackward);
         
         switch (actionType) {
             case ACTION_SEND:
@@ -556,7 +556,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                 // BACKWARD - CONFISCATE
                 boolean backward = isBackward();
 
-                int actionType = Account.actionType(this.key, this.amount, backward);
+                int actionType = Account.balancePosition(this.key, this.amount, backward);
                 int assetType = this.asset.getAssetType();
                 BigDecimal balance;
 
@@ -896,8 +896,12 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
                             }
 
                             break;
-                        
+
                         case ACTION_SPEND: // PRODUCE - SPEND
+
+                            if (backward && !asset.getOwner().equals(creator))
+                                return INVALID_BACKWARD_ACTION;
+
 
                             if (absKey == FEE_KEY
                                     || assetType == AssetCls.AS_INDEX
@@ -986,7 +990,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // BACKWARD - CONFISCATE
         boolean backward = isBackward();
         long absKey = getAbsKey();
-        int actionType = Account.actionType(key, amount, backward);
+        int actionType = Account.balancePosition(key, amount, backward);
         boolean incomeReverse = actionType == ACTION_HOLD;
 
         // ASSET ACTIONS PROCESS - 18165-1
@@ -1096,7 +1100,7 @@ public abstract class TransactionAmount extends Transaction implements Itemable{
         // BACKWARD - CONFISCATE
         boolean backward = isBackward();
         long absKey = getAbsKey();
-        int actionType = Account.actionType(key, amount, backward);
+        int actionType = Account.balancePosition(key, amount, backward);
         boolean incomeReverse = actionType == ACTION_HOLD;
 
         String creatorStr = this.creator.getAddress();
