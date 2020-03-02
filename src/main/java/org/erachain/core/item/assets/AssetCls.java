@@ -862,7 +862,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SEND:
                         return "Передать учетную банковскую гарантию";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Выдать учетную банковскую гарантию" : "Забрать учетную банковскую гарантию";
+                        return backward ? "Отозвать учетную банковскую гарантию" : "Выдать учетную банковскую гарантию";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Вернуть учетную банковскую гарантию";
                     case TransactionAmount.ACTION_HOLD:
@@ -934,7 +934,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SEND:
                         return "Передача банковской гарантии - %asset%";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозыв банковской гарантии - %asset%" : "Выдача банковской гарантии - %asset%";
+                        return backward ? "Отзыв банковской гарантии - %asset%" : "Выдача банковской гарантии - %asset%";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Возврат банковской гарантии - %asset%";
                     case TransactionAmount.ACTION_HOLD:
@@ -947,7 +947,7 @@ public abstract class AssetCls extends ItemCls {
                     case TransactionAmount.ACTION_SEND:
                         return "Передача учетной банковской гарантии - %asset%";
                     case TransactionAmount.ACTION_DEBT:
-                        return backward ? "Отозыв учетной банковской гарантии - %asset%" : "Выдача учетной банковской гарантии - %asset%";
+                        return backward ? "Отзыв учетной банковской гарантии - %asset%" : "Выдача учетной банковской гарантии - %asset%";
                     case TransactionAmount.ACTION_REPAY_DEBT:
                         return "Возврат учетной банковской гарантии - %asset%";
                     case TransactionAmount.ACTION_HOLD:
