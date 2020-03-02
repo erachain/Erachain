@@ -68,7 +68,7 @@ public class DealsPopupMenu extends JPopupMenu {
         sendAsset.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // AccountAssetLendPanel
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(asset, TransactionAmount.ACTION_SEND, pubKey, null, null, null));
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(asset, pubKey, null, null, null));
 
             }
         });

@@ -10,7 +10,6 @@ import org.erachain.core.crypto.Base58;
 import org.erachain.core.crypto.Crypto;
 import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.PasswordPane;
 import org.erachain.gui.SplitPanel;
@@ -343,7 +342,7 @@ public class TelegramSplitPanel extends SplitPanel {
         public void actionPerformed(ActionEvent e) {
             Pair<String, Tuple2<String, String>> account1 = accountModel.getPairItem(row);
             Account account = new Account(account1.getA());
-            MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+            MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
                     null, account, null, null));
 
 

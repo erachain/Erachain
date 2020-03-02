@@ -1,7 +1,6 @@
 package org.erachain.gui.library;
 
 import org.erachain.controller.Controller;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.MainFrame;
 import org.erachain.gui.items.accounts.*;
 import org.erachain.gui.items.mails.MailSendPanel;
@@ -38,7 +37,7 @@ public class MenuDeals extends JMenu {
         dealsMenuSendMessage.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
                         null, null, null, null));
 
             }
@@ -102,7 +101,7 @@ public class MenuDeals extends JMenu {
 
         addSeparator();
 
-        // Repay_Debt
+        // Spend
 
         JMenuItem dealsMenu_Spend = new JMenuItem(Lang.getInstance().translate("Spend"));
         //      dealsMenuLend.getAccessibleContext().setAccessibleDescription(Lang.getInstance().translate("to Lend"));

@@ -5,7 +5,6 @@ import com.google.common.io.Files;
 import org.erachain.controller.Controller;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.database.SortableList;
 import org.erachain.database.wallet.AccountsPropertisMap;
 import org.erachain.gui.MainFrame;
@@ -239,7 +238,7 @@ public class AccountsNameSearchSplitPanel extends SplitPanel {
             public void actionPerformed(ActionEvent e) {
                 Pair<String, Tuple2<String, String>> account1 = tableModelImprints.getPairItem(row);
                 Account accountTo = new Account(account1.getA());
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
                         null, accountTo, null, null));
 
             }

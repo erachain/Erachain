@@ -2,7 +2,6 @@ package org.erachain.gui.items.persons;
 
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
@@ -111,7 +110,7 @@ public class PersonWorkDialog extends JDialog {
                     if (addresses.isEmpty()) {
 
                     } else {
-                        MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                        MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
                                 null, null, person, null));
 
                     }

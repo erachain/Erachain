@@ -6,6 +6,7 @@ import org.erachain.core.item.assets.AssetCls;
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.RSend;
 import org.erachain.core.transaction.Transaction;
+import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.library.IssueConfirmDialog;
 import org.erachain.gui.library.Library;
 import org.erachain.gui.transaction.Send_RecordDetailsFrame;
@@ -15,12 +16,12 @@ import org.erachain.lang.Lang;
 @SuppressWarnings("serial")
 
 public class AccountAssetSendPanel extends AccountAssetActionPanelCls {
-    
+
     //private AccountAssetSendPanel th;
     public boolean noRecive;
 
-    public AccountAssetSendPanel(AssetCls assetIn, int balancePosition, Account accountFrom, Account accountTo, PersonCls person, String message) {
-        super(false, null, assetIn, null, balancePosition, accountFrom, accountTo, message);
+    public AccountAssetSendPanel(AssetCls assetIn, Account accountFrom, Account accountTo, PersonCls person, String message) {
+        super(false, null, assetIn, null, TransactionAmount.ACTION_SEND, accountFrom, accountTo, message);
 
         //  icon.setIcon(null);
 

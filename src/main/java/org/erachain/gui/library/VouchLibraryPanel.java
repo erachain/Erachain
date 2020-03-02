@@ -3,7 +3,6 @@ package org.erachain.gui.library;
 import org.erachain.core.account.Account;
 import org.erachain.core.account.PublicKeyAccount;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
 import org.erachain.gui.items.statement.StatementsVouchTableModel;
@@ -197,7 +196,7 @@ public class VouchLibraryPanel extends JPanel {
 
                 Account account = (Account) model.getCreator(row);
 
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
                         null, account, null, null));
 
 

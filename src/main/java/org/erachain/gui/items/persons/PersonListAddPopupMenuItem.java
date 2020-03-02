@@ -1,14 +1,7 @@
 package org.erachain.gui.items.persons;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-
 import org.erachain.core.item.persons.PersonCls;
 import org.erachain.core.transaction.Transaction;
-import org.erachain.core.transaction.TransactionAmount;
 import org.erachain.datachain.DCSet;
 import org.erachain.gui.items.accounts.AccountAssetSendPanel;
 import org.erachain.gui.items.mails.MailSendPanel;
@@ -16,9 +9,13 @@ import org.erachain.gui.records.VouchRecordDialog;
 import org.erachain.gui2.MainPanel;
 import org.erachain.lang.Lang;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 public class PersonListAddPopupMenuItem {
 
-    public PersonListAddPopupMenuItem(PersonCls person, JPopupMenu menu){
+    public PersonListAddPopupMenuItem(PersonCls person, JPopupMenu menu) {
         JMenuItem vsend_Coins_Item = new JMenuItem(Lang.getInstance().translate("Send asset"));
 
         vsend_Coins_Item.addActionListener(new ActionListener() {
@@ -26,7 +23,7 @@ public class PersonListAddPopupMenuItem {
             public void actionPerformed(ActionEvent e) {
 
                 //new AccountSendDialog(null, null, null, person);
-                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null, TransactionAmount.ACTION_SEND,
+                MainPanel.getInstance().insertTab(new AccountAssetSendPanel(null,
                         null, null, person, null));
 
             }
