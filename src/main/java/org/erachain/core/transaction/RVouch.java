@@ -326,11 +326,17 @@ public class RVouch extends Transaction {
         if (isWiped())
             return accounts;
 
-        Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
-        if (record == null) {
-            new Exception(this.toString() + " - not found record: " + vouchHeight + "-" + vouchSeqNo);
+        // НЕЛЬЗЯ ссылаться на новую запись см. issue #1241 - иначе при откате ссылается на уже удаленную запись
+        if (false) {
+            Transaction record = dcSet.getTransactionFinalMap().get(vouchHeight, vouchSeqNo);
+            if (record == null) {
+                ///throw new Exception(this.toString() + " - not found record: " + vouchHeight + "-" + vouchSeqNo);
+            } else {
+                accounts.addAll(record.getInvolvedAccounts());
+            }
+
         }
-        accounts.addAll(record.getInvolvedAccounts());
+
 
         return accounts;
     }

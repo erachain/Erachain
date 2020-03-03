@@ -1163,16 +1163,22 @@ public class BlockChain {
         // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
         DB database = DCSet.makeDBinMemory();
         boolean noValid = true;
+        DCSet fork = dcSet.fork(database);
         try {
-            noValid = !block.isValid(dcSet.fork(database), true);
-        } finally {
-            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
-            if (noValid)
-                database.close();
+            noValid = !block.isValid(fork, true);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            Controller.getInstance().stopAll(1104);
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+            Controller.getInstance().stopAll(1105);
         }
 
         // FULL VALIDATE because before was only HEAD validating
         if (noValid) {
+
+            // если невалидная то закроем Форк базы, иначе базу храним для последующего слива
+            fork.close();
 
             LOGGER.info("new winBlock is BAD!");
             if (peer != null)
@@ -1182,6 +1188,9 @@ public class BlockChain {
 
             return false;
         }
+
+        // иначе запоним форкнутую СУБД чтобы потом быстро слить
+        block.setValidatedForkDB(fork);
 
         // set and close OLD
         setWaitWinBufferUnchecked(block);

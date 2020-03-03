@@ -310,6 +310,9 @@ public class Synchronizer extends Thread {
                 }
             }
 
+            // далее тут блок не Процессим так как он в isValid(fork, true) процессится параллельно
+            // и далее будет слив разом без вызова pipe
+
             // проверка силы цепочки на уровне нашего блока и если высота новой цепочки меньше нашей
             if (height - 1 == myHeight && myWeight > block.blockHead.totalWinValue
             ) {

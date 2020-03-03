@@ -1932,9 +1932,6 @@ import java.util.*;
         }
 
         this.wasValidated = true;
-        if (andProcess) {
-            validatedForkDB = dcSetPlace;
-        }
         return true;
     }
 
@@ -1945,7 +1942,12 @@ import java.util.*;
         validatedForkDB = null;
     }
 
+    public void setValidatedForkDB(DCSet validatedForkDB) {
+        this.validatedForkDB = validatedForkDB;
+    }
+
     private boolean isClosed;
+
     /**
      * Закрывает базу в котрой производилась проверка блока
      */

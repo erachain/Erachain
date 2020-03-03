@@ -1622,14 +1622,28 @@ public class DCSet extends DBASet implements Closeable {
     @Override
     public synchronized void writeToParent() {
 
-        // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
-        // иначе размер больше будет в форке и не то значение
-        ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
+        try {
+            // до сброса обновим - там по Разсеру таблицы - чтобы не влияло новой в Родителе и а Форке
+            // иначе размер больше будет в форке и не то значение
+            ((BlockMap) blockMap.getParent()).setLastBlockSignature(blockMap.getLastBlockSignature());
 
-        for (DBTab table : tables) {
-            table.writeToParent();
+            for (DBTab table : tables) {
+                table.writeToParent();
+            }
+            // теперь нужно все общие переменные переопределить
+        } catch (Exception e) {
+
+            LOGGER.error(e.getMessage(), e);
+
+            // база битая полуяается !? хотя rollback должен сработать
+            Controller.getInstance().stopAll(9613);
+            return;
+        } catch (Throwable e) {
+            LOGGER.error(e.getMessage(), e);
+
+            // база битая полуяается !? хотя rollback должен сработать
+            Controller.getInstance().stopAll(9615);
         }
-        // теперь нужно все общие переменные переопределить
 
     }
 

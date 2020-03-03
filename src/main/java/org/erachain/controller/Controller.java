@@ -2061,6 +2061,13 @@ public class Controller extends Observable {
                         null // если блок не верный - не баним ПИР может просто он отстал
                 );
             }
+            // если все же он не подошел или не было победного то вышлем всеим запрос на "Порделитесль последним блоком"
+            if (this.blockChain.popWaitWinBuffer() == null) {
+                // TODO тут сделать стандартный пустой блок для запроса или новую команду сетевую
+                winBlockUnchecked = getBlockByHeight(2);
+                if (winBlockUnchecked != null)
+                    broadcastWinBlock(winBlockUnchecked);
+            }
 
         }
 
@@ -2730,11 +2737,14 @@ public class Controller extends Observable {
 
                 // создаем в памяти базу - так как она на 1 блок только нужна - а значит много памяти не возьмет
                 DB database = DCSet.makeDBinMemory();
+                DCSet forked = dcSet.fork(database);
                 // в процессингом сразу делаем - чтобы потом изменения из форка залить сразу в цепочку
-                if (!newBlock.isValid(dcSet.fork(database), true)) {
+                if (!newBlock.isValid(forked, true)) {
                     // тогда проверим заново полностью
                     return false;
                 }
+                // запоним что в этой базе проверку сделали с Процессингом чтобы потом быстро слить в основную базу
+                newBlock.setValidatedForkDB(forked);
             }
 
             try {
