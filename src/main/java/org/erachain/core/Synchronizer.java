@@ -568,17 +568,12 @@ public class Synchronizer extends Thread {
                                 break;
                             }
 
-                            try {
-                                DB database = DCSet.makeDBinMemory();
-                                try {
-                                    if (!blockFromPeer.isValid(dcSet.fork(database), false)) {
+                            try (DCSet fork = dcSet.fork(DCSet.makeDBinMemory())) {
+                                if (!blockFromPeer.isValid(fork, false)) {
 
-                                        errorMess = "invalid BLOCK";
-                                        banTime = BAN_BLOCK_TIMES;
-                                        break;
-                                    }
-                                } finally {
-                                    database.close();
+                                    errorMess = "invalid BLOCK";
+                                    banTime = BAN_BLOCK_TIMES;
+                                    break;
                                 }
                             } catch (Exception e) {
 
